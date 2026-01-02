@@ -1,25 +1,42 @@
-import { useState } from 'react';
-import { X, Bell, Volume2, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Bell, Volume2, Clock, Check } from 'lucide-react';
 
 export function Settings({ settings, onClose, onSave }) {
-    const [localSettings, setLocalSettings] = useState(settings);
-    const [selectedHour, setSelectedHour] = useState(settings.notificationTime.hour);
-    const [selectedMinute, setSelectedMinute] = useState(settings.notificationTime.minute);
+    const [showSaved, setShowSaved] = useState(false);
 
-    const handleSave = () => {
-        onSave({
-            ...localSettings,
-            notificationTime: { hour: selectedHour, minute: selectedMinute }
-        });
-        onClose();
+    const handleToggleNotifications = () => {
+        const newSettings = { ...settings, notificationsEnabled: !settings.notificationsEnabled };
+        onSave(newSettings);
+        showSavedIndicator();
     };
 
-    const toggleNotifications = () => {
-        setLocalSettings(prev => ({ ...prev, notificationsEnabled: !prev.notificationsEnabled }));
+    const handleToggleSounds = () => {
+        const newSettings = { ...settings, soundsEnabled: !settings.soundsEnabled };
+        onSave(newSettings);
+        showSavedIndicator();
     };
 
-    const toggleSounds = () => {
-        setLocalSettings(prev => ({ ...prev, soundsEnabled: !prev.soundsEnabled }));
+    const handleHourChange = (hour) => {
+        const newSettings = {
+            ...settings,
+            notificationTime: { ...settings.notificationTime, hour: parseInt(hour) }
+        };
+        onSave(newSettings);
+        showSavedIndicator();
+    };
+
+    const handleMinuteChange = (minute) => {
+        const newSettings = {
+            ...settings,
+            notificationTime: { ...settings.notificationTime, minute: parseInt(minute) }
+        };
+        onSave(newSettings);
+        showSavedIndicator();
+    };
+
+    const showSavedIndicator = () => {
+        setShowSaved(true);
+        setTimeout(() => setShowSaved(false), 1500);
     };
 
     return (
@@ -68,24 +85,44 @@ export function Settings({ settings, onClose, onSave }) {
                     }}>
                         Settings
                     </h2>
-                    <button
-                        onClick={onClose}
-                        className="hover-lift"
-                        style={{
-                            background: 'rgba(255,255,255,0.1)',
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: '36px',
-                            height: '36px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            color: 'var(--text-primary)'
-                        }}
-                    >
-                        <X size={20} />
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        {/* Auto-save indicator */}
+                        {showSaved && (
+                            <div className="scale-in" style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                padding: '6px 12px',
+                                borderRadius: '20px',
+                                background: 'linear-gradient(135deg, #10b981, #059669)',
+                                color: 'white',
+                                fontSize: '0.85rem',
+                                fontWeight: '600',
+                                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.4)'
+                            }}>
+                                <Check size={16} />
+                                Saved
+                            </div>
+                        )}
+                        <button
+                            onClick={onClose}
+                            className="hover-lift"
+                            style={{
+                                background: 'rgba(255,255,255,0.1)',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '36px',
+                                height: '36px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                color: 'var(--text-primary)'
+                            }}
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Settings Content */}
@@ -115,19 +152,19 @@ export function Settings({ settings, onClose, onSave }) {
                             </div>
                         </div>
                         <button
-                            onClick={toggleNotifications}
+                            onClick={handleToggleNotifications}
                             style={{
                                 width: '56px',
                                 height: '32px',
                                 borderRadius: '16px',
-                                background: localSettings.notificationsEnabled
+                                background: settings.notificationsEnabled
                                     ? 'linear-gradient(135deg, #10b981, #059669)'
                                     : 'rgba(255,255,255,0.1)',
                                 border: 'none',
                                 cursor: 'pointer',
                                 position: 'relative',
                                 transition: 'all 0.3s ease',
-                                boxShadow: localSettings.notificationsEnabled
+                                boxShadow: settings.notificationsEnabled
                                     ? '0 4px 12px rgba(16, 185, 129, 0.4)'
                                     : 'none'
                             }}
@@ -139,7 +176,7 @@ export function Settings({ settings, onClose, onSave }) {
                                 background: 'white',
                                 position: 'absolute',
                                 top: '4px',
-                                left: localSettings.notificationsEnabled ? '28px' : '4px',
+                                left: settings.notificationsEnabled ? '28px' : '4px',
                                 transition: 'left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                                 boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                             }} />
@@ -147,7 +184,7 @@ export function Settings({ settings, onClose, onSave }) {
                     </div>
 
                     {/* Notification Time Picker */}
-                    {localSettings.notificationsEnabled && (
+                    {settings.notificationsEnabled && (
                         <div className="glass scale-in" style={{
                             padding: 'var(--spacing-md)',
                             borderRadius: 'var(--radius-lg)',
@@ -171,8 +208,8 @@ export function Settings({ settings, onClose, onSave }) {
                             }}>
                                 {/* Hour Picker */}
                                 <select
-                                    value={selectedHour}
-                                    onChange={(e) => setSelectedHour(parseInt(e.target.value))}
+                                    value={settings.notificationTime.hour}
+                                    onChange={(e) => handleHourChange(e.target.value)}
                                     className="glass"
                                     style={{
                                         padding: '12px 16px',
@@ -197,8 +234,8 @@ export function Settings({ settings, onClose, onSave }) {
                                 <span style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-secondary)' }}>:</span>
                                 {/* Minute Picker */}
                                 <select
-                                    value={selectedMinute}
-                                    onChange={(e) => setSelectedMinute(parseInt(e.target.value))}
+                                    value={settings.notificationTime.minute}
+                                    onChange={(e) => handleMinuteChange(e.target.value)}
                                     className="glass"
                                     style={{
                                         padding: '12px 16px',
@@ -248,19 +285,19 @@ export function Settings({ settings, onClose, onSave }) {
                             </div>
                         </div>
                         <button
-                            onClick={toggleSounds}
+                            onClick={handleToggleSounds}
                             style={{
                                 width: '56px',
                                 height: '32px',
                                 borderRadius: '16px',
-                                background: localSettings.soundsEnabled
+                                background: settings.soundsEnabled
                                     ? 'linear-gradient(135deg, #0ea5e9, #06b6d4)'
                                     : 'rgba(255,255,255,0.1)',
                                 border: 'none',
                                 cursor: 'pointer',
                                 position: 'relative',
                                 transition: 'all 0.3s ease',
-                                boxShadow: localSettings.soundsEnabled
+                                boxShadow: settings.soundsEnabled
                                     ? '0 4px 12px rgba(14, 165, 233, 0.4)'
                                     : 'none'
                             }}
@@ -272,56 +309,24 @@ export function Settings({ settings, onClose, onSave }) {
                                 background: 'white',
                                 position: 'absolute',
                                 top: '4px',
-                                left: localSettings.soundsEnabled ? '28px' : '4px',
+                                left: settings.soundsEnabled ? '28px' : '4px',
                                 transition: 'left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                                 boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                             }} />
                         </button>
                     </div>
-                </div>
 
-                {/* Footer Buttons */}
-                <div style={{
-                    padding: 'var(--spacing-lg)',
-                    borderTop: '1px solid rgba(255,255,255,0.1)',
-                    display: 'flex',
-                    gap: 'var(--spacing-sm)'
-                }}>
-                    <button
-                        onClick={onClose}
-                        className="glass hover-lift"
-                        style={{
-                            flex: 1,
-                            padding: 'var(--spacing-md)',
-                            borderRadius: 'var(--radius-lg)',
-                            border: '1px solid rgba(255,255,255,0.2)',
-                            background: 'rgba(255,255,255,0.05)',
-                            color: 'var(--text-primary)',
-                            fontSize: '1rem',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        className="gradient-button hover-lift"
-                        style={{
-                            flex: 1,
-                            padding: 'var(--spacing-md)',
-                            borderRadius: 'var(--radius-lg)',
-                            border: 'none',
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            color: 'white',
-                            fontSize: '1rem',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            boxShadow: '0 4px 16px rgba(109, 40, 217, 0.4)'
-                        }}
-                    >
-                        Save Settings
-                    </button>
+                    {/* Auto-save notice */}
+                    <div style={{
+                        marginTop: 'var(--spacing-md)',
+                        padding: 'var(--spacing-sm)',
+                        textAlign: 'center',
+                        color: 'var(--text-secondary)',
+                        fontSize: '0.85rem',
+                        opacity: 0.7
+                    }}>
+                        ✨ Changes are saved automatically
+                    </div>
                 </div>
             </div>
         </div>
