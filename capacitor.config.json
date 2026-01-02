@@ -1,5 +1,15 @@
 {
   "appId": "com.lucasm548.oneup",
   "appName": "OneUp",
-  "webDir": "dist"
+  "webDir": "dist",
+  "plugins": {
+    "GoogleAuth": {
+      "scopes": [
+        "profile",
+        "email"
+      ],
+      "serverClientId": "595493181718-m1je2o82qoa4d88rml1h2hbnpl3rge0t.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
+    }
+  }
 }

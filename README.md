@@ -3,6 +3,17 @@
 **OneUp** is a modern, gamified push-up tracker designed to help you build a habit of daily exercise.
 Built with **Vibe Coding**.
 
+## ✨ Features
+
+- 📈 **Progressive Challenge**: Start with 1 push-up, increase daily up to 365
+- 📅 **Calendar View**: Track your progress throughout the year
+- 📊 **Statistics**: View your completion rate, streaks, and time-of-day preferences
+- 🔔 **Daily Notifications**: Customizable reminders to stay on track
+- 🎵 **Sound Effects**: Engaging audio feedback for achievements
+- ☁️ **Cloud Sync**: Save your progress to Google Play and sync across devices (Firebase)
+- 🌍 **Multi-language**: Supports English and French
+- 📱 **Native Android App**: Full mobile experience with Capacitor
+
 ## 📱 Mobile App (Android)
 
 OneUp is available as a native Android application!
@@ -39,6 +50,14 @@ If you want to build the app yourself or contribute:
     npm run dev
     ```
 
+### ☁️ Cloud Sync Setup
+
+To enable cloud synchronization with Google Play:
+
+1. Follow the detailed setup guide in [`CLOUD_SETUP.md`](./CLOUD_SETUP.md)
+2. Configure Firebase and Realtime Database
+3. Update the Firebase credentials in `src/services/cloudSync.js`
+
 ### 🤖 Build for Android
 
 1.  **Build the Web Assets**
@@ -64,4 +83,5 @@ If you want to build the app yourself or contribute:
 ## 🏗️ Built With
 - **React + Vite** - Fast web framework.
 - **Capacitor** - Cross-platform native runtime.
+- **Firebase** - Cloud sync and authentication.
 - **Tailwind-free** - Custom CSS for maximum style control.

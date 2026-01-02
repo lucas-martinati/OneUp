@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { cloudSync } from '../services/cloudSync';
+
 
 const STORAGE_KEY = 'pushup_challenge_data';
 const NOTIFICATION_ID = 1;
@@ -204,6 +206,57 @@ export function useProgress() {
       return total + getDayNumber(dateStr);
     }, 0);
   };
+
+  // Sauvegarder les données dans le cloud
+  const saveToCloud = useCallback(async () => {
+    try {
+      await cloudSync.saveToCloud(state);
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to save to cloud:', error);
+      return { success: false, error: error.message };
+    }
+  }, [state]);
+
+  // Charger les données depuis le cloud (avec sécurité anti-crash)
+  const loadFromCloud = useCallback(async () => {
+    try {
+      const cloudData = await cloudSync.loadFromCloud();
+      if (cloudData) {
+        setState(prev => {
+           // Safe merge: Default structure + Previous state + Cloud data
+           // This ensures if cloudData is partial, we don't break the app
+           return {
+              startDate: cloudData.startDate || prev.startDate || `${new Date().getFullYear()}-01-01`,
+              userStartDate: cloudData.userStartDate || prev.userStartDate || `${new Date().getFullYear()}-01-01`,
+              // Ensure completions is an object
+              completions: cloudData.completions || {}, 
+              // Keep setup true if it was true in cloud OR local (usually cloud governs)
+              isSetup: cloudData.isSetup !== undefined ? cloudData.isSetup : prev.isSetup,
+              // Keep other previous fields if any
+              ...cloudData
+           };
+        });
+        return { success: true, data: cloudData };
+      }
+      return { success: false, error: 'No cloud data found' };
+    } catch (error) {
+      console.error('Failed to load from cloud:', error);
+      return { success: false, error: error.message };
+    }
+  }, []);
+
+  // Synchroniser (fusionner local et cloud)
+  const syncWithCloud = useCallback(async () => {
+    try {
+      const mergedData = await cloudSync.syncData(state);
+      setState(mergedData);
+      return { success: true, data: mergedData };
+    } catch (error) {
+      console.error('Failed to sync with cloud:', error);
+      return { success: false, error: error.message };
+    }
+  }, [state]);
   
   return {
     startDate: state.startDate,
@@ -216,6 +269,11 @@ export function useProgress() {
     isSetup: state.isSetup,
     userStartDate: state.userStartDate || state.startDate,
     scheduleNotification,
-    requestNotificationPermission
+    requestNotificationPermission,
+    // Cloud sync methods
+    saveToCloud,
+    loadFromCloud,
+    syncWithCloud
   };
+
 }

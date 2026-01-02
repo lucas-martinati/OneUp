@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { X, Bell, Volume2, Clock, Check } from 'lucide-react';
+import { CloudSyncPanel } from './CloudSyncPanel';
 
-export function Settings({ settings, onClose, onSave }) {
+export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict }) {
     const [showSaved, setShowSaved] = useState(false);
 
     const handleToggleNotifications = () => {
@@ -64,7 +65,10 @@ export function Settings({ settings, onClose, onSave }) {
                     borderRadius: 'var(--radius-xl)',
                     padding: 0,
                     overflow: 'hidden',
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.4)'
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+                    maxHeight: '85vh',
+                    display: 'flex',
+                    flexDirection: 'column'
                 }}
             >
                 {/* Header */}
@@ -126,7 +130,11 @@ export function Settings({ settings, onClose, onSave }) {
                 </div>
 
                 {/* Settings Content */}
-                <div style={{ padding: 'var(--spacing-lg)' }}>
+                <div style={{
+                    padding: 'var(--spacing-lg)',
+                    overflowY: 'auto',
+                    overscrollBehavior: 'contain'
+                }}>
                     {/* Notifications Toggle */}
                     <div className="glass" style={{
                         padding: 'var(--spacing-md)',
@@ -267,7 +275,8 @@ export function Settings({ settings, onClose, onSave }) {
                         borderRadius: 'var(--radius-lg)',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between'
+                        justifyContent: 'space-between',
+                        marginBottom: 'var(--spacing-md)'
                     }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <div style={{
@@ -315,6 +324,16 @@ export function Settings({ settings, onClose, onSave }) {
                             }} />
                         </button>
                     </div>
+
+                    {cloudAuth && cloudSync && (
+                        <CloudSyncPanel
+                            authState={cloudAuth}
+                            onSignIn={() => cloudSync.signIn()}
+                            onSignOut={() => cloudSync.signOut()}
+                            conflictData={conflictData}
+                            onResolveConflict={onResolveConflict}
+                        />
+                    )}
                 </div>
             </div>
         </div>

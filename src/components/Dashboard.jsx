@@ -4,10 +4,10 @@ import { Check, Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as S
 import { Calendar } from './Calendar';
 import { Stats } from './Stats';
 import { Settings } from './Settings';
-import { useSettings } from '../hooks/useSettings';
+
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 
-export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, completions, startDate, userStartDate, scheduleNotification }) {
+export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, completions, startDate, userStartDate, scheduleNotification, cloudAuth, cloudSync, settings, updateSettings, conflictData, onResolveConflict }) {
     const getLocalDateStr = (d) => {
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -21,7 +21,7 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
     const [showSettings, setShowSettings] = useState(false);
     const [numberKey, setNumberKey] = useState(0);
 
-    const { settings, updateSettings } = useSettings();
+
 
     // Inject settings getter for sound manager
     useEffect(() => {
@@ -394,6 +394,10 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
                     settings={settings}
                     onClose={() => setShowSettings(false)}
                     onSave={handleSaveSettings}
+                    cloudAuth={cloudAuth}
+                    cloudSync={cloudSync}
+                    conflictData={conflictData}
+                    onResolveConflict={onResolveConflict}
                 />
             )}
         </div>

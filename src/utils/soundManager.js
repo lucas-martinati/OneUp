@@ -1,5 +1,8 @@
 // Sound manager with rarity-based audio files
 // Respects user settings for sound enablement
+import { createLogger } from './logger';
+
+const logger = createLogger('SoundManager');
 
 let settingsGetter = null;
 const soundCache = {};
@@ -20,10 +23,9 @@ function preloadSound(name, path) {
 }
 
 // Preload all success sound variants
-preloadSound('success', '/sounds/success.mp3');      // Common - 95%
-preloadSound('perfect', '/sounds/perfect.mp3');      // Rare - 4.99%
-preloadSound('yaaas', '/sounds/yaaas.mp3');          // Ultra Rare - 0.01%
-preloadSound('click', '/sounds/click.mp3');          // UI feedback
+preloadSound('success', 'sounds/success.mp3');      // Common - 95%
+preloadSound('perfect', 'sounds/perfect.mp3');      // Rare - 4.99%
+preloadSound('yaaas', 'sounds/yaaas.mp3');          // Ultra Rare - 0.01%
 
 // Select success sound based on rarity
 function getSuccessSound() {
@@ -31,23 +33,23 @@ function getSuccessSound() {
   
   if (random < 0.01) {
     // 0.01% chance - ULTRA RARE! 🌟
-    console.log('🌟 ULTRA RARE SOUND! YAAAS!');
+    logger.success('🌟 ULTRA RARE SOUND! YAAAS!');
     return 'yaaas';
   } else if (random < 5.00) {
     // 4.99% chance - RARE! ⭐
-    console.log('⭐ RARE SOUND! PERFECT!');
+    logger.success('⭐ RARE SOUND! PERFECT!');
     return 'perfect';
   } else {
     // 95% chance - COMMON
     return 'success';
   }
-}
+};
 
 // Play audio file
 function playAudioFile(soundName) {
   const audio = soundCache[soundName];
   if (!audio) {
-    console.warn(`Sound not found: ${soundName}`);
+    logger.warn(`Sound not found: ${soundName}`);
     return;
   }
   

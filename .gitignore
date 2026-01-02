@@ -30,3 +30,15 @@ android/local.properties
 android/*/build/
 android/.idea/
 android/app/src/main/assets/public/
+
+# Firebase Configuration
+android/app/google-services.json
+google-services.json
+
+# Android Signing (Already in android/.gitignore but adding here for safety)
+*.jks
+*.keystore
+android/keystore.properties
+
+# Capacitor Build Output
+android/capacitor-cordova-android-plugins/build/
