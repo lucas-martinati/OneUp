@@ -21,6 +21,28 @@ function App() {
     }
   }, [isSetup, settings.notificationsEnabled]);
 
+  // Refresh notification daily to update pushup count
+  useEffect(() => {
+    if (isSetup && settings.notificationsEnabled) {
+      // Update notification every time app opens to keep count fresh
+      scheduleNotification(settings);
+
+      // Also update at midnight to ensure accurate count for tomorrow
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 30, 0); // 30 seconds after midnight
+
+      const timeUntilMidnight = tomorrow.getTime() - now.getTime();
+
+      const midnightTimer = setTimeout(() => {
+        scheduleNotification(settings);
+      }, timeUntilMidnight);
+
+      return () => clearTimeout(midnightTimer);
+    }
+  }, [isSetup, settings.notificationsEnabled, settings.notificationTime]);
+
   return (
     <>
       {!isSetup ? (

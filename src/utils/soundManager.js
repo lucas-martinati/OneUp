@@ -1,94 +1,64 @@
-// Sound manager using Web Audio API for programmatically generated sounds
+// Sound manager with rarity-based audio files
 // Respects user settings for sound enablement
 
 let settingsGetter = null;
-let audioContext = null;
-
-// Initialize audio context on first use
-function getAudioContext() {
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  return audioContext;
-}
+const soundCache = {};
 
 // Allow injection of settings getter from the app
 export function setSoundSettingsGetter(getter) {
   settingsGetter = getter;
 }
 
-// Generate success sound - cheerful upbeat tones
-function playSuccessSound() {
-  const ctx = getAudioContext();
-  const currentTime = ctx.currentTime;
-  
-  // Create oscillator for main tone
-  const oscillator1 = ctx.createOscillator();
-  const oscillator2 = ctx.createOscillator();
-  const gainNode = ctx.createGain();
-  
-  // Connect nodes
-  oscillator1.connect(gainNode);
-  oscillator2.connect(gainNode);
-  gainNode.connect(ctx.destination);
-  
-  // Set frequencies for pleasant chord (C major)
-  oscillator1.frequency.setValueAtTime(523.25, currentTime); // C5
-  oscillator2.frequency.setValueAtTime(659.25, currentTime); // E5
-  
-  // Set oscillator types
-  oscillator1.type = 'sine';
-  oscillator2.type = 'sine';
-  
-  // Envelope for volume
-  gainNode.gain.setValueAtTime(0, currentTime);
-  gainNode.gain.linearRampToValueAtTime(0.3, currentTime + 0.02);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.5);
-  
-  // Start and stop
-  oscillator1.start(currentTime);
-  oscillator2.start(currentTime);
-  oscillator1.stop(currentTime + 0.5);
-  oscillator2.stop(currentTime + 0.5);
-  
-  // Second tone for richness
-  setTimeout(() => {
-    const osc3 = ctx.createOscillator();
-    const gain2 = ctx.createGain();
-    osc3.connect(gain2);
-    gain2.connect(ctx.destination);
-    
-    osc3.frequency.setValueAtTime(783.99, ctx.currentTime); // G5
-    osc3.type = 'sine';
-    
-    gain2.gain.setValueAtTime(0, ctx.currentTime);
-    gain2.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.02);
-    gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-    
-    osc3.start();
-    osc3.stop(ctx.currentTime + 0.4);
-  }, 100);
+// Preload audio files
+function preloadSound(name, path) {
+  if (!soundCache[name]) {
+    const audio = new Audio(path);
+    audio.preload = 'auto';
+    soundCache[name] = audio;
+  }
+  return soundCache[name];
 }
 
-// Generate click sound - subtle feedback
-function playClickSound() {
-  const ctx = getAudioContext();
-  const currentTime = ctx.currentTime;
+// Preload all success sound variants
+preloadSound('success', '/sounds/success.mp3');      // Common - 95%
+preloadSound('perfect', '/sounds/perfect.mp3');      // Rare - 4.99%
+preloadSound('yaaas', '/sounds/yaaas.mp3');          // Ultra Rare - 0.01%
+preloadSound('click', '/sounds/click.mp3');          // UI feedback
+
+// Select success sound based on rarity
+function getSuccessSound() {
+  const random = Math.random() * 100; // 0-100
   
-  const oscillator = ctx.createOscillator();
-  const gainNode = ctx.createGain();
+  if (random < 0.01) {
+    // 0.01% chance - ULTRA RARE! 🌟
+    console.log('🌟 ULTRA RARE SOUND! YAAAS!');
+    return 'yaaas';
+  } else if (random < 5.00) {
+    // 4.99% chance - RARE! ⭐
+    console.log('⭐ RARE SOUND! PERFECT!');
+    return 'perfect';
+  } else {
+    // 95% chance - COMMON
+    return 'success';
+  }
+}
+
+// Play audio file
+function playAudioFile(soundName) {
+  const audio = soundCache[soundName];
+  if (!audio) {
+    console.warn(`Sound not found: ${soundName}`);
+    return;
+  }
   
-  oscillator.connect(gainNode);
-  gainNode.connect(ctx.destination);
+  // Clone the audio to allow overlapping plays
+  const clone = audio.cloneNode();
+  clone.volume = 0.6; // Set reasonable volume
   
-  oscillator.frequency.setValueAtTime(800, currentTime);
-  oscillator.type = 'sine';
-  
-  gainNode.gain.setValueAtTime(0.15, currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.1);
-  
-  oscillator.start(currentTime);
-  oscillator.stop(currentTime + 0.1);
+  clone.play().catch(err => {
+    // Silently fail if audio can't play (e.g., user hasn't interacted yet)
+    console.debug('Sound play failed:', err);
+  });
 }
 
 export function playSound(soundName) {
@@ -102,9 +72,11 @@ export function playSound(soundName) {
 
   try {
     if (soundName === 'success') {
-      playSuccessSound();
+      // Use rarity system for success sounds
+      const selectedSound = getSuccessSound();
+      playAudioFile(selectedSound);
     } else if (soundName === 'click') {
-      playClickSound();
+      playAudioFile('click');
     }
   } catch (err) {
     // Silently fail if audio can't play

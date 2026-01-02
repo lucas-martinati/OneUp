@@ -132,16 +132,27 @@ export function useProgress() {
             notificationTime.setDate(notificationTime.getDate() + 1);
           }
           
-          // Get today's day number for the notification
-          const today = getLocalDateStr(new Date());
-          const dayNum = getDayNumber(today);
+          // Calculate day number for when notification will be sent
+          const notificationDateStr = getLocalDateStr(notificationTime);
+          const dayNum = getDayNumber(notificationDateStr);
+          
+          // Create engaging message with exact pushup count
+          const messages = [
+            `🎯 ${dayNum} pushups today! Let\'s crush this goal! 💪`,
+            `💥 Challenge: ${dayNum} pushups! You got this! 🔥`,
+            `⚡ ${dayNum} pushups waiting for you! Time to shine! ✨`,
+            `🚀 ${dayNum} pushups to keep the streak alive! Let\'s go! 🏆`
+          ];
+          
+          // Randomly select a message for variety
+          const selectedMessage = messages[Math.floor(Math.random() * messages.length)];
           
           await LocalNotifications.schedule({
             notifications: [
               {
                 id: NOTIFICATION_ID,
-                title: '💪 OneUp - Time to Train!',
-                body: `Today's goal: ${dayNum} pushups. Let's keep the streak going! 🔥`,
+                title: '💪 OneUp - Daily Challenge!',
+                body: selectedMessage,
                 schedule: {
                   at: notificationTime,
                   repeats: true,
