@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 const STORAGE_KEY = 'pushup_challenge_data';
+const NOTIFICATION_ID = 1;
 
 export function useProgress() {
   // Helper to get consistent YYYY-MM-DD in local time
@@ -105,6 +107,71 @@ export function useProgress() {
       return { ...prev, completions: newCompletions };
     });
   };
+  
+  // Schedule daily notification
+  const scheduleNotification = async (settings) => {
+    try {
+      // Check if we have permission first
+      const permission = await LocalNotifications.checkPermissions();
+      
+      if (permission.display === 'granted') {
+        // Cancel existing notification
+        await LocalNotifications.cancel({ notifications: [{ id: NOTIFICATION_ID }] });
+        
+        // Only schedule if notifications are enabled
+        if (settings?.notificationsEnabled) {
+          const { hour, minute } = settings.notificationTime;
+          
+          // Calculate next notification time
+          const now = new Date();
+          const notificationTime = new Date();
+          notificationTime.setHours(hour, minute, 0, 0);
+          
+          // If time has passed today, schedule for tomorrow
+          if (notificationTime <= now) {
+            notificationTime.setDate(notificationTime.getDate() + 1);
+          }
+          
+          // Get today's day number for the notification
+          const today = getLocalDateStr(new Date());
+          const dayNum = getDayNumber(today);
+          
+          await LocalNotifications.schedule({
+            notifications: [
+              {
+                id: NOTIFICATION_ID,
+                title: '💪 OneUp - Time to Train!',
+                body: `Today's goal: ${dayNum} pushups. Let's keep the streak going! 🔥`,
+                schedule: {
+                  at: notificationTime,
+                  repeats: true,
+                  every: 'day'
+                },
+                sound: null,
+                attachments: null,
+                actionTypeId: '',
+                extra: null
+              }
+            ]
+          });
+        }
+      }
+    } catch (error) {
+      console.debug('Notification scheduling failed:', error);
+    }
+  };
+  
+  // Request notification permissions
+  const requestNotificationPermission = async () => {
+    try {
+      const permission = await LocalNotifications.checkPermissions();
+      if (permission.display === 'prompt' || permission.display === 'prompt-with-rationale') {
+        await LocalNotifications.requestPermissions();
+      }
+    } catch (error) {
+      console.debug('Permission request failed:', error);
+    }
+  };
 
   const getDayNumber = (dateStr) => {
     if (!state.startDate) return 0;
@@ -136,6 +203,8 @@ export function useProgress() {
     getTotalPushups,
     getLocalDateStr,
     isSetup: state.isSetup,
-    userStartDate: state.userStartDate || state.startDate
+    userStartDate: state.userStartDate || state.startDate,
+    scheduleNotification,
+    requestNotificationPermission
   };
 }

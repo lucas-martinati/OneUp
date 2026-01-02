@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
-import { Check, Trophy, Calendar as CalendarIcon, PieChart, Flame } from 'lucide-react';
+import { Check, Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon } from 'lucide-react';
 import { Calendar } from './Calendar';
 import { Stats } from './Stats';
+import { Settings } from './Settings';
+import { useSettings } from '../hooks/useSettings';
+import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 
-export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, completions, startDate, userStartDate }) {
+export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, completions, startDate, userStartDate, scheduleNotification }) {
     const getLocalDateStr = (d) => {
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -15,7 +18,15 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
     const [today, setToday] = useState(getLocalDateStr(new Date()));
     const [showCalendar, setShowCalendar] = useState(false);
     const [showStats, setShowStats] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
     const [numberKey, setNumberKey] = useState(0);
+
+    const { settings, updateSettings } = useSettings();
+
+    // Inject settings getter for sound manager
+    useEffect(() => {
+        setSoundSettingsGetter(() => settings);
+    }, [settings]);
 
     const dayNumber = getDayNumber(today);
     const isCompleted = completions[today];
@@ -45,7 +56,7 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
 
     // With single button, we just toggle. The HOOK handles the time detection.
     const handleComplete = () => {
-        // If currently false, we are completing -> Confetti
+        // If currently false, we are completing -> Confetti + Sound
         if (!isCompleted) {
             confetti({
                 particleCount: 150,
@@ -56,10 +67,21 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
                 gravity: 0.8,
                 scalar: 1.2
             });
+            // Play success sound
+            sounds.success();
             // Trigger number animation
             setNumberKey(prev => prev + 1);
         }
         toggleCompletion(today);
+    };
+
+    // Handle settings save
+    const handleSaveSettings = (newSettings) => {
+        updateSettings(newSettings);
+        // Update notification scheduling
+        if (scheduleNotification) {
+            scheduleNotification(newSettings);
+        }
     };
 
     // Progress circle calculation
@@ -102,6 +124,24 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <button
+                        onClick={() => setShowSettings(true)}
+                        className="hover-lift"
+                        style={{
+                            background: 'rgba(255,255,255,0.1)',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'var(--text-primary)',
+                            border: 'none',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <SettingsIcon size={18} />
+                    </button>
                     <button
                         onClick={() => setShowStats(true)}
                         className="hover-lift"
@@ -168,8 +208,8 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
                             }}>
                                 {dayNumber}
                             </div>
-                            <div style={{ 
-                                fontSize: '1.3rem', 
+                            <div style={{
+                                fontSize: '1.3rem',
                                 color: 'var(--text-secondary)',
                                 fontWeight: '500'
                             }}>
@@ -219,8 +259,8 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
                                     width: '100px',
                                     height: '100px',
                                     borderRadius: '50%',
-                                    background: isCompleted 
-                                        ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' 
+                                    background: isCompleted
+                                        ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
                                         : 'transparent',
                                     border: isCompleted ? 'none' : '3px solid var(--accent)',
                                     display: 'flex',
@@ -228,17 +268,17 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
                                     justifyContent: 'center',
                                     transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
                                     transform: isCompleted ? 'scale(1.1)' : 'scale(1)',
-                                    boxShadow: isCompleted 
-                                        ? '0 0 40px rgba(16, 185, 129, 0.6), 0 4px 20px rgba(16, 185, 129, 0.3)' 
+                                    boxShadow: isCompleted
+                                        ? '0 0 40px rgba(16, 185, 129, 0.6), 0 4px 20px rgba(16, 185, 129, 0.3)'
                                         : '0 0 20px rgba(109, 40, 217, 0.3)',
                                     cursor: 'pointer',
                                     position: 'relative'
                                 }}
                             >
-                                <Check 
-                                    size={50} 
-                                    color={isCompleted ? 'white' : 'var(--accent)'} 
-                                    strokeWidth={3} 
+                                <Check
+                                    size={50}
+                                    color={isCompleted ? 'white' : 'var(--accent)'}
+                                    strokeWidth={3}
                                     style={{
                                         transition: 'all 0.3s ease',
                                         filter: isCompleted ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' : 'none'
@@ -291,15 +331,15 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
                         )}
                     </>
                 ) : (
-                    <div className="glass-premium" style={{ 
-                        textAlign: 'center', 
+                    <div className="glass-premium" style={{
+                        textAlign: 'center',
                         padding: 'var(--spacing-xl)',
                         borderRadius: 'var(--radius-xl)',
                         maxWidth: '320px'
                     }}>
                         <h2 style={{ marginBottom: '12px', fontSize: '1.5rem' }}>⏳ Waiting to Start</h2>
                         <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                            Your challenge begins on <br/>
+                            Your challenge begins on <br />
                             <strong style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>{effectiveStart}</strong>
                         </p>
                     </div>
@@ -345,6 +385,15 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
                 <Stats
                     completions={completions}
                     onClose={() => setShowStats(false)}
+                />
+            )}
+
+            {/* Settings Modal */}
+            {showSettings && (
+                <Settings
+                    settings={settings}
+                    onClose={() => setShowSettings(false)}
+                    onSave={handleSaveSettings}
                 />
             )}
         </div>
