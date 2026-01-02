@@ -315,18 +315,6 @@ export function Settings({ settings, onClose, onSave }) {
                             }} />
                         </button>
                     </div>
-
-                    {/* Auto-save notice */}
-                    <div style={{
-                        marginTop: 'var(--spacing-md)',
-                        padding: 'var(--spacing-sm)',
-                        textAlign: 'center',
-                        color: 'var(--text-secondary)',
-                        fontSize: '0.85rem',
-                        opacity: 0.7
-                    }}>
-                        ✨ Changes are saved automatically
-                    </div>
                 </div>
             </div>
         </div>
