@@ -42,3 +42,8 @@ android/keystore.properties
 
 # Capacitor Build Output
 android/capacitor-cordova-android-plugins/build/
+
+# Env
+.env
+.env.local
+.env.*.local
