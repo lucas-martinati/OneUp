@@ -4,6 +4,14 @@ import { X, ChevronLeft, ChevronRight, CheckCircle2, Circle } from 'lucide-react
 export function Calendar({ startDate, completions, onClose }) {
     const [currentDate, setCurrentDate] = useState(new Date());
 
+    // Helper to get local date string (not UTC)
+    const getLocalDateStr = (d) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     // Helpers
     const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
     const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay(); // 0 = Sun
@@ -46,7 +54,7 @@ export function Calendar({ startDate, completions, onClose }) {
         const dateString = `${y}-${m}-${dStr}`;
 
         const isCompleted = completions[dateString];
-        const isFuture = dateString > new Date().toISOString().split('T')[0];
+        const isFuture = dateString > getLocalDateStr(new Date());
         const isBeforeStart = dateString < startDate;
 
         if (!isFuture && !isBeforeStart) {
@@ -229,9 +237,9 @@ export function Calendar({ startDate, completions, onClose }) {
                     const dateString = `${y}-${m}-${dStr}`;
 
                     const isCompleted = completions[dateString];
-                    const isFuture = dateString > new Date().toISOString().split('T')[0];
+                    const isFuture = dateString > getLocalDateStr(new Date());
                     const isBeforeStart = dateString < startDate;
-                    const isToday = dateString === new Date().toISOString().split('T')[0];
+                    const isToday = dateString === getLocalDateStr(new Date());
 
                     const isMissed = !isCompleted && !isFuture && !isBeforeStart;
 

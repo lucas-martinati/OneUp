@@ -20,6 +20,8 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
     const [showStats, setShowStats] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [numberKey, setNumberKey] = useState(0);
+    const [isCounterTransitioning, setIsCounterTransitioning] = useState(false);
+    const [prevDayNumber, setPrevDayNumber] = useState(null);
 
 
 
@@ -53,6 +55,78 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
     };
 
     const currentStreak = calculateStreak();
+
+    // Midnight detection and animation
+    useEffect(() => {
+        const checkMidnight = () => {
+            const now = new Date();
+            const currentDateStr = getLocalDateStr(now);
+
+            // If the date has changed
+            if (currentDateStr !== today) {
+                const previousDayNumber = getDayNumber(today);
+                const newDayNumber = getDayNumber(currentDateStr);
+
+                // Only trigger if pushup count actually increased
+                if (newDayNumber > previousDayNumber) {
+                    // Store the previous number for animation
+                    setPrevDayNumber(previousDayNumber);
+                    setIsCounterTransitioning(true);
+
+                    // 🎊 MIDNIGHT CELEBRATION ANIMATION
+                    const duration = 3000;
+                    const animationEnd = Date.now() + duration;
+                    const colors = ['#6d28d9', '#8b5cf6', '#0ea5e9', '#f093fb', '#fbbf24', '#10b981'];
+
+                    const frame = () => {
+                        confetti({
+                            particleCount: 3,
+                            angle: 60,
+                            spread: 55,
+                            origin: { x: 0 },
+                            colors: colors
+                        });
+                        confetti({
+                            particleCount: 3,
+                            angle: 120,
+                            spread: 55,
+                            origin: { x: 1 },
+                            colors: colors
+                        });
+
+                        if (Date.now() < animationEnd) {
+                            requestAnimationFrame(frame);
+                        }
+                    };
+
+                    frame();
+
+
+                    // Reset transition after animation completes
+                    setTimeout(() => {
+                        setIsCounterTransitioning(false);
+                        setPrevDayNumber(null);
+                    }, 1000);
+                }
+
+                // Update to new day
+                setToday(currentDateStr);
+
+                // Reschedule notifications for the new day
+                if (scheduleNotification) {
+                    scheduleNotification(settings);
+                }
+            }
+        };
+
+        // Check immediately on mount
+        checkMidnight();
+
+        // Then check every 10 seconds (more responsive than 60s)
+        const interval = setInterval(checkMidnight, 10000);
+
+        return () => clearInterval(interval);
+    }, [today, getDayNumber, settings, scheduleNotification]);
 
     // With single button, we just toggle. The HOOK handles the time detection.
     const handleComplete = () => {
@@ -199,14 +273,44 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
                             }}>
                                 Day {dayNumber}
                             </div>
-                            <div key={numberKey} className="rainbow-gradient" style={{
-                                fontSize: '7rem',
-                                fontWeight: '800',
-                                lineHeight: 1,
-                                marginBottom: 'var(--spacing-xs)',
-                                animation: 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out'
+
+                            {/* Counter with midnight transition animation */}
+                            <div style={{
+                                position: 'relative',
+                                height: '7rem',
+                                overflow: 'hidden',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginBottom: 'var(--spacing-xs)'
                             }}>
-                                {dayNumber}
+                                {/* Old number sliding down */}
+                                {isCounterTransitioning && prevDayNumber && (
+                                    <div className="rainbow-gradient" style={{
+                                        position: 'absolute',
+                                        fontSize: '7rem',
+                                        fontWeight: '800',
+                                        lineHeight: 1,
+                                        animation: 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards'
+                                    }}>
+                                        {prevDayNumber}
+                                    </div>
+                                )}
+                                {/* New number sliding up */}
+                                <div
+                                    key={isCounterTransitioning ? `new-${dayNumber}` : numberKey}
+                                    className="rainbow-gradient"
+                                    style={{
+                                        fontSize: '7rem',
+                                        fontWeight: '800',
+                                        lineHeight: 1,
+                                        animation: isCounterTransitioning
+                                            ? 'rainbowFlow 6s ease infinite, counterSlideUp 1s ease-out'
+                                            : 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out'
+                                    }}
+                                >
+                                    {dayNumber}
+                                </div>
                             </div>
                             <div style={{
                                 fontSize: '1.3rem',
@@ -372,34 +476,40 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
             </button>
 
             {/* Calendar Modal */}
-            {showCalendar && (
-                <Calendar
-                    startDate={startDate}
-                    completions={completions}
-                    onClose={() => setShowCalendar(false)}
-                />
-            )}
+            {
+                showCalendar && (
+                    <Calendar
+                        startDate={startDate}
+                        completions={completions}
+                        onClose={() => setShowCalendar(false)}
+                    />
+                )
+            }
 
             {/* Stats Modal */}
-            {showStats && (
-                <Stats
-                    completions={completions}
-                    onClose={() => setShowStats(false)}
-                />
-            )}
+            {
+                showStats && (
+                    <Stats
+                        completions={completions}
+                        onClose={() => setShowStats(false)}
+                    />
+                )
+            }
 
             {/* Settings Modal */}
-            {showSettings && (
-                <Settings
-                    settings={settings}
-                    onClose={() => setShowSettings(false)}
-                    onSave={handleSaveSettings}
-                    cloudAuth={cloudAuth}
-                    cloudSync={cloudSync}
-                    conflictData={conflictData}
-                    onResolveConflict={onResolveConflict}
-                />
-            )}
-        </div>
+            {
+                showSettings && (
+                    <Settings
+                        settings={settings}
+                        onClose={() => setShowSettings(false)}
+                        onSave={handleSaveSettings}
+                        cloudAuth={cloudAuth}
+                        cloudSync={cloudSync}
+                        conflictData={conflictData}
+                        onResolveConflict={onResolveConflict}
+                    />
+                )
+            }
+        </div >
     );
 }

@@ -4,7 +4,16 @@ import { Calendar, ArrowRight, Zap, Target } from 'lucide-react';
 export function Onboarding({ onStart }) {
     const [step, setStep] = useState(1);
     const currentYear = new Date().getFullYear();
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+
+    // Helper to get local date string (not UTC)
+    const getLocalDateStr = (d) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const [date, setDate] = useState(getLocalDateStr(new Date()));
 
     const handleStart = () => {
         onStart(new Date(date));
