@@ -7,6 +7,32 @@ import { Settings } from './Settings';
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 
+// Utility to clean up confetti canvas (fixes Android Pixel bug)
+const resetConfetti = () => {
+    try {
+        confetti.reset(); // Official reset method
+    } catch (e) {
+        console.warn('Confetti reset error:', e);
+    }
+
+    // Fallback: Manually clear any remaining canvases
+    const canvases = document.querySelectorAll('canvas');
+    canvases.forEach(canvas => {
+        try {
+            const context = canvas.getContext('2d');
+            if (context) {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            // Force removal if it's a fixed position overlay (likely confetti)
+            if (canvas.style.position === 'fixed' || canvas.style.position === 'absolute') {
+                canvas.remove();
+            }
+        } catch (e) {
+            console.error('Canvas cleanup error:', e);
+        }
+    });
+};
+
 export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, completions, startDate, userStartDate, scheduleNotification, cloudAuth, cloudSync, settings, updateSettings, conflictData, onResolveConflict }) {
     const getLocalDateStr = (d) => {
         const year = d.getFullYear();
@@ -106,7 +132,8 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
                     setTimeout(() => {
                         setIsCounterTransitioning(false);
                         setPrevDayNumber(null);
-                    }, 1000);
+                        resetConfetti(); // Clean up canvas
+                    }, 4000); // After confetti animation finishes
                 }
 
                 // Update to new day
@@ -145,6 +172,8 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
             sounds.success();
             // Trigger number animation
             setNumberKey(prev => prev + 1);
+            // Clean up confetti after animation
+            setTimeout(() => resetConfetti(), 5000);
         }
         toggleCompletion(today);
     };

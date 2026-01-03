@@ -23,9 +23,13 @@ function preloadSound(name, path) {
 }
 
 // Preload all success sound variants
-preloadSound('success', 'sounds/success.mp3');      // Common - 95%
-preloadSound('perfect', 'sounds/perfect.mp3');      // Rare - 4.99%
-preloadSound('yaaas', 'sounds/yaaas.mp3');          // Ultra Rare - 0.01%
+preloadSound('success', '/sounds/success.mp3');      // Common - 95%
+
+// Delay loading of rare sounds to prevent network congestion/errors on startup
+setTimeout(() => {
+  preloadSound('perfect', '/sounds/perfect.mp3');      // Rare - 4.99%
+  preloadSound('yaaas', '/sounds/yaaas.mp3');          // Ultra Rare - 0.01%
+}, 3000);
 
 // Select success sound based on rarity
 function getSuccessSound() {
