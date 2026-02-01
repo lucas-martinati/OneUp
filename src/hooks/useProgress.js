@@ -18,7 +18,7 @@ export function useProgress() {
   const [state, setState] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     let parsed = saved ? JSON.parse(saved) : null;
-    
+
     // Always start Jan 1st of current year
     const currentYear = new Date().getFullYear();
     const fixedStartDate = `${currentYear}-01-01`;
@@ -30,15 +30,15 @@ export function useProgress() {
         startDate: fixedStartDate,
         userStartDate: fixedStartDate, // Default matches fixed
         completions: {},
-        isSetup: false 
+        isSetup: false
       };
     }
-    
+
     // Legacy support
     if (parsed.isSetup === undefined) {
         return { ...parsed, isSetup: true, userStartDate: parsed.startDate };
     }
-    
+
     return parsed;
   });
 
@@ -56,7 +56,7 @@ export function useProgress() {
             const startYear = userStartDate.getFullYear();
             const startMonth = userStartDate.getMonth();
             const startDay = userStartDate.getDate();
-            
+
             const start = new Date(startYear, startMonth, startDay);
             userStartStr = getLocalDateStr(start); // Save for UI blocking
 
@@ -76,11 +76,11 @@ export function useProgress() {
                 loopDate.setDate(loopDate.getDate() + 1);
             }
         }
-        return { 
-            ...prev, 
-            completions: newCompletions, 
+        return {
+            ...prev,
+            completions: newCompletions,
             isSetup: true,
-            userStartDate: userStartStr 
+            userStartDate: userStartStr
         };
     });
   };
@@ -89,7 +89,7 @@ export function useProgress() {
     setState(prev => {
       const newCompletions = { ...prev.completions };
       const current = newCompletions[dateStr];
-      
+
       // Toggle logic: If exists, remove. If not, add.
       if (current) {
          delete newCompletions[dateStr];
@@ -109,78 +109,81 @@ export function useProgress() {
       return { ...prev, completions: newCompletions };
     });
   };
-  
+
   // Schedule daily notification
   const scheduleNotification = async (settings) => {
     try {
       // Check if we have permission first
       const permission = await LocalNotifications.checkPermissions();
-      
+
       if (permission.display === 'granted') {
         // Cancel existing notification
         await LocalNotifications.cancel({ notifications: [{ id: NOTIFICATION_ID }] });
-        
+
         // Only schedule if notifications are enabled
         if (settings?.notificationsEnabled) {
           const { hour, minute } = settings.notificationTime;
-          
+
           // Calculate next notification time
           const now = new Date();
-          const notificationTime = new Date();
+          let notificationTime = new Date();
           notificationTime.setHours(hour, minute, 0, 0);
-          
+
           // If time has passed today, schedule for tomorrow
           if (notificationTime <= now) {
             notificationTime.setDate(notificationTime.getDate() + 1);
           }
-          
-          // Calculate day number for when notification will be sent
-          const notificationDateStr = getLocalDateStr(notificationTime);
-          
+
           // Check if that day's pushups are already completed
-          const isDayCompleted = state.completions[notificationDateStr]?.done;
-          
-          // Only schedule notification if the day is NOT already completed
-          if (!isDayCompleted) {
-            const dayNum = getDayNumber(notificationDateStr);
-            
-            // Create engaging message with exact pushup count
-            const messages = [
-              `🎯 ${dayNum} pushups today! Let\\'s crush this goal! 💪`,
-              `💥 Challenge: ${dayNum} pushups! You got this! 🔥`,
-              `⚡ ${dayNum} pushups waiting for you! Time to shine! ✨`,
-              `🚀 ${dayNum} pushups to keep the streak alive! Let\\'s go! 🏆`
-            ];
-            
-            // Randomly select a message for variety
-            const selectedMessage = messages[Math.floor(Math.random() * messages.length)];
-            
-            await LocalNotifications.schedule({
-              notifications: [
-                {
-                  id: NOTIFICATION_ID,
-                  title: '💪 OneUp - Daily Challenge!',
-                  body: selectedMessage,
-                  schedule: {
-                    at: notificationTime,
-                    repeats: true,
-                    every: 'day'
-                  },
-                  sound: null,
-                  attachments: null,
-                  actionTypeId: '',
-                  extra: null
-                }
-              ]
-            });
+          // If so, skip to the next day until we find an incomplete day
+          let notificationDateStr = getLocalDateStr(notificationTime);
+          let safetyCounter = 0; // Prevent infinite loop
+
+          while (state.completions[notificationDateStr]?.done && safetyCounter < 365) {
+            notificationTime.setDate(notificationTime.getDate() + 1);
+            notificationDateStr = getLocalDateStr(notificationTime);
+            safetyCounter++;
           }
+
+          // Schedule notification for the found date
+          const dayNum = getDayNumber(notificationDateStr);
+
+          // Create engaging message with exact pushup count
+          const messages = [
+            `🎯 ${dayNum} pushups today! Let\\'s crush this goal! 💪`,
+            `💥 Challenge: ${dayNum} pushups! You got this! 🔥`,
+            `⚡ ${dayNum} pushups waiting for you! Time to shine! ✨`,
+            `🚀 ${dayNum} pushups to keep the streak alive! Let\\'s go! 🏆`
+          ];
+
+          // Randomly select a message for variety
+          const selectedMessage = messages[Math.floor(Math.random() * messages.length)];
+
+          await LocalNotifications.schedule({
+            notifications: [
+              {
+                id: NOTIFICATION_ID,
+                title: '💪 OneUp - Daily Challenge!',
+                body: selectedMessage,
+                schedule: {
+                  at: notificationTime,
+                  repeats: true,
+                  every: 'day'
+                },
+                sound: null,
+                attachments: null,
+                actionTypeId: '',
+                extra: null
+              }
+            ]
+          });
         }
       }
     } catch (error) {
       console.debug('Notification scheduling failed:', error);
     }
   };
-  
+
   // Request notification permissions
   const requestNotificationPermission = async () => {
     try {
@@ -197,13 +200,13 @@ export function useProgress() {
     if (!state.startDate) return 0;
     const start = new Date(state.startDate);
     const current = new Date(dateStr);
-    
+
     const utcStart = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
     const utcCurrent = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
 
     const diffTime = utcCurrent - utcStart;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
-    
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
     return diffDays + 1;
   };
 
@@ -237,7 +240,7 @@ export function useProgress() {
               startDate: cloudData.startDate || prev.startDate || `${new Date().getFullYear()}-01-01`,
               userStartDate: cloudData.userStartDate || prev.userStartDate || `${new Date().getFullYear()}-01-01`,
               // Ensure completions is an object
-              completions: cloudData.completions || {}, 
+              completions: cloudData.completions || {},
               // Keep setup true if it was true in cloud OR local (usually cloud governs)
               isSetup: cloudData.isSetup !== undefined ? cloudData.isSetup : prev.isSetup,
               // Keep other previous fields if any
@@ -264,7 +267,7 @@ export function useProgress() {
       return { success: false, error: error.message };
     }
   }, [state]);
-  
+
   return {
     startDate: state.startDate,
     completions: state.completions,

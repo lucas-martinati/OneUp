@@ -66,7 +66,7 @@ function App() {
 
       return () => clearTimeout(midnightTimer);
     }
-  }, [isSetup, settings.notificationsEnabled, settings.notificationTime]);
+  }, [isSetup, settings.notificationsEnabled, settings.notificationTime, completions]);
 
   // Auto-sync when signed in and data changes (paused during conflict and until initial check done)
   useEffect(() => {
