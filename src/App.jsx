@@ -28,6 +28,8 @@ function App() {
     userStartDate,
     scheduleNotification,
     requestNotificationPermission,
+    getPushupCount,
+    updatePushupCount,
     saveToCloud,
     loadFromCloud,
     syncWithCloud
@@ -206,6 +208,8 @@ function App() {
           cloudSync={{ saveToCloud, loadFromCloud, syncWithCloud, signIn: googleAuth.signIn, signOut: googleAuth.signOut }}
           conflictData={conflictData}
           onResolveConflict={handleResolveConflict}
+          getPushupCount={getPushupCount}
+          updatePushupCount={updatePushupCount}
         />
       )}
     </>

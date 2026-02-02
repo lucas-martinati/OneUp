@@ -226,6 +226,25 @@ class CloudSyncService {
     }
   }
 
+  // Sanitize data for cloud (remove pushup counts)
+  sanitizeForCloud(data) {
+    if (!data || !data.completions) return data;
+    
+    // Create deep copy to avoid mutating original
+    const sanitizedCompletions = {};
+    Object.keys(data.completions).forEach(key => {
+        const entry = data.completions[key];
+        // Destructure to remove pushupCount
+        const { pushupCount, ...rest } = entry;
+        sanitizedCompletions[key] = rest;
+    });
+
+    return {
+        ...data,
+        completions: sanitizedCompletions
+    };
+  }
+
   // Sauvegarder les données dans le cloud
   async saveToCloud(data) {
     try {
@@ -243,9 +262,12 @@ class CloudSyncService {
       const userId = auth.currentUser.uid;
       const userRef = ref(database, `users/${userId}/progress`);
 
+      // Sanitize data (remove pushup counts as per privacy requirement)
+      const cleanData = this.sanitizeForCloud(data);
+
       // Ajouter un timestamp pour la dernière mise à jour
       const dataWithTimestamp = {
-        ...data,
+        ...cleanData,
         lastSyncedAt: serverTimestamp()
       };
 
@@ -328,7 +350,14 @@ class CloudSyncService {
         if (!localEntry || 
             (cloudEntry.timestamp && localEntry.timestamp && 
              new Date(cloudEntry.timestamp) > new Date(localEntry.timestamp))) {
-          mergedCompletions[dateStr] = cloudEntry;
+          
+          // Restore local pushup count if available (since cloud doesn't have it)
+          const preservedCount = localEntry?.pushupCount || 0;
+          
+          mergedCompletions[dateStr] = {
+              ...cloudEntry,
+              pushupCount: preservedCount
+          };
         }
       });
     }

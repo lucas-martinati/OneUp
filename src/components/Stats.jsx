@@ -19,13 +19,16 @@ export function Stats({ completions, onClose }) {
 
     sortedDates.forEach(dateStr => {
         const c = completions[dateStr];
-        totalCompletions++;
 
-        if (typeof c === 'object' && c.timeOfDay) {
-            if (c.timeOfDay === 'morning') data[0].value++;
-            if (c.timeOfDay === 'afternoon') data[1].value++;
-            if (c.timeOfDay === 'evening') data[2].value++;
-            trackedCount++;
+        if (c?.done) {
+            totalCompletions++;
+
+            if (typeof c === 'object' && c.timeOfDay) {
+                if (c.timeOfDay === 'morning') data[0].value++;
+                if (c.timeOfDay === 'afternoon') data[1].value++;
+                if (c.timeOfDay === 'evening') data[2].value++;
+                trackedCount++;
+            }
         }
     });
 
@@ -39,7 +42,7 @@ export function Stats({ completions, onClose }) {
         const day = String(checkDate.getDate()).padStart(2, '0');
         const dateString = `${year}-${month}-${day}`;
 
-        if (completions[dateString]) {
+        if (completions[dateString]?.done) {
             currentStreak++;
             if (currentStreak > maxStreak) maxStreak = currentStreak;
         } else {

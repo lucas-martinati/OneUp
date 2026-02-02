@@ -90,10 +90,17 @@ export function useProgress() {
       const newCompletions = { ...prev.completions };
       const current = newCompletions[dateStr];
 
-      // Toggle logic: If exists, remove. If not, add.
-      if (current) {
-         delete newCompletions[dateStr];
+      // Toggle logic: Toggle done status, preserve pushup count
+      if (current && current.done) {
+         // Mark as undone
+         newCompletions[dateStr] = {
+             ...current,
+             done: false,
+             timestamp: null,
+             timeOfDay: null
+         };
       } else {
+         // Mark as done
          const now = new Date();
          const hour = now.getHours();
          let timeOfDay = 'morning';
@@ -101,11 +108,62 @@ export function useProgress() {
          if (hour >= 18) timeOfDay = 'evening';
 
          newCompletions[dateStr] = {
+            pushupCount: current?.pushupCount || 0, //Preserve count or init 0
+            ...current,
             done: true,
             timestamp: now.toISOString(),
             timeOfDay
          };
       }
+      return { ...prev, completions: newCompletions };
+    });
+  };
+
+  // Get push-up count for a specific day
+  const getPushupCount = (dateStr) => {
+    return state.completions[dateStr]?.pushupCount || 0;
+  };
+
+  // Update push-up count for a specific day with strict validation
+  const updatePushupCount = (dateStr, newCount, dailyGoal) => {
+    setState(prev => {
+      const newCompletions = { ...prev.completions };
+      const current = newCompletions[dateStr] || {};
+      
+      // Ensure count doesn't go below 0
+      const finalCount = Math.max(0, newCount);
+      
+      // Strict validation: status implies count >= goal
+      // When the user manually updates the count, we enforce this truth.
+      const isNowDone = Number(finalCount) >= Number(dailyGoal);
+      const wasDone = current.done || false;
+      
+      let timestamp = current.timestamp;
+      let timeOfDay = current.timeOfDay;
+      
+      // Only update metadata if status changes
+      if (!wasDone && isNowDone) {
+        // Just finished!
+        const now = new Date();
+        timestamp = now.toISOString();
+        const hour = now.getHours();
+        if (hour < 12) timeOfDay = 'morning';
+        else if (hour < 18) timeOfDay = 'afternoon';
+        else timeOfDay = 'evening';
+      } else if (wasDone && !isNowDone) {
+        // No longer finished
+        timestamp = null;
+        timeOfDay = null;
+      }
+      
+      newCompletions[dateStr] = {
+        ...current,
+        pushupCount: finalCount,
+        done: isNowDone,
+        timestamp,
+        timeOfDay
+      };
+      
       return { ...prev, completions: newCompletions };
     });
   };
@@ -280,6 +338,9 @@ export function useProgress() {
     userStartDate: state.userStartDate || state.startDate,
     scheduleNotification,
     requestNotificationPermission,
+    // Push-up counter methods
+    getPushupCount,
+    updatePushupCount,
     // Cloud sync methods
     saveToCloud,
     loadFromCloud,

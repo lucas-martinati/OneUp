@@ -53,7 +53,7 @@ export function Calendar({ startDate, completions, onClose }) {
         const dStr = String(date.getDate()).padStart(2, '0');
         const dateString = `${y}-${m}-${dStr}`;
 
-        const isCompleted = completions[dateString];
+        const isCompleted = completions[dateString]?.done;
         const isFuture = dateString > getLocalDateStr(new Date());
         const isBeforeStart = dateString < startDate;
 
@@ -236,7 +236,7 @@ export function Calendar({ startDate, completions, onClose }) {
                     const dStr = String(date.getDate()).padStart(2, '0');
                     const dateString = `${y}-${m}-${dStr}`;
 
-                    const isCompleted = completions[dateString];
+                    const isCompleted = completions[dateString]?.done;
                     const isFuture = dateString > getLocalDateStr(new Date());
                     const isBeforeStart = dateString < startDate;
                     const isToday = dateString === getLocalDateStr(new Date());

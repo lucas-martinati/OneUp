@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
-import { Check, Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon } from 'lucide-react';
+import { Check, Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon, Hash } from 'lucide-react';
 import { Calendar } from './Calendar';
 import { Stats } from './Stats';
 import { Settings } from './Settings';
+import { Counter } from './Counter';
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 
@@ -33,7 +34,7 @@ const resetConfetti = () => {
     });
 };
 
-export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, completions, startDate, userStartDate, scheduleNotification, cloudAuth, cloudSync, settings, updateSettings, conflictData, onResolveConflict }) {
+export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, completions, startDate, userStartDate, scheduleNotification, cloudAuth, cloudSync, settings, updateSettings, conflictData, onResolveConflict, getPushupCount, updatePushupCount }) {
     const getLocalDateStr = (d) => {
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -45,6 +46,7 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
     const [showCalendar, setShowCalendar] = useState(false);
     const [showStats, setShowStats] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [showCounter, setShowCounter] = useState(false);
     const [numberKey, setNumberKey] = useState(0);
     const [isCounterTransitioning, setIsCounterTransitioning] = useState(false);
     const [prevDayNumber, setPrevDayNumber] = useState(null);
@@ -57,7 +59,9 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
     }, [settings]);
 
     const dayNumber = getDayNumber(today);
-    const isCompleted = completions[today];
+    const completionEntry = completions[today];
+    // Only consider it completed if done is strictly true
+    const isCompleted = completionEntry?.done ? completionEntry : null;
     const totalPushups = getTotalPushups();
 
     const effectiveStart = userStartDate || startDate;
@@ -71,7 +75,7 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
             const checkDate = new Date(todayDate);
             checkDate.setDate(checkDate.getDate() - i);
             const dateStr = getLocalDateStr(checkDate);
-            if (completions[dateStr]) {
+            if (completions[dateStr]?.done) {
                 streak++;
             } else {
                 break;
@@ -244,6 +248,24 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
                         }}
                     >
                         <SettingsIcon size={18} />
+                    </button>
+                    <button
+                        onClick={() => setShowCounter(true)}
+                        className="hover-lift"
+                        style={{
+                            background: 'rgba(255,255,255,0.1)',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'var(--text-primary)',
+                            border: 'none',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <Hash size={18} />
                     </button>
                     <button
                         onClick={() => setShowStats(true)}
@@ -536,6 +558,19 @@ export function Dashboard({ getDayNumber, getTotalPushups, toggleCompletion, com
                         cloudSync={cloudSync}
                         conflictData={conflictData}
                         onResolveConflict={onResolveConflict}
+                    />
+                )
+            }
+
+            {/* Counter Modal */}
+            {
+                showCounter && (
+                    <Counter
+                        onClose={() => setShowCounter(false)}
+                        dailyGoal={dayNumber}
+                        currentCount={getPushupCount(today)}
+                        onUpdateCount={(newCount) => updatePushupCount(today, newCount, dayNumber)}
+                        isCompleted={getPushupCount(today) >= dayNumber}
                     />
                 )
             }
