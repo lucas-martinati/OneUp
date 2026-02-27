@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useProgress } from './hooks/useProgress';
 import { useSettings } from './hooks/useSettings';
 import { useGoogleAuth } from './hooks/useGoogleAuth';
@@ -15,6 +15,7 @@ function App() {
   const googleAuth = useGoogleAuth();
   const [conflictData, setConflictData] = useState(null);
   const [conflictCheckDone, setConflictCheckDone] = useState(false);
+  const initialSyncDoneRef = useRef(false);
 
   const {
     startDate,
@@ -32,8 +33,7 @@ function App() {
     updateExerciseCount,
     saveToCloud,
     loadFromCloud,
-    syncWithCloud,
-    startCloudListener
+    syncWithCloud
   } = progress;
 
   // Request notification permission and schedule on first setup
@@ -64,9 +64,20 @@ function App() {
     }
   }, [isSetup, settings.notificationsEnabled, settings.notificationTime, completions]);
 
-  // Auto-save to cloud when data changes (upload only — no loop risk)
+  // Save to cloud only when an exercise completion status changes (not on count changes)
   useEffect(() => {
-    if (googleAuth.isSignedIn && !googleAuth.loading && !conflictData && conflictCheckDone) {
+    if (googleAuth.isSignedIn && !googleAuth.loading && !conflictData && conflictCheckDone && initialSyncDoneRef.current) {
+      // Build a fingerprint of only isCompleted values to detect real changes
+      const fingerprint = JSON.stringify(
+        Object.fromEntries(
+          Object.entries(completions).map(([date, exs]) => [
+            date,
+            Object.fromEntries(
+              Object.entries(exs || {}).map(([exId, data]) => [exId, !!data?.isCompleted])
+            )
+          ])
+        )
+      );
       const doSave = async () => {
         try {
           await saveToCloud();
@@ -75,10 +86,23 @@ function App() {
           logger.error('Auto-save failed:', error);
         }
       };
-      const timer = setTimeout(doSave, 500);
+      const timer = setTimeout(doSave, 1000);
       return () => clearTimeout(timer);
     }
-  }, [completions, googleAuth.isSignedIn, googleAuth.loading, conflictData]);
+  }, [
+    // Only re-run when isCompleted statuses actually change
+    JSON.stringify(
+      Object.fromEntries(
+        Object.entries(completions).map(([date, exs]) => [
+          date,
+          Object.fromEntries(
+            Object.entries(exs || {}).map(([exId, data]) => [exId, !!data?.isCompleted])
+          )
+        ])
+      )
+    ),
+    googleAuth.isSignedIn, googleAuth.loading, conflictData, conflictCheckDone
+  ]);
 
   // Sync settings with cloud on sign-in
   useEffect(() => {
@@ -181,28 +205,16 @@ function App() {
       const initialSync = async () => {
         try {
           await syncWithCloud();
+          initialSyncDoneRef.current = true;
           logger.success('Initial sync completed on app launch');
         } catch (error) {
           logger.error('Initial sync failed:', error);
+          initialSyncDoneRef.current = true; // allow saves even if sync fails
         }
       };
       initialSync();
     }
   }, [conflictCheckDone, googleAuth.isSignedIn, googleAuth.loading, isSetup]);
-
-  // Real-time listener: receive live updates from other devices
-  useEffect(() => {
-    if (googleAuth.isSignedIn && !googleAuth.loading && conflictCheckDone && isSetup) {
-      const unsubscribe = startCloudListener();
-      logger.info('Real-time cloud listener started');
-      return () => {
-        if (unsubscribe) {
-          unsubscribe();
-          logger.info('Real-time cloud listener stopped');
-        }
-      };
-    }
-  }, [googleAuth.isSignedIn, googleAuth.loading, conflictCheckDone, isSetup, startCloudListener]);
 
   return (
     <>

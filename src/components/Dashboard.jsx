@@ -131,53 +131,53 @@ export function Dashboard({
     return (
         <div className="fade-in" style={{
             display: 'flex', flexDirection: 'column', height: '100%',
-            gap: 'var(--spacing-md)', paddingBottom: 'var(--spacing-lg)'
+            gap: 'clamp(4px, 1vh, 10px)', paddingBottom: 'clamp(2px, 0.5vh, 8px)'
         }}>
             {/* ── Header ── */}
             <header className="glass" style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-lg)',
-                boxShadow: 'var(--shadow-md)'
+                padding: 'clamp(6px, 1vh, 12px) clamp(8px, 1.5vw, 14px)', borderRadius: 'var(--radius-lg)',
+                boxShadow: 'var(--shadow-md)', minWidth: 0
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
                     <img
                         src={`${import.meta.env.BASE_URL}pwa-192x192.png`} alt="OneUp Logo"
                         className="bounce-on-hover"
-                        style={{ width: '40px', height: '40px', borderRadius: '12px', objectFit: 'cover', cursor: 'pointer', transition: 'transform 0.3s ease' }}
+                        style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', objectFit: 'cover', cursor: 'pointer', transition: 'transform 0.3s ease' }}
                     />
-                    <span style={{ fontWeight: '600', fontSize: '1.1rem' }}>OneUp</span>
+                    <span style={{ fontWeight: '600', fontSize: 'clamp(0.8rem, 1.8vh, 1.1rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>OneUp</span>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 1, minWidth: 0 }}>
                     <button onClick={() => setShowSettings(true)} className="hover-lift" style={iconBtnStyle}>
-                        <SettingsIcon size={18} />
+                        <SettingsIcon size={16} />
                     </button>
                     <button onClick={() => setShowStats(true)} className="hover-lift" style={iconBtnStyle}>
-                        <PieChart size={18} />
+                        <PieChart size={16} />
                     </button>
 
                     {/* Global streak badge */}
                     {globalStreak > 0 && (
                         <div className="glass-premium" style={{
                             background: 'linear-gradient(135deg, rgba(249,115,22,0.15), rgba(239,68,68,0.15))',
-                            padding: '6px 12px', borderRadius: '20px', fontSize: '0.85rem',
-                            display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '700',
-                            boxShadow: '0 4px 12px rgba(249,115,22,0.25)',
-                            border: '1px solid rgba(249,115,22,0.3)'
+                            padding: 'clamp(3px, 0.5vh, 6px) clamp(6px, 1vw, 12px)', borderRadius: '16px', fontSize: 'clamp(0.65rem, 1.4vh, 0.85rem)',
+                            display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '700',
+                            border: '1px solid rgba(249,115,22,0.3)',
+                            boxShadow: '0 2px 8px rgba(249,115,22,0.15)'
                         }}>
-                            <Flame size={16} color="#f97316" />
+                            <Flame size={13} color="#f97316" />
                             <span style={{ color: '#f97316' }}>{globalStreak}</span>
                         </div>
                     )}
 
-                    {/* Total reps badge — colours match selected exercise */}
+                    {/* Total reps badge */}
                     <div className="glass-premium shimmer" style={{
                         background: `linear-gradient(135deg, ${selectedExercise.color}22, ${selectedExercise.gradient[0]}22)`,
-                        padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem',
-                        display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '600',
-                        boxShadow: `0 4px 12px ${selectedExercise.color}33`
+                        padding: 'clamp(3px, 0.5vh, 6px) clamp(6px, 1vw, 12px)', borderRadius: '16px', fontSize: 'clamp(0.65rem, 1.4vh, 0.85rem)',
+                        display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '600',
+                        boxShadow: `0 2px 8px ${selectedExercise.color}33`
                     }}>
-                        <Trophy size={16} color={selectedExercise.color} />
+                        <Trophy size={13} color={selectedExercise.color} />
                         <span>{totalReps}</span>
                     </div>
                 </div>
@@ -186,29 +186,30 @@ export function Dashboard({
             {/* ── Main ── */}
             <main style={{
                 flex: 1, display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center', gap: 'var(--spacing-md)'
+                alignItems: 'center', justifyContent: 'space-evenly', gap: 'clamp(4px, 0.8vh, 12px)',
+                minHeight: 0
             }}>
                 {!isFuture ? (
                     <>
                         {/* Day & Goal Hero Section */}
                         <div style={{ textAlign: 'center' }}>
                             <div style={{
-                                fontSize: '0.85rem', color: 'var(--text-secondary)',
-                                textTransform: 'uppercase', letterSpacing: '3px',
-                                marginBottom: '4px', fontWeight: '600'
+                                fontSize: 'clamp(0.75rem, 1.6vh, 1rem)', color: 'var(--text-secondary)',
+                                textTransform: 'uppercase', letterSpacing: '4px',
+                                marginBottom: '2px', fontWeight: '700'
                             }}>
                                 Jour
                             </div>
 
                             {/* Big animated day number */}
                             <div style={{
-                                position: 'relative', height: '5.5rem', overflow: 'hidden',
+                                position: 'relative', height: 'clamp(3.2rem, 9vh, 7rem)', overflow: 'hidden',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                marginBottom: '6px'
+                                marginBottom: 'clamp(2px, 0.5vh, 6px)'
                             }}>
                                 {isCounterTransitioning && prevDayNumber && (
                                     <div className="rainbow-gradient" style={{
-                                        position: 'absolute', fontSize: '5rem', fontWeight: '800', lineHeight: 1,
+                                        position: 'absolute', fontSize: 'clamp(3rem, 8.5vh, 6.5rem)', fontWeight: '800', lineHeight: 1,
                                         animation: 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards'
                                     }}>
                                         {prevDayNumber}
@@ -218,7 +219,7 @@ export function Dashboard({
                                     key={isCounterTransitioning ? `new-${dayNumber}` : numberKey}
                                     className="rainbow-gradient"
                                     style={{
-                                        fontSize: '5rem', fontWeight: '800', lineHeight: 1,
+                                        fontSize: 'clamp(3rem, 8.5vh, 6.5rem)', fontWeight: '800', lineHeight: 1,
                                         animation: isCounterTransitioning
                                             ? 'rainbowFlow 6s ease infinite, counterSlideUp 1s ease-out'
                                             : 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out'
@@ -230,21 +231,21 @@ export function Dashboard({
 
                             {/* Prominent daily goal badge */}
                             <div className="glass-premium" style={{
-                                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                                padding: '8px 20px', borderRadius: 'var(--radius-lg)',
+                                display: 'inline-flex', alignItems: 'center', gap: 'clamp(6px, 1.5vw, 12px)',
+                                padding: 'clamp(6px, 1vh, 12px) clamp(14px, 3vw, 24px)', borderRadius: 'var(--radius-lg)',
                                 background: `linear-gradient(135deg, ${selectedExercise.color}18, ${selectedExercise.gradient[0]}18)`,
                                 border: `1px solid ${selectedExercise.color}33`,
                                 boxShadow: `0 2px 12px ${selectedExercise.color}22`
                             }}>
-                                {(() => { const I = ICON_MAP[selectedExercise.icon] || Dumbbell; return <I size={18} color={selectedExercise.color} />; })()}
+                                {(() => { const I = ICON_MAP[selectedExercise.icon] || Dumbbell; return <I size={20} color={selectedExercise.color} />; })()}
                                 <span style={{
-                                    fontSize: '1.3rem', fontWeight: '700',
+                                    fontSize: 'clamp(1.1rem, 4.5vw, 1.6rem)', fontWeight: '800',
                                     color: selectedExercise.color
                                 }}>
                                     {dailyGoal}
                                 </span>
                                 <span style={{
-                                    fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: '500'
+                                    fontSize: 'clamp(0.8rem, 3.2vw, 1.05rem)', color: 'var(--text-secondary)', fontWeight: '500'
                                 }}>
                                     {selectedExercise.label.toLowerCase()} aujourd'hui
                                 </span>
@@ -254,7 +255,7 @@ export function Dashboard({
                         {/* ── Exercise Selector ── */}
                         <div style={{
                             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-                            gap: '8px', width: '100%', maxWidth: '360px'
+                            gap: 'clamp(6px, 1.2vw, 12px)', width: '100%', maxWidth: '400px'
                         }}>
                             {EXERCISES.map(ex => {
                                 const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
@@ -270,53 +271,68 @@ export function Dashboard({
                                         className="hover-lift"
                                         style={{
                                             display: 'flex', flexDirection: 'column',
-                                            alignItems: 'center', gap: '4px',
-                                            padding: '10px 6px', borderRadius: 'var(--radius-md)',
-                                            background: isActive
-                                                ? `linear-gradient(135deg, ${ex.color}28, ${ex.gradient[0]}28)`
-                                                : 'rgba(255,255,255,0.04)',
-                                            border: isActive
-                                                ? `1.5px solid ${ex.color}88`
-                                                : '1.5px solid rgba(255,255,255,0.06)',
+                                            alignItems: 'center', gap: 'clamp(2px, 0.5vh, 6px)',
+                                            padding: 'clamp(8px, 1.2vh, 14px) clamp(6px, 1vw, 10px)', borderRadius: 'var(--radius-md)',
+                                            background: exDone
+                                                ? `linear-gradient(135deg, ${ex.color}20, ${ex.gradient[1]}18)`
+                                                : isActive
+                                                    ? `linear-gradient(135deg, ${ex.color}28, ${ex.gradient[0]}28)`
+                                                    : 'rgba(255,255,255,0.04)',
+                                            border: exDone
+                                                ? `1.5px solid ${ex.color}66`
+                                                : isActive
+                                                    ? `1.5px solid ${ex.color}88`
+                                                    : '1.5px solid rgba(255,255,255,0.06)',
                                             cursor: 'pointer',
                                             transition: 'all 0.25s ease',
-                                            position: 'relative'
+                                            position: 'relative',
+                                            '--done-color': `${ex.color}55`,
+                                            '--done-color-dim': `${ex.color}12`,
+                                            animation: exDone ? 'doneGlow 3s ease-in-out infinite' : 'none',
+                                            boxShadow: exDone ? `0 0 8px ${ex.color}33` : 'none'
                                         }}
                                     >
-                                        {/* Done indicator */}
+                                        {/* Done checkmark */}
                                         {exDone && (
                                             <div style={{
-                                                position: 'absolute', top: '4px', right: '4px',
-                                                width: '8px', height: '8px', borderRadius: '50%',
-                                                background: ex.color,
-                                                boxShadow: `0 0 6px ${ex.color}`
-                                            }} />
+                                                position: 'absolute', top: '-4px', right: '-4px',
+                                                width: '16px', height: '16px', borderRadius: '50%',
+                                                background: `linear-gradient(135deg, ${ex.gradient[0]}, ${ex.gradient[1]})`,
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                boxShadow: `0 0 8px ${ex.color}66`,
+                                                animation: 'checkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                                zIndex: 1
+                                            }}>
+                                                <span style={{ fontSize: '9px', color: 'white', fontWeight: '700', lineHeight: 1 }}>✓</span>
+                                            </div>
                                         )}
                                         <ExIcon
                                             size={20}
-                                            color={isActive ? ex.color : 'var(--text-secondary)'}
+                                            color={exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)'}
                                             style={{ transition: 'color 0.2s ease' }}
                                         />
                                         <span style={{
-                                            fontSize: '0.65rem', fontWeight: '600',
-                                            color: isActive ? ex.color : 'var(--text-secondary)',
-                                            textAlign: 'center', lineHeight: '1.2',
+                                            fontSize: 'clamp(0.6rem, 1.4vh, 0.8rem)', fontWeight: '600',
+                                            color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
+                                            textAlign: 'center', lineHeight: '1.1',
                                             transition: 'color 0.2s ease'
                                         }}>
                                             {ex.label}
                                         </span>
                                         <span style={{
-                                            fontSize: '0.7rem', fontWeight: '700',
-                                            color: isActive ? ex.color : 'var(--text-secondary)',
-                                            opacity: isActive ? 1 : 0.6,
-                                            transition: 'color 0.2s ease'
+                                            fontSize: 'clamp(0.65rem, 1.5vh, 0.85rem)', fontWeight: '700',
+                                            color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
+                                            opacity: exDone ? 1 : isActive ? 1 : 0.6,
+                                            transition: 'color 0.2s ease',
+                                            textDecoration: exDone ? 'line-through' : 'none',
+                                            textDecorationColor: `${ex.color}88`
                                         }}>
                                             {exGoal}
                                         </span>
                                         {exStreak > 0 && (
                                             <span style={{
-                                                fontSize: '0.6rem',
-                                                color: isActive ? ex.color : 'var(--text-secondary)',
+                                                fontSize: 'clamp(0.5rem, 1.1vh, 0.65rem)',
+                                                color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
                                                 opacity: 0.8
                                             }}>
                                                 🔥{exStreak}
@@ -327,105 +343,114 @@ export function Dashboard({
                             })}
                         </div>
 
-                        {/* ── Progress ring + Counter open button ── */}
-                        <div style={{ position: 'relative', display: 'inline-block' }}>
-                            {/* Year progress ring */}
-                            <svg width="120" height="120" style={{ position: 'absolute', top: '-10px', left: '-10px' }}>
-                                <circle cx="60" cy="60" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="4" />
-                                <circle
-                                    className="progress-ring-circle"
-                                    cx="60" cy="60" r="45" fill="none"
-                                    stroke={`url(#dashGrad-${selectedExerciseId})`}
-                                    strokeWidth="4"
-                                    strokeDasharray={circumference}
-                                    strokeDashoffset={strokeDashoffset}
-                                    strokeLinecap="round"
-                                    transform="rotate(-90 60 60)"
-                                />
-                                <defs>
-                                    <linearGradient id={`dashGrad-${selectedExerciseId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stopColor={selectedExercise.gradient[0]} />
-                                        <stop offset="100%" stopColor={selectedExercise.gradient[1]} />
-                                    </linearGradient>
-                                </defs>
-                            </svg>
+                        {/* ── Progress ring + Counter button + Completion status (grouped) ── */}
+                        <div style={{
+                            display: 'flex', flexDirection: 'column', alignItems: 'center',
+                            gap: 'clamp(4px, 0.8vh, 10px)'
+                        }}>
+                            <div style={{ position: 'relative', display: 'inline-block' }}>
+                                {/* Year progress ring */}
+                                <svg viewBox="0 0 100 100" style={{
+                                    position: 'absolute', top: '-8%', left: '-8%',
+                                    width: 'clamp(90px, 14vh, 130px)', height: 'clamp(90px, 14vh, 130px)'
+                                }}>
+                                    <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3.5" />
+                                    <circle
+                                        className="progress-ring-circle"
+                                        cx="50" cy="50" r="42" fill="none"
+                                        stroke={`url(#dashGrad-${selectedExerciseId})`}
+                                        strokeWidth="3.5"
+                                        strokeDasharray={2 * Math.PI * 42}
+                                        strokeDashoffset={2 * Math.PI * 42 - (progress / 100) * 2 * Math.PI * 42}
+                                        strokeLinecap="round"
+                                        transform="rotate(-90 50 50)"
+                                    />
+                                    <defs>
+                                        <linearGradient id={`dashGrad-${selectedExerciseId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stopColor={selectedExercise.gradient[0]} />
+                                            <stop offset="100%" stopColor={selectedExercise.gradient[1]} />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
 
-                            {/* Counter open button */}
-                            <button
-                                onClick={() => setShowCounter(true)}
-                                className="ripple"
-                                style={{
-                                    width: '100px', height: '100px', borderRadius: '50%',
-                                    background: isExerciseDone
-                                        ? `linear-gradient(135deg, ${selectedExercise.gradient[0]}, ${selectedExercise.gradient[1]})`
-                                        : 'transparent',
-                                    border: isExerciseDone ? 'none' : `3px solid ${selectedExercise.color}`,
-                                    display: 'flex', flexDirection: 'column',
-                                    alignItems: 'center', justifyContent: 'center', gap: '2px',
-                                    transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                                    transform: isExerciseDone ? 'scale(1.1)' : 'scale(1)',
-                                    boxShadow: isExerciseDone
-                                        ? `0 0 40px ${selectedExercise.color}66, 0 4px 20px ${selectedExercise.color}33`
-                                        : `0 0 20px ${selectedExercise.color}33`,
-                                    cursor: 'pointer',
-                                    position: 'relative'
-                                }}
-                            >
-                                {isExerciseDone ? (
-                                    <>
-                                        {(() => { const I = ICON_MAP[selectedExercise.icon] || Dumbbell; return <I size={28} color="white" />; })()}
-                                        <span style={{ fontSize: '0.65rem', color: 'white', fontWeight: '700' }}>{dailyGoal}/{dailyGoal}</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        {(() => { const I = ICON_MAP[selectedExercise.icon] || Dumbbell; return <I size={28} color={selectedExercise.color} />; })()}
-                                        <span style={{ fontSize: '0.65rem', color: selectedExercise.color, fontWeight: '700' }}>{currentCount}/{dailyGoal}</span>
-                                    </>
-                                )}
-                            </button>
-                        </div>
-
-                        {/* Completion status */}
-                        {isExerciseDone && (() => {
-                            const exData = completions[today]?.[selectedExerciseId];
-                            const completedAt = exData?.timestamp ? new Date(exData.timestamp) : null;
-                            const timeStr = completedAt
-                                ? completedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-                                : null;
-                            return (
-                            <div className="scale-in" style={{
-                                color: selectedExercise.color, fontWeight: '600',
-                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px'
-                            }}>
-                                <span style={{ fontSize: '1rem' }}>
-                                    ✨ {selectedExercise.label} complété{isDayComplete ? ' — Journée validée !' : ''}
-                                </span>
-                                {timeStr && (
-                                    <span style={{
-                                        fontSize: '0.75rem', color: 'var(--text-secondary)',
-                                        fontWeight: '400', opacity: 0.7
-                                    }}>
-                                        Fait à {timeStr}
-                                    </span>
-                                )}
+                                {/* Counter open button */}
+                                <button
+                                    onClick={() => setShowCounter(true)}
+                                    className="ripple"
+                                    style={{
+                                        width: 'clamp(72px, 12vh, 110px)', height: 'clamp(72px, 12vh, 110px)', borderRadius: '50%',
+                                        background: isExerciseDone
+                                            ? `linear-gradient(135deg, ${selectedExercise.gradient[0]}, ${selectedExercise.gradient[1]})`
+                                            : 'transparent',
+                                        border: isExerciseDone ? 'none' : `2.5px solid ${selectedExercise.color}`,
+                                        display: 'flex', flexDirection: 'column',
+                                        alignItems: 'center', justifyContent: 'center', gap: '1px',
+                                        transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                        transform: isExerciseDone ? 'scale(1.05)' : 'scale(1)',
+                                        boxShadow: isExerciseDone
+                                            ? `0 0 30px ${selectedExercise.color}66, 0 4px 16px ${selectedExercise.color}33`
+                                            : `0 0 16px ${selectedExercise.color}33`,
+                                        cursor: 'pointer',
+                                        position: 'relative'
+                                    }}
+                                >
+                                    {isExerciseDone ? (
+                                        <>
+                                            {(() => { const I = ICON_MAP[selectedExercise.icon] || Dumbbell; return <I size={22} color="white" />; })()}
+                                            <span style={{ fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)', color: 'white', fontWeight: '700' }}>{dailyGoal}/{dailyGoal}</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            {(() => { const I = ICON_MAP[selectedExercise.icon] || Dumbbell; return <I size={22} color={selectedExercise.color} />; })()}
+                                            <span style={{ fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)', color: selectedExercise.color, fontWeight: '700' }}>{currentCount}/{dailyGoal}</span>
+                                        </>
+                                    )}
+                                </button>
                             </div>
-                            );
-                        })()}
+
+                            {/* Completion status (directly under button, no gap) */}
+                            {isExerciseDone && (() => {
+                                const exData = completions[today]?.[selectedExerciseId];
+                                const completedAt = exData?.timestamp ? new Date(exData.timestamp) : null;
+                                const timeStr = completedAt
+                                    ? completedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                                    : null;
+                                return (
+                                <div className="scale-in" style={{
+                                    color: selectedExercise.color, fontWeight: '700',
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px'
+                                }}>
+                                    <span style={{ fontSize: 'clamp(0.95rem, 3.8vw, 1.35rem)', textAlign: 'center', lineHeight: 1.3 }}>
+                                        {selectedExercise.label} complété{isDayComplete ? ' — Journée validée !' : ''}
+                                    </span>
+                                    {timeStr && (
+                                        <span style={{
+                                            fontSize: 'clamp(0.7rem, 2.8vw, 0.95rem)', color: 'var(--text-secondary)',
+                                            fontWeight: '500', opacity: 0.75
+                                        }}>
+                                            Fait à {timeStr}
+                                        </span>
+                                    )}
+                                </div>
+                                );
+                            })()}
+                        </div>
 
                         {/* Streak for selected exercise */}
                         {exerciseStreak > 0 && (
                             <div className="glass-premium slide-up" style={{
-                                padding: '10px 20px', borderRadius: 'var(--radius-lg)',
-                                display: 'flex', alignItems: 'center', gap: '10px',
+                                padding: 'clamp(6px, 1vh, 14px) clamp(14px, 2.5vw, 24px)', borderRadius: 'var(--radius-lg)',
+                                display: 'flex', alignItems: 'center', gap: 'clamp(8px, 1.2vw, 14px)',
                                 background: 'linear-gradient(135deg, rgba(239,68,68,0.15), rgba(249,115,22,0.15))',
-                                boxShadow: '0 4px 16px rgba(239,68,68,0.2)'
+                                boxShadow: '0 2px 12px rgba(239,68,68,0.2)',
+                                border: '1px solid rgba(249,115,22,0.25)'
                             }}>
                                 <Flame size={24} color="#f97316" className="pulse-glow" />
                                 <div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                    <div style={{ fontSize: 'clamp(0.65rem, 1.4vh, 0.85rem)', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '600' }}>
                                         Série — {selectedExercise.label}
                                     </div>
-                                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#f97316' }}>
+                                    <div style={{ fontSize: 'clamp(1.1rem, 2.5vh, 1.8rem)', fontWeight: '800', color: '#f97316' }}>
                                         {exerciseStreak} {exerciseStreak === 1 ? 'jour' : 'jours'}
                                     </div>
                                 </div>
@@ -451,15 +476,15 @@ export function Dashboard({
                 onClick={() => setShowCalendar(true)}
                 className="glass hover-lift gradient-button"
                 style={{
-                    width: '100%', padding: 'var(--spacing-md)', borderRadius: 'var(--radius-lg)',
+                    width: '100%', padding: 'clamp(8px, 1.2vh, 14px)', borderRadius: 'var(--radius-lg)',
                     color: 'var(--text-primary)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    gap: '10px', fontSize: '1rem', fontWeight: '600', border: 'none', cursor: 'pointer',
+                    gap: '8px', fontSize: 'clamp(0.8rem, 1.6vh, 1rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
                     background: `linear-gradient(135deg, ${selectedExercise.color}28, ${selectedExercise.gradient[0]}28)`,
                     boxShadow: 'var(--shadow-md)'
                 }}
             >
-                <CalendarIcon size={20} />
+                <CalendarIcon size={18} />
                 Ouvrir le Calendrier
             </button>
 
@@ -507,7 +532,7 @@ export function Dashboard({
 
 // Shared icon button style
 const iconBtnStyle = {
-    background: 'rgba(255,255,255,0.1)', width: '36px', height: '36px',
+    background: 'rgba(255,255,255,0.1)', width: '32px', height: '32px',
     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
     color: 'var(--text-primary)', border: 'none', cursor: 'pointer'
 };

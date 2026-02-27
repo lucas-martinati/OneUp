@@ -38,7 +38,7 @@ export const EXERCISES = [
         colorDim: 'rgba(52,211,153,0.15)',
         gradient: ['#10b981', '#34d399'],
         confettiColors: ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#ffffff'],
-        multiplier: 2,
+        multiplier: 1,
     },
     {
         id: 'pullups',
@@ -48,7 +48,7 @@ export const EXERCISES = [
         colorDim: 'rgba(251,191,36,0.15)',
         gradient: ['#f59e0b', '#fbbf24'],
         confettiColors: ['#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#ffffff'],
-        multiplier: 0.5,            // Math.ceil applied in Dashboard
+        multiplier: 0.3,            // Math.ceil applied in Dashboard
     },
     {
         id: 'abs',
@@ -58,7 +58,7 @@ export const EXERCISES = [
         colorDim: 'rgba(244,114,182,0.15)',
         gradient: ['#ec4899', '#f472b6'],
         confettiColors: ['#ec4899', '#f472b6', '#f9a8d4', '#fbcfe8', '#ffffff'],
-        multiplier: 1.5,
+        multiplier: 1,
     },
     {
         id: 'jumpingjacks',
@@ -68,7 +68,7 @@ export const EXERCISES = [
         colorDim: 'rgba(34,211,238,0.15)',
         gradient: ['#06b6d4', '#22d3ee'],
         confettiColors: ['#06b6d4', '#22d3ee', '#67e8f9', '#a5f3fc', '#ffffff'],
-        multiplier: 2,
+        multiplier: 1,
     },
     {
         id: 'lunges',
@@ -78,7 +78,7 @@ export const EXERCISES = [
         colorDim: 'rgba(251,146,60,0.15)',
         gradient: ['#f97316', '#fb923c'],
         confettiColors: ['#f97316', '#fb923c', '#fdba74', '#fed7aa', '#ffffff'],
-        multiplier: 1,
+        multiplier: 1.5,
     },
 ];
 
