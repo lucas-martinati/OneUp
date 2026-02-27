@@ -37,7 +37,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
         if (!isFuture && !isBeforeStart) {
             monthTotal++;
             const day = completions[dStr];
-            if (day && Object.values(day).some(ex => ex?.done)) monthCompleted++;
+            if (day && Object.values(day).some(ex => ex?.isCompleted)) monthCompleted++;
         }
     });
     const completionRate = monthTotal > 0 ? Math.round((monthCompleted / monthTotal) * 100) : 0;
@@ -129,7 +129,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                     const isToday = dateString === todayStr;
 
                     const dayCompletions = completions[dateString] || {};
-                    const isAnyDone = Object.values(dayCompletions).some(ex => ex?.done);
+                    const isAnyDone = Object.values(dayCompletions).some(ex => ex?.isCompleted);
                     const isMissed = !isAnyDone && !isFuture && !isBeforeStart;
 
                     let bgColor = 'rgba(255,255,255,0.03)';
@@ -176,7 +176,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                                 <div style={{ display: 'flex', gap: '2px', flexWrap: 'wrap', justifyContent: 'center' }}>
                                     {exercises.map(ex => {
                                         const exData = dayCompletions[ex.id];
-                                        if (!exData?.done) return null;
+                                        if (!exData?.isCompleted) return null;
                                         return (
                                             <div key={ex.id} style={{
                                                 width: '5px', height: '5px', borderRadius: '50%',
@@ -268,13 +268,13 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose }
                 {exercises && exercises.map(ex => {
                     const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
                     const goal = Math.max(1, Math.ceil(dayNum * ex.multiplier));
-                    const exData = dayCompletions[ex.id] || { count: 0, done: false };
+                    const exData = dayCompletions[ex.id] || { isCompleted: false };
                     return (
                         <div key={ex.id} style={{
                             display: 'flex', alignItems: 'center', gap: '12px',
                             padding: '10px 14px', borderRadius: 'var(--radius-md)',
-                            background: exData.done ? `${ex.color}18` : 'rgba(255,255,255,0.03)',
-                            border: `1px solid ${exData.done ? ex.color + '44' : 'rgba(255,255,255,0.06)'}`
+                            background: exData.isCompleted ? `${ex.color}18` : 'rgba(255,255,255,0.03)',
+                            border: `1px solid ${exData.isCompleted ? ex.color + '44' : 'rgba(255,255,255,0.06)'}`
                         }}>
                             <div style={{
                                 width: '34px', height: '34px', borderRadius: '50%',
@@ -283,14 +283,14 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose }
                                 <ExIcon size={16} color={ex.color} />
                             </div>
                             <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: '0.9rem', fontWeight: '600', color: exData.done ? ex.color : 'var(--text-primary)' }}>
+                                <div style={{ fontSize: '0.9rem', fontWeight: '600', color: exData.isCompleted ? ex.color : 'var(--text-primary)' }}>
                                     {ex.label}
                                 </div>
                                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                    {exData.count || 0} / {goal} reps
+                                    {exData.isCompleted ? goal : 0} / {goal} reps
                                 </div>
                             </div>
-                            {exData.done && (
+                            {exData.isCompleted && (
                                 <CheckCircle2 size={20} color={ex.color} strokeWidth={2} />
                             )}
                         </div>

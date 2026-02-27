@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import {
-    X, Check, RotateCcw, Plus, Minus,
+    X, Check, CheckCheck, RotateCcw, Plus, Minus,
     Dumbbell, ArrowDownUp, ArrowUp, Zap
 } from 'lucide-react';
 import { sounds } from '../utils/soundManager';
@@ -9,8 +9,20 @@ import { sounds } from '../utils/soundManager';
 // Map icon name strings to lucide components
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap };
 
+/** Trigger haptic feedback if available (Capacitor native) */
+const triggerHaptic = async () => {
+    try {
+        const { Haptics, ImpactStyle } = await import('@capacitor/haptics');
+        await Haptics.impact({ style: ImpactStyle.Heavy });
+    } catch {
+        // Fallback: Vibration API (most mobile browsers)
+        if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
+    }
+};
+
 export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig }) {
     const [isAnimating, setIsAnimating] = useState(false);
+    const [completeFlash, setCompleteFlash] = useState(false);
 
     // Use ref to track previous completion state (survives re-renders)
     const prevCompletedRef = useRef(isCompleted);
@@ -43,13 +55,16 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
 
     const handleIncrement = (amount) => {
         setIsAnimating(true);
-        onUpdateCount(currentCount + amount);
+        // Cap at dailyGoal (useProgress also caps, but UX feels better capping here too)
+        onUpdateCount(Math.min(currentCount + amount, dailyGoal));
         setTimeout(() => setIsAnimating(false), 200);
     };
 
     const handleDecrement = (amount) => {
         setIsAnimating(true);
-        onUpdateCount(Math.max(0, currentCount - amount));
+        // If completed but count is 0 (cloud sync), decrement from dailyGoal
+        const base = (isCompleted && currentCount === 0) ? dailyGoal : currentCount;
+        onUpdateCount(Math.max(0, base - amount));
         setTimeout(() => setIsAnimating(false), 200);
     };
 
@@ -59,8 +74,22 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
         setTimeout(() => setIsAnimating(false), 200);
     };
 
-    const progress = Math.min((currentCount / dailyGoal) * 100, 100);
-    const remaining = Math.max(0, dailyGoal - currentCount);
+    const handleCompleteAll = () => {
+        if (isCompleted) return;
+        setIsAnimating(true);
+        setCompleteFlash(true);
+        onUpdateCount(dailyGoal);
+        triggerHaptic();
+        setTimeout(() => {
+            setIsAnimating(false);
+            setCompleteFlash(false);
+        }, 600);
+    };
+
+    // When isCompleted is true but count is 0 (cloud sync strips count), display dailyGoal
+    const displayCount = isCompleted && currentCount === 0 ? dailyGoal : currentCount;
+    const progress = Math.min((displayCount / dailyGoal) * 100, 100);
+    const remaining = Math.max(0, dailyGoal - displayCount);
 
     // Exercise-specific styling
     const activeColor = exerciseConfig?.color || '#818cf8';
@@ -172,7 +201,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                                 transition: 'color 0.3s ease'
                             }}
                         >
-                            {currentCount}
+                            {displayCount}
                         </div>
                         <div style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
                             / {dailyGoal}
@@ -190,7 +219,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                     }}>
                         <Check size={24} color={activeColor} strokeWidth={3} />
                         <span style={{ color: activeColor, fontWeight: '600', fontSize: '1.1rem' }}>
-                            {exerciseLabel} Validé !
+                            {exerciseLabel} Valid&eacute; !
                         </span>
                     </div>
                 ) : (
@@ -210,15 +239,18 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                             key={`plus-${amount}`}
                             onClick={() => handleIncrement(amount)}
                             className="glass hover-lift ripple"
+                            disabled={isCompleted}
                             style={{
                                 padding: '16px 8px',
                                 borderRadius: 'var(--radius-md)',
                                 background: `linear-gradient(135deg, ${activeColor}2a, ${gradEnd}2a)`,
                                 border: `1px solid ${activeColor}44`,
-                                color: 'var(--text-primary)',
+                                color: isCompleted ? 'var(--text-secondary)' : 'var(--text-primary)',
                                 fontSize: '1.2rem', fontWeight: '700',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                gap: '4px', cursor: 'pointer'
+                                gap: '4px',
+                                cursor: isCompleted ? 'not-allowed' : 'pointer',
+                                opacity: isCompleted ? 0.4 : 1
                             }}
                         >
                             <Plus size={16} />
@@ -232,50 +264,81 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                     display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
                     gap: '12px', width: '100%', maxWidth: '200px'
                 }}>
-                    {[1, 5].map(amount => (
+                    {[1, 5].map(amount => {
+                        const canDecrement = displayCount > 0;
+                        return (
                         <button
                             key={`minus-${amount}`}
                             onClick={() => handleDecrement(amount)}
                             className="glass hover-lift ripple"
-                            disabled={currentCount === 0}
+                            disabled={!canDecrement}
                             style={{
                                 padding: '14px 8px', borderRadius: 'var(--radius-md)',
                                 background: 'rgba(255, 255, 255, 0.05)',
                                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                                color: currentCount === 0 ? 'var(--text-secondary)' : 'var(--text-primary)',
+                                color: !canDecrement ? 'var(--text-secondary)' : 'var(--text-primary)',
                                 fontSize: '1.1rem', fontWeight: '600',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 gap: '4px',
-                                cursor: currentCount === 0 ? 'not-allowed' : 'pointer',
-                                opacity: currentCount === 0 ? 0.5 : 1
+                                cursor: !canDecrement ? 'not-allowed' : 'pointer',
+                                opacity: !canDecrement ? 0.5 : 1
                             }}
                         >
                             <Minus size={16} />
                             {amount}
                         </button>
-                    ))}
+                        );
+                    })}
                 </div>
 
-                {/* Reset Button */}
-                <button
-                    onClick={handleReset}
-                    className="glass hover-lift"
-                    disabled={currentCount === 0}
-                    style={{
-                        padding: '12px 24px', borderRadius: 'var(--radius-lg)',
-                        background: 'rgba(239, 68, 68, 0.1)',
-                        border: '1px solid rgba(239, 68, 68, 0.3)',
-                        color: currentCount === 0 ? 'var(--text-secondary)' : '#ef4444',
-                        fontSize: '0.95rem', fontWeight: '600',
-                        display: 'flex', alignItems: 'center', gap: '8px',
-                        cursor: currentCount === 0 ? 'not-allowed' : 'pointer',
-                        opacity: currentCount === 0 ? 0.5 : 1,
-                        marginTop: 'var(--spacing-sm)'
-                    }}
-                >
-                    <RotateCcw size={18} />
-                    Réinitialiser
-                </button>
+                {/* Action Buttons Row: Reset + Complete All */}
+                <div style={{
+                    display: 'flex', gap: '12px', alignItems: 'center',
+                    marginTop: 'var(--spacing-sm)'
+                }}>
+                    {/* Reset Button */}
+                    <button
+                        onClick={handleReset}
+                        className="glass hover-lift"
+                        disabled={displayCount === 0}
+                        style={{
+                            padding: '12px 24px', borderRadius: 'var(--radius-lg)',
+                            background: 'rgba(239, 68, 68, 0.1)',
+                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            color: displayCount === 0 ? 'var(--text-secondary)' : '#ef4444',
+                            fontSize: '0.95rem', fontWeight: '600',
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            cursor: displayCount === 0 ? 'not-allowed' : 'pointer',
+                            opacity: displayCount === 0 ? 0.5 : 1
+                        }}
+                    >
+                        <RotateCcw size={18} />
+                        R&eacute;initialiser
+                    </button>
+
+                    {/* Complete All Button */}
+                    <button
+                        onClick={handleCompleteAll}
+                        className={`glass hover-lift${completeFlash ? ' complete-flash success-glow' : ''}`}
+                        disabled={isCompleted}
+                        style={{
+                            padding: '12px 24px', borderRadius: 'var(--radius-lg)',
+                            background: isCompleted
+                                ? `linear-gradient(135deg, ${activeColor}33, ${gradEnd}33)`
+                                : `linear-gradient(135deg, ${activeColor}22, ${gradEnd}22)`,
+                            border: `1px solid ${isCompleted ? activeColor + '66' : activeColor + '44'}`,
+                            color: isCompleted ? activeColor : 'var(--text-primary)',
+                            fontSize: '0.95rem', fontWeight: '600',
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            cursor: isCompleted ? 'not-allowed' : 'pointer',
+                            opacity: isCompleted ? 0.6 : 1,
+                            transition: 'all 0.3s ease'
+                        }}
+                    >
+                        <CheckCheck size={18} />
+                        Tout compl&eacute;ter
+                    </button>
+                </div>
             </div>
         </div>
     );

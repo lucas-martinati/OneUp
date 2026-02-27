@@ -28,7 +28,7 @@ export function Stats({ completions, exercises, onClose }) {
             totalDays++;
             // Find first exercise with a timeOfDay for the pie
             for (const exData of Object.values(day)) {
-                if (exData?.done && exData.timeOfDay) {
+                if (exData?.isCompleted && exData.timeOfDay) {
                     if (exData.timeOfDay === 'morning') pieData[0].value++;
                     else if (exData.timeOfDay === 'afternoon') pieData[1].value++;
                     else if (exData.timeOfDay === 'evening') pieData[2].value++;
@@ -73,12 +73,20 @@ export function Stats({ completions, exercises, onClose }) {
     const successRate = totalDays > 0 ? Math.round((totalDays / 365) * 100) : 0;
     const activeData = pieData.filter(d => d.value > 0);
 
-    // ── Per-exercise stats ────────────────────────────────────────────────
+    // ── Per-exercise stats (compute reps from daily goals on completed days) ──
+    const startDate = `${new Date().getFullYear()}-01-01`;
+    const utcStart = Date.UTC(new Date().getFullYear(), 0, 1);
+
     const exerciseStats = exercises ? exercises.map(ex => {
         let totalReps = 0;
         sortedDates.forEach(dateStr => {
             const exData = completions[dateStr]?.[ex.id];
-            if (exData?.done) totalReps += exData.count || 0;
+            if (exData?.isCompleted) {
+                const current = new Date(dateStr);
+                const utcCurrent = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
+                const dayNum = Math.floor((utcCurrent - utcStart) / (1000 * 60 * 60 * 24)) + 1;
+                totalReps += Math.max(1, Math.ceil(dayNum * ex.multiplier));
+            }
         });
         const streak = calculateExerciseStreak(completions, todayStr, ex.id);
         return { ...ex, totalReps, streak };

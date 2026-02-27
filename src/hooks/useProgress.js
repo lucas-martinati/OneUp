@@ -9,24 +9,37 @@ const NOTIFICATION_ID = 1;
 
 /**
  * Migrate legacy flat completions entry to the new per-exercise structure.
- * Old: completions[dateStr] = { done, pushupCount, timestamp, timeOfDay }
- * New: completions[dateStr][exerciseId] = { count, done, timestamp, timeOfDay }
+ * Old format 1: completions[dateStr] = { done, pushupCount, timestamp, timeOfDay }
+ * Old format 2: completions[dateStr][exerciseId] = { count, done, timestamp, timeOfDay }
+ * New: completions[dateStr][exerciseId] = { isCompleted, timestamp, timeOfDay }
  */
 function migrateLegacyEntry(entry) {
-  // Already migrated (has exercise keys, not flat done/pushupCount)
   const exerciseIds = EXERCISES.map(e => e.id);
   const hasExerciseKey = exerciseIds.some(id => id in entry);
-  if (hasExerciseKey) return entry;
 
-  // Legacy flat entry — migrate pushupCount into pushups exercise
+  if (!hasExerciseKey) {
+    // Legacy flat entry — migrate pushupCount into pushups exercise
+    const migrated = {};
+    if (entry.done !== undefined || entry.pushupCount !== undefined || entry.isCompleted !== undefined) {
+      migrated.pushups = {
+        isCompleted: entry.isCompleted || entry.done || false,
+        timestamp: entry.timestamp || null,
+        timeOfDay: entry.timeOfDay || null,
+      };
+    }
+    return migrated;
+  }
+
+  // Has exercise keys — migrate each from {count, done} to {isCompleted}
   const migrated = {};
-  if (entry.done !== undefined || entry.pushupCount !== undefined) {
-    migrated.pushups = {
-      count: entry.pushupCount || 0,
-      done: entry.done || false,
-      timestamp: entry.timestamp || null,
-      timeOfDay: entry.timeOfDay || null,
-    };
+  for (const [key, val] of Object.entries(entry)) {
+    if (val && typeof val === 'object') {
+      migrated[key] = {
+        isCompleted: val.isCompleted !== undefined ? val.isCompleted : (val.done || false),
+        timestamp: val.timestamp || null,
+        timeOfDay: val.timeOfDay || null,
+      };
+    }
   }
   return migrated;
 }
@@ -67,7 +80,7 @@ function makeAllDone() {
   const entry = {};
   const now = new Date().toISOString();
   for (const ex of EXERCISES) {
-    entry[ex.id] = { count: 0, done: true, timestamp: now, timeOfDay: null };
+    entry[ex.id] = { isCompleted: true, timestamp: now, timeOfDay: null };
   }
   return entry;
 }
@@ -147,7 +160,7 @@ export function useProgress() {
   const isDayDone = (dateStr) => {
     const day = state.completions[dateStr];
     if (!day) return false;
-    return Object.values(day).some(ex => ex?.done === true);
+    return Object.values(day).some(ex => ex?.isCompleted === true);
   };
 
   /** Toggle global day done status (marks/unmarks ALL exercises) */
@@ -155,13 +168,13 @@ export function useProgress() {
     setState(prev => {
       const newCompletions = { ...prev.completions };
       const day = newCompletions[dateStr] || {};
-      const currentlyDone = Object.values(day).some(ex => ex?.done);
+      const currentlyDone = Object.values(day).some(ex => ex?.isCompleted);
 
       if (currentlyDone) {
         // Mark all exercises as undone
         const updated = {};
         for (const [exId, exData] of Object.entries(day)) {
-          updated[exId] = { ...exData, done: false, timestamp: null, timeOfDay: null };
+          updated[exId] = { ...exData, isCompleted: false, timestamp: null, timeOfDay: null };
         }
         newCompletions[dateStr] = updated;
       } else {
@@ -174,26 +187,31 @@ export function useProgress() {
 
   // ─── Exercise-level helpers ───────────────────────────────────────────────
 
-  /** Get the rep count for a specific exercise on a given date */
+  /** Get the rep count for a specific exercise on a given date (counter UI only, capped at goal) */
   const getExerciseCount = (dateStr, exerciseId) => {
     return state.completions[dateStr]?.[exerciseId]?.count || 0;
   };
 
-  /** Get done status for a specific exercise on a specific date */
+  /** Get completion status for a specific exercise on a specific date */
   const getExerciseDone = (dateStr, exerciseId) => {
-    return state.completions[dateStr]?.[exerciseId]?.done || false;
+    return state.completions[dateStr]?.[exerciseId]?.isCompleted || false;
   };
 
-  /** Update rep count for a specific exercise. Marks done if count >= goal. */
+  /**
+   * Update rep count for a specific exercise. Caps at dailyGoal.
+   * Saves isCompleted boolean + timestamp. Count is kept locally for the counter UI
+   * but NOT synced to Firebase (only isCompleted is synced).
+   */
   const updateExerciseCount = (dateStr, exerciseId, newCount, dailyGoal) => {
     setState(prev => {
       const newCompletions = { ...prev.completions };
       const day = { ...(newCompletions[dateStr] || {}) };
       const current = day[exerciseId] || {};
 
-      const finalCount = Math.max(0, newCount);
-      const isNowDone = Number(finalCount) >= Number(dailyGoal);
-      const wasDone = current.done || false;
+      // Cap at dailyGoal
+      const finalCount = Math.max(0, Math.min(newCount, dailyGoal));
+      const isNowDone = finalCount >= dailyGoal;
+      const wasDone = current.isCompleted || false;
 
       let timestamp = current.timestamp;
       let timeOfDay = current.timeOfDay;
@@ -210,20 +228,27 @@ export function useProgress() {
         timeOfDay = null;
       }
 
-      day[exerciseId] = { ...current, count: finalCount, done: isNowDone, timestamp, timeOfDay };
+      day[exerciseId] = { count: finalCount, isCompleted: isNowDone, timestamp, timeOfDay };
       newCompletions[dateStr] = day;
 
       return { ...prev, completions: newCompletions };
     });
   };
 
-  /** Total reps logged for a given exercise across the whole year */
+  /** Total reps for a given exercise across the whole year (computed from daily goals on completed days) */
   const getTotalReps = (exerciseId) => {
+    const exercise = EXERCISES.find(e => e.id === exerciseId);
+    if (!exercise || !state.startDate) return 0;
+    const start = new Date(state.startDate);
+    const utcStart = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
     return Object.keys(state.completions).reduce((total, dateStr) => {
       if (dateStr < state.startDate) return total;
       const ex = state.completions[dateStr]?.[exerciseId];
-      if (!ex?.done) return total;
-      return total + (ex.count || 0);
+      if (!ex?.isCompleted) return total;
+      const current = new Date(dateStr);
+      const utcCurrent = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
+      const dayNum = Math.floor((utcCurrent - utcStart) / (1000 * 60 * 60 * 24)) + 1;
+      return total + Math.max(1, Math.ceil(dayNum * exercise.multiplier));
     }, 0);
   };
 

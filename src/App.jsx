@@ -188,6 +188,7 @@ function App() {
           onResolveConflict={handleResolveConflict}
           getExerciseCount={getExerciseCount}
           updateExerciseCount={updateExerciseCount}
+          getExerciseDone={progress.getExerciseDone}
         />
       )}
     </>

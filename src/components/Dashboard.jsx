@@ -10,7 +10,7 @@ import { Settings } from './Settings';
 import { Counter } from './Counter';
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
-import { getLocalDateStr, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
+import { getLocalDateStr, calculateStreak, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
 import { EXERCISES, EXERCISES_MAP } from '../config/exercises';
 
 // Map icon name → lucide component
@@ -34,7 +34,8 @@ const resetConfetti = () => {
 export function Dashboard({
     getDayNumber, toggleCompletion, completions, startDate, userStartDate,
     scheduleNotification, cloudAuth, cloudSync, settings, updateSettings,
-    conflictData, onResolveConflict, getExerciseCount, updateExerciseCount, getTotalReps
+    conflictData, onResolveConflict, getExerciseCount, updateExerciseCount, getTotalReps,
+    getExerciseDone
 }) {
     const [today, setToday] = useState(getLocalDateStr(new Date()));
     const [showCalendar, setShowCalendar] = useState(false);
@@ -57,7 +58,7 @@ export function Dashboard({
     const dailyGoal = Math.max(1, Math.ceil(dayNumber * selectedExercise.multiplier));
 
     const currentCount = getExerciseCount(today, selectedExerciseId);
-    const isExerciseDone = currentCount >= dailyGoal;
+    const isExerciseDone = completions[today]?.[selectedExerciseId]?.isCompleted || currentCount >= dailyGoal;
     const isDayComplete = isDayDoneFromCompletions(completions, today);
 
     const totalReps = useMemo(() => getTotalReps(selectedExerciseId), [completions, selectedExerciseId]);
@@ -69,6 +70,12 @@ export function Dashboard({
     const exerciseStreak = useMemo(
         () => calculateExerciseStreak(completions, today, selectedExerciseId),
         [completions, today, selectedExerciseId]
+    );
+
+    // Global streak (all exercises — consecutive days where ANY exercise is done)
+    const globalStreak = useMemo(
+        () => calculateStreak(completions, today),
+        [completions, today]
     );
 
     // Day change detection
@@ -149,6 +156,20 @@ export function Dashboard({
                         <PieChart size={18} />
                     </button>
 
+                    {/* Global streak badge */}
+                    {globalStreak > 0 && (
+                        <div className="glass-premium" style={{
+                            background: 'linear-gradient(135deg, rgba(249,115,22,0.15), rgba(239,68,68,0.15))',
+                            padding: '6px 12px', borderRadius: '20px', fontSize: '0.85rem',
+                            display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '700',
+                            boxShadow: '0 4px 12px rgba(249,115,22,0.25)',
+                            border: '1px solid rgba(249,115,22,0.3)'
+                        }}>
+                            <Flame size={16} color="#f97316" />
+                            <span style={{ color: '#f97316' }}>{globalStreak}</span>
+                        </div>
+                    )}
+
                     {/* Total reps badge — colours match selected exercise */}
                     <div className="glass-premium shimmer" style={{
                         background: `linear-gradient(135deg, ${selectedExercise.color}22, ${selectedExercise.gradient[0]}22)`,
@@ -169,25 +190,25 @@ export function Dashboard({
             }}>
                 {!isFuture ? (
                     <>
-                        {/* Day label */}
+                        {/* Day & Goal Hero Section */}
                         <div style={{ textAlign: 'center' }}>
                             <div style={{
-                                fontSize: '0.9rem', color: 'var(--text-secondary)',
+                                fontSize: '0.85rem', color: 'var(--text-secondary)',
                                 textTransform: 'uppercase', letterSpacing: '3px',
-                                marginBottom: 'var(--spacing-sm)', fontWeight: '500'
+                                marginBottom: '4px', fontWeight: '600'
                             }}>
-                                Day {dayNumber}
+                                Jour
                             </div>
 
                             {/* Big animated day number */}
                             <div style={{
-                                position: 'relative', height: '7rem', overflow: 'hidden',
+                                position: 'relative', height: '5.5rem', overflow: 'hidden',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                marginBottom: 'var(--spacing-xs)'
+                                marginBottom: '6px'
                             }}>
                                 {isCounterTransitioning && prevDayNumber && (
                                     <div className="rainbow-gradient" style={{
-                                        position: 'absolute', fontSize: '7rem', fontWeight: '800', lineHeight: 1,
+                                        position: 'absolute', fontSize: '5rem', fontWeight: '800', lineHeight: 1,
                                         animation: 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards'
                                     }}>
                                         {prevDayNumber}
@@ -197,7 +218,7 @@ export function Dashboard({
                                     key={isCounterTransitioning ? `new-${dayNumber}` : numberKey}
                                     className="rainbow-gradient"
                                     style={{
-                                        fontSize: '7rem', fontWeight: '800', lineHeight: 1,
+                                        fontSize: '5rem', fontWeight: '800', lineHeight: 1,
                                         animation: isCounterTransitioning
                                             ? 'rainbowFlow 6s ease infinite, counterSlideUp 1s ease-out'
                                             : 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out'
@@ -207,8 +228,26 @@ export function Dashboard({
                                 </div>
                             </div>
 
-                            <div style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', fontWeight: '500' }}>
-                                Reps Today
+                            {/* Prominent daily goal badge */}
+                            <div className="glass-premium" style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                                padding: '8px 20px', borderRadius: 'var(--radius-lg)',
+                                background: `linear-gradient(135deg, ${selectedExercise.color}18, ${selectedExercise.gradient[0]}18)`,
+                                border: `1px solid ${selectedExercise.color}33`,
+                                boxShadow: `0 2px 12px ${selectedExercise.color}22`
+                            }}>
+                                {(() => { const I = ICON_MAP[selectedExercise.icon] || Dumbbell; return <I size={18} color={selectedExercise.color} />; })()}
+                                <span style={{
+                                    fontSize: '1.3rem', fontWeight: '700',
+                                    color: selectedExercise.color
+                                }}>
+                                    {dailyGoal}
+                                </span>
+                                <span style={{
+                                    fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: '500'
+                                }}>
+                                    {selectedExercise.label.toLowerCase()} aujourd'hui
+                                </span>
                             </div>
                         </div>
 
@@ -223,7 +262,7 @@ export function Dashboard({
                                 const exStreak = calculateExerciseStreak(completions, today, ex.id);
                                 const exCount = getExerciseCount(today, ex.id);
                                 const exGoal = Math.max(1, Math.ceil(dayNumber * ex.multiplier));
-                                const exDone = exCount >= exGoal;
+                                const exDone = completions[today]?.[ex.id]?.isCompleted || exCount >= exGoal;
                                 return (
                                     <button
                                         key={ex.id}
@@ -265,6 +304,14 @@ export function Dashboard({
                                             transition: 'color 0.2s ease'
                                         }}>
                                             {ex.label}
+                                        </span>
+                                        <span style={{
+                                            fontSize: '0.7rem', fontWeight: '700',
+                                            color: isActive ? ex.color : 'var(--text-secondary)',
+                                            opacity: isActive ? 1 : 0.6,
+                                            transition: 'color 0.2s ease'
+                                        }}>
+                                            {exGoal}
                                         </span>
                                         {exStreak > 0 && (
                                             <span style={{
@@ -327,7 +374,7 @@ export function Dashboard({
                                 {isExerciseDone ? (
                                     <>
                                         {(() => { const I = ICON_MAP[selectedExercise.icon] || Dumbbell; return <I size={28} color="white" />; })()}
-                                        <span style={{ fontSize: '0.65rem', color: 'white', fontWeight: '700' }}>{currentCount}/{dailyGoal}</span>
+                                        <span style={{ fontSize: '0.65rem', color: 'white', fontWeight: '700' }}>{dailyGoal}/{dailyGoal}</span>
                                     </>
                                 ) : (
                                     <>

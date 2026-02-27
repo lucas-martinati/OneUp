@@ -226,17 +226,27 @@ class CloudSyncService {
     }
   }
 
-  // Sanitize data for cloud (remove pushup counts)
+  // Sanitize data for cloud (only save isCompleted boolean, strip count)
   sanitizeForCloud(data) {
     if (!data || !data.completions) return data;
 
-    // Create deep copy to avoid mutating original
     const sanitizedCompletions = {};
-    Object.keys(data.completions).forEach(key => {
-      const entry = data.completions[key];
-      // Destructure to remove pushupCount
-      const { pushupCount, ...rest } = entry;
-      sanitizedCompletions[key] = rest;
+    Object.keys(data.completions).forEach(dateStr => {
+      const dayEntry = data.completions[dateStr];
+      if (!dayEntry || typeof dayEntry !== 'object') return;
+
+      const sanitizedDay = {};
+      Object.keys(dayEntry).forEach(exerciseId => {
+        const ex = dayEntry[exerciseId];
+        if (!ex || typeof ex !== 'object') return;
+        // Only save isCompleted, timestamp, timeOfDay — no count
+        sanitizedDay[exerciseId] = {
+          isCompleted: ex.isCompleted || false,
+          timestamp: ex.timestamp || null,
+          timeOfDay: ex.timeOfDay || null,
+        };
+      });
+      sanitizedCompletions[dateStr] = sanitizedDay;
     });
 
     return {
@@ -343,21 +353,26 @@ class CloudSyncService {
 
     if (cloudData.completions) {
       Object.keys(cloudData.completions).forEach(dateStr => {
-        const cloudEntry = cloudData.completions[dateStr];
-        const localEntry = mergedCompletions[dateStr];
+        const cloudDay = cloudData.completions[dateStr];
+        const localDay = mergedCompletions[dateStr];
 
-        // Si l'entrée cloud est plus récente ou n'existe pas en local, la prendre
-        if (!localEntry ||
-          (cloudEntry.timestamp && localEntry.timestamp &&
-            new Date(cloudEntry.timestamp) > new Date(localEntry.timestamp))) {
-
-          // Restore local pushup count if available (since cloud doesn't have it)
-          const preservedCount = localEntry?.pushupCount || 0;
-
-          mergedCompletions[dateStr] = {
-            ...cloudEntry,
-            pushupCount: preservedCount
-          };
+        if (!localDay) {
+          // Cloud-only entry — take it
+          mergedCompletions[dateStr] = cloudDay;
+        } else if (cloudDay && typeof cloudDay === 'object') {
+          // Both exist — merge per exercise, prefer the one with a more recent timestamp
+          const merged = { ...localDay };
+          Object.keys(cloudDay).forEach(exId => {
+            const cloudEx = cloudDay[exId];
+            const localEx = merged[exId];
+            if (!localEx ||
+              (cloudEx?.timestamp && localEx?.timestamp &&
+                new Date(cloudEx.timestamp) > new Date(localEx.timestamp)) ||
+              (cloudEx?.timestamp && !localEx?.timestamp)) {
+              merged[exId] = cloudEx;
+            }
+          });
+          mergedCompletions[dateStr] = merged;
         }
       });
     }
