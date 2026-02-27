@@ -4,14 +4,16 @@
  * multiplier: the goal for a given day is Math.ceil(dayNumber * multiplier).
  * Colors are used across the UI (counter ring, calendar dots, selector cards).
  *
- * ┌────────────┬────────────┬──────────────────────────────────┐
- * │ Exercise   │ Multiplier │ Examples (day → goal)            │
- * ├────────────┼────────────┼──────────────────────────────────┤
- * │ Pompes     │ 1          │ day 1→1, day 50→50, day 100→100 │
- * │ Squats     │ 2          │ day 1→2, day 50→100, day 100→200│
- * │ Tractions  │ 0.5        │ day 1→1, day 50→25, day 100→50  │
- * │ Abdos      │ 1.5        │ day 1→2, day 50→75, day 100→150 │
- * └────────────┴────────────┴──────────────────────────────────┘
+ * ┌──────────────┬────────────┬──────────────────────────────────┐
+ * │ Exercise     │ Multiplier │ Examples (day → goal)            │
+ * ├──────────────┼────────────┼──────────────────────────────────┤
+ * │ Pompes       │ 1          │ day 1→1, day 50→50, day 100→100 │
+ * │ Squats       │ 2          │ day 1→2, day 50→100, day 100→200│
+ * │ Tractions    │ 0.5        │ day 1→1, day 50→25, day 100→50  │
+ * │ Abdos        │ 1.5        │ day 1→2, day 50→75, day 100→150 │
+ * │ Jumping Jack │ 2          │ day 1→2, day 50→100, day 100→200│
+ * │ Fentes       │ 1          │ day 1→1, day 50→50, day 100→100 │
+ * └──────────────┴────────────┴──────────────────────────────────┘
  *
  * To adjust difficulty: change the `multiplier` value below.
  * Formula: dailyGoal = Math.max(1, Math.ceil(dayNumber × multiplier))
@@ -57,6 +59,26 @@ export const EXERCISES = [
         gradient: ['#ec4899', '#f472b6'],
         confettiColors: ['#ec4899', '#f472b6', '#f9a8d4', '#fbcfe8', '#ffffff'],
         multiplier: 1.5,
+    },
+    {
+        id: 'jumpingjacks',
+        label: 'Jumping Jack',
+        icon: 'ChevronsUp',
+        color: '#22d3ee',           // Cyan-400
+        colorDim: 'rgba(34,211,238,0.15)',
+        gradient: ['#06b6d4', '#22d3ee'],
+        confettiColors: ['#06b6d4', '#22d3ee', '#67e8f9', '#a5f3fc', '#ffffff'],
+        multiplier: 2,
+    },
+    {
+        id: 'lunges',
+        label: 'Fentes',
+        icon: 'Footprints',
+        color: '#fb923c',           // Orange-400
+        colorDim: 'rgba(251,146,60,0.15)',
+        gradient: ['#f97316', '#fb923c'],
+        confettiColors: ['#f97316', '#fb923c', '#fdba74', '#fed7aa', '#ffffff'],
+        multiplier: 1,
     },
 ];
 

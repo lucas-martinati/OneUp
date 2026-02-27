@@ -32,7 +32,8 @@ function App() {
     updateExerciseCount,
     saveToCloud,
     loadFromCloud,
-    syncWithCloud
+    syncWithCloud,
+    startCloudListener
   } = progress;
 
   // Request notification permission and schedule on first setup
@@ -63,18 +64,18 @@ function App() {
     }
   }, [isSetup, settings.notificationsEnabled, settings.notificationTime, completions]);
 
-  // Auto-sync when signed in and data changes
+  // Auto-save to cloud when data changes (upload only — no loop risk)
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading && !conflictData && conflictCheckDone) {
-      const syncData = async () => {
+      const doSave = async () => {
         try {
           await saveToCloud();
-          logger.success('Data auto-saved to cloud');
+          logger.success('Data saved to cloud');
         } catch (error) {
           logger.error('Auto-save failed:', error);
         }
       };
-      const timer = setTimeout(syncData, 2000);
+      const timer = setTimeout(doSave, 500);
       return () => clearTimeout(timer);
     }
   }, [completions, googleAuth.isSignedIn, googleAuth.loading, conflictData]);
@@ -112,15 +113,23 @@ function App() {
           if (cloudData && cloudData.completions) {
             const cloudKeys = Object.keys(cloudData.completions);
             const localKeys = Object.keys(completions);
+
+            // Compare only isCompleted status per exercise (count is stripped in cloud)
             const hasConflict = cloudKeys.length > 0 && (
-              cloudKeys.length !== localKeys.length ||
               cloudKeys.some(key => !completions[key]) ||
+              localKeys.some(key => !cloudData.completions[key]) ||
               cloudKeys.some(key => {
                 const cloudDay = cloudData.completions[key];
                 const localDay = completions[key];
                 if (!cloudDay || !localDay) return true;
-                // Compare any exercise done status
-                return JSON.stringify(cloudDay) !== JSON.stringify(localDay);
+                // Compare per exercise: only check isCompleted
+                const allExIds = new Set([...Object.keys(cloudDay), ...Object.keys(localDay)]);
+                for (const exId of allExIds) {
+                  const cloudDone = cloudDay[exId]?.isCompleted || false;
+                  const localDone = localDay[exId]?.isCompleted || false;
+                  if (cloudDone !== localDone) return true;
+                }
+                return false;
               })
             );
             if (hasConflict) {
@@ -165,6 +174,35 @@ function App() {
       logger.error('Conflict resolution failed:', error);
     }
   };
+
+  // Full sync on app startup once conflict check is resolved
+  useEffect(() => {
+    if (googleAuth.isSignedIn && !googleAuth.loading && conflictCheckDone && isSetup) {
+      const initialSync = async () => {
+        try {
+          await syncWithCloud();
+          logger.success('Initial sync completed on app launch');
+        } catch (error) {
+          logger.error('Initial sync failed:', error);
+        }
+      };
+      initialSync();
+    }
+  }, [conflictCheckDone, googleAuth.isSignedIn, googleAuth.loading, isSetup]);
+
+  // Real-time listener: receive live updates from other devices
+  useEffect(() => {
+    if (googleAuth.isSignedIn && !googleAuth.loading && conflictCheckDone && isSetup) {
+      const unsubscribe = startCloudListener();
+      logger.info('Real-time cloud listener started');
+      return () => {
+        if (unsubscribe) {
+          unsubscribe();
+          logger.info('Real-time cloud listener stopped');
+        }
+      };
+    }
+  }, [googleAuth.isSignedIn, googleAuth.loading, conflictCheckDone, isSetup, startCloudListener]);
 
   return (
     <>

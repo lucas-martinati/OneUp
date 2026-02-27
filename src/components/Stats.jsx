@@ -1,9 +1,9 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { X, TrendingUp, Award, Flame, Target } from 'lucide-react';
-import { Dumbbell, ArrowDownUp, ArrowUp, Zap } from 'lucide-react';
+import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { getLocalDateStr, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
 
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap };
+const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
 export function Stats({ completions, exercises, onClose }) {
     const todayStr = getLocalDateStr(new Date());

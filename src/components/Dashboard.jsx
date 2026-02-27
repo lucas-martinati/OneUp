@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import confetti from 'canvas-confetti';
 import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
-    Dumbbell, ArrowDownUp, ArrowUp, Zap
+    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints
 } from 'lucide-react';
 import { Calendar } from './Calendar';
 import { Stats } from './Stats';
@@ -14,7 +14,7 @@ import { getLocalDateStr, calculateStreak, calculateExerciseStreak, isDayDoneFro
 import { EXERCISES, EXERCISES_MAP } from '../config/exercises';
 
 // Map icon name → lucide component
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap };
+const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
 // Utility to clean up confetti canvas (fixes Android Pixel bug)
 const resetConfetti = () => {
@@ -141,7 +141,7 @@ export function Dashboard({
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <img
-                        src="/pwa-512x512.png" alt="OneUp Logo"
+                        src={`${import.meta.env.BASE_URL}pwa-192x192.png`} alt="OneUp Logo"
                         className="bounce-on-hover"
                         style={{ width: '40px', height: '40px', borderRadius: '12px', objectFit: 'cover', cursor: 'pointer', transition: 'transform 0.3s ease' }}
                     />
@@ -253,7 +253,7 @@ export function Dashboard({
 
                         {/* ── Exercise Selector ── */}
                         <div style={{
-                            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+                            display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
                             gap: '8px', width: '100%', maxWidth: '360px'
                         }}>
                             {EXERCISES.map(ex => {
@@ -386,7 +386,13 @@ export function Dashboard({
                         </div>
 
                         {/* Completion status */}
-                        {isExerciseDone && (
+                        {isExerciseDone && (() => {
+                            const exData = completions[today]?.[selectedExerciseId];
+                            const completedAt = exData?.timestamp ? new Date(exData.timestamp) : null;
+                            const timeStr = completedAt
+                                ? completedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                                : null;
+                            return (
                             <div className="scale-in" style={{
                                 color: selectedExercise.color, fontWeight: '600',
                                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px'
@@ -394,8 +400,17 @@ export function Dashboard({
                                 <span style={{ fontSize: '1rem' }}>
                                     ✨ {selectedExercise.label} complété{isDayComplete ? ' — Journée validée !' : ''}
                                 </span>
+                                {timeStr && (
+                                    <span style={{
+                                        fontSize: '0.75rem', color: 'var(--text-secondary)',
+                                        fontWeight: '400', opacity: 0.7
+                                    }}>
+                                        Fait à {timeStr}
+                                    </span>
+                                )}
                             </div>
-                        )}
+                            );
+                        })()}
 
                         {/* Streak for selected exercise */}
                         {exerciseStreak > 0 && (

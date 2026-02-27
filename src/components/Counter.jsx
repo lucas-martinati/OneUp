@@ -2,12 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import {
     X, Check, CheckCheck, RotateCcw, Plus, Minus,
-    Dumbbell, ArrowDownUp, ArrowUp, Zap
+    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints
 } from 'lucide-react';
 import { sounds } from '../utils/soundManager';
 
 // Map icon name strings to lucide components
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap };
+const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
 /** Trigger haptic feedback if available (Capacitor native) */
 const triggerHaptic = async () => {

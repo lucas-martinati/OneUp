@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
-import { Dumbbell, ArrowDownUp, ArrowUp, Zap } from 'lucide-react';
+import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { getLocalDateStr } from '../utils/dateUtils';
 
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap };
+const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
 export function Calendar({ startDate, completions, exercises, getDayNumber, onClose }) {
     const [currentDate, setCurrentDate] = useState(new Date());

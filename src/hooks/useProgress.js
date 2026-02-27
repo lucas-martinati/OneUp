@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { cloudSync } from '../services/cloudSync';
 import { getLocalDateStr } from '../utils/dateUtils';
@@ -341,11 +341,18 @@ export function useProgress() {
 
   // ─── Cloud Sync ───────────────────────────────────────────────────────────
 
+  // Guard: skip incoming cloud updates triggered by our own writes
+  const isLocalWriteRef = useRef(false);
+
   const saveToCloud = useCallback(async () => {
     try {
+      isLocalWriteRef.current = true;
       await cloudSync.saveToCloud(state);
+      // Reset after a short delay (Firebase onValue fires almost instantly)
+      setTimeout(() => { isLocalWriteRef.current = false; }, 1500);
       return { success: true };
     } catch (error) {
+      isLocalWriteRef.current = false;
       console.error('Failed to save to cloud:', error);
       return { success: false, error: error.message };
     }
@@ -375,14 +382,46 @@ export function useProgress() {
 
   const syncWithCloud = useCallback(async () => {
     try {
+      isLocalWriteRef.current = true;
       const mergedData = await cloudSync.syncData(state);
       setState(validateProgressData(mergedData) || mergedData);
+      setTimeout(() => { isLocalWriteRef.current = false; }, 1500);
       return { success: true, data: mergedData };
     } catch (error) {
+      isLocalWriteRef.current = false;
       console.error('Failed to sync with cloud:', error);
       return { success: false, error: error.message };
     }
   }, [state]);
+
+  /**
+   * Start listening to real-time cloud changes (Firebase onValue).
+   * When another device writes, this callback fires and merges the incoming data.
+   * Returns an unsubscribe function.
+   */
+  const startCloudListener = useCallback(() => {
+    return cloudSync.listenToCloudChanges((cloudData) => {
+      // Skip if this change was triggered by our own write
+      if (isLocalWriteRef.current) return;
+      if (!cloudData || !cloudData.completions) return;
+
+      setState(prev => {
+        const validated = validateProgressData(cloudData);
+        // Only update if cloud data actually differs
+        const cloudJSON = JSON.stringify(validated.completions);
+        const localJSON = JSON.stringify(prev.completions);
+        if (cloudJSON === localJSON) return prev;
+
+        console.log('[Real-time sync] Incoming cloud update applied');
+        return {
+          startDate: validated.startDate || prev.startDate,
+          userStartDate: validated.userStartDate || prev.userStartDate,
+          completions: validated.completions || prev.completions,
+          isSetup: validated.isSetup ?? prev.isSetup,
+        };
+      });
+    });
+  }, []);
 
   // ─── Return ───────────────────────────────────────────────────────────────
 
@@ -405,5 +444,6 @@ export function useProgress() {
     saveToCloud,
     loadFromCloud,
     syncWithCloud,
+    startCloudListener,
   };
 }
