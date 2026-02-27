@@ -1,33 +1,32 @@
 import { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
-import { X, Check, RotateCcw, Plus, Minus } from 'lucide-react';
+import {
+    X, Check, RotateCcw, Plus, Minus,
+    Dumbbell, ArrowDownUp, ArrowUp, Zap
+} from 'lucide-react';
 import { sounds } from '../utils/soundManager';
 
-export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted }) {
-    const [displayCount, setDisplayCount] = useState(currentCount);
+// Map icon name strings to lucide components
+const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap };
+
+export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig }) {
     const [isAnimating, setIsAnimating] = useState(false);
 
-    // Use ref to track previous completion state properly (survives re-renders)
+    // Use ref to track previous completion state (survives re-renders)
     const prevCompletedRef = useRef(isCompleted);
     const hasCelebratedRef = useRef(false);
-
-    // Sync display with actual count
-    useEffect(() => {
-        setDisplayCount(currentCount);
-    }, [currentCount]);
 
     // Track threshold crossing for celebration
     useEffect(() => {
         const wasCompleted = prevCompletedRef.current;
 
-        // Only celebrate if we just crossed from NOT completed to completed
         if (isCompleted && !wasCompleted && !hasCelebratedRef.current) {
             hasCelebratedRef.current = true;
             confetti({
                 particleCount: 150,
                 spread: 120,
                 origin: { y: 0.6 },
-                colors: ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#ffffff'],
+                colors: exerciseConfig?.confettiColors || ['#10b981', '#34d399', '#6ee7b7', '#ffffff'],
                 ticks: 200,
                 gravity: 0.8,
                 scalar: 1.2
@@ -35,26 +34,22 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
             sounds.success();
         }
 
-        // Reset celebration flag if we go back below the goal
         if (!isCompleted && wasCompleted) {
             hasCelebratedRef.current = false;
         }
 
-        // Update the ref for next comparison
         prevCompletedRef.current = isCompleted;
-    }, [isCompleted]);
+    }, [isCompleted, exerciseConfig]);
 
     const handleIncrement = (amount) => {
         setIsAnimating(true);
-        const newCount = currentCount + amount;
-        onUpdateCount(newCount);
+        onUpdateCount(currentCount + amount);
         setTimeout(() => setIsAnimating(false), 200);
     };
 
     const handleDecrement = (amount) => {
         setIsAnimating(true);
-        const newCount = Math.max(0, currentCount - amount);
-        onUpdateCount(newCount);
+        onUpdateCount(Math.max(0, currentCount - amount));
         setTimeout(() => setIsAnimating(false), 200);
     };
 
@@ -67,6 +62,15 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     const progress = Math.min((currentCount / dailyGoal) * 100, 100);
     const remaining = Math.max(0, dailyGoal - currentCount);
 
+    // Exercise-specific styling
+    const activeColor = exerciseConfig?.color || '#818cf8';
+    const [gradStart, gradEnd] = exerciseConfig?.gradient || ['#667eea', '#818cf8'];
+    const ExIcon = ICON_MAP[exerciseConfig?.icon] || Dumbbell;
+    const exerciseLabel = exerciseConfig?.label || 'Exercice';
+
+    // Unique SVG gradient id per exercise to avoid conflicts
+    const gradientId = `counterGrad-${exerciseConfig?.id || 'default'}`;
+
     return (
         <div className="fade-in" style={{
             position: 'fixed',
@@ -74,8 +78,8 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0, 0, 0, 0.85)',
-            backdropFilter: 'blur(10px)',
+            background: 'rgba(0, 0, 0, 0.88)',
+            backdropFilter: 'blur(12px)',
             zIndex: 1000,
             display: 'flex',
             flexDirection: 'column',
@@ -90,22 +94,26 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                 alignItems: 'center',
                 marginBottom: 'var(--spacing-lg)'
             }}>
-                <h2 className="title-gradient" style={{ fontSize: '1.5rem', fontWeight: '700' }}>
-                    Compteur de Pompes
-                </h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                        width: '36px', height: '36px', borderRadius: '50%',
+                        background: `${activeColor}22`,
+                        border: `1.5px solid ${activeColor}55`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        <ExIcon size={18} color={activeColor} />
+                    </div>
+                    <h2 style={{ fontSize: '1.4rem', fontWeight: '700', color: activeColor, margin: 0 }}>
+                        {exerciseLabel}
+                    </h2>
+                </div>
                 <button
                     onClick={onClose}
                     className="glass hover-lift"
                     style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'rgba(255,255,255,0.1)',
-                        border: 'none',
-                        cursor: 'pointer'
+                        width: '40px', height: '40px', borderRadius: '50%',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: 'rgba(255,255,255,0.08)', border: 'none', cursor: 'pointer'
                     }}
                 >
                     <X size={20} color="var(--text-primary)" />
@@ -123,64 +131,50 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
             }}>
                 {/* Progress Circle & Count Display */}
                 <div style={{ position: 'relative', textAlign: 'center' }}>
-                    {/* Background circle */}
                     <svg width="200" height="200" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                        {/* Track */}
+                        <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                        {/* Progress arc */}
                         <circle
-                            cx="100"
-                            cy="100"
-                            r="90"
+                            cx="100" cy="100" r="90"
                             fill="none"
-                            stroke="rgba(255,255,255,0.1)"
-                            strokeWidth="8"
-                        />
-                        <circle
-                            cx="100"
-                            cy="100"
-                            r="90"
-                            fill="none"
-                            stroke={isCompleted ? '#10b981' : 'url(#counterGradient)'}
+                            stroke={isCompleted ? activeColor : `url(#${gradientId})`}
                             strokeWidth="8"
                             strokeDasharray={2 * Math.PI * 90}
                             strokeDashoffset={2 * Math.PI * 90 * (1 - progress / 100)}
                             strokeLinecap="round"
                             transform="rotate(-90 100 100)"
-                            style={{ transition: 'stroke-dashoffset 0.3s ease, stroke 0.3s ease' }}
+                            style={{
+                                transition: 'stroke-dashoffset 0.3s ease, stroke 0.3s ease',
+                                filter: isCompleted ? `drop-shadow(0 0 8px ${activeColor}88)` : 'none'
+                            }}
                         />
                         <defs>
-                            <linearGradient id="counterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#667eea" />
-                                <stop offset="50%" stopColor="#764ba2" />
-                                <stop offset="100%" stopColor="#f093fb" />
+                            <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor={gradStart} />
+                                <stop offset="100%" stopColor={gradEnd} />
                             </linearGradient>
                         </defs>
                     </svg>
 
                     {/* Count Display */}
                     <div style={{
-                        width: '200px',
-                        height: '200px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center'
+                        width: '200px', height: '200px',
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center'
                     }}>
                         <div
                             className={isAnimating ? 'scale-in' : ''}
                             style={{
-                                fontSize: '4rem',
-                                fontWeight: '800',
-                                color: isCompleted ? '#10b981' : 'var(--text-primary)',
+                                fontSize: '4rem', fontWeight: '800',
+                                color: isCompleted ? activeColor : 'var(--text-primary)',
                                 lineHeight: 1,
                                 transition: 'color 0.3s ease'
                             }}
                         >
                             {currentCount}
                         </div>
-                        <div style={{
-                            fontSize: '1rem',
-                            color: 'var(--text-secondary)',
-                            marginTop: '8px'
-                        }}>
+                        <div style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
                             / {dailyGoal}
                         </div>
                     </div>
@@ -189,25 +183,19 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                 {/* Validation Status */}
                 {isCompleted ? (
                     <div className="scale-in glass-premium" style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        padding: '12px 24px',
-                        borderRadius: 'var(--radius-lg)',
-                        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.2))',
-                        boxShadow: '0 0 30px rgba(16, 185, 129, 0.3)'
+                        display: 'flex', alignItems: 'center', gap: '10px',
+                        padding: '12px 24px', borderRadius: 'var(--radius-lg)',
+                        background: `linear-gradient(135deg, ${activeColor}22, ${gradEnd}22)`,
+                        boxShadow: `0 0 30px ${activeColor}44`
                     }}>
-                        <Check size={24} color="#10b981" strokeWidth={3} />
-                        <span style={{ color: '#10b981', fontWeight: '600', fontSize: '1.1rem' }}>
-                            Journée Validée !
+                        <Check size={24} color={activeColor} strokeWidth={3} />
+                        <span style={{ color: activeColor, fontWeight: '600', fontSize: '1.1rem' }}>
+                            {exerciseLabel} Validé !
                         </span>
                     </div>
                 ) : (
-                    <div style={{
-                        color: 'var(--text-secondary)',
-                        fontSize: '1rem'
-                    }}>
-                        Encore <span style={{ color: 'var(--accent)', fontWeight: '600' }}>{remaining}</span> pompes
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
+                        Encore <span style={{ color: activeColor, fontWeight: '600' }}>{remaining}</span> {exerciseLabel.toLowerCase()}
                     </div>
                 )}
 
@@ -215,9 +203,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: '12px',
-                    width: '100%',
-                    maxWidth: '350px'
+                    gap: '12px', width: '100%', maxWidth: '350px'
                 }}>
                     {[1, 2, 5, 10].map(amount => (
                         <button
@@ -227,16 +213,12 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                             style={{
                                 padding: '16px 8px',
                                 borderRadius: 'var(--radius-md)',
-                                background: 'linear-gradient(135deg, rgba(109, 40, 217, 0.3), rgba(139, 92, 246, 0.3))',
-                                border: '1px solid rgba(139, 92, 246, 0.3)',
+                                background: `linear-gradient(135deg, ${activeColor}2a, ${gradEnd}2a)`,
+                                border: `1px solid ${activeColor}44`,
                                 color: 'var(--text-primary)',
-                                fontSize: '1.2rem',
-                                fontWeight: '700',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '4px',
-                                cursor: 'pointer'
+                                fontSize: '1.2rem', fontWeight: '700',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                gap: '4px', cursor: 'pointer'
                             }}
                         >
                             <Plus size={16} />
@@ -247,11 +229,8 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
 
                 {/* Decrement Buttons */}
                 <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    gap: '12px',
-                    width: '100%',
-                    maxWidth: '200px'
+                    display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
+                    gap: '12px', width: '100%', maxWidth: '200px'
                 }}>
                     {[1, 5].map(amount => (
                         <button
@@ -260,16 +239,12 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                             className="glass hover-lift ripple"
                             disabled={currentCount === 0}
                             style={{
-                                padding: '14px 8px',
-                                borderRadius: 'var(--radius-md)',
+                                padding: '14px 8px', borderRadius: 'var(--radius-md)',
                                 background: 'rgba(255, 255, 255, 0.05)',
                                 border: '1px solid rgba(255, 255, 255, 0.1)',
                                 color: currentCount === 0 ? 'var(--text-secondary)' : 'var(--text-primary)',
-                                fontSize: '1.1rem',
-                                fontWeight: '600',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
+                                fontSize: '1.1rem', fontWeight: '600',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 gap: '4px',
                                 cursor: currentCount === 0 ? 'not-allowed' : 'pointer',
                                 opacity: currentCount === 0 ? 0.5 : 1
@@ -287,16 +262,12 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                     className="glass hover-lift"
                     disabled={currentCount === 0}
                     style={{
-                        padding: '12px 24px',
-                        borderRadius: 'var(--radius-lg)',
+                        padding: '12px 24px', borderRadius: 'var(--radius-lg)',
                         background: 'rgba(239, 68, 68, 0.1)',
                         border: '1px solid rgba(239, 68, 68, 0.3)',
                         color: currentCount === 0 ? 'var(--text-secondary)' : '#ef4444',
-                        fontSize: '0.95rem',
-                        fontWeight: '600',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
+                        fontSize: '0.95rem', fontWeight: '600',
+                        display: 'flex', alignItems: 'center', gap: '8px',
                         cursor: currentCount === 0 ? 'not-allowed' : 'pointer',
                         opacity: currentCount === 0 ? 0.5 : 1,
                         marginTop: 'var(--spacing-sm)'

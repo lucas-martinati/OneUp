@@ -16,20 +16,20 @@ function App() {
   const [conflictData, setConflictData] = useState(null);
   const [conflictCheckDone, setConflictCheckDone] = useState(false);
 
-  // Destructure progress for easier access
   const {
     startDate,
     completions,
     startChallenge,
     toggleCompletion,
     getDayNumber,
-    getTotalPushups,
+    getTotalReps,
+    isDayDone,
     isSetup,
     userStartDate,
     scheduleNotification,
     requestNotificationPermission,
-    getPushupCount,
-    updatePushupCount,
+    getExerciseCount,
+    updateExerciseCount,
     saveToCloud,
     loadFromCloud,
     syncWithCloud
@@ -38,39 +38,32 @@ function App() {
   // Request notification permission and schedule on first setup
   useEffect(() => {
     if (isSetup) {
-      // Request permissions if needed
       requestNotificationPermission();
-
-      // Schedule notification based on current settings
       if (settings.notificationsEnabled) {
         scheduleNotification(settings);
       }
     }
   }, [isSetup, settings.notificationsEnabled]);
 
-  // Refresh notification daily to update pushup count
+  // Refresh notification daily to keep day count fresh
   useEffect(() => {
     if (isSetup && settings.notificationsEnabled) {
-      // Update notification every time app opens to keep count fresh
       scheduleNotification(settings);
 
-      // Also update at midnight to ensure accurate count for tomorrow
       const now = new Date();
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      tomorrow.setHours(0, 0, 30, 0); // 30 seconds after midnight
-
-      const timeUntilMidnight = tomorrow.getTime() - now.getTime();
+      tomorrow.setHours(0, 0, 30, 0);
 
       const midnightTimer = setTimeout(() => {
         scheduleNotification(settings);
-      }, timeUntilMidnight);
+      }, tomorrow.getTime() - now.getTime());
 
       return () => clearTimeout(midnightTimer);
     }
   }, [isSetup, settings.notificationsEnabled, settings.notificationTime, completions]);
 
-  // Auto-sync when signed in and data changes (paused during conflict and until initial check done)
+  // Auto-sync when signed in and data changes
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading && !conflictData && conflictCheckDone) {
       const syncData = async () => {
@@ -81,35 +74,25 @@ function App() {
           logger.error('Auto-save failed:', error);
         }
       };
-
-      // Debounce the sync to avoid too many calls
       const timer = setTimeout(syncData, 2000);
       return () => clearTimeout(timer);
     }
   }, [completions, googleAuth.isSignedIn, googleAuth.loading, conflictData]);
 
-  // Sync settings with cloud
+  // Sync settings with cloud on sign-in
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading) {
-      // 1. Load settings from cloud on auth
       const loadSettings = async () => {
         try {
           const cloudSettings = await cloudSync.loadSettingsFromCloud();
           if (cloudSettings) {
-            console.log('Synced settings from cloud:', cloudSettings);
-
-            // Validate and sanitize settings before applying
             const safeSettings = {
               ...cloudSettings,
-              // Ensure notificationTime exists and is valid if we have settings
               notificationTime: cloudSettings.notificationTime || { hour: 9, minute: 0 }
             };
-
-            // Fix potential string/broken values from old syncs
             if (typeof safeSettings.notificationTime !== 'object') {
               safeSettings.notificationTime = { hour: 9, minute: 0 };
             }
-
             updateSettings(safeSettings);
           }
         } catch (error) {
@@ -118,7 +101,7 @@ function App() {
       };
       loadSettings();
     }
-  }, [googleAuth.isSignedIn, googleAuth.loading]); // Intentionally run once on load/auth
+  }, [googleAuth.isSignedIn, googleAuth.loading]);
 
   // Auto-detect cloud data conflict on sign-in
   useEffect(() => {
@@ -126,37 +109,35 @@ function App() {
       const detectConflict = async () => {
         try {
           const cloudData = await cloudSync.loadFromCloud();
-
           if (cloudData && cloudData.completions) {
-            // Check if cloud data differs from local data
             const cloudKeys = Object.keys(cloudData.completions);
             const localKeys = Object.keys(completions);
-
-            // Simple conflict detection: cloud has data and it's different
             const hasConflict = cloudKeys.length > 0 && (
               cloudKeys.length !== localKeys.length ||
-              cloudKeys.some(key => !completions[key])
+              cloudKeys.some(key => !completions[key]) ||
+              cloudKeys.some(key => {
+                const cloudDay = cloudData.completions[key];
+                const localDay = completions[key];
+                if (!cloudDay || !localDay) return true;
+                // Compare any exercise done status
+                return JSON.stringify(cloudDay) !== JSON.stringify(localDay);
+              })
             );
-
             if (hasConflict) {
               setConflictData(cloudData);
             } else {
-              // No conflict, safe to start auto-sync
               setConflictCheckDone(true);
             }
           } else {
-            // No cloud data, safe to start auto-sync
             setConflictCheckDone(true);
           }
         } catch (error) {
           logger.error('Conflict detection failed:', error);
-          // On error, allow auto-sync to prevent blocking
           setConflictCheckDone(true);
         }
       };
       detectConflict();
     } else if (googleAuth.isSignedIn && !googleAuth.loading && !isSetup) {
-      // If no setup needed (fresh start), mark conflict check as done
       setConflictCheckDone(true);
     }
   }, [googleAuth.isSignedIn, googleAuth.loading, isSetup]);
@@ -171,17 +152,13 @@ function App() {
     }
   }, [settings, googleAuth.isSignedIn, googleAuth.loading, isSetup]);
 
-  // Handle conflict resolution
   const handleResolveConflict = async (action) => {
     try {
       if (action === 'restore') {
-        // Restore: Load cloud data to local (overwrite local)
         await loadFromCloud();
       } else if (action === 'upload') {
-        // Upload: Save local data to cloud (overwrite cloud)
         await saveToCloud();
       }
-      // Clear conflict after resolution and enable auto-sync
       setConflictData(null);
       setConflictCheckDone(true);
     } catch (error) {
@@ -196,10 +173,11 @@ function App() {
       ) : (
         <Dashboard
           getDayNumber={getDayNumber}
-          getTotalPushups={getTotalPushups}
+          getTotalReps={getTotalReps}
+          isDayDone={isDayDone}
           toggleCompletion={toggleCompletion}
-          startDate={startDate} // Math anchor (Jan 1)
-          userStartDate={userStartDate} // Interaction anchor (User Choice)
+          startDate={startDate}
+          userStartDate={userStartDate}
           completions={completions}
           scheduleNotification={scheduleNotification}
           settings={settings}
@@ -208,8 +186,8 @@ function App() {
           cloudSync={{ saveToCloud, loadFromCloud, syncWithCloud, signIn: googleAuth.signIn, signOut: googleAuth.signOut }}
           conflictData={conflictData}
           onResolveConflict={handleResolveConflict}
-          getPushupCount={getPushupCount}
-          updatePushupCount={updatePushupCount}
+          getExerciseCount={getExerciseCount}
+          updateExerciseCount={updateExerciseCount}
         />
       )}
     </>

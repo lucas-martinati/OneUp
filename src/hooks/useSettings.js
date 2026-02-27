@@ -29,23 +29,9 @@ export function useSettings() {
     setSettings(prev => ({ ...prev, ...newSettings }));
   };
 
-  const toggleNotifications = () => {
-    setSettings(prev => ({ ...prev, notificationsEnabled: !prev.notificationsEnabled }));
-  };
-
-  const toggleSounds = () => {
-    setSettings(prev => ({ ...prev, soundsEnabled: !prev.soundsEnabled }));
-  };
-
-  const setNotificationTime = (hour, minute) => {
-    setSettings(prev => ({ ...prev, notificationTime: { hour, minute } }));
-  };
-
   return {
     settings,
-    updateSettings,
-    toggleNotifications,
-    toggleSounds,
-    setNotificationTime
+    updateSettings
   };
 }
+

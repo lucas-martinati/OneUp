@@ -51,3 +51,5 @@ android/capacitor-cordova-android-plugins/build/
 # Generated configuration files (created from templates)
 capacitor.config.json
 android/app/src/main/res/values/strings.xml
+
+upload_certificate.pem

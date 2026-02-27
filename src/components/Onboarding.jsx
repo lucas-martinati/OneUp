@@ -1,17 +1,10 @@
 import { useState } from 'react';
 import { Calendar, ArrowRight, Zap, Target } from 'lucide-react';
+import { getLocalDateStr } from '../utils/dateUtils';
 
 export function Onboarding({ onStart }) {
     const [step, setStep] = useState(1);
     const currentYear = new Date().getFullYear();
-
-    // Helper to get local date string (not UTC)
-    const getLocalDateStr = (d) => {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
 
     const [date, setDate] = useState(getLocalDateStr(new Date()));
 

@@ -63,12 +63,12 @@ class CloudSyncService {
           logger.info('Firebase Auth Restored:', user.email);
 
           await Preferences.set({
-             key: 'user_signed_in',
-             value: 'true'
+            key: 'user_signed_in',
+            value: 'true'
           });
           await Preferences.set({
-             key: 'user_id',
-             value: user.uid
+            key: 'user_id',
+            value: user.uid
           });
 
           this.notifyListeners({
@@ -81,9 +81,9 @@ class CloudSyncService {
             }
           });
         } else {
-           // Only notify sign out if we were previously thought to be signed in
-           // to avoid initial flickering if possible, but for safety we notify.
-           this.notifyListeners({
+          // Only notify sign out if we were previously thought to be signed in
+          // to avoid initial flickering if possible, but for safety we notify.
+          this.notifyListeners({
             isSignedIn: false,
             user: null
           });
@@ -233,15 +233,15 @@ class CloudSyncService {
     // Create deep copy to avoid mutating original
     const sanitizedCompletions = {};
     Object.keys(data.completions).forEach(key => {
-        const entry = data.completions[key];
-        // Destructure to remove pushupCount
-        const { pushupCount, ...rest } = entry;
-        sanitizedCompletions[key] = rest;
+      const entry = data.completions[key];
+      // Destructure to remove pushupCount
+      const { pushupCount, ...rest } = entry;
+      sanitizedCompletions[key] = rest;
     });
 
     return {
-        ...data,
-        completions: sanitizedCompletions
+      ...data,
+      completions: sanitizedCompletions
     };
   }
 
@@ -348,15 +348,15 @@ class CloudSyncService {
 
         // Si l'entrée cloud est plus récente ou n'existe pas en local, la prendre
         if (!localEntry ||
-            (cloudEntry.timestamp && localEntry.timestamp &&
-             new Date(cloudEntry.timestamp) > new Date(localEntry.timestamp))) {
+          (cloudEntry.timestamp && localEntry.timestamp &&
+            new Date(cloudEntry.timestamp) > new Date(localEntry.timestamp))) {
 
           // Restore local pushup count if available (since cloud doesn't have it)
           const preservedCount = localEntry?.pushupCount || 0;
 
           mergedCompletions[dateStr] = {
-              ...cloudEntry,
-              pushupCount: preservedCount
+            ...cloudEntry,
+            pushupCount: preservedCount
           };
         }
       });
@@ -390,8 +390,8 @@ class CloudSyncService {
   async saveSettingsToCloud(settings) {
     try {
       if (!auth?.currentUser || !database) {
-         // Silently fail if not logged in, it's fine for local-only
-         return false;
+        // Silently fail if not logged in, it's fine for local-only
+        return false;
       }
 
       const userId = auth.currentUser.uid;
