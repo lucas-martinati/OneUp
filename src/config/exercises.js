@@ -48,7 +48,7 @@ export const EXERCISES = [
         colorDim: 'rgba(251,191,36,0.15)',
         gradient: ['#f59e0b', '#fbbf24'],
         confettiColors: ['#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#ffffff'],
-        multiplier: 0.3,            // Math.ceil applied in Dashboard
+        multiplier: 0.4,            // Math.ceil applied in Dashboard
     },
     {
         id: 'abs',
