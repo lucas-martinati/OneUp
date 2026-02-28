@@ -9,6 +9,7 @@
     "dev": "vite",
     "prebuild": "npm run generate:config",
     "build": "vite build",
+"build:android": "npm run build && npx cap copy android",
     "lint": "eslint .",
     "preview": "vite preview",
     "deploy": "GITHUB_PAGES=true npm run build && gh-pages -d dist -b gh-pages --dotfiles"
