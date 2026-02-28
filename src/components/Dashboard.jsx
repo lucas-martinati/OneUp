@@ -78,6 +78,16 @@ export function Dashboard({
         [completions, today]
     );
 
+    // Duolingo-style streak: if today not done, show yesterday's streak in gray
+    const todayDone = isDayDoneFromCompletions(completions, today);
+    const yesterdayStreak = useMemo(() => {
+        const d = new Date(today);
+        d.setDate(d.getDate() - 1);
+        return calculateStreak(completions, getLocalDateStr(d));
+    }, [completions, today]);
+    const displayStreak = todayDone ? globalStreak : yesterdayStreak;
+    const streakActive = todayDone;
+
     // Day change detection
     useEffect(() => {
         const handleDayChange = () => {
@@ -136,7 +146,7 @@ export function Dashboard({
             {/* ── Header ── */}
             <header className="glass" style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: 'clamp(6px, 1vh, 12px) clamp(8px, 1.5vw, 14px)', borderRadius: 'var(--radius-lg)',
+                padding: 'clamp(10px, 1.5vh, 16px) clamp(10px, 2vw, 16px)', borderRadius: 'var(--radius-lg)',
                 boxShadow: 'var(--shadow-md)', minWidth: 0
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
@@ -150,34 +160,35 @@ export function Dashboard({
 
                 <div style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 1, minWidth: 0 }}>
                     <button onClick={() => setShowSettings(true)} className="hover-lift" style={iconBtnStyle}>
-                        <SettingsIcon size={16} />
+                        <SettingsIcon size={19} />
                     </button>
                     <button onClick={() => setShowStats(true)} className="hover-lift" style={iconBtnStyle}>
-                        <PieChart size={16} />
+                        <PieChart size={19} />
                     </button>
 
-                    {/* Global streak badge */}
-                    {globalStreak > 0 && (
-                        <div className="glass-premium" style={{
-                            background: 'linear-gradient(135deg, rgba(249,115,22,0.15), rgba(239,68,68,0.15))',
-                            padding: 'clamp(3px, 0.5vh, 6px) clamp(6px, 1vw, 12px)', borderRadius: '16px', fontSize: 'clamp(0.65rem, 1.4vh, 0.85rem)',
-                            display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '700',
-                            border: '1px solid rgba(249,115,22,0.3)',
-                            boxShadow: '0 2px 8px rgba(249,115,22,0.15)'
-                        }}>
-                            <Flame size={13} color="#f97316" />
-                            <span style={{ color: '#f97316' }}>{globalStreak}</span>
-                        </div>
-                    )}
+                    {/* Global streak badge — Duolingo style: gray if not done today */}
+                    <div className="glass-premium" style={{
+                        background: streakActive
+                            ? 'linear-gradient(135deg, rgba(249,115,22,0.15), rgba(239,68,68,0.15))'
+                            : 'linear-gradient(135deg, rgba(120,120,120,0.12), rgba(90,90,90,0.12))',
+                        padding: 'clamp(4px, 0.7vh, 8px) clamp(8px, 1.2vw, 14px)', borderRadius: '16px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)',
+                        display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '700',
+                        border: streakActive ? '1px solid rgba(249,115,22,0.3)' : '1px solid rgba(120,120,120,0.25)',
+                        boxShadow: streakActive ? '0 2px 8px rgba(249,115,22,0.15)' : 'none',
+                        opacity: streakActive ? 1 : 0.7
+                    }}>
+                        <Flame size={16} color={streakActive ? '#f97316' : '#888'} />
+                        <span style={{ color: streakActive ? '#f97316' : '#888' }}>{displayStreak}</span>
+                    </div>
 
                     {/* Total reps badge */}
                     <div className="glass-premium shimmer" style={{
                         background: `linear-gradient(135deg, ${selectedExercise.color}22, ${selectedExercise.gradient[0]}22)`,
-                        padding: 'clamp(3px, 0.5vh, 6px) clamp(6px, 1vw, 12px)', borderRadius: '16px', fontSize: 'clamp(0.65rem, 1.4vh, 0.85rem)',
-                        display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '600',
+                        padding: 'clamp(4px, 0.7vh, 8px) clamp(8px, 1.2vw, 14px)', borderRadius: '16px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)',
+                        display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '600',
                         boxShadow: `0 2px 8px ${selectedExercise.color}33`
                     }}>
-                        <Trophy size={13} color={selectedExercise.color} />
+                        <Trophy size={16} color={selectedExercise.color} />
                         <span>{totalReps}</span>
                     </div>
                 </div>
@@ -476,10 +487,10 @@ export function Dashboard({
                 onClick={() => setShowCalendar(true)}
                 className="glass hover-lift gradient-button"
                 style={{
-                    width: '100%', padding: 'clamp(8px, 1.2vh, 14px)', borderRadius: 'var(--radius-lg)',
+                    width: '100%', padding: 'clamp(12px, 1.8vh, 18px)', borderRadius: 'var(--radius-lg)',
                     color: 'var(--text-primary)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    gap: '8px', fontSize: 'clamp(0.8rem, 1.6vh, 1rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
+                    gap: '8px', fontSize: 'clamp(0.85rem, 1.8vh, 1.05rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
                     background: `linear-gradient(135deg, ${selectedExercise.color}28, ${selectedExercise.gradient[0]}28)`,
                     boxShadow: 'var(--shadow-md)'
                 }}
@@ -532,7 +543,7 @@ export function Dashboard({
 
 // Shared icon button style
 const iconBtnStyle = {
-    background: 'rgba(255,255,255,0.1)', width: '32px', height: '32px',
+    background: 'rgba(255,255,255,0.1)', width: '38px', height: '38px',
     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
     color: 'var(--text-primary)', border: 'none', cursor: 'pointer'
 };

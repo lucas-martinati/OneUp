@@ -73,6 +73,24 @@ export function Stats({ completions, exercises, onClose }) {
     const successRate = totalDays > 0 ? Math.round((totalDays / 365) * 100) : 0;
     const activeData = pieData.filter(d => d.value > 0);
 
+    // Duolingo-style: if today not done, show yesterday's streak in gray
+    const todayDone = isDayDoneFromCompletions(completions, todayStr);
+    const yesterdayStreak = (() => {
+        let streak = 0;
+        const yesterday = new Date(todayStr);
+        yesterday.setDate(yesterday.getDate() - 1);
+        for (let i = 0; i < 365; i++) {
+            const d = new Date(yesterday);
+            d.setDate(d.getDate() - i);
+            const s = getLocalDateStr(d);
+            if (isDayDoneFromCompletions(completions, s)) streak++;
+            else break;
+        }
+        return streak;
+    })();
+    const displayStreak = todayDone ? currentStreak : yesterdayStreak;
+    const streakActive = todayDone;
+
     // ── Per-exercise stats (compute reps from daily goals on completed days) ──
     const startDate = `${new Date().getFullYear()}-01-01`;
     const utcStart = Date.UTC(new Date().getFullYear(), 0, 1);
@@ -89,7 +107,16 @@ export function Stats({ completions, exercises, onClose }) {
             }
         });
         const streak = calculateExerciseStreak(completions, todayStr, ex.id);
-        return { ...ex, totalReps, streak };
+        const exDoneToday = completions[todayStr]?.[ex.id]?.isCompleted || false;
+        // If not done today, show yesterday's streak
+        const yesterdayExStreak = (() => {
+            const d = new Date(todayStr);
+            d.setDate(d.getDate() - 1);
+            return calculateExerciseStreak(completions, getLocalDateStr(d), ex.id);
+        })();
+        const displayExStreak = exDoneToday ? streak : yesterdayExStreak;
+        const exStreakActive = exDoneToday;
+        return { ...ex, totalReps, streak: displayExStreak, streakActive: exStreakActive };
     }) : [];
 
     return (
@@ -123,9 +150,12 @@ export function Stats({ completions, exercises, onClose }) {
                 display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
                 gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-lg)'
             }}>
-                <div className="glass-premium scale-in" style={statCardStyle('rgba(239,68,68,0.15)', 'rgba(249,115,22,0.15)')}>
-                    <Flame size={28} color="#f97316" style={{ marginBottom: '8px' }} />
-                    <div style={{ fontSize: '2rem', fontWeight: '800', color: '#f97316', lineHeight: 1 }}>{currentStreak}</div>
+                <div className="glass-premium scale-in" style={statCardStyle(
+                    streakActive ? 'rgba(239,68,68,0.15)' : 'rgba(120,120,120,0.1)',
+                    streakActive ? 'rgba(249,115,22,0.15)' : 'rgba(90,90,90,0.1)'
+                )}>
+                    <Flame size={28} color={streakActive ? '#f97316' : '#888'} style={{ marginBottom: '8px', opacity: streakActive ? 1 : 0.6 }} />
+                    <div style={{ fontSize: '2rem', fontWeight: '800', color: streakActive ? '#f97316' : '#888', lineHeight: 1 }}>{displayStreak}</div>
                     <div style={statLabelStyle}>Série actuelle</div>
                 </div>
                 <div className="glass-premium scale-in" style={{ ...statCardStyle('rgba(251,191,36,0.15)', 'rgba(245,158,11,0.15)'), animationDelay: '0.1s' }}>
@@ -185,11 +215,12 @@ export function Stats({ completions, exercises, onClose }) {
                                     {ex.streak > 0 && (
                                         <div style={{
                                             display: 'flex', alignItems: 'center', gap: '4px',
-                                            background: 'rgba(249,115,22,0.1)', padding: '4px 10px',
+                                            background: ex.streakActive ? 'rgba(249,115,22,0.1)' : 'rgba(120,120,120,0.08)',
+                                            padding: '4px 10px',
                                             borderRadius: '12px'
                                         }}>
-                                            <span style={{ fontSize: '0.8rem' }}>🔥</span>
-                                            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#f97316' }}>
+                                            <span style={{ fontSize: '0.8rem', opacity: ex.streakActive ? 1 : 0.5, filter: ex.streakActive ? 'none' : 'grayscale(1)' }}>🔥</span>
+                                            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: ex.streakActive ? '#f97316' : '#888' }}>
                                                 {ex.streak}j
                                             </span>
                                         </div>
