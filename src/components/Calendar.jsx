@@ -45,7 +45,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
     return (
         <div className="fade-in" style={{
             position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'rgba(5, 5, 5, 0.97)', backdropFilter: 'blur(16px)', zIndex: 100,
+            background: 'var(--overlay-bg)', backdropFilter: 'blur(16px)', zIndex: 100,
             display: 'flex', flexDirection: 'column', padding: 'var(--spacing-md)',
             paddingTop: 'calc(var(--spacing-md) + env(safe-area-inset-top))',
             paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))',
@@ -60,9 +60,9 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                     Historique
                 </h2>
                 <button onClick={onClose} className="hover-lift glass" style={{
-                    background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
+                    background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
                     width: '44px', height: '44px', display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', color: 'white', cursor: 'pointer'
+                    justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
                 }}>
                     <X size={24} />
                 </button>
@@ -79,7 +79,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                     <div style={{ fontSize: '1.8rem', fontWeight: '700', color: '#10b981' }}>{monthCompleted}</div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Complétés</div>
                 </div>
-                <div style={{ width: '1px', background: 'rgba(255,255,255,0.1)' }} />
+                <div style={{ width: '1px', background: 'var(--border-default)' }} />
                 <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '1.8rem', fontWeight: '700', color: '#8b5cf6' }}>{completionRate}%</div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Réussite</div>
@@ -96,7 +96,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                 </button>
                 <span style={{
                     fontSize: '1.3rem', fontWeight: '700',
-                    background: 'linear-gradient(135deg, #fff 0%, #a1a1aa 100%)',
+                    background: 'linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%)',
                     WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
                 }}>
                     {monthNames[month]} {year}
@@ -132,7 +132,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                     const isAnyDone = Object.values(dayCompletions).some(ex => ex?.isCompleted);
                     const isMissed = !isAnyDone && !isFuture && !isBeforeStart;
 
-                    let bgColor = 'rgba(255,255,255,0.03)';
+                    let bgColor = 'var(--surface-subtle)';
                     if (isToday) bgColor = 'rgba(139, 92, 246, 0.1)';
                     if (isAnyDone) bgColor = 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.15))';
                     if (isMissed) bgColor = 'linear-gradient(135deg, rgba(239,68,68,0.1), rgba(220,38,38,0.1))';
@@ -155,7 +155,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                                 position: 'relative',
                                 opacity: isFuture || isBeforeStart ? 0.25 : 1,
                                 border: isSelected
-                                    ? '2px solid rgba(255,255,255,0.5)'
+                                    ? '2px solid var(--border-strong)'
                                     : isToday
                                         ? '2px solid rgba(139,92,246,0.5)'
                                         : '2px solid transparent',
@@ -238,7 +238,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose }
     return (
         <div style={{
             position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
-            background: 'rgba(10,10,15,0.97)', backdropFilter: 'blur(20px)',
+            background: 'var(--sheet-bg)', backdropFilter: 'blur(20px)',
             borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
             padding: 'var(--spacing-md)',
             paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))',
@@ -246,7 +246,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose }
             animation: 'slideUp 0.25s ease'
         }}>
             {/* Handle */}
-            <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.15)', margin: '0 auto 16px' }} />
+            <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'var(--sheet-handle)', margin: '0 auto 16px' }} />
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <div>
@@ -256,7 +256,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose }
                     <div style={{ fontSize: '1.2rem', fontWeight: '700' }}>Jour {dayNum}</div>
                 </div>
                 <button onClick={onClose} style={{
-                    background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: '50%',
+                    background: 'var(--surface-dim)', border: 'none', borderRadius: '50%',
                     width: '36px', height: '36px', display: 'flex', alignItems: 'center',
                     justifyContent: 'center', cursor: 'pointer'
                 }}>
@@ -273,8 +273,8 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose }
                         <div key={ex.id} style={{
                             display: 'flex', alignItems: 'center', gap: '12px',
                             padding: '10px 14px', borderRadius: 'var(--radius-md)',
-                            background: exData.isCompleted ? `${ex.color}18` : 'rgba(255,255,255,0.03)',
-                            border: `1px solid ${exData.isCompleted ? ex.color + '44' : 'rgba(255,255,255,0.06)'}`
+                            background: exData.isCompleted ? `${ex.color}18` : 'var(--surface-subtle)',
+                            border: `1px solid ${exData.isCompleted ? ex.color + '44' : 'var(--border-muted)'}`
                         }}>
                             <div style={{
                                 width: '34px', height: '34px', borderRadius: '50%',
@@ -302,7 +302,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose }
 }
 
 const navBtnStyle = {
-    color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.05)',
+    color: 'var(--text-secondary)', background: 'var(--surface-muted)',
     border: 'none', borderRadius: '50%', width: '40px', height: '40px',
     display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
 };

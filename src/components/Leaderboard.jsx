@@ -50,7 +50,7 @@ export function Leaderboard({ onClose, cloudSync }) {
     return (
         <div className="fade-in" style={{
             position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'rgba(5, 5, 5, 0.97)', backdropFilter: 'blur(16px)', zIndex: 110,
+            background: 'var(--overlay-bg)', backdropFilter: 'blur(16px)', zIndex: 110,
             display: 'flex', flexDirection: 'column',
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)'
@@ -69,9 +69,9 @@ export function Leaderboard({ onClose, cloudSync }) {
                     Classement
                 </h2>
                 <button onClick={onClose} className="hover-lift glass" style={{
-                    background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
+                    background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
                     width: '40px', height: '40px', display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', color: 'white', cursor: 'pointer'
+                    justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
                 }}>
                     <X size={22} />
                 </button>
@@ -95,10 +95,10 @@ export function Leaderboard({ onClose, cloudSync }) {
                                 padding: '6px 12px', borderRadius: '20px',
                                 background: isActive
                                     ? `linear-gradient(135deg, ${tab.color}30, ${tab.color}18)`
-                                    : 'rgba(255,255,255,0.05)',
+                                    : 'var(--surface-muted)',
                                 border: isActive
                                     ? `1.5px solid ${tab.color}60`
-                                    : '1.5px solid rgba(255,255,255,0.08)',
+                                    : '1.5px solid var(--border-default)',
                                 color: isActive ? tab.color : 'var(--text-secondary)',
                                 fontSize: '0.75rem', fontWeight: '600',
                                 cursor: 'pointer', whiteSpace: 'nowrap',
@@ -177,18 +177,18 @@ export function Leaderboard({ onClose, cloudSync }) {
                                                     borderRadius: '50%', overflow: 'hidden',
                                                     border: `2px solid ${colors[rank]}`,
                                                     boxShadow: `0 0 12px ${colors[rank]}44`,
-                                                    background: 'rgba(255,255,255,0.05)'
-                                                }}>
-                                                    {entry.photoURL ? (
-                                                        <img src={entry.photoURL} alt="" style={{
-                                                            width: '100%', height: '100%', objectFit: 'cover'
-                                                        }} />
-                                                    ) : (
-                                                        <div style={{
-                                                            width: '100%', height: '100%', display: 'flex',
-                                                            alignItems: 'center', justifyContent: 'center'
-                                                        }}>
-                                                            <User size={parseInt(avatarSizes[rank]) / 2} color={colors[rank]} />
+                                    background: 'var(--surface-muted)'
+                                }}>
+                                    {entry.photoURL ? (
+                                        <img src={entry.photoURL} alt="" style={{
+                                            width: '100%', height: '100%', objectFit: 'cover'
+                                        }} />
+                                    ) : (
+                                        <div style={{
+                                            width: '100%', height: '100%', display: 'flex',
+                                            alignItems: 'center', justifyContent: 'center'
+                                        }}>
+                                            <User size={parseInt(avatarSizes[rank]) / 2} color={colors[rank]} />
                                                         </div>
                                                     )}
                                                 </div>
@@ -252,10 +252,10 @@ export function Leaderboard({ onClose, cloudSync }) {
                                         padding: '10px 12px', borderRadius: 'var(--radius-md)',
                                         background: isMe
                                             ? 'linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06))'
-                                            : 'rgba(255,255,255,0.03)',
+                                            : 'var(--surface-subtle)',
                                         border: isMe
                                             ? '1px solid rgba(251,191,36,0.25)'
-                                            : '1px solid rgba(255,255,255,0.05)',
+                                            : '1px solid var(--border-subtle)',
                                         cursor: 'pointer', transition: 'all 0.2s ease'
                                     }}
                                 >
@@ -272,8 +272,8 @@ export function Leaderboard({ onClose, cloudSync }) {
                                     <div style={{
                                         width: '32px', height: '32px', borderRadius: '50%',
                                         overflow: 'hidden', flexShrink: 0,
-                                        background: 'rgba(255,255,255,0.05)',
-                                        border: isMe ? '1.5px solid rgba(251,191,36,0.4)' : '1.5px solid rgba(255,255,255,0.08)'
+                                        background: 'var(--surface-muted)',
+                                        border: isMe ? '1.5px solid rgba(251,191,36,0.4)' : '1.5px solid var(--border-default)'
                                     }}>
                                         {entry.photoURL ? (
                                             <img src={entry.photoURL} alt="" style={{
@@ -342,7 +342,7 @@ function UserDetail({ entry, rank, isMe, onClose }) {
             className="fade-in"
             style={{
                 position: 'absolute', inset: 0,
-                background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
+                background: 'var(--overlay-backdrop)', backdropFilter: 'blur(8px)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 padding: 'var(--spacing-md)', zIndex: 120
             }}
@@ -361,7 +361,7 @@ function UserDetail({ entry, rank, isMe, onClose }) {
                     onClick={onClose}
                     className="hover-lift"
                     style={{
-                        background: 'rgba(255,255,255,0.08)', border: 'none',
+                        background: 'var(--surface-dim)', border: 'none',
                         borderRadius: '50%', width: '32px', height: '32px',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: 'var(--text-secondary)', cursor: 'pointer', marginBottom: '12px'
@@ -380,7 +380,7 @@ function UserDetail({ entry, rank, isMe, onClose }) {
                         width: '64px', height: '64px', borderRadius: '50%',
                         overflow: 'hidden', border: `2px solid ${rankColor}`,
                         boxShadow: `0 0 20px ${rankColor}33`,
-                        background: 'rgba(255,255,255,0.05)'
+                        background: 'var(--surface-muted)'
                     }}>
                         {entry.photoURL ? (
                             <img src={entry.photoURL} alt="" style={{
@@ -475,7 +475,7 @@ function UserDetail({ entry, rank, isMe, onClose }) {
                                     </div>
                                     <div style={{
                                         height: '3px', borderRadius: '2px',
-                                        background: 'rgba(255,255,255,0.05)', overflow: 'hidden'
+                                        background: 'var(--progress-track-thin)', overflow: 'hidden'
                                     }}>
                                         <div style={{
                                             height: '100%', borderRadius: '2px',

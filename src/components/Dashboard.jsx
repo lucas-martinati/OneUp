@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import confetti from 'canvas-confetti';
+import { App as CapacitorApp } from '@capacitor/app';
 import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users
@@ -36,7 +37,7 @@ export function Dashboard({
     getDayNumber, toggleCompletion, completions, startDate, userStartDate,
     scheduleNotification, cloudAuth, cloudSync, settings, updateSettings,
     conflictData, onResolveConflict, getExerciseCount, updateExerciseCount, getTotalReps,
-    getExerciseDone
+    getExerciseDone, pauseCloudSync, resumeCloudSync
 }) {
     const [today, setToday] = useState(getLocalDateStr(new Date()));
     const [showCalendar, setShowCalendar] = useState(false);
@@ -129,6 +130,39 @@ export function Dashboard({
         const interval = setInterval(handleDayChange, 10000);
         return () => clearInterval(interval);
     }, [today, getDayNumber, settings, scheduleNotification]);
+
+    // Handle Android hardware back button
+    useEffect(() => {
+        const handleBackButton = ({ canGoBack }) => {
+            if (showCounter) {
+                setShowCounter(false);
+                resumeCloudSync?.();
+            } else if (showCalendar) {
+                setShowCalendar(false);
+            } else if (showStats) {
+                setShowStats(false);
+            } else if (showSettings) {
+                setShowSettings(false);
+            } else if (showLeaderboard) {
+                setShowLeaderboard(false);
+            } else {
+                CapacitorApp.exitApp();
+            }
+        };
+        
+        let backButtonListener;
+        CapacitorApp.addListener('backButton', handleBackButton).then(listener => {
+            backButtonListener = listener;
+        }).catch(err => {
+            console.warn('Capacitor App plugin error:', err);
+        });
+
+        return () => {
+            if (backButtonListener) {
+                backButtonListener.remove();
+            }
+        };
+    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, resumeCloudSync]);
 
     const handleSaveSettings = (newSettings) => {
         updateSettings(newSettings);
@@ -293,12 +327,12 @@ export function Dashboard({
                                                 ? `linear-gradient(135deg, ${ex.color}20, ${ex.gradient[1]}18)`
                                                 : isActive
                                                     ? `linear-gradient(135deg, ${ex.color}28, ${ex.gradient[0]}28)`
-                                                    : 'rgba(255,255,255,0.04)',
+                                                    : 'var(--surface-subtle)',
                                             border: exDone
                                                 ? `1.5px solid ${ex.color}66`
                                                 : isActive
                                                     ? `1.5px solid ${ex.color}88`
-                                                    : '1.5px solid rgba(255,255,255,0.06)',
+                                                    : '1.5px solid var(--border-muted)',
                                             cursor: 'pointer',
                                             transition: 'all 0.25s ease',
                                             position: 'relative',
@@ -370,7 +404,7 @@ export function Dashboard({
                                     position: 'absolute', top: '-8%', left: '-8%',
                                     width: 'clamp(90px, 14vh, 130px)', height: 'clamp(90px, 14vh, 130px)'
                                 }}>
-                                    <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3.5" />
+                                    <circle cx="50" cy="50" r="42" fill="none" stroke="var(--progress-track)" strokeWidth="3.5" />
                                     <circle
                                         className="progress-ring-circle"
                                         cx="50" cy="50" r="42" fill="none"
@@ -391,7 +425,7 @@ export function Dashboard({
 
                                 {/* Counter open button */}
                                 <button
-                                    onClick={() => setShowCounter(true)}
+                                    onClick={() => { pauseCloudSync?.(); setShowCounter(true); }}
                                     className="ripple"
                                     style={{
                                         width: 'clamp(72px, 12vh, 110px)', height: 'clamp(72px, 12vh, 110px)', borderRadius: '50%',
@@ -535,7 +569,7 @@ export function Dashboard({
             {showCounter && (
                 <Counter
                     exerciseConfig={selectedExercise}
-                    onClose={() => setShowCounter(false)}
+                    onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
                     dailyGoal={dailyGoal}
                     currentCount={currentCount}
                     onUpdateCount={(newCount) => updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal)}
@@ -554,7 +588,7 @@ export function Dashboard({
 
 // Shared icon button style
 const iconBtnStyle = {
-    background: 'rgba(255,255,255,0.1)', width: '38px', height: '38px',
+    background: 'var(--surface-hover)', width: '38px', height: '38px',
     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
     color: 'var(--text-primary)', border: 'none', cursor: 'pointer'
 };

@@ -211,7 +211,7 @@ export function Stats({ completions, exercises, onClose }) {
     return (
         <div className="fade-in" style={{
             position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'rgba(5, 5, 5, 0.97)', backdropFilter: 'blur(16px)', zIndex: 110,
+            background: 'var(--overlay-bg)', backdropFilter: 'blur(16px)', zIndex: 110,
             display: 'flex', flexDirection: 'column', padding: 'var(--spacing-md)',
             paddingTop: 'calc(var(--spacing-md) + env(safe-area-inset-top))',
             paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))',
@@ -226,9 +226,9 @@ export function Stats({ completions, exercises, onClose }) {
                     Statistiques
                 </h2>
                 <button onClick={onClose} className="hover-lift glass" style={{
-                    background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
+                    background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
                     width: '40px', height: '40px', display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', color: 'white', cursor: 'pointer'
+                    justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
                 }}>
                     <X size={22} />
                 </button>
@@ -353,7 +353,7 @@ export function Stats({ completions, exercises, onClose }) {
                                     {champion.label}
                                 </span>
                             </div>
-                            <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'white' }}>
+                            <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)' }}>
                                 {champion.totalReps.toLocaleString('fr-FR')} reps
                             </div>
                             <div style={statLabelSmallStyle}>Champion</div>
@@ -370,7 +370,7 @@ export function Stats({ completions, exercises, onClose }) {
                             <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#fbbf24', marginBottom: '2px' }}>
                                 {formatDate(bestDayDate)}
                             </div>
-                            <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'white' }}>
+                            <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)' }}>
                                 {bestDayReps.toLocaleString('fr-FR')} reps
                             </div>
                             <div style={statLabelSmallStyle}>
@@ -385,7 +385,7 @@ export function Stats({ completions, exercises, onClose }) {
             <div className="glass-premium" style={{
                 padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
                 marginBottom: 'var(--spacing-md)',
-                background: 'linear-gradient(135deg, rgba(15,15,20,0.8), rgba(25,25,35,0.8))'
+                background: 'var(--surface-section)'
             }}>
                 <h3 style={sectionTitleStyle}>📅 Activité mensuelle</h3>
                 <div style={{
@@ -414,7 +414,7 @@ export function Stats({ completions, exercises, onClose }) {
                                         ? isCurrentMonth
                                             ? 'linear-gradient(180deg, #818cf8, #6366f1)'
                                             : 'linear-gradient(180deg, rgba(129,140,248,0.5), rgba(99,102,241,0.3))'
-                                        : 'rgba(255,255,255,0.05)',
+                                        : 'var(--surface-muted)',
                                     transition: 'height 0.5s ease'
                                 }} />
                                 <span style={{
@@ -433,9 +433,9 @@ export function Stats({ completions, exercises, onClose }) {
                 <div className="glass-premium" style={{
                     padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
                     marginBottom: 'var(--spacing-md)',
-                    background: 'linear-gradient(135deg, rgba(15,15,20,0.8), rgba(25,25,35,0.8))'
-                }}>
-                    <h3 style={sectionTitleStyle}>Par exercice</h3>
+                background: 'var(--surface-section)'
+            }}>
+                <h3 style={sectionTitleStyle}>Par exercice</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {exerciseStats.map(ex => {
                             const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
@@ -522,7 +522,7 @@ export function Stats({ completions, exercises, onClose }) {
                                     {/* Mini progress bar */}
                                     <div style={{
                                         height: '3px', borderRadius: '2px',
-                                        background: 'rgba(255,255,255,0.05)', overflow: 'hidden'
+                                        background: 'var(--progress-track-thin)', overflow: 'hidden'
                                     }}>
                                         <div style={{
                                             height: '100%', borderRadius: '2px',
@@ -564,10 +564,10 @@ export function Stats({ completions, exercises, onClose }) {
                                         ))}
                                     </Pie>
                                     <Tooltip contentStyle={{
-                                        background: 'rgba(18,18,20,0.95)',
-                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        background: 'var(--tooltip-bg)',
+                                        border: '1px solid var(--border-default)',
                                         borderRadius: '8px', backdropFilter: 'blur(10px)'
-                                    }} itemStyle={{ color: 'white', fontWeight: '600' }} />
+                                    }} itemStyle={{ color: 'var(--text-primary)', fontWeight: '600' }} />
                                     <Legend verticalAlign="bottom" height={36} iconType="circle"
                                         wrapperStyle={{ fontSize: '0.8rem', fontWeight: '600' }} />
                                 </PieChart>

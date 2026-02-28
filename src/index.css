@@ -38,6 +38,78 @@
   --radius-lg: 20px;
   --radius-xl: 24px;
   --radius-full: 9999px;
+
+  /* Theme-dependent surfaces */
+  --overlay-bg: rgba(5, 5, 5, 0.97);
+  --overlay-bg-heavy: rgba(0, 0, 0, 0.88);
+  --overlay-backdrop: rgba(0, 0, 0, 0.7);
+  --surface-elevated: linear-gradient(135deg, rgba(15,15,20,0.6), rgba(25,25,35,0.6));
+  --surface-section: linear-gradient(135deg, rgba(15,15,20,0.8), rgba(25,25,35,0.8));
+  --surface-subtle: rgba(255,255,255,0.03);
+  --surface-muted: rgba(255,255,255,0.05);
+  --surface-dim: rgba(255,255,255,0.08);
+  --surface-hover: rgba(255,255,255,0.1);
+  --border-subtle: rgba(255,255,255,0.05);
+  --border-muted: rgba(255,255,255,0.06);
+  --border-default: rgba(255,255,255,0.1);
+  --border-strong: rgba(255,255,255,0.15);
+  --text-on-surface: #ffffff;
+  --select-option-bg: #1a1a2e;
+  --sheet-bg: rgba(10,10,15,0.97);
+  --sheet-handle: rgba(255,255,255,0.15);
+  --progress-track: rgba(255,255,255,0.08);
+  --progress-track-thin: rgba(255,255,255,0.05);
+  --shimmer-color: rgba(255,255,255,0.1);
+  --ripple-color: rgba(255,255,255,0.3);
+  --divider: rgba(255,255,255,0.04);
+  --body-bg: linear-gradient(180deg, #050505 0%, #0a0a0f 100%);
+  --body-glow-1: rgba(109, 40, 217, 0.1);
+  --body-glow-2: rgba(139, 92, 246, 0.08);
+  --tooltip-bg: rgba(18,18,20,0.95);
+  color-scheme: dark;
+}
+
+/* ── Light theme ──────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg-color: #f5f5f7;
+  --card-bg: #ffffff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+
+  --overlay-bg: rgba(245, 245, 247, 0.97);
+  --overlay-bg-heavy: rgba(240, 240, 245, 0.95);
+  --overlay-backdrop: rgba(0, 0, 0, 0.25);
+  --surface-elevated: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(240,240,248,0.7));
+  --surface-section: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(240,240,248,0.85));
+  --surface-subtle: rgba(0,0,0,0.02);
+  --surface-muted: rgba(0,0,0,0.03);
+  --surface-dim: rgba(0,0,0,0.05);
+  --surface-hover: rgba(0,0,0,0.07);
+  --border-subtle: rgba(0,0,0,0.04);
+  --border-muted: rgba(0,0,0,0.06);
+  --border-default: rgba(0,0,0,0.1);
+  --border-strong: rgba(0,0,0,0.12);
+  --text-on-surface: #1a1a2e;
+  --select-option-bg: #ffffff;
+  --sheet-bg: rgba(245,245,247,0.97);
+  --sheet-handle: rgba(0,0,0,0.15);
+  --progress-track: rgba(0,0,0,0.08);
+  --progress-track-thin: rgba(0,0,0,0.05);
+  --shimmer-color: rgba(0,0,0,0.04);
+  --ripple-color: rgba(0,0,0,0.15);
+  --divider: rgba(0,0,0,0.06);
+  --body-bg: linear-gradient(180deg, #f5f5f7 0%, #eeeef3 100%);
+  --body-glow-1: rgba(109, 40, 217, 0.04);
+  --body-glow-2: rgba(139, 92, 246, 0.03);
+  --tooltip-bg: rgba(255,255,255,0.95);
+  color-scheme: light;
+
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
+  --glow-primary: 0 0 20px rgba(102, 126, 234, 0.15);
+  --glow-success: 0 0 30px rgba(16, 185, 129, 0.12);
+  --glow-accent: 0 0 25px rgba(109, 40, 217, 0.15);
 }
 
 * {
@@ -49,7 +121,7 @@
 
 body {
   font-family: var(--font-main);
-  background: linear-gradient(180deg, #050505 0%, #0a0a0f 100%);
+  background: var(--body-bg);
   color: var(--text-primary);
   line-height: 1.5;
   overflow-x: hidden;
@@ -70,8 +142,8 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 20% 50%, rgba(109, 40, 217, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+  background: radial-gradient(circle at 20% 50%, var(--body-glow-1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, var(--body-glow-2) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
   animation: backgroundPulse 10s ease-in-out infinite;
@@ -112,19 +184,19 @@ button:active {
 
 /* Enhanced Utilities */
 .glass {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-muted);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-default);
   box-shadow: var(--shadow-md);
 }
 
 .glass-premium {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--surface-dim);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 var(--border-default);
 }
 
 .title-gradient {
@@ -256,7 +328,7 @@ button:active {
   right: 0;
   bottom: 0;
   left: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, var(--shimmer-color), transparent);
   animation: shimmer 2s infinite;
 }
 
@@ -338,7 +410,7 @@ button:active {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--ripple-color);
   transform: translate(-50%, -50%);
   transition: width 0.6s, height 0.6s;
 }
