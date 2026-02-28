@@ -5,7 +5,9 @@ const SETTINGS_KEY = 'oneup_settings';
 const defaultSettings = {
   notificationsEnabled: false,
   soundsEnabled: true,
-  notificationTime: { hour: 9, minute: 0 } // Default 9:00 AM
+  notificationTime: { hour: 9, minute: 0 }, // Default 9:00 AM
+  leaderboardEnabled: false,
+  leaderboardPseudo: ''
 };
 
 export function useSettings() {

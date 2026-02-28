@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Bell, Volume2, Clock, Check } from 'lucide-react';
+import { X, Bell, Volume2, Clock, Check, Users } from 'lucide-react';
 import { CloudSyncPanel } from './CloudSyncPanel';
 
 export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict }) {
@@ -325,6 +325,99 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                                 boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                             }} />
                         </button>
+                    </div>
+
+                    {/* Leaderboard Toggle */}
+                    <div className="glass" style={{
+                        padding: 'var(--spacing-md)',
+                        borderRadius: 'var(--radius-lg)',
+                        marginBottom: 'var(--spacing-md)'
+                    }}>
+                        <div style={{
+                            display: 'flex', alignItems: 'center',
+                            justifyContent: 'space-between', marginBottom: settings.leaderboardEnabled ? '12px' : 0
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div style={{
+                                    background: 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.2))',
+                                    padding: '10px',
+                                    borderRadius: '12px'
+                                }}>
+                                    <Users size={20} color="#fbbf24" />
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: '600', fontSize: '1rem' }}>Leaderboard</div>
+                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                                        Apparaître dans le classement
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    const newSettings = { ...settings, leaderboardEnabled: !settings.leaderboardEnabled };
+                                    onSave(newSettings);
+                                    showSavedIndicator();
+                                }}
+                                style={{
+                                    width: '52px', height: '28px', borderRadius: '14px',
+                                    background: settings.leaderboardEnabled
+                                        ? 'linear-gradient(135deg, #fbbf24, #f59e0b)'
+                                        : 'rgba(255,255,255,0.1)',
+                                    border: 'none', cursor: 'pointer',
+                                    position: 'relative', transition: 'all 0.3s ease',
+                                    boxShadow: settings.leaderboardEnabled
+                                        ? '0 4px 12px rgba(251, 191, 36, 0.4)' : 'none',
+                                    flexShrink: 0
+                                }}
+                            >
+                                <div style={{
+                                    width: '20px', height: '20px', borderRadius: '50%',
+                                    background: 'white', position: 'absolute', top: '4px',
+                                    left: settings.leaderboardEnabled ? 'calc(100% - 24px)' : '4px',
+                                    transition: 'left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                }} />
+                            </button>
+                        </div>
+
+                        {settings.leaderboardEnabled && (
+                            <div className="scale-in">
+                                <label style={{
+                                    fontSize: '0.85rem', color: 'var(--text-secondary)',
+                                    fontWeight: '600', marginBottom: '6px', display: 'block'
+                                }}>
+                                    Pseudo affiché
+                                </label>
+                                <input
+                                    type="text"
+                                    value={settings.leaderboardPseudo || ''}
+                                    onChange={(e) => {
+                                        const newSettings = { ...settings, leaderboardPseudo: e.target.value.slice(0, 20) };
+                                        onSave(newSettings);
+                                    }}
+                                    onBlur={() => showSavedIndicator()}
+                                    placeholder={cloudAuth?.user?.displayName || 'Ton pseudo...'}
+                                    maxLength={20}
+                                    style={{
+                                        width: '100%', padding: '10px 14px',
+                                        borderRadius: 'var(--radius-md)',
+                                        border: '1px solid rgba(255,255,255,0.15)',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        color: 'var(--text-primary)',
+                                        fontSize: '1rem', fontWeight: '500',
+                                        outline: 'none', boxSizing: 'border-box',
+                                        transition: 'border-color 0.2s ease'
+                                    }}
+                                    onFocus={(e) => e.target.style.borderColor = 'rgba(251,191,36,0.5)'}
+                                />
+                                <div style={{
+                                    fontSize: '0.7rem', color: 'var(--text-secondary)',
+                                    marginTop: '4px', opacity: 0.6
+                                }}>
+                                    Max 20 caractères · Ta photo Google sera utilisée
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {cloudAuth && cloudSync && (

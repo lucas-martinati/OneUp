@@ -2,12 +2,13 @@ import { useEffect, useState, useMemo } from 'react';
 import confetti from 'canvas-confetti';
 import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
-    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints
+    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users
 } from 'lucide-react';
 import { Calendar } from './Calendar';
 import { Stats } from './Stats';
 import { Settings } from './Settings';
 import { Counter } from './Counter';
+import { Leaderboard } from './Leaderboard';
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr, calculateStreak, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
@@ -42,6 +43,7 @@ export function Dashboard({
     const [showStats, setShowStats] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [showCounter, setShowCounter] = useState(false);
+    const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [selectedExerciseId, setSelectedExerciseId] = useState('pushups');
     const [numberKey, setNumberKey] = useState(0);
     const [isCounterTransitioning, setIsCounterTransitioning] = useState(false);
@@ -164,6 +166,9 @@ export function Dashboard({
                     </button>
                     <button onClick={() => setShowStats(true)} className="hover-lift" style={iconBtnStyle}>
                         <PieChart size={19} />
+                    </button>
+                    <button onClick={() => setShowLeaderboard(true)} className="hover-lift" style={iconBtnStyle}>
+                        <Users size={19} />
                     </button>
 
                     {/* Global streak badge — Duolingo style: gray if not done today */}
@@ -535,6 +540,12 @@ export function Dashboard({
                     currentCount={currentCount}
                     onUpdateCount={(newCount) => updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal)}
                     isCompleted={isExerciseDone}
+                />
+            )}
+            {showLeaderboard && (
+                <Leaderboard
+                    onClose={() => setShowLeaderboard(false)}
+                    cloudSync={cloudSync}
                 />
             )}
         </div>

@@ -401,6 +401,95 @@ class CloudSyncService {
   }
 
 
+  // ── Leaderboard ──────────────────────────────────────────────────────
+
+  /**
+   * Publish (or update) this user's leaderboard entry.
+   * Stored at `leaderboard/{uid}`.
+   */
+  async publishToLeaderboard({ pseudo, totalReps, exerciseReps }) {
+    try {
+      if (!auth?.currentUser || !database) return false;
+
+      const uid = auth.currentUser.uid;
+      const entry = {
+        pseudo: pseudo || auth.currentUser.displayName || 'Anonyme',
+        photoURL: auth.currentUser.photoURL || null,
+        totalReps: totalReps || 0,
+        exerciseReps: exerciseReps || {},
+        lastUpdated: serverTimestamp()
+      };
+
+      const lbRef = ref(database, `leaderboard/${uid}`);
+      await set(lbRef, entry);
+      logger.success('Leaderboard entry published');
+      return true;
+    } catch (error) {
+      logger.error('Error publishing to leaderboard:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Remove this user's leaderboard entry (opt-out).
+   */
+  async removeFromLeaderboard() {
+    try {
+      if (!auth?.currentUser || !database) return false;
+
+      const uid = auth.currentUser.uid;
+      const lbRef = ref(database, `leaderboard/${uid}`);
+      await set(lbRef, null);
+      logger.success('Leaderboard entry removed');
+      return true;
+    } catch (error) {
+      logger.error('Error removing from leaderboard:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Load the full leaderboard (all users who opted in).
+   * Returns an array sorted by totalReps desc.
+   */
+  async loadLeaderboard() {
+    try {
+      if (!database) {
+        initializeFirebase();
+        if (!database) return [];
+      }
+
+      const lbRef = ref(database, 'leaderboard');
+      const snapshot = await get(lbRef);
+
+      if (!snapshot.exists()) return [];
+
+      const data = snapshot.val();
+      const entries = Object.entries(data).map(([uid, entry]) => ({
+        uid,
+        pseudo: entry.pseudo || 'Anonyme',
+        photoURL: entry.photoURL || null,
+        totalReps: entry.totalReps || 0,
+        exerciseReps: entry.exerciseReps || {},
+        lastUpdated: entry.lastUpdated || null
+      }));
+
+      // Sort by total reps descending
+      entries.sort((a, b) => b.totalReps - a.totalReps);
+      return entries;
+    } catch (error) {
+      logger.error('Error loading leaderboard:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get the current user's UID (needed to highlight own entry).
+   */
+  getCurrentUserId() {
+    return auth?.currentUser?.uid || null;
+  }
+
   // Save settings to cloud
   async saveSettingsToCloud(settings) {
     try {

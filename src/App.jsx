@@ -3,6 +3,7 @@ import { useProgress } from './hooks/useProgress';
 import { useSettings } from './hooks/useSettings';
 import { useGoogleAuth } from './hooks/useGoogleAuth';
 import { cloudSync } from './services/cloudSync';
+import { EXERCISES } from './config/exercises';
 import { Onboarding } from './components/Onboarding';
 import { Dashboard } from './components/Dashboard';
 import { createLogger } from './utils/logger';
@@ -185,6 +186,50 @@ function App() {
     }
   }, [settings, googleAuth.isSignedIn, googleAuth.loading, isSetup]);
 
+  // Auto-publish leaderboard when completions change (if opted in)
+  useEffect(() => {
+    if (!googleAuth.isSignedIn || googleAuth.loading || !isSetup || !settings.leaderboardEnabled) return;
+    if (!initialSyncDoneRef.current) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        const utcStart = Date.UTC(new Date().getFullYear(), 0, 1);
+        let totalReps = 0;
+        const exerciseReps = {};
+
+        EXERCISES.forEach(ex => {
+          let exTotal = 0;
+          Object.entries(completions).forEach(([dateStr, day]) => {
+            if (day?.[ex.id]?.isCompleted) {
+              const d = new Date(dateStr);
+              const utcD = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+              const dayNum = Math.floor((utcD - utcStart) / (1000 * 60 * 60 * 24)) + 1;
+              exTotal += Math.max(1, Math.ceil(dayNum * ex.multiplier));
+            }
+          });
+          exerciseReps[ex.id] = exTotal;
+          totalReps += exTotal;
+        });
+
+        const pseudo = settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme';
+        await cloudSync.publishToLeaderboard({ pseudo, totalReps, exerciseReps });
+      } catch (error) {
+        logger.error('Leaderboard publish failed:', error);
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [
+    completions, settings.leaderboardEnabled, settings.leaderboardPseudo,
+    googleAuth.isSignedIn, googleAuth.loading, isSetup
+  ]);
+
+  // Remove from leaderboard when user opts out
+  useEffect(() => {
+    if (googleAuth.isSignedIn && !googleAuth.loading && !settings.leaderboardEnabled) {
+      cloudSync.removeFromLeaderboard();
+    }
+  }, [settings.leaderboardEnabled, googleAuth.isSignedIn, googleAuth.loading]);
+
   const handleResolveConflict = async (action) => {
     try {
       if (action === 'restore') {
@@ -233,7 +278,7 @@ function App() {
           settings={settings}
           updateSettings={updateSettings}
           cloudAuth={googleAuth}
-          cloudSync={{ saveToCloud, loadFromCloud, syncWithCloud, signIn: googleAuth.signIn, signOut: googleAuth.signOut }}
+          cloudSync={{ saveToCloud, loadFromCloud, syncWithCloud, signIn: googleAuth.signIn, signOut: googleAuth.signOut, loadLeaderboard: () => cloudSync.loadLeaderboard(), getCurrentUserId: () => cloudSync.getCurrentUserId() }}
           conflictData={conflictData}
           onResolveConflict={handleResolveConflict}
           getExerciseCount={getExerciseCount}
