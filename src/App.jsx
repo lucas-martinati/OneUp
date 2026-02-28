@@ -16,7 +16,8 @@ function App() {
   const googleAuth = useGoogleAuth();
   const [conflictData, setConflictData] = useState(null);
   const [conflictCheckDone, setConflictCheckDone] = useState(false);
-  const initialSyncDoneRef = useRef(false);
+  const [isInitialSyncDone, setIsInitialSyncDone] = useState(false);
+  const [isSyncPaused, setIsSyncPaused] = useState(false);
 
   const {
     startDate,
@@ -34,7 +35,8 @@ function App() {
     updateExerciseCount,
     saveToCloud,
     loadFromCloud,
-    syncWithCloud
+    syncWithCloud,
+    startCloudListener
   } = progress;
 
   // Request notification permission and schedule on first setup
@@ -67,7 +69,7 @@ function App() {
 
   // Save to cloud only when an exercise completion status changes (not on count changes)
   useEffect(() => {
-    if (googleAuth.isSignedIn && !googleAuth.loading && !conflictData && conflictCheckDone && initialSyncDoneRef.current) {
+    if (googleAuth.isSignedIn && !googleAuth.loading && !conflictData && conflictCheckDone && isInitialSyncDone) {
       // Build a fingerprint of only isCompleted values to detect real changes
       const fingerprint = JSON.stringify(
         Object.fromEntries(
@@ -189,7 +191,7 @@ function App() {
   // Auto-publish leaderboard when completions change (if opted in)
   useEffect(() => {
     if (!googleAuth.isSignedIn || googleAuth.loading || !isSetup || !settings.leaderboardEnabled) return;
-    if (!initialSyncDoneRef.current) return;
+    if (!isInitialSyncDone) return;
 
     const timer = setTimeout(async () => {
       try {
@@ -246,20 +248,32 @@ function App() {
 
   // Full sync on app startup once conflict check is resolved
   useEffect(() => {
-    if (googleAuth.isSignedIn && !googleAuth.loading && conflictCheckDone && isSetup) {
+    if (googleAuth.isSignedIn && !googleAuth.loading && conflictCheckDone && isSetup && !isInitialSyncDone) {
       const initialSync = async () => {
         try {
           await syncWithCloud();
-          initialSyncDoneRef.current = true;
+          setIsInitialSyncDone(true);
           logger.success('Initial sync completed on app launch');
         } catch (error) {
           logger.error('Initial sync failed:', error);
-          initialSyncDoneRef.current = true; // allow saves even if sync fails
+          setIsInitialSyncDone(true); // allow saves even if sync fails
         }
       };
       initialSync();
     }
-  }, [conflictCheckDone, googleAuth.isSignedIn, googleAuth.loading, isSetup]);
+  }, [conflictCheckDone, googleAuth.isSignedIn, googleAuth.loading, isSetup, isInitialSyncDone]);
+
+  // Real-time cloud sync listener
+  useEffect(() => {
+    if (googleAuth.isSignedIn && !googleAuth.loading && conflictCheckDone && isInitialSyncDone && !isSyncPaused && !conflictData) {
+      logger.info('Starting real-time cloud listener');
+      const unsubscribe = startCloudListener();
+      return () => {
+        logger.info('Stopping real-time cloud listener');
+        if (unsubscribe) unsubscribe();
+      };
+    }
+  }, [googleAuth.isSignedIn, googleAuth.loading, conflictCheckDone, isInitialSyncDone, isSyncPaused, conflictData, startCloudListener]);
 
   return (
     <>
@@ -284,6 +298,8 @@ function App() {
           getExerciseCount={getExerciseCount}
           updateExerciseCount={updateExerciseCount}
           getExerciseDone={progress.getExerciseDone}
+          pauseCloudSync={() => setIsSyncPaused(true)}
+          resumeCloudSync={() => setIsSyncPaused(false)}
         />
       )}
     </>
