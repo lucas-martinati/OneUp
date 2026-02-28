@@ -344,7 +344,7 @@ class CloudSyncService {
   }
 
   // Fusionner les données locales et cloud
-  async mergeData(localData, cloudData) {
+  mergeData(localData, cloudData) {
     if (!cloudData) return localData;
     if (!localData) return cloudData;
 
@@ -369,7 +369,8 @@ class CloudSyncService {
               (cloudEx?.timestamp && localEx?.timestamp &&
                 new Date(cloudEx.timestamp) > new Date(localEx.timestamp)) ||
               (cloudEx?.timestamp && !localEx?.timestamp)) {
-              merged[exId] = cloudEx;
+              // Preserve count from local if possible, as cloud only has isCompleted
+              merged[exId] = { ...localEx, ...cloudEx };
             }
           });
           mergedCompletions[dateStr] = merged;
@@ -390,7 +391,7 @@ class CloudSyncService {
   async syncData(localData) {
     try {
       const cloudData = await this.loadFromCloud();
-      const mergedData = await this.mergeData(localData, cloudData);
+      const mergedData = this.mergeData(localData, cloudData);
       await this.saveToCloud(mergedData);
 
       return mergedData;

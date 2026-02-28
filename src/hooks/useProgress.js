@@ -173,8 +173,9 @@ export function useProgress() {
       if (currentlyDone) {
         // Mark all exercises as undone
         const updated = {};
+        const now = new Date().toISOString();
         for (const [exId, exData] of Object.entries(day)) {
-          updated[exId] = { ...exData, isCompleted: false, timestamp: null, timeOfDay: null };
+          updated[exId] = { ...exData, isCompleted: false, timestamp: now, timeOfDay: null };
         }
         newCompletions[dateStr] = updated;
       } else {
@@ -224,7 +225,7 @@ export function useProgress() {
         else if (hour < 18) timeOfDay = 'afternoon';
         else timeOfDay = 'evening';
       } else if (wasDone && !isNowDone) {
-        timestamp = null;
+        timestamp = new Date().toISOString(); // Keep a timestamp so cloud sync knows it was recently unchecked
         timeOfDay = null;
       }
 
@@ -413,11 +414,13 @@ export function useProgress() {
         if (cloudJSON === localJSON) return prev;
 
         console.log('[Real-time sync] Incoming cloud update applied');
+        const merged = cloudSync.mergeData(prev, validated);
+
         return {
-          startDate: validated.startDate || prev.startDate,
-          userStartDate: validated.userStartDate || prev.userStartDate,
-          completions: validated.completions || prev.completions,
-          isSetup: validated.isSetup ?? prev.isSetup,
+          startDate: merged.startDate || prev.startDate,
+          userStartDate: merged.userStartDate || prev.userStartDate,
+          completions: merged.completions || prev.completions,
+          isSetup: merged.isSetup ?? prev.isSetup,
         };
       });
     });

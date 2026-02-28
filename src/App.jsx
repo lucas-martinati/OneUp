@@ -39,6 +39,15 @@ function App() {
     startCloudListener
   } = progress;
 
+  // Reset sync state when user signs out or changes
+  useEffect(() => {
+    if (!googleAuth.isSignedIn) {
+      setConflictCheckDone(false);
+      setIsInitialSyncDone(false);
+      setConflictData(null);
+    }
+  }, [googleAuth.isSignedIn, googleAuth.user?.uid]);
+
   // Request notification permission and schedule on first setup
   useEffect(() => {
     if (isSetup) {
@@ -133,7 +142,7 @@ function App() {
 
   // Auto-detect cloud data conflict on sign-in
   useEffect(() => {
-    if (googleAuth.isSignedIn && !googleAuth.loading && isSetup) {
+    if (googleAuth.isSignedIn && !googleAuth.loading && isSetup && !conflictCheckDone) {
       const detectConflict = async () => {
         try {
           const cloudData = await cloudSync.loadFromCloud();
@@ -173,10 +182,10 @@ function App() {
         }
       };
       detectConflict();
-    } else if (googleAuth.isSignedIn && !googleAuth.loading && !isSetup) {
+    } else if (googleAuth.isSignedIn && !googleAuth.loading && !isSetup && !conflictCheckDone) {
       setConflictCheckDone(true);
     }
-  }, [googleAuth.isSignedIn, googleAuth.loading, isSetup]);
+  }, [googleAuth.isSignedIn, googleAuth.loading, isSetup, conflictCheckDone, completions]);
 
   // Auto-save settings
   useEffect(() => {
