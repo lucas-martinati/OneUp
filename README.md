@@ -1,87 +1,78 @@
-# OneUp 🚀
+# OneUp
 
-**OneUp** is a modern, gamified push-up tracker designed to help you build a habit of daily exercise.
+**OneUp** est un défi fitness quotidien sur 365 jours. Chaque jour, le nombre de répétitions augmente progressivement sur 6 exercices. L'objectif ? Tenir toute l'année.
+
 Built with **Vibe Coding**.
 
-## ✨ Features
+## Features
 
-- 📈 **Progressive Challenge**: Start with 1 push-up, increase daily up to 365
-- 📅 **Calendar View**: Track your progress throughout the year
-- 📊 **Statistics**: View your completion rate, streaks, and time-of-day preferences
-- 🔔 **Daily Notifications**: Customizable reminders to stay on track
-- 🎵 **Sound Effects**: Engaging audio feedback for achievements
-- ☁️ **Cloud Sync**: Save your progress to Google Play and sync across devices (Firebase)
-- 🌍 **Multi-language**: Supports English and French
-- 📱 **Native Android App**: Full mobile experience with Capacitor
+- **6 exercices** : Pompes, Squats, Tractions, Abdos, Jumping Jacks, Fentes
+- **Objectifs progressifs** : Le nombre de reps augmente chaque jour pendant 365 jours
+- **Streak Duolingo-style** : Toujours visible, passe en gris si vous manquez un jour
+- **Leaderboard** : Classement global et par exercice, profil joueur avec pseudo et photo Google
+- **Statistiques completes** : Reps totales, exercice champion, meilleur jour, activite mensuelle, taux de completion, moyenne hebdomadaire
+- **Calendrier visuel** : Suivez votre progression jour par jour sur l'annee
+- **Cloud Sync** : Synchronisation via compte Google (Firebase Realtime Database)
+- **Notifications** : Rappels quotidiens configurables
+- **Design dark premium** : Animations, confettis, retour haptique, sons
 
-## 📱 Mobile App (Android)
+## Installer l'app sur Android
 
-OneUp is available as a native Android application!
+OneUp est disponible en test ferme sur le Google Play Store. Pour l'installer :
 
-### How to Install (User)
-1.  **Download the APK**: Get the `OneUp.apk` file.
-2.  **Allow Unknown Sources**: On your phone, if prompted, allow installation from your file manager or browser.
-3.  **Install**: Open the APK file and tap "Install".
+1. **Rejoindre le groupe Google de test** : https://groups.google.com/g/close-test-oneup
+2. **Devenir testeur** en cliquant sur ce lien : https://play.google.com/apps/testing/com.lucasm548.oneup
+3. **Installer l'app** depuis le Google Play Store une fois accepte comme testeur
 
----
-
-## 🛠️ Installation (Developer)
-
-If you want to build the app yourself or contribute:
+## Installation (Developpeur)
 
 ### Prerequisites
-- Node.js installed.
-- Android Studio installed (for mobile build).
+- Node.js
+- Android SDK (pour le build mobile)
 
 ### Setup
-1.  **Clone the repository**
-    ```bash
-    git clone https://github.com/LucasM548/OneUp.git
-    cd OneUp
-    ```
 
-2.  **Install Dependencies**
-    ```bash
-    npm install
-    ```
+```bash
+git clone https://github.com/LucasM548/OneUp.git
+cd OneUp
+npm install
+```
 
-3.  **Run Web Version** (Local Development)
-    ```bash
-    npm run dev
-    ```
+### Lancer en local
 
-### ☁️ Cloud Sync Setup
+```bash
+npm run dev
+```
 
-To enable cloud synchronization with Google Play:
+### Cloud Sync Setup
 
-1. Follow the detailed setup guide in [`CLOUD_SETUP.md`](./CLOUD_SETUP.md)
-2. Configure Firebase and Realtime Database
-3. Update the Firebase credentials in `src/services/cloudSync.js`
+Pour activer la synchronisation cloud :
 
-### 🤖 Build for Android
+1. Suivre le guide dans [`CLOUD_SETUP.md`](./CLOUD_SETUP.md)
+2. Configurer Firebase et Realtime Database
+3. Mettre a jour les credentials Firebase dans `.env`
 
-1.  **Build the Web Assets**
-    ```bash
-    npm run build
-    ```
+### Build Android (AAB)
 
-2.  **Sync with Capacitor**
-    ```bash
-    npx cap sync
-    ```
+```bash
+npm run build
+npx cap sync android
+./android/gradlew bundleRelease -p android
+```
 
-3.  **Open in Android Studio**
-    ```bash
-    npx cap open android
-    ```
-    - Once Android Studio opens, wait for Gradle to sync.
-    - Connect your phone via USB.
-    - Click the **Run (Play)** button to install on your device.
+Le bundle signe se trouve dans `android/app/build/outputs/bundle/release/app-release.aab`.
 
----
+### Deploy GitHub Pages
 
-## 🏗️ Built With
-- **React + Vite** - Fast web framework.
-- **Capacitor** - Cross-platform native runtime.
-- **Firebase** - Cloud sync and authentication.
-- **Tailwind-free** - Custom CSS for maximum style control.
+```bash
+npm run deploy
+```
+
+## Built With
+
+- **React 19 + Vite** - Framework web
+- **Capacitor** - Runtime natif cross-platform
+- **Firebase Realtime Database** - Cloud sync et authentification Google
+- **Recharts** - Graphiques (pie chart statistiques)
+- **Lucide React** - Icones
+- **Canvas Confetti** - Effets de celebration
