@@ -24,7 +24,7 @@ OneUp est disponible en test ferme sur le Google Play Store. Pour l'installer :
 2. **Devenir testeur** en cliquant sur ce lien : https://play.google.com/apps/testing/com.lucasm548.oneup
 3. **Installer l'app** depuis le Google Play Store une fois accepte comme testeur
 
-## Installation (Developpeur)
+## Installation (Développeur)
 
 ### Prerequisites
 - Node.js
@@ -44,23 +44,39 @@ npm install
 npm run dev
 ```
 
+### Commandes de build
+
+Plusieurs commandes sont disponibles pour générer l'application :
+
+| Commande | Description |
+|----------|-------------|
+| `npm run build` | Build web (dist/) pour PWA |
+| `npm run build:bundle` | Build AAB (Android App Bundle) signé pour Play Store |
+| `npm run build:apk` | Build APK (fichier directement installable) |
+
+#### Exemple - Build APK pour tester :
+
+```bash
+npm run build:apk
+```
+
+L'APK se trouve dans `android/app/build/outputs/apk/release/`.
+
+#### Exemple - Build Bundle pour Play Store :
+
+```bash
+npm run build:bundle
+```
+
+Le bundle se trouve dans `android/app/build/outputs/bundle/release/`.
+
 ### Cloud Sync Setup
 
 Pour activer la synchronisation cloud :
 
 1. Suivre le guide dans [`CLOUD_SETUP.md`](./CLOUD_SETUP.md)
 2. Configurer Firebase et Realtime Database
-3. Mettre a jour les credentials Firebase dans `.env`
-
-### Build Android (AAB)
-
-```bash
-npm run build
-npx cap sync android
-./android/gradlew bundleRelease -p android
-```
-
-Le bundle signe se trouve dans `android/app/build/outputs/bundle/release/app-release.aab`.
+3. Mettre à jour les credentials Firebase dans `.env`
 
 ### Deploy GitHub Pages
 
