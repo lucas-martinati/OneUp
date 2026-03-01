@@ -11,7 +11,7 @@ const TABS = [
     ...EXERCISES.map(ex => ({ id: ex.id, label: ex.label, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
 ];
 
-export function Leaderboard({ onClose, cloudSync }) {
+export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('global');
@@ -77,11 +77,10 @@ export function Leaderboard({ onClose, cloudSync }) {
                 </button>
             </div>
 
-            {/* ── Tabs (scrollable) ───────────────────────────────── */}
+            {/* ── Tabs (wrapping) ───────────────────────────────── */}
             <div style={{
-                display: 'flex', gap: '6px', overflowX: 'auto',
-                padding: 'var(--spacing-sm) var(--spacing-md)',
-                scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch'
+                display: 'flex', flexWrap: 'wrap', gap: '6px',
+                padding: 'var(--spacing-sm) var(--spacing-md)'
             }}>
                 {TABS.map(tab => {
                     const isActive = tab.id === activeTab;
@@ -101,8 +100,8 @@ export function Leaderboard({ onClose, cloudSync }) {
                                     : '1.5px solid rgba(255,255,255,0.08)',
                                 color: isActive ? tab.color : 'var(--text-secondary)',
                                 fontSize: '0.75rem', fontWeight: '600',
-                                cursor: 'pointer', whiteSpace: 'nowrap',
-                                transition: 'all 0.2s ease', flexShrink: 0
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
                             }}
                         >
                             <Icon size={14} />
@@ -137,9 +136,15 @@ export function Leaderboard({ onClose, cloudSync }) {
                     }}>
                         <Trophy size={40} color="rgba(251,191,36,0.3)" />
                         <p style={{ fontSize: '1rem', fontWeight: '600' }}>Personne ici pour l'instant</p>
-                        <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>
-                            Active le leaderboard dans les paramètres pour apparaître !
-                        </p>
+                        {!cloudAuth?.isSignedIn ? (
+                            <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>
+                                Connecte-toi avec Google pour apparaître dans le classement !
+                            </p>
+                        ) : (
+                            <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>
+                                Active le leaderboard dans les paramètres pour apparaître !
+                            </p>
+                        )}
                     </div>
                 ) : (
                     <>
@@ -148,6 +153,22 @@ export function Leaderboard({ onClose, cloudSync }) {
                             const rank = i + 1;
                             const isMe = entry.uid === currentUid;
                             const reps = getReps(entry);
+                            const rankBgColors = {
+                                1: 'linear-gradient(135deg, rgba(255,215,0,0.25), rgba(255,215,0,0.1))',
+                                2: 'linear-gradient(135deg, rgba(192,192,192,0.2), rgba(192,192,192,0.08))',
+                                3: 'linear-gradient(135deg, rgba(205,127,50,0.2), rgba(205,127,50,0.08))'
+                            };
+                            const rankBorderColors = {
+                                1: '1px solid rgba(255,215,0,0.35)',
+                                2: '1px solid rgba(192,192,192,0.3)',
+                                3: '1px solid rgba(205,127,50,0.3)'
+                            };
+                            const bg = rankBgColors[rank] || (isMe
+                                ? 'linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06))'
+                                : 'rgba(255,255,255,0.03)');
+                            const border = rankBorderColors[rank] || (isMe
+                                ? '1px solid rgba(251,191,36,0.25)'
+                                : '1px solid rgba(255,255,255,0.05)');
                             return (
                                 <div
                                     key={entry.uid}
@@ -156,12 +177,8 @@ export function Leaderboard({ onClose, cloudSync }) {
                                     style={{
                                         display: 'flex', alignItems: 'center', gap: '10px',
                                         padding: '10px 12px', borderRadius: 'var(--radius-md)',
-                                        background: isMe
-                                            ? 'linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06))'
-                                            : 'rgba(255,255,255,0.03)',
-                                        border: isMe
-                                            ? '1px solid rgba(251,191,36,0.25)'
-                                            : '1px solid rgba(255,255,255,0.05)',
+                                        background: bg,
+                                        border: border,
                                         cursor: 'pointer', transition: 'all 0.2s ease'
                                     }}
                                 >

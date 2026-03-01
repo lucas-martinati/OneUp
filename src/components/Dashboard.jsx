@@ -580,6 +580,7 @@ export function Dashboard({
                 <Leaderboard
                     onClose={() => setShowLeaderboard(false)}
                     cloudSync={cloudSync}
+                    cloudAuth={cloudAuth}
                 />
             )}
         </div>

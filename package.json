@@ -9,10 +9,11 @@
     "dev": "vite",
     "prebuild": "npm run generate:config",
     "build": "vite build",
-    "build:android": "npm run build && npx cap copy android",
+    "build:bundle": "npm run build && npx cap copy android && cd android && ./gradlew bundleRelease",
+    "build:apk": "npm run build && npx cap copy android && cd android && ./gradlew assembleRelease",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "GITHUB_PAGES=true npm run build:android && gh-pages -d dist -b gh-pages --dotfiles"
+    "deploy": "GITHUB_PAGES=true gh-pages -d dist -b gh-pages --dotfiles"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
