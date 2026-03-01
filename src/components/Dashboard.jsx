@@ -3,7 +3,7 @@ import confetti from 'canvas-confetti';
 import { App as CapacitorApp } from '@capacitor/app';
 import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
-    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users
+    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users, Check
 } from 'lucide-react';
 import { Calendar } from './Calendar';
 import { Stats } from './Stats';
@@ -430,24 +430,50 @@ export function Dashboard({
                                     style={{
                                         width: 'clamp(72px, 12vh, 110px)', height: 'clamp(72px, 12vh, 110px)', borderRadius: '50%',
                                         background: isExerciseDone
-                                            ? `linear-gradient(135deg, ${selectedExercise.gradient[0]}, ${selectedExercise.gradient[1]})`
+                                            ? `linear-gradient(135deg, ${selectedExercise.color} 0%, ${selectedExercise.gradient[1]} 100%)`
                                             : 'transparent',
                                         border: isExerciseDone ? 'none' : `2.5px solid ${selectedExercise.color}`,
                                         display: 'flex', flexDirection: 'column',
                                         alignItems: 'center', justifyContent: 'center', gap: '1px',
                                         transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                                        transform: isExerciseDone ? 'scale(1.05)' : 'scale(1)',
+                                        transform: isExerciseDone ? 'scale(1.1)' : 'scale(1)',
                                         boxShadow: isExerciseDone
-                                            ? `0 0 30px ${selectedExercise.color}66, 0 4px 16px ${selectedExercise.color}33`
+                                            ? `0 0 50px ${selectedExercise.color}aa, 0 8px 30px ${selectedExercise.color}55, 0 0 0 4px ${selectedExercise.color}33, inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.1)`
                                             : `0 0 16px ${selectedExercise.color}33`,
                                         cursor: 'pointer',
-                                        position: 'relative'
+                                        position: 'relative',
+                                        overflow: 'hidden'
                                     }}
                                 >
                                     {isExerciseDone ? (
                                         <>
-                                            {(() => { const I = ICON_MAP[selectedExercise.icon] || Dumbbell; return <I size={22} color="white" />; })()}
-                                            <span style={{ fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)', color: 'white', fontWeight: '700' }}>{dailyGoal}/{dailyGoal}</span>
+                                            <div style={{
+                                                position: 'absolute',
+                                                inset: 0,
+                                                background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
+                                                pointerEvents: 'none'
+                                            }} />
+                                            <div style={{
+                                                position: 'absolute',
+                                                top: '-50%',
+                                                left: '-50%',
+                                                width: '200%',
+                                                height: '200%',
+                                                background: `conic-gradient(from 0deg, transparent, ${selectedExercise.color}44, transparent, ${selectedExercise.color}44, transparent)`,
+                                                animation: 'spin 2s linear infinite',
+                                                pointerEvents: 'none'
+                                            }} />
+                                            <Check size={26} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
+                                            <span style={{ 
+                                                fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)', 
+                                                color: 'white', 
+                                                fontWeight: '800',
+                                                textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                                                position: 'relative',
+                                                zIndex: 1
+                                            }}>
+                                                {dailyGoal}/{dailyGoal}
+                                            </span>
                                         </>
                                     ) : (
                                         <>
@@ -458,7 +484,7 @@ export function Dashboard({
                                 </button>
                             </div>
 
-                            {/* Completion status (directly under button, no gap) */}
+                            {/* Completion status (under button with spacing) */}
                             {isExerciseDone && (() => {
                                 const exData = completions[today]?.[selectedExerciseId];
                                 const completedAt = exData?.timestamp ? new Date(exData.timestamp) : null;
@@ -468,7 +494,8 @@ export function Dashboard({
                                 return (
                                 <div className="scale-in" style={{
                                     color: selectedExercise.color, fontWeight: '700',
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px'
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
+                                    marginTop: '8px'
                                 }}>
                                     <span style={{ fontSize: 'clamp(0.95rem, 3.8vw, 1.35rem)', textAlign: 'center', lineHeight: 1.3 }}>
                                         {selectedExercise.label} complété{isDayComplete ? ' — Journée validée !' : ''}

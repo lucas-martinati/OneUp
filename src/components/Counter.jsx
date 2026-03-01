@@ -211,14 +211,23 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
 
                 {/* Validation Status */}
                 {isCompleted ? (
-                    <div className="scale-in glass-premium" style={{
+                    <div className="scale-in pulse-glow-exercise" style={{
                         display: 'flex', alignItems: 'center', gap: '10px',
-                        padding: '12px 24px', borderRadius: 'var(--radius-lg)',
-                        background: `linear-gradient(135deg, ${activeColor}22, ${gradEnd}22)`,
-                        boxShadow: `0 0 30px ${activeColor}44`
+                        padding: '14px 28px', borderRadius: 'var(--radius-lg)',
+                        background: `linear-gradient(135deg, ${activeColor}18, ${gradEnd}18)`,
+                        border: `1px solid ${activeColor}44`,
+                        boxShadow: `0 0 24px ${activeColor}33, inset 0 1px 0 ${activeColor}22`,
+                        animation: `pulseGlowExercise 2.5s ease-in-out infinite`,
+                        ['--exercise-glow-color']: `${activeColor}44`
                     }}>
                         <Check size={24} color={activeColor} strokeWidth={3} />
-                        <span style={{ color: activeColor, fontWeight: '600', fontSize: '1.1rem' }}>
+                        <span style={{
+                            color: activeColor, fontWeight: '600', fontSize: '1.1rem',
+                            background: `linear-gradient(135deg, ${gradStart}, ${gradEnd})`,
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                        }}>
                             {exerciseLabel} Valid&eacute; !
                         </span>
                     </div>

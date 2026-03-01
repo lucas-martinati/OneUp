@@ -354,7 +354,18 @@ button:active {
   }
 
   50% {
-    box-shadow: 0 0 40px rgba(109, 40, 217, 0.8);
+    box-shadow: 0 0 35px rgba(109, 40, 217, 0.7);
+  }
+}
+
+@keyframes pulseGlowExercise {
+  0%,
+  100% {
+    box-shadow: 0 0 20px var(--exercise-glow-color, rgba(129, 140, 248, 0.3));
+  }
+
+  50% {
+    box-shadow: 0 0 35px var(--exercise-glow-color, rgba(129, 140, 248, 0.5));
   }
 }
 
@@ -513,4 +524,9 @@ button:active {
 
 .gradient-button:hover::before {
   left: 100%;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
