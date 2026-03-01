@@ -344,17 +344,18 @@ button:active {
 
 .pulse-glow {
   animation: pulseGlow 2s ease-in-out infinite;
+  border-radius: 50%;
 }
 
 @keyframes pulseGlow {
 
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(109, 40, 217, 0.4);
+    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
   }
 
   50% {
-    box-shadow: 0 0 35px rgba(109, 40, 217, 0.7);
+    filter: drop-shadow(0 0 16px rgba(139, 92, 246, 1));
   }
 }
 

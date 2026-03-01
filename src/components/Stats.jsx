@@ -27,9 +27,13 @@ export function Stats({ completions, exercises, onClose }) {
     let bestDayDate = null;
     let bestDayExCount = 0;
     let bestDayReps = 0;
+    let bestDayExReps = {}; // { pushups: 50, squats: 100, ... }
 
-    // ── Monthly activity ─────────────────────────────────────────────────
-    const monthlyActivity = Array(12).fill(0);
+    // ── Monthly activity (by exercise) ───────────────────────────────────
+    const monthlyActivityByExercise = exercises
+        ? exercises.map(() => Array(12).fill(0))
+        : [];
+    const monthlyActivityTotal = Array(12).fill(0);
 
     // ── First active day ─────────────────────────────────────────────────
     let firstActiveDate = null;
@@ -45,7 +49,7 @@ export function Stats({ completions, exercises, onClose }) {
 
             // Monthly activity
             const monthIdx = new Date(dateStr).getMonth();
-            monthlyActivity[monthIdx]++;
+            monthlyActivityTotal[monthIdx]++;
 
             // Count individual exercise completions + best day
             let dayExCount = 0;
@@ -58,6 +62,12 @@ export function Stats({ completions, exercises, onClose }) {
                 if (exData?.isCompleted) {
                     totalExerciseCompletions++;
                     dayExCount++;
+
+                    // Track monthly activity by exercise
+                    const exIndex = exercises.findIndex(e => e.id === exId);
+                    if (exIndex !== -1) {
+                        monthlyActivityByExercise[exIndex][monthIdx]++;
+                    }
                     const ex = exercises?.find(e => e.id === exId);
                     if (ex) {
                         dayReps += Math.max(1, Math.ceil(dayNum * ex.multiplier));
@@ -69,6 +79,15 @@ export function Stats({ completions, exercises, onClose }) {
                 bestDayDate = dateStr;
                 bestDayExCount = dayExCount;
                 bestDayReps = dayReps;
+                bestDayExReps = {};
+                for (const [exId, exData] of Object.entries(day)) {
+                    if (exData?.isCompleted) {
+                        const ex = exercises?.find(e => e.id === exId);
+                        if (ex) {
+                            bestDayExReps[exId] = Math.max(1, Math.ceil(dayNum * ex.multiplier));
+                        }
+                    }
+                }
             }
 
             // Pie chart time-of-day (one entry per day)
@@ -198,7 +217,7 @@ export function Stats({ completions, exercises, onClose }) {
     const ChampionIcon = champion ? (ICON_MAP[champion.icon] || Dumbbell) : null;
 
     // ── Monthly bar chart max ────────────────────────────────────────────
-    const maxMonthly = Math.max(...monthlyActivity, 1);
+    const maxMonthly = Math.max(...monthlyActivityTotal, 1);
     const monthNames = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
 
     // ── Format date helper ───────────────────────────────────────────────
@@ -373,11 +392,52 @@ export function Stats({ completions, exercises, onClose }) {
                             <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)' }}>
                                 {bestDayReps.toLocaleString('fr-FR')} reps
                             </div>
-                            <div style={statLabelSmallStyle}>
-                                {bestDayExCount}/{exercises?.length || 0} exercices · Meilleur jour
+                            <div style={{
+                                display: 'flex', flexWrap: 'wrap', gap: '4px 8px',
+                                justifyContent: 'center', marginTop: '6px'
+                            }}>
+                                {Object.entries(bestDayExReps).map(([exId, reps]) => {
+                                    const ex = exercises?.find(e => e.id === exId);
+                                    if (!ex) return null;
+                                    return (
+                                        <div key={exId} style={{
+                                            display: 'flex', alignItems: 'center', gap: '3px',
+                                            fontSize: '0.6rem', color: 'var(--text-secondary)',
+                                            background: 'rgba(255,255,255,0.05)', padding: '2px 6px',
+                                            borderRadius: '4px'
+                                        }}>
+                                            <div style={{
+                                                width: '6px', height: '6px', borderRadius: '2px',
+                                                background: ex.color
+                                            }} />
+                                            <span style={{ fontWeight: '600', color: ex.color }}>{reps}</span>
+                                            <span>{ex.label}</span>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
+                </div>
+            )}
+
+            {exercises && exercises.length > 0 && (
+                <div style={{
+                    display: 'flex', flexWrap: 'wrap', gap: '8px',
+                    marginTop: '12px', justifyContent: 'center'
+                }}>
+                    {exercises.map(ex => (
+                        <div key={ex.id} style={{
+                            display: 'flex', alignItems: 'center', gap: '4px',
+                            fontSize: '0.6rem', color: 'var(--text-secondary)'
+                        }}>
+                            <div style={{
+                                width: '8px', height: '8px', borderRadius: '2px',
+                                background: ex.color
+                            }} />
+                            <span>{ex.label}</span>
+                        </div>
+                    ))}
                 </div>
             )}
 
@@ -390,33 +450,68 @@ export function Stats({ completions, exercises, onClose }) {
                 <h3 style={sectionTitleStyle}>📅 Activité mensuelle</h3>
                 <div style={{
                     display: 'flex', alignItems: 'flex-end', gap: '4px',
-                    height: '80px', padding: '0 4px'
+                    height: '100px', padding: '0 4px'
                 }}>
-                    {monthlyActivity.map((count, i) => {
+                    {monthlyActivityTotal.map((count, i) => {
                         const height = count > 0 ? Math.max(8, (count / maxMonthly) * 100) : 0;
                         const isCurrentMonth = i === today.getMonth();
+
+                        const exCounts = exercises.map((ex, exIdx) => ({
+                            ex,
+                            count: monthlyActivityByExercise[exIdx]?.[i] || 0
+                        }));
+                        const totalExCount = exCounts.reduce((sum, e) => sum + e.count, 0);
+
                         return (
                             <div key={i} style={{
                                 flex: 1, display: 'flex', flexDirection: 'column',
-                                alignItems: 'center', gap: '4px',
+                                alignItems: 'center', gap: '2px',
                                 height: '100%', justifyContent: 'flex-end'
                             }}>
-                                {count > 0 && (
+                                {totalExCount > 0 && (
                                     <span style={{
-                                        fontSize: '0.55rem', color: 'var(--text-secondary)',
-                                        fontWeight: '600'
-                                    }}>{count}</span>
+                                        fontSize: '0.5rem', color: 'var(--text-secondary)',
+                                        fontWeight: '600', lineHeight: 1.1
+                                    }}>{totalExCount}</span>
                                 )}
                                 <div style={{
                                     width: '100%', borderRadius: '4px 4px 2px 2px',
                                     height: count > 0 ? `${height}%` : '3px',
-                                    background: count > 0
-                                        ? isCurrentMonth
-                                            ? 'linear-gradient(180deg, #818cf8, #6366f1)'
-                                            : 'linear-gradient(180deg, rgba(129,140,248,0.5), rgba(99,102,241,0.3))'
-                                        : 'var(--surface-muted)',
+                                    background: 'var(--surface-muted)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    overflow: 'hidden',
                                     transition: 'height 0.5s ease'
-                                }} />
+                                }}>
+                                    {exCounts.map(({ ex, count: exCount }, exIdx) => {
+                                        if (exCount === 0) return null;
+                                        const segmentHeight = (exCount / Math.max(totalExCount, 1)) * 100;
+                                        const nextEx = exCounts[exIdx + 1];
+                                        const segment = (
+                                            <div key={exIdx} style={{
+                                                width: '100%',
+                                                height: `${segmentHeight}%`,
+                                                background: ex.color,
+                                                opacity: isCurrentMonth ? 1 : 0.6,
+                                                transition: 'height 0.3s ease',
+                                                position: 'relative'
+                                            }}>
+                                                {nextEx && nextEx.count > 0 && (
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        bottom: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        height: '15%',
+                                                        background: `linear-gradient(to bottom, ${ex.color}88, transparent)`,
+                                                        pointerEvents: 'none'
+                                                    }} />
+                                                )}
+                                            </div>
+                                        );
+                                        return segment;
+                                    })}
+                                </div>
                                 <span style={{
                                     fontSize: '0.55rem',
                                     color: isCurrentMonth ? '#818cf8' : 'var(--text-secondary)',
@@ -433,9 +528,9 @@ export function Stats({ completions, exercises, onClose }) {
                 <div className="glass-premium" style={{
                     padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
                     marginBottom: 'var(--spacing-md)',
-                background: 'var(--surface-section)'
-            }}>
-                <h3 style={sectionTitleStyle}>Par exercice</h3>
+                    background: 'var(--surface-section)'
+                }}>
+                    <h3 style={sectionTitleStyle}>Par exercice</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {exerciseStats.map(ex => {
                             const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
@@ -551,8 +646,8 @@ export function Stats({ completions, exercises, onClose }) {
 
                 {trackedCount > 0 ? (
                     <>
-                        <div style={{ width: '100%', height: '200px' }}>
-                            <ResponsiveContainer width="100%" height="100%">
+                        <div style={{ width: '100%', minHeight: '180px' }}>
+                            <ResponsiveContainer width="100%" height={180}>
                                 <PieChart>
                                     <Pie data={activeData} cx="50%" cy="50%"
                                         innerRadius={45} outerRadius={68}

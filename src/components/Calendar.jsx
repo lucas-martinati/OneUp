@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { getLocalDateStr } from '../utils/dateUtils';
@@ -7,7 +7,27 @@ const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints }
 
 export function Calendar({ startDate, completions, exercises, getDayNumber, onClose }) {
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedDay, setSelectedDay] = useState(null); // dateString for detail popup
+    const [selectedDay, setSelectedDay] = useState(null);
+    const touchStartX = useRef(null);
+
+    const goToPrevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+    const goToNextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+
+    const handleTouchStart = (e) => {
+        touchStartX.current = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = (e) => {
+        if (touchStartX.current === null) return;
+        const touchEndX = e.changedTouches[0].clientX;
+        const diff = touchStartX.current - touchEndX;
+        const threshold = 50;
+        if (Math.abs(diff) > threshold) {
+            if (diff > 0) goToNextMonth();
+            else goToPrevMonth();
+        }
+        touchStartX.current = null;
+    };
 
     const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
     const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
@@ -43,7 +63,11 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
     const completionRate = monthTotal > 0 ? Math.round((monthCompleted / monthTotal) * 100) : 0;
 
     return (
-        <div className="fade-in" style={{
+        <div 
+            className="fade-in" 
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            style={{
             position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
             background: 'var(--overlay-bg)', backdropFilter: 'blur(16px)', zIndex: 100,
             display: 'flex', flexDirection: 'column', padding: 'var(--spacing-md)',
