@@ -242,7 +242,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
             {selectedUser && (
                 <UserDetail
                     entry={selectedUser}
-                    rank={sorted.findIndex(e => e.uid === selectedUser.uid) + 1}
+                    rank={getRank(sorted.findIndex(e => e.uid === selectedUser.uid))}
                     isMe={selectedUser.uid === currentUid}
                     onClose={() => setSelectedUser(null)}
                 />
