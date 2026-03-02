@@ -1,15 +1,35 @@
 import { useState } from 'react';
-import { Calendar, ArrowRight, Zap, Target } from 'lucide-react';
+import { Calendar, ArrowRight, Zap, Target, Dumbbell, ArrowDownUp, ArrowUp, ChevronsUp, Footprints } from 'lucide-react';
 import { getLocalDateStr } from '../utils/dateUtils';
+import { EXERCISES } from '../config/exercises';
+
+const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
 export function Onboarding({ onStart }) {
     const [step, setStep] = useState(1);
     const currentYear = new Date().getFullYear();
+    const todayStr = getLocalDateStr(new Date());
 
     const [date, setDate] = useState(getLocalDateStr(new Date()));
+    const [selectedExercises, setSelectedExercises] = useState(['pushups']);
+
+    const isPastDate = date < todayStr;
+
+    const toggleExercise = (exId) => {
+        setSelectedExercises(prev => {
+            if (prev.includes(exId)) {
+                return prev.filter(id => id !== exId);
+            }
+            return [...prev, exId];
+        });
+    };
 
     const handleStart = () => {
-        onStart(new Date(date));
+        if (isPastDate) {
+            onStart(new Date(date), selectedExercises);
+        } else {
+            onStart(new Date(date), null);
+        }
     };
 
     return (
@@ -127,7 +147,7 @@ export function Onboarding({ onStart }) {
                             Let's Begin
                         </button>
                     </>
-                ) : (
+                ) : step === 2 ? (
                     <>
                         {/* Step 2: Start Date */}
                         <div style={{ textAlign: 'left' }}>
@@ -206,7 +226,13 @@ export function Onboarding({ onStart }) {
                                 Back
                             </button>
                             <button
-                                onClick={handleStart}
+                                onClick={() => {
+                                    if (date < todayStr) {
+                                        setStep(3);
+                                    } else {
+                                        handleStart();
+                                    }
+                                }}
                                 className="gradient-button hover-lift ripple"
                                 style={{
                                     flex: 2,
@@ -223,6 +249,133 @@ export function Onboarding({ onStart }) {
                                     boxShadow: '0 6px 24px rgba(245, 87, 108, 0.5)',
                                     border: 'none',
                                     cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                {date < todayStr ? 'Next' : 'Start Challenge'}
+                                <ArrowRight size={20} strokeWidth={3} />
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        {/* Step 3: Exercise Selection (only if past date) */}
+                        <div style={{ textAlign: 'left' }}>
+                            <label style={{
+                                fontSize: '1rem',
+                                color: 'var(--text-primary)',
+                                fontWeight: '600',
+                                marginBottom: 'var(--spacing-xs)',
+                                display: 'block'
+                            }}>
+                                🎯 Which exercises to validate?
+                            </label>
+                            <p style={{
+                                fontSize: '0.85rem',
+                                color: 'var(--text-secondary)',
+                                marginBottom: 'var(--spacing-md)',
+                                lineHeight: '1.5'
+                            }}>
+                                Select the exercises to auto-complete for past days<br />
+                                <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>
+                                    (choose at least one)
+                                </span>
+                            </p>
+
+                            {/* Exercise Grid */}
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(2, 1fr)',
+                                gap: '10px',
+                                marginBottom: 'var(--spacing-sm)'
+                            }}>
+                                {EXERCISES.map(ex => {
+                                    const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
+                                    const isSelected = selectedExercises.includes(ex.id);
+                                    return (
+                                        <button
+                                            key={ex.id}
+                                            onClick={() => toggleExercise(ex.id)}
+                                            className="hover-lift"
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '10px',
+                                                padding: '12px',
+                                                background: isSelected
+                                                    ? `${ex.color}22`
+                                                    : 'rgba(255,255,255,0.05)',
+                                                border: `2px solid ${isSelected ? ex.color : 'rgba(255,255,255,0.1)'}`,
+                                                borderRadius: 'var(--radius-md)',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s ease',
+                                                opacity: 1
+                                            }}
+                                        >
+                                            <div style={{
+                                                width: '36px',
+                                                height: '36px',
+                                                borderRadius: '50%',
+                                                background: `${ex.color}33`,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}>
+                                                <ExIcon size={18} color={ex.color} />
+                                            </div>
+                                            <span style={{
+                                                color: isSelected ? ex.color : 'var(--text-primary)',
+                                                fontWeight: '600',
+                                                fontSize: '0.9rem'
+                                            }}>
+                                                {ex.label}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Navigation Buttons */}
+                        <div style={{ display: 'flex', gap: '12px', marginTop: 'var(--spacing-sm)' }}>
+                            <button
+                                onClick={() => setStep(2)}
+                                className="hover-lift"
+                                style={{
+                                    flex: 1,
+                                    background: 'rgba(255,255,255,0.08)',
+                                    color: 'var(--text-secondary)',
+                                    padding: 'var(--spacing-sm)',
+                                    borderRadius: 'var(--radius-lg)',
+                                    fontWeight: '600',
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                Back
+                            </button>
+                            <button
+                                onClick={handleStart}
+                                className="gradient-button hover-lift ripple"
+                                disabled={selectedExercises.length === 0}
+                                style={{
+                                    flex: 2,
+                                    background: selectedExercises.length > 0
+                                        ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+                                        : 'rgba(255,255,255,0.1)',
+                                    color: selectedExercises.length > 0 ? 'white' : 'var(--text-secondary)',
+                                    padding: 'var(--spacing-sm) var(--spacing-md)',
+                                    borderRadius: 'var(--radius-lg)',
+                                    fontWeight: '700',
+                                    fontSize: '1.1rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '10px',
+                                    boxShadow: selectedExercises.length > 0 ? '0 6px 24px rgba(245, 87, 108, 0.5)' : 'none',
+                                    border: 'none',
+                                    cursor: selectedExercises.length > 0 ? 'pointer' : 'not-allowed',
                                     transition: 'all 0.3s ease'
                                 }}
                             >
@@ -250,11 +403,20 @@ export function Onboarding({ onStart }) {
                     transition: 'all 0.3s ease'
                 }} />
                 <div style={{
-                    width: step === 2 ? '24px' : '8px',
+                    width: step >= 2 ? '24px' : '8px',
                     height: '8px',
                     borderRadius: '4px',
-                    background: step === 2
+                    background: step >= 2
                         ? 'linear-gradient(90deg, #f093fb, #f5576c)'
+                        : 'rgba(255,255,255,0.2)',
+                    transition: 'all 0.3s ease'
+                }} />
+                <div style={{
+                    width: step === 3 ? '24px' : '8px',
+                    height: '8px',
+                    borderRadius: '4px',
+                    background: step === 3
+                        ? 'linear-gradient(90deg, #10b981, #34d399)'
                         : 'rgba(255,255,255,0.2)',
                     transition: 'all 0.3s ease'
                 }} />

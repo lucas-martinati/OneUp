@@ -76,10 +76,14 @@ function validateProgressData(data) {
 }
 
 /** Build a "day done" object for all exercises (used in backfill) */
-function makeAllDone() {
+function makeAllDone(selectedExercises = null) {
   const entry = {};
   const now = new Date().toISOString();
-  for (const ex of EXERCISES) {
+  const exercisesToComplete = selectedExercises 
+    ? EXERCISES.filter(ex => selectedExercises.includes(ex.id))
+    : EXERCISES;
+  
+  for (const ex of exercisesToComplete) {
     entry[ex.id] = { isCompleted: true, timestamp: now, timeOfDay: null };
   }
   return entry;
@@ -123,7 +127,7 @@ export function useProgress() {
 
   // ─── Challenge Setup ──────────────────────────────────────────────────────
 
-  const startChallenge = (userStartDate) => {
+  const startChallenge = (userStartDate, selectedExercises = null) => {
     setState(prev => {
       const newCompletions = { ...prev.completions };
       let userStartStr = prev.startDate;
@@ -141,7 +145,7 @@ export function useProgress() {
 
         const loopDate = new Date(start);
         while (loopDate < today) {
-          newCompletions[getLocalDateStr(loopDate)] = makeAllDone();
+          newCompletions[getLocalDateStr(loopDate)] = makeAllDone(selectedExercises);
           loopDate.setDate(loopDate.getDate() + 1);
         }
       }
