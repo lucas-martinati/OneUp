@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Trophy, Medal, Crown, ChevronRight, ChevronLeft, User } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { EXERCISES } from '../config/exercises';
+import { Avatar } from './Avatar';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
@@ -38,6 +39,15 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
         if (activeTab === 'global') return b.totalReps - a.totalReps;
         return (b.exerciseReps?.[activeTab] || 0) - (a.exerciseReps?.[activeTab] || 0);
     });
+
+    // Compute ranks with ties (same score = same rank)
+    const getRank = (index) => {
+        if (index === 0) return 1;
+        const currentReps = getReps(sorted[index]);
+        const previousReps = getReps(sorted[index - 1]);
+        if (currentReps === previousReps) return getRank(index - 1);
+        return index + 1;
+    };
 
     const getReps = (entry) => {
         if (activeTab === 'global') return entry.totalReps;
@@ -150,7 +160,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
                     <>
                         {/* ── All ranks (simple list) ───────────────────── */}
                         {sorted.map((entry, i) => {
-                            const rank = i + 1;
+                            const rank = getRank(i);
                             const isMe = entry.uid === currentUid;
                             const reps = getReps(entry);
                             const rankBgColors = {
@@ -192,25 +202,12 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
                                     </span>
 
                                     {/* Avatar */}
-                                    <div style={{
-                                        width: '32px', height: '32px', borderRadius: '50%',
-                                        overflow: 'hidden', flexShrink: 0,
-                                        background: 'rgba(255,255,255,0.05)',
-                                        border: isMe ? '1.5px solid rgba(251,191,36,0.4)' : '1.5px solid rgba(255,255,255,0.08)'
-                                    }}>
-                                        {entry.photoURL ? (
-                                            <img src={entry.photoURL} alt="" style={{
-                                                width: '100%', height: '100%', objectFit: 'cover'
-                                            }} />
-                                        ) : (
-                                            <div style={{
-                                                width: '100%', height: '100%', display: 'flex',
-                                                alignItems: 'center', justifyContent: 'center'
-                                            }}>
-                                                <User size={16} color="var(--text-secondary)" />
-                                            </div>
-                                        )}
-                                    </div>
+                                    <Avatar
+                                        photoURL={entry.photoURL}
+                                        name={entry.pseudo}
+                                        size={32}
+                                        borderColor={isMe ? 'rgba(251,191,36,0.4)' : null}
+                                    />
 
                                     {/* Name */}
                                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -299,25 +296,12 @@ function UserDetail({ entry, rank, isMe, onClose }) {
                     gap: '8px', marginBottom: 'var(--spacing-md)'
                 }}>
                     {/* Avatar */}
-                    <div style={{
-                        width: '64px', height: '64px', borderRadius: '50%',
-                        overflow: 'hidden', border: `2px solid ${rankColor}`,
-                        boxShadow: `0 0 20px ${rankColor}33`,
-                        background: 'rgba(255,255,255,0.05)'
-                    }}>
-                        {entry.photoURL ? (
-                            <img src={entry.photoURL} alt="" style={{
-                                width: '100%', height: '100%', objectFit: 'cover'
-                            }} />
-                        ) : (
-                            <div style={{
-                                width: '100%', height: '100%', display: 'flex',
-                                alignItems: 'center', justifyContent: 'center'
-                            }}>
-                                <User size={28} color={rankColor} />
-                            </div>
-                        )}
-                    </div>
+                    <Avatar
+                        photoURL={entry.photoURL}
+                        name={entry.pseudo}
+                        size={64}
+                        borderColor={rankColor}
+                    />
 
                     <div style={{ textAlign: 'center' }}>
                         <div style={{

@@ -68,7 +68,7 @@ export const EXERCISES = [
         colorDim: 'rgba(34,211,238,0.15)',
         gradient: ['#06b6d4', '#22d3ee'],
         confettiColors: ['#06b6d4', '#22d3ee', '#67e8f9', '#a5f3fc', '#ffffff'],
-        multiplier: 1,
+        multiplier: 1.5,
     },
     {
         id: 'lunges',
@@ -78,7 +78,7 @@ export const EXERCISES = [
         colorDim: 'rgba(251,146,60,0.15)',
         gradient: ['#f97316', '#fb923c'],
         confettiColors: ['#f97316', '#fb923c', '#fdba74', '#fed7aa', '#ffffff'],
-        multiplier: 1.5,
+        multiplier: 1,
     },
 ];
 

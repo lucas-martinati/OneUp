@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Cloud, CloudOff, User, AlertCircle, Upload } from 'lucide-react';
+import { Avatar } from './Avatar';
 
 export function CloudSyncPanel({
   authState,
@@ -229,15 +230,13 @@ export function CloudSyncPanel({
       ) : authState.isSignedIn ? (
         <div className="cloud-sync-content">
           {/* User info */}
-          <div className="cloud-user-info">
-            <div className="user-avatar">
-              {authState.user?.photoURL ? (
-                <img src={authState.user.photoURL} alt="Avatar" />
-              ) : (
-                <User />
-              )}
-            </div>
-            <div className="user-details">
+            <div className="cloud-user-info">
+              <Avatar
+                photoURL={authState.user?.photoURL}
+                name={authState.user?.displayName || authState.user?.email}
+                size={48}
+              />
+              <div className="user-details">
               <p className="user-name">{authState.user?.displayName || 'Utilisateur'}</p>
               <p className="user-email">{authState.user?.email || ''}</p>
             </div>
