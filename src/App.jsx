@@ -301,7 +301,7 @@ function App() {
           settings={settings}
           updateSettings={updateSettings}
           cloudAuth={googleAuth}
-          cloudSync={{ saveToCloud, loadFromCloud, syncWithCloud, signIn: googleAuth.signIn, signOut: googleAuth.signOut, loadLeaderboard: () => cloudSync.loadLeaderboard(), getCurrentUserId: () => cloudSync.getCurrentUserId() }}
+          cloudSync={{ saveToCloud, loadFromCloud, syncWithCloud, signIn: googleAuth.signIn, signOut: googleAuth.signOut, loadLeaderboard: () => cloudSync.loadLeaderboard(), getCurrentUserId: () => cloudSync.getCurrentUserId(), deleteAccount: () => cloudSync.deleteAccount() }}
           conflictData={conflictData}
           onResolveConflict={handleResolveConflict}
           getExerciseCount={getExerciseCount}

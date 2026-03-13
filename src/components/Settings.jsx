@@ -345,6 +345,10 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                         authState={cloudAuth}
                         onSignIn={() => cloudSync.signIn()}
                         onSignOut={() => cloudSync.signOut()}
+                        onDeleteAccount={async () => {
+                            await cloudSync.deleteAccount();
+                            onClose();
+                        }}
                         conflictData={conflictData}
                         onResolveConflict={onResolveConflict}
                     />

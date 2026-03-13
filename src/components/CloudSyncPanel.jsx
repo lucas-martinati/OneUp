@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Cloud, CloudOff, User, AlertCircle, Upload } from 'lucide-react';
+import { Cloud, CloudOff, User, AlertCircle, Upload, Trash2, AlertTriangle } from 'lucide-react';
 import { Avatar } from './Avatar';
 
 export function CloudSyncPanel({
@@ -8,9 +8,12 @@ export function CloudSyncPanel({
   onSignIn,
   onSignOut,
   conflictData,
-  onResolveConflict
+  onResolveConflict,
+  onDeleteAccount
 }) {
   const [resolving, setResolving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const handleResolve = async (action) => {
     setResolving(true);
@@ -269,6 +272,333 @@ export function CloudSyncPanel({
           >
             Déconnexion
           </button>
+
+          {/* Delete account */}
+          <button
+            className="btn-cloud-delete"
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={authState.loading}
+          >
+            <Trash2 size={16} />
+            Supprimer mon compte
+          </button>
+
+          {/* Delete confirmation modal */}
+          {showDeleteConfirm && createPortal(
+            <div className="delete-overlay" onClick={() => setShowDeleteConfirm(false)}>
+              <div className="delete-modal" onClick={e => e.stopPropagation()}>
+                <div className="delete-bg-effects">
+                  <div className="delete-glow delete-glow-1"></div>
+                  <div className="delete-glow delete-glow-2"></div>
+                </div>
+                <div className="delete-content">
+                  <div className="delete-icon-wrapper">
+                    <div className="delete-icon-pulse"></div>
+                    <div className="delete-icon">
+                      <Trash2 />
+                    </div>
+                  </div>
+                  <h3>Supprimer mon compte</h3>
+                  <p>
+                    Cette action est <strong>irréversible</strong>. Toutes vos données seront 
+                    supprimées définitivement, y compris votre progression et vos paramètres.
+                  </p>
+                  <div className="delete-warning">
+                    <AlertTriangle size={14} />
+                    <span>Cette action ne peut pas être annulée</span>
+                  </div>
+                  <div className="delete-actions">
+                    <button 
+                      className="btn-delete-cancel"
+                      onClick={() => setShowDeleteConfirm(false)}
+                      disabled={deleting}
+                    >
+                      Annuler
+                    </button>
+                    <button 
+                      className="btn-delete-confirm"
+                      onClick={async () => {
+                        setDeleting(true);
+                        try {
+                          await onDeleteAccount();
+                        } finally {
+                          setDeleting(false);
+                          setShowDeleteConfirm(false);
+                        }
+                      }}
+                      disabled={deleting}
+                    >
+                      {deleting ? (
+                        <>
+                          <span className="delete-spinner"></span>
+                          Suppression...
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 size={16} />
+                          Supprimer
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <style>{`
+                .delete-overlay {
+                  position: fixed;
+                  inset: 0;
+                  background: rgba(0, 0, 0, 0.85);
+                  backdrop-filter: blur(12px);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  z-index: 10000;
+                  padding: 20px;
+                  animation: fadeIn 0.25s ease;
+                }
+
+                .delete-modal {
+                  position: relative;
+                  background: linear-gradient(145deg, #0f0f1a 0%, #1a1a2e 50%, #0d0d1a 100%);
+                  border-radius: 24px;
+                  padding: 40px;
+                  max-width: 420px;
+                  width: 100%;
+                  border: 1px solid rgba(255, 87, 87, 0.15);
+                  box-shadow: 
+                    0 25px 80px rgba(0, 0, 0, 0.6),
+                    0 0 60px rgba(255, 87, 87, 0.08),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+                  animation: deleteModalSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                  overflow: hidden;
+                }
+
+                @keyframes deleteModalSlide {
+                  from {
+                    opacity: 0;
+                    transform: scale(0.9) translateY(20px);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: scale(1) translateY(0);
+                  }
+                }
+
+                .delete-bg-effects {
+                  position: absolute;
+                  inset: 0;
+                  pointer-events: none;
+                  overflow: hidden;
+                }
+
+                .delete-glow {
+                  position: absolute;
+                  border-radius: 50%;
+                  filter: blur(60px);
+                  opacity: 0.4;
+                }
+
+                .delete-glow-1 {
+                  width: 200px;
+                  height: 200px;
+                  background: radial-gradient(circle, rgba(255, 87, 87, 0.3) 0%, transparent 70%);
+                  top: -80px;
+                  right: -60px;
+                  animation: deleteFloat 6s ease-in-out infinite;
+                }
+
+                .delete-glow-2 {
+                  width: 150px;
+                  height: 150px;
+                  background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, transparent 70%);
+                  bottom: -50px;
+                  left: -40px;
+                  animation: deleteFloat 8s ease-in-out infinite reverse;
+                }
+
+                @keyframes deleteFloat {
+                  0%, 100% { transform: translate(0, 0); }
+                  50% { transform: translate(15px, 10px); }
+                }
+
+                .delete-content {
+                  position: relative;
+                  z-index: 1;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                }
+
+                .delete-icon-wrapper {
+                  position: relative;
+                  margin-bottom: 24px;
+                }
+
+                .delete-icon-pulse {
+                  position: absolute;
+                  inset: -8px;
+                  border-radius: 50%;
+                  background: radial-gradient(circle, rgba(255, 87, 87, 0.3) 0%, transparent 70%);
+                  animation: deletePulse 2s ease-in-out infinite;
+                }
+
+                @keyframes deletePulse {
+                  0%, 100% { transform: scale(1); opacity: 0.6; }
+                  50% { transform: scale(1.2); opacity: 0.3; }
+                }
+
+                .delete-icon {
+                  width: 72px;
+                  height: 72px;
+                  border-radius: 20px;
+                  background: linear-gradient(145deg, rgba(255, 87, 87, 0.2), rgba(239, 68, 68, 0.1));
+                  border: 1px solid rgba(255, 87, 87, 0.3);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  box-shadow: 0 8px 32px rgba(255, 87, 87, 0.2);
+                }
+
+                .delete-icon svg {
+                  width: 32px;
+                  height: 32px;
+                  color: #ef4444;
+                }
+
+                .delete-modal h3 {
+                  margin: 0 0 12px 0;
+                  font-size: 26px;
+                  font-weight: 800;
+                  background: linear-gradient(135deg, #fff 0%, #fecaca 100%);
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  background-clip: text;
+                  text-align: center;
+                }
+
+                .delete-modal p {
+                  margin: 0 0 20px 0;
+                  font-size: 14px;
+                  color: rgba(255, 255, 255, 0.6);
+                  line-height: 1.7;
+                  text-align: center;
+                }
+
+                .delete-modal p strong {
+                  color: #ef4444;
+                  font-weight: 600;
+                }
+
+                .delete-warning {
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  padding: 10px 16px;
+                  background: rgba(239, 68, 68, 0.1);
+                  border: 1px solid rgba(239, 68, 68, 0.2);
+                  border-radius: 10px;
+                  margin-bottom: 28px;
+                  width: 100%;
+                  box-sizing: border-box;
+                }
+
+                .delete-warning svg {
+                  width: 14px;
+                  height: 14px;
+                  color: #ef4444;
+                  flex-shrink: 0;
+                }
+
+                .delete-warning span {
+                  font-size: 12px;
+                  color: rgba(254, 202, 202, 0.9);
+                  font-weight: 500;
+                }
+
+                .delete-actions {
+                  display: flex;
+                  gap: 14px;
+                  width: 100%;
+                }
+
+                .btn-delete-cancel {
+                  flex: 1;
+                  padding: 16px 24px;
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  border-radius: 14px;
+                  background: rgba(255, 255, 255, 0.03);
+                  color: rgba(255, 255, 255, 0.8);
+                  font-size: 15px;
+                  font-weight: 600;
+                  font-family: var(--font-primary);
+                  cursor: pointer;
+                  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                .btn-delete-cancel:hover:not(:disabled) {
+                  background: rgba(255, 255, 255, 0.08);
+                  border-color: rgba(255, 255, 255, 0.2);
+                  transform: translateY(-2px);
+                }
+
+                .btn-delete-cancel:active:not(:disabled) {
+                  transform: translateY(0);
+                }
+
+                .btn-delete-confirm {
+                  flex: 1.2;
+                  padding: 16px 24px;
+                  border: none;
+                  border-radius: 14px;
+                  background: linear-gradient(145deg, #ef4444, #dc2626);
+                  color: white;
+                  font-size: 15px;
+                  font-weight: 700;
+                  font-family: var(--font-primary);
+                  cursor: pointer;
+                  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 8px;
+                  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+                }
+
+                .btn-delete-confirm:hover:not(:disabled) {
+                  transform: translateY(-2px);
+                  box-shadow: 0 8px 30px rgba(239, 68, 68, 0.4);
+                }
+
+                .btn-delete-confirm:active:not(:disabled) {
+                  transform: translateY(0);
+                }
+
+                .btn-delete-confirm:disabled {
+                  opacity: 0.7;
+                  cursor: not-allowed;
+                }
+
+                .delete-spinner {
+                  width: 16px;
+                  height: 16px;
+                  border: 2px solid rgba(255, 255, 255, 0.3);
+                  border-top-color: white;
+                  border-radius: 50%;
+                  animation: deleteSpin 0.8s linear infinite;
+                }
+
+                @keyframes deleteSpin {
+                  to { transform: rotate(360deg); }
+                }
+
+                .btn-delete-cancel:disabled {
+                  opacity: 0.5;
+                  cursor: not-allowed;
+                }
+              `}</style>
+            </div>,
+            document.body
+          )}
         </div>
       ) : (
         <div className="cloud-sync-content">
@@ -710,6 +1040,143 @@ export function CloudSyncPanel({
         .sync-message svg {
           width: 18px;
           height: 18px;
+        }
+
+        .btn-cloud-delete {
+          width: 100%;
+          padding: 12px 16px;
+          border: 1px solid rgba(255, 87, 87, 0.2);
+          border-radius: 12px;
+          background: transparent;
+          color: hsl(0, 84%, 60%);
+          font-size: 13px;
+          font-weight: 500;
+          font-family: var(--font-primary);
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        }
+
+        .btn-cloud-delete:hover:not(:disabled) {
+          background: rgba(255, 87, 87, 0.1);
+          border-color: rgba(255, 87, 87, 0.4);
+        }
+
+        .btn-cloud-delete:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .delete-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.8);
+          backdrop-filter: blur(8px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+          padding: 20px;
+          animation: fadeIn 0.2s ease;
+        }
+
+        .delete-modal {
+          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+          border-radius: 20px;
+          padding: 32px;
+          max-width: 400px;
+          width: 100%;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+          border: 1px solid rgba(255, 87, 87, 0.2);
+          animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .delete-icon {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          background: rgba(255, 87, 87, 0.15);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 20px;
+        }
+
+        .delete-icon svg {
+          width: 32px;
+          height: 32px;
+          color: hsl(0, 84%, 60%);
+        }
+
+        .delete-modal h3 {
+          margin: 0 0 12px 0;
+          font-size: 22px;
+          font-weight: 700;
+          color: white;
+          text-align: center;
+        }
+
+        .delete-modal p {
+          margin: 0 0 28px 0;
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.7);
+          line-height: 1.6;
+          text-align: center;
+        }
+
+        .delete-modal p strong {
+          color: hsl(0, 84%, 60%);
+        }
+
+        .delete-actions {
+          display: flex;
+          gap: 12px;
+        }
+
+        .btn-delete-cancel {
+          flex: 1;
+          padding: 14px 20px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          background: transparent;
+          color: var(--text-primary);
+          font-size: 14px;
+          font-weight: 600;
+          font-family: var(--font-primary);
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .btn-delete-cancel:hover:not(:disabled) {
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-delete-confirm {
+          flex: 1;
+          padding: 14px 20px;
+          border: none;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #ef4444, #dc2626);
+          color: white;
+          font-size: 14px;
+          font-weight: 600;
+          font-family: var(--font-primary);
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .btn-delete-confirm:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-delete-cancel:disabled,
+        .btn-delete-confirm:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
       `}</style>
     </div>
