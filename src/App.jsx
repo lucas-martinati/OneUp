@@ -5,6 +5,7 @@ import { useGoogleAuth } from './hooks/useGoogleAuth';
 import { cloudSync } from './services/cloudSync';
 import { EXERCISES } from './config/exercises';
 import { getLocalDateStr } from './utils/dateUtils';
+import { calculateAchievements } from './utils/achievements';
 import { Onboarding } from './components/Onboarding';
 import { Dashboard } from './components/Dashboard';
 import { createLogger } from './utils/logger';
@@ -223,48 +224,7 @@ function App() {
           totalReps += exTotal;
         });
 
-        // Calculate achievements
-        const totalDays = Object.keys(completions).filter(d => {
-          const day = completions[d];
-          return EXERCISES.some(ex => day?.[ex.id]?.isCompleted);
-        }).length;
-
-        let maxStreak = 0, temp = 0;
-        for (let i = 0; i < 365; i++) {
-          const d = new Date();
-          d.setDate(d.getDate() - i);
-          const dStr = getLocalDateStr(d);
-          const day = completions[dStr];
-          if (EXERCISES.some(ex => day?.[ex.id]?.isCompleted)) { temp++; if (temp > maxStreak) maxStreak = temp; }
-          else temp = 0;
-        }
-
-        let perfectDays = 0;
-        Object.entries(completions).forEach(([dateStr, day]) => {
-          if (EXERCISES.every(ex => day?.[ex.id]?.isCompleted)) perfectDays++;
-        });
-
-        // Check if all exercises done at least once
-        const allExercisesDone = EXERCISES.every(ex => 
-          Object.values(completions).some(day => day?.[ex.id]?.isCompleted)
-        );
-
-        const achievements = [
-          totalDays >= 1,
-          maxStreak >= 3,
-          maxStreak >= 7,
-          maxStreak >= 14,
-          maxStreak >= 30,
-          totalDays >= 10,
-          totalDays >= 50,
-          totalDays >= 100,
-          totalReps >= 500,
-          totalReps >= 1000,
-          perfectDays >= 1,
-          perfectDays >= 5,
-          perfectDays >= 10,
-          allExercisesDone
-        ].filter(Boolean).length;
+        const achievements = calculateAchievements(completions, EXERCISES);
 
         const pseudo = settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme';
         await cloudSync.publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements });

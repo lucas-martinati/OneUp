@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Radar, Radar
 import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { getLocalDateStr, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
+import { calculateAchievements } from '../utils/achievements';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 

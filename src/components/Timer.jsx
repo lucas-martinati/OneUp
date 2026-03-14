@@ -20,20 +20,26 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
         return `${m}:${s.toString().padStart(2, '0')}`;
     };
 
-    // Timer logic
+    // Timer logic - using refs to track values
+    const countRef = useRef(currentCount);
+    const completedRef = useRef(isCompleted);
+    countRef.current = currentCount;
+    completedRef.current = isCompleted;
+    
     useEffect(() => {
-        let interval;
-        if (isRunning && !isCompleted) {
-            interval = setInterval(() => {
-                const newCount = currentCount + 1;
-                onUpdateCount(newCount);
-                if (newCount >= dailyGoal) {
-                    setIsRunning(false);
-                }
-            }, 1000);
-        }
+        if (!isRunning || isCompleted) return;
+        
+        const interval = setInterval(() => {
+            if (completedRef.current) return;
+            const newCount = countRef.current + 1;
+            onUpdateCount(newCount);
+            if (newCount >= dailyGoal) {
+                setIsRunning(false);
+            }
+        }, 1000);
+        
         return () => clearInterval(interval);
-    }, [isRunning, currentCount, dailyGoal, isCompleted, onUpdateCount]);
+    }, [isRunning, isCompleted, dailyGoal]);
 
     // Celebration
     useEffect(() => {

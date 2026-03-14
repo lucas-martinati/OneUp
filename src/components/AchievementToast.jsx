@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronRight } from 'lucide-react';
 
 export function AchievementToast({ achievement, onClose, onView }) {
     const [isVisible, setIsVisible] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
+    const [translateX, setTranslateX] = useState(0);
+    const startX = useRef(0);
+    const isDragging = useRef(false);
 
     useEffect(() => {
         requestAnimationFrame(() => setIsVisible(true));
@@ -20,6 +23,7 @@ export function AchievementToast({ achievement, onClose, onView }) {
     const Icon = achievement.icon;
 
     const handleClick = () => {
+        if (Math.abs(translateX) > 50) return;
         setIsExiting(true);
         setTimeout(() => {
             onClose();
@@ -27,17 +31,42 @@ export function AchievementToast({ achievement, onClose, onView }) {
         }, 200);
     };
 
+    const handleTouchStart = (e) => {
+        startX.current = e.touches[0].clientX;
+        isDragging.current = true;
+    };
+
+    const handleTouchMove = (e) => {
+        if (!isDragging.current) return;
+        const currentX = e.touches[0].clientX;
+        const diff = currentX - startX.current;
+        setTranslateX(diff * 0.5);
+    };
+
+    const handleTouchEnd = () => {
+        isDragging.current = false;
+        if (Math.abs(translateX) > 25) {
+            setIsExiting(true);
+            setTimeout(onClose, 200);
+        } else {
+            setTranslateX(0);
+        }
+    };
+
     return createPortal(
         <div style={{
-            position: 'fixed', top: '60px', left: '50%', transform: 'translateX(-50%)',
+            position: 'fixed', top: '60px', left: '50%', transform: `translateX(calc(-50% + ${translateX}px))`,
             zIndex: 9999,
             opacity: isExiting ? 0 : (isVisible ? 1 : 0),
             translateY: isExiting ? -20 : (isVisible ? 0 : -100),
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: isDragging.current ? 'none' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             pointerEvents: isVisible && !isExiting ? 'auto' : 'none'
         }}>
-            <div 
+            <div
                 onClick={handleClick}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
                 className="glass hover-lift"
                 style={{
                     display: 'flex', alignItems: 'center', gap: '12px',
