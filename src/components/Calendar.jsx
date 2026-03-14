@@ -279,6 +279,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
     const [isVisible, setIsVisible] = useState(false);
     const startY = useRef(0);
     const currentDragY = useRef(0);
+    const sheetRef = useRef(null);
     const isClosing = externalIsClosing ?? false;
 
     useEffect(() => {
@@ -297,8 +298,16 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
     }, [onClose]);
 
     const handleTouchStart = (e) => {
-        startY.current = e.touches[0].clientY;
-        setIsDragging(true);
+        const contentEl = sheetRef.current?.querySelector('[data-scroll-content]');
+        const canScrollUp = contentEl ? contentEl.scrollTop > 0 : false;
+        
+        const touchY = e.touches[0].clientY;
+        const isNearTop = touchY < 100;
+        
+        if (!canScrollUp || isNearTop) {
+            startY.current = e.touches[0].clientY;
+            setIsDragging(true);
+        }
     };
 
     const handleTouchMove = (e) => {
@@ -352,6 +361,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
 
     return (
         <div
+            ref={sheetRef}
             onClick={(e) => e.stopPropagation()}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
@@ -386,7 +396,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                 </div>
             </div>
 
-            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">
+            <div data-scroll-content style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">
                 {exercises && exercises.map(ex => {
                     const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
                     const goal = Math.max(1, Math.ceil(dayNum * ex.multiplier));

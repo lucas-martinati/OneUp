@@ -32,8 +32,17 @@ export function Achievements({ completions, exercises, onClose, highlightedBadge
     }, [handleClose]);
 
     const handleTouchStart = (e) => {
-        startY.current = e.touches[0].clientY;
-        setIsDragging(true);
+        const contentEl = sheetRef.current?.querySelector('[data-scroll-content]');
+        const canScrollUp = contentEl ? contentEl.scrollTop > 0 : false;
+        
+        // Only enable drag to close if content is scrolled to top or touching near top
+        const touchY = e.touches[0].clientY;
+        const isNearTop = touchY < 100;
+        
+        if (!canScrollUp || isNearTop) {
+            startY.current = e.touches[0].clientY;
+            setIsDragging(true);
+        }
     };
 
     const handleTouchMove = (e) => {
@@ -233,6 +242,40 @@ export function Achievements({ completions, exercises, onClose, highlightedBadge
         }
         return count;
     }, [completions]);
+
+    // Ghost - workout between 3h and 4h
+    const ghostWorkout = useMemo(() => {
+        for (const date in completions) {
+            for (const exId in completions[date]) {
+                const timestamp = completions[date][exId]?.timestamp;
+                if (timestamp) {
+                    const hour = new Date(timestamp).getHours();
+                    if (hour >= 3 && hour < 4) return true;
+                }
+            }
+        }
+        return false;
+    }, [completions]);
+
+    // Perfectionist - 30 consecutive perfect days
+    const perfectStreak = useMemo(() => {
+        let streak = 0, maxStreak = 0;
+        const today = new Date();
+        for (let i = 0; i < 365; i++) {
+            const d = new Date(today);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const dayCompletions = completions[dateStr];
+            const isPerfect = exercises?.every(ex => dayCompletions?.[ex.id]?.isCompleted) ?? false;
+            if (isPerfect) {
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+            } else {
+                streak = 0;
+            }
+        }
+        return maxStreak;
+    }, [completions, exercises]);
 
     // Achievements
     const BADGES = [
@@ -590,31 +633,31 @@ export function Achievements({ completions, exercises, onClose, highlightedBadge
         // === SECRETS ===
         {
             id: 'ghost',
-            title: '???',
-            description: 'Secret',
+            title: ghostWorkout ? 'Fantôme' : '???',
+            description: ghostWorkout ? 'Entraînement entre 3h et 4h' : 'Secret',
             icon: Ghost,
             color: '#6b7280',
-            unlocked: false,
+            unlocked: ghostWorkout,
             secret: true,
             category: 'secrets'
         },
         {
             id: 'perfectionist',
-            title: '???',
-            description: 'Secret',
+            title: perfectStreak >= 30 ? 'Perfectionniste' : '???',
+            description: perfectStreak >= 30 ? '30 jours parfaits consécutifs' : 'Secret',
             icon: Star,
             color: '#6b7280',
-            unlocked: false,
+            unlocked: perfectStreak >= 30,
             secret: true,
             category: 'secrets'
         },
         {
             id: 'beast',
-            title: '???',
-            description: 'Secret',
+            title: totalRepsAll >= 100000 ? 'Bête' : '???',
+            description: totalRepsAll >= 100000 ? '100 000 répétitions au total' : 'Secret',
             icon: Rocket,
             color: '#6b7280',
-            unlocked: false,
+            unlocked: totalRepsAll >= 100000,
             secret: true,
             category: 'secrets'
         }
@@ -663,7 +706,7 @@ export function Achievements({ completions, exercises, onClose, highlightedBadge
                     cursor: 'grab'
                 }} />
 
-                <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">
+                <div data-scroll-content style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">
                     {/* Progress Overview */}
                     <div className="glass-premium scale-in" style={{
                         padding: 'var(--spacing-lg) var(--spacing-md)',

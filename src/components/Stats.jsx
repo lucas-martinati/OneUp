@@ -12,60 +12,9 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
     const today = new Date(todayStr);
     const utcStart = Date.UTC(today.getFullYear(), 0, 1);
 
-    // Badge count
+    // Badge count - using shared calculation
     const badgeStats = useMemo(() => {
-        const totalDays = Object.keys(completions).filter(date => isDayDoneFromCompletions(completions, date)).length;
-        let maxStreak = 0, temp = 0;
-        for (let i = 0; i < 365; i++) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            if (isDayDoneFromCompletions(completions, getLocalDateStr(d))) { temp++; if (temp > maxStreak) maxStreak = temp; }
-            else temp = 0;
-        }
-        let totalReps = 0;
-        for (const date in completions) {
-            for (const exId in completions[date]) {
-                if (completions[date][exId]?.isCompleted) {
-                    const ex = exercises?.find(e => e.id === exId);
-                    if (ex) {
-                        const d = new Date(date);
-                        const dayNum = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24)) + 1;
-                        totalReps += Math.max(1, Math.ceil(dayNum * ex.multiplier));
-                    }
-                }
-            }
-        }
-        let perfectDays = 0;
-        for (const date in completions) {
-            const allDone = exercises?.every(ex => completions[date]?.[ex.id]?.isCompleted) ?? false;
-            if (allDone) perfectDays++;
-        }
-        const unlocked = [
-            totalDays >= 1,
-            maxStreak >= 3,
-            maxStreak >= 7,
-            maxStreak >= 14,
-            maxStreak >= 30,
-            maxStreak >= 60,
-            maxStreak >= 90,
-            maxStreak >= 180,
-            maxStreak >= 365,
-            totalDays >= 10,
-            totalDays >= 50,
-            totalDays >= 100,
-            totalDays >= 200,
-            totalDays >= 500,
-            totalReps >= 500,
-            totalReps >= 1000,
-            totalReps >= 5000,
-            totalReps >= 10000,
-            totalReps >= 50000,
-            perfectDays >= 1,
-            perfectDays >= 5,
-            perfectDays >= 10,
-            perfectDays >= 20,
-            exercises?.every(ex => Object.values(completions).some(day => day?.[ex.id]?.isCompleted)) ?? false
-        ].filter(Boolean).length;
+        const unlocked = calculateAchievements(completions, exercises);
         return { unlocked, total: 40 };
     }, [completions, exercises]);
 
