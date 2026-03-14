@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Trophy, Medal, Crown, ChevronRight, ChevronLeft, User } from 'lucide-react';
+import { X, Trophy, Medal, Crown, ChevronRight, ChevronLeft, User, Award } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { EXERCISES } from '../config/exercises';
 import { Avatar } from './Avatar';
@@ -19,10 +19,6 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
     const [selectedUser, setSelectedUser] = useState(null);
     const currentUid = cloudSync.getCurrentUserId();
 
-    useEffect(() => {
-        loadData();
-    }, []);
-
     const loadData = async () => {
         setLoading(true);
         try {
@@ -33,6 +29,10 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
         }
         setLoading(false);
     };
+
+    useEffect(() => {
+        loadData();
+    }, []);
 
     // Sort entries based on active tab
     const sorted = [...entries].sort((a, b) => {
@@ -273,7 +273,8 @@ function UserDetail({ entry, rank, isMe, onClose }) {
                 style={{
                     width: '100%', maxWidth: '380px',
                     borderRadius: 'var(--radius-xl)', padding: 'var(--spacing-lg)',
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+                    maxHeight: '90vh', display: 'flex', flexDirection: 'column'
                 }}
             >
                 {/* Back button */}
@@ -284,7 +285,8 @@ function UserDetail({ entry, rank, isMe, onClose }) {
                         background: 'rgba(255,255,255,0.08)', border: 'none',
                         borderRadius: '50%', width: '32px', height: '32px',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'var(--text-secondary)', cursor: 'pointer', marginBottom: '12px'
+                        color: 'var(--text-secondary)', cursor: 'pointer', marginBottom: '12px',
+                        flexShrink: 0
                     }}
                 >
                     <ChevronLeft size={18} />
@@ -346,9 +348,31 @@ function UserDetail({ entry, rank, isMe, onClose }) {
                     </div>
                 </div>
 
+                {/* Achievements */}
+                <div style={{
+                    textAlign: 'center', marginBottom: 'var(--spacing-md)',
+                    padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-lg)',
+                    background: 'linear-gradient(135deg, rgba(168,85,247,0.1), rgba(139,92,246,0.05))'
+                }}>
+                    <div style={{
+                        fontSize: '0.6rem', textTransform: 'uppercase',
+                        letterSpacing: '1.5px', color: 'var(--text-secondary)', marginBottom: '2px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px'
+                    }}>
+                        <Award size={12} color="#a855f7" />
+                        Succès
+                    </div>
+                    <div style={{
+                        fontSize: '1.5rem', fontWeight: '900', color: '#a855f7'
+                    }}>
+                        {entry.achievements || 0}
+                    </div>
+                </div>
+
                 {/* Per-exercise breakdown */}
                 <div style={{
-                    display: 'flex', flexDirection: 'column', gap: '6px'
+                    display: 'flex', flexDirection: 'column', gap: '6px',
+                    flex: 1, overflowY: 'auto', scrollbarWidth: 'thin'
                 }}>
                     {EXERCISES.map(ex => {
                         const ExIcon = ICON_MAP[ex.icon] || Dumbbell;

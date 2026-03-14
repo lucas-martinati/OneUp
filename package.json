@@ -1,7 +1,7 @@
 {
   "name": "pushup-tracker",
   "private": true,
-  "version": "1.9.2",
+  "version": "2.1.0",
   "type": "module",
   "scripts": {
     "generate:config": "node scripts/generate-config.js",

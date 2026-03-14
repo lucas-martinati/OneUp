@@ -1,15 +1,19 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { App as CapacitorApp } from '@capacitor/app';
 import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
-    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users, Check
+    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users, Check, Award,
+    Target, TrendingUp, Star, Activity
 } from 'lucide-react';
 import { Calendar } from './Calendar';
 import { Stats } from './Stats';
 import { Settings } from './Settings';
 import { Counter } from './Counter';
 import { Leaderboard } from './Leaderboard';
+import { Achievements } from './Achievements';
+import { Timer } from './Timer';
+import { AchievementToast } from './AchievementToast';
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr, calculateStreak, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
@@ -45,6 +49,8 @@ export function Dashboard({
     const [showSettings, setShowSettings] = useState(false);
     const [showCounter, setShowCounter] = useState(false);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
+    const [showAchievements, setShowAchievements] = useState(false);
+    const [newAchievement, setNewAchievement] = useState(null);
     const [selectedExerciseId, setSelectedExerciseId] = useState('pushups');
     const [numberKey, setNumberKey] = useState(0);
     const [isCounterTransitioning, setIsCounterTransitioning] = useState(false);
@@ -53,6 +59,97 @@ export function Dashboard({
     useEffect(() => {
         setSoundSettingsGetter(() => settings);
     }, [settings]);
+
+    // Achievement detection
+    const prevCompletionsRef = useRef(completions);
+    useEffect(() => {
+        const prev = prevCompletionsRef.current;
+        const totalDays = Object.keys(completions).filter(d => isDayDoneFromCompletions(completions, d)).length;
+        const prevDays = Object.keys(prev).filter(d => isDayDoneFromCompletions(prev, d)).length;
+        
+        let maxStreak = 0, temp = 0;
+        for (let i = 0; i < 365; i++) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            if (isDayDoneFromCompletions(completions, getLocalDateStr(d))) { temp++; if (temp > maxStreak) maxStreak = temp; }
+            else temp = 0;
+        }
+        
+        let prevStreak = 0, temp2 = 0;
+        for (let i = 0; i < 365; i++) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            if (isDayDoneFromCompletions(prev, getLocalDateStr(d))) { temp2++; if (temp2 > prevStreak) prevStreak = temp2; }
+            else temp2 = 0;
+        }
+        
+        let totalReps = 0;
+        for (const date in completions) {
+            for (const exId in completions[date]) {
+                if (completions[date][exId]?.isCompleted) {
+                    const ex = EXERCISES.find(e => e.id === exId);
+                    if (ex) {
+                        const d = new Date(date);
+                        const dayNum = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24)) + 1;
+                        totalReps += Math.max(1, Math.ceil(dayNum * ex.multiplier));
+                    }
+                }
+            }
+        }
+        
+        let prevReps = 0;
+        for (const date in prev) {
+            for (const exId in prev[date]) {
+                if (prev[date][exId]?.isCompleted) {
+                    const ex = EXERCISES.find(e => e.id === exId);
+                    if (ex) {
+                        const d = new Date(date);
+                        const dayNum = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24)) + 1;
+                        prevReps += Math.max(1, Math.ceil(dayNum * ex.multiplier));
+                    }
+                }
+            }
+        }
+
+        let perfectDays = 0;
+        for (const date in completions) {
+            const allDone = EXERCISES.every(ex => completions[date]?.[ex.id]?.isCompleted);
+            if (allDone) perfectDays++;
+        }
+        let prevPerfect = 0;
+        for (const date in prev) {
+            const allDone = EXERCISES.every(ex => prev[date]?.[ex.id]?.isCompleted);
+            if (allDone) prevPerfect++;
+        }
+
+        const newBadges = [];
+        if (totalDays >= 1 && prevDays < 1) newBadges.push({ id: 'first_blood', title: 'Premier Pas', color: '#3b82f6', icon: Target });
+        if (maxStreak >= 3 && prevStreak < 3) newBadges.push({ id: 'consistent', title: 'Régularité', color: '#f97316', icon: Flame });
+        if (maxStreak >= 7 && prevStreak < 7) newBadges.push({ id: 'week_warrior', title: 'Guerrier de la Semaine', color: '#8b5cf6', icon: CalendarIcon });
+        if (maxStreak >= 14 && prevStreak < 14) newBadges.push({ id: 'two_weeks', title: 'Ténacité', color: '#06b6d4', icon: TrendingUp });
+        if (maxStreak >= 30 && prevStreak < 30) newBadges.push({ id: 'month_warrior', title: 'Soldat du Mois', color: '#eab308', icon: Zap });
+        if (totalDays >= 10 && prevDays < 10) newBadges.push({ id: 'ten_sessions', title: 'Dix de der', color: '#22c55e', icon: Star });
+        if (totalDays >= 50 && prevDays < 50) newBadges.push({ id: 'fifty_sessions', title: 'Cinquante', color: '#14b8a6', icon: Award });
+        if (totalDays >= 100 && prevDays < 100) newBadges.push({ id: 'hundred_sessions', title: 'Centurion', color: '#f472b6', icon: Trophy });
+        if (totalReps >= 500 && prevReps < 500) newBadges.push({ id: 'rep_500', title: '500 Répétitions', color: '#ef4444', icon: Activity });
+        if (totalReps >= 1000 && prevReps < 1000) newBadges.push({ id: 'rep_1000', title: 'Millier', color: '#facc15', icon: Zap });
+        if (perfectDays >= 1 && prevPerfect < 1) newBadges.push({ id: 'perfect_one', title: 'Premier Jour Parfait', color: '#22d3d1', icon: Star });
+
+        if (newBadges.length > 0) {
+            setTimeout(() => {
+                setNewAchievement(newBadges[newBadges.length - 1]);
+            }, 100);
+        }
+        
+        prevCompletionsRef.current = completions;
+    }, [completions]);
+
+    // Helper for time formatting
+    const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60);
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    };
 
     const dayNumber = getDayNumber(today);
     const selectedExercise = EXERCISES_MAP[selectedExerciseId];
@@ -145,11 +242,13 @@ export function Dashboard({
                 setShowSettings(false);
             } else if (showLeaderboard) {
                 setShowLeaderboard(false);
+            } else if (showAchievements) {
+                setShowAchievements(false);
             } else {
                 CapacitorApp.exitApp();
             }
         };
-        
+
         let backButtonListener;
         CapacitorApp.addListener('backButton', handleBackButton).then(listener => {
             backButtonListener = listener;
@@ -162,7 +261,7 @@ export function Dashboard({
                 backButtonListener.remove();
             }
         };
-    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, resumeCloudSync]);
+    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, showAchievements, resumeCloudSync]);
 
     const handleSaveSettings = (newSettings) => {
         updateSettings(newSettings);
@@ -174,11 +273,27 @@ export function Dashboard({
     const progress = (dayNumber / 365) * 100;
     const strokeDashoffset = circumference - (progress / 100) * circumference;
 
+    const handleViewAchievement = () => {
+        setShowCounter(false);
+        setShowStats(true);
+        setTimeout(() => {
+            setShowAchievements(true);
+        }, 100);
+    };
+
     return (
-        <div className="fade-in" style={{
-            display: 'flex', flexDirection: 'column', height: '100%',
-            gap: 'clamp(4px, 1vh, 10px)', paddingBottom: 'clamp(2px, 0.5vh, 8px)'
-        }}>
+        <>
+            {newAchievement && (
+                <AchievementToast 
+                    achievement={newAchievement} 
+                    onClose={() => setNewAchievement(null)}
+                    onView={handleViewAchievement}
+                />
+            )}
+            <div className="fade-in" style={{
+                display: 'flex', flexDirection: 'column', height: '100%',
+                gap: 'clamp(4px, 1vh, 10px)', paddingBottom: 'clamp(2px, 0.5vh, 8px)'
+            }}>
             {/* ── Header ── */}
             <header className="glass" style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -242,7 +357,7 @@ export function Dashboard({
                 {!isFuture ? (
                     <>
                         {/* Day & Goal Hero Section */}
-                        <div style={{ textAlign: 'center' }}>
+                        <div style={{ textAlign: 'center', position: 'relative' }}>
                             <div style={{
                                 fontSize: 'clamp(0.75rem, 1.6vh, 1rem)', color: 'var(--text-secondary)',
                                 textTransform: 'uppercase', letterSpacing: '4px',
@@ -292,7 +407,9 @@ export function Dashboard({
                                     fontSize: 'clamp(1.1rem, 4.5vw, 1.6rem)', fontWeight: '800',
                                     color: selectedExercise.color
                                 }}>
-                                    {dailyGoal}
+                                    {selectedExerciseId === 'planche'
+                                        ? formatTime(dailyGoal)
+                                        : dailyGoal}
                                 </span>
                                 <span style={{
                                     fontSize: 'clamp(0.8rem, 3.2vw, 1.05rem)', color: 'var(--text-secondary)', fontWeight: '500'
@@ -304,8 +421,9 @@ export function Dashboard({
 
                         {/* ── Exercise Selector ── */}
                         <div style={{
-                            display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-                            gap: 'clamp(6px, 1.2vw, 12px)', width: '100%', maxWidth: '400px'
+                            display: 'flex', flexWrap: 'wrap', justifyContent: 'center',
+                            gap: 'clamp(6px, 1.2vw, 10px)', width: '100%', maxWidth: '600px',
+                            padding: '2px'
                         }}>
                             {EXERCISES.map(ex => {
                                 const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
@@ -320,9 +438,12 @@ export function Dashboard({
                                         onClick={() => setSelectedExerciseId(ex.id)}
                                         className="hover-lift"
                                         style={{
+                                            flex: '1 1 calc(33.333% - 10px)',
+                                            minWidth: 'clamp(70px, 20vw, 100px)',
+                                            maxWidth: '120px',
                                             display: 'flex', flexDirection: 'column',
-                                            alignItems: 'center', gap: 'clamp(2px, 0.5vh, 6px)',
-                                            padding: 'clamp(8px, 1.2vh, 14px) clamp(6px, 1vw, 10px)', borderRadius: 'var(--radius-md)',
+                                            alignItems: 'center', gap: 'clamp(2px, 0.4vh, 4px)',
+                                            padding: 'clamp(6px, 1vh, 10px) clamp(4px, 0.8vw, 8px)', borderRadius: 'var(--radius-md)',
                                             background: exDone
                                                 ? `linear-gradient(135deg, ${ex.color}20, ${ex.gradient[1]}18)`
                                                 : isActive
@@ -377,7 +498,10 @@ export function Dashboard({
                                             textDecoration: exDone ? 'line-through' : 'none',
                                             textDecorationColor: `${ex.color}88`
                                         }}>
-                                            {exGoal}
+                                            {ex.id === 'planche'
+                                                ? (exDone ? formatTime(exGoal) : `${formatTime(exCount)}/${formatTime(exGoal)}`)
+                                                : (exDone ? exGoal : `${exCount}/${exGoal}`)
+                                            }
                                         </span>
                                         {exStreak > 0 && (
                                             <span style={{
@@ -464,21 +588,28 @@ export function Dashboard({
                                                 pointerEvents: 'none'
                                             }} />
                                             <Check size={26} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
-                                            <span style={{ 
-                                                fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)', 
-                                                color: 'white', 
+                                            <span style={{
+                                                fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)',
+                                                color: 'white',
                                                 fontWeight: '800',
                                                 textShadow: '0 1px 2px rgba(0,0,0,0.3)',
                                                 position: 'relative',
                                                 zIndex: 1
                                             }}>
-                                                {dailyGoal}/{dailyGoal}
+                                                {selectedExerciseId === 'planche'
+                                                    ? `${formatTime(dailyGoal)}/${formatTime(dailyGoal)}`
+                                                    : `${dailyGoal}/${dailyGoal}`
+                                                }
                                             </span>
                                         </>
                                     ) : (
                                         <>
                                             {(() => { const I = ICON_MAP[selectedExercise.icon] || Dumbbell; return <I size={22} color={selectedExercise.color} />; })()}
-                                            <span style={{ fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)', color: selectedExercise.color, fontWeight: '700' }}>{currentCount}/{dailyGoal}</span>
+                                            <span style={{ fontSize: 'clamp(0.45rem, 1.2vh, 0.65rem)', color: selectedExercise.color, fontWeight: '700' }}>
+                                                {selectedExerciseId === 'planche'
+                                                    ? `${formatTime(currentCount)}/${formatTime(dailyGoal)}`
+                                                    : `${currentCount}/${dailyGoal}`}
+                                            </span>
                                         </>
                                     )}
                                 </button>
@@ -492,47 +623,26 @@ export function Dashboard({
                                     ? completedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
                                     : null;
                                 return (
-                                <div className="scale-in" style={{
-                                    color: selectedExercise.color, fontWeight: '700',
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
-                                    marginTop: '8px'
-                                }}>
-                                    <span style={{ fontSize: 'clamp(0.95rem, 3.8vw, 1.35rem)', textAlign: 'center', lineHeight: 1.3 }}>
-                                        {selectedExercise.label} complété{isDayComplete ? ' — Journée validée !' : ''}
-                                    </span>
-                                    {timeStr && (
-                                        <span style={{
-                                            fontSize: 'clamp(0.7rem, 2.8vw, 0.95rem)', color: 'var(--text-secondary)',
-                                            fontWeight: '500', opacity: 0.75
-                                        }}>
-                                            Fait à {timeStr}
+                                    <div className="scale-in" style={{
+                                        color: selectedExercise.color, fontWeight: '700',
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
+                                        marginTop: '8px'
+                                    }}>
+                                        <span style={{ fontSize: 'clamp(0.95rem, 3.8vw, 1.35rem)', textAlign: 'center', lineHeight: 1.3 }}>
+                                            {selectedExercise.label} complété{isDayComplete ? ' — Journée validée !' : ''}
                                         </span>
-                                    )}
-                                </div>
+                                        {timeStr && (
+                                            <span style={{
+                                                fontSize: 'clamp(0.7rem, 2.8vw, 0.95rem)', color: 'var(--text-secondary)',
+                                                fontWeight: '500', opacity: 0.75
+                                            }}>
+                                                Fait à {timeStr}
+                                            </span>
+                                        )}
+                                    </div>
                                 );
                             })()}
                         </div>
-
-                        {/* Streak for selected exercise */}
-                        {exerciseStreak > 0 && (
-                            <div className="glass-premium slide-up" style={{
-                                padding: 'clamp(6px, 1vh, 14px) clamp(14px, 2.5vw, 24px)', borderRadius: 'var(--radius-lg)',
-                                display: 'flex', alignItems: 'center', gap: 'clamp(8px, 1.2vw, 14px)',
-                                background: 'linear-gradient(135deg, rgba(239,68,68,0.15), rgba(249,115,22,0.15))',
-                                boxShadow: '0 2px 12px rgba(239,68,68,0.2)',
-                                border: '1px solid rgba(249,115,22,0.25)'
-                            }}>
-                                <Flame size={24} color="#f97316" className="pulse-glow" />
-                                <div>
-                                    <div style={{ fontSize: 'clamp(0.65rem, 1.4vh, 0.85rem)', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '600' }}>
-                                        Série — {selectedExercise.label}
-                                    </div>
-                                    <div style={{ fontSize: 'clamp(1.1rem, 2.5vh, 1.8rem)', fontWeight: '800', color: '#f97316' }}>
-                                        {exerciseStreak} {exerciseStreak === 1 ? 'jour' : 'jours'}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
                     </>
                 ) : (
                     <div className="glass-premium" style={{
@@ -580,6 +690,8 @@ export function Dashboard({
                     completions={completions}
                     exercises={EXERCISES}
                     onClose={() => setShowStats(false)}
+                    onOpenAchievements={() => { setShowAchievements(true); }}
+                    highlightedBadgeId={newAchievement?.id}
                 />
             )}
             {showSettings && (
@@ -593,7 +705,7 @@ export function Dashboard({
                     onResolveConflict={onResolveConflict}
                 />
             )}
-            {showCounter && (
+            {showCounter && selectedExerciseId !== 'planche' && (
                 <Counter
                     exerciseConfig={selectedExercise}
                     onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
@@ -601,6 +713,18 @@ export function Dashboard({
                     currentCount={currentCount}
                     onUpdateCount={(newCount) => updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal)}
                     isCompleted={isExerciseDone}
+                    dayNumber={dayNumber}
+                />
+            )}
+            {showCounter && selectedExerciseId === 'planche' && (
+                <Timer
+                    exerciseConfig={selectedExercise}
+                    onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
+                    dailyGoal={dailyGoal}
+                    currentCount={currentCount}
+                    onUpdateCount={(newCount) => updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal)}
+                    isCompleted={isExerciseDone}
+                    dayNumber={dayNumber}
                 />
             )}
             {showLeaderboard && (
@@ -610,7 +734,16 @@ export function Dashboard({
                     cloudAuth={cloudAuth}
                 />
             )}
-        </div>
+            {showAchievements && (
+                <Achievements
+                    completions={completions}
+                    exercises={EXERCISES}
+                    onClose={() => { setShowAchievements(false); setNewAchievement(null); }}
+                    highlightedBadgeId={newAchievement?.id}
+                />
+            )}
+            </div>
+        </>
     );
 }
 

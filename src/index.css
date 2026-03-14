@@ -69,6 +69,10 @@
   color-scheme: dark;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Light theme ──────────────────────────────────────────────────────── */
 [data-theme="light"] {
   --bg-color: #f5f5f7;
@@ -359,6 +363,19 @@ button:active {
   }
 }
 
+.pulse-glow {
+  animation: badgeHighlight 1.5s ease-in-out infinite;
+}
+
+@keyframes badgeHighlight {
+  0%, 100% {
+    box-shadow: 0 0 15px var(--badge-color, rgba(251, 191, 36, 0.5));
+  }
+  50% {
+    box-shadow: 0 0 30px var(--badge-color, rgba(251, 191, 36, 0.8));
+  }
+}
+
 @keyframes pulseGlowExercise {
   0%,
   100% {
@@ -530,4 +547,13 @@ button:active {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* Hide scrollbar for cleanly scrolling containers */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;            /* Chrome, Safari, Opera */
 }

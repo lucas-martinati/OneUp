@@ -20,7 +20,7 @@ const triggerHaptic = async () => {
     }
 };
 
-export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig }) {
+export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber }) {
     const [isAnimating, setIsAnimating] = useState(false);
     const [completeFlash, setCompleteFlash] = useState(false);
 
@@ -348,6 +348,17 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                         Tout compl&eacute;ter
                     </button>
                 </div>
+            </div>
+
+            {/* Daily Tip Footer */}
+            <div style={{
+                marginTop: 'auto', marginBottom: '8px', 
+                padding: '8px 16px', borderRadius: '12px',
+                background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)',
+                fontSize: '0.8rem', textAlign: 'center', alignSelf: 'center', width: '90%', maxWidth: '300px',
+                border: '1px solid rgba(255,255,255,0.05)'
+            }}>
+                💡 {["Boire de l'eau booste les performances.", "Garde le dos droit !", "La constance bat l'intensité.", "Respire bien après l'effort.", "1% meilleur chaque jour."][(dayNumber || 0) % 5]}
             </div>
         </div>
     );

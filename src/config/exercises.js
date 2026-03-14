@@ -80,6 +80,46 @@ export const EXERCISES = [
         confettiColors: ['#f97316', '#fb923c', '#fdba74', '#fed7aa', '#ffffff'],
         multiplier: 1,
     },
+    {
+        id: 'burpees',
+        label: 'Burpees',
+        icon: 'Flame',
+        color: '#ef4444',           // Red-500
+        colorDim: 'rgba(239,68,68,0.15)',
+        gradient: ['#dc2626', '#ef4444'],
+        confettiColors: ['#b91c1c', '#dc2626', '#ef4444', '#f87171', '#ffffff'],
+        multiplier: 0.5,
+    },
+    {
+        id: 'planche',
+        label: 'Gainage (s)',
+        icon: 'Square',
+        color: '#8b5cf6',           // Violet-500
+        colorDim: 'rgba(139,92,246,0.15)',
+        gradient: ['#7c3aed', '#8b5cf6'],
+        confettiColors: ['#6d28d9', '#7c3aed', '#8b5cf6', '#a78bfa', '#ffffff'],
+        multiplier: 2,
+    },
+    {
+        id: 'dips',
+        label: 'Dips',
+        icon: 'MoveDown',
+        color: '#ec4899',           // Pink-500
+        colorDim: 'rgba(236,72,153,0.15)',
+        gradient: ['#db2777', '#ec4899'],
+        confettiColors: ['#be185d', '#db2777', '#ec4899', '#f472b6', '#ffffff'],
+        multiplier: 1,
+    },
+    {
+        id: 'mountain',
+        label: 'Climbers',
+        icon: 'MoveDiagonal',
+        color: '#10b981',           // Emerald-500
+        colorDim: 'rgba(16,185,129,0.15)',
+        gradient: ['#059669', '#10b981'],
+        confettiColors: ['#047857', '#059669', '#10b981', '#34d399', '#ffffff'],
+        multiplier: 2,
+    }
 ];
 
 /** Quick lookup by exercise id */

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { getLocalDateStr } from '../utils/dateUtils';
@@ -8,7 +8,16 @@ const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints }
 export function Calendar({ startDate, completions, exercises, getDayNumber, onClose }) {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
+    const [isClosing, setIsClosing] = useState(false);
     const touchStartX = useRef(null);
+
+    const handleCloseDetail = () => {
+        setIsClosing(true);
+        setTimeout(() => {
+            setSelectedDay(null);
+            setIsClosing(false);
+        }, 150);
+    };
 
     const goToPrevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
     const goToNextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
@@ -63,18 +72,18 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
     const completionRate = monthTotal > 0 ? Math.round((monthCompleted / monthTotal) * 100) : 0;
 
     return (
-        <div 
-            className="fade-in" 
+        <div
+            className="fade-in"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             style={{
-            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'var(--overlay-bg)', backdropFilter: 'blur(16px)', zIndex: 100,
-            display: 'flex', flexDirection: 'column', padding: 'var(--spacing-md)',
-            paddingTop: 'calc(var(--spacing-md) + env(safe-area-inset-top))',
-            paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))',
-            overflowY: 'auto'
-        }}>
+                position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                background: 'var(--overlay-bg)', backdropFilter: 'blur(16px)', zIndex: 100,
+                display: 'flex', flexDirection: 'column', padding: 'var(--spacing-md)',
+                paddingTop: 'calc(var(--spacing-md) + env(safe-area-inset-top))',
+                paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))',
+                overflowY: 'auto'
+            }}>
             {/* Header */}
             <div style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -225,13 +234,20 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
 
             {/* Detail popup */}
             {selectedDay && (
-                <DayDetail
-                    dateString={selectedDay}
-                    completions={completions}
-                    exercises={exercises}
-                    getDayNumber={getDayNumber}
-                    onClose={() => setSelectedDay(null)}
-                />
+                <>
+                    <div onClick={handleCloseDetail} style={{
+                        position: 'fixed', inset: 0, zIndex: 199,
+                        background: 'rgba(0,0,0,0.5)', opacity: isClosing ? 0 : 1, transition: 'opacity 0.15s'
+                    }} />
+                    <DayDetail
+                        dateString={selectedDay}
+                        completions={completions}
+                        exercises={exercises}
+                        getDayNumber={getDayNumber}
+                        onClose={handleCloseDetail}
+                        isClosing={isClosing}
+                    />
+                </>
             )}
 
             {/* Legend */}
@@ -255,22 +271,111 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
 }
 
 /** Day detail bottom sheet */
-function DayDetail({ dateString, completions, exercises, getDayNumber, onClose }) {
+function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing }) {
     const dayNum = getDayNumber(dateString);
     const dayCompletions = completions[dateString] || {};
+    const [dragY, setDragY] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const startY = useRef(0);
+    const currentDragY = useRef(0);
+    const isClosing = externalIsClosing ?? false;
+
+    useEffect(() => {
+        requestAnimationFrame(() => setIsVisible(true));
+    }, []);
+
+    useEffect(() => {
+        history.pushState({ sheetOpen: true }, '');
+        const handlePopState = (e) => {
+            if (e.state?.sheetOpen) {
+                onClose();
+            }
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [onClose]);
+
+    const handleTouchStart = (e) => {
+        startY.current = e.touches[0].clientY;
+        setIsDragging(true);
+    };
+
+    const handleTouchMove = (e) => {
+        if (!isDragging) return;
+        const currentY = e.touches[0].clientY;
+        const diff = currentY - startY.current;
+        if (diff > 0) {
+            const newDragY = diff * 0.13;
+            currentDragY.current = newDragY;
+            setDragY(newDragY);
+        }
+    };
+
+    const handleTouchEnd = () => {
+        setIsDragging(false);
+        if (currentDragY.current > 15) {
+            onClose();
+        } else {
+            currentDragY.current = 0;
+            setDragY(0);
+        }
+    };
+
+    const handleMouseDown = (e) => {
+        startY.current = e.clientY;
+        setIsDragging(true);
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDragging) return;
+        const currentY = e.clientY;
+        const diff = currentY - startY.current;
+        if (diff > 0) {
+            const newDragY = diff * 0.13;
+            currentDragY.current = newDragY;
+            setDragY(newDragY);
+        }
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+        if (currentDragY.current > 15) {
+            onClose();
+        } else {
+            currentDragY.current = 0;
+            setDragY(0);
+        }
+    };
+
+    const translateY = dragY;
 
     return (
-        <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
-            background: 'var(--sheet-bg)', backdropFilter: 'blur(20px)',
-            borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
-            padding: 'var(--spacing-md)',
-            paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))',
-            boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
-            animation: 'slideUp 0.25s ease'
-        }}>
-            {/* Handle */}
-            <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'var(--sheet-handle)', margin: '0 auto 16px' }} />
+        <div
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            style={{
+                position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
+                background: 'var(--sheet-bg)', backdropFilter: 'blur(20px)',
+                borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
+                padding: '20px',
+                paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))',
+                boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
+                transform: `translateY(${isClosing ? 100 : (isVisible ? translateY : 100)}%)`,
+                transition: isDragging ? 'none' : 'transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+                maxHeight: '80vh', display: 'flex', flexDirection: 'column'
+            }}>
+            <div style={{
+                width: '40px', height: '4px', borderRadius: '2px',
+                background: 'var(--sheet-handle)', margin: '0 auto 16px',
+                cursor: 'grab'
+            }} />
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <div>
@@ -279,16 +384,9 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose }
                     </div>
                     <div style={{ fontSize: '1.2rem', fontWeight: '700' }}>Jour {dayNum}</div>
                 </div>
-                <button onClick={onClose} style={{
-                    background: 'var(--surface-dim)', border: 'none', borderRadius: '50%',
-                    width: '36px', height: '36px', display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', cursor: 'pointer'
-                }}>
-                    <X size={18} color="var(--text-secondary)" />
-                </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">
                 {exercises && exercises.map(ex => {
                     const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
                     const goal = Math.max(1, Math.ceil(dayNum * ex.multiplier));
@@ -298,7 +396,8 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose }
                             display: 'flex', alignItems: 'center', gap: '12px',
                             padding: '10px 14px', borderRadius: 'var(--radius-md)',
                             background: exData.isCompleted ? `${ex.color}18` : 'var(--surface-subtle)',
-                            border: `1px solid ${exData.isCompleted ? ex.color + '44' : 'var(--border-muted)'}`
+                            border: `1px solid ${exData.isCompleted ? ex.color + '44' : 'var(--border-muted)'}`,
+                            flexShrink: 0
                         }}>
                             <div style={{
                                 width: '34px', height: '34px', borderRadius: '50%',

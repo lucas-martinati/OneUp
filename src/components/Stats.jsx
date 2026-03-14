@@ -1,14 +1,72 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { useMemo } from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { getLocalDateStr, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
-export function Stats({ completions, exercises, onClose }) {
+export function Stats({ completions, exercises, onClose, onOpenAchievements, highlightedBadgeId }) {
     const todayStr = getLocalDateStr(new Date());
     const today = new Date(todayStr);
     const utcStart = Date.UTC(today.getFullYear(), 0, 1);
+
+    // Badge count
+    const badgeStats = useMemo(() => {
+        const totalDays = Object.keys(completions).filter(date => isDayDoneFromCompletions(completions, date)).length;
+        let maxStreak = 0, temp = 0;
+        for (let i = 0; i < 365; i++) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            if (isDayDoneFromCompletions(completions, getLocalDateStr(d))) { temp++; if (temp > maxStreak) maxStreak = temp; }
+            else temp = 0;
+        }
+        let totalReps = 0;
+        for (const date in completions) {
+            for (const exId in completions[date]) {
+                if (completions[date][exId]?.isCompleted) {
+                    const ex = exercises?.find(e => e.id === exId);
+                    if (ex) {
+                        const d = new Date(date);
+                        const dayNum = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24)) + 1;
+                        totalReps += Math.max(1, Math.ceil(dayNum * ex.multiplier));
+                    }
+                }
+            }
+        }
+        let perfectDays = 0;
+        for (const date in completions) {
+            const allDone = exercises?.every(ex => completions[date]?.[ex.id]?.isCompleted) ?? false;
+            if (allDone) perfectDays++;
+        }
+        const unlocked = [
+            totalDays >= 1,
+            maxStreak >= 3,
+            maxStreak >= 7,
+            maxStreak >= 14,
+            maxStreak >= 30,
+            maxStreak >= 60,
+            maxStreak >= 90,
+            maxStreak >= 180,
+            maxStreak >= 365,
+            totalDays >= 10,
+            totalDays >= 50,
+            totalDays >= 100,
+            totalDays >= 200,
+            totalDays >= 500,
+            totalReps >= 500,
+            totalReps >= 1000,
+            totalReps >= 5000,
+            totalReps >= 10000,
+            totalReps >= 50000,
+            perfectDays >= 1,
+            perfectDays >= 5,
+            perfectDays >= 10,
+            perfectDays >= 20,
+            exercises?.every(ex => Object.values(completions).some(day => day?.[ex.id]?.isCompleted)) ?? false
+        ].filter(Boolean).length;
+        return { unlocked, total: 40 };
+    }, [completions, exercises]);
 
     // ── Sorted dates ─────────────────────────────────────────────────────
     const sortedDates = Object.keys(completions).sort();
@@ -210,6 +268,13 @@ export function Stats({ completions, exercises, onClose }) {
     // ── Global total reps ────────────────────────────────────────────────
     const globalTotalReps = exerciseStats.reduce((sum, ex) => sum + ex.totalReps, 0);
 
+    // ── Radar Data ───────────────────────────────────────────────────────
+    const radarData = exerciseStats.map(ex => ({
+        subject: ex.label,
+        reps: ex.totalReps,
+        fullMark: Math.max(...exerciseStats.map(e => e.totalReps)) || 100
+    }));
+
     // ── Champion exercise (most total reps) ──────────────────────────────
     const champion = exerciseStats.length > 0
         ? exerciseStats.reduce((best, ex) => ex.totalReps > best.totalReps ? ex : best, exerciseStats[0])
@@ -244,13 +309,26 @@ export function Stats({ completions, exercises, onClose }) {
                 <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
                     Statistiques
                 </h2>
-                <button onClick={onClose} className="hover-lift glass" style={{
-                    background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-                    width: '40px', height: '40px', display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
-                }}>
-                    <X size={22} />
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={onOpenAchievements} className="hover-lift glass" style={{
+                        background: 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.1))', 
+                        border: '1px solid rgba(251,191,36,0.3)', borderRadius: '12px',
+                        padding: '8px 12px', display: 'flex', alignItems: 'center',
+                        gap: '8px', color: '#fbbf24', cursor: 'pointer'
+                    }}>
+                        <Award size={18} />
+                        <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>
+                            {badgeStats.unlocked}/{badgeStats.total}
+                        </span>
+                    </button>
+                    <button onClick={onClose} className="hover-lift glass" style={{
+                        background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
+                        width: '40px', height: '40px', display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
+                    }}>
+                        <X size={22} />
+                    </button>
+                </div>
             </div>
 
             {/* ── Hero: Global Total Reps ─────────────────────────────── */}
@@ -522,6 +600,34 @@ export function Stats({ completions, exercises, onClose }) {
                     })}
                 </div>
             </div>
+
+            {/* ── Equilibre Musculaire (Radar) ────────────────────────── */}
+            {radarData.length > 2 && globalTotalReps > 0 && (
+                <div className="glass-premium" style={{
+                    padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    marginBottom: 'var(--spacing-md)',
+                    background: 'linear-gradient(135deg, rgba(52,211,153,0.1), rgba(16,185,129,0.1))'
+                }}>
+                    <h3 style={{ ...sectionTitleStyle, textAlign: 'center', width: '100%' }}>
+                        🕸️ Équilibre Musculaire
+                    </h3>
+                    <div style={{ width: '100%', height: '220px' }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                                <PolarGrid stroke="rgba(255,255,255,0.2)" />
+                                <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-secondary)', fontSize: 10, fontWeight: 600 }} />
+                                <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={false} axisLine={false} />
+                                <Radar name="Reps" dataKey="reps" stroke="#10b981" fill="#34d399" fillOpacity={0.5} />
+                                <Tooltip contentStyle={{
+                                    background: 'var(--tooltip-bg)', border: '1px solid var(--border-default)',
+                                    borderRadius: '8px', backdropFilter: 'blur(10px)'
+                                }} itemStyle={{ color: '#10b981', fontWeight: '800' }} />
+                            </RadarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            )}
 
             {/* ── Per-exercise breakdown ───────────────────────────────── */}
             {exerciseStats.length > 0 && (
