@@ -18,11 +18,8 @@ Built with **Vibe Coding**.
 
 ## Installer l'app sur Android
 
-OneUp est disponible en test ferme sur le Google Play Store. Pour l'installer :
-
-1. **Rejoindre le groupe Google de test** : https://groups.google.com/g/close-test-oneup
-2. **Devenir testeur** en cliquant sur ce lien : https://play.google.com/apps/testing/com.lucasm548.oneup
-3. **Installer l'app** depuis le Google Play Store une fois accepte comme testeur
+Vous pouvez télécharger l'application directement depuis le Google Play Store :
+https://play.google.com/store/apps/details?id=com.lucasm548.oneup&pcampaignid=web_share
 
 ## Installation (Développeur)
 
