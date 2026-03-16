@@ -15,7 +15,8 @@ import {
   get,
   onValue,
   serverTimestamp,
-  remove
+  remove,
+  push
 } from 'firebase/database';
 import { Preferences } from '@capacitor/preferences';
 import { createLogger } from '../utils/logger';
@@ -477,7 +478,7 @@ class CloudSyncService {
    * Publish (or update) this user's leaderboard entry.
    * Stored at `leaderboard/{uid}`.
    */
-  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements }) {
+  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null }) {
     try {
       if (!auth?.currentUser || !database) return false;
 
@@ -488,6 +489,8 @@ class CloudSyncService {
         totalReps: totalReps || 0,
         exerciseReps: exerciseReps || {},
         achievements: achievements || 0,
+        lastActiveDay: lastActiveDay,
+        isPublic: isPublic !== false,
         lastUpdated: serverTimestamp()
       };
 
@@ -536,15 +539,18 @@ class CloudSyncService {
       if (!snapshot.exists()) return [];
 
       const data = snapshot.val();
-      const entries = Object.entries(data).map(([uid, entry]) => ({
-        uid,
-        pseudo: entry.pseudo || 'Anonyme',
-        photoURL: entry.photoURL || null,
-        totalReps: entry.totalReps || 0,
-        exerciseReps: entry.exerciseReps || {},
-        achievements: entry.achievements || 0,
-        lastUpdated: entry.lastUpdated || null
-      }));
+      const entries = Object.entries(data)
+        .filter(([uid, entry]) => entry.isPublic !== false)
+        .map(([uid, entry]) => ({
+          uid,
+          pseudo: entry.pseudo || 'Anonyme',
+          photoURL: entry.photoURL || null,
+          totalReps: entry.totalReps || 0,
+          exerciseReps: entry.exerciseReps || {},
+          achievements: entry.achievements || 0,
+          lastActiveDay: entry.lastActiveDay || null,
+          lastUpdated: entry.lastUpdated || null
+        }));
 
       // Sort by total reps descending
       entries.sort((a, b) => b.totalReps - a.totalReps);
@@ -626,6 +632,280 @@ class CloudSyncService {
     } catch (error) {
       logger.error('Error loading settings:', error);
       return null;
+    }
+  }
+
+  // ── Clan System ──────────────────────────────────────────────────────
+
+  // Create a new clan
+  async createClan(name) {
+    try {
+      if (!auth?.currentUser || !database) throw new Error('Not initialized');
+      const uid = auth.currentUser.uid;
+
+      // Generate random 6-char code (A-Z, 0-9)
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+
+      const clansRef = ref(database, 'clans');
+      const newClanRef = push(clansRef);
+      const clanId = newClanRef.key;
+
+      const clanData = {
+        name: name,
+        code: code,
+        createdBy: uid,
+        createdAt: serverTimestamp(),
+        members: {
+          [uid]: 'admin'
+        }
+      };
+
+      await set(newClanRef, clanData);
+
+      // Save clanId to user profile
+      await set(ref(database, `users/${uid}/clans/${clanId}`), 'admin');
+
+      logger.success(`Clan ${name} created with code ${code}`);
+      return { success: true, clanId, code };
+    } catch (error) {
+      logger.error('Error creating clan:', error);
+      return { success: false, error: 'Une erreur est survenue' };
+    }
+  }
+
+  // Join a clan by code
+  async joinClan(code) {
+    try {
+      if (!auth?.currentUser || !database) throw new Error('Not initialized');
+      const uid = auth.currentUser.uid;
+      const cleanCode = code.toUpperCase().trim();
+
+      // Find clan by code
+      const clansRef = ref(database, 'clans');
+      const snapshot = await get(clansRef);
+      if (!snapshot.exists()) return { success: false, error: 'Code invalide' };
+
+      const clans = snapshot.val();
+      let foundClanId = null;
+
+      for (const [id, clan] of Object.entries(clans)) {
+        if (clan.code === cleanCode) {
+          foundClanId = id;
+          break;
+        }
+      }
+
+      if (!foundClanId) return { success: false, error: 'Code invalide' };
+
+      // Check if user is already in this clan
+      const userClanSnapshot = await get(ref(database, `users/${uid}/clans/${foundClanId}`));
+      if (userClanSnapshot.exists()) return { success: false, error: 'Tu es déjà dans ce clan' };
+
+      // Add user to members
+      await set(ref(database, `clans/${foundClanId}/members/${uid}`), 'member');
+
+      // Update user profile
+      await set(ref(database, `users/${uid}/clans/${foundClanId}`), 'member');
+
+      logger.success(`Joined clan ${foundClanId}`);
+      return { success: true, clanId: foundClanId };
+    } catch (error) {
+      logger.error('Error joining clan:', error);
+      return { success: false, error: 'Erreur lors de la connexion au clan' };
+    }
+  }
+
+  // Leave current clan
+  async leaveClan(clanId) {
+    try {
+      if (!auth?.currentUser || !database) throw new Error('Not initialized');
+      if (!clanId) return { success: false, error: 'ID de clan manquant' };
+      const uid = auth.currentUser.uid;
+
+      const userSnapshot = await get(ref(database, `users/${uid}/clans/${clanId}`));
+      if (!userSnapshot.exists()) return { success: true };
+
+      // Remove from clan members
+      await remove(ref(database, `clans/${clanId}/members/${uid}`));
+
+      // Remove clanId from user profile
+      await remove(ref(database, `users/${uid}/clans/${clanId}`));
+
+      // Check remaining members; delete clan if empty
+      const clanSnapshot = await get(ref(database, `clans/${clanId}`));
+      if (clanSnapshot.exists()) {
+        const remainingMembers = clanSnapshot.val().members || {};
+        if (Object.keys(remainingMembers).length === 0) {
+          await remove(ref(database, `clans/${clanId}`));
+          logger.success(`Clan ${clanId} deleted because it became empty.`);
+        }
+      }
+
+      logger.success(`Left clan ${clanId} successfully`);
+      return { success: true };
+    } catch (error) {
+      logger.error('Error leaving clan:', error);
+      return { success: false, error: 'Erreur lors de la sortie du clan' };
+    }
+  }
+
+  // Get all clans the user is part of
+  async getUserClans() {
+    try {
+      if (!auth?.currentUser || !database) return [];
+      const uid = auth.currentUser.uid;
+
+      const userClansSnapshot = await get(ref(database, `users/${uid}/clans`));
+      if (!userClansSnapshot.exists()) return [];
+
+      const userClans = userClansSnapshot.val();
+      const clanIds = Object.keys(userClans);
+      
+      const clansData = [];
+      for (const clanId of clanIds) {
+        const clanSnapshot = await get(ref(database, `clans/${clanId}`));
+        if (clanSnapshot.exists()) {
+          const data = clanSnapshot.val();
+          clansData.push({
+            id: clanId,
+            name: data.name,
+            code: data.code,
+            role: userClans[clanId],
+            memberCount: Object.keys(data.members || {}).length
+          });
+        }
+      }
+      return clansData;
+    } catch (error) {
+      logger.error('Error fetching user clans:', error);
+      return [];
+    }
+  }
+
+  // Get details for a specific clan
+  async getClanDetails(clanId) {
+    try {
+      if (!auth?.currentUser || !database) return null;
+      if (!clanId) return null;
+      const uid = auth.currentUser.uid;
+
+      const clanSnapshot = await get(ref(database, `clans/${clanId}`));
+      if (!clanSnapshot.exists()) return null;
+
+      const clanData = clanSnapshot.val();
+
+      // Fetch member details (pseudo, photoURL) to display list
+      const lbSnapshot = await get(ref(database, 'leaderboard'));
+      const leaderboards = lbSnapshot.exists() ? lbSnapshot.val() : {};
+
+      const memberIds = Object.keys(clanData.members || {});
+      const members = memberIds.map(memberUid => {
+        const lbData = leaderboards[memberUid] || {};
+        return {
+          uid: memberUid,
+          role: clanData.members[memberUid],
+          pseudo: lbData.pseudo || 'Anonyme',
+          photoURL: lbData.photoURL || null,
+          totalReps: lbData.totalReps || 0,
+          exerciseReps: lbData.exerciseReps || {},
+          achievements: lbData.achievements || 0,
+          lastActiveDay: lbData.lastActiveDay || null,
+          isCurrentUser: memberUid === uid
+        };
+      });
+
+      // Sort by total reps
+      members.sort((a, b) => b.totalReps - a.totalReps);
+
+      return {
+        id: clanId,
+        name: clanData.name,
+        code: clanData.code,
+        members
+      };
+    } catch (error) {
+      logger.error('Error fetching clan details:', error);
+      return null;
+    }
+  }
+
+  // Send a interaction/nudge to a clan member
+  async sendClanNotification(targetUid, type = 'nudge', message = "t'a envoyé un poke !") {
+    try {
+      if (!auth?.currentUser || !database) return false;
+      const fromUid = auth.currentUser.uid;
+
+      // Get sender's pseudo
+      const lbSnapshot = await get(ref(database, `leaderboard/${fromUid}`));
+      const pseudo = lbSnapshot.exists() && lbSnapshot.val().pseudo ? lbSnapshot.val().pseudo : 'Un membre';
+      const photoURL = lbSnapshot.exists() && lbSnapshot.val().photoURL ? lbSnapshot.val().photoURL : null;
+
+      const notifsRef = ref(database, `notifications/${targetUid}`);
+      const newNotifRef = push(notifsRef);
+
+      await set(newNotifRef, {
+        type,
+        message,
+        fromUid,
+        fromName: pseudo,
+        fromPhoto: photoURL,
+        timestamp: serverTimestamp(),
+        read: false
+      });
+
+      logger.success(`Nudge sent to ${targetUid}`);
+      return true;
+    } catch (error) {
+      logger.error('Error sending notification:', error);
+      return false;
+    }
+  }
+
+  // Listen for incoming notifications
+  listenToNotifications(callback) {
+    try {
+      if (!auth?.currentUser || !database) return null;
+      const uid = auth.currentUser.uid;
+
+      // Listen specifically for unread logic, but we can query them later and set to read.
+      const notifsRef = ref(database, `notifications/${uid}`);
+
+      const unsubscribe = onValue(notifsRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const notifs = [];
+          snapshot.forEach((child) => {
+            notifs.push({
+              id: child.key,
+              ...child.val()
+            });
+          });
+          callback(notifs);
+        } else {
+          callback([]);
+        }
+      });
+
+      return unsubscribe;
+    } catch (error) {
+      logger.error('Error listening to notifications:', error);
+      return null;
+    }
+  }
+
+  // Mark notification as read (or delete it to save space since it's transient)
+  async deleteNotification(notifId) {
+    try {
+      if (!auth?.currentUser || !database) return false;
+      const uid = auth.currentUser.uid;
+      await remove(ref(database, `notifications/${uid}/${notifId}`));
+      return true;
+    } catch (error) {
+      logger.error('Error deleting notification:', error);
+      return false;
     }
   }
 }

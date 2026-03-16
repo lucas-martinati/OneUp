@@ -24,6 +24,7 @@ function preloadSound(name, path) {
 
 // Preload all success sound variants
 preloadSound('success', '/sounds/success.mp3');      // Common - 95%
+preloadSound('poke', '/sounds/poke.mp3');            // For nudges
 
 // Delay loading of rare sounds to prevent network congestion/errors on startup
 setTimeout(() => {
@@ -83,6 +84,8 @@ export function playSound(soundName) {
       playAudioFile(selectedSound);
     } else if (soundName === 'click') {
       playAudioFile('click');
+    } else if (soundName === 'poke') {
+      playAudioFile('poke');
     }
   } catch (err) {
     // Silently fail if audio can't play
@@ -92,6 +95,7 @@ export function playSound(soundName) {
 
 export const sounds = {
   success: () => playSound('success'),
-  click: () => playSound('click')
+  click: () => playSound('click'),
+  poke: () => playSound('poke')
 };
 

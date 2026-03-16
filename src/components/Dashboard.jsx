@@ -3,7 +3,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users, Check, Award,
-    Target, TrendingUp, Star, Activity, Play, Square, MoveDown, MoveDiagonal
+    Target, TrendingUp, Star, Activity, Play, Square, MoveDown, MoveDiagonal, Shield
 } from 'lucide-react';
 import { Calendar } from './Calendar';
 import { Stats } from './Stats';
@@ -15,6 +15,8 @@ import { Timer } from './Timer';
 import { AchievementToast } from './AchievementToast';
 import { CSSConfetti } from './CSSConfetti';
 import { WorkoutSession } from './WorkoutSession';
+import { ClanModal } from './ClanModal';
+import { NotificationManager } from './NotificationManager';
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr, calculateStreak, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
@@ -38,6 +40,7 @@ export function Dashboard({
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [showAchievements, setShowAchievements] = useState(false);
     const [showSession, setShowSession] = useState(false);
+    const [showClan, setShowClan] = useState(false);
     const [newAchievement, setNewAchievement] = useState(null);
     const [selectedExerciseId, setSelectedExerciseId] = useState('pushups');
     const [numberKey, setNumberKey] = useState(0);
@@ -217,6 +220,9 @@ export function Dashboard({
             } else if (showSession) {
                 setShowSession(false);
                 resumeCloudSync?.();
+            } else if (showClan) {
+                setShowClan(false);
+                resumeCloudSync?.();
             } else if (showAchievements) {
                 setShowAchievements(false);
             } else if (showLeaderboard) {
@@ -244,7 +250,7 @@ export function Dashboard({
                 backButtonListener.remove();
             }
         };
-    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, showAchievements, showSession, resumeCloudSync]);
+    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, showAchievements, showSession, showClan, resumeCloudSync]);
 
     const handleSaveSettings = (newSettings) => {
         updateSettings(newSettings);
@@ -266,6 +272,7 @@ export function Dashboard({
 
     return (
         <>
+            <NotificationManager />
             <CSSConfetti
                 active={showDayConfetti}
                 colors={['#6d28d9', '#8b5cf6', '#0ea5e9', '#f093fb', '#fbbf24', '#10b981']}
@@ -298,6 +305,14 @@ export function Dashboard({
                     </div>
 
                     <div style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 1, minWidth: 0 }}>
+                        <button
+                            onClick={() => { setShowClan(true); pauseCloudSync?.(); }}
+                            title="Clan"
+                            className="glass hover-lift"
+                            style={{ padding: 'clamp(6px, 1.2vh, 8px)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'var(--text-primary)', cursor: 'pointer' }}
+                        >
+                            <Shield size="clamp(16px, 3.5vh, 20px)" />
+                        </button>
                         <button onClick={() => setShowSettings(true)} className="hover-lift" style={iconBtnStyle}>
                             <SettingsIcon size={19} />
                         </button>
@@ -721,6 +736,14 @@ export function Dashboard({
                         getExerciseCount={getExerciseCount}
                         updateExerciseCount={updateExerciseCount}
                         completions={completions}
+                    />
+                )}
+                {showClan && (
+                    <ClanModal 
+                        onClose={() => { setShowClan(false); resumeCloudSync?.(); }} 
+                        cloudAuth={cloudAuth}
+                        settings={settings}
+                        updateSettings={updateSettings}
                     />
                 )}
             </div>

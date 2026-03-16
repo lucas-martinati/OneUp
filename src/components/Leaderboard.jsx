@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Trophy, Medal, Crown, ChevronRight, ChevronLeft, User, Award, Flame, Calendar, TrendingUp, Activity } from 'lucide-react';
+import { X, Trophy, Medal, Crown, ChevronRight, ChevronLeft, User, Award, Flame, Calendar, TrendingUp, Activity, HeartHandshake, Link, UserPlus, LogOut, Check, Shield } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { EXERCISES } from '../config/exercises';
 import { Avatar } from './Avatar';
@@ -14,18 +14,41 @@ const TABS = [
     ...EXERCISES.map(ex => ({ id: ex.id, label: ex.label, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
 ];
 
-export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
+export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveClan }) {
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('global');
     const [selectedUser, setSelectedUser] = useState(null);
+    const [copied, setCopied] = useState(false);
+    const [nudgedMember, setNudgedMember] = useState(null);
+    const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
     const currentUid = cloudSync.getCurrentUserId();
+    const todayStr = getLocalDateStr(new Date());
+
+    const handleCopyCode = () => {
+        if (!clanData?.code) return;
+        navigator.clipboard.writeText(clanData.code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleNudge = async (e, uid) => {
+        e.stopPropagation();
+        if (nudgedMember === uid) return;
+        setNudgedMember(uid);
+        await cloudSync.sendClanNotification(uid, 'nudge', `t'a envoyé un poke !`);
+        setTimeout(() => setNudgedMember(null), 2000);
+    };
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const data = await cloudSync.loadLeaderboard();
-            setEntries(data);
+            if (clanData) {
+                setEntries(clanData.members);
+            } else {
+                const data = await cloudSync.loadLeaderboard();
+                setEntries(data);
+            }
         } catch (e) {
             console.error('Failed to load leaderboard', e);
         }
@@ -72,14 +95,25 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 padding: 'var(--spacing-md) var(--spacing-md) 0'
             }}>
-                <h2 style={{
-                    margin: 0, fontSize: '1.8rem', fontWeight: '800',
-                    background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                    WebkitBackgroundClip: 'text', backgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
-                }}>
-                    Classement
-                </h2>
+                {clanData ? (
+                    <div>
+                        <div style={{ fontSize: '0.75rem', color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '2px' }}>
+                            Ton Clan
+                        </div>
+                        <h2 style={{ margin: 0, fontSize: '1.6rem', fontWeight: '800', color: 'white' }}>
+                            {clanData.name}
+                        </h2>
+                    </div>
+                ) : (
+                    <h2 style={{
+                        margin: 0, fontSize: '1.8rem', fontWeight: '800',
+                        background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                        WebkitBackgroundClip: 'text', backgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent'
+                    }}>
+                        Classement
+                    </h2>
+                )}
                 <button onClick={onClose} className="hover-lift glass" style={{
                     background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
                     width: '40px', height: '40px', display: 'flex', alignItems: 'center',
@@ -88,6 +122,36 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
                     <X size={22} />
                 </button>
             </div>
+
+            {/* Invite Code Card */}
+            {clanData && (
+                <div style={{ padding: 'var(--spacing-md) var(--spacing-md) 0' }}>
+                    <div style={{
+                        background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.1))',
+                        border: '1px solid rgba(245,158,11,0.2)',
+                        borderRadius: 'var(--radius-lg)', padding: '16px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+                    }}>
+                        <div>
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <UserPlus size={14} /> Code d'invitation
+                            </div>
+                            <div style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '2px', color: '#fbbf24' }}>
+                                {clanData.code}
+                            </div>
+                        </div>
+                        <button onClick={handleCopyCode} className="hover-lift" style={{
+                            padding: '10px 16px', borderRadius: 'var(--radius-md)',
+                            background: copied ? '#10b981' : 'rgba(255,255,255,0.1)',
+                            border: copied ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                            color: 'white', fontSize: '0.85rem', fontWeight: '600',
+                            display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer'
+                        }}>
+                            {copied ? <><Check size={16} /> Copié</> : <><Link size={16} /> Copier</>}
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* ── Tabs (wrapping) ───────────────────────────────── */}
             <div style={{
@@ -213,14 +277,15 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
 
                                     {/* Name */}
                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                        <span style={{
+                                        <div style={{
                                             fontSize: '0.85rem', fontWeight: '600',
                                             color: isMe ? '#fbbf24' : 'var(--text-primary)',
                                             overflow: 'hidden', textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap', display: 'block'
+                                            whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px'
                                         }}>
                                             {isMe ? `${entry.pseudo} (toi)` : entry.pseudo}
-                                        </span>
+                                            {entry.lastActiveDay === todayStr && <Shield size={12} color="#10b981" />}
+                                        </div>
                                     </div>
 
                                     {/* Reps */}
@@ -233,12 +298,77 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
                                     </span>
 
                                     <ChevronRight size={16} color="var(--text-secondary)" style={{ opacity: 0.4, flexShrink: 0 }} />
+
+                                    {clanData && !isMe && (
+                                        <button 
+                                            onClick={(e) => handleNudge(e, entry.uid)}
+                                            disabled={nudgedMember === entry.uid}
+                                            className="hover-lift" 
+                                            style={{
+                                                width: '36px', height: '36px', borderRadius: '50%',
+                                                background: nudgedMember === entry.uid ? '#10b981' : 'rgba(99,102,241,0.1)',
+                                                border: 'none', color: nudgedMember === entry.uid ? 'white' : '#818cf8',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                cursor: 'pointer', flexShrink: 0, marginLeft: '4px'
+                                            }}
+                                        >
+                                            {nudgedMember === entry.uid ? <Check size={18} /> : <HeartHandshake size={18} />}
+                                        </button>
+                                    )}
                                 </div>
                             );
                         })}
                     </>
                 )}
             </div>
+
+            {/* ── Footer ───────────────────────────────── */}
+            {clanData && (
+                <div style={{ padding: 'var(--spacing-md)' }}>
+                    <button onClick={() => setShowLeaveConfirm(true)} style={{
+                        width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
+                        background: 'transparent', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444',
+                        fontSize: '0.9rem', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer'
+                    }}>
+                        <LogOut size={16} /> Quitter le clan
+                    </button>
+                </div>
+            )}
+
+            {/* ── Leave Clan Confirmation Modal ─────────── */}
+            {showLeaveConfirm && (
+                <div className="fade-in" style={{
+                    position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.85)',
+                    zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: 'var(--spacing-lg)'
+                }}>
+                    <div className="scale-in" style={{
+                        background: 'linear-gradient(135deg, rgba(30,30,30,0.95), rgba(20,20,20,0.95))',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: 'var(--radius-xl)', padding: '24px',
+                        width: '100%', maxWidth: '320px', textAlign: 'center',
+                        boxShadow: '0 20px 40px rgba(0,0,0,0.5)'
+                    }}>
+                        <LogOut size={48} color="#ef4444" style={{ marginBottom: '16px' }} />
+                        <h3 style={{ margin: '0 0 12px 0', fontSize: '1.4rem', color: 'white' }}>Quitter le clan ?</h3>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px', lineHeight: '1.5' }}>
+                            Es-tu sûr de vouloir quitter <strong>{clanData.name}</strong> ? Tes statistiques personnelles sont protégées, mais tu n'apparaîtras plus dans leur classement.
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <button onClick={() => setShowLeaveConfirm(false)} className="hover-lift" style={{
+                                flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
+                                background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white',
+                                fontWeight: '600', cursor: 'pointer'
+                            }}>Annuler</button>
+                            <button onClick={() => { setShowLeaveConfirm(false); onLeaveClan(); }} className="hover-lift" style={{
+                                flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
+                                background: '#ef4444', border: 'none', color: 'white',
+                                fontWeight: '700', cursor: 'pointer'
+                            }}>Quitter</button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* ── User Detail Modal ───────────────────────────────── */}
             {selectedUser && (
