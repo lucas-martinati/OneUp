@@ -442,6 +442,25 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                                             fontSize: '0.75rem', fontWeight: '600', color: ex.color
                                         }}>{ex.label}</span>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            {!loadingDetails && (stats.exerciseStreaks?.[ex.id] || 0) > 0 && (
+                                                <div style={{
+                                                    display: 'flex', alignItems: 'center', gap: '2px',
+                                                    background: stats.exerciseDoneToday?.[ex.id]
+                                                        ? 'rgba(249,115,22,0.12)'
+                                                        : 'rgba(120,120,120,0.08)',
+                                                    padding: '2px 6px', borderRadius: '8px'
+                                                }}>
+                                                    <span style={{
+                                                        fontSize: '0.6rem',
+                                                        opacity: stats.exerciseDoneToday?.[ex.id] ? 1 : 0.5,
+                                                        filter: stats.exerciseDoneToday?.[ex.id] ? 'none' : 'grayscale(1)'
+                                                    }}>🔥</span>
+                                                    <span style={{
+                                                        fontSize: '0.65rem', fontWeight: '700',
+                                                        color: stats.exerciseDoneToday?.[ex.id] ? '#f97316' : '#888'
+                                                    }}>{stats.exerciseStreaks[ex.id]}j</span>
+                                                </div>
+                                            )}
                                             {exDays !== null && (
                                                 <span style={{
                                                     fontSize: '0.65rem', color: 'var(--text-secondary)',
@@ -565,5 +584,27 @@ function computeStats(details) {
     // Current streak
     currentStreak = calculateStreak(completions, today);
 
-    return { maxStreak, currentStreak, totalDays, perfectDays, exerciseDays };
+    // Per-exercise streaks & today-done
+    const exerciseStreaks = {};
+    const exerciseDoneToday = {};
+    for (const ex of EXERCISES) {
+        exerciseDoneToday[ex.id] = !!completions[today]?.[ex.id]?.isCompleted;
+        // Streak: count consecutive days backward
+        let streak = 0;
+        for (let i = 0; i < 365; i++) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = getLocalDateStr(d);
+            if (completions[dateStr]?.[ex.id]?.isCompleted) {
+                streak++;
+            } else if (i === 0) {
+                // Today not done — check from yesterday
+            } else {
+                break;
+            }
+        }
+        exerciseStreaks[ex.id] = streak;
+    }
+
+    return { maxStreak, currentStreak, totalDays, perfectDays, exerciseDays, exerciseStreaks, exerciseDoneToday };
 }
