@@ -2,11 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { CSSConfetti } from './CSSConfetti';
 import {
     X, Check, CheckCheck, RotateCcw, Play, Pause,
-    Square
+    Square, ChevronRight
 } from 'lucide-react';
 import { sounds } from '../utils/soundManager';
 
-export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber }) {
+export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext }) {
     const [isRunning, setIsRunning] = useState(false);
     const [completeFlash, setCompleteFlash] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
@@ -49,6 +49,11 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
             hasCelebratedRef.current = true;
             setShowConfetti(true);
             sounds.success();
+
+            // Auto-advance to next exercise in session mode
+            if (onNext) {
+                setTimeout(() => onNext(), 1500);
+            }
         }
         if (!isCompleted && wasCompleted) {
             hasCelebratedRef.current = false;
@@ -90,7 +95,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
         />
         <div className="fade-in" style={{
             position: 'fixed', inset: 0,
-            background: 'rgba(0, 0, 0, 0.92)',
+            background: 'rgba(0, 0, 0, 0.98)',
             zIndex: 1000, display: 'flex', flexDirection: 'column',
             padding: 'var(--spacing-sm)',
             paddingTop: 'calc(var(--spacing-sm) + env(safe-area-inset-top))',
@@ -110,17 +115,39 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                         {exerciseLabel}
                     </h2>
                 </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <button
                     onClick={onClose}
                     className="glass hover-lift"
                     style={{
-                        width: '40px', height: '40px', borderRadius: '50%',
+                        width: '36px', height: '36px', borderRadius: '50%',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'rgba(255,255,255,0.08)', border: 'none', cursor: 'pointer'
+                        background: 'rgba(255,255,255,0.08)', border: 'none',
+                        color: 'var(--text-secondary)', cursor: 'pointer'
                     }}
                 >
-                    <X size={20} color="var(--text-primary)" />
+                    <X size={20} />
                 </button>
+
+                {/* Session: Next button */}
+                {onNext && (
+                    <button
+                        onClick={onNext}
+                        className="hover-lift"
+                        style={{
+                            padding: '6px 14px', borderRadius: '20px',
+                            background: `${activeColor}20`,
+                            border: `1px solid ${activeColor}40`,
+                            color: activeColor,
+                            fontSize: '0.8rem', fontWeight: '600',
+                            display: 'flex', alignItems: 'center', gap: '4px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Suivant <ChevronRight size={16} />
+                    </button>
+                )}
+                </div>
             </div>
 
             {/* Main Content */}

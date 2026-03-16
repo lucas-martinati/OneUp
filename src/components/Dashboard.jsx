@@ -3,7 +3,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users, Check, Award,
-    Target, TrendingUp, Star, Activity
+    Target, TrendingUp, Star, Activity, Play, Square, MoveDown, MoveDiagonal
 } from 'lucide-react';
 import { Calendar } from './Calendar';
 import { Stats } from './Stats';
@@ -14,6 +14,7 @@ import { Achievements } from './Achievements';
 import { Timer } from './Timer';
 import { AchievementToast } from './AchievementToast';
 import { CSSConfetti } from './CSSConfetti';
+import { WorkoutSession } from './WorkoutSession';
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr, calculateStreak, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
@@ -21,7 +22,7 @@ import { EXERCISES, EXERCISES_MAP } from '../config/exercises';
 import { runBackHandler } from '../utils/backHandler';
 
 // Map icon name → lucide component
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
+const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
 
 export function Dashboard({
     getDayNumber, toggleCompletion, completions, startDate, userStartDate,
@@ -36,6 +37,7 @@ export function Dashboard({
     const [showCounter, setShowCounter] = useState(false);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [showAchievements, setShowAchievements] = useState(false);
+    const [showSession, setShowSession] = useState(false);
     const [newAchievement, setNewAchievement] = useState(null);
     const [selectedExerciseId, setSelectedExerciseId] = useState('pushups');
     const [numberKey, setNumberKey] = useState(0);
@@ -212,6 +214,9 @@ export function Dashboard({
             if (showCounter) {
                 setShowCounter(false);
                 resumeCloudSync?.();
+            } else if (showSession) {
+                setShowSession(false);
+                resumeCloudSync?.();
             } else if (showAchievements) {
                 setShowAchievements(false);
             } else if (showLeaderboard) {
@@ -239,7 +244,7 @@ export function Dashboard({
                 backButtonListener.remove();
             }
         };
-    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, showAchievements, resumeCloudSync]);
+    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, showAchievements, showSession, resumeCloudSync]);
 
     const handleSaveSettings = (newSettings) => {
         updateSettings(newSettings);
@@ -581,25 +586,15 @@ export function Dashboard({
                                     const timeStr = completedAt
                                         ? completedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
                                         : null;
-                                    return (
+                                    return timeStr ? (
                                         <div className="scale-in" style={{
-                                            color: selectedExercise.color, fontWeight: '700',
-                                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
-                                            marginTop: '8px'
+                                            color: 'var(--text-secondary)', fontWeight: '500',
+                                            marginTop: '8px', opacity: 0.75,
+                                            fontSize: 'clamp(0.7rem, 2.8vw, 0.95rem)'
                                         }}>
-                                            <span style={{ fontSize: 'clamp(0.95rem, 3.8vw, 1.35rem)', textAlign: 'center', lineHeight: 1.3 }}>
-                                                {selectedExercise.label} complété{isDayComplete ? ' — Journée validée !' : ''}
-                                            </span>
-                                            {timeStr && (
-                                                <span style={{
-                                                    fontSize: 'clamp(0.7rem, 2.8vw, 0.95rem)', color: 'var(--text-secondary)',
-                                                    fontWeight: '500', opacity: 0.75
-                                                }}>
-                                                    Fait à {timeStr}
-                                                </span>
-                                            )}
+                                            Fait à {timeStr}
                                         </div>
-                                    );
+                                    ) : null;
                                 })()}
                             </div>
                         </>
@@ -632,6 +627,23 @@ export function Dashboard({
                 >
                     <CalendarIcon size={18} />
                     Ouvrir le Calendrier
+                </button>
+
+                {/* Session Button */}
+                <button
+                    onClick={() => { setShowSession(true); pauseCloudSync?.(); }}
+                    className="glass hover-lift gradient-button"
+                    style={{
+                        width: '100%', padding: 'clamp(12px, 1.8vh, 18px)', borderRadius: 'var(--radius-lg)',
+                        color: 'var(--text-primary)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        gap: '8px', fontSize: 'clamp(0.85rem, 1.8vh, 1.05rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
+                        background: 'linear-gradient(135deg, rgba(129,140,248,0.2), rgba(99,102,241,0.2))',
+                        boxShadow: 'var(--shadow-md)'
+                    }}
+                >
+                    <Play size={18} />
+                    Lancer une séance
                 </button>
 
                 {/* Modals */}
@@ -699,6 +711,16 @@ export function Dashboard({
                         exercises={EXERCISES}
                         onClose={() => { setShowAchievements(false); setNewAchievement(null); }}
                         highlightedBadgeId={newAchievement?.id}
+                    />
+                )}
+                {showSession && (
+                    <WorkoutSession
+                        onClose={() => { setShowSession(false); resumeCloudSync?.(); }}
+                        today={today}
+                        dayNumber={dayNumber}
+                        getExerciseCount={getExerciseCount}
+                        updateExerciseCount={updateExerciseCount}
+                        completions={completions}
                     />
                 )}
             </div>

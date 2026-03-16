@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { CSSConfetti } from './CSSConfetti';
 import {
-    X, Check, CheckCheck, RotateCcw, Plus, Minus,
-    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints
+    X, Check, CheckCheck, RotateCcw, Plus, Minus, ChevronRight,
+    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
+    Flame, Square, MoveDown, MoveDiagonal
 } from 'lucide-react';
 import { sounds } from '../utils/soundManager';
 
 // Map icon name strings to lucide components
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
+const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
 
 /** Trigger haptic feedback if available (Capacitor native) */
 const triggerHaptic = async () => {
@@ -20,7 +21,7 @@ const triggerHaptic = async () => {
     }
 };
 
-export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber }) {
+export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext }) {
     const [isAnimating, setIsAnimating] = useState(false);
     const [completeFlash, setCompleteFlash] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
@@ -37,6 +38,11 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
             hasCelebratedRef.current = true;
             setShowConfetti(true);
             sounds.success();
+
+            // Auto-advance to next exercise in session mode
+            if (onNext) {
+                setTimeout(() => onNext(), 1500);
+            }
         }
 
         if (!isCompleted && wasCompleted) {
@@ -106,7 +112,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0, 0, 0, 0.92)',
+            background: 'rgba(0, 0, 0, 0.98)',
             zIndex: 1000,
             display: 'flex',
             flexDirection: 'column',
@@ -134,17 +140,39 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                         {exerciseLabel}
                     </h2>
                 </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <button
                     onClick={onClose}
                     className="glass hover-lift"
                     style={{
-                        width: '40px', height: '40px', borderRadius: '50%',
+                        width: '36px', height: '36px', borderRadius: '50%',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'rgba(255,255,255,0.08)', border: 'none', cursor: 'pointer'
+                        background: 'rgba(255,255,255,0.08)', border: 'none',
+                        color: 'var(--text-secondary)', cursor: 'pointer'
                     }}
                 >
-                    <X size={20} color="var(--text-primary)" />
+                    <X size={20} />
                 </button>
+
+                {/* Session: Next button */}
+                {onNext && (
+                    <button
+                        onClick={onNext}
+                        className="hover-lift"
+                        style={{
+                            padding: '6px 14px', borderRadius: '20px',
+                            background: `${activeColor}20`,
+                            border: `1px solid ${activeColor}40`,
+                            color: activeColor,
+                            fontSize: '0.8rem', fontWeight: '600',
+                            display: 'flex', alignItems: 'center', gap: '4px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Suivant <ChevronRight size={16} />
+                    </button>
+                )}
+                </div>
             </div>
 
             {/* Main Content */}
