@@ -1,11 +1,15 @@
-import { 
-    Target, Flame, Zap, Calendar, TrendingUp, Trophy, Medal, Gem, Rocket, 
+import {
+    Target, Flame, Zap, Calendar, TrendingUp, Trophy, Medal, Gem, Rocket,
     Star, Award, Crown, Activity, Sun, Moon, Users, Star as StarIcon,
     Ghost
 } from 'lucide-react';
 import { isDayDoneFromCompletions, getLocalDateStr } from './dateUtils';
 
-export function calculateAchievements(completions, exercises) {
+import { getDailyGoal } from '../config/exercises';
+
+export function calculateAchievements(completions, exercises, settings) {
+    const difficultyMultiplier = settings?.difficultyMultiplier ?? 1.0;
+    const startDate = settings?.startDate;
     if (!exercises || exercises.length === 0) return 0;
 
     // Total days - using isDayDoneFromCompletions like Achievements.jsx
@@ -30,16 +34,32 @@ export function calculateAchievements(completions, exercises) {
 
     // Total reps - using same formula as Achievements.jsx
     let totalReps = 0;
-    for (const date in completions) {
-        for (const exId in completions[date]) {
-            if (completions[date][exId]?.isCompleted) {
-                const ex = exercises.find(e => e.id === exId);
-                if (ex) {
-                    const d = new Date(date);
-                    const utcStart = Date.UTC(d.getFullYear(), 0, 1);
-                    const utcCurrent = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
-                    const dayNum = Math.floor((utcCurrent - utcStart) / (1000 * 60 * 60 * 24)) + 1;
-                    totalReps += Math.max(1, Math.ceil(dayNum * ex.multiplier));
+    // Fallback to first completion date if settings.startDate is missing
+    let effectiveStartDate = startDate;
+    if (!effectiveStartDate) {
+        const allDates = Object.keys(completions).sort();
+        if (allDates.length > 0) {
+            effectiveStartDate = new Date(allDates[0]);
+        }
+    }
+
+    // Helper to get day index from start date
+    const getDayIndex = (currentDateStr, start) => {
+        if (!start) return 1;
+        const current = new Date(currentDateStr);
+        const startD = new Date(start);
+        const diffTime = current.getTime() - startD.getTime();
+        return Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    };
+
+    for (const dateStr in completions) {
+        const dayData = completions[dateStr];
+        for (const exId in dayData) {
+            const ex = exercises.find(e => e.id === exId);
+            if (ex) {
+                if (dayData?.[ex.id]?.isCompleted) {
+                    const dayNum = getDayIndex(dateStr, effectiveStartDate);
+                    totalReps += getDailyGoal(ex, dayNum, difficultyMultiplier);
                 }
             }
         }

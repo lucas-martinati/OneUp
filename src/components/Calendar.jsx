@@ -3,10 +3,11 @@ import { X, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { getLocalDateStr } from '../utils/dateUtils';
 import { registerBackHandler } from '../utils/backHandler';
+import { getDailyGoal } from '../config/exercises'; // Added getDailyGoal import
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
-export function Calendar({ startDate, completions, exercises, getDayNumber, onClose }) {
+export function Calendar({ startDate, completions, exercises, getDayNumber, onClose, settings }) { // Added settings prop
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
     const [isClosing, setIsClosing] = useState(false);
@@ -247,6 +248,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                         getDayNumber={getDayNumber}
                         onClose={handleCloseDetail}
                         isClosing={isClosing}
+                        settings={settings} // Pass settings to DayDetail
                     />
                 </>
             )}
@@ -272,7 +274,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
 }
 
 /** Day detail bottom sheet */
-function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing }) {
+function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, settings }) { // Added settings prop
     const dayNum = getDayNumber(dateString);
     const dayCompletions = completions[dateString] || {};
     const [dragY, setDragY] = useState(0);
@@ -406,7 +408,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
             <div data-scroll-content style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">
                 {exercises && exercises.map(ex => {
                     const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
-                    const goal = Math.max(1, Math.ceil(dayNum * ex.multiplier));
+                    const goal = getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
                     const exData = dayCompletions[ex.id] || { isCompleted: false };
                     return (
                         <div key={ex.id} style={{

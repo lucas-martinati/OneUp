@@ -2,21 +2,22 @@ import { useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
+import { getDailyGoal } from '../config/exercises';
 import { getLocalDateStr, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
 import { calculateAchievements } from '../utils/achievements';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
-export function Stats({ completions, exercises, onClose, onOpenAchievements, highlightedBadgeId }) {
+export function Stats({ completions, exercises, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber }) {
     const todayStr = getLocalDateStr(new Date());
     const today = new Date(todayStr);
-    const utcStart = Date.UTC(today.getFullYear(), 0, 1);
+
 
     // Badge count - using shared calculation
     const badgeStats = useMemo(() => {
-        const unlocked = calculateAchievements(completions, exercises);
+        const unlocked = calculateAchievements(completions, exercises, settings);
         return { unlocked, total: 40 };
-    }, [completions, exercises]);
+    }, [completions, exercises, settings]);
 
     // ── Sorted dates ─────────────────────────────────────────────────────
     const sortedDates = Object.keys(completions).sort();
@@ -67,9 +68,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
             // Count individual exercise completions + best day
             let dayExCount = 0;
             let dayReps = 0;
-            const current = new Date(dateStr);
-            const utcCurrent = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
-            const dayNum = Math.floor((utcCurrent - utcStart) / (1000 * 60 * 60 * 24)) + 1;
+            const dayNum = getDayNumber(dateStr);
 
             for (const [exId, exData] of Object.entries(day)) {
                 if (exData?.isCompleted) {
@@ -83,7 +82,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     }
                     const ex = exercises?.find(e => e.id === exId);
                     if (ex) {
-                        dayReps += Math.max(1, Math.ceil(dayNum * ex.multiplier));
+                        dayReps += getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
                     }
                 }
             }
@@ -97,7 +96,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     if (exData?.isCompleted) {
                         const ex = exercises?.find(e => e.id === exId);
                         if (ex) {
-                            bestDayExReps[exId] = Math.max(1, Math.ceil(dayNum * ex.multiplier));
+                            bestDayExReps[exId] = getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
                         }
                     }
                 }
@@ -175,10 +174,8 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
             const exData = completions[dateStr]?.[ex.id];
             if (exData?.isCompleted) {
                 daysCompleted++;
-                const current = new Date(dateStr);
-                const utcCurrent = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
-                const dayNum = Math.floor((utcCurrent - utcStart) / (1000 * 60 * 60 * 24)) + 1;
-                totalReps += Math.max(1, Math.ceil(dayNum * ex.multiplier));
+                const dayNum = getDayNumber(dateStr);
+                totalReps += getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
             }
         });
 

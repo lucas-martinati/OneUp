@@ -20,7 +20,7 @@ import { NotificationManager } from './NotificationManager';
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr, calculateStreak, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
-import { EXERCISES, EXERCISES_MAP } from '../config/exercises';
+import { EXERCISES, EXERCISES_MAP, getDailyGoal } from '../config/exercises';
 import { runBackHandler } from '../utils/backHandler';
 
 // Map icon name → lucide component
@@ -77,13 +77,14 @@ export function Dashboard({
 
         let totalReps = 0;
         for (const date in completions) {
-            for (const exId in completions[date]) {
-                if (completions[date][exId]?.isCompleted) {
+            const dayData = completions[date];
+            for (const exId in dayData) {
+                if (dayData?.[exId]?.isCompleted) {
                     const ex = EXERCISES.find(e => e.id === exId);
                     if (ex) {
                         const d = new Date(date);
                         const dayNum = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24)) + 1;
-                        totalReps += Math.max(1, Math.ceil(dayNum * ex.multiplier));
+                        totalReps += getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
                     }
                 }
             }
@@ -91,13 +92,14 @@ export function Dashboard({
 
         let prevReps = 0;
         for (const date in prev) {
-            for (const exId in prev[date]) {
-                if (prev[date][exId]?.isCompleted) {
+            const pDayData = prev[date];
+            for (const exId in pDayData) {
+                if (pDayData?.[exId]?.isCompleted) {
                     const ex = EXERCISES.find(e => e.id === exId);
                     if (ex) {
                         const d = new Date(date);
                         const dayNum = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24)) + 1;
-                        prevReps += Math.max(1, Math.ceil(dayNum * ex.multiplier));
+                        prevReps += getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
                     }
                 }
             }
@@ -134,7 +136,7 @@ export function Dashboard({
         }
 
         prevCompletionsRef.current = completions;
-    }, [completions]);
+    }, [completions, settings]);
 
     // Helper for time formatting
     const formatTime = (seconds) => {
@@ -146,14 +148,14 @@ export function Dashboard({
     const dayNumber = getDayNumber(today);
     const selectedExercise = EXERCISES_MAP[selectedExerciseId];
 
-    // Goal = ceil(dayNumber * multiplier), minimum 1
-    const dailyGoal = Math.max(1, Math.ceil(dayNumber * selectedExercise.multiplier));
+    // Goal = ceil(dayNumber * multiplier * difficultyMultiplier), minimum 1
+    const dailyGoal = getDailyGoal(selectedExercise, dayNumber, settings?.difficultyMultiplier);
 
     const currentCount = getExerciseCount(today, selectedExerciseId);
     const isExerciseDone = completions[today]?.[selectedExerciseId]?.isCompleted || currentCount >= dailyGoal;
     const isDayComplete = isDayDoneFromCompletions(completions, today);
 
-    const totalReps = useMemo(() => getTotalReps(selectedExerciseId), [completions, selectedExerciseId]);
+    const totalReps = useMemo(() => getTotalReps(selectedExerciseId, settings?.difficultyMultiplier), [completions, selectedExerciseId, settings?.difficultyMultiplier]);
 
     const effectiveStart = userStartDate || startDate;
     const isFuture = today < effectiveStart;
@@ -298,10 +300,10 @@ export function Dashboard({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
                         <img
                             src={`${import.meta.env.BASE_URL}pwa-192x192.png`} alt="OneUp Logo"
-                            className="bounce-on-hover"
+                            className="bounce-on-hover hide-logo-mobile"
                             style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', objectFit: 'cover', cursor: 'pointer', transition: 'transform 0.3s ease' }}
                         />
-                        <span style={{ fontWeight: '600', fontSize: 'clamp(0.8rem, 1.8vh, 1.1rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>OneUp</span>
+                        <span className="hide-text-mobile" style={{ fontWeight: '600', fontSize: 'clamp(0.8rem, 1.8vh, 1.1rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>OneUp</span>
                     </div>
 
                     <div style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 1, minWidth: 0 }}>
@@ -309,7 +311,7 @@ export function Dashboard({
                             onClick={() => { setShowClan(true); pauseCloudSync?.(); }}
                             title="Clan"
                             className="glass hover-lift"
-                            style={{ padding: 'clamp(6px, 1.2vh, 8px)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'var(--text-primary)', cursor: 'pointer' }}
+                            style={{ padding: 'clamp(6px, 1.2vh, 8px)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', flexShrink: 0 }}
                         >
                             <Shield size="clamp(16px, 3.5vh, 20px)" />
                         </button>
@@ -332,7 +334,7 @@ export function Dashboard({
                             display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '700',
                             border: streakActive ? '1px solid rgba(249,115,22,0.3)' : '1px solid rgba(120,120,120,0.25)',
                             boxShadow: streakActive ? '0 2px 8px rgba(249,115,22,0.15)' : 'none',
-                            opacity: streakActive ? 1 : 0.7
+                            opacity: streakActive ? 1 : 0.7, flexShrink: 0
                         }}>
                             <Flame size={16} color={streakActive ? '#f97316' : '#888'} />
                             <span style={{ color: streakActive ? '#f97316' : '#888' }}>{displayStreak}</span>
@@ -343,7 +345,7 @@ export function Dashboard({
                             background: `linear-gradient(135deg, ${selectedExercise.color}22, ${selectedExercise.gradient[0]}22)`,
                             padding: 'clamp(4px, 0.7vh, 8px) clamp(8px, 1.2vw, 14px)', borderRadius: '16px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)',
                             display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '600',
-                            boxShadow: `0 2px 8px ${selectedExercise.color}33`
+                            boxShadow: `0 2px 8px ${selectedExercise.color}33`, flexShrink: 0
                         }}>
                             <Trophy size={16} color={selectedExercise.color} />
                             <span>{totalReps}</span>
@@ -409,7 +411,7 @@ export function Dashboard({
                                     const isActive = ex.id === selectedExerciseId;
                                     const exStreak = calculateExerciseStreak(completions, today, ex.id);
                                     const exCount = getExerciseCount(today, ex.id);
-                                    const exGoal = Math.max(1, Math.ceil(dayNumber * ex.multiplier));
+                                    const exGoal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
                                     const exDone = completions[today]?.[ex.id]?.isCompleted || exCount >= exGoal;
                                     return (
                                         <button
@@ -669,6 +671,7 @@ export function Dashboard({
                         exercises={EXERCISES}
                         getDayNumber={getDayNumber}
                         onClose={() => setShowCalendar(false)}
+                        settings={settings}
                     />
                 )}
                 {showStats && (
@@ -678,6 +681,8 @@ export function Dashboard({
                         onClose={() => setShowStats(false)}
                         onOpenAchievements={() => { setShowAchievements(true); }}
                         highlightedBadgeId={newAchievement?.id}
+                        settings={settings}
+                        getDayNumber={getDayNumber}
                     />
                 )}
                 {showSettings && (
@@ -725,6 +730,8 @@ export function Dashboard({
                         completions={completions}
                         exercises={EXERCISES}
                         onClose={() => { setShowAchievements(false); setNewAchievement(null); }}
+                        settings={settings}
+                        getDayNumber={getDayNumber}
                         highlightedBadgeId={newAchievement?.id}
                     />
                 )}
@@ -736,6 +743,7 @@ export function Dashboard({
                         getExerciseCount={getExerciseCount}
                         updateExerciseCount={updateExerciseCount}
                         completions={completions}
+                        settings={settings}
                     />
                 )}
                 {showClan && (
@@ -755,5 +763,5 @@ export function Dashboard({
 const iconBtnStyle = {
     background: 'var(--surface-hover)', width: '38px', height: '38px',
     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    color: 'var(--text-primary)', border: 'none', cursor: 'pointer'
+    color: 'var(--text-primary)', border: 'none', cursor: 'pointer', flexShrink: 0
 };

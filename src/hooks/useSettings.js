@@ -7,7 +7,8 @@ const defaultSettings = {
   soundsEnabled: true,
   notificationTime: { hour: 9, minute: 0 }, // Default 9:00 AM
   leaderboardEnabled: false,
-  leaderboardPseudo: ''
+  leaderboardPseudo: '',
+  difficultyMultiplier: 1.0
 };
 
 export function useSettings() {

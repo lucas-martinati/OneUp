@@ -3,11 +3,11 @@ import { useProgress } from './hooks/useProgress';
 import { useSettings } from './hooks/useSettings';
 import { useGoogleAuth } from './hooks/useGoogleAuth';
 import { cloudSync } from './services/cloudSync';
-import { EXERCISES } from './config/exercises';
+import { Dashboard } from './components/Dashboard';
+import { EXERCISES, getDailyGoal } from './config/exercises';
 import { getLocalDateStr } from './utils/dateUtils';
 import { calculateAchievements } from './utils/achievements';
 import { Onboarding } from './components/Onboarding';
-import { Dashboard } from './components/Dashboard';
 import { createLogger } from './utils/logger';
 
 const logger = createLogger('App');
@@ -206,7 +206,6 @@ function App() {
 
     const timer = setTimeout(async () => {
       try {
-        const utcStart = Date.UTC(new Date().getFullYear(), 0, 1);
         let totalReps = 0;
         const exerciseReps = {};
 
@@ -219,28 +218,34 @@ function App() {
               if (!lastActiveDay || dateStr > lastActiveDay) {
                 lastActiveDay = dateStr;
               }
-              const d = new Date(dateStr);
-              const utcD = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
-              const dayNum = Math.floor((utcD - utcStart) / (1000 * 60 * 60 * 24)) + 1;
-              exTotal += Math.max(1, Math.ceil(dayNum * ex.multiplier));
+              const dayNum = getDayNumber(dateStr);
+              exTotal += getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
             }
           });
           exerciseReps[ex.id] = exTotal;
           totalReps += exTotal;
         });
 
-        const achievements = calculateAchievements(completions, EXERCISES);
+        const achievements = calculateAchievements(completions, EXERCISES, settings);
 
         const pseudo = settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme';
         const isPublic = !!settings.leaderboardEnabled;
-        await cloudSync.publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic, lastActiveDay });
+        await cloudSync.publishToLeaderboard({ 
+          pseudo, 
+          totalReps, 
+          exerciseReps, 
+          achievements, 
+          isPublic, 
+          lastActiveDay,
+          difficultyMultiplier: settings?.difficultyMultiplier
+        });
       } catch (error) {
         logger.error('Leaderboard publish failed:', error);
       }
     }, 2000);
     return () => clearTimeout(timer);
   }, [
-    completions, settings.leaderboardEnabled, settings.leaderboardPseudo,
+    completions, settings.leaderboardEnabled, settings.leaderboardPseudo, settings.difficultyMultiplier,
     googleAuth.isSignedIn, googleAuth.loading, isSetup, isInitialSyncDone
   ]);
 

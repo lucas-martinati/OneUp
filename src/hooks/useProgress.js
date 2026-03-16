@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { cloudSync } from '../services/cloudSync';
 import { getLocalDateStr } from '../utils/dateUtils';
-import { EXERCISES } from '../config/exercises';
+import { EXERCISES, getDailyGoal } from '../config/exercises';
 
 const STORAGE_KEY = 'pushup_challenge_data';
 const NOTIFICATION_ID = 1;
@@ -241,7 +241,7 @@ export function useProgress() {
   };
 
   /** Total reps for a given exercise across the whole year (computed from daily goals on completed days) */
-  const getTotalReps = (exerciseId) => {
+  const getTotalReps = (exerciseId, difficultyMultiplier = 1.0) => {
     const exercise = EXERCISES.find(e => e.id === exerciseId);
     if (!exercise || !state.startDate) return 0;
     const start = new Date(state.startDate);
@@ -253,7 +253,7 @@ export function useProgress() {
       const current = new Date(dateStr);
       const utcCurrent = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
       const dayNum = Math.floor((utcCurrent - utcStart) / (1000 * 60 * 60 * 24)) + 1;
-      return total + Math.max(1, Math.ceil(dayNum * exercise.multiplier));
+      return total + getDailyGoal(exercise, dayNum, difficultyMultiplier);
     }, 0);
   };
 

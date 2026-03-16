@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Award, Flame, Zap, Target, Crown, Activity, Star, Rocket, Trophy, Medal, Gem, Heart, Moon, Sun, Calendar, Clock, TrendingUp, Users, Zap as Lightning, Star as StarIcon, Ghost, Lock } from 'lucide-react';
 import { isDayDoneFromCompletions, getLocalDateStr } from '../utils/dateUtils';
+import { getDailyGoal } from '../config/exercises';
 
-export function Achievements({ completions, exercises, onClose, highlightedBadgeId }) {
+export function Achievements({ completions, exercises, onClose, highlightedBadgeId, settings, getDayNumber }) {
     const [dragY, setDragY] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
@@ -32,11 +33,11 @@ export function Achievements({ completions, exercises, onClose, highlightedBadge
     const handleTouchStart = (e) => {
         const contentEl = sheetRef.current?.querySelector('[data-scroll-content]');
         const canScrollUp = contentEl ? contentEl.scrollTop > 0 : false;
-        
+
         // Only enable drag to close if content is scrolled to top or touching near top
         const touchY = e.touches[0].clientY;
         const isNearTop = touchY < 100;
-        
+
         if (!canScrollUp || isNearTop) {
             startY.current = e.touches[0].clientY;
             setIsDragging(true);
@@ -128,17 +129,14 @@ export function Achievements({ completions, exercises, onClose, highlightedBadge
                 if (completions[date][exId]?.isCompleted) {
                     const ex = exercises?.find(e => e.id === exId);
                     if (ex) {
-                        const d = new Date(date);
-                        const utcStart = Date.UTC(d.getFullYear(), 0, 1);
-                        const utcCurrent = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
-                        const dayNum = Math.floor((utcCurrent - utcStart) / (1000 * 60 * 60 * 24)) + 1;
-                        reps[exId] = (reps[exId] || 0) + Math.max(1, Math.ceil(dayNum * ex.multiplier));
+                        const dayNum = getDayNumber(date);
+                        reps[exId] = (reps[exId] || 0) + getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
                     }
                 }
             }
         }
         return reps;
-    }, [completions, exercises]);
+    }, [completions, exercises, settings]);
 
     // Tous les exercices faits au moins une fois
     const hasCompletedAllExercisesOnce = useMemo(() => {

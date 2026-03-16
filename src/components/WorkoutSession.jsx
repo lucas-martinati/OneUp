@@ -4,7 +4,7 @@ import {
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
     Flame, Square, MoveDown, MoveDiagonal
 } from 'lucide-react';
-import { EXERCISES } from '../config/exercises';
+import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { Counter } from './Counter';
 import { Timer } from './Timer';
 import { CSSConfetti } from './CSSConfetti';
@@ -13,7 +13,7 @@ import { registerBackHandler } from '../utils/backHandler';
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
 
 export function WorkoutSession({
-    onClose, today, dayNumber, getExerciseCount, updateExerciseCount, completions
+    onClose, today, dayNumber, getExerciseCount, updateExerciseCount, completions, settings
 }) {
     const [phase, setPhase] = useState('config'); // 'config' | 'running' | 'done'
     const [queue, setQueue] = useState([]); // ordered list of exercise IDs
@@ -35,12 +35,12 @@ export function WorkoutSession({
     // Exercise info with current state
     const exerciseInfo = useMemo(() => {
         return EXERCISES.map(ex => {
-            const goal = Math.max(1, Math.ceil(dayNumber * ex.multiplier));
+            const goal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
             const count = getExerciseCount(today, ex.id);
             const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
             return { ...ex, goal, count, done };
         });
-    }, [dayNumber, today, completions, getExerciseCount]);
+    }, [dayNumber, today, completions, getExerciseCount, settings?.difficultyMultiplier]);
 
     // Toggle in queue
     const toggleExercise = (id) => {
@@ -61,7 +61,7 @@ export function WorkoutSession({
     // Current exercise
     const currentExId = queue[currentIdx];
     const currentEx = currentExId ? EXERCISES.find(e => e.id === currentExId) : null;
-    const currentGoal = currentEx ? Math.max(1, Math.ceil(dayNumber * currentEx.multiplier)) : 0;
+    const currentGoal = currentEx ? getDailyGoal(currentEx, dayNumber, settings?.difficultyMultiplier) : 0;
     const currentCount = currentEx ? getExerciseCount(today, currentExId) : 0;
     const currentDone = currentEx ? (completions[today]?.[currentExId]?.isCompleted || currentCount >= currentGoal) : false;
 

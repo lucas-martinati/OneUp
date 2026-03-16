@@ -124,3 +124,7 @@ export const EXERCISES = [
 
 /** Quick lookup by exercise id */
 export const EXERCISES_MAP = Object.fromEntries(EXERCISES.map(e => [e.id, e]));
+
+export const getDailyGoal = (exercise, dayNumber, userMultiplier = 1.0) => {
+    return Math.max(1, Math.ceil(dayNumber * exercise.multiplier * userMultiplier));
+};

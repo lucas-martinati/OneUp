@@ -498,6 +498,15 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                     display: 'grid', gridTemplateColumns: '1fr 1fr',
                     gap: '8px', marginBottom: 'var(--spacing-md)'
                 }}>
+                    {/* Multiplier (if not default) */}
+                    {entry.difficultyMultiplier && entry.difficultyMultiplier !== 1 && (
+                        <StatCard
+                            icon={<Zap size={16} color="#6366f1" />}
+                            label="Difficulté"
+                            value={`x${entry.difficultyMultiplier}`}
+                            color="#6366f1"
+                        />
+                    )}
                     {/* Total reps */}
                     <StatCard
                         icon={<Trophy size={16} color="#fbbf24" />}

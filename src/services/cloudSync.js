@@ -478,7 +478,7 @@ class CloudSyncService {
    * Publish (or update) this user's leaderboard entry.
    * Stored at `leaderboard/{uid}`.
    */
-  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null }) {
+  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1 }) {
     try {
       if (!auth?.currentUser || !database) return false;
 
@@ -490,6 +490,7 @@ class CloudSyncService {
         exerciseReps: exerciseReps || {},
         achievements: achievements || 0,
         lastActiveDay: lastActiveDay,
+        difficultyMultiplier: difficultyMultiplier || 1,
         isPublic: isPublic !== false,
         lastUpdated: serverTimestamp()
       };
@@ -549,6 +550,7 @@ class CloudSyncService {
           exerciseReps: entry.exerciseReps || {},
           achievements: entry.achievements || 0,
           lastActiveDay: entry.lastActiveDay || null,
+          difficultyMultiplier: entry.difficultyMultiplier || 1,
           lastUpdated: entry.lastUpdated || null
         }));
 

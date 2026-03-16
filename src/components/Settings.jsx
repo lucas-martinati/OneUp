@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon } from 'lucide-react';
+import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock } from 'lucide-react';
 import { CloudSyncPanel } from './CloudSyncPanel';
 
 export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict }) {
     const [showSaved, setShowSaved] = useState(false);
+    const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
 
     const handleToggleNotifications = () => {
         const newSettings = { ...settings, notificationsEnabled: !settings.notificationsEnabled };
@@ -158,7 +159,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
             </div>
 
             {/* ── Settings Content ────────────────────────────────────── */}
-            
+
             {/* ── Préférences ─────────────────────────────────────────── */}
             <div className="glass-premium" style={{
                 padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
@@ -166,23 +167,23 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                 background: 'var(--surface-section)'
             }}>
                 <h3 style={sectionTitleStyle}>Préférences</h3>
-                
-                <SettingRow 
-                    icon={Bell} 
-                    title="Notifications" 
-                    description="Rappel d'entraînement" 
+
+                <SettingRow
+                    icon={Bell}
+                    title="Notifications"
+                    description="Rappel d'entraînement"
                     color="#8b5cf6"
                     isLast={!settings.notificationsEnabled}
                 >
-                    <ToggleSwitch 
-                        enabled={settings.notificationsEnabled} 
+                    <ToggleSwitch
+                        enabled={settings.notificationsEnabled}
                         onClick={handleToggleNotifications}
                         activeGradient="linear-gradient(135deg, #8b5cf6, #6d28d9)"
                     />
                 </SettingRow>
 
                 {/* Notification Time Picker */}
-                {settings.notificationsEnabled && (
+                {settings?.notificationsEnabled && settings?.notificationTime && (
                     <div className="scale-in" style={{
                         padding: '12px 0 16px 0',
                         borderBottom: '1px solid var(--border-subtle)',
@@ -248,15 +249,15 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                     </div>
                 )}
 
-                <SettingRow 
-                    icon={Volume2} 
-                    title="Effets sonores" 
-                    description="Sons lors des actions" 
+                <SettingRow
+                    icon={Volume2}
+                    title="Effets sonores"
+                    description="Sons lors des actions"
                     color="#0ea5e9"
                     isLast={true}
                 >
-                    <ToggleSwitch 
-                        enabled={settings.soundsEnabled} 
+                    <ToggleSwitch
+                        enabled={settings.soundsEnabled}
                         onClick={handleToggleSounds}
                         activeGradient="linear-gradient(135deg, #0ea5e9, #0284c7)"
                     />
@@ -270,16 +271,16 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                 background: 'var(--surface-section)'
             }}>
                 <h3 style={sectionTitleStyle}>Communauté</h3>
-                
-                <SettingRow 
-                    icon={Users} 
-                    title="Classement" 
-                    description="Apparaître dans le classement public" 
+
+                <SettingRow
+                    icon={Users}
+                    title="Classement"
+                    description="Apparaître dans le classement public"
                     color="#fbbf24"
                     isLast={!settings.leaderboardEnabled}
                 >
-                    <ToggleSwitch 
-                        enabled={settings.leaderboardEnabled} 
+                    <ToggleSwitch
+                        enabled={settings.leaderboardEnabled}
                         onClick={() => {
                             const newSettings = { ...settings, leaderboardEnabled: !settings.leaderboardEnabled };
                             onSave(newSettings);
@@ -354,6 +355,93 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                     />
                 </div>
             )}
+
+            {/* ── Difficulté (Sensitive Setting) ─────────────────────────── */}
+            <div className="glass-premium" style={{
+                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                marginBottom: 'var(--spacing-md)',
+                background: 'var(--surface-section)',
+                border: isMultiplierUnlocked ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--border-subtle)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                position: 'relative',
+                overflow: 'hidden',
+                flexShrink: 0
+            }}>
+                <h3 style={{ ...sectionTitleStyle, color: isMultiplierUnlocked ? '#ef4444' : 'var(--text-secondary)' }}>Difficulté</h3>
+
+                <div style={{ marginBottom: '16px' }}>
+                    <div style={{
+                        background: isMultiplierUnlocked ? 'rgba(239, 68, 68, 0.15)' : 'rgba(239, 68, 68, 0.05)',
+                        border: `1px solid ${isMultiplierUnlocked ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.1)'}`,
+                        padding: '14px', borderRadius: 'var(--radius-md)', color: '#fca5a5',
+                        fontSize: '0.85rem', lineHeight: '1.6', display: 'flex', flexDirection: 'column', gap: '8px',
+                        transition: 'all 0.3s ease'
+                    }}>
+                        <p style={{ margin: 0, fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px', color: '#ef4444' }}>
+                            <Lock size={14} /> PARAMÈTRE SENSIBLE
+                        </p>
+                        <p style={{ margin: 0, opacity: 0.9 }}>Modifier ceci changera vos objectifs de répétitions quotidiens. Un réglage à 0.5 divise vos objectifs par deux.</p>
+                    </div>
+                </div>
+
+                {!isMultiplierUnlocked ? (
+                    <button
+                        onClick={() => setIsMultiplierUnlocked(true)}
+                        className="hover-lift"
+                        style={{
+                            width: '100%', padding: '16px', borderRadius: 'var(--radius-lg)',
+                            background: 'rgba(239, 68, 68, 0.1)',
+                            border: '2px solid rgba(239, 68, 68, 0.4)',
+                            color: '#ef4444', fontWeight: '800', fontSize: '0.9rem',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            gap: '12px', cursor: 'pointer', letterSpacing: '1px',
+                            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.1)'
+                        }}
+                    >
+                        DÉBLOQUER LES PARAMÈTRES <Lock size={18} />
+                    </button>
+                ) : (
+                    <div className="scale-in">
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ fontWeight: '700', color: 'white', fontSize: '0.9rem' }}>Multiplicateur (Max 1.0)</span>
+                                <button
+                                    onClick={() => setIsMultiplierUnlocked(false)}
+                                    style={{
+                                        background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '12px',
+                                        padding: '4px 10px', color: 'white', fontSize: '0.7rem', fontWeight: '700',
+                                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'
+                                    }}
+                                >
+                                    Bloquer <Unlock size={12} />
+                                </button>
+                            </div>
+                            <span style={{ fontWeight: '800', color: '#fbbf24', fontSize: '1.4rem', textShadow: '0 0 10px rgba(251,191,36,0.3)' }}>
+                                {settings.difficultyMultiplier || 1.0}x
+                            </span>
+                        </div>
+
+                        <input
+                            type="range"
+                            min="0.1" max="1.0" step="0.1"
+                            value={settings.difficultyMultiplier || 1.0}
+                            onChange={(e) => {
+                                const val = Math.min(1.0, Math.max(0.1, parseFloat(e.target.value)));
+                                onSave({ ...settings, difficultyMultiplier: val });
+                            }}
+                            onMouseUp={() => showSavedIndicator()}
+                            onTouchEnd={() => showSavedIndicator()}
+                            style={{
+                                width: '100%',
+                                height: '6px',
+                                accentColor: '#fbbf24',
+                                cursor: 'pointer',
+                                filter: 'drop-shadow(0 0 5px rgba(251,191,36,0.2))'
+                            }}
+                        />
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
