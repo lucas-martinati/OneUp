@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import confetti from 'canvas-confetti';
+import { CSSConfetti } from './CSSConfetti';
 import {
     X, Check, CheckCheck, RotateCcw, Play, Pause,
     Square
@@ -9,6 +9,7 @@ import { sounds } from '../utils/soundManager';
 export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber }) {
     const [isRunning, setIsRunning] = useState(false);
     const [completeFlash, setCompleteFlash] = useState(false);
+    const [showConfetti, setShowConfetti] = useState(false);
 
     const prevCompletedRef = useRef(isCompleted);
     const hasCelebratedRef = useRef(false);
@@ -46,18 +47,14 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
         const wasCompleted = prevCompletedRef.current;
         if (isCompleted && !wasCompleted && !hasCelebratedRef.current) {
             hasCelebratedRef.current = true;
-            confetti({
-                particleCount: 150, spread: 120, origin: { y: 0.6 },
-                colors: exerciseConfig?.confettiColors || ['#8b5cf6', '#a78bfa', '#ffffff'],
-                ticks: 200, gravity: 0.8, scalar: 1.2
-            });
+            setShowConfetti(true);
             sounds.success();
         }
         if (!isCompleted && wasCompleted) {
             hasCelebratedRef.current = false;
         }
         prevCompletedRef.current = isCompleted;
-    }, [isCompleted, exerciseConfig]);
+    }, [isCompleted]);
 
     const handleReset = () => {
         setIsRunning(false);
@@ -85,9 +82,15 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
     const gradientId = `timerGrad-${exerciseConfig?.id || 'timer'}`;
 
     return (
+        <>
+        <CSSConfetti
+            active={showConfetti}
+            colors={exerciseConfig?.confettiColors || ['#8b5cf6', '#a78bfa', '#ffffff']}
+            onDone={() => setShowConfetti(false)}
+        />
         <div className="fade-in" style={{
             position: 'fixed', inset: 0,
-            background: 'rgba(0, 0, 0, 0.88)', backdropFilter: 'blur(12px)',
+            background: 'rgba(0, 0, 0, 0.92)',
             zIndex: 1000, display: 'flex', flexDirection: 'column',
             padding: 'var(--spacing-sm)',
             paddingTop: 'calc(var(--spacing-sm) + env(safe-area-inset-top))',
@@ -167,14 +170,12 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                 </div>
 
                 {isCompleted ? (
-                    <div className="scale-in pulse-glow-exercise" style={{
+                    <div className="scale-in" style={{
                         display: 'flex', alignItems: 'center', gap: '10px',
                         padding: '14px 28px', borderRadius: 'var(--radius-lg)',
                         background: `linear-gradient(135deg, ${activeColor}18, ${gradEnd}18)`,
                         border: `1px solid ${activeColor}44`,
-                        boxShadow: `0 0 24px ${activeColor}33, inset 0 1px 0 ${activeColor}22`,
-                        animation: `pulseGlowExercise 2.5s ease-in-out infinite`,
-                        ['--exercise-glow-color']: `${activeColor}44`
+                        boxShadow: `0 0 16px ${activeColor}22`
                     }}>
                         <Check size={24} color={activeColor} strokeWidth={3} />
                         <span style={{
@@ -249,5 +250,6 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                 💡 {["Boire de l'eau booste les performances.", "Garde le dos droit !", "La constance bat l'intensité.", "Respire bien pendant l'effort.", "1% meilleur chaque jour."][(dayNumber || 0) % 5]}
             </div>
         </div>
+        </>
     );
 }

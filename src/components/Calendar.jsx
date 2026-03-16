@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { getLocalDateStr } from '../utils/dateUtils';
+import { registerBackHandler } from '../utils/backHandler';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
@@ -289,12 +290,18 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
     useEffect(() => {
         history.pushState({ sheetOpen: true }, '');
         const handlePopState = (e) => {
-            if (e.state?.sheetOpen) {
-                onClose();
-            }
+            onClose();
         };
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
+    }, [onClose]);
+
+    useEffect(() => {
+        const unregister = registerBackHandler(() => {
+            onClose();
+            return true;
+        });
+        return unregister;
     }, [onClose]);
 
     const handleTouchStart = (e) => {

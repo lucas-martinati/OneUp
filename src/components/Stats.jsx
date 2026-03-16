@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
-import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown } from 'lucide-react';
+import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { getLocalDateStr, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
 import { calculateAchievements } from '../utils/achievements';
@@ -30,6 +30,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
     let trackedCount = 0;
     let totalDays = 0;
     let totalExerciseCompletions = 0;
+    let perfectDays = 0;
 
     // ── Best day tracking ────────────────────────────────────────────────
     let bestDayDate = null;
@@ -54,6 +55,10 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
         if (anyDone) {
             totalDays++;
             if (!firstActiveDate) firstActiveDate = dateStr;
+
+            // Check if all exercises are done (perfect day)
+            const allDone = exercises.every(ex => day[ex.id]?.isCompleted);
+            if (allDone) perfectDays++;
 
             // Monthly activity
             const monthIdx = new Date(dateStr).getMonth();
@@ -160,11 +165,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
     const displayStreak = todayDone ? currentStreak : yesterdayStreak;
     const streakActive = todayDone;
 
-    // ── Weekly average ───────────────────────────────────────────────────
-    const weeksSinceStart = firstActiveDate
-        ? Math.max(1, Math.ceil((today - new Date(firstActiveDate)) / (7 * 24 * 60 * 60 * 1000)))
-        : 1;
-    const weeklyAverage = totalDays > 0 ? (totalDays / weeksSinceStart).toFixed(1) : '0';
+
 
     // ── Per-exercise stats ───────────────────────────────────────────────
     const exerciseStats = exercises ? exercises.map(ex => {
@@ -365,14 +366,14 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     <div style={statLabelStyle}>Exercices faits</div>
                 </div>
                 <div className="glass-premium scale-in" style={{
-                    ...statCardStyle('rgba(16,185,129,0.15)', 'rgba(16,185,129,0.08)'),
+                    ...statCardStyle('rgba(236,72,153,0.15)', 'rgba(236,72,153,0.08)'),
                     animationDelay: '0.4s'
                 }}>
-                    <Activity size={24} color="#34d399" style={{ marginBottom: '6px' }} />
-                    <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#34d399', lineHeight: 1 }}>
-                        {weeklyAverage}
+                    <Star size={24} color="#ec4899" style={{ marginBottom: '6px' }} />
+                    <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#ec4899', lineHeight: 1 }}>
+                        {perfectDays}
                     </div>
-                    <div style={statLabelStyle}>Jours / sem.</div>
+                    <div style={statLabelStyle}>Jours parfaits</div>
                 </div>
             </div>
 

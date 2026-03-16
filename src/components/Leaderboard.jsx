@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { X, Trophy, Medal, Crown, ChevronRight, ChevronLeft, User, Award } from 'lucide-react';
+import { X, Trophy, Medal, Crown, ChevronRight, ChevronLeft, User, Award, Flame, Calendar, TrendingUp, Activity } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { EXERCISES } from '../config/exercises';
 import { Avatar } from './Avatar';
+import { registerBackHandler } from '../utils/backHandler';
+import { isDayDoneFromCompletions, getLocalDateStr, calculateStreak } from '../utils/dateUtils';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
@@ -60,7 +62,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
     return (
         <div className="fade-in" style={{
             position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'rgba(5, 5, 5, 0.97)', backdropFilter: 'blur(16px)', zIndex: 110,
+            background: 'rgba(5, 5, 5, 0.97)', zIndex: 110,
             display: 'flex', flexDirection: 'column',
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)'
@@ -245,16 +247,49 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth }) {
                     rank={getRank(sorted.findIndex(e => e.uid === selectedUser.uid))}
                     isMe={selectedUser.uid === currentUid}
                     onClose={() => setSelectedUser(null)}
+                    cloudSync={cloudSync}
                 />
             )}
         </div>
     );
 }
 
-/* ── User Detail Sub-Component ──────────────────────────────────────── */
-function UserDetail({ entry, rank, isMe, onClose }) {
+/* ── User Detail Sub-Component (with lazy-loaded progress) ──────────── */
+function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
     const rankColors = { 1: '#fbbf24', 2: '#c0c0c0', 3: '#cd7f32' };
     const rankColor = rankColors[rank] || '#818cf8';
+
+    // Lazy-loaded detail data
+    const [details, setDetails] = useState(null);
+    const [loadingDetails, setLoadingDetails] = useState(true);
+
+    useEffect(() => {
+        const unregister = registerBackHandler(() => {
+            onClose();
+            return true;
+        });
+        return unregister;
+    }, [onClose]);
+
+    // Load user details on mount (lazy)
+    useEffect(() => {
+        let cancelled = false;
+        const load = async () => {
+            setLoadingDetails(true);
+            try {
+                const data = await cloudSync.loadUserDetails(entry.uid);
+                if (!cancelled) setDetails(data);
+            } catch (e) {
+                console.error('Failed to load user details', e);
+            }
+            if (!cancelled) setLoadingDetails(false);
+        };
+        load();
+        return () => { cancelled = true; };
+    }, [entry.uid]);
+
+    // Compute stats from details
+    const stats = computeStats(details);
 
     return (
         <div
@@ -262,7 +297,7 @@ function UserDetail({ entry, rank, isMe, onClose }) {
             className="fade-in"
             style={{
                 position: 'absolute', inset: 0,
-                background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
+                background: 'rgba(0,0,0,0.7)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 padding: 'var(--spacing-md)', zIndex: 120
             }}
@@ -271,7 +306,7 @@ function UserDetail({ entry, rank, isMe, onClose }) {
                 onClick={(e) => e.stopPropagation()}
                 className="glass-premium slide-up"
                 style={{
-                    width: '100%', maxWidth: '380px',
+                    width: '100%', maxWidth: '400px',
                     borderRadius: 'var(--radius-xl)', padding: 'var(--spacing-lg)',
                     boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
                     maxHeight: '90vh', display: 'flex', flexDirection: 'column'
@@ -297,7 +332,6 @@ function UserDetail({ entry, rank, isMe, onClose }) {
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
                     gap: '8px', marginBottom: 'var(--spacing-md)'
                 }}>
-                    {/* Avatar */}
                     <Avatar
                         photoURL={entry.photoURL}
                         name={entry.pseudo}
@@ -329,44 +363,53 @@ function UserDetail({ entry, rank, isMe, onClose }) {
                     </div>
                 </div>
 
-                {/* Total reps hero */}
+                {/* ── Stats Grid ── */}
                 <div style={{
-                    textAlign: 'center', marginBottom: 'var(--spacing-md)',
-                    padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-lg)',
-                    background: 'linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.05))'
+                    display: 'grid', gridTemplateColumns: '1fr 1fr',
+                    gap: '8px', marginBottom: 'var(--spacing-md)'
                 }}>
-                    <div style={{
-                        fontSize: '0.6rem', textTransform: 'uppercase',
-                        letterSpacing: '1.5px', color: 'var(--text-secondary)', marginBottom: '2px'
-                    }}>
-                        Reps totales
-                    </div>
-                    <div style={{
-                        fontSize: '2rem', fontWeight: '900', color: '#fbbf24'
-                    }}>
-                        {entry.totalReps.toLocaleString('fr-FR')}
-                    </div>
-                </div>
-
-                {/* Achievements */}
-                <div style={{
-                    textAlign: 'center', marginBottom: 'var(--spacing-md)',
-                    padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-lg)',
-                    background: 'linear-gradient(135deg, rgba(168,85,247,0.1), rgba(139,92,246,0.05))'
-                }}>
-                    <div style={{
-                        fontSize: '0.6rem', textTransform: 'uppercase',
-                        letterSpacing: '1.5px', color: 'var(--text-secondary)', marginBottom: '2px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px'
-                    }}>
-                        <Award size={12} color="#a855f7" />
-                        Succès
-                    </div>
-                    <div style={{
-                        fontSize: '1.5rem', fontWeight: '900', color: '#a855f7'
-                    }}>
-                        {entry.achievements || 0}
-                    </div>
+                    {/* Total reps */}
+                    <StatCard
+                        icon={<Trophy size={16} color="#fbbf24" />}
+                        label="Reps totales"
+                        value={entry.totalReps.toLocaleString('fr-FR')}
+                        color="#fbbf24"
+                    />
+                    {/* Achievements */}
+                    <StatCard
+                        icon={<Award size={16} color="#a855f7" />}
+                        label="Succès"
+                        value={entry.achievements || 0}
+                        color="#a855f7"
+                    />
+                    {/* Streak (from lazy-loaded data) */}
+                    <StatCard
+                        icon={<Flame size={16} color="#f97316" />}
+                        label="Meilleure série"
+                        value={loadingDetails ? '…' : (stats.maxStreak || 0)}
+                        color="#f97316"
+                    />
+                    {/* Total days */}
+                    <StatCard
+                        icon={<Calendar size={16} color="#22d3ee" />}
+                        label="Jours actifs"
+                        value={loadingDetails ? '…' : (stats.totalDays || 0)}
+                        color="#22d3ee"
+                    />
+                    {/* Current streak */}
+                    <StatCard
+                        icon={<TrendingUp size={16} color="#10b981" />}
+                        label="Série en cours"
+                        value={loadingDetails ? '…' : (stats.currentStreak || 0)}
+                        color="#10b981"
+                    />
+                    {/* Perfect days */}
+                    <StatCard
+                        icon={<Activity size={16} color="#ec4899" />}
+                        label="Jours parfaits"
+                        value={loadingDetails ? '…' : (stats.perfectDays || 0)}
+                        color="#ec4899"
+                    />
                 </div>
 
                 {/* Per-exercise breakdown */}
@@ -382,6 +425,7 @@ function UserDetail({ entry, rank, isMe, onClose }) {
                             1
                         );
                         const barWidth = (reps / maxReps) * 100;
+                        const exDays = loadingDetails ? null : (stats.exerciseDays?.[ex.id] || 0);
                         return (
                             <div key={ex.id} style={{
                                 display: 'flex', alignItems: 'center', gap: '8px',
@@ -397,12 +441,22 @@ function UserDetail({ entry, rank, isMe, onClose }) {
                                         <span style={{
                                             fontSize: '0.75rem', fontWeight: '600', color: ex.color
                                         }}>{ex.label}</span>
-                                        <span style={{
-                                            fontSize: '0.75rem', fontWeight: '700',
-                                            color: 'var(--text-primary)'
-                                        }}>
-                                            {reps.toLocaleString('fr-FR')}
-                                        </span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            {exDays !== null && (
+                                                <span style={{
+                                                    fontSize: '0.65rem', color: 'var(--text-secondary)',
+                                                    opacity: 0.7
+                                                }}>
+                                                    {exDays}j
+                                                </span>
+                                            )}
+                                            <span style={{
+                                                fontSize: '0.75rem', fontWeight: '700',
+                                                color: 'var(--text-primary)'
+                                            }}>
+                                                {reps.toLocaleString('fr-FR')}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div style={{
                                         height: '3px', borderRadius: '2px',
@@ -423,4 +477,93 @@ function UserDetail({ entry, rank, isMe, onClose }) {
             </div>
         </div>
     );
+}
+
+/* ── Stat Card ─────────────────────────────────────────────────────── */
+function StatCard({ icon, label, value, color }) {
+    return (
+        <div style={{
+            padding: '10px', borderRadius: 'var(--radius-md)',
+            background: `${color}08`,
+            border: `1px solid ${color}15`,
+            textAlign: 'center'
+        }}>
+            <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: '4px', marginBottom: '4px'
+            }}>
+                {icon}
+                <span style={{
+                    fontSize: '0.6rem', textTransform: 'uppercase',
+                    letterSpacing: '1px', color: 'var(--text-secondary)'
+                }}>{label}</span>
+            </div>
+            <div style={{
+                fontSize: '1.3rem', fontWeight: '800', color
+            }}>
+                {value}
+            </div>
+        </div>
+    );
+}
+
+/* ── Compute stats from user progress data ──────────────────────────── */
+function computeStats(details) {
+    if (!details?.completions) {
+        return { maxStreak: 0, currentStreak: 0, totalDays: 0, perfectDays: 0, exerciseDays: {} };
+    }
+
+    const completions = details.completions;
+    const today = getLocalDateStr(new Date());
+
+    // Total active days (at least one exercise done)
+    let totalDays = 0;
+    let perfectDays = 0;
+    const exerciseDays = {};
+
+    EXERCISES.forEach(ex => { exerciseDays[ex.id] = 0; });
+
+    for (const date in completions) {
+        const day = completions[date];
+        if (!day || typeof day !== 'object') continue;
+
+        let anyDone = false;
+        let allDone = true;
+        for (const ex of EXERCISES) {
+            if (day[ex.id]?.isCompleted) {
+                anyDone = true;
+                exerciseDays[ex.id]++;
+            } else {
+                allDone = false;
+            }
+        }
+        if (anyDone) totalDays++;
+        if (allDone) perfectDays++;
+    }
+
+    // Streak calculation
+    let maxStreak = 0;
+    let currentStreak = 0;
+    let temp = 0;
+    for (let i = 0; i < 365; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = getLocalDateStr(d);
+        if (isDayDoneFromCompletions(completions, dateStr)) {
+            temp++;
+            if (temp > maxStreak) maxStreak = temp;
+        } else {
+            if (i === 0) {
+                // Today not done — still count from yesterday
+            } else {
+                break;
+            }
+            temp = 0;
+        }
+    }
+
+    // Current streak
+    currentStreak = calculateStreak(completions, today);
+
+    return { maxStreak, currentStreak, totalDays, perfectDays, exerciseDays };
 }

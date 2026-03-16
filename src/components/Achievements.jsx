@@ -23,9 +23,7 @@ export function Achievements({ completions, exercises, onClose, highlightedBadge
     useEffect(() => {
         history.pushState({ sheetOpen: true }, '');
         const handlePopState = (e) => {
-            if (e.state?.sheetOpen) {
-                handleClose();
-            }
+            handleClose();
         };
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);

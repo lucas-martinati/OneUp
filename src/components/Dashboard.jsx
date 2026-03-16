@@ -1,5 +1,4 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
-import confetti from 'canvas-confetti';
 import { App as CapacitorApp } from '@capacitor/app';
 import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
@@ -14,28 +13,15 @@ import { Leaderboard } from './Leaderboard';
 import { Achievements } from './Achievements';
 import { Timer } from './Timer';
 import { AchievementToast } from './AchievementToast';
+import { CSSConfetti } from './CSSConfetti';
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr, calculateStreak, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
 import { EXERCISES, EXERCISES_MAP } from '../config/exercises';
+import { runBackHandler } from '../utils/backHandler';
 
 // Map icon name → lucide component
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
-
-// Utility to clean up confetti canvas (fixes Android Pixel bug)
-const resetConfetti = () => {
-    try { confetti.reset(); } catch (e) { console.warn('Confetti reset error:', e); }
-    const canvases = document.querySelectorAll('canvas');
-    canvases.forEach(canvas => {
-        try {
-            const ctx = canvas.getContext('2d');
-            if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (canvas.style.position === 'fixed' || canvas.style.position === 'absolute') {
-                canvas.remove();
-            }
-        } catch (e) { console.error('Canvas cleanup error:', e); }
-    });
-};
 
 export function Dashboard({
     getDayNumber, toggleCompletion, completions, startDate, userStartDate,
@@ -55,6 +41,7 @@ export function Dashboard({
     const [numberKey, setNumberKey] = useState(0);
     const [isCounterTransitioning, setIsCounterTransitioning] = useState(false);
     const [prevDayNumber, setPrevDayNumber] = useState(null);
+    const [showDayConfetti, setShowDayConfetti] = useState(false);
 
     useEffect(() => {
         setSoundSettingsGetter(() => settings);
@@ -200,22 +187,12 @@ export function Dashboard({
                 if (newDayNumber > previousDayNumber) {
                     setPrevDayNumber(previousDayNumber);
                     setIsCounterTransitioning(true);
-
-                    const duration = 3000;
-                    const animationEnd = Date.now() + duration;
-                    const colors = ['#6d28d9', '#8b5cf6', '#0ea5e9', '#f093fb', '#fbbf24', '#10b981'];
-                    const frame = () => {
-                        confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors });
-                        confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors });
-                        if (Date.now() < animationEnd) requestAnimationFrame(frame);
-                    };
-                    frame();
+                    setShowDayConfetti(true);
 
                     setTimeout(() => {
                         setIsCounterTransitioning(false);
                         setPrevDayNumber(null);
-                        resetConfetti();
-                    }, 4000);
+                    }, 800);
                 }
 
                 setToday(currentDateStr);
@@ -231,19 +208,20 @@ export function Dashboard({
     // Handle Android hardware back button
     useEffect(() => {
         const handleBackButton = ({ canGoBack }) => {
+            if (runBackHandler()) return;
             if (showCounter) {
                 setShowCounter(false);
                 resumeCloudSync?.();
-            } else if (showCalendar) {
-                setShowCalendar(false);
-            } else if (showStats) {
-                setShowStats(false);
-            } else if (showSettings) {
-                setShowSettings(false);
-            } else if (showLeaderboard) {
-                setShowLeaderboard(false);
             } else if (showAchievements) {
                 setShowAchievements(false);
+            } else if (showLeaderboard) {
+                setShowLeaderboard(false);
+            } else if (showSettings) {
+                setShowSettings(false);
+            } else if (showStats) {
+                setShowStats(false);
+            } else if (showCalendar) {
+                setShowCalendar(false);
             } else {
                 CapacitorApp.exitApp();
             }
@@ -283,6 +261,11 @@ export function Dashboard({
 
     return (
         <>
+            <CSSConfetti
+                active={showDayConfetti}
+                colors={['#6d28d9', '#8b5cf6', '#0ea5e9', '#f093fb', '#fbbf24', '#10b981']}
+                onDone={() => setShowDayConfetti(false)}
+            />
             {newAchievement && (
                 <AchievementToast
                     achievement={newAchievement}
@@ -471,7 +454,7 @@ export function Dashboard({
                                                 color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
                                                 opacity: exDone ? 1 : isActive ? 1 : 0.6,
                                                 transition: 'color 0.2s ease',
-                                                textDecoration: exDone ? 'line-through' : 'none',
+                                                textDecorationLine: exDone ? 'line-through' : 'none',
                                                 textDecorationColor: `${ex.color}88`
                                             }}>
                                                 {ex.id === 'planche'

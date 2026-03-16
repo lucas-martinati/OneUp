@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import confetti from 'canvas-confetti';
+import { CSSConfetti } from './CSSConfetti';
 import {
     X, Check, CheckCheck, RotateCcw, Plus, Minus,
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints
@@ -23,6 +23,7 @@ const triggerHaptic = async () => {
 export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber }) {
     const [isAnimating, setIsAnimating] = useState(false);
     const [completeFlash, setCompleteFlash] = useState(false);
+    const [showConfetti, setShowConfetti] = useState(false);
 
     // Use ref to track previous completion state (survives re-renders)
     const prevCompletedRef = useRef(isCompleted);
@@ -34,15 +35,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
 
         if (isCompleted && !wasCompleted && !hasCelebratedRef.current) {
             hasCelebratedRef.current = true;
-            confetti({
-                particleCount: 150,
-                spread: 120,
-                origin: { y: 0.6 },
-                colors: exerciseConfig?.confettiColors || ['#10b981', '#34d399', '#6ee7b7', '#ffffff'],
-                ticks: 200,
-                gravity: 0.8,
-                scalar: 1.2
-            });
+            setShowConfetti(true);
             sounds.success();
         }
 
@@ -51,7 +44,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
         }
 
         prevCompletedRef.current = isCompleted;
-    }, [isCompleted, exerciseConfig]);
+    }, [isCompleted]);
 
     const handleIncrement = (amount) => {
         setIsAnimating(true);
@@ -101,14 +94,19 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     const gradientId = `counterGrad-${exerciseConfig?.id || 'default'}`;
 
     return (
+        <>
+        <CSSConfetti
+            active={showConfetti}
+            colors={exerciseConfig?.confettiColors || ['#10b981', '#34d399', '#6ee7b7', '#ffffff']}
+            onDone={() => setShowConfetti(false)}
+        />
         <div className="fade-in" style={{
             position: 'fixed',
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0, 0, 0, 0.88)',
-            backdropFilter: 'blur(12px)',
+            background: 'rgba(0, 0, 0, 0.92)',
             zIndex: 1000,
             display: 'flex',
             flexDirection: 'column',
@@ -211,14 +209,12 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
 
                 {/* Validation Status */}
                 {isCompleted ? (
-                    <div className="scale-in pulse-glow-exercise" style={{
+                    <div className="scale-in" style={{
                         display: 'flex', alignItems: 'center', gap: '10px',
                         padding: '14px 28px', borderRadius: 'var(--radius-lg)',
                         background: `linear-gradient(135deg, ${activeColor}18, ${gradEnd}18)`,
                         border: `1px solid ${activeColor}44`,
-                        boxShadow: `0 0 24px ${activeColor}33, inset 0 1px 0 ${activeColor}22`,
-                        animation: `pulseGlowExercise 2.5s ease-in-out infinite`,
-                        ['--exercise-glow-color']: `${activeColor}44`
+                        boxShadow: `0 0 16px ${activeColor}22`
                     }}>
                         <Check size={24} color={activeColor} strokeWidth={3} />
                         <span style={{
@@ -361,5 +357,6 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                 💡 {["Boire de l'eau booste les performances.", "Garde le dos droit !", "La constance bat l'intensité.", "Respire bien après l'effort.", "1% meilleur chaque jour."][(dayNumber || 0) % 5]}
             </div>
         </div>
+        </>
     );
 }

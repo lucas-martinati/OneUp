@@ -556,6 +556,33 @@ class CloudSyncService {
   }
 
   /**
+   * Load detailed progress for a specific user (lazy-loaded from leaderboard detail).
+   * Returns { completions, startDate } or null.
+   */
+  async loadUserDetails(uid) {
+    try {
+      if (!database) {
+        initializeFirebase();
+        if (!database) return null;
+      }
+
+      const progressRef = ref(database, `users/${uid}/progress`);
+      const snapshot = await get(progressRef);
+      if (!snapshot.exists()) return null;
+
+      const data = snapshot.val();
+      return {
+        completions: data.completions || {},
+        startDate: data.startDate || null,
+        userStartDate: data.userStartDate || null,
+      };
+    } catch (error) {
+      logger.error('Error loading user details:', error);
+      return null;
+    }
+  }
+
+  /**
    * Get the current user's UID (needed to highlight own entry).
    */
   getCurrentUserId() {
