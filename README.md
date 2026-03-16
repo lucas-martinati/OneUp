@@ -1,12 +1,12 @@
 # OneUp
 
-**OneUp** est un défi fitness quotidien sur 365 jours. Chaque jour, le nombre de répétitions augmente progressivement sur 6 exercices. L'objectif ? Tenir toute l'année.
+**OneUp** est un défi fitness quotidien sur 365 jours. Chaque jour, le nombre de répétitions augmente progressivement sur 10 exercices. L'objectif ? Tenir toute l'année.
 
 Built with **Vibe Coding**.
 
 ## Features
 
-- **6 exercices** : Pompes, Squats, Tractions, Abdos, Jumping Jacks, Fentes
+- **10 exercices** : Pompes, Squats, Tractions, Abdos, Jumping Jacks, Fentes, Burpees, Gainage (s), Dips, Climbers
 - **Objectifs progressifs** : Le nombre de reps augmente chaque jour pendant 365 jours
 - **Streak Duolingo-style** : Toujours visible, passe en gris si vous manquez un jour
 - **Leaderboard** : Classement global et par exercice, profil joueur avec pseudo et photo Google
