@@ -2,11 +2,11 @@ import { useEffect, useState, useRef } from 'react';
 import { useProgress } from './hooks/useProgress';
 import { useSettings } from './hooks/useSettings';
 import { useGoogleAuth } from './hooks/useGoogleAuth';
+import { useComputedStats } from './hooks/useComputedStats';
+import { useUserDetailsCache } from './hooks/useUserDetailsCache';
 import { cloudSync } from './services/cloudSync';
 import { Dashboard } from './components/Dashboard';
-import { EXERCISES, getDailyGoal } from './config/exercises';
-import { getLocalDateStr } from './utils/dateUtils';
-import { calculateAchievements } from './utils/achievements';
+import { EXERCISES } from './config/exercises';
 import { Onboarding } from './components/Onboarding';
 import { createLogger } from './utils/logger';
 
@@ -40,6 +40,12 @@ function App() {
     syncWithCloud,
     startCloudListener
   } = progress;
+
+  // Centralized stats computation (single pass over completions)
+  const computedStats = useComputedStats(completions, settings, getDayNumber);
+
+  // Cached user details for leaderboard
+  const userDetailsCache = useUserDetailsCache(cloudSync);
 
   // Reset sync state when user signs out or changes
   useEffect(() => {
@@ -206,35 +212,22 @@ function App() {
 
     const timer = setTimeout(async () => {
       try {
-        let totalReps = 0;
-        const exerciseReps = {};
-
+        // Find last active day from sorted dates
         let lastActiveDay = null;
-
-        EXERCISES.forEach(ex => {
-          let exTotal = 0;
-          Object.entries(completions).forEach(([dateStr, day]) => {
-            if (day?.[ex.id]?.isCompleted) {
-              if (!lastActiveDay || dateStr > lastActiveDay) {
-                lastActiveDay = dateStr;
-              }
-              const dayNum = getDayNumber(dateStr);
-              exTotal += getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
-            }
-          });
-          exerciseReps[ex.id] = exTotal;
-          totalReps += exTotal;
-        });
-
-        const achievements = calculateAchievements(completions, EXERCISES, settings);
+        for (const dateStr of computedStats.sortedDates) {
+          const day = completions[dateStr];
+          if (day && EXERCISES.some(ex => day[ex.id]?.isCompleted)) {
+            lastActiveDay = dateStr;
+          }
+        }
 
         const pseudo = settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme';
         const isPublic = !!settings.leaderboardEnabled;
         await cloudSync.publishToLeaderboard({ 
           pseudo, 
-          totalReps, 
-          exerciseReps, 
-          achievements, 
+          totalReps: computedStats.globalTotalReps, 
+          exerciseReps: computedStats.exerciseReps, 
+          achievements: computedStats.badgeCount, 
           isPublic, 
           lastActiveDay,
           difficultyMultiplier: settings?.difficultyMultiplier
@@ -246,7 +239,7 @@ function App() {
     return () => clearTimeout(timer);
   }, [
     completions, settings.leaderboardEnabled, settings.leaderboardPseudo, settings.difficultyMultiplier,
-    googleAuth.isSignedIn, googleAuth.loading, isSetup, isInitialSyncDone
+    googleAuth.isSignedIn, googleAuth.loading, isSetup, isInitialSyncDone, computedStats
   ]);
 
   const handleResolveConflict = async (action) => {
@@ -309,7 +302,7 @@ function App() {
           settings={settings}
           updateSettings={updateSettings}
           cloudAuth={googleAuth}
-          cloudSync={{ saveToCloud, loadFromCloud, syncWithCloud, signIn: googleAuth.signIn, signOut: googleAuth.signOut, loadLeaderboard: () => cloudSync.loadLeaderboard(), loadUserDetails: (uid) => cloudSync.loadUserDetails(uid), getCurrentUserId: () => cloudSync.getCurrentUserId(), deleteAccount: () => cloudSync.deleteAccount() }}
+          cloudSync={{ saveToCloud, loadFromCloud, syncWithCloud, signIn: googleAuth.signIn, signOut: googleAuth.signOut, loadLeaderboard: () => cloudSync.loadLeaderboard(), loadUserDetails: (uid) => userDetailsCache.loadUserDetails(uid), getCurrentUserId: () => cloudSync.getCurrentUserId(), deleteAccount: () => cloudSync.deleteAccount() }}
           conflictData={conflictData}
           onResolveConflict={handleResolveConflict}
           getExerciseCount={getExerciseCount}
@@ -317,6 +310,7 @@ function App() {
           getExerciseDone={progress.getExerciseDone}
           pauseCloudSync={() => setIsSyncPaused(true)}
           resumeCloudSync={() => setIsSyncPaused(false)}
+          computedStats={computedStats}
         />
       )}
     </>

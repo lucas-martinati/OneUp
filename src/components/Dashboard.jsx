@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
@@ -19,7 +19,7 @@ import { ClanModal } from './ClanModal';
 import { NotificationManager } from './NotificationManager';
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
-import { getLocalDateStr, calculateStreak, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
+import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';
 import { EXERCISES, EXERCISES_MAP, getDailyGoal } from '../config/exercises';
 import { runBackHandler } from '../utils/backHandler';
 
@@ -30,7 +30,7 @@ export function Dashboard({
     getDayNumber, toggleCompletion, completions, startDate, userStartDate,
     scheduleNotification, cloudAuth, cloudSync, settings, updateSettings,
     conflictData, onResolveConflict, getExerciseCount, updateExerciseCount, getTotalReps,
-    getExerciseDone, pauseCloudSync, resumeCloudSync
+    getExerciseDone, pauseCloudSync, resumeCloudSync, computedStats
 }) {
     const [today, setToday] = useState(getLocalDateStr(new Date()));
     const [showCalendar, setShowCalendar] = useState(false);
@@ -52,91 +52,19 @@ export function Dashboard({
         setSoundSettingsGetter(() => settings);
     }, [settings]);
 
-    // Achievement detection
-    const prevCompletionsRef = useRef(completions);
+    // Achievement detection — compare badge count changes
+    const prevBadgeCountRef = useRef(computedStats.badgeCount);
     useEffect(() => {
-        const prev = prevCompletionsRef.current;
-        const totalDays = Object.keys(completions).filter(d => isDayDoneFromCompletions(completions, d)).length;
-        const prevDays = Object.keys(prev).filter(d => isDayDoneFromCompletions(prev, d)).length;
+        const prevCount = prevBadgeCountRef.current;
+        const newCount = computedStats.badgeCount;
 
-        let maxStreak = 0, temp = 0;
-        for (let i = 0; i < 365; i++) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            if (isDayDoneFromCompletions(completions, getLocalDateStr(d))) { temp++; if (temp > maxStreak) maxStreak = temp; }
-            else temp = 0;
+        if (newCount > prevCount) {
+            // A new badge was unlocked — show a generic achievement toast
+            setNewAchievement({ id: 'new_badge', title: 'Nouveau Succès !', color: '#fbbf24', icon: Award });
         }
 
-        let prevStreak = 0, temp2 = 0;
-        for (let i = 0; i < 365; i++) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            if (isDayDoneFromCompletions(prev, getLocalDateStr(d))) { temp2++; if (temp2 > prevStreak) prevStreak = temp2; }
-            else temp2 = 0;
-        }
-
-        let totalReps = 0;
-        for (const date in completions) {
-            const dayData = completions[date];
-            for (const exId in dayData) {
-                if (dayData?.[exId]?.isCompleted) {
-                    const ex = EXERCISES.find(e => e.id === exId);
-                    if (ex) {
-                        const d = new Date(date);
-                        const dayNum = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24)) + 1;
-                        totalReps += getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
-                    }
-                }
-            }
-        }
-
-        let prevReps = 0;
-        for (const date in prev) {
-            const pDayData = prev[date];
-            for (const exId in pDayData) {
-                if (pDayData?.[exId]?.isCompleted) {
-                    const ex = EXERCISES.find(e => e.id === exId);
-                    if (ex) {
-                        const d = new Date(date);
-                        const dayNum = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24)) + 1;
-                        prevReps += getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
-                    }
-                }
-            }
-        }
-
-        let perfectDays = 0;
-        for (const date in completions) {
-            const allDone = EXERCISES.every(ex => completions[date]?.[ex.id]?.isCompleted);
-            if (allDone) perfectDays++;
-        }
-        let prevPerfect = 0;
-        for (const date in prev) {
-            const allDone = EXERCISES.every(ex => prev[date]?.[ex.id]?.isCompleted);
-            if (allDone) prevPerfect++;
-        }
-
-        const newBadges = [];
-        if (totalDays >= 1 && prevDays < 1) newBadges.push({ id: 'first_blood', title: 'Premier Pas', color: '#3b82f6', icon: Target });
-        if (maxStreak >= 3 && prevStreak < 3) newBadges.push({ id: 'consistent', title: 'Régularité', color: '#f97316', icon: Flame });
-        if (maxStreak >= 7 && prevStreak < 7) newBadges.push({ id: 'week_warrior', title: 'Guerrier de la Semaine', color: '#8b5cf6', icon: CalendarIcon });
-        if (maxStreak >= 14 && prevStreak < 14) newBadges.push({ id: 'two_weeks', title: 'Ténacité', color: '#06b6d4', icon: TrendingUp });
-        if (maxStreak >= 30 && prevStreak < 30) newBadges.push({ id: 'month_warrior', title: 'Soldat du Mois', color: '#eab308', icon: Zap });
-        if (totalDays >= 10 && prevDays < 10) newBadges.push({ id: 'ten_sessions', title: 'Dix de der', color: '#22c55e', icon: Star });
-        if (totalDays >= 50 && prevDays < 50) newBadges.push({ id: 'fifty_sessions', title: 'Cinquante', color: '#14b8a6', icon: Award });
-        if (totalDays >= 100 && prevDays < 100) newBadges.push({ id: 'hundred_sessions', title: 'Centurion', color: '#f472b6', icon: Trophy });
-        if (totalReps >= 500 && prevReps < 500) newBadges.push({ id: 'rep_500', title: '500 Répétitions', color: '#ef4444', icon: Activity });
-        if (totalReps >= 1000 && prevReps < 1000) newBadges.push({ id: 'rep_1000', title: 'Millier', color: '#facc15', icon: Zap });
-        if (perfectDays >= 1 && prevPerfect < 1) newBadges.push({ id: 'perfect_one', title: 'Premier Jour Parfait', color: '#22d3d1', icon: Star });
-
-        if (newBadges.length > 0) {
-            setTimeout(() => {
-                setNewAchievement(newBadges[newBadges.length - 1]);
-            }, 100);
-        }
-
-        prevCompletionsRef.current = completions;
-    }, [completions, settings]);
+        prevBadgeCountRef.current = newCount;
+    }, [computedStats.badgeCount]);
 
     // Helper for time formatting
     const formatTime = (seconds) => {
@@ -155,32 +83,19 @@ export function Dashboard({
     const isExerciseDone = completions[today]?.[selectedExerciseId]?.isCompleted || currentCount >= dailyGoal;
     const isDayComplete = isDayDoneFromCompletions(completions, today);
 
-    const totalReps = useMemo(() => getTotalReps(selectedExerciseId, settings?.difficultyMultiplier), [completions, selectedExerciseId, settings?.difficultyMultiplier]);
+    const totalReps = computedStats.exerciseReps[selectedExerciseId] || 0;
 
     const effectiveStart = userStartDate || startDate;
     const isFuture = today < effectiveStart;
 
-    // Per-exercise streaks
-    const exerciseStreak = useMemo(
-        () => calculateExerciseStreak(completions, today, selectedExerciseId),
-        [completions, today, selectedExerciseId]
-    );
+    // Pre-computed streaks from computedStats
+    const exerciseStreak = computedStats.exerciseDoneToday[selectedExerciseId]
+        ? computedStats.exerciseCurrentStreaks[selectedExerciseId]
+        : (computedStats.exerciseCurrentStreaks[selectedExerciseId] > 0 ? computedStats.exerciseCurrentStreaks[selectedExerciseId] : 0);
 
-    // Global streak (all exercises — consecutive days where ANY exercise is done)
-    const globalStreak = useMemo(
-        () => calculateStreak(completions, today),
-        [completions, today]
-    );
-
-    // Duolingo-style streak: if today not done, show yesterday's streak in gray
-    const todayDone = isDayDoneFromCompletions(completions, today);
-    const yesterdayStreak = useMemo(() => {
-        const d = new Date(today);
-        d.setDate(d.getDate() - 1);
-        return calculateStreak(completions, getLocalDateStr(d));
-    }, [completions, today]);
-    const displayStreak = todayDone ? globalStreak : yesterdayStreak;
-    const streakActive = todayDone;
+    // Duolingo-style streak from computedStats
+    const displayStreak = computedStats.displayStreak;
+    const streakActive = computedStats.streakActive;
 
     // Day change detection
     useEffect(() => {
@@ -409,7 +324,7 @@ export function Dashboard({
                                 {EXERCISES.map(ex => {
                                     const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
                                     const isActive = ex.id === selectedExerciseId;
-                                    const exStreak = calculateExerciseStreak(completions, today, ex.id);
+                                    const exStreak = computedStats.exerciseDoneToday[ex.id] ? (computedStats.exerciseCurrentStreaks[ex.id] || 0) : (computedStats.exerciseCurrentStreaks[ex.id] > 0 ? computedStats.exerciseCurrentStreaks[ex.id] : 0);
                                     const exCount = getExerciseCount(today, ex.id);
                                     const exGoal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
                                     const exDone = completions[today]?.[ex.id]?.isCompleted || exCount >= exGoal;
@@ -689,6 +604,7 @@ export function Dashboard({
                         highlightedBadgeId={newAchievement?.id}
                         settings={settings}
                         getDayNumber={getDayNumber}
+                        computedStats={computedStats}
                     />
                 )}
                 {showSettings && (
@@ -739,6 +655,7 @@ export function Dashboard({
                         settings={settings}
                         getDayNumber={getDayNumber}
                         highlightedBadgeId={newAchievement?.id}
+                        computedStats={computedStats}
                     />
                 )}
                 {showSession && (

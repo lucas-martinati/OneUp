@@ -1,213 +1,28 @@
-import { useMemo } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
-import { getDailyGoal } from '../config/exercises';
-import { getLocalDateStr, calculateExerciseStreak, isDayDoneFromCompletions, calculateMaxStreak, calculateStreak } from '../utils/dateUtils';
-import { calculateAchievements } from '../utils/achievements';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
-export function Stats({ completions, exercises, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber }) {
-    const todayStr = getLocalDateStr(new Date());
-    const today = new Date(todayStr);
+export function Stats({ completions, exercises, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats }) {
+    // All values come from computedStats — no local calculations needed
+    const {
+        totalDays, maxStreak, displayStreak, streakActive, successRate,
+        perfectDays, totalExerciseCompletions, globalTotalReps,
+        exerciseStats, radarData, champion,
+        monthlyActivityByExercise, monthlyActivityTotal,
+        pieData, trackedCount, badgeCount,
+        bestDayDate, bestDayReps, bestDayExReps,
+        firstActiveDate
+    } = computedStats;
 
-
-    // Badge count - using shared calculation
-    const badgeStats = useMemo(() => {
-        const unlocked = calculateAchievements(completions, exercises, settings);
-        return { unlocked, total: 40 };
-    }, [completions, exercises, settings]);
-
-    // ── Sorted dates ─────────────────────────────────────────────────────
-    const sortedDates = Object.keys(completions).sort();
-
-    // ── Time-of-day pie chart ────────────────────────────────────────────
-    const pieData = [
-        { name: 'Matin', value: 0, color: '#f59e0b' },
-        { name: 'Après-midi', value: 0, color: '#0ea5e9' },
-        { name: 'Soir', value: 0, color: '#8b5cf6' }
-    ];
-    let trackedCount = 0;
-    let totalDays = 0;
-    let totalExerciseCompletions = 0;
-    let perfectDays = 0;
-
-    // ── Best day tracking ────────────────────────────────────────────────
-    let bestDayDate = null;
-    let bestDayExCount = 0;
-    let bestDayReps = 0;
-    let bestDayExReps = {}; // { pushups: 50, squats: 100, ... }
-
-    // ── Monthly activity (by exercise) ───────────────────────────────────
-    const monthlyActivityByExercise = exercises
-        ? exercises.map(() => Array(12).fill(0))
-        : [];
-    const monthlyActivityTotal = Array(12).fill(0);
-
-    // ── First active day ─────────────────────────────────────────────────
-    let firstActiveDate = null;
-
-    sortedDates.forEach(dateStr => {
-        const day = completions[dateStr];
-        if (!day) return;
-
-        const anyDone = isDayDoneFromCompletions(completions, dateStr);
-        if (anyDone) {
-            totalDays++;
-            if (!firstActiveDate) firstActiveDate = dateStr;
-
-            // Check if all exercises are done (perfect day)
-            const allDone = exercises.every(ex => day[ex.id]?.isCompleted);
-            if (allDone) perfectDays++;
-
-            // Monthly activity
-            const monthIdx = new Date(dateStr).getMonth();
-            monthlyActivityTotal[monthIdx]++;
-
-            // Count individual exercise completions + best day
-            let dayExCount = 0;
-            let dayReps = 0;
-            const dayNum = getDayNumber(dateStr);
-
-            for (const [exId, exData] of Object.entries(day)) {
-                if (exData?.isCompleted) {
-                    totalExerciseCompletions++;
-                    dayExCount++;
-
-                    // Track monthly activity by exercise
-                    const exIndex = exercises.findIndex(e => e.id === exId);
-                    if (exIndex !== -1) {
-                        monthlyActivityByExercise[exIndex][monthIdx]++;
-                    }
-                    const ex = exercises?.find(e => e.id === exId);
-                    if (ex) {
-                        dayReps += getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
-                    }
-                }
-            }
-
-            if (dayReps > bestDayReps || (dayReps === bestDayReps && dayExCount > bestDayExCount)) {
-                bestDayDate = dateStr;
-                bestDayExCount = dayExCount;
-                bestDayReps = dayReps;
-                bestDayExReps = {};
-                for (const [exId, exData] of Object.entries(day)) {
-                    if (exData?.isCompleted) {
-                        const ex = exercises?.find(e => e.id === exId);
-                        if (ex) {
-                            bestDayExReps[exId] = getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
-                        }
-                    }
-                }
-            }
-
-            // Pie chart time-of-day (one entry per day)
-            for (const exData of Object.values(day)) {
-                if (exData?.isCompleted && exData.timeOfDay) {
-                    if (exData.timeOfDay === 'morning') pieData[0].value++;
-                    else if (exData.timeOfDay === 'afternoon') pieData[1].value++;
-                    else if (exData.timeOfDay === 'evening') pieData[2].value++;
-                    trackedCount++;
-                    break;
-                }
-            }
-        }
-    });
-
-    // ── Overall streaks ──────────────────────────────────────────────────
-    const currentStreak = calculateStreak(completions, todayStr);
-    const maxStreak = calculateMaxStreak(completions);
-    const successRate = totalDays > 0 ? Math.round((totalDays / 365) * 100) : 0;
     const activeData = pieData.filter(d => d.value > 0);
-
-    // Duolingo-style streak display
-    const todayDone = isDayDoneFromCompletions(completions, todayStr);
-    const yesterdayStreak = (() => {
-        let streak = 0;
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        for (let i = 0; i < 365; i++) {
-            const d = new Date(yesterday);
-            d.setDate(d.getDate() - i);
-            if (isDayDoneFromCompletions(completions, getLocalDateStr(d))) streak++;
-            else break;
-        }
-        return streak;
-    })();
-    const displayStreak = todayDone ? currentStreak : yesterdayStreak;
-    const streakActive = todayDone;
-
-
-
-    // ── Per-exercise stats ───────────────────────────────────────────────
-    const exerciseStats = exercises ? exercises.map(ex => {
-        let totalReps = 0;
-        let daysCompleted = 0;
-        sortedDates.forEach(dateStr => {
-            const exData = completions[dateStr]?.[ex.id];
-            if (exData?.isCompleted) {
-                daysCompleted++;
-                const dayNum = getDayNumber(dateStr);
-                totalReps += getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
-            }
-        });
-
-        // Current streak (Duolingo-style)
-        const streak = calculateExerciseStreak(completions, todayStr, ex.id);
-        const exDoneToday = completions[todayStr]?.[ex.id]?.isCompleted || false;
-        const yesterdayExStreak = (() => {
-            const d = new Date(today);
-            d.setDate(d.getDate() - 1);
-            return calculateExerciseStreak(completions, getLocalDateStr(d), ex.id);
-        })();
-        const displayExStreak = exDoneToday ? streak : yesterdayExStreak;
-        const exStreakActive = exDoneToday;
-
-        // Max streak per exercise
-        let maxExStreak = 0, tempStreak = 0;
-        for (let i = 0; i < 365; i++) {
-            const d = new Date(today);
-            d.setDate(d.getDate() - i);
-            if (completions[getLocalDateStr(d)]?.[ex.id]?.isCompleted) {
-                tempStreak++;
-                if (tempStreak > maxExStreak) maxExStreak = tempStreak;
-            } else {
-                tempStreak = 0;
-            }
-        }
-
-        // Completion rate (out of active days)
-        const completionRate = totalDays > 0 ? Math.round((daysCompleted / totalDays) * 100) : 0;
-
-        return {
-            ...ex, totalReps, daysCompleted,
-            streak: displayExStreak, streakActive: exStreakActive,
-            maxStreak: maxExStreak, completionRate
-        };
-    }) : [];
-
-    // ── Global total reps ────────────────────────────────────────────────
-    const globalTotalReps = exerciseStats.reduce((sum, ex) => sum + ex.totalReps, 0);
-
-    // ── Radar Data ───────────────────────────────────────────────────────
-    const radarData = exerciseStats.map(ex => ({
-        subject: ex.label,
-        reps: ex.totalReps,
-        fullMark: Math.max(...exerciseStats.map(e => e.totalReps)) || 100
-    }));
-
-    // ── Champion exercise (most total reps) ──────────────────────────────
-    const champion = exerciseStats.length > 0
-        ? exerciseStats.reduce((best, ex) => ex.totalReps > best.totalReps ? ex : best, exerciseStats[0])
-        : null;
-    const ChampionIcon = champion ? (ICON_MAP[champion.icon] || Dumbbell) : null;
-
-    // ── Monthly bar chart max ────────────────────────────────────────────
     const maxMonthly = Math.max(...monthlyActivityTotal, 1);
     const monthNames = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+    const today = new Date();
 
-    // ── Format date helper ───────────────────────────────────────────────
+    const ChampionIcon = champion ? (ICON_MAP[champion.icon] || Dumbbell) : null;
+
     const formatDate = (dateStr) => {
         if (!dateStr) return '—';
         const d = new Date(dateStr);
@@ -240,7 +55,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     }}>
                         <Award size={18} />
                         <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>
-                            {badgeStats.unlocked}/{badgeStats.total}
+                            {badgeCount}/40
                         </span>
                     </button>
                     <button onClick={onClose} className="hover-lift glass" style={{

@@ -1,9 +1,7 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Award, Flame, Zap, Target, Crown, Activity, Star, Rocket, Trophy, Medal, Gem, Heart, Moon, Sun, Calendar, Clock, TrendingUp, Users, Zap as Lightning, Star as StarIcon, Ghost, Lock } from 'lucide-react';
-import { isDayDoneFromCompletions, getLocalDateStr } from '../utils/dateUtils';
-import { getDailyGoal } from '../config/exercises';
 
-export function Achievements({ completions, exercises, onClose, highlightedBadgeId, settings, getDayNumber }) {
+export function Achievements({ completions, exercises, onClose, highlightedBadgeId, settings, getDayNumber, computedStats }) {
     const [dragY, setDragY] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
@@ -93,185 +91,15 @@ export function Achievements({ completions, exercises, onClose, highlightedBadge
 
     const translateY = dragY;
 
-    // === CALCULS POUR LES ACHIEVEMENTS ===
-
-    // Jours totaux
-    const totalDays = useMemo(() => {
-        let count = 0;
-        for (const date in completions) {
-            if (isDayDoneFromCompletions(completions, date)) count++;
-        }
-        return count;
-    }, [completions]);
-
-    // Série max
-    const maxStreak = useMemo(() => {
-        let max = 0, temp = 0;
-        const today = new Date();
-        for (let i = 0; i < 365; i++) {
-            const d = new Date(today);
-            d.setDate(d.getDate() - i);
-            if (isDayDoneFromCompletions(completions, getLocalDateStr(d))) {
-                temp++;
-                if (temp > max) max = temp;
-            } else {
-                temp = 0;
-            }
-        }
-        return max;
-    }, [completions]);
-
-    // Total répétitions par exercice
-    const totalExerciseReps = useMemo(() => {
-        let reps = {};
-        for (const date in completions) {
-            for (const exId in completions[date]) {
-                if (completions[date][exId]?.isCompleted) {
-                    const ex = exercises?.find(e => e.id === exId);
-                    if (ex) {
-                        const dayNum = getDayNumber(date);
-                        reps[exId] = (reps[exId] || 0) + getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
-                    }
-                }
-            }
-        }
-        return reps;
-    }, [completions, exercises, settings]);
-
-    // Tous les exercices faits au moins une fois
-    const hasCompletedAllExercisesOnce = useMemo(() => {
-        let completedIds = new Set();
-        for (const date in completions) {
-            for (const exId in completions[date]) {
-                if (completions[date][exId]?.isCompleted) {
-                    completedIds.add(exId);
-                }
-            }
-        }
-        return exercises?.every(ex => completedIds.has(ex.id)) ?? false;
-    }, [completions, exercises]);
-
-    // Total reps tous exercices
-    const totalRepsAll = useMemo(() => {
-        let total = 0;
-        for (const exId in totalExerciseReps) {
-            total += totalExerciseReps[exId];
-        }
-        return total;
-    }, [totalExerciseReps]);
-
-    // Jours avec tous les exercices complétés
-    const perfectDays = useMemo(() => {
-        let count = 0;
-        for (const date in completions) {
-            const dayCompletions = completions[date];
-            const allDone = exercises?.every(ex => dayCompletions[ex.id]?.isCompleted) ?? false;
-            if (allDone) count++;
-        }
-        return count;
-    }, [completions, exercises]);
-
-    // Jours de la semaine (lundi-vendredi)
-    const weekdayWorkouts = useMemo(() => {
-        let count = 0;
-        for (const date in completions) {
-            const d = new Date(date);
-            const dayOfWeek = d.getDay();
-            if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-                if (isDayDoneFromCompletions(completions, date)) count++;
-            }
-        }
-        return count;
-    }, [completions]);
-
-    // Jours du week-end
-    const weekendWorkouts = useMemo(() => {
-        let count = 0;
-        for (const date in completions) {
-            const d = new Date(date);
-            const dayOfWeek = d.getDay();
-            if (dayOfWeek === 0 || dayOfWeek === 6) {
-                if (isDayDoneFromCompletions(completions, date)) count++;
-            }
-        }
-        return count;
-    }, [completions]);
-
-    // Entraînements le matin
-    const morningWorkouts = useMemo(() => {
-        let count = 0;
-        for (const date in completions) {
-            for (const exId in completions[date]) {
-                if (completions[date][exId]?.timeOfDay === 'morning') {
-                    count++;
-                    break;
-                }
-            }
-        }
-        return count;
-    }, [completions]);
-
-    // Entraînements l'après-midi
-    const afternoonWorkouts = useMemo(() => {
-        let count = 0;
-        for (const date in completions) {
-            for (const exId in completions[date]) {
-                if (completions[date][exId]?.timeOfDay === 'afternoon') {
-                    count++;
-                    break;
-                }
-            }
-        }
-        return count;
-    }, [completions]);
-
-    // Entraînements le soir
-    const eveningWorkouts = useMemo(() => {
-        let count = 0;
-        for (const date in completions) {
-            for (const exId in completions[date]) {
-                if (completions[date][exId]?.timeOfDay === 'evening') {
-                    count++;
-                    break;
-                }
-            }
-        }
-        return count;
-    }, [completions]);
-
-    // Ghost - workout between 3h and 4h
-    const ghostWorkout = useMemo(() => {
-        for (const date in completions) {
-            for (const exId in completions[date]) {
-                const timestamp = completions[date][exId]?.timestamp;
-                if (timestamp) {
-                    const hour = new Date(timestamp).getHours();
-                    if (hour >= 3 && hour < 4) return true;
-                }
-            }
-        }
-        return false;
-    }, [completions]);
-
-    // Perfectionist - 30 consecutive perfect days
-    const perfectStreak = useMemo(() => {
-        let streak = 0, maxStreak = 0;
-        const today = new Date();
-        for (let i = 0; i < 365; i++) {
-            const d = new Date(today);
-            d.setDate(d.getDate() - i);
-            const dateStr = d.toISOString().split('T')[0];
-            const dayCompletions = completions[dateStr];
-            const isPerfect = exercises?.every(ex => dayCompletions?.[ex.id]?.isCompleted) ?? false;
-            if (isPerfect) {
-                streak++;
-                if (streak > maxStreak) maxStreak = streak;
-            } else {
-                streak = 0;
-            }
-        }
-        return maxStreak;
-    }, [completions, exercises]);
+    // === ALL VALUES FROM computedStats ===
+    const {
+        totalDays, maxStreak,
+        totalRepsAll, totalExerciseReps,
+        perfectDays, hasCompletedAllExercisesOnce,
+        weekdayWorkouts, weekendWorkouts,
+        morningWorkouts, afternoonWorkouts, eveningWorkouts,
+        ghostWorkout, perfectStreak
+    } = computedStats;
 
     // Achievements
     const BADGES = [
