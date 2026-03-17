@@ -1,14 +1,17 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense, lazy } from 'react';
 import { useProgress } from './hooks/useProgress';
 import { useSettings } from './hooks/useSettings';
 import { useGoogleAuth } from './hooks/useGoogleAuth';
 import { useComputedStats } from './hooks/useComputedStats';
 import { useUserDetailsCache } from './hooks/useUserDetailsCache';
 import { cloudSync } from './services/cloudSync';
-import { Dashboard } from './components/Dashboard';
+// Simple components stay static
 import { EXERCISES } from './config/exercises';
-import { Onboarding } from './components/Onboarding';
 import { createLogger } from './utils/logger';
+
+// Heavy components are lazy loaded
+const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
+const Onboarding = lazy(() => import('./components/Onboarding').then(module => ({ default: module.Onboarding })));
 
 const logger = createLogger('App');
 
@@ -265,7 +268,15 @@ function App() {
   }, [googleAuth.isSignedIn, googleAuth.loading, conflictCheckDone, isInitialSyncDone, isSyncPaused, conflictData, startCloudListener]);
 
   return (
-    <>
+    <Suspense fallback={
+      <div style={{
+        position: 'fixed', inset: 0, background: '#050505',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: '600'
+      }}>
+        Initialisation...
+      </div>
+    }>
       {!isSetup ? (
         <Onboarding onStart={startChallenge} />
       ) : (
@@ -292,7 +303,7 @@ function App() {
           computedStats={computedStats}
         />
       )}
-    </>
+    </Suspense>
   );
 }
 

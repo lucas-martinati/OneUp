@@ -220,14 +220,11 @@ button:active {
 }
 
 @keyframes rainbowFlow {
-
-  0%,
-  100% {
-    background-position: 0% 50%;
+  0%, 100% {
+    filter: hue-rotate(0deg);
   }
-
   50% {
-    background-position: 100% 50%;
+    filter: hue-rotate(45deg);
   }
 }
 
@@ -484,14 +481,11 @@ button:active {
 }
 
 @keyframes gradientShift {
-
-  0%,
-  100% {
-    background-position: 0% 50%;
+  0%, 100% {
+    opacity: 0.9;
   }
-
   50% {
-    background-position: 100% 50%;
+    opacity: 1;
   }
 }
 

@@ -215,6 +215,17 @@ class CloudSyncService {
 
       const userId = auth.currentUser.uid;
 
+      // Quitter tous les clans dont l'utilisateur fait partie avant de supprimer le compte
+      try {
+        const userClans = await this.getUserClans();
+        for (const clan of userClans) {
+          await this.leaveClan(clan.id);
+          logger.info(`Left clan ${clan.id} during account deletion.`);
+        }
+      } catch (clanErr) {
+        logger.warn('Failed to leave some clans during account deletion', clanErr);
+      }
+
       // Supprimer les données utilisateur dans la base de données
       const userDataRef = ref(database, `users/${userId}`);
       await remove(userDataRef);

@@ -1,22 +1,25 @@
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo, Suspense, lazy } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users, Check, Award,
     Target, TrendingUp, Star, Activity, Play, Square, MoveDown, MoveDiagonal, Shield
 } from 'lucide-react';
-import { Calendar } from './Calendar';
-import { Stats } from './Stats';
-import { Settings } from './Settings';
-import { Counter } from './Counter';
-import { Leaderboard } from './Leaderboard';
-import { Achievements } from './Achievements';
-import { Timer } from './Timer';
+// Static imports for core/immediate components
 import { AchievementToast } from './AchievementToast';
 import { CSSConfetti } from './CSSConfetti';
-import { WorkoutSession } from './WorkoutSession';
-import { ClanModal } from './ClanModal';
 import { NotificationManager } from './NotificationManager';
+
+// Lazy imports for heavy modal-based components
+const Calendar = lazy(() => import('./Calendar').then(m => ({ default: m.Calendar })));
+const Stats = lazy(() => import('./Stats').then(m => ({ default: m.Stats })));
+const Settings = lazy(() => import('./Settings').then(m => ({ default: m.Settings })));
+const Counter = lazy(() => import('./Counter').then(m => ({ default: m.Counter })));
+const Leaderboard = lazy(() => import('./Leaderboard').then(m => ({ default: m.Leaderboard })));
+const Achievements = lazy(() => import('./Achievements').then(m => ({ default: m.Achievements })));
+const Timer = lazy(() => import('./Timer').then(m => ({ default: m.Timer })));
+const WorkoutSession = lazy(() => import('./WorkoutSession').then(m => ({ default: m.WorkoutSession })));
+const ClanModal = lazy(() => import('./ClanModal').then(m => ({ default: m.ClanModal })));
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';
@@ -25,6 +28,13 @@ import { runBackHandler } from '../utils/backHandler';
 
 // Map icon name → lucide component
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
+
+// Helper for time formatting - moved outside to avoid re-creation
+const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+};
 
 export function Dashboard({
     getDayNumber, toggleCompletion, completions, startDate, userStartDate,
@@ -48,6 +58,10 @@ export function Dashboard({
     const [prevDayNumber, setPrevDayNumber] = useState(null);
     const [showDayConfetti, setShowDayConfetti] = useState(false);
 
+    const handleSelectExercise = useCallback((exerciseId) => {
+        setSelectedExerciseId(exerciseId);
+    }, []);
+
     useEffect(() => {
         setSoundSettingsGetter(() => settings);
     }, [settings]);
@@ -66,22 +80,24 @@ export function Dashboard({
         prevBadgeCountRef.current = newCount;
     }, [computedStats.badgeCount]);
 
-    // Helper for time formatting
-    const formatTime = (seconds) => {
-        const m = Math.floor(seconds / 60);
-        const s = (seconds % 60).toString().padStart(2, '0');
-        return `${m}:${s}`;
-    };
-
-    const dayNumber = getDayNumber(today);
-    const selectedExercise = EXERCISES_MAP[selectedExerciseId];
+    const dayNumber = useMemo(() => getDayNumber(today), [getDayNumber, today]);
+    const selectedExercise = useMemo(() => EXERCISES_MAP[selectedExerciseId], [selectedExerciseId]);
 
     // Goal = ceil(dayNumber * multiplier * difficultyMultiplier), minimum 1
-    const dailyGoal = getDailyGoal(selectedExercise, dayNumber, settings?.difficultyMultiplier);
+    const dailyGoal = useMemo(() => 
+        getDailyGoal(selectedExercise, dayNumber, settings?.difficultyMultiplier),
+        [selectedExercise, dayNumber, settings?.difficultyMultiplier]
+    );
 
     const currentCount = getExerciseCount(today, selectedExerciseId);
-    const isExerciseDone = completions[today]?.[selectedExerciseId]?.isCompleted || currentCount >= dailyGoal;
-    const isDayComplete = isDayDoneFromCompletions(completions, today);
+    const isExerciseDone = useMemo(() => 
+        completions[today]?.[selectedExerciseId]?.isCompleted || currentCount >= dailyGoal,
+        [completions, today, selectedExerciseId, currentCount, dailyGoal]
+    );
+    const isDayComplete = useMemo(() => 
+        isDayDoneFromCompletions(completions, today),
+        [completions, today]
+    );
 
     const totalReps = computedStats.exerciseReps[selectedExerciseId] || 0;
 
@@ -169,23 +185,23 @@ export function Dashboard({
         };
     }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, showAchievements, showSession, showClan, resumeCloudSync]);
 
-    const handleSaveSettings = (newSettings) => {
-        updateSettings(newSettings);
-        if (scheduleNotification) scheduleNotification(newSettings);
-    };
-
     // Progress circle for year (day X / 365)
     const circumference = 2 * Math.PI * 45;
     const progress = (dayNumber / 365) * 100;
     const strokeDashoffset = circumference - (progress / 100) * circumference;
 
-    const handleViewAchievement = () => {
+    const handleSaveSettings = useCallback((newSettings) => {
+        updateSettings(newSettings);
+        if (scheduleNotification) scheduleNotification(newSettings);
+    }, [updateSettings, scheduleNotification]);
+
+    const handleViewAchievement = useCallback(() => {
         setShowCounter(false);
         setShowStats(true);
         setTimeout(() => {
             setShowAchievements(true);
         }, 100);
-    };
+    }, []);
 
     return (
         <>
@@ -321,96 +337,20 @@ export function Dashboard({
                                 gap: 'clamp(6px, 1.2vw, 10px)', width: '100%', maxWidth: '600px',
                                 padding: '2px'
                             }}>
-                                {EXERCISES.map(ex => {
-                                    const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
-                                    const isActive = ex.id === selectedExerciseId;
-                                    const exStreak = computedStats.exerciseDoneToday[ex.id] ? (computedStats.exerciseCurrentStreaks[ex.id] || 0) : (computedStats.exerciseCurrentStreaks[ex.id] > 0 ? computedStats.exerciseCurrentStreaks[ex.id] : 0);
-                                    const exCount = getExerciseCount(today, ex.id);
-                                    const exGoal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
-                                    const exDone = completions[today]?.[ex.id]?.isCompleted || exCount >= exGoal;
-                                    return (
-                                        <button
-                                            key={ex.id}
-                                            onClick={() => setSelectedExerciseId(ex.id)}
-                                            className="hover-lift"
-                                            style={{
-                                                flex: '1 1 calc(33.333% - 10px)',
-                                                minWidth: 'clamp(70px, 20vw, 100px)',
-                                                maxWidth: '120px',
-                                                display: 'flex', flexDirection: 'column',
-                                                alignItems: 'center', gap: 'clamp(2px, 0.4vh, 4px)',
-                                                padding: 'clamp(6px, 1vh, 10px) clamp(4px, 0.8vw, 8px)', borderRadius: 'var(--radius-md)',
-                                                background: exDone
-                                                    ? `linear-gradient(135deg, ${ex.color}20, ${ex.gradient[1]}18)`
-                                                    : isActive
-                                                        ? `linear-gradient(135deg, ${ex.color}28, ${ex.gradient[0]}28)`
-                                                        : 'var(--surface-subtle)',
-                                                border: exDone
-                                                    ? `1.5px solid ${ex.color}66`
-                                                    : isActive
-                                                        ? `1.5px solid ${ex.color}88`
-                                                        : '1.5px solid var(--border-muted)',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.25s ease',
-                                                position: 'relative',
-                                                '--done-color': `${ex.color}55`,
-                                                '--done-color-dim': `${ex.color}12`,
-                                                animation: exDone ? 'doneGlow 3s ease-in-out infinite' : 'none',
-                                                boxShadow: exDone ? `0 0 8px ${ex.color}33` : 'none'
-                                            }}
-                                        >
-                                            {/* Done checkmark */}
-                                            {exDone && (
-                                                <div style={{
-                                                    position: 'absolute', top: '-4px', right: '-4px',
-                                                    width: '16px', height: '16px', borderRadius: '50%',
-                                                    background: `linear-gradient(135deg, ${ex.gradient[0]}, ${ex.gradient[1]})`,
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    boxShadow: `0 0 8px ${ex.color}66`,
-                                                    animation: 'checkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                                                    zIndex: 1
-                                                }}>
-                                                    <span style={{ fontSize: '9px', color: 'white', fontWeight: '700', lineHeight: 1 }}>✓</span>
-                                                </div>
-                                            )}
-                                            <ExIcon
-                                                size={20}
-                                                color={exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)'}
-                                                style={{ transition: 'color 0.2s ease' }}
-                                            />
-                                            <span style={{
-                                                fontSize: 'clamp(0.6rem, 1.4vh, 0.8rem)', fontWeight: '600',
-                                                color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
-                                                textAlign: 'center', lineHeight: '1.1',
-                                                transition: 'color 0.2s ease'
-                                            }}>
-                                                {ex.label}
-                                            </span>
-                                            <span style={{
-                                                fontSize: 'clamp(0.65rem, 1.5vh, 0.85rem)', fontWeight: '700',
-                                                color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
-                                                opacity: exDone ? 1 : isActive ? 1 : 0.6,
-                                                transition: 'color 0.2s ease',
-                                                textDecorationLine: exDone ? 'line-through' : 'none',
-                                                textDecorationColor: `${ex.color}88`
-                                            }}>
-                                                {ex.id === 'planche'
-                                                    ? (exDone ? formatTime(exGoal) : `${formatTime(exCount)}/${formatTime(exGoal)}`)
-                                                    : (exDone ? exGoal : `${exCount}/${exGoal}`)
-                                                }
-                                            </span>
-                                            {exStreak > 0 && (
-                                                <span style={{
-                                                    fontSize: 'clamp(0.5rem, 1.1vh, 0.65rem)',
-                                                    color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
-                                                    opacity: 0.8
-                                                }}>
-                                                    🔥{exStreak}
-                                                </span>
-                                            )}
-                                        </button>
-                                    );
-                                })}
+                                {EXERCISES.map(ex => (
+                                    <ExerciseButton
+                                        key={ex.id}
+                                        ex={ex}
+                                        isActive={ex.id === selectedExerciseId}
+                                        dayNumber={dayNumber}
+                                        today={today}
+                                        settings={settings}
+                                        getExerciseCount={getExerciseCount}
+                                        completions={completions}
+                                        computedStats={computedStats}
+                                        onSelect={handleSelectExercise}
+                                    />
+                                ))}
                             </div>
 
                             {/* ── Progress ring + Counter button + Completion status (grouped) ── */}
@@ -585,102 +525,207 @@ export function Dashboard({
                 </div>
 
                 {/* Modals */}
-                {showCalendar && (
-                    <Calendar
-                        startDate={startDate}
-                        completions={completions}
-                        exercises={EXERCISES}
-                        getDayNumber={getDayNumber}
-                        onClose={() => setShowCalendar(false)}
-                        settings={settings}
-                    />
-                )}
-                {showStats && (
-                    <Stats
-                        completions={completions}
-                        exercises={EXERCISES}
-                        onClose={() => setShowStats(false)}
-                        onOpenAchievements={() => { setShowAchievements(true); }}
-                        highlightedBadgeId={newAchievement?.id}
-                        settings={settings}
-                        getDayNumber={getDayNumber}
-                        computedStats={computedStats}
-                    />
-                )}
-                {showSettings && (
-                    <Settings
-                        settings={settings}
-                        onClose={() => setShowSettings(false)}
-                        onSave={handleSaveSettings}
-                        cloudAuth={cloudAuth}
-                        cloudSync={cloudSync}
-                        conflictData={conflictData}
-                        onResolveConflict={onResolveConflict}
-                    />
-                )}
-                {showCounter && selectedExerciseId !== 'planche' && (
-                    <Counter
-                        exerciseConfig={selectedExercise}
-                        onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
-                        dailyGoal={dailyGoal}
-                        currentCount={currentCount}
-                        onUpdateCount={(newCount) => updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal)}
-                        isCompleted={isExerciseDone}
-                        dayNumber={dayNumber}
-                    />
-                )}
-                {showCounter && selectedExerciseId === 'planche' && (
-                    <Timer
-                        exerciseConfig={selectedExercise}
-                        onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
-                        dailyGoal={dailyGoal}
-                        currentCount={currentCount}
-                        onUpdateCount={(newCount) => updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal)}
-                        isCompleted={isExerciseDone}
-                        dayNumber={dayNumber}
-                    />
-                )}
-                {showLeaderboard && (
-                    <Leaderboard
-                        onClose={() => setShowLeaderboard(false)}
-                        cloudSync={cloudSync}
-                        cloudAuth={cloudAuth}
-                    />
-                )}
-                {showAchievements && (
-                    <Achievements
-                        completions={completions}
-                        exercises={EXERCISES}
-                        onClose={() => { setShowAchievements(false); setNewAchievement(null); }}
-                        settings={settings}
-                        getDayNumber={getDayNumber}
-                        highlightedBadgeId={newAchievement?.id}
-                        computedStats={computedStats}
-                    />
-                )}
-                {showSession && (
-                    <WorkoutSession
-                        onClose={() => { setShowSession(false); resumeCloudSync?.(); }}
-                        today={today}
-                        dayNumber={dayNumber}
-                        getExerciseCount={getExerciseCount}
-                        updateExerciseCount={updateExerciseCount}
-                        completions={completions}
-                        settings={settings}
-                    />
-                )}
-                {showClan && (
-                    <ClanModal 
-                        onClose={() => { setShowClan(false); resumeCloudSync?.(); }} 
-                        cloudAuth={cloudAuth}
-                        settings={settings}
-                        updateSettings={updateSettings}
-                    />
-                )}
+                <Suspense fallback={null}>
+                    {showCalendar && (
+                        <Calendar
+                            startDate={startDate}
+                            completions={completions}
+                            exercises={EXERCISES}
+                            getDayNumber={getDayNumber}
+                            onClose={() => setShowCalendar(false)}
+                            settings={settings}
+                        />
+                    )}
+                    {showStats && (
+                        <Stats
+                            completions={completions}
+                            exercises={EXERCISES}
+                            onClose={() => setShowStats(false)}
+                            onOpenAchievements={() => { setShowAchievements(true); }}
+                            highlightedBadgeId={newAchievement?.id}
+                            settings={settings}
+                            getDayNumber={getDayNumber}
+                            computedStats={computedStats}
+                        />
+                    )}
+                    {showSettings && (
+                        <Settings
+                            settings={settings}
+                            onClose={() => setShowSettings(false)}
+                            onSave={handleSaveSettings}
+                            cloudAuth={cloudAuth}
+                            cloudSync={cloudSync}
+                            conflictData={conflictData}
+                            onResolveConflict={onResolveConflict}
+                        />
+                    )}
+                    {showCounter && selectedExerciseId !== 'planche' && (
+                        <Counter
+                            exerciseConfig={selectedExercise}
+                            onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
+                            dailyGoal={dailyGoal}
+                            currentCount={currentCount}
+                            onUpdateCount={(newCount) => updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal)}
+                            isCompleted={isExerciseDone}
+                            dayNumber={dayNumber}
+                        />
+                    )}
+                    {showCounter && selectedExerciseId === 'planche' && (
+                        <Timer
+                            exerciseConfig={selectedExercise}
+                            onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
+                            dailyGoal={dailyGoal}
+                            currentCount={currentCount}
+                            onUpdateCount={(newCount) => updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal)}
+                            isCompleted={isExerciseDone}
+                            dayNumber={dayNumber}
+                        />
+                    )}
+                    {showLeaderboard && (
+                        <Leaderboard
+                            onClose={() => setShowLeaderboard(false)}
+                            cloudSync={cloudSync}
+                            cloudAuth={cloudAuth}
+                        />
+                    )}
+                    {showAchievements && (
+                        <Achievements
+                            completions={completions}
+                            exercises={EXERCISES}
+                            onClose={() => { setShowAchievements(false); setNewAchievement(null); }}
+                            settings={settings}
+                            getDayNumber={getDayNumber}
+                            highlightedBadgeId={newAchievement?.id}
+                            computedStats={computedStats}
+                        />
+                    )}
+                    {showSession && (
+                        <WorkoutSession
+                            onClose={() => { setShowSession(false); resumeCloudSync?.(); }}
+                            today={today}
+                            dayNumber={dayNumber}
+                            getExerciseCount={getExerciseCount}
+                            updateExerciseCount={updateExerciseCount}
+                            completions={completions}
+                            settings={settings}
+                        />
+                    )}
+                    {showClan && (
+                        <ClanModal 
+                            onClose={() => { setShowClan(false); resumeCloudSync?.(); }} 
+                            cloudAuth={cloudAuth}
+                            settings={settings}
+                            updateSettings={updateSettings}
+                        />
+                    )}
+                </Suspense>
             </div>
         </>
     );
 }
+
+// Memoized exercise button to avoid re-rendering all 10 exercises when one changes
+const ExerciseButton = React.memo(({
+    ex, isActive, dayNumber, today, settings,
+    getExerciseCount, completions, computedStats, onSelect
+}) => {
+    // We import formatTime helper logic directly here or replicate it
+    const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60);
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    };
+
+    const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
+    const exStreak = computedStats.exerciseDoneToday[ex.id]
+        ? (computedStats.exerciseCurrentStreaks[ex.id] || 0)
+        : (computedStats.exerciseCurrentStreaks[ex.id] > 0 ? computedStats.exerciseCurrentStreaks[ex.id] : 0);
+    const exCount = getExerciseCount(today, ex.id);
+    const exGoal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
+    const exDone = completions[today]?.[ex.id]?.isCompleted || exCount >= exGoal;
+
+    return (
+        <button
+            onClick={() => onSelect(ex.id)}
+            className="hover-lift"
+            style={{
+                flex: '1 1 calc(33.333% - 10px)',
+                minWidth: 'clamp(70px, 20vw, 100px)',
+                maxWidth: '120px',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: 'clamp(2px, 0.4vh, 4px)',
+                padding: 'clamp(6px, 1vh, 10px) clamp(4px, 0.8vw, 8px)', borderRadius: 'var(--radius-md)',
+                background: exDone
+                    ? `linear-gradient(135deg, ${ex.color}20, ${ex.gradient[1]}18)`
+                    : isActive
+                        ? `linear-gradient(135deg, ${ex.color}28, ${ex.gradient[0]}28)`
+                        : 'var(--surface-subtle)',
+                border: exDone
+                    ? `1.5px solid ${ex.color}66`
+                    : isActive
+                        ? `1.5px solid ${ex.color}88`
+                        : '1.5px solid var(--border-muted)',
+                cursor: 'pointer',
+                transition: 'all 0.25s ease',
+                position: 'relative',
+                '--done-color': `${ex.color}55`,
+                '--done-color-dim': `${ex.color}12`,
+                animation: exDone ? 'doneGlow 3s ease-in-out infinite' : 'none',
+                boxShadow: exDone ? `0 0 8px ${ex.color}33` : 'none'
+            }}
+        >
+            {/* Done checkmark */}
+            {exDone && (
+                <div style={{
+                    position: 'absolute', top: '-4px', right: '-4px',
+                    width: '16px', height: '16px', borderRadius: '50%',
+                    background: `linear-gradient(135deg, ${ex.gradient[0]}, ${ex.gradient[1]})`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: `0 0 8px ${ex.color}66`,
+                    animation: 'checkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    zIndex: 1
+                }}>
+                    <span style={{ fontSize: '9px', color: 'white', fontWeight: '700', lineHeight: 1 }}>✓</span>
+                </div>
+            )}
+            <ExIcon
+                size={20}
+                color={exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)'}
+                style={{ transition: 'color 0.2s ease' }}
+            />
+            <span style={{
+                fontSize: 'clamp(0.6rem, 1.4vh, 0.8rem)', fontWeight: '600',
+                color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
+                textAlign: 'center', lineHeight: '1.1',
+                transition: 'color 0.2s ease'
+            }}>
+                {ex.label}
+            </span>
+            <span style={{
+                fontSize: 'clamp(0.65rem, 1.5vh, 0.85rem)', fontWeight: '700',
+                color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
+                opacity: exDone ? 1 : isActive ? 1 : 0.6,
+                transition: 'color 0.2s ease',
+                textDecorationLine: exDone ? 'line-through' : 'none',
+                textDecorationColor: `${ex.color}88`
+            }}>
+                {ex.id === 'planche'
+                    ? (exDone ? formatTime(exGoal) : `${formatTime(exCount)}/${formatTime(exGoal)}`)
+                    : (exDone ? exGoal : `${exCount}/${exGoal}`)
+                }
+            </span>
+            {exStreak > 0 && (
+                <span style={{
+                    fontSize: 'clamp(0.5rem, 1.1vh, 0.65rem)',
+                    color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
+                    opacity: 0.8
+                }}>
+                    🔥{exStreak}
+                </span>
+            )}
+        </button>
+    );
+});
 
 // Shared icon button style
 const iconBtnStyle = {

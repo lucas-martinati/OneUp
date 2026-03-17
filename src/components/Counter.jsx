@@ -10,16 +10,7 @@ import { sounds } from '../utils/soundManager';
 // Map icon name strings to lucide components
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
 
-/** Trigger haptic feedback if available (Capacitor native) */
-const triggerHaptic = async () => {
-    try {
-        const { Haptics, ImpactStyle } = await import('@capacitor/haptics');
-        await Haptics.impact({ style: ImpactStyle.Heavy });
-    } catch {
-        // Fallback: Vibration API (most mobile browsers)
-        if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
-    }
-};
+
 
 export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext }) {
     const [isAnimating, setIsAnimating] = useState(false);
@@ -78,7 +69,6 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
         setIsAnimating(true);
         setCompleteFlash(true);
         onUpdateCount(dailyGoal);
-        triggerHaptic();
         setTimeout(() => {
             setIsAnimating(false);
             setCompleteFlash(false);

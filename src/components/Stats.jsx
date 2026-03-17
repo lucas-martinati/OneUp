@@ -1,10 +1,111 @@
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
+// Lazy load Recharts components
+const RechartsComponents = lazy(() => import('recharts').then(module => ({
+    default: ({ activeData, radarData, trackedCount, globalTotalReps }) => {
+        const { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } = module;
+        return (
+            <>
+                {radarData.length > 2 && globalTotalReps > 0 && (
+                    <div className="glass-premium" style={{
+                        padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center',
+                        marginBottom: 'var(--spacing-md)',
+                        background: 'linear-gradient(135deg, rgba(52,211,153,0.1), rgba(16,185,129,0.1))'
+                    }}>
+                        <h3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', textAlign: 'center', width: '100%' }}>
+                            🕸️ Équilibre Musculaire
+                        </h3>
+                        <div style={{ width: '100%', height: '220px' }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                                    <PolarGrid stroke="rgba(255,255,255,0.2)" />
+                                    <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-secondary)', fontSize: 10, fontWeight: 600 }} />
+                                    <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={false} axisLine={false} />
+                                    <Radar name="Reps" dataKey="reps" stroke="#10b981" fill="#34d399" fillOpacity={0.5} />
+                                    <Tooltip contentStyle={{
+                                        background: 'var(--tooltip-bg)', border: '1px solid var(--border-default)',
+                                        borderRadius: '8px', backdropFilter: 'blur(10px)'
+                                    }} itemStyle={{ color: '#10b981', fontWeight: '800' }} />
+                                </RadarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                )}
+                <div className="glass-premium" style={{
+                    padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    marginBottom: 'var(--spacing-md)',
+                    background: 'linear-gradient(135deg, rgba(109,40,217,0.1), rgba(139,92,246,0.1))'
+                }}>
+                    <h3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', textAlign: 'center', width: '100%' }}>
+                        ⏰ Consistance
+                    </h3>
+
+                    {trackedCount > 0 ? (
+                        <>
+                            <div style={{ width: '100%', minHeight: '180px' }}>
+                                <ResponsiveContainer width="100%" height={180}>
+                                    <PieChart>
+                                        <Pie data={activeData} cx="50%" cy="50%"
+                                            innerRadius={45} outerRadius={68}
+                                            paddingAngle={4} dataKey="value" stroke="none"
+                                            animationBegin={0} animationDuration={800}>
+                                            {activeData.map((entry, idx) => (
+                                                <Cell key={`cell-${idx}`} fill={entry.color}
+                                                    style={{ filter: 'drop-shadow(0 0 6px rgba(0,0,0,0.3))' }} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip contentStyle={{
+                                            background: 'var(--tooltip-bg)',
+                                            border: '1px solid var(--border-default)',
+                                            borderRadius: '8px', backdropFilter: 'blur(10px)'
+                                        }} itemStyle={{ color: 'var(--text-primary)', fontWeight: '600' }} />
+                                        <Legend verticalAlign="bottom" height={36} iconType="circle"
+                                            wrapperStyle={{ fontSize: '0.8rem', fontWeight: '600' }} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <p style={{
+                                textAlign: 'center', color: 'var(--text-secondary)',
+                                fontSize: '0.7rem', marginTop: '4px', fontStyle: 'italic'
+                            }}>
+                                Basé sur {trackedCount} journée{trackedCount !== 1 ? 's' : ''} manuelles
+                            </p>
+                        </>
+                    ) : (
+                        <div style={{
+                            textAlign: 'center', color: 'var(--text-secondary)',
+                            padding: 'var(--spacing-lg)'
+                        }}>
+                            <p style={{ fontSize: '0.9rem', marginBottom: '6px' }}>
+                                📊 Pas encore assez de données
+                            </p>
+                            <p style={{ fontSize: '0.78rem', opacity: 0.7, lineHeight: '1.5' }}>
+                                Complete tes exercices quotidiens pour voir<br />tes habitudes ici !
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </>
+        );
+    }
+})));
+
 export function Stats({ completions, exercises, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats }) {
+    const [chartsReady, setChartsReady] = useState(false);
+
+    // Wait for the modal transition to finish before attempting to load huge charting libraries
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setChartsReady(true);
+        }, 500); // Wait for transition
+        return () => clearTimeout(timer);
+    }, []);
     // All values come from computedStats — no local calculations needed
     const {
         totalDays, maxStreak, displayStreak, streakActive, successRate,
@@ -338,33 +439,25 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                 </div>
             </div>
 
-            {/* ── Equilibre Musculaire (Radar) ────────────────────────── */}
-            {radarData.length > 2 && globalTotalReps > 0 && (
-                <div className="glass-premium" style={{
-                    padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    marginBottom: 'var(--spacing-md)',
-                    background: 'linear-gradient(135deg, rgba(52,211,153,0.1), rgba(16,185,129,0.1))'
-                }}>
-                    <h3 style={{ ...sectionTitleStyle, textAlign: 'center', width: '100%' }}>
-                        🕸️ Équilibre Musculaire
-                    </h3>
-                    <div style={{ width: '100%', height: '220px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                                <PolarGrid stroke="rgba(255,255,255,0.2)" />
-                                <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-secondary)', fontSize: 10, fontWeight: 600 }} />
-                                <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={false} axisLine={false} />
-                                <Radar name="Reps" dataKey="reps" stroke="#10b981" fill="#34d399" fillOpacity={0.5} />
-                                <Tooltip contentStyle={{
-                                    background: 'var(--tooltip-bg)', border: '1px solid var(--border-default)',
-                                    borderRadius: '8px', backdropFilter: 'blur(10px)'
-                                }} itemStyle={{ color: '#10b981', fontWeight: '800' }} />
-                            </RadarChart>
-                        </ResponsiveContainer>
+            {/* ── Equilibre Musculaire + Time-of-day pie (Lazy Loaded) ────────────────────────── */}
+            {chartsReady ? (
+                <Suspense fallback={
+                    <div className="glass-premium" style={{
+                        padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                        display: 'flex', justifyContent: 'center', alignItems: 'center',
+                        height: '200px', marginBottom: 'var(--spacing-md)'
+                    }}>
+                        <div style={{ color: 'var(--text-secondary)' }}>Chargement des graphiques...</div>
                     </div>
-                </div>
-            )}
+                }>
+                    <RechartsComponents 
+                        activeData={activeData} 
+                        radarData={radarData} 
+                        trackedCount={trackedCount} 
+                        globalTotalReps={globalTotalReps} 
+                    />
+                </Suspense>
+            ) : null}
 
             {/* ── Per-exercise breakdown ───────────────────────────────── */}
             {exerciseStats.length > 0 && (
@@ -475,63 +568,6 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     </div>
                 </div>
             )}
-
-            {/* ── Time-of-day pie ─────────────────────────────────────── */}
-            <div className="glass-premium" style={{
-                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                marginBottom: 'var(--spacing-md)',
-                background: 'linear-gradient(135deg, rgba(109,40,217,0.1), rgba(139,92,246,0.1))'
-            }}>
-                <h3 style={{ ...sectionTitleStyle, textAlign: 'center', width: '100%' }}>
-                    ⏰ Consistance
-                </h3>
-
-                {trackedCount > 0 ? (
-                    <>
-                        <div style={{ width: '100%', minHeight: '180px' }}>
-                            <ResponsiveContainer width="100%" height={180}>
-                                <PieChart>
-                                    <Pie data={activeData} cx="50%" cy="50%"
-                                        innerRadius={45} outerRadius={68}
-                                        paddingAngle={4} dataKey="value" stroke="none"
-                                        animationBegin={0} animationDuration={800}>
-                                        {activeData.map((entry, idx) => (
-                                            <Cell key={`cell-${idx}`} fill={entry.color}
-                                                style={{ filter: 'drop-shadow(0 0 6px rgba(0,0,0,0.3))' }} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip contentStyle={{
-                                        background: 'var(--tooltip-bg)',
-                                        border: '1px solid var(--border-default)',
-                                        borderRadius: '8px', backdropFilter: 'blur(10px)'
-                                    }} itemStyle={{ color: 'var(--text-primary)', fontWeight: '600' }} />
-                                    <Legend verticalAlign="bottom" height={36} iconType="circle"
-                                        wrapperStyle={{ fontSize: '0.8rem', fontWeight: '600' }} />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </div>
-                        <p style={{
-                            textAlign: 'center', color: 'var(--text-secondary)',
-                            fontSize: '0.7rem', marginTop: '4px', fontStyle: 'italic'
-                        }}>
-                            Basé sur {trackedCount} journée{trackedCount !== 1 ? 's' : ''} manuelles
-                        </p>
-                    </>
-                ) : (
-                    <div style={{
-                        textAlign: 'center', color: 'var(--text-secondary)',
-                        padding: 'var(--spacing-lg)'
-                    }}>
-                        <p style={{ fontSize: '0.9rem', marginBottom: '6px' }}>
-                            📊 Pas encore assez de données
-                        </p>
-                        <p style={{ fontSize: '0.78rem', opacity: 0.7, lineHeight: '1.5' }}>
-                            Complete tes exercices quotidiens pour voir<br />tes habitudes ici !
-                        </p>
-                    </div>
-                )}
-            </div>
 
             {/* ── Motivational footer ─────────────────────────────────── */}
             <div className="glass slide-up" style={{

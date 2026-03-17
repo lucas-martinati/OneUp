@@ -88,4 +88,3 @@ npm run deploy
 - **Firebase Realtime Database** - Cloud sync et authentification Google
 - **Recharts** - Graphiques (pie chart statistiques)
 - **Lucide React** - Icones
-- **Canvas Confetti** - Effets de celebration

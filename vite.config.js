@@ -40,5 +40,25 @@ export default defineConfig({
         ]
       }
     })
-  ]
+  ],
+  build: {
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'firebase-vendor': ['firebase/app', 'firebase/auth', 'firebase/database'],
+          'capacitor-vendor': [
+            '@capacitor/core',
+            '@capacitor/app',
+            '@capacitor/local-notifications',
+            '@capacitor/preferences'
+          ],
+          'charts-vendor': ['recharts'],
+          'ui-vendor': ['lucide-react']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  }
 })
