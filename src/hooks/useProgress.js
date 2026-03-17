@@ -115,10 +115,10 @@ export function useProgress() {
 
     // Legacy support
     if (parsed.isSetup === undefined) {
-      return { ...parsed, isSetup: true, userStartDate: parsed.startDate };
+      return { ...parsed, isSetup: true, userStartDate: parsed.startDate, lastCompletionChange: Date.now() };
     }
 
-    return parsed;
+    return { ...parsed, lastCompletionChange: Date.now() };
   });
 
   useEffect(() => {
@@ -186,7 +186,7 @@ export function useProgress() {
         // Mark all exercises as done
         newCompletions[dateStr] = makeAllDone();
       }
-      return { ...prev, completions: newCompletions };
+      return { ...prev, completions: newCompletions, lastCompletionChange: Date.now() };
     });
   };
 
@@ -236,6 +236,9 @@ export function useProgress() {
       day[exerciseId] = { count: finalCount, isCompleted: isNowDone, timestamp, timeOfDay };
       newCompletions[dateStr] = day;
 
+      if (wasDone !== isNowDone) {
+        return { ...prev, completions: newCompletions, lastCompletionChange: Date.now() };
+      }
       return { ...prev, completions: newCompletions };
     });
   };
@@ -425,6 +428,7 @@ export function useProgress() {
           userStartDate: merged.userStartDate || prev.userStartDate,
           completions: merged.completions || prev.completions,
           isSetup: merged.isSetup ?? prev.isSetup,
+          lastCompletionChange: Date.now(),
         };
       });
     });

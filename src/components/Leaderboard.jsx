@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { X, Trophy, Medal, Crown, ChevronRight, ChevronLeft, User, Award, Flame, Calendar, TrendingUp, Activity, HeartHandshake, Link, UserPlus, LogOut, Check, Shield } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { EXERCISES } from '../config/exercises';
@@ -60,10 +60,12 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
     }, []);
 
     // Sort entries based on active tab
-    const sorted = [...entries].sort((a, b) => {
-        if (activeTab === 'global') return b.totalReps - a.totalReps;
-        return (b.exerciseReps?.[activeTab] || 0) - (a.exerciseReps?.[activeTab] || 0);
-    });
+    const sorted = useMemo(() => {
+        return [...entries].sort((a, b) => {
+            if (activeTab === 'global') return b.totalReps - a.totalReps;
+            return (b.exerciseReps?.[activeTab] || 0) - (a.exerciseReps?.[activeTab] || 0);
+        });
+    }, [entries, activeTab]);
 
     // Compute ranks with ties (same score = same rank)
     const getRank = (index) => {

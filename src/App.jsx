@@ -87,17 +87,6 @@ function App() {
   // Save to cloud only when an exercise completion status changes (not on count changes)
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading && !conflictData && conflictCheckDone && isInitialSyncDone) {
-      // Build a fingerprint of only isCompleted values to detect real changes
-      const fingerprint = JSON.stringify(
-        Object.fromEntries(
-          Object.entries(completions).map(([date, exs]) => [
-            date,
-            Object.fromEntries(
-              Object.entries(exs || {}).map(([exId, data]) => [exId, !!data?.isCompleted])
-            )
-          ])
-        )
-      );
       const doSave = async () => {
         try {
           await saveToCloud();
@@ -110,17 +99,7 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [
-    // Only re-run when isCompleted statuses actually change
-    JSON.stringify(
-      Object.fromEntries(
-        Object.entries(completions).map(([date, exs]) => [
-          date,
-          Object.fromEntries(
-            Object.entries(exs || {}).map(([exId, data]) => [exId, !!data?.isCompleted])
-          )
-        ])
-      )
-    ),
+    progress.lastCompletionChange,
     googleAuth.isSignedIn, googleAuth.loading, conflictData, conflictCheckDone
   ]);
 

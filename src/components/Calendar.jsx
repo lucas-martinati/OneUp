@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { getLocalDateStr } from '../utils/dateUtils';
@@ -51,27 +51,34 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
         "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
     ];
 
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfMonth(year, month);
-
-    const days = [];
-    for (let i = 0; i < firstDay; i++) days.push(null);
-    for (let i = 1; i <= daysInMonth; i++) days.push(new Date(year, month, i));
-
-    // Month stats
     const todayStr = getLocalDateStr(new Date());
-    let monthCompleted = 0, monthTotal = 0;
-    days.filter(Boolean).forEach(date => {
-        const dStr = getLocalDateStr(date);
-        const isFuture = dStr > todayStr;
-        const isBeforeStart = dStr < startDate;
-        if (!isFuture && !isBeforeStart) {
-            monthTotal++;
-            const day = completions[dStr];
-            if (day && Object.values(day).some(ex => ex?.isCompleted)) monthCompleted++;
-        }
-    });
-    const completionRate = monthTotal > 0 ? Math.round((monthCompleted / monthTotal) * 100) : 0;
+
+    const { days, monthCompleted, completionRate } = useMemo(() => {
+        const daysInMonth = getDaysInMonth(year, month);
+        const firstDay = getFirstDayOfMonth(year, month);
+
+        const daysArr = [];
+        for (let i = 0; i < firstDay; i++) daysArr.push(null);
+        for (let i = 1; i <= daysInMonth; i++) daysArr.push(new Date(year, month, i));
+
+        const todayStr = getLocalDateStr(new Date());
+        let completed = 0, total = 0;
+        
+        daysArr.filter(Boolean).forEach(date => {
+            const dStr = getLocalDateStr(date);
+            const isFuture = dStr > todayStr;
+            const isBeforeStart = dStr < startDate;
+            if (!isFuture && !isBeforeStart) {
+                total++;
+                const day = completions[dStr];
+                if (day && Object.values(day).some(ex => ex?.isCompleted)) completed++;
+            }
+        });
+        
+        const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+        
+        return { days: daysArr, monthCompleted: completed, completionRate: rate };
+    }, [year, month, startDate, completions]);
 
     return (
         <div
