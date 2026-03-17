@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useWakeLock } from '../hooks/useWakeLock';
 import { CSSConfetti } from './CSSConfetti';
 import {
     X, Check, CheckCheck, RotateCcw, Play, Pause,
@@ -7,6 +8,7 @@ import {
 import { sounds } from '../utils/soundManager';
 
 export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext }) {
+    useWakeLock();
     const [isRunning, setIsRunning] = useState(false);
     const [completeFlash, setCompleteFlash] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);

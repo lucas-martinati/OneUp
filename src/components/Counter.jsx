@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useWakeLock } from '../hooks/useWakeLock';
 import { CSSConfetti } from './CSSConfetti';
 import {
     X, Check, CheckCheck, RotateCcw, Plus, Minus, ChevronRight,
@@ -13,6 +14,7 @@ const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, 
 
 
 export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext }) {
+    useWakeLock();
     const [isAnimating, setIsAnimating] = useState(false);
     const [completeFlash, setCompleteFlash] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
