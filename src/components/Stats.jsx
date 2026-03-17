@@ -20,8 +20,8 @@ const RechartsComponents = lazy(() => import('recharts').then(module => ({
                         <h3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', textAlign: 'center', width: '100%' }}>
                             🕸️ Équilibre Musculaire
                         </h3>
-                        <div style={{ width: '100%', height: '220px' }}>
-                            <ResponsiveContainer width="100%" height="100%">
+                        <div style={{ width: '100%', height: '220px', minHeight: '220px' }}>
+                            <ResponsiveContainer width="100%" height={220} debounce={100}>
                                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
                                     <PolarGrid stroke="rgba(255,255,255,0.2)" />
                                     <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-secondary)', fontSize: 10, fontWeight: 600 }} />
@@ -49,7 +49,7 @@ const RechartsComponents = lazy(() => import('recharts').then(module => ({
                     {trackedCount > 0 ? (
                         <>
                             <div style={{ width: '100%', minHeight: '180px' }}>
-                                <ResponsiveContainer width="100%" height={180}>
+                                <ResponsiveContainer width="100%" height={180} minWidth={0} minHeight={0} debounce={100}>
                                     <PieChart>
                                         <Pie data={activeData} cx="50%" cy="50%"
                                             innerRadius={45} outerRadius={68}

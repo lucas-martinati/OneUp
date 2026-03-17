@@ -90,20 +90,23 @@ function App() {
   // Save to cloud only when an exercise completion status changes (not on count changes)
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading && !conflictData && conflictCheckDone && isInitialSyncDone) {
+      logger.debug('Auto-save triggered by completion change');
       const doSave = async () => {
         try {
           await saveToCloud();
-          logger.success('Data saved to cloud');
+          logger.success('Auto-save: Progression synchronisée');
         } catch (error) {
           logger.error('Auto-save failed:', error);
         }
       };
       const timer = setTimeout(doSave, 1000);
       return () => clearTimeout(timer);
+    } else if (googleAuth.isSignedIn && !isInitialSyncDone && !googleAuth.loading) {
+      logger.debug('Auto-save skipped: Initial sync still in progress');
     }
   }, [
     progress.lastCompletionChange,
-    googleAuth.isSignedIn, googleAuth.loading, conflictData, conflictCheckDone
+    googleAuth.isSignedIn, googleAuth.loading, conflictData, conflictCheckDone, isInitialSyncDone, saveToCloud
   ]);
 
   // Sync settings with cloud on sign-in

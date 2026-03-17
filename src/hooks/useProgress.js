@@ -356,8 +356,8 @@ export function useProgress() {
     try {
       isLocalWriteRef.current = true;
       await cloudSync.saveToCloud(state);
-      // Reset after a short delay (Firebase onValue fires almost instantly)
-      setTimeout(() => { isLocalWriteRef.current = false; }, 1500);
+      // Reset after a shorter delay to avoid missing legitimate incoming changes
+      setTimeout(() => { isLocalWriteRef.current = false; }, 800);
       return { success: true };
     } catch (error) {
       isLocalWriteRef.current = false;
@@ -393,7 +393,8 @@ export function useProgress() {
       isLocalWriteRef.current = true;
       const mergedData = await cloudSync.syncData(state);
       setState(validateProgressData(mergedData) || mergedData);
-      setTimeout(() => { isLocalWriteRef.current = false; }, 1500);
+      // Reset after a shorter delay
+      setTimeout(() => { isLocalWriteRef.current = false; }, 800);
       return { success: true, data: mergedData };
     } catch (error) {
       isLocalWriteRef.current = false;

@@ -14,7 +14,7 @@ Built with **Vibe Coding**.
 - **Calendrier visuel** : Suivez votre progression jour par jour sur l'annee
 - **Cloud Sync** : Synchronisation via compte Google (Firebase Realtime Database)
 - **Notifications** : Rappels quotidiens configurables
-- **Design dark premium** : Animations, confettis, retour haptique, sons
+- **Design dark premium** : Animations, confettis CSS, sons
 
 ## Installer l'app sur Android
 
