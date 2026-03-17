@@ -4,7 +4,7 @@ import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'luc
 import { EXERCISES } from '../config/exercises';
 import { Avatar } from './Avatar';
 import { registerBackHandler } from '../utils/backHandler';
-import { isDayDoneFromCompletions, getLocalDateStr, calculateStreak } from '../utils/dateUtils';
+import { isDayDoneFromCompletions, getLocalDateStr, calculateStreak, calculateMaxStreak } from '../utils/dateUtils';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
@@ -700,28 +700,8 @@ function computeStats(details) {
     }
 
     // Streak calculation
-    let maxStreak = 0;
-    let currentStreak = 0;
-    let temp = 0;
-    for (let i = 0; i < 365; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const dateStr = getLocalDateStr(d);
-        if (isDayDoneFromCompletions(completions, dateStr)) {
-            temp++;
-            if (temp > maxStreak) maxStreak = temp;
-        } else {
-            if (i === 0) {
-                // Today not done — still count from yesterday
-            } else {
-                break;
-            }
-            temp = 0;
-        }
-    }
-
-    // Current streak
-    currentStreak = calculateStreak(completions, today);
+    const maxStreak = calculateMaxStreak(completions);
+    const currentStreak = calculateStreak(completions, today);
 
     // Per-exercise streaks & today-done
     const exerciseStreaks = {};

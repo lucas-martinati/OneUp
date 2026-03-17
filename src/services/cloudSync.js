@@ -816,6 +816,8 @@ class CloudSyncService {
           exerciseReps: lbData.exerciseReps || {},
           achievements: lbData.achievements || 0,
           lastActiveDay: lbData.lastActiveDay || null,
+          difficultyMultiplier: lbData.difficultyMultiplier || 1,
+          lastUpdated: lbData.lastUpdated || null,
           isCurrentUser: memberUid === uid
         };
       });

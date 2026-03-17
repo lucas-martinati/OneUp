@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Radar, Radar
 import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { getDailyGoal } from '../config/exercises';
-import { getLocalDateStr, calculateExerciseStreak, isDayDoneFromCompletions } from '../utils/dateUtils';
+import { getLocalDateStr, calculateExerciseStreak, isDayDoneFromCompletions, calculateMaxStreak, calculateStreak } from '../utils/dateUtils';
 import { calculateAchievements } from '../utils/achievements';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
@@ -87,7 +87,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                 }
             }
 
-            if (dayExCount > bestDayExCount || (dayExCount === bestDayExCount && dayReps > bestDayReps)) {
+            if (dayReps > bestDayReps || (dayReps === bestDayReps && dayExCount > bestDayExCount)) {
                 bestDayDate = dateStr;
                 bestDayExCount = dayExCount;
                 bestDayReps = dayReps;
@@ -116,34 +116,8 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
     });
 
     // ── Overall streaks ──────────────────────────────────────────────────
-    const calcGlobalStreak = () => {
-        let streak = 0;
-        for (let i = 0; i < 365; i++) {
-            const d = new Date(today);
-            d.setDate(d.getDate() - i);
-            if (isDayDoneFromCompletions(completions, getLocalDateStr(d))) streak++;
-            else break;
-        }
-        return streak;
-    };
-
-    const calcMaxGlobalStreak = () => {
-        let max = 0, temp = 0;
-        for (let i = 0; i < 365; i++) {
-            const d = new Date(today);
-            d.setDate(d.getDate() - i);
-            if (isDayDoneFromCompletions(completions, getLocalDateStr(d))) {
-                temp++;
-                if (temp > max) max = temp;
-            } else {
-                temp = 0;
-            }
-        }
-        return max;
-    };
-
-    const currentStreak = calcGlobalStreak();
-    const maxStreak = calcMaxGlobalStreak();
+    const currentStreak = calculateStreak(completions, todayStr);
+    const maxStreak = calculateMaxStreak(completions);
     const successRate = totalDays > 0 ? Math.round((totalDays / 365) * 100) : 0;
     const activeData = pieData.filter(d => d.value > 0);
 

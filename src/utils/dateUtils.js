@@ -73,3 +73,30 @@ export function isDayDoneFromCompletions(completions, dateStr) {
     if (!day) return false;
     return Object.values(day).some(ex => ex?.isCompleted === true);
 }
+
+/**
+ * Calculate the maximum streak of consecutive days where at least one exercise
+ * was completed, looking back at the last 365 days.
+ * @param {Object} completions
+ * @returns {number}
+ */
+export function calculateMaxStreak(completions) {
+    let max = 0;
+    let temp = 0;
+    const today = new Date();
+    
+    // We check last 365 days to find the longest sequence
+    for (let i = 0; i < 365; i++) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const dateStr = getLocalDateStr(d);
+        
+        if (isDayDoneFromCompletions(completions, dateStr)) {
+            temp++;
+            if (temp > max) max = temp;
+        } else {
+            temp = 0;
+        }
+    }
+    return max;
+}

@@ -44,6 +44,9 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
                 return true;
             }
             if (view === 'dashboard') {
+                // If a user is selected in the leaderboard, the Leaderboard common back handler 
+                // (registered via UserDetail) will catch it first because it was registered later.
+                // If we reach here, no user is selected, so we go back to menu.
                 setView('menu');
                 setClanData(null);
                 return true;

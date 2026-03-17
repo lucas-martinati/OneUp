@@ -629,39 +629,45 @@ export function Dashboard({
                     )}
                 </main>
 
-                {/* Calendar Button */}
-                <button
-                    onClick={() => setShowCalendar(true)}
-                    className="glass hover-lift gradient-button"
-                    style={{
-                        width: '100%', padding: 'clamp(12px, 1.8vh, 18px)', borderRadius: 'var(--radius-lg)',
-                        color: 'var(--text-primary)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        gap: '8px', fontSize: 'clamp(0.85rem, 1.8vh, 1.05rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
-                        background: `linear-gradient(135deg, ${selectedExercise.color}28, ${selectedExercise.gradient[0]}28)`,
-                        boxShadow: 'var(--shadow-md)'
-                    }}
-                >
-                    <CalendarIcon size={18} />
-                    Ouvrir le Calendrier
-                </button>
+                {/* Bottom Actions Row */}
+                <div style={{
+                    display: 'flex', gap: '8px', width: '100%',
+                    paddingBottom: '2px'
+                }}>
+                    {/* Calendar Button */}
+                    <button
+                        onClick={() => setShowCalendar(true)}
+                        className="glass hover-lift gradient-button"
+                        style={{
+                            flex: 1, padding: 'clamp(12px, 1.8vh, 18px)', borderRadius: 'var(--radius-lg)',
+                            color: 'var(--text-primary)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            gap: '8px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
+                            background: `linear-gradient(135deg, ${selectedExercise.color}28, ${selectedExercise.gradient[0]}28)`,
+                            boxShadow: 'var(--shadow-md)'
+                        }}
+                    >
+                        <CalendarIcon size={18} />
+                        Calendrier
+                    </button>
 
-                {/* Session Button */}
-                <button
-                    onClick={() => { setShowSession(true); pauseCloudSync?.(); }}
-                    className="glass hover-lift gradient-button"
-                    style={{
-                        width: '100%', padding: 'clamp(12px, 1.8vh, 18px)', borderRadius: 'var(--radius-lg)',
-                        color: 'var(--text-primary)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        gap: '8px', fontSize: 'clamp(0.85rem, 1.8vh, 1.05rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
-                        background: 'linear-gradient(135deg, rgba(129,140,248,0.2), rgba(99,102,241,0.2))',
-                        boxShadow: 'var(--shadow-md)'
-                    }}
-                >
-                    <Play size={18} />
-                    Lancer une séance
-                </button>
+                    {/* Session Button */}
+                    <button
+                        onClick={() => { setShowSession(true); pauseCloudSync?.(); }}
+                        className="glass hover-lift gradient-button"
+                        style={{
+                            flex: 1, padding: 'clamp(12px, 1.8vh, 18px)', borderRadius: 'var(--radius-lg)',
+                            color: 'var(--text-primary)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            gap: '8px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
+                            background: 'linear-gradient(135deg, rgba(129,140,248,0.2), rgba(99,102,241,0.2))',
+                            boxShadow: 'var(--shadow-md)'
+                        }}
+                    >
+                        <Play size={18} />
+                        Séance
+                    </button>
+                </div>
 
                 {/* Modals */}
                 {showCalendar && (
