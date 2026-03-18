@@ -227,7 +227,8 @@ export function Dashboard({
                 <header className="glass" style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     padding: 'clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 20px)', borderRadius: 'var(--radius-lg)',
-                    boxShadow: 'var(--shadow-md)', minWidth: 0
+                    boxShadow: 'var(--shadow-md)', minWidth: 0,
+                    containerType: 'inline-size', containerName: 'header'
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
                         <img
