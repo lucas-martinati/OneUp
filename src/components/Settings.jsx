@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock } from 'lucide-react';
+import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge } from 'lucide-react';
 import { CloudSyncPanel } from './CloudSyncPanel';
 
 export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict }) {
@@ -261,6 +261,62 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                         onClick={handleToggleSounds}
                         activeGradient="linear-gradient(135deg, #0ea5e9, #0284c7)"
                     />
+                </SettingRow>
+            </div>
+
+            {/* ── Performance ──────────────────────────────────────────── */}
+            <div className="glass-premium" style={{
+                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                marginBottom: 'var(--spacing-md)',
+                background: 'var(--surface-section)'
+            }}>
+                <h3 style={sectionTitleStyle}>Performance</h3>
+
+                <SettingRow
+                    icon={Gauge}
+                    title="Mode graphique"
+                    description={
+                        settings.performanceMode === 'low'
+                            ? 'Effets visuels réduits'
+                            : 'Tous les effets activés'
+                    }
+                    color="#10b981"
+                    isLast={true}
+                >
+                    <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
+                        {[
+                            { value: 'low', label: 'Éco', color: '#f59e0b' },
+                            { value: 'high', label: 'Max', color: '#8b5cf6' }
+                        ].map(opt => (
+                            <button
+                                key={opt.value}
+                                onClick={() => {
+                                    const newSettings = { ...settings, performanceMode: opt.value };
+                                    onSave(newSettings);
+                                    showSavedIndicator();
+                                }}
+                                style={{
+                                    padding: '6px 16px',
+                                    borderRadius: '10px',
+                                    border: settings.performanceMode === opt.value
+                                        ? `2px solid ${opt.color}`
+                                        : '2px solid var(--border-subtle)',
+                                    background: settings.performanceMode === opt.value
+                                        ? `${opt.color}20`
+                                        : 'transparent',
+                                    color: settings.performanceMode === opt.value
+                                        ? opt.color
+                                        : 'var(--text-secondary)',
+                                    fontSize: '0.85rem',
+                                    fontWeight: '700',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease'
+                                }}
+                            >
+                                {opt.label}
+                            </button>
+                        ))}
+                    </div>
                 </SettingRow>
             </div>
 

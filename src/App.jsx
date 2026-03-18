@@ -50,6 +50,11 @@ function App() {
   // Cached user details for leaderboard
   const userDetailsCache = useUserDetailsCache(cloudSync);
 
+  // Apply performance mode on document root
+  useEffect(() => {
+    document.documentElement.setAttribute('data-perf', settings.performanceMode);
+  }, [settings.performanceMode]);
+
   // Reset sync state when user signs out or changes
   useEffect(() => {
     if (!googleAuth.isSignedIn) {

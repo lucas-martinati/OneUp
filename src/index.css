@@ -628,3 +628,66 @@ button:active {
     display: none !important;
   }
 }
+
+/* ── Low Performance Mode ────────────────────────────────────────────── */
+/* Disables expensive GPU effects for low-end devices (Redmi, etc.)     */
+
+[data-perf="low"] body::before {
+  animation: none !important;
+  opacity: 0.5;
+}
+
+[data-perf="low"] .glass {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--card-bg) !important;
+}
+
+[data-perf="low"] .glass-premium {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--card-bg) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+[data-perf="low"] .rainbow-gradient {
+  animation: none !important;
+  filter: none !important;
+}
+
+[data-perf="low"] .shimmer::after {
+  animation: none !important;
+  display: none !important;
+}
+
+[data-perf="low"] .gradient-button {
+  animation: none !important;
+}
+
+[data-perf="low"] .gradient-button::before {
+  display: none !important;
+}
+
+[data-perf="low"] .pulse-glow {
+  animation: none !important;
+}
+
+[data-perf="low"] .progress-ring-circle {
+  transition: none !important;
+}
+
+[data-perf="low"] .hover-lift {
+  transition: none !important;
+}
+
+[data-perf="low"] .hover-lift:hover {
+  transform: none !important;
+}
+
+[data-perf="low"] button {
+  transition: none !important;
+}
+
+[data-perf="low"] .ripple::after {
+  display: none !important;
+}

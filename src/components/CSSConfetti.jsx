@@ -5,15 +5,16 @@ import { useState, useEffect } from 'react';
  * Uses GPU-composited CSS animations.
  */
 
-const PARTICLE_COUNT = 80; // Augmenté pour un effet plus riche
+const PARTICLE_COUNT_HIGH = 80;
+const PARTICLE_COUNT_LOW = 20;
 const BASE_DURATION_MS = 2500; // Durée de base un peu plus longue pour la chute
 
 const rand = (min, max) => Math.random() * (max - min) + min;
 
 const SHAPES = ['circle', 'square', 'rectangle'];
 
-const generateParticles = (colors) =>
-    Array.from({ length: PARTICLE_COUNT }, (_, i) => {
+const generateParticles = (colors, count) =>
+    Array.from({ length: count }, (_, i) => {
         // Angle aléatoire sur 360°
         const angle = rand(0, 360);
         const rad = (angle * Math.PI) / 180;
@@ -94,9 +95,11 @@ const injectStyles = () => {
 export function CSSConfetti({
     active,
     colors = ['#fbbf24', '#8b5cf6', '#10b981', '#ec4899', '#3b82f6'],
-    onDone
+    onDone,
+    reducedParticles = false
 }) {
     const [particles, setParticles] = useState(null);
+    const particleCount = reducedParticles ? PARTICLE_COUNT_LOW : PARTICLE_COUNT_HIGH;
 
     useEffect(() => {
         if (!active) {
@@ -105,7 +108,7 @@ export function CSSConfetti({
         }
 
         injectStyles();
-        setParticles(generateParticles(colors));
+        setParticles(generateParticles(colors, particleCount));
 
         // Nettoyage après la durée maximale d'une particule
         const maxTimer = BASE_DURATION_MS + 800 + 150;

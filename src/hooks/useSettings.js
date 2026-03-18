@@ -8,7 +8,8 @@ const defaultSettings = {
   notificationTime: { hour: 9, minute: 0 }, // Default 9:00 AM
   leaderboardEnabled: false,
   leaderboardPseudo: '',
-  difficultyMultiplier: 1.0
+  difficultyMultiplier: 1.0,
+  performanceMode: 'high' // 'low' | 'high'
 };
 
 export function useSettings() {

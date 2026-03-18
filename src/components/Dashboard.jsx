@@ -210,6 +210,7 @@ export function Dashboard({
                 active={showDayConfetti}
                 colors={['#6d28d9', '#8b5cf6', '#0ea5e9', '#f093fb', '#fbbf24', '#10b981']}
                 onDone={() => setShowDayConfetti(false)}
+                reducedParticles={settings?.performanceMode === 'low'}
             />
             {newAchievement && (
                 <AchievementToast
