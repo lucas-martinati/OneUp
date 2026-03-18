@@ -22,14 +22,17 @@ function preloadSound(name, path) {
   return soundCache[name];
 }
 
+// Get the base URL configured in Vite (e.g. '/' or '/OneUp/')
+const baseUrl = import.meta.env.BASE_URL;
+
 // Preload all success sound variants
-preloadSound('success', '/sounds/success.mp3');      // Common - 95%
-preloadSound('poke', '/sounds/poke.mp3');            // For nudges
+preloadSound('success', `${baseUrl}sounds/success.mp3`);      // Common - 95%
+preloadSound('poke', `${baseUrl}sounds/poke.mp3`);            // For nudges
 
 // Delay loading of rare sounds to prevent network congestion/errors on startup
 setTimeout(() => {
-  preloadSound('perfect', '/sounds/perfect.mp3');      // Rare - 4.99%
-  preloadSound('yaaas', '/sounds/yaaas.mp3');          // Ultra Rare - 0.01%
+  preloadSound('perfect', `${baseUrl}sounds/perfect.mp3`);      // Rare - 4.99%
+  preloadSound('yaaas', `${baseUrl}sounds/yaaas.mp3`);          // Ultra Rare - 0.01%
 }, 3000);
 
 // Select success sound based on rarity
