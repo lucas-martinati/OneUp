@@ -4,7 +4,7 @@
 
 Built with **Vibe Coding**.
 
-## Features
+## 🚀 Features
 
 - **10 exercices** : Pompes, Squats, Tractions, Abdos, Jumping Jacks, Fentes, Burpees, Gainage (s), Dips, Climbers
 - **Objectifs progressifs** : Le nombre de reps augmente chaque jour pendant 365 jours
@@ -16,12 +16,12 @@ Built with **Vibe Coding**.
 - **Notifications** : Rappels quotidiens configurables
 - **Design dark premium** : Animations, confettis CSS, sons
 
-## Installer l'app sur Android
+## 📱 Installer l'app sur Android
 
 Vous pouvez télécharger l'application directement depuis le Google Play Store :
-https://play.google.com/store/apps/details?id=com.lucasm548.oneup&pcampaignid=web_share
+[Lien vers Google Play Store](https://play.google.com/store/apps/details?id=com.lucasm548.oneup&pcampaignid=web_share)
 
-## Installation (Développeur)
+## 🛠 Installation (Développeur)
 
 ### Prerequisites
 - Node.js
@@ -81,10 +81,32 @@ Pour activer la synchronisation cloud :
 npm run deploy
 ```
 
-## Built With
+## 🛠 Built With
 
 - **React 19 + Vite** - Framework web
 - **Capacitor** - Runtime natif cross-platform
 - **Firebase Realtime Database** - Cloud sync et authentification Google
 - **Recharts** - Graphiques (pie chart statistiques)
 - **Lucide React** - Icones
+
+---
+
+## ✍️ Auteur
+
+Ce projet a été conçu et développé par **[Lucas Martinati](https://github.com/lucas-martinati)**.
+N'hésitez pas à me suivre ou à me contacter pour toute question !
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! Si vous souhaitez améliorer **OneUp**, merci de :
+1. Fork le projet
+2. Créer une branche pour votre fonctionnalité (`git checkout -b feature/AmazingFeature`)
+3. Commit vos changements (`git commit -m 'Add some AmazingFeature'`)
+4. Push sur la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrir une **Pull Request**
+
+## 📄 Licence
+
+Ce projet est distribué sous la licence **MIT**. Cela signifie que vous pouvez l'utiliser librement, mais vous devez impérativement citer l'auteur original (**Lucas Martinati**) dans toute copie ou modification du code. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+Copyright (c) 2026 Lucas Martinati
