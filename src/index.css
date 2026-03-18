@@ -276,7 +276,6 @@ button:active {
 /* Animations */
 .fade-in {
   animation: fadeIn 0.5s ease-out;
-  will-change: opacity, transform;
 }
 
 @keyframes fadeIn {
@@ -293,7 +292,6 @@ button:active {
 
 .slide-up {
   animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: opacity, transform;
 }
 
 @keyframes slideUp {
@@ -656,8 +654,6 @@ button:active {
 [data-perf="low"] .glass-premium {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  background: var(--card-bg) !important;
-  box-shadow: var(--shadow-md) !important;
 }
 
 [data-perf="low"] .rainbow-gradient {

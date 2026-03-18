@@ -226,7 +226,7 @@ export function Dashboard({
                 {/* ── Header ── */}
                 <header className="glass" style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: 'clamp(10px, 1.5vh, 16px) clamp(10px, 2vw, 16px)', borderRadius: 'var(--radius-lg)',
+                    padding: 'clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 20px)', borderRadius: 'var(--radius-lg)',
                     boxShadow: 'var(--shadow-md)', minWidth: 0
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
@@ -238,15 +238,7 @@ export function Dashboard({
                         <span className="hide-text-mobile" style={{ fontWeight: '600', fontSize: 'clamp(0.8rem, 1.8vh, 1.1rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>OneUp</span>
                     </div>
 
-                    <div style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 1, minWidth: 0 }}>
-                        <button
-                            onClick={() => { setShowClan(true); pauseCloudSync?.(); }}
-                            title="Clan"
-                            className="glass hover-lift"
-                            style={{ padding: 'clamp(6px, 1.2vh, 8px)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', flexShrink: 0 }}
-                        >
-                            <Shield size="clamp(16px, 3.5vh, 20px)" />
-                        </button>
+                    <div style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 1, minWidth: 0, justifyContent: 'flex-end' }}>
                         <button onClick={() => setShowSettings(true)} className="hover-lift" style={iconBtnStyle}>
                             <SettingsIcon size={19} />
                         </button>
@@ -256,12 +248,20 @@ export function Dashboard({
                         <button onClick={() => setShowLeaderboard(true)} className="hover-lift" style={iconBtnStyle}>
                             <Users size={19} />
                         </button>
+                        <button
+                            onClick={() => { setShowClan(true); pauseCloudSync?.(); }}
+                            title="Clan"
+                            className="hover-lift"
+                            style={iconBtnStyle}
+                        >
+                            <Shield size={19} />
+                        </button>
 
                         {/* Global streak badge — Duolingo style: gray if not done today */}
-                        <div className="glass-premium" style={{
+                        <div style={{
                             background: streakActive
-                                ? 'linear-gradient(135deg, rgba(249,115,22,0.15), rgba(239,68,68,0.15))'
-                                : 'linear-gradient(135deg, rgba(120,120,120,0.12), rgba(90,90,90,0.12))',
+                                ? 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(239,68,68,0.22))'
+                                : 'linear-gradient(135deg, rgba(120,120,120,0.18), rgba(90,90,90,0.18))',
                             padding: 'clamp(4px, 0.7vh, 8px) clamp(8px, 1.2vw, 14px)', borderRadius: '16px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)',
                             display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '700',
                             border: streakActive ? '1px solid rgba(249,115,22,0.3)' : '1px solid rgba(120,120,120,0.25)',
@@ -273,10 +273,11 @@ export function Dashboard({
                         </div>
 
                         {/* Total reps badge */}
-                        <div className="glass-premium shimmer" style={{
-                            background: `linear-gradient(135deg, ${selectedExercise.color}22, ${selectedExercise.gradient[0]}22)`,
+                        <div className="shimmer" style={{
+                            background: `linear-gradient(135deg, ${selectedExercise.color}33, ${selectedExercise.gradient[0]}33)`,
                             padding: 'clamp(4px, 0.7vh, 8px) clamp(8px, 1.2vw, 14px)', borderRadius: '16px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)',
                             display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '600',
+                            border: '1px solid var(--border-strong)',
                             boxShadow: `0 2px 8px ${selectedExercise.color}33`, flexShrink: 0
                         }}>
                             <Trophy size={16} color={selectedExercise.color} />
@@ -494,7 +495,7 @@ export function Dashboard({
                     {/* Calendar Button */}
                     <button
                         onClick={() => setShowCalendar(true)}
-                        className="glass hover-lift gradient-button"
+                        className="hover-lift gradient-button"
                         style={{
                             flex: 1, padding: 'clamp(12px, 1.8vh, 18px)', borderRadius: 'var(--radius-lg)',
                             color: 'var(--text-primary)',
@@ -511,7 +512,7 @@ export function Dashboard({
                     {/* Session Button */}
                     <button
                         onClick={() => { setShowSession(true); pauseCloudSync?.(); }}
-                        className="glass hover-lift gradient-button"
+                        className="hover-lift gradient-button"
                         style={{
                             flex: 1, padding: 'clamp(12px, 1.8vh, 18px)', borderRadius: 'var(--radius-lg)',
                             color: 'var(--text-primary)',

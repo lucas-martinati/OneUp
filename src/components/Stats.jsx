@@ -148,7 +148,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     Statistiques
                 </h2>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                    <button onClick={onOpenAchievements} className="hover-lift glass" style={{
+                    <button onClick={onOpenAchievements} className="hover-lift" style={{
                         background: 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.1))', 
                         border: '1px solid rgba(251,191,36,0.3)', borderRadius: '12px',
                         padding: '8px 12px', display: 'flex', alignItems: 'center',
