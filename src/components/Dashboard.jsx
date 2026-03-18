@@ -396,7 +396,8 @@ export function Dashboard({
                                             border: isExerciseDone ? 'none' : `2.5px solid ${selectedExercise.color}`,
                                             display: 'flex', flexDirection: 'column',
                                             alignItems: 'center', justifyContent: 'center', gap: '1px',
-                                            transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                            transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                            willChange: 'transform',
                                             transform: isExerciseDone ? 'scale(1.1)' : 'scale(1)',
                                             boxShadow: isExerciseDone
                                                 ? `0 0 50px ${selectedExercise.color}aa, 0 8px 30px ${selectedExercise.color}55, 0 0 0 4px ${selectedExercise.color}33, inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.1)`
