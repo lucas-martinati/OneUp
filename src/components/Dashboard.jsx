@@ -84,17 +84,17 @@ export function Dashboard({
     const selectedExercise = useMemo(() => EXERCISES_MAP[selectedExerciseId], [selectedExerciseId]);
 
     // Goal = ceil(dayNumber * multiplier * difficultyMultiplier), minimum 1
-    const dailyGoal = useMemo(() => 
+    const dailyGoal = useMemo(() =>
         getDailyGoal(selectedExercise, dayNumber, settings?.difficultyMultiplier),
         [selectedExercise, dayNumber, settings?.difficultyMultiplier]
     );
 
     const currentCount = getExerciseCount(today, selectedExerciseId);
-    const isExerciseDone = useMemo(() => 
+    const isExerciseDone = useMemo(() =>
         completions[today]?.[selectedExerciseId]?.isCompleted || currentCount >= dailyGoal,
         [completions, today, selectedExerciseId, currentCount, dailyGoal]
     );
-    const isDayComplete = useMemo(() => 
+    const isDayComplete = useMemo(() =>
         isDayDoneFromCompletions(completions, today),
         [completions, today]
     );
@@ -231,7 +231,7 @@ export function Dashboard({
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
                         <img
-                            src={`${import.meta.env.BASE_URL}pwa-192x192.png`} alt="OneUp Logo"
+                            src={`${import.meta.env.BASE_URL}pwa-192x192.webp`} alt="OneUp Logo"
                             className="bounce-on-hover hide-logo-mobile"
                             style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', objectFit: 'cover', cursor: 'pointer', transition: 'transform 0.3s ease' }}
                         />
@@ -612,8 +612,8 @@ export function Dashboard({
                         />
                     )}
                     {showClan && (
-                        <ClanModal 
-                            onClose={() => { setShowClan(false); resumeCloudSync?.(); }} 
+                        <ClanModal
+                            onClose={() => { setShowClan(false); resumeCloudSync?.(); }}
                             cloudAuth={cloudAuth}
                             settings={settings}
                             updateSettings={updateSettings}
