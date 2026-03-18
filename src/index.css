@@ -220,9 +220,12 @@ button:active {
 }
 
 @keyframes rainbowFlow {
-  0%, 100% {
+
+  0%,
+  100% {
     filter: hue-rotate(0deg);
   }
+
   50% {
     filter: hue-rotate(45deg);
   }
@@ -324,7 +327,6 @@ button:active {
 .shimmer {
   position: relative;
   overflow: hidden;
-  will-change: transform;
 }
 
 .shimmer::after {
@@ -336,7 +338,6 @@ button:active {
   left: 0;
   background: linear-gradient(90deg, transparent, var(--shimmer-color), transparent);
   animation: shimmer 2s infinite;
-  will-change: transform;
 }
 
 @keyframes shimmer {
@@ -352,40 +353,45 @@ button:active {
 .pulse-glow {
   animation: pulseGlow 2s ease-in-out infinite;
   border-radius: 50%;
-  will-change: opacity, transform;
 }
 
 @keyframes pulseGlow {
-  0%, 100% {
-    opacity: 0.7;
-    transform: scale(0.98);
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
   }
+
   50% {
-    opacity: 1;
-    transform: scale(1.02);
+    filter: drop-shadow(0 0 16px rgba(139, 92, 246, 1));
   }
 }
 
-/* Redefining badgeHighlight using GPU-friendly properties */
+.pulse-glow {
+  animation: badgeHighlight 1.5s ease-in-out infinite;
+}
+
 @keyframes badgeHighlight {
-  0%, 100% {
-    opacity: 0.8;
-    transform: scale(0.98);
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px var(--badge-color, rgba(251, 191, 36, 0.5));
   }
+
   50% {
-    opacity: 1;
-    transform: scale(1.04);
+    box-shadow: 0 0 30px var(--badge-color, rgba(251, 191, 36, 0.8));
   }
 }
 
 @keyframes pulseGlowExercise {
-  0%, 100% {
-    opacity: 0.8;
-    transform: scale(0.98);
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px var(--exercise-glow-color, rgba(129, 140, 248, 0.3));
   }
+
   50% {
-    opacity: 1;
-    transform: scale(1.02);
+    box-shadow: 0 0 35px var(--exercise-glow-color, rgba(129, 140, 248, 0.5));
   }
 }
 
@@ -463,12 +469,13 @@ button:active {
 
 /* Hover lift effect */
 .hover-lift {
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   will-change: transform;
 }
 
 .hover-lift:hover {
   transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Gradient button */
@@ -481,9 +488,12 @@ button:active {
 }
 
 @keyframes gradientShift {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.9;
   }
+
   50% {
     opacity: 1;
   }
@@ -519,18 +529,15 @@ button:active {
 
 @keyframes successGlow {
   0% {
-    opacity: 1;
-    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
   }
 
-  50% {
-    opacity: 0.5;
-    transform: scale(1.05);
+  70% {
+    box-shadow: 0 0 0 12px rgba(16, 185, 129, 0);
   }
 
   100% {
-    opacity: 1;
-    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
 }
 
@@ -540,13 +547,14 @@ button:active {
 
 /* Exercise selector done effects */
 @keyframes doneGlow {
-  0%, 100% {
-    opacity: 0.85;
-    transform: scale(0.98);
+
+  0%,
+  100% {
+    box-shadow: 0 0 6px var(--done-color, rgba(16, 185, 129, 0.3)), inset 0 0 8px var(--done-color-dim, rgba(16, 185, 129, 0.06));
   }
+
   50% {
-    opacity: 1;
-    transform: scale(1.01);
+    box-shadow: 0 0 14px var(--done-color, rgba(16, 185, 129, 0.5)), inset 0 0 12px var(--done-color-dim, rgba(16, 185, 129, 0.1));
   }
 }
 
