@@ -29,7 +29,7 @@ const RechartsComponents = lazy(() => import('recharts').then(module => ({
                                     <Radar name="Reps" dataKey="reps" stroke="#10b981" fill="#34d399" fillOpacity={0.5} />
                                     <Tooltip contentStyle={{
                                         background: 'var(--tooltip-bg)', border: '1px solid var(--border-default)',
-                                        borderRadius: '8px', backdropFilter: 'blur(10px)'
+                                        borderRadius: '8px'
                                     }} itemStyle={{ color: '#10b981', fontWeight: '800' }} />
                                 </RadarChart>
                             </ResponsiveContainer>
@@ -63,7 +63,7 @@ const RechartsComponents = lazy(() => import('recharts').then(module => ({
                                         <Tooltip contentStyle={{
                                             background: 'var(--tooltip-bg)',
                                             border: '1px solid var(--border-default)',
-                                            borderRadius: '8px', backdropFilter: 'blur(10px)'
+                                            borderRadius: '8px'
                                         }} itemStyle={{ color: 'var(--text-primary)', fontWeight: '600' }} />
                                         <Legend verticalAlign="bottom" height={36} iconType="circle"
                                             wrapperStyle={{ fontSize: '0.8rem', fontWeight: '600' }} />
@@ -149,7 +149,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                 </h2>
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <button onClick={onOpenAchievements} className="hover-lift" style={{
-                        background: 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.1))', 
+                        background: 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.1))',
                         border: '1px solid rgba(251,191,36,0.3)', borderRadius: '12px',
                         padding: '8px 12px', display: 'flex', alignItems: 'center',
                         gap: '8px', color: '#fbbf24', cursor: 'pointer'
@@ -450,11 +450,11 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                         <div style={{ color: 'var(--text-secondary)' }}>Chargement des graphiques...</div>
                     </div>
                 }>
-                    <RechartsComponents 
-                        activeData={activeData} 
-                        radarData={radarData} 
-                        trackedCount={trackedCount} 
-                        globalTotalReps={globalTotalReps} 
+                    <RechartsComponents
+                        activeData={activeData}
+                        radarData={radarData}
+                        trackedCount={trackedCount}
+                        globalTotalReps={globalTotalReps}
                     />
                 </Suspense>
             ) : null}

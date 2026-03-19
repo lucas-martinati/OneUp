@@ -193,7 +193,7 @@ export function Achievements({ completions, exercises, onClose, highlightedBadge
                 onMouseLeave={handleEnd}
                 style={{
                     position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
-                    background: 'var(--sheet-bg)', backdropFilter: 'blur(20px)',
+                    background: 'var(--sheet-bg)',
                     borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
                     padding: '20px',
                     paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))',

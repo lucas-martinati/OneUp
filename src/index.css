@@ -645,16 +645,15 @@ button:active {
   opacity: 0.5;
 }
 
-[data-perf="low"] .glass {
+[data-perf="low"] * {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  background: var(--card-bg) !important;
 }
 
-[data-perf="low"] .glass-premium {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  background: var(--card-bg) !important;
+[data-perf="low"] .glass,
+[data-perf="low"] .glass-premium,
+[data-perf="low"] .pulse-glow {
+  background-color: var(--card-bg) !important;
 }
 
 [data-perf="low"] .rainbow-gradient {
