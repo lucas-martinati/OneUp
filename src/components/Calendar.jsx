@@ -82,16 +82,16 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
 
     return (
         <div
-            className="fade-in"
+            className="fade-in modal-overlay"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
-            style={{
-                position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-                background: 'var(--overlay-bg)', backdropFilter: 'blur(16px)', zIndex: 100,
-                display: 'flex', flexDirection: 'column', padding: 'var(--spacing-md)',
+            style={{ zIndex: 100 }}
+        >
+            <div className="modal-content" style={{
+                maxWidth: '640px', width: '100%', margin: '0 auto',
+                padding: 'var(--spacing-md)',
                 paddingTop: 'calc(var(--spacing-md) + env(safe-area-inset-top))',
-                paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))',
-                overflowY: 'auto'
+                paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))'
             }}>
             {/* Header */}
             <div style={{
@@ -215,23 +215,24 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
 
                             {/* Exercise dots */}
                             {!isFuture && !isBeforeStart && exercises && (
-                                <div style={{ display: 'flex', gap: '2px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', justifyContent: 'center' }}>
                                     {exercises.map(ex => {
                                         const exData = dayCompletions[ex.id];
                                         if (!exData?.isCompleted) return null;
                                         return (
                                             <div key={ex.id} style={{
-                                                width: '5px', height: '5px', borderRadius: '50%',
+                                                width: '7px', height: '7px', borderRadius: '50%',
                                                 background: ex.color,
-                                                boxShadow: `0 0 3px ${ex.color}88`
+                                                boxShadow: `0 0 4px ${ex.color}88`
                                             }} />
                                         );
                                     })}
                                     {/* Red dot if nothing done and not future */}
                                     {isMissed && (
                                         <div style={{
-                                            width: '5px', height: '5px', borderRadius: '50%',
-                                            background: '#ef4444'
+                                            width: '7px', height: '7px', borderRadius: '50%',
+                                            background: '#ef4444',
+                                            boxShadow: '0 0 4px rgba(239,68,68,0.5)'
                                         }} />
                                     )}
                                 </div>
@@ -275,6 +276,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                         <span style={{ color: 'var(--text-secondary)' }}>{ex.label}</span>
                     </div>
                 ))}
+            </div>
             </div>
         </div>
     );
@@ -455,6 +457,6 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
 
 const navBtnStyle = {
     color: 'var(--text-secondary)', background: 'var(--surface-muted)',
-    border: 'none', borderRadius: '50%', width: '40px', height: '40px',
+    border: 'none', borderRadius: '50%', width: 'var(--touch-min)', height: 'var(--touch-min)',
     display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
 };

@@ -335,9 +335,9 @@ export function Dashboard({
                             </div>
 
                             {/* ── Exercise Selector ── */}
-                            <div style={{
+                            <div className="exercise-grid" style={{
                                 display: 'flex', flexWrap: 'wrap', justifyContent: 'center',
-                                gap: 'clamp(6px, 1.2vw, 10px)', width: '100%', maxWidth: '600px',
+                                gap: 'clamp(6px, 1.2vw, 10px)', width: '100%', maxWidth: '640px',
                                 padding: '2px'
                             }}>
                                 {EXERCISES.map(ex => (
@@ -655,10 +655,12 @@ const ExerciseButton = React.memo(({
             style={{
                 flex: '1 1 calc(33.333% - 10px)',
                 minWidth: 'clamp(70px, 20vw, 100px)',
-                maxWidth: '120px',
+                maxWidth: '130px',
                 display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: 'clamp(2px, 0.4vh, 4px)',
-                padding: 'clamp(6px, 1vh, 10px) clamp(4px, 0.8vw, 8px)', borderRadius: 'var(--radius-md)',
+                alignItems: 'center', gap: 'clamp(3px, 0.5vh, 6px)',
+                padding: 'clamp(8px, 1.2vh, 12px) clamp(6px, 1vw, 10px)',
+                borderRadius: 'var(--radius-md)',
+                minHeight: 'var(--touch-min)',
                 background: exDone
                     ? `linear-gradient(135deg, ${ex.color}20, ${ex.gradient[1]}18)`
                     : isActive
@@ -731,9 +733,9 @@ const ExerciseButton = React.memo(({
     );
 });
 
-// Shared icon button style
+// Shared icon button style — 44px min touch target
 const iconBtnStyle = {
-    background: 'var(--surface-hover)', width: '38px', height: '38px',
+    background: 'var(--surface-hover)', width: 'var(--touch-min)', height: 'var(--touch-min)',
     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
     color: 'var(--text-primary)', border: 'none', cursor: 'pointer', flexShrink: 0
 };

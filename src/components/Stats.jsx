@@ -131,20 +131,19 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
     };
 
     return (
-        <div className="fade-in" style={{
-            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'var(--overlay-bg)', backdropFilter: 'blur(16px)', zIndex: 110,
-            display: 'flex', flexDirection: 'column', padding: 'var(--spacing-md)',
-            paddingTop: 'calc(var(--spacing-md) + env(safe-area-inset-top))',
-            paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))',
-            overflowY: 'auto'
-        }}>
+        <div className="fade-in modal-overlay" style={{ zIndex: 110 }}>
+            <div className="modal-content" style={{
+                maxWidth: '640px', width: '100%', margin: '0 auto',
+                padding: 'var(--spacing-md)',
+                paddingTop: 'calc(var(--spacing-md) + env(safe-area-inset-top))',
+                paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))'
+            }}>
             {/* ── Header ──────────────────────────────────────────────── */}
             <div style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 marginBottom: 'var(--spacing-md)'
             }}>
-                <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
+                <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: '800' }}>
                     Statistiques
                 </h2>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -152,7 +151,8 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                         background: 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.1))',
                         border: '1px solid rgba(251,191,36,0.3)', borderRadius: '12px',
                         padding: '8px 12px', display: 'flex', alignItems: 'center',
-                        gap: '8px', color: '#fbbf24', cursor: 'pointer'
+                        gap: '8px', color: '#fbbf24', cursor: 'pointer',
+                        minHeight: 'var(--touch-min)'
                     }}>
                         <Award size={18} />
                         <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>
@@ -161,7 +161,8 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     </button>
                     <button onClick={onClose} className="hover-lift glass" style={{
                         background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-                        width: '40px', height: '40px', display: 'flex', alignItems: 'center',
+                        width: 'var(--touch-min)', height: 'var(--touch-min)',
+                        display: 'flex', alignItems: 'center',
                         justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
                     }}>
                         <X size={22} />
@@ -582,6 +583,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     Montre-toi chaque jour, un pas à la fois !
                 </p>
             </div>
+            </div>
         </div>
     );
 }
@@ -594,12 +596,12 @@ const statCardStyle = (bg1, bg2) => ({
 });
 
 const statLabelStyle = {
-    fontSize: '0.65rem', color: 'var(--text-secondary)',
-    textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '3px'
+    fontSize: 'clamp(0.6rem, 1.5vw, 0.7rem)', color: 'var(--text-secondary)',
+    textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '4px'
 };
 
 const statLabelSmallStyle = {
-    fontSize: '0.55rem', color: 'var(--text-secondary)',
+    fontSize: 'clamp(0.5rem, 1.2vw, 0.6rem)', color: 'var(--text-secondary)',
     textTransform: 'uppercase', letterSpacing: '0.3px', marginTop: '2px'
 };
 

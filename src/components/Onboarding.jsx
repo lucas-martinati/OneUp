@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Calendar, ArrowRight, Zap, Target, Dumbbell, ArrowDownUp, ArrowUp, ChevronsUp, Footprints } from 'lucide-react';
+import { Calendar, ArrowRight, Zap, Target, Dumbbell, ArrowDownUp, ArrowUp, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal } from 'lucide-react';
 import { getLocalDateStr } from '../utils/dateUtils';
 import { EXERCISES } from '../config/exercises';
 
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
+const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
 
 export function Onboarding({ onStart }) {
     const [step, setStep] = useState(1);
@@ -40,14 +40,14 @@ export function Onboarding({ onStart }) {
             justifyContent: 'center',
             height: '100%',
             textAlign: 'center',
-            gap: 'var(--spacing-xl)',
+            gap: 'clamp(16px, 3vh, 32px)',
             padding: 'var(--spacing-md)'
         }}>
             {/* Title */}
-            <div style={{ maxWidth: '320px' }}>
+            <div style={{ maxWidth: '380px' }}>
                 <h1 className="rainbow-gradient" style={{
-                    fontSize: '3rem',
-                    marginBottom: 'var(--spacing-sm)',
+                    fontSize: 'clamp(2.4rem, 7vw, 3.5rem)',
+                    marginBottom: 'var(--spacing-xs)',
                     fontWeight: '800',
                     letterSpacing: '-1px'
                 }}>
@@ -59,18 +59,23 @@ export function Onboarding({ onStart }) {
                     justifyContent: 'center',
                     gap: '8px',
                     color: 'var(--text-secondary)',
-                    fontSize: '1rem',
+                    fontSize: 'clamp(0.85rem, 2.2vw, 1.05rem)',
                     fontWeight: '500'
                 }}>
                     {step === 1 ? (
                         <>
                             <Target size={18} color="#8b5cf6" />
-                            <span>The Concept</span>
+                            <span>Le Concept</span>
+                        </>
+                    ) : step === 2 ? (
+                        <>
+                            <Zap size={18} color="#f59e0b" />
+                            <span>Ton Parcours</span>
                         </>
                     ) : (
                         <>
-                            <Zap size={18} color="#f59e0b" />
-                            <span>Your Journey</span>
+                            <Dumbbell size={18} color="#10b981" />
+                            <span>Tes Exercices</span>
                         </>
                     )}
                 </div>
@@ -81,14 +86,14 @@ export function Onboarding({ onStart }) {
                 key={step}
                 className={step === 1 ? "glass-premium scale-in" : "glass-premium flip-enter"}
                 style={{
-                    padding: 'var(--spacing-lg)',
+                    padding: 'clamp(16px, 3vw, 28px)',
                     borderRadius: 'var(--radius-xl)',
                     width: '100%',
-                    maxWidth: '340px',
+                    maxWidth: '400px',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 'var(--spacing-md)',
-                    minHeight: '280px',
+                    minHeight: 'clamp(240px, 40vh, 320px)',
                     justifyContent: 'center',
                     boxShadow: 'var(--shadow-lg)'
                 }}
@@ -98,7 +103,7 @@ export function Onboarding({ onStart }) {
                         {/* Step 1: Concept */}
                         <div style={{
                             textAlign: 'left',
-                            fontSize: '1rem',
+                            fontSize: 'clamp(0.9rem, 2.5vw, 1.05rem)',
                             lineHeight: '1.7',
                             color: 'var(--text-primary)'
                         }}>
@@ -110,22 +115,22 @@ export function Onboarding({ onStart }) {
                                 borderLeft: '3px solid var(--accent)'
                             }}>
                                 <p style={{ marginBottom: '8px' }}>
-                                    <strong style={{ color: '#8b5cf6' }}>Day 1</strong> = 1 Pushup
+                                    <strong style={{ color: '#8b5cf6' }}>Jour 1</strong> = 1 Pompe
                                 </p>
                                 <p>
-                                    <strong style={{ color: '#f093fb' }}>Day 365</strong> = 365 Pushups
+                                    <strong style={{ color: '#f093fb' }}>Jour 365</strong> = 365 Pompes
                                 </p>
                             </div>
                             <p style={{ color: 'var(--text-secondary)' }}>
-                                Build <strong style={{ color: 'var(--text-primary)' }}>unstoppable discipline</strong> with small, incremental progress every single day.
+                                D&eacute;veloppe une <strong style={{ color: 'var(--text-primary)' }}>discipline in&eacute;branlable</strong> avec une progression quotidienne.
                             </p>
                             <p style={{
                                 marginTop: 'var(--spacing-sm)',
-                                fontSize: '0.9rem',
+                                fontSize: 'clamp(0.8rem, 2vw, 0.95rem)',
                                 fontStyle: 'italic',
                                 color: '#8b5cf6'
                             }}>
-                                💪 Consistency is your superpower.
+                                💪 La constance est ton superpouvoir.
                             </p>
                         </div>
                         <button
@@ -134,17 +139,18 @@ export function Onboarding({ onStart }) {
                             style={{
                                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                 color: 'white',
-                                padding: 'var(--spacing-sm) var(--spacing-md)',
+                                padding: 'clamp(12px, 2vh, 16px) var(--spacing-md)',
                                 borderRadius: 'var(--radius-lg)',
                                 fontWeight: '600',
-                                fontSize: '1.05rem',
-                                marginTop: 'var(--spacing-sm)',
+                                fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
+                                marginTop: 'var(--spacing-xs)',
                                 border: 'none',
                                 cursor: 'pointer',
-                                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)'
+                                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)',
+                                minHeight: 'var(--touch-min)'
                             }}
                         >
-                            Let's Begin
+                            C&apos;est parti !
                         </button>
                     </>
                 ) : step === 2 ? (
@@ -152,23 +158,23 @@ export function Onboarding({ onStart }) {
                         {/* Step 2: Start Date */}
                         <div style={{ textAlign: 'left' }}>
                             <label style={{
-                                fontSize: '1rem',
+                                fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
                                 color: 'var(--text-primary)',
                                 fontWeight: '600',
                                 marginBottom: 'var(--spacing-xs)',
                                 display: 'block'
                             }}>
-                                📅 When did you start?
+                                📅 Quand as-tu commenc&eacute; ?
                             </label>
                             <p style={{
-                                fontSize: '0.85rem',
+                                fontSize: 'clamp(0.8rem, 2vw, 0.9rem)',
                                 color: 'var(--text-secondary)',
                                 marginBottom: 'var(--spacing-md)',
                                 lineHeight: '1.5'
                             }}>
-                                We'll auto-complete previous days for you<br />
+                                On compl&egrave;tera les jours pr&eacute;c&eacute;dents pour toi<br />
                                 <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>
-                                    (limited to {currentYear} only)
+                                    (limit&eacute; &agrave; {currentYear})
                                 </span>
                             </p>
 
@@ -181,9 +187,10 @@ export function Onboarding({ onStart }) {
                                 borderRadius: 'var(--radius-lg)',
                                 border: '2px solid rgba(139, 92, 246, 0.3)',
                                 transition: 'all 0.3s ease',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                minHeight: 'var(--touch-min)'
                             }}>
-                                <Calendar size={22} style={{ color: '#8b5cf6', marginRight: '12px' }} />
+                                <Calendar size={22} style={{ color: '#8b5cf6', marginRight: '12px', flexShrink: 0 }} />
                                 <input
                                     type="date"
                                     value={date}
@@ -193,8 +200,8 @@ export function Onboarding({ onStart }) {
                                     style={{
                                         background: 'transparent',
                                         border: 'none',
-                                        color: 'white',
-                                        fontSize: '1.05rem',
+                                        color: 'var(--text-primary)',
+                                        fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
                                         fontFamily: 'inherit',
                                         fontWeight: '600',
                                         width: '100%',
@@ -207,7 +214,7 @@ export function Onboarding({ onStart }) {
                         </div>
 
                         {/* Navigation Buttons */}
-                        <div style={{ display: 'flex', gap: '12px', marginTop: 'var(--spacing-sm)' }}>
+                        <div style={{ display: 'flex', gap: '10px', marginTop: 'var(--spacing-sm)' }}>
                             <button
                                 onClick={() => setStep(1)}
                                 className="hover-lift"
@@ -215,15 +222,17 @@ export function Onboarding({ onStart }) {
                                     flex: 1,
                                     background: 'rgba(255,255,255,0.08)',
                                     color: 'var(--text-secondary)',
-                                    padding: 'var(--spacing-sm)',
+                                    padding: 'clamp(10px, 1.5vh, 14px)',
                                     borderRadius: 'var(--radius-lg)',
                                     fontWeight: '600',
                                     border: '1px solid rgba(255,255,255,0.1)',
                                     cursor: 'pointer',
-                                    transition: 'all 0.3s ease'
+                                    transition: 'all 0.3s ease',
+                                    minHeight: 'var(--touch-min)',
+                                    fontSize: 'clamp(0.85rem, 2.2vw, 1rem)'
                                 }}
                             >
-                                Back
+                                Retour
                             </button>
                             <button
                                 onClick={() => {
@@ -238,10 +247,10 @@ export function Onboarding({ onStart }) {
                                     flex: 2,
                                     background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
                                     color: 'white',
-                                    padding: 'var(--spacing-sm) var(--spacing-md)',
+                                    padding: 'clamp(10px, 1.5vh, 14px) var(--spacing-md)',
                                     borderRadius: 'var(--radius-lg)',
                                     fontWeight: '700',
-                                    fontSize: '1.1rem',
+                                    fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -249,10 +258,11 @@ export function Onboarding({ onStart }) {
                                     boxShadow: '0 6px 24px rgba(245, 87, 108, 0.5)',
                                     border: 'none',
                                     cursor: 'pointer',
-                                    transition: 'all 0.3s ease'
+                                    transition: 'all 0.3s ease',
+                                    minHeight: 'var(--touch-min)'
                                 }}
                             >
-                                {date < todayStr ? 'Next' : 'Start Challenge'}
+                                {date < todayStr ? 'Suivant' : 'Lancer le D&eacute;fi'}
                                 <ArrowRight size={20} strokeWidth={3} />
                             </button>
                         </div>
@@ -262,23 +272,23 @@ export function Onboarding({ onStart }) {
                         {/* Step 3: Exercise Selection (only if past date) */}
                         <div style={{ textAlign: 'left' }}>
                             <label style={{
-                                fontSize: '1rem',
+                                fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
                                 color: 'var(--text-primary)',
                                 fontWeight: '600',
                                 marginBottom: 'var(--spacing-xs)',
                                 display: 'block'
                             }}>
-                                🎯 Which exercises to validate?
+                                🎯 Quels exercices valider ?
                             </label>
                             <p style={{
-                                fontSize: '0.85rem',
+                                fontSize: 'clamp(0.8rem, 2vw, 0.9rem)',
                                 color: 'var(--text-secondary)',
                                 marginBottom: 'var(--spacing-md)',
                                 lineHeight: '1.5'
                             }}>
-                                Select the exercises to auto-complete for past days<br />
+                                S&eacute;lectionne les exercices &agrave; compl&eacute;ter pour les jours pass&eacute;s<br />
                                 <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>
-                                    (choose at least one)
+                                    (choisis au moins un)
                                 </span>
                             </p>
 
@@ -286,8 +296,10 @@ export function Onboarding({ onStart }) {
                             <div style={{
                                 display: 'grid',
                                 gridTemplateColumns: 'repeat(2, 1fr)',
-                                gap: '10px',
-                                marginBottom: 'var(--spacing-sm)'
+                                gap: 'clamp(8px, 1.5vw, 12px)',
+                                marginBottom: 'var(--spacing-sm)',
+                                maxHeight: '40vh',
+                                overflowY: 'auto'
                             }}>
                                 {EXERCISES.map(ex => {
                                     const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
@@ -300,8 +312,8 @@ export function Onboarding({ onStart }) {
                                             style={{
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                gap: '10px',
-                                                padding: '12px',
+                                                gap: '8px',
+                                                padding: 'clamp(8px, 1.5vh, 12px)',
                                                 background: isSelected
                                                     ? `${ex.color}22`
                                                     : 'rgba(255,255,255,0.05)',
@@ -309,24 +321,26 @@ export function Onboarding({ onStart }) {
                                                 borderRadius: 'var(--radius-md)',
                                                 cursor: 'pointer',
                                                 transition: 'all 0.2s ease',
-                                                opacity: 1
+                                                opacity: 1,
+                                                minHeight: 'var(--touch-min)'
                                             }}
                                         >
                                             <div style={{
-                                                width: '36px',
-                                                height: '36px',
+                                                width: '32px',
+                                                height: '32px',
                                                 borderRadius: '50%',
                                                 background: `${ex.color}33`,
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                justifyContent: 'center'
+                                                justifyContent: 'center',
+                                                flexShrink: 0
                                             }}>
-                                                <ExIcon size={18} color={ex.color} />
+                                                <ExIcon size={16} color={ex.color} />
                                             </div>
                                             <span style={{
                                                 color: isSelected ? ex.color : 'var(--text-primary)',
                                                 fontWeight: '600',
-                                                fontSize: '0.9rem'
+                                                fontSize: 'clamp(0.75rem, 2vw, 0.9rem)'
                                             }}>
                                                 {ex.label}
                                             </span>
@@ -337,7 +351,7 @@ export function Onboarding({ onStart }) {
                         </div>
 
                         {/* Navigation Buttons */}
-                        <div style={{ display: 'flex', gap: '12px', marginTop: 'var(--spacing-sm)' }}>
+                        <div style={{ display: 'flex', gap: '10px', marginTop: 'var(--spacing-sm)' }}>
                             <button
                                 onClick={() => setStep(2)}
                                 className="hover-lift"
@@ -345,15 +359,17 @@ export function Onboarding({ onStart }) {
                                     flex: 1,
                                     background: 'rgba(255,255,255,0.08)',
                                     color: 'var(--text-secondary)',
-                                    padding: 'var(--spacing-sm)',
+                                    padding: 'clamp(10px, 1.5vh, 14px)',
                                     borderRadius: 'var(--radius-lg)',
                                     fontWeight: '600',
                                     border: '1px solid rgba(255,255,255,0.1)',
                                     cursor: 'pointer',
-                                    transition: 'all 0.3s ease'
+                                    transition: 'all 0.3s ease',
+                                    minHeight: 'var(--touch-min)',
+                                    fontSize: 'clamp(0.85rem, 2.2vw, 1rem)'
                                 }}
                             >
-                                Back
+                                Retour
                             </button>
                             <button
                                 onClick={handleStart}
@@ -365,10 +381,10 @@ export function Onboarding({ onStart }) {
                                         ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
                                         : 'rgba(255,255,255,0.1)',
                                     color: selectedExercises.length > 0 ? 'white' : 'var(--text-secondary)',
-                                    padding: 'var(--spacing-sm) var(--spacing-md)',
+                                    padding: 'clamp(10px, 1.5vh, 14px) var(--spacing-md)',
                                     borderRadius: 'var(--radius-lg)',
                                     fontWeight: '700',
-                                    fontSize: '1.1rem',
+                                    fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -376,10 +392,11 @@ export function Onboarding({ onStart }) {
                                     boxShadow: selectedExercises.length > 0 ? '0 6px 24px rgba(245, 87, 108, 0.5)' : 'none',
                                     border: 'none',
                                     cursor: selectedExercises.length > 0 ? 'pointer' : 'not-allowed',
-                                    transition: 'all 0.3s ease'
+                                    transition: 'all 0.3s ease',
+                                    minHeight: 'var(--touch-min)'
                                 }}
                             >
-                                Start Challenge
+                                Lancer le D&eacute;fi
                                 <ArrowRight size={20} strokeWidth={3} />
                             </button>
                         </div>
@@ -393,33 +410,19 @@ export function Onboarding({ onStart }) {
                 gap: '8px',
                 justifyContent: 'center'
             }}>
-                <div style={{
-                    width: step === 1 ? '24px' : '8px',
-                    height: '8px',
-                    borderRadius: '4px',
-                    background: step === 1
-                        ? 'linear-gradient(90deg, #667eea, #764ba2)'
-                        : 'rgba(255,255,255,0.2)',
-                    transition: 'all 0.3s ease'
-                }} />
-                <div style={{
-                    width: step >= 2 ? '24px' : '8px',
-                    height: '8px',
-                    borderRadius: '4px',
-                    background: step >= 2
-                        ? 'linear-gradient(90deg, #f093fb, #f5576c)'
-                        : 'rgba(255,255,255,0.2)',
-                    transition: 'all 0.3s ease'
-                }} />
-                <div style={{
-                    width: step === 3 ? '24px' : '8px',
-                    height: '8px',
-                    borderRadius: '4px',
-                    background: step === 3
-                        ? 'linear-gradient(90deg, #10b981, #34d399)'
-                        : 'rgba(255,255,255,0.2)',
-                    transition: 'all 0.3s ease'
-                }} />
+                {[1, 2, 3].map(s => (
+                    <div key={s} style={{
+                        width: step === s ? '24px' : '8px',
+                        height: '8px',
+                        borderRadius: '4px',
+                        background: step === s
+                            ? s === 1 ? 'linear-gradient(90deg, #667eea, #764ba2)'
+                              : s === 2 ? 'linear-gradient(90deg, #f093fb, #f5576c)'
+                              : 'linear-gradient(90deg, #10b981, #34d399)'
+                            : 'rgba(255,255,255,0.2)',
+                        transition: 'all 0.3s ease'
+                    }} />
+                ))}
             </div>
         </div>
     );

@@ -45,8 +45,9 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
     const ToggleSwitch = ({ enabled, onClick, activeGradient }) => (
         <button
             onClick={onClick}
+            aria-label={enabled ? 'Désactiver' : 'Activer'}
             style={{
-                width: '52px',
+                width: '50px',
                 height: '28px',
                 borderRadius: '14px',
                 background: enabled ? activeGradient : 'var(--surface-hover)',
@@ -62,12 +63,12 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
             }}
         >
             <div style={{
-                width: '20px',
-                height: '20px',
+                width: '22px',
+                height: '22px',
                 borderRadius: '50%',
                 background: 'white',
                 position: 'absolute',
-                left: enabled ? 'calc(100% - 24px)' : '4px',
+                left: enabled ? 'calc(100% - 26px)' : '4px',
                 transition: 'left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
             }} />
@@ -113,23 +114,22 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
     };
 
     return (
-        <div className="fade-in" style={{
-            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'var(--overlay-bg)', backdropFilter: 'blur(16px)', zIndex: 110,
-            display: 'flex', flexDirection: 'column', padding: 'var(--spacing-md)',
-            paddingTop: 'calc(var(--spacing-md) + env(safe-area-inset-top))',
-            paddingBottom: 'calc(var(--spacing-md) + env(safe-area-inset-bottom))',
-            overflowY: 'auto'
-        }}>
+        <div className="fade-in modal-overlay" style={{ zIndex: 110 }}>
+            <div className="modal-content" style={{
+                maxWidth: '600px', width: '100%', margin: '0 auto',
+                padding: 'var(--spacing-md)',
+                paddingTop: 'calc(var(--spacing-md) + env(safe-area-inset-top))',
+                paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))'
+            }}>
             {/* ── Header ──────────────────────────────────────────────── */}
             <div style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 marginBottom: 'var(--spacing-md)'
             }}>
-                <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
+                <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: '800' }}>
                     Paramètres
                 </h2>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     {/* Auto-save indicator */}
                     {showSaved && (
                         <div className="scale-in" style={{
@@ -150,7 +150,8 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                     )}
                     <button onClick={onClose} className="hover-lift glass" style={{
                         background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-                        width: '40px', height: '40px', display: 'flex', alignItems: 'center',
+                        width: 'var(--touch-min)', height: 'var(--touch-min)',
+                        display: 'flex', alignItems: 'center',
                         justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
                     }}>
                         <X size={22} />
@@ -310,7 +311,8 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                                     fontSize: '0.85rem',
                                     fontWeight: '700',
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s ease'
+                                    transition: 'all 0.2s ease',
+                                    minHeight: 'var(--touch-min)'
                                 }}
                             >
                                 {opt.label}
@@ -497,6 +499,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                         />
                     </div>
                 )}
+            </div>
             </div>
         </div>
     );

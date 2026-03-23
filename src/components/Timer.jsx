@@ -95,10 +95,8 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
             colors={exerciseConfig?.confettiColors || ['#8b5cf6', '#a78bfa', '#ffffff']}
             onDone={() => setShowConfetti(false)}
         />
-        <div className="fade-in" style={{
-            position: 'fixed', inset: 0,
-            background: 'rgba(0, 0, 0, 0.98)',
-            zIndex: 1000, display: 'flex', flexDirection: 'column',
+        <div className="fade-in modal-overlay" style={{
+            zIndex: 1000,
             padding: 'var(--spacing-sm)',
             paddingTop: 'calc(var(--spacing-sm) + env(safe-area-inset-top))',
             paddingBottom: 'calc(var(--spacing-sm) + env(safe-area-inset-bottom))'
@@ -107,13 +105,13 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-lg)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{
-                        width: '36px', height: '36px', borderRadius: '50%',
+                        width: 'var(--touch-min)', height: 'var(--touch-min)', borderRadius: '50%',
                         background: `${activeColor}22`, border: `1.5px solid ${activeColor}55`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
-                        <ExIcon size={18} color={activeColor} />
+                        <ExIcon size={20} color={activeColor} />
                     </div>
-                    <h2 style={{ fontSize: '1.4rem', fontWeight: '700', color: activeColor, margin: 0 }}>
+                    <h2 style={{ fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', fontWeight: '700', color: activeColor, margin: 0 }}>
                         {exerciseLabel}
                     </h2>
                 </div>
@@ -122,7 +120,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                     onClick={onClose}
                     className="glass hover-lift"
                     style={{
-                        width: '36px', height: '36px', borderRadius: '50%',
+                        width: 'var(--touch-min)', height: 'var(--touch-min)', borderRadius: '50%',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         background: 'rgba(255,255,255,0.08)', border: 'none',
                         color: 'var(--text-secondary)', cursor: 'pointer'
@@ -137,13 +135,14 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                         onClick={onNext}
                         className="hover-lift"
                         style={{
-                            padding: '6px 14px', borderRadius: '20px',
+                            padding: '8px 16px', borderRadius: '20px',
                             background: `${activeColor}20`,
                             border: `1px solid ${activeColor}40`,
                             color: activeColor,
-                            fontSize: '0.8rem', fontWeight: '600',
+                            fontSize: '0.85rem', fontWeight: '600',
                             display: 'flex', alignItems: 'center', gap: '4px',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            minHeight: 'var(--touch-min)'
                         }}
                     >
                         Suivant <ChevronRight size={16} />
@@ -153,10 +152,19 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
             </div>
 
             {/* Main Content */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 'var(--spacing-lg)' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 'clamp(16px, 2.5vh, 28px)' }}>
                 {/* Progress Circle & Time Display */}
                 <div style={{ position: 'relative', textAlign: 'center' }}>
-                    <svg width="240" height="240" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                    <svg
+                        viewBox="0 0 240 240"
+                        overflow="visible"
+                        style={{
+                            position: 'absolute', top: '50%', left: '50%',
+                            width: 'clamp(200px, 35vh, 280px)',
+                            height: 'clamp(200px, 35vh, 280px)',
+                            transform: 'translate(-50%, -50%)'
+                        }}
+                    >
                         <circle cx="120" cy="120" r="110" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
                         <circle
                             cx="120" cy="120" r="110" fill="none"
@@ -180,19 +188,20 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                     </svg>
 
                     <div style={{
-                        width: '240px', height: '240px',
+                        width: 'clamp(200px, 35vh, 280px)',
+                        height: 'clamp(200px, 35vh, 280px)',
                         display: 'flex', flexDirection: 'column',
                         alignItems: 'center', justifyContent: 'center'
                     }}>
                         <div style={{
-                            fontSize: '4.5rem', fontWeight: '800',
+                            fontSize: 'clamp(4rem, 12vw, 6rem)', fontWeight: '800',
                             color: isCompleted ? activeColor : 'var(--text-primary)',
                             lineHeight: 1, transition: 'color 0.3s ease',
                             fontVariantNumeric: 'tabular-nums'
                         }}>
                             {formatTime(displayCount)}
                         </div>
-                        <div style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
+                        <div style={{ fontSize: 'clamp(1rem, 3vw, 1.3rem)', color: 'var(--text-secondary)', marginTop: '8px' }}>
                             / {formatTime(dailyGoal)}
                         </div>
                     </div>
@@ -227,7 +236,9 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                         onClick={() => setIsRunning(!isRunning)}
                         className="glass hover-lift ripple"
                         style={{
-                            width: '80px', height: '80px', borderRadius: '50%',
+                            width: 'clamp(72px, 12vh, 90px)',
+                            height: 'clamp(72px, 12vh, 90px)',
+                            borderRadius: '50%',
                             background: `linear-gradient(135deg, ${activeColor}44, ${gradEnd}44)`,
                             border: `2px solid ${activeColor}`,
                             color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -239,29 +250,39 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                 )}
 
                 {/* Actions */}
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: 'var(--spacing-md)' }}>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center', marginTop: 'var(--spacing-md)' }}>
                     <button
                         onClick={handleReset} className="glass hover-lift" disabled={displayCount === 0}
                         style={{
-                            padding: '12px 24px', borderRadius: 'var(--radius-lg)',
+                            padding: 'clamp(10px, 1.5vh, 14px) clamp(16px, 3vw, 24px)',
+                            borderRadius: 'var(--radius-lg)',
                             background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)',
-                            color: displayCount === 0 ? 'var(--text-secondary)' : '#ef4444',
-                            fontSize: '0.95rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px',
-                            cursor: displayCount === 0 ? 'not-allowed' : 'pointer', opacity: displayCount === 0 ? 0.5 : 1
+                            color: displayCount === 0 ? 'var(--text-secondary)' : 'var(--error)',
+                            fontSize: 'clamp(0.85rem, 2.2vw, 1rem)', fontWeight: '600',
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            cursor: displayCount === 0 ? 'not-allowed' : 'pointer',
+                            opacity: displayCount === 0 ? 0.5 : 1,
+                            minHeight: 'var(--touch-min)'
                         }}
                     >
                         <RotateCcw size={18} /> RAZ
                     </button>
 
                     <button
-                        onClick={handleCompleteAll} className={`glass hover-lift${completeFlash ? ' complete-flash success-glow' : ''}`} disabled={isCompleted}
+                        onClick={handleCompleteAll}
+                        className={`glass hover-lift${completeFlash ? ' complete-flash success-glow' : ''}`}
+                        disabled={isCompleted}
                         style={{
-                            padding: '12px 24px', borderRadius: 'var(--radius-lg)',
+                            padding: 'clamp(10px, 1.5vh, 14px) clamp(16px, 3vw, 24px)',
+                            borderRadius: 'var(--radius-lg)',
                             background: isCompleted ? `linear-gradient(135deg, ${activeColor}33, ${gradEnd}33)` : `linear-gradient(135deg, ${activeColor}22, ${gradEnd}22)`,
                             border: `1px solid ${isCompleted ? activeColor + '66' : activeColor + '44'}`,
                             color: isCompleted ? activeColor : 'var(--text-primary)',
-                            fontSize: '0.95rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px',
-                            cursor: isCompleted ? 'not-allowed' : 'pointer', opacity: isCompleted ? 0.6 : 1, transition: 'all 0.3s ease'
+                            fontSize: 'clamp(0.85rem, 2.2vw, 1rem)', fontWeight: '600',
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            cursor: isCompleted ? 'not-allowed' : 'pointer',
+                            opacity: isCompleted ? 0.6 : 1, transition: 'all 0.3s ease',
+                            minHeight: 'var(--touch-min)'
                         }}
                     >
                         <CheckCheck size={18} /> Skip

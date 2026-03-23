@@ -3,12 +3,16 @@
   --bg-color: #050505;
   --card-bg: #121214;
   --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
+  --text-secondary: #b0b0ba;
   --accent: #6d28d9;
   --accent-glow: #8b5cf6;
   --success: #10b981;
   --error: #ef4444;
+  --warning: #f59e0b;
   --font-main: 'Outfit', sans-serif;
+
+  /* Touch targets */
+  --touch-min: 40px;
 
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -349,6 +353,22 @@ button:active {
 }
 
 .pulse-glow {
+  animation: badgeHighlight 1.5s ease-in-out infinite;
+}
+
+@keyframes badgeHighlight {
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px var(--badge-color, rgba(251, 191, 36, 0.5));
+  }
+
+  50% {
+    box-shadow: 0 0 30px var(--badge-color, rgba(251, 191, 36, 0.8));
+  }
+}
+
+.pulse-ring {
   animation: pulseGlow 2s ease-in-out infinite;
   border-radius: 50%;
 }
@@ -362,22 +382,6 @@ button:active {
 
   50% {
     filter: drop-shadow(0 0 16px rgba(139, 92, 246, 1));
-  }
-}
-
-.pulse-glow {
-  animation: badgeHighlight 1.5s ease-in-out infinite;
-}
-
-@keyframes badgeHighlight {
-
-  0%,
-  100% {
-    box-shadow: 0 0 15px var(--badge-color, rgba(251, 191, 36, 0.5));
-  }
-
-  50% {
-    box-shadow: 0 0 30px var(--badge-color, rgba(251, 191, 36, 0.8));
   }
 }
 
@@ -419,8 +423,12 @@ button:active {
   }
 }
 
-/* Number counter animation */
-@keyframes numberRoll {
+/* Slide down animation (for toasts) */
+.slide-down {
+  animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
   from {
     opacity: 0;
     transform: translateY(-20px);
@@ -429,6 +437,23 @@ button:active {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Slide exit animation */
+.slide-exit {
+  animation: slideExit 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
   }
 }
 
@@ -637,6 +662,13 @@ button:active {
   }
 }
 
+/* ── Exercise Grid Responsive ──────────────────────────────────────── */
+@media (min-width: 500px) {
+  .exercise-grid > button {
+    flex: 1 1 calc(25% - 10px) !important;
+  }
+}
+
 /* ── Low Performance Mode ────────────────────────────────────────────── */
 /* Disables expensive GPU effects for low-end devices (Redmi, etc.)     */
 
@@ -696,4 +728,120 @@ button:active {
 
 [data-perf="low"] .ripple::after {
   display: none !important;
+}
+
+/* ── Responsive Breakpoints ─────────────────────────────────────────── */
+/* Tablet+ adjustments for full-screen modals and grids */
+
+@media (min-width: 600px) {
+  #root {
+    padding: 12px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 900px) {
+  #root {
+    padding: 16px;
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 1200px) {
+  #root {
+    max-width: 1100px;
+  }
+}
+
+/* ── Accessibility ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Shared Modal Overlay ───────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-overlay .modal-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-md);
+  padding-top: calc(var(--spacing-md) + env(safe-area-inset-top));
+  padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 600px) {
+  .modal-overlay {
+    align-items: center;
+    justify-content: flex-start;
+    padding: var(--spacing-lg);
+  }
+
+  .modal-overlay .modal-content {
+    max-width: 600px;
+    width: 100%;
+    padding: var(--spacing-lg);
+  }
+}
+
+/* ── Shared Bottom Sheet ────────────────────────────────────────────── */
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--sheet-bg);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-default);
+  z-index: 200;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
+}
+
+.bottom-sheet .sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--sheet-handle);
+  border-radius: var(--radius-full);
+  margin: var(--spacing-sm) auto;
+}
+
+@media (min-width: 600px) {
+  .bottom-sheet {
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 560px;
+    border-radius: var(--radius-xl);
+    bottom: var(--spacing-lg);
+    border: 1px solid var(--border-default);
+  }
 }

@@ -118,7 +118,8 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                 )}
                 <button onClick={onClose} className="hover-lift glass" style={{
                     background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
-                    width: '40px', height: '40px', display: 'flex', alignItems: 'center',
+                    width: 'var(--touch-min)', height: 'var(--touch-min)',
+                    display: 'flex', alignItems: 'center',
                     justifyContent: 'center', color: 'white', cursor: 'pointer'
                 }}>
                     <X size={22} />
@@ -169,7 +170,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                             onClick={() => setActiveTab(tab.id)}
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '5px',
-                                padding: '6px 12px', borderRadius: '20px',
+                                padding: '7px 12px', borderRadius: '20px',
                                 background: isActive
                                     ? `linear-gradient(135deg, ${tab.color}30, ${tab.color}18)`
                                     : 'rgba(255,255,255,0.05)',
@@ -179,7 +180,8 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                                 color: isActive ? tab.color : 'var(--text-secondary)',
                                 fontSize: '0.75rem', fontWeight: '600',
                                 cursor: 'pointer',
-                                transition: 'all 0.2s ease'
+                                transition: 'all 0.2s ease',
+                                minHeight: 'var(--touch-min)'
                             }}
                         >
                             <Icon size={14} />
@@ -307,7 +309,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                                             disabled={nudgedMember === entry.uid}
                                             className="hover-lift" 
                                             style={{
-                                                width: '36px', height: '36px', borderRadius: '50%',
+                                                width: 'var(--touch-min)', height: 'var(--touch-min)', borderRadius: '50%',
                                                 background: nudgedMember === entry.uid ? '#10b981' : 'rgba(99,102,241,0.1)',
                                                 border: 'none', color: nudgedMember === entry.uid ? 'white' : '#818cf8',
                                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -360,12 +362,12 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                             <button onClick={() => setShowLeaveConfirm(false)} className="hover-lift" style={{
                                 flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
                                 background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white',
-                                fontWeight: '600', cursor: 'pointer'
+                                fontWeight: '600', cursor: 'pointer', minHeight: 'var(--touch-min)'
                             }}>Annuler</button>
                             <button onClick={() => { setShowLeaveConfirm(false); onLeaveClan(); }} className="hover-lift" style={{
                                 flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
                                 background: '#ef4444', border: 'none', color: 'white',
-                                fontWeight: '700', cursor: 'pointer'
+                                fontWeight: '700', cursor: 'pointer', minHeight: 'var(--touch-min)'
                             }}>Quitter</button>
                         </div>
                     </div>
@@ -450,7 +452,7 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                     className="hover-lift"
                     style={{
                         background: 'rgba(255,255,255,0.08)', border: 'none',
-                        borderRadius: '50%', width: '32px', height: '32px',
+                        borderRadius: '50%', width: 'var(--touch-min)', height: 'var(--touch-min)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: 'var(--text-secondary)', cursor: 'pointer', marginBottom: '12px',
                         flexShrink: 0

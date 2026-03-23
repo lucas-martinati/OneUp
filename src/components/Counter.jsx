@@ -98,16 +98,8 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
             colors={exerciseConfig?.confettiColors || ['#10b981', '#34d399', '#6ee7b7', '#ffffff']}
             onDone={() => setShowConfetti(false)}
         />
-        <div className="fade-in" style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.98)',
+        <div className="fade-in modal-overlay" style={{
             zIndex: 1000,
-            display: 'flex',
-            flexDirection: 'column',
             padding: 'var(--spacing-sm)',
             paddingTop: 'calc(var(--spacing-sm) + env(safe-area-inset-top))',
             paddingBottom: 'calc(var(--spacing-sm) + env(safe-area-inset-bottom))'
@@ -121,14 +113,14 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{
-                        width: '36px', height: '36px', borderRadius: '50%',
+                        width: 'var(--touch-min)', height: 'var(--touch-min)', borderRadius: '50%',
                         background: `${activeColor}22`,
                         border: `1.5px solid ${activeColor}55`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
-                        <ExIcon size={18} color={activeColor} />
+                        <ExIcon size={20} color={activeColor} />
                     </div>
-                    <h2 style={{ fontSize: '1.4rem', fontWeight: '700', color: activeColor, margin: 0 }}>
+                    <h2 style={{ fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', fontWeight: '700', color: activeColor, margin: 0 }}>
                         {exerciseLabel}
                     </h2>
                 </div>
@@ -137,7 +129,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                     onClick={onClose}
                     className="glass hover-lift"
                     style={{
-                        width: '36px', height: '36px', borderRadius: '50%',
+                        width: 'var(--touch-min)', height: 'var(--touch-min)', borderRadius: '50%',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         background: 'rgba(255,255,255,0.08)', border: 'none',
                         color: 'var(--text-secondary)', cursor: 'pointer'
@@ -152,13 +144,14 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                         onClick={onNext}
                         className="hover-lift"
                         style={{
-                            padding: '6px 14px', borderRadius: '20px',
+                            padding: '8px 16px', borderRadius: '20px',
                             background: `${activeColor}20`,
                             border: `1px solid ${activeColor}40`,
                             color: activeColor,
-                            fontSize: '0.8rem', fontWeight: '600',
+                            fontSize: '0.85rem', fontWeight: '600',
                             display: 'flex', alignItems: 'center', gap: '4px',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            minHeight: 'var(--touch-min)'
                         }}
                     >
                         Suivant <ChevronRight size={16} />
@@ -174,11 +167,20 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 'var(--spacing-lg)'
+                gap: 'clamp(16px, 2.5vh, 28px)'
             }}>
                 {/* Progress Circle & Count Display */}
                 <div style={{ position: 'relative', textAlign: 'center' }}>
-                    <svg width="200" height="200" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                    <svg
+                        viewBox="0 0 200 200"
+                        overflow="visible"
+                        style={{
+                            position: 'absolute', top: '50%', left: '50%',
+                            width: 'clamp(160px, 30vh, 220px)',
+                            height: 'clamp(160px, 30vh, 220px)',
+                            transform: 'translate(-50%, -50%)'
+                        }}
+                    >
                         {/* Track */}
                         <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
                         {/* Progress arc */}
@@ -206,22 +208,24 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
 
                     {/* Count Display */}
                     <div style={{
-                        width: '200px', height: '200px',
+                        width: 'clamp(160px, 30vh, 220px)',
+                        height: 'clamp(160px, 30vh, 220px)',
                         display: 'flex', flexDirection: 'column',
                         alignItems: 'center', justifyContent: 'center'
                     }}>
                         <div
                             className={isAnimating ? 'scale-in' : ''}
                             style={{
-                                fontSize: '4rem', fontWeight: '800',
+                                fontSize: 'clamp(4rem, 12vw, 6rem)', fontWeight: '800',
                                 color: isCompleted ? activeColor : 'var(--text-primary)',
                                 lineHeight: 1,
-                                transition: 'color 0.3s ease'
+                                transition: 'color 0.3s ease',
+                                fontVariantNumeric: 'tabular-nums'
                             }}
                         >
                             {displayCount}
                         </div>
-                        <div style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
+                        <div style={{ fontSize: 'clamp(1rem, 3vw, 1.3rem)', color: 'var(--text-secondary)', marginTop: '8px' }}>
                             / {dailyGoal}
                         </div>
                     </div>
@@ -257,7 +261,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: '12px', width: '100%', maxWidth: '350px'
+                    gap: '10px', width: '100%', maxWidth: '360px'
                 }}>
                     {[1, 2, 5, 10].map(amount => (
                         <button
@@ -266,14 +270,14 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                             className="glass hover-lift ripple"
                             disabled={isCompleted}
                             style={{
-                                padding: '16px 8px',
+                                padding: 'clamp(14px, 2vh, 20px) 8px',
                                 borderRadius: 'var(--radius-md)',
                                 background: `linear-gradient(135deg, ${activeColor}2a, ${gradEnd}2a)`,
                                 border: `1px solid ${activeColor}44`,
                                 color: isCompleted ? 'var(--text-secondary)' : 'var(--text-primary)',
-                                fontSize: '1.2rem', fontWeight: '700',
+                                fontSize: 'clamp(1rem, 2.8vw, 1.3rem)', fontWeight: '700',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                gap: '4px',
+                                gap: '4px', minHeight: 'var(--touch-min)',
                                 cursor: isCompleted ? 'not-allowed' : 'pointer',
                                 opacity: isCompleted ? 0.4 : 1
                             }}
@@ -287,7 +291,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                 {/* Decrement Buttons */}
                 <div style={{
                     display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
-                    gap: '12px', width: '100%', maxWidth: '200px'
+                    gap: '10px', width: '100%', maxWidth: '220px'
                 }}>
                     {[1, 5].map(amount => {
                         const canDecrement = displayCount > 0;
@@ -298,13 +302,14 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                             className="glass hover-lift ripple"
                             disabled={!canDecrement}
                             style={{
-                                padding: '14px 8px', borderRadius: 'var(--radius-md)',
+                                padding: 'clamp(12px, 1.8vh, 18px) 8px',
+                                borderRadius: 'var(--radius-md)',
                                 background: 'rgba(255, 255, 255, 0.05)',
                                 border: '1px solid rgba(255, 255, 255, 0.1)',
                                 color: !canDecrement ? 'var(--text-secondary)' : 'var(--text-primary)',
-                                fontSize: '1.1rem', fontWeight: '600',
+                                fontSize: 'clamp(0.95rem, 2.5vw, 1.15rem)', fontWeight: '600',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                gap: '4px',
+                                gap: '4px', minHeight: 'var(--touch-min)',
                                 cursor: !canDecrement ? 'not-allowed' : 'pointer',
                                 opacity: !canDecrement ? 0.5 : 1
                             }}
@@ -318,7 +323,8 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
 
                 {/* Action Buttons Row: Reset + Complete All */}
                 <div style={{
-                    display: 'flex', gap: '12px', alignItems: 'center',
+                    display: 'flex', gap: '10px', alignItems: 'center',
+                    flexWrap: 'wrap', justifyContent: 'center',
                     marginTop: 'var(--spacing-sm)'
                 }}>
                     {/* Reset Button */}
@@ -327,14 +333,16 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                         className="glass hover-lift"
                         disabled={displayCount === 0}
                         style={{
-                            padding: '12px 24px', borderRadius: 'var(--radius-lg)',
+                            padding: 'clamp(10px, 1.5vh, 14px) clamp(16px, 3vw, 24px)',
+                            borderRadius: 'var(--radius-lg)',
                             background: 'rgba(239, 68, 68, 0.1)',
                             border: '1px solid rgba(239, 68, 68, 0.3)',
-                            color: displayCount === 0 ? 'var(--text-secondary)' : '#ef4444',
-                            fontSize: '0.95rem', fontWeight: '600',
+                            color: displayCount === 0 ? 'var(--text-secondary)' : 'var(--error)',
+                            fontSize: 'clamp(0.85rem, 2.2vw, 1rem)', fontWeight: '600',
                             display: 'flex', alignItems: 'center', gap: '8px',
                             cursor: displayCount === 0 ? 'not-allowed' : 'pointer',
-                            opacity: displayCount === 0 ? 0.5 : 1
+                            opacity: displayCount === 0 ? 0.5 : 1,
+                            minHeight: 'var(--touch-min)'
                         }}
                     >
                         <RotateCcw size={18} />
@@ -347,17 +355,19 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                         className={`glass hover-lift${completeFlash ? ' complete-flash success-glow' : ''}`}
                         disabled={isCompleted}
                         style={{
-                            padding: '12px 24px', borderRadius: 'var(--radius-lg)',
+                            padding: 'clamp(10px, 1.5vh, 14px) clamp(16px, 3vw, 24px)',
+                            borderRadius: 'var(--radius-lg)',
                             background: isCompleted
                                 ? `linear-gradient(135deg, ${activeColor}33, ${gradEnd}33)`
                                 : `linear-gradient(135deg, ${activeColor}22, ${gradEnd}22)`,
                             border: `1px solid ${isCompleted ? activeColor + '66' : activeColor + '44'}`,
                             color: isCompleted ? activeColor : 'var(--text-primary)',
-                            fontSize: '0.95rem', fontWeight: '600',
+                            fontSize: 'clamp(0.85rem, 2.2vw, 1rem)', fontWeight: '600',
                             display: 'flex', alignItems: 'center', gap: '8px',
                             cursor: isCompleted ? 'not-allowed' : 'pointer',
                             opacity: isCompleted ? 0.6 : 1,
-                            transition: 'all 0.3s ease'
+                            transition: 'all 0.3s ease',
+                            minHeight: 'var(--touch-min)'
                         }}
                     >
                         <CheckCheck size={18} />

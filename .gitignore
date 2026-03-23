@@ -54,3 +54,6 @@ android/app/src/main/res/values/strings.xml
 
 upload_certificate.pem
 outputs
+
+AGENTS.md
+.opencode
