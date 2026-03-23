@@ -192,7 +192,7 @@
       "evening_10": { "title": "Nocturnal", "desc": "10 evening workouts" },
       "evening_25": { "title": "Moon", "desc": "25 evening workouts" },
       "ghost": { "title": "Ghost", "desc": "Workout between 3am and 4am" },
-      "perfectionist_secret": { "title": "Perfectionist", "desc": "30 consecutive perfect days" },
+      "perfectionist_secret": { "title": "Unstoppable", "desc": "30 consecutive perfect days" },
       "beast": { "title": "Beast", "desc": "100,000 total reps" },
       "secret": "Secret"
     }
