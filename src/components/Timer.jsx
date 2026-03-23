@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { CSSConfetti } from './CSSConfetti';
 import {
@@ -9,6 +10,7 @@ import { sounds } from '../utils/soundManager';
 
 export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext }) {
     useWakeLock();
+    const { t } = useTranslation();
     const [isRunning, setIsRunning] = useState(false);
     const [completeFlash, setCompleteFlash] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
@@ -85,7 +87,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
     const activeColor = exerciseConfig?.color || '#8b5cf6';
     const [gradStart, gradEnd] = exerciseConfig?.gradient || ['#7c3aed', '#8b5cf6'];
     const ExIcon = Square;
-    const exerciseLabel = exerciseConfig?.label || 'Gainage';
+    const exerciseLabel = t('exercises.' + exerciseConfig?.id) || t('common.exercise');
     const gradientId = `timerGrad-${exerciseConfig?.id || 'timer'}`;
 
     return (
@@ -125,7 +127,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                             minHeight: 'var(--touch-min)'
                         }}
                     >
-                        Suivant <ChevronRight size={16} />
+                        {t('timer.next')} <ChevronRight size={16} />
                     </button>
                 )}
                 <button
@@ -228,12 +230,12 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                             background: `linear-gradient(135deg, ${gradStart}, ${gradEnd})`,
                             backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                         }}>
-                            Chrono Valid&eacute; !
+                            {t('timer.validated')}
                         </span>
                     </div>
                 ) : (
                     <div style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
-                        Encore <span style={{ color: activeColor, fontWeight: '600' }}>{formatTime(remaining)}</span> à tenir
+                        {t('timer.remaining', { time: formatTime(remaining) })}
                     </div>
                 )}
 
@@ -272,7 +274,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                             minHeight: 'var(--touch-min)'
                         }}
                     >
-                        <RotateCcw size={18} /> RAZ
+                        <RotateCcw size={18} /> {t('timer.reset')}
                     </button>
 
                     <button
@@ -292,7 +294,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                             minHeight: 'var(--touch-min)'
                         }}
                     >
-                        <CheckCheck size={18} /> Skip
+                        <CheckCheck size={18} /> {t('timer.skip')}
                     </button>
                 </div>
             </div>
@@ -304,7 +306,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                 fontSize: '0.8rem', textAlign: 'center', alignSelf: 'center', width: '90%', maxWidth: '300px',
                 border: '1px solid rgba(255,255,255,0.05)'
             }}>
-                💡 {["Boire de l'eau booste les performances.", "Garde le dos droit !", "La constance bat l'intensité.", "Respire bien pendant l'effort.", "1% meilleur chaque jour."][(dayNumber || 0) % 5]}
+                💡 {t('timer.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
             </div>
         </div>
         </>

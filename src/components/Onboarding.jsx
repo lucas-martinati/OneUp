@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { Calendar, ArrowRight, Zap, Target, Dumbbell, ArrowDownUp, ArrowUp, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal } from 'lucide-react';
 import { getLocalDateStr } from '../utils/dateUtils';
 import { EXERCISES } from '../config/exercises';
@@ -6,6 +7,7 @@ import { EXERCISES } from '../config/exercises';
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
 
 export function Onboarding({ onStart }) {
+    const { t } = useTranslation();
     const [step, setStep] = useState(1);
     const currentYear = new Date().getFullYear();
     const todayStr = getLocalDateStr(new Date());
@@ -65,17 +67,17 @@ export function Onboarding({ onStart }) {
                     {step === 1 ? (
                         <>
                             <Target size={18} color="#8b5cf6" />
-                            <span>Le Concept</span>
+                            <span>{t('onboarding.concept')}</span>
                         </>
                     ) : step === 2 ? (
                         <>
                             <Zap size={18} color="#f59e0b" />
-                            <span>Ton Parcours</span>
+                            <span>{t('onboarding.yourJourney')}</span>
                         </>
                     ) : (
                         <>
                             <Dumbbell size={18} color="#10b981" />
-                            <span>Tes Exercices</span>
+                            <span>{t('onboarding.yourExercises')}</span>
                         </>
                     )}
                 </div>
@@ -115,14 +117,14 @@ export function Onboarding({ onStart }) {
                                 borderLeft: '3px solid var(--accent)'
                             }}>
                                 <p style={{ marginBottom: '8px' }}>
-                                    <strong style={{ color: '#8b5cf6' }}>Jour 1</strong> = 1 Pompe
+                                    <strong style={{ color: '#8b5cf6' }}>{t('onboarding.day1')}</strong> {t('onboarding.day1Desc')}
                                 </p>
                                 <p>
-                                    <strong style={{ color: '#f093fb' }}>Jour 365</strong> = 365 Pompes
+                                    <strong style={{ color: '#f093fb' }}>{t('onboarding.day365')}</strong> {t('onboarding.day365Desc')}
                                 </p>
                             </div>
                             <p style={{ color: 'var(--text-secondary)' }}>
-                                D&eacute;veloppe une <strong style={{ color: 'var(--text-primary)' }}>discipline in&eacute;branlable</strong> avec une progression quotidienne.
+                                <Trans i18nKey="onboarding.discipline"><strong style={{ color: 'var(--text-primary)' }}>PLACEHOLDER</strong></Trans>
                             </p>
                             <p style={{
                                 marginTop: 'var(--spacing-sm)',
@@ -130,7 +132,7 @@ export function Onboarding({ onStart }) {
                                 fontStyle: 'italic',
                                 color: '#8b5cf6'
                             }}>
-                                💪 La constance est ton superpouvoir.
+                                {t('onboarding.consistencySuperpower')}
                             </p>
                         </div>
                         <button
@@ -150,7 +152,7 @@ export function Onboarding({ onStart }) {
                                 minHeight: 'var(--touch-min)'
                             }}
                         >
-                            C&apos;est parti !
+                            {t('onboarding.letsGo')}
                         </button>
                     </>
                 ) : step === 2 ? (
@@ -164,7 +166,7 @@ export function Onboarding({ onStart }) {
                                 marginBottom: 'var(--spacing-xs)',
                                 display: 'block'
                             }}>
-                                📅 Quand as-tu commenc&eacute; ?
+                                {t('onboarding.whenStarted')}
                             </label>
                             <p style={{
                                 fontSize: 'clamp(0.8rem, 2vw, 0.9rem)',
@@ -172,9 +174,9 @@ export function Onboarding({ onStart }) {
                                 marginBottom: 'var(--spacing-md)',
                                 lineHeight: '1.5'
                             }}>
-                                On compl&egrave;tera les jours pr&eacute;c&eacute;dents pour toi<br />
+                                {t('onboarding.backfillDesc')}<br />
                                 <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>
-                                    (limit&eacute; &agrave; {currentYear})
+                                    {t('onboarding.limitedTo', { year: currentYear })}
                                 </span>
                             </p>
 
@@ -232,7 +234,7 @@ export function Onboarding({ onStart }) {
                                     fontSize: 'clamp(0.85rem, 2.2vw, 1rem)'
                                 }}
                             >
-                                Retour
+                                {t('onboarding.back')}
                             </button>
                             <button
                                 onClick={() => {
@@ -262,7 +264,7 @@ export function Onboarding({ onStart }) {
                                     minHeight: 'var(--touch-min)'
                                 }}
                             >
-                                {date < todayStr ? 'Suivant' : 'Lancer le Défi'}
+                                {date < todayStr ? t('onboarding.next') : t('onboarding.startChallenge')}
                                 <ArrowRight size={20} strokeWidth={3} />
                             </button>
                         </div>
@@ -278,7 +280,7 @@ export function Onboarding({ onStart }) {
                                 marginBottom: 'var(--spacing-xs)',
                                 display: 'block'
                             }}>
-                                🎯 Quels exercices valider ?
+                                {t('onboarding.whichExercises')}
                             </label>
                             <p style={{
                                 fontSize: 'clamp(0.8rem, 2vw, 0.9rem)',
@@ -286,9 +288,9 @@ export function Onboarding({ onStart }) {
                                 marginBottom: 'var(--spacing-md)',
                                 lineHeight: '1.5'
                             }}>
-                                S&eacute;lectionne les exercices &agrave; compl&eacute;ter pour les jours pass&eacute;s<br />
+                                {t('onboarding.selectPastExercises')}<br />
                                 <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>
-                                    (choisis au moins un)
+                                    {t('onboarding.chooseAtLeast')}
                                 </span>
                             </p>
 
@@ -342,7 +344,7 @@ export function Onboarding({ onStart }) {
                                                 fontWeight: '600',
                                                 fontSize: 'clamp(0.75rem, 2vw, 0.9rem)'
                                             }}>
-                                                {ex.label}
+                                                {t('exercises.' + ex.id)}
                                             </span>
                                         </button>
                                     );
@@ -369,7 +371,7 @@ export function Onboarding({ onStart }) {
                                     fontSize: 'clamp(0.85rem, 2.2vw, 1rem)'
                                 }}
                             >
-                                Retour
+                                {t('onboarding.back')}
                             </button>
                             <button
                                 onClick={handleStart}
@@ -396,7 +398,7 @@ export function Onboarding({ onStart }) {
                                     minHeight: 'var(--touch-min)'
                                 }}
                             >
-                                Lancer le Défi
+                                {t('onboarding.startChallenge')}
                                 <ArrowRight size={20} strokeWidth={3} />
                             </button>
                         </div>

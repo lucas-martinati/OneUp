@@ -1,12 +1,13 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
 // Lazy load Recharts components
 const RechartsComponents = lazy(() => import('recharts').then(module => ({
-    default: ({ activeData, radarData, trackedCount, globalTotalReps }) => {
+    default: ({ activeData, radarData, trackedCount, globalTotalReps, t_muscleBalance, t_consistency, t_basedOnManual, t_notEnoughData, t_completeForHabits }) => {
         const { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } = module;
         return (
             <>
@@ -18,7 +19,7 @@ const RechartsComponents = lazy(() => import('recharts').then(module => ({
                         background: 'linear-gradient(135deg, rgba(52,211,153,0.1), rgba(16,185,129,0.1))'
                     }}>
                         <h3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', textAlign: 'center', width: '100%' }}>
-                            🕸️ Équilibre Musculaire
+                            {t_muscleBalance}
                         </h3>
                         <div style={{ width: '100%', height: '220px', minHeight: '220px' }}>
                             <ResponsiveContainer width="100%" height={220} debounce={100}>
@@ -43,7 +44,7 @@ const RechartsComponents = lazy(() => import('recharts').then(module => ({
                     background: 'linear-gradient(135deg, rgba(109,40,217,0.1), rgba(139,92,246,0.1))'
                 }}>
                     <h3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', textAlign: 'center', width: '100%' }}>
-                        ⏰ Consistance
+                            {t_consistency}
                     </h3>
 
                     {trackedCount > 0 ? (
@@ -74,7 +75,7 @@ const RechartsComponents = lazy(() => import('recharts').then(module => ({
                                 textAlign: 'center', color: 'var(--text-secondary)',
                                 fontSize: '0.7rem', marginTop: '4px', fontStyle: 'italic'
                             }}>
-                                Basé sur {trackedCount} journée{trackedCount !== 1 ? 's' : ''} manuelles
+                                {t_basedOnManual(trackedCount)}
                             </p>
                         </>
                     ) : (
@@ -83,10 +84,10 @@ const RechartsComponents = lazy(() => import('recharts').then(module => ({
                             padding: 'var(--spacing-lg)'
                         }}>
                             <p style={{ fontSize: '0.9rem', marginBottom: '6px' }}>
-                                📊 Pas encore assez de données
+                                {t_notEnoughData}
                             </p>
                             <p style={{ fontSize: '0.78rem', opacity: 0.7, lineHeight: '1.5' }}>
-                                Complete tes exercices quotidiens pour voir<br />tes habitudes ici !
+                                {t_completeForHabits}
                             </p>
                         </div>
                     )}
@@ -97,6 +98,7 @@ const RechartsComponents = lazy(() => import('recharts').then(module => ({
 })));
 
 export function Stats({ completions, exercises, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats }) {
+    const { t } = useTranslation();
     const [chartsReady, setChartsReady] = useState(false);
 
     // Wait for the modal transition to finish before attempting to load huge charting libraries
@@ -117,9 +119,16 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
         firstActiveDate
     } = computedStats;
 
-    const activeData = pieData.filter(d => d.value > 0);
+    const activeData = pieData.filter(d => d.value > 0).map(d => ({
+        ...d,
+        name: t('stats.pieLabels.' + d.id)
+    }));
+    const translatedRadarData = radarData.map(d => ({
+        ...d,
+        subject: t('exercises.' + d.exId)
+    }));
     const maxMonthly = Math.max(...monthlyActivityTotal, 1);
-    const monthNames = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+    const monthNames = t('stats.monthAbbreviations', { returnObjects: true });
     const today = new Date();
 
     const ChampionIcon = champion ? (ICON_MAP[champion.icon] || Dumbbell) : null;
@@ -127,7 +136,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
     const formatDate = (dateStr) => {
         if (!dateStr) return '—';
         const d = new Date(dateStr);
-        return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
     };
 
     return (
@@ -144,7 +153,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                 marginBottom: 'var(--spacing-md)'
             }}>
                 <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: '800' }}>
-                    Statistiques
+                    {t('stats.title')}
                 </h2>
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <button onClick={onOpenAchievements} className="hover-lift" style={{
@@ -181,17 +190,17 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '2px',
                     color: 'var(--text-secondary)', marginBottom: '4px'
                 }}>
-                    Reps totales
+                    {t('stats.totalReps')}
                 </div>
                 <div style={{
                     fontSize: 'clamp(2.5rem, 10vw, 4.5rem)', fontWeight: '900', lineHeight: 1.1,
                     background: 'linear-gradient(135deg, #818cf8, #a78bfa, #f472b6)',
                     WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
                 }}>
-                    {globalTotalReps.toLocaleString('fr-FR')}
+                    {globalTotalReps.toLocaleString()}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                    sur {exercises?.length || 0} exercices · {totalDays} jour{totalDays !== 1 ? 's' : ''} d'effort
+                    {t('stats.overExercises', { count: exercises?.length || 0, days: totalDays, plural: totalDays !== 1 ? 's' : '' })}
                 </div>
             </div>
 
@@ -210,7 +219,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                         fontSize: '1.8rem', fontWeight: '800', lineHeight: 1,
                         color: streakActive ? '#f97316' : '#888'
                     }}>{displayStreak}</div>
-                    <div style={statLabelStyle}>Série actuelle</div>
+                    <div style={statLabelStyle}>{t('stats.currentStreak')}</div>
                 </div>
                 <div className="glass-premium scale-in" style={{
                     ...statCardStyle('rgba(251,191,36,0.15)', 'rgba(245,158,11,0.15)'),
@@ -218,7 +227,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                 }}>
                     <Award size={24} color="#fbbf24" style={{ marginBottom: '6px' }} />
                     <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fbbf24', lineHeight: 1 }}>{maxStreak}</div>
-                    <div style={statLabelStyle}>Meilleure série</div>
+                    <div style={statLabelStyle}>{t('stats.bestStreak')}</div>
                 </div>
                 <div className="glass-premium scale-in" style={{
                     ...statCardStyle('rgba(16,185,129,0.15)', 'rgba(5,150,105,0.15)'),
@@ -226,7 +235,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                 }}>
                     <Target size={24} color="#10b981" style={{ marginBottom: '6px' }} />
                     <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#10b981', lineHeight: 1 }}>{totalDays}</div>
-                    <div style={statLabelStyle}>Jours complétés</div>
+                    <div style={statLabelStyle}>{t('stats.completedDays')}</div>
                 </div>
                 <div className="glass-premium scale-in" style={{
                     ...statCardStyle('rgba(139,92,246,0.15)', 'rgba(109,40,217,0.15)'),
@@ -234,7 +243,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                 }}>
                     <TrendingUp size={24} color="#8b5cf6" style={{ marginBottom: '6px' }} />
                     <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#8b5cf6', lineHeight: 1 }}>{successRate}%</div>
-                    <div style={statLabelStyle}>De l'année</div>
+                    <div style={statLabelStyle}>{t('stats.ofYear')}</div>
                 </div>
             </div>
 
@@ -251,7 +260,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#22d3ee', lineHeight: 1 }}>
                         {totalExerciseCompletions}
                     </div>
-                    <div style={statLabelStyle}>Exercices faits</div>
+                    <div style={statLabelStyle}>{t('stats.exercisesDone')}</div>
                 </div>
                 <div className="glass-premium scale-in" style={{
                     ...statCardStyle('rgba(236,72,153,0.15)', 'rgba(236,72,153,0.08)'),
@@ -261,7 +270,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#ec4899', lineHeight: 1 }}>
                         {perfectDays}
                     </div>
-                    <div style={statLabelStyle}>Jours parfaits</div>
+                    <div style={statLabelStyle}>{t('stats.perfectDays')}</div>
                 </div>
             </div>
 
@@ -286,13 +295,13 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                             }}>
                                 {ChampionIcon && <ChampionIcon size={16} color={champion.color} />}
                                 <span style={{ fontSize: '0.85rem', fontWeight: '700', color: champion.color }}>
-                                    {champion.label}
+                                    {t('exercises.' + champion.id)}
                                 </span>
                             </div>
                             <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)' }}>
-                                {champion.totalReps.toLocaleString('fr-FR')} reps
+                                {champion.totalReps.toLocaleString()} {t('common.reps')}
                             </div>
-                            <div style={statLabelSmallStyle}>Champion</div>
+                            <div style={statLabelSmallStyle}>{t('stats.champion')}</div>
                         </div>
                     )}
                     {bestDayDate && (
@@ -307,7 +316,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                                 {formatDate(bestDayDate)}
                             </div>
                             <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)' }}>
-                                {bestDayReps.toLocaleString('fr-FR')} reps
+                                {bestDayReps.toLocaleString()} {t('common.reps')}
                             </div>
                             <div style={{
                                 display: 'flex', flexWrap: 'wrap', gap: '4px 8px',
@@ -328,7 +337,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                                                 background: ex.color
                                             }} />
                                             <span style={{ fontWeight: '600', color: ex.color }}>{reps}</span>
-                                            <span>{ex.label}</span>
+                                            <span>{t('exercises.' + ex.id)}</span>
                                         </div>
                                     );
                                 })}
@@ -352,7 +361,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                                 width: '8px', height: '8px', borderRadius: '2px',
                                 background: ex.color
                             }} />
-                            <span>{ex.label}</span>
+                            <span>{t('exercises.' + ex.id)}</span>
                         </div>
                     ))}
                 </div>
@@ -364,7 +373,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                 marginBottom: 'var(--spacing-md)',
                 background: 'var(--surface-section)'
             }}>
-                <h3 style={sectionTitleStyle}>📅 Activité mensuelle</h3>
+                <h3 style={sectionTitleStyle}>{t('stats.monthlyActivity')}</h3>
                 <div style={{
                     display: 'flex', alignItems: 'flex-end', gap: '4px',
                     height: '100px', padding: '0 4px'
@@ -448,14 +457,19 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                         display: 'flex', justifyContent: 'center', alignItems: 'center',
                         height: '200px', marginBottom: 'var(--spacing-md)'
                     }}>
-                        <div style={{ color: 'var(--text-secondary)' }}>Chargement des graphiques...</div>
+                        <div style={{ color: 'var(--text-secondary)' }}>{t('stats.loadingCharts')}</div>
                     </div>
                 }>
                     <RechartsComponents
                         activeData={activeData}
-                        radarData={radarData}
+                        radarData={translatedRadarData}
                         trackedCount={trackedCount}
                         globalTotalReps={globalTotalReps}
+                        t_muscleBalance={t('stats.muscleBalance')}
+                        t_consistency={t('stats.consistency')}
+                        t_basedOnManual={(count) => t('stats.basedOnManual', { count, plural: count !== 1 ? 's' : '' })}
+                        t_notEnoughData={t('stats.notEnoughData')}
+                        t_completeForHabits={t('stats.completeForHabits')}
                     />
                 </Suspense>
             ) : null}
@@ -467,7 +481,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     marginBottom: 'var(--spacing-md)',
                     background: 'var(--surface-section)'
                 }}>
-                    <h3 style={sectionTitleStyle}>Par exercice</h3>
+                    <h3 style={sectionTitleStyle}>{t('stats.byExercise')}</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {exerciseStats.map(ex => {
                             const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
@@ -497,7 +511,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                                                 <span style={{
                                                     fontSize: '0.85rem', fontWeight: '700',
                                                     color: ex.color
-                                                }}>{ex.label}</span>
+                                                    }}>{t('exercises.' + ex.id)}</span>
                                                 <div style={{
                                                     display: 'flex', alignItems: 'center', gap: '6px'
                                                 }}>
@@ -508,7 +522,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                                                             padding: '2px 6px', borderRadius: '8px',
                                                             fontWeight: '600'
                                                         }}>
-                                                            max {ex.maxStreak}j
+                                                            {t('stats.maxDays', { count: ex.maxStreak })}
                                                         </span>
                                                     )}
                                                     {ex.streak > 0 && (
@@ -527,7 +541,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                                                             <span style={{
                                                                 fontSize: '0.75rem', fontWeight: '700',
                                                                 color: ex.streakActive ? '#f97316' : '#888'
-                                                            }}>{ex.streak}j</span>
+                                                            }}>{ex.streak}{t('common.daysAbbr')}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -538,11 +552,11 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                                                 gap: '8px', marginTop: '2px'
                                             }}>
                                                 <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                                                    {ex.totalReps.toLocaleString('fr-FR')} reps
+                                                    {ex.totalReps.toLocaleString()} {t('common.reps')}
                                                 </span>
                                                 <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
                                                 <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                                                    {ex.daysCompleted}j
+                                                    {ex.daysCompleted}{t('common.daysAbbr')}
                                                 </span>
                                                 <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
                                                 <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
@@ -577,10 +591,10 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                 background: 'linear-gradient(135deg, rgba(14,165,233,0.1), rgba(6,182,212,0.1))'
             }}>
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
-                    💪 <strong style={{ color: '#0ea5e9' }}>"La régularité bat la perfection"</strong>
+                    💪 <strong style={{ color: '#0ea5e9' }}>{t('stats.quote')}</strong>
                 </p>
                 <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '2px', opacity: 0.7 }}>
-                    Montre-toi chaque jour, un pas à la fois !
+                    {t('stats.quoteSub')}
                 </p>
             </div>
             </div>

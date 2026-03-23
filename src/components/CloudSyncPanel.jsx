@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import { Cloud, CloudOff, User, AlertCircle, Upload, Trash2, AlertTriangle } from 'lucide-react';
 import { Avatar } from './Avatar';
 
@@ -12,6 +13,7 @@ export function CloudSyncPanel({
   onDeleteAccount
 }) {
   const [resolving, setResolving] = useState(false);
+  const { t } = useTranslation();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -31,10 +33,10 @@ export function CloudSyncPanel({
         <div className="conflict-modal">
           <div className="conflict-header">
             <AlertCircle className="conflict-icon" />
-            <h2>Données cloud détectées</h2>
+            <h2>{t('cloud.cloudDataDetected')}</h2>
           </div>
           <p className="conflict-message">
-            Une sauvegarde existe déjà dans le cloud. Que souhaitez-vous faire ?
+            {t('cloud.backupExists')}
           </p>
           <div className="conflict-actions">
             <button
@@ -44,8 +46,8 @@ export function CloudSyncPanel({
             >
               <Cloud />
               <div>
-                <strong>Restaurer</strong>
-                <span>Récupérer mes données du cloud</span>
+                <strong>{t('cloud.restore')}</strong>
+                <span>{t('cloud.restoreDesc')}</span>
               </div>
             </button>
             <button
@@ -55,8 +57,8 @@ export function CloudSyncPanel({
             >
               <Upload />
               <div>
-                <strong>Remplacer le cloud</strong>
-                <span>Écraser le cloud avec mes données locales</span>
+                <strong>{t('cloud.replaceCloud')}</strong>
+                <span>{t('cloud.replaceDesc')}</span>
               </div>
             </button>
           </div>
@@ -215,11 +217,11 @@ export function CloudSyncPanel({
           )}
         </div>
         <div className="cloud-sync-title">
-          <h3>Sauvegarde Cloud</h3>
+          <h3>{t('cloud.cloudBackup')}</h3>
           <p className="cloud-sync-subtitle">
             {authState.isSignedIn
-              ? 'Connecté avec Google Play'
-              : 'Non connecté'
+              ? t('cloud.connectedGooglePlay')
+              : t('cloud.notConnected')
             }
           </p>
         </div>
@@ -228,7 +230,7 @@ export function CloudSyncPanel({
       {authState.loading ? (
         <div className="cloud-sync-loading">
           <Cloud className="pulse-animation" />
-          <span>Chargement...</span>
+          <span>{t('cloud.loading')}</span>
         </div>
       ) : authState.isSignedIn ? (
         <div className="cloud-sync-content">
@@ -240,7 +242,7 @@ export function CloudSyncPanel({
                 size={48}
               />
               <div className="user-details">
-              <p className="user-name">{authState.user?.displayName || 'Utilisateur'}</p>
+              <p className="user-name">{authState.user?.displayName || t('cloud.user')}</p>
               <p className="user-email">{authState.user?.email || ''}</p>
             </div>
           </div>
@@ -250,10 +252,10 @@ export function CloudSyncPanel({
             <div className="conflict-dialog">
               <div className="conflict-header">
                 <AlertCircle className="conflict-icon" />
-                <h4>Conflit de données</h4>
+                <h4>{t('cloud.dataConflict')}</h4>
               </div>
               <p className="conflict-message">
-                Résolution en cours...
+                {t('cloud.resolving')}
               </p>
             </div>
           )}
@@ -261,7 +263,7 @@ export function CloudSyncPanel({
           {/* Auto-sync indicator */}
           <div className="auto-sync-info">
             <Cloud className="info-icon" />
-            <span>Synchronisation automatique activée</span>
+            <span>{t('cloud.autoSyncEnabled')}</span>
           </div>
 
           {/* Sign out */}
@@ -270,7 +272,7 @@ export function CloudSyncPanel({
             onClick={onSignOut}
             disabled={authState.loading}
           >
-            Déconnexion
+            {t('cloud.signOut')}
           </button>
 
           {/* Delete account */}
@@ -280,7 +282,7 @@ export function CloudSyncPanel({
             disabled={authState.loading}
           >
             <Trash2 size={16} />
-            Supprimer mon compte
+            {t('cloud.deleteAccount')}
           </button>
 
           {/* Delete confirmation modal */}
@@ -298,14 +300,16 @@ export function CloudSyncPanel({
                       <Trash2 />
                     </div>
                   </div>
-                  <h3>Supprimer mon compte</h3>
+                  <h3>{t('cloud.deleteTitle')}</h3>
                   <p>
-                    Cette action est <strong>irréversible</strong>. Toutes vos données seront 
-                    supprimées définitivement, y compris votre progression et vos paramètres.
+                    <Trans i18nKey="cloud.deleteWarning">
+                      Cette action est <strong>irréversible</strong>. Toutes vos données seront
+                      supprimées définitivement, y compris votre progression et vos paramètres.
+                    </Trans>
                   </p>
                   <div className="delete-warning">
                     <AlertTriangle size={14} />
-                    <span>Cette action ne peut pas être annulée</span>
+                    <span>{t('cloud.deleteCannotUndo')}</span>
                   </div>
                   <div className="delete-actions">
                     <button 
@@ -313,7 +317,7 @@ export function CloudSyncPanel({
                       onClick={() => setShowDeleteConfirm(false)}
                       disabled={deleting}
                     >
-                      Annuler
+                      {t('common.cancel')}
                     </button>
                     <button 
                       className="btn-delete-confirm"
@@ -331,12 +335,12 @@ export function CloudSyncPanel({
                       {deleting ? (
                         <>
                           <span className="delete-spinner"></span>
-                          Suppression...
+                          {t('cloud.deleting')}
                         </>
                       ) : (
                         <>
                           <Trash2 size={16} />
-                          Supprimer
+                          {t('cloud.deleteConfirm')}
                         </>
                       )}
                     </button>
@@ -604,20 +608,20 @@ export function CloudSyncPanel({
         <div className="cloud-sync-content">
           <div className="cloud-promo">
             <p className="cloud-promo-text">
-              Connectez-vous avec votre compte Google pour sauvegarder votre progression dans le cloud et la synchroniser entre appareils.
+              {t('cloud.promoText')}
             </p>
             <ul className="cloud-benefits">
               <li>
                 <Cloud className="icon-check" />
-                <span>Sauvegarde automatique</span>
+                <span>{t('cloud.autoBackup')}</span>
               </li>
               <li>
                 <Cloud className="icon-check" />
-                <span>Synchronisation multi-appareils</span>
+                <span>{t('cloud.multiDevice')}</span>
               </li>
               <li>
                 <Cloud className="icon-check" />
-                <span>Ne perdez jamais votre progression</span>
+                <span>{t('cloud.neverLose')}</span>
               </li>
             </ul>
           </div>
@@ -633,7 +637,7 @@ export function CloudSyncPanel({
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
-            Se connecter avec Google
+            {t('cloud.signInWithGoogle')}
           </button>
 
           {authState.error && (

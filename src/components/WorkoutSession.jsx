@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     X, Play, Check, Trophy,
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
@@ -15,6 +16,7 @@ const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, 
 export function WorkoutSession({
     onClose, today, dayNumber, getExerciseCount, updateExerciseCount, completions, settings
 }) {
+    const { t } = useTranslation();
     const [phase, setPhase] = useState('config'); // 'config' | 'running' | 'done'
     const [queue, setQueue] = useState([]); // ordered list of exercise IDs
     const [currentIdx, setCurrentIdx] = useState(0);
@@ -101,7 +103,7 @@ export function WorkoutSession({
                         WebkitBackgroundClip: 'text', backgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
                     }}>
-                        Nouvelle séance
+                        {t('workout.newSession')}
                     </h2>
                     <button onClick={onClose} className="hover-lift" style={{
                         background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
@@ -121,7 +123,7 @@ export function WorkoutSession({
                         fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px',
                         color: 'var(--text-secondary)', fontWeight: '600'
                     }}>
-                        Choisis l'ordre des exercices
+                        {t('workout.chooseOrder')}
                     </div>
 
                     {/* Selected order */}
@@ -149,7 +151,7 @@ export function WorkoutSession({
                                         <Icon size={14} color={ex.color} />
                                         <span style={{
                                             fontSize: '0.7rem', fontWeight: '600', color: ex.color
-                                        }}>{ex.label}</span>
+                                        }}>{t('exercises.' + ex.id)}</span>
                                     </div>
                                 );
                             })}
@@ -213,11 +215,11 @@ export function WorkoutSession({
                                     <Icon size={24} />
                                     <span style={{
                                         fontSize: '0.75rem', fontWeight: '600'
-                                    }}>{ex.label}</span>
+                                    }}>{t('exercises.' + ex.id)}</span>
                                     <span style={{
                                         fontSize: '0.6rem', opacity: 0.6
                                     }}>
-                                        {ex.done ? 'Complété ✓' : `${ex.goal - ex.count} restantes`}
+                                        {ex.done ? t('workout.completed') : t('workout.remaining', { count: ex.goal - ex.count })}
                                     </span>
                                 </button>
                             );
@@ -245,7 +247,7 @@ export function WorkoutSession({
                         }}
                     >
                         <Play size={20} />
-                        Lancer ({queue.length} exercice{queue.length > 1 ? 's' : ''})
+                        {t('workout.launch', { count: queue.length, plural: queue.length > 1 ? 's' : '' })}
                     </button>
                 </div>
             </div>
@@ -297,13 +299,13 @@ export function WorkoutSession({
                     WebkitBackgroundClip: 'text', backgroundClip: 'text',
                     WebkitTextFillColor: 'transparent', textAlign: 'center'
                 }}>
-                    Séance terminée !
+                    {t('workout.sessionDone')}
                 </div>
 
                 <div style={{
                     fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center'
                 }}>
-                    Tous les exercices sont complétés 💪
+                    {t('workout.allCompleted')}
                 </div>
 
                 {/* Recap */}
@@ -324,14 +326,14 @@ export function WorkoutSession({
                                 <Icon size={16} color={ex.color} />
                                 <span style={{
                                     flex: 1, fontSize: '0.8rem', fontWeight: '600', color: ex.color
-                                }}>{ex.label}</span>
+                                }}>{t('exercises.' + ex.id)}</span>
                                 <div style={{
                                     display: 'flex', alignItems: 'center', gap: '4px'
                                 }}>
                                     <Check size={14} color="#10b981" />
                                     <span style={{
                                         fontSize: '0.75rem', fontWeight: '700', color: '#10b981'
-                                    }}>{ex.goal} reps</span>
+                                    }}>{t('workout.reps', { count: ex.goal })}</span>
                                 </div>
                             </div>
                         );
@@ -348,7 +350,7 @@ export function WorkoutSession({
                         cursor: 'pointer'
                     }}
                 >
-                    Fermer
+                    {t('common.close')}
                 </button>
             </div>
         );

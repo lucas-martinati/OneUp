@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Users, LogIn, Plus, X, Check, Shield } from 'lucide-react';
 import { cloudSync } from '../services/cloudSync';
 import { Leaderboard } from './Leaderboard';
@@ -6,6 +7,7 @@ import { registerBackHandler } from '../utils/backHandler';
 import { CSSConfetti } from './CSSConfetti';
 
 export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
+    const { t } = useTranslation();
     const [userClans, setUserClans] = useState([]);
     const [clanData, setClanData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -64,14 +66,14 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
             setClanData(data);
             setView('dashboard');
         } else {
-            setError('Impossible de charger ce clan');
+            setError(t('clan.cannotLoad'));
         }
         setIsLoading(false);
     };
 
     const handleCreate = async () => {
-        if (!settings?.leaderboardPseudo && !pseudoInput.trim()) return setError('Un pseudo est requis');
-        if (!inputValue.trim()) return setError('Le nom du clan est requis');
+        if (!settings?.leaderboardPseudo && !pseudoInput.trim()) return setError(t('clan.pseudoRequired'));
+        if (!inputValue.trim()) return setError(t('clan.nameRequired'));
         
         setIsLoading(true);
         setError('');
@@ -87,14 +89,14 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
             setUserClans(clans);
             await handleOpenClan(res.clanId);
         } else {
-            setError(res.error || 'Erreur lors de la création');
+            setError(res.error || t('clan.createError'));
             setIsLoading(false);
         }
     };
 
     const handleJoin = async () => {
-        if (!settings?.leaderboardPseudo && !pseudoInput.trim()) return setError('Un pseudo est requis');
-        if (!inputValue.trim() || inputValue.trim().length !== 6) return setError('Code à 6 caractères requis');
+        if (!settings?.leaderboardPseudo && !pseudoInput.trim()) return setError(t('clan.pseudoRequired'));
+        if (!inputValue.trim() || inputValue.trim().length !== 6) return setError(t('clan.codeRequired'));
         
         setIsLoading(true);
         setError('');
@@ -110,7 +112,7 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
             setUserClans(clans);
             await handleOpenClan(res.clanId);
         } else {
-            setError(res.error || 'Code invalide');
+            setError(res.error || t('clan.invalidCode'));
             setIsLoading(false);
         }
     };
@@ -135,7 +137,7 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
                 position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.92)',
                 zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>
-                <div style={{ color: 'var(--text-secondary)' }}>Chargement...</div>
+                <div style={{ color: 'var(--text-secondary)' }}>{t('clan.loading')}</div>
             </div>
         );
     }
@@ -162,28 +164,28 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
                     <h2 style={{
                         fontSize: '1.8rem', fontWeight: '800', textAlign: 'center', margin: 0,
                         background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                        WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
-                    }}>Clan OneUp</h2>
+                        WebkitBackgroundClip: 'text', backgroundClip: 'text',                         WebkitTextFillColor: 'transparent'
+                    }}>{t('clan.title')}</h2>
 
                     {view === 'menu' && (
                         <>
                             {!cloudAuth?.isSignedIn ? (
                                 <>
                                     <p style={{ color: 'var(--text-secondary)', textAlign: 'center', maxWidth: '300px', margin: '0 0 20px 0', lineHeight: '1.5' }}>
-                                        Connecte-toi avec Google pour créer ou rejoindre un clan !
+                                        {t('clan.signInRequired')}
                                     </p>
                                     <button onClick={() => cloudSync.signIn()} className="hover-lift" style={{
                                         width: '100%', maxWidth: '300px', padding: '16px', borderRadius: 'var(--radius-lg)',
                                         background: 'linear-gradient(135deg, #818cf8, #6366f1)', border: 'none', color: 'white',
                                         fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
-                                    }}><LogIn size={20} /> Se connecter</button>
+                                    }}><LogIn size={20} /> {t('clan.signIn')}</button>
                                 </>
                             ) : (
                                 <>
                                     {userClans.length > 0 && (
                                         <div style={{ width: '100%', maxWidth: '300px', display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
                                             <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800', textAlign: 'center', marginBottom: '4px' }}>
-                                                Tes Clans ({userClans.length})
+                                                {t('clan.yourClans', { count: userClans.length })}
                                             </div>
                                             {userClans.map(clan => (
                                                 <button key={clan.id} onClick={() => handleOpenClan(clan.id)} className="hover-lift" style={{
@@ -214,7 +216,7 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
 
                                     {userClans.length === 0 && (
                                         <p style={{ color: 'var(--text-secondary)', textAlign: 'center', maxWidth: '300px', margin: '0 0 20px 0', lineHeight: '1.5' }}>
-                                            Rejoins tes amis, comparez vos efforts et motivez-vous ensemble !
+                                            {t('clan.joinFriends')}
                                         </p>
                                     )}
 
@@ -223,13 +225,13 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
                                         background: 'linear-gradient(135deg, #818cf8, #6366f1)', border: 'none', color: 'white',
                                         fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                                         marginBottom: '12px'
-                                    }}><LogIn size={20} /> Rejoindre un clan</button>
+                                    }}><LogIn size={20} /> {t('clan.joinClan')}</button>
 
                                     <button onClick={() => { setView('create'); setError(''); setInputValue(''); }} className="hover-lift" style={{
                                         width: '100%', maxWidth: '300px', padding: '16px', borderRadius: 'var(--radius-lg)',
                                         background: 'rgba(255,255,255,0.05)', border: '2px solid rgba(255,255,255,0.1)', color: 'var(--text-primary)',
                                         fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
-                                    }}><Plus size={20} /> Créer un clan</button>
+                                    }}><Plus size={20} /> {t('clan.createClan')}</button>
                                 </>
                             )}
                         </>
@@ -240,13 +242,13 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
                             {!settings?.leaderboardPseudo && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <p style={{ margin: 0, color: 'var(--text-secondary)', textAlign: 'center', fontSize: '0.85rem' }}>
-                                        Choisis un pseudo pour apparaître dans ton clan :
+                                        {t('clan.choosePseudo')}
                                     </p>
                                     <input
                                         type="text"
                                         value={pseudoInput}
                                         onChange={(e) => setPseudoInput(e.target.value)}
-                                        placeholder="Ton pseudo..."
+                                        placeholder={t('clan.yourPseudo')}
                                         maxLength={20}
                                         style={{
                                             width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)',
@@ -259,13 +261,13 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: !settings?.leaderboardPseudo ? '16px' : '0' }}>
                                 <p style={{ margin: 0, color: 'var(--text-secondary)', textAlign: 'center', fontSize: '0.85rem' }}>
-                                    {view === 'create' ? 'Donne un nom épique à ton clan :' : 'Entre le code à 6 caractères :'}
+                                    {view === 'create' ? t('clan.clanNamePrompt') : t('clan.enterCode')}
                                 </p>
                                 <input
                                     type="text"
                                     value={inputValue}
                                     onChange={(e) => setInputValue(view === 'join' ? e.target.value.toUpperCase() : e.target.value)}
-                                    placeholder={view === 'create' ? "Nom du clan..." : "EX: ABC123"}
+                                    placeholder={view === 'create' ? t('clan.clanNamePlaceholder') : "EX: ABC123"}
                                     maxLength={view === 'join' ? 6 : 20}
                                     style={{
                                         width: '100%', padding: '16px', borderRadius: 'var(--radius-md)',
@@ -281,12 +283,12 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
                                 fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                                 opacity: isLoading ? 0.7 : 1
                             }}>
-                                {isLoading ? 'Chargement...' : view === 'create' ? 'Créer le clan' : 'Rejoindre'}
+                                {isLoading ? t('clan.loadingBtn') : view === 'create' ? t('clan.createButton') : t('clan.join')}
                             </button>
                             <button onClick={() => setView('menu')} style={{
                                 width: '100%', padding: '12px', background: 'transparent', border: 'none',
                                 color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '8px'
-                            }}>Annuler</button>
+                            }}>{t('common.cancel')}</button>
                         </div>
                     )}
                 </div>

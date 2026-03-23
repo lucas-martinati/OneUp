@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo, Suspense, lazy } from 'react';
+import { useTranslation } from 'react-i18next';
 import { App as CapacitorApp } from '@capacitor/app';
 import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
@@ -42,6 +43,7 @@ export function Dashboard({
     conflictData, onResolveConflict, getExerciseCount, updateExerciseCount, getTotalReps,
     getExerciseDone, pauseCloudSync, resumeCloudSync, computedStats
 }) {
+    const { t } = useTranslation();
     const [today, setToday] = useState(getLocalDateStr(new Date()));
     const [showCalendar, setShowCalendar] = useState(false);
     const [showStats, setShowStats] = useState(false);
@@ -74,7 +76,7 @@ export function Dashboard({
 
         if (newCount > prevCount) {
             // A new badge was unlocked — show a generic achievement toast
-            setNewAchievement({ id: 'new_badge', title: 'Nouveau Succès !', color: '#fbbf24', icon: Award });
+            setNewAchievement({ id: 'new_badge', title: t('dashboard.newAchievement'), color: '#fbbf24', icon: Award });
         }
 
         prevBadgeCountRef.current = newCount;
@@ -302,7 +304,7 @@ export function Dashboard({
                                     textTransform: 'uppercase', letterSpacing: '4px',
                                     marginBottom: '2px', fontWeight: '700'
                                 }}>
-                                    Jour
+                                    {t('dashboard.day')}
                                 </div>
 
                                 {/* Big animated day number */}
@@ -468,7 +470,7 @@ export function Dashboard({
                                             marginTop: '8px', opacity: 0.75,
                                             fontSize: 'clamp(0.7rem, 2.8vw, 0.95rem)'
                                         }}>
-                                            Fait à {timeStr}
+                                            {t('dashboard.doneAt', { time: timeStr })}
                                         </div>
                                     ) : null;
                                 })()}
@@ -479,9 +481,9 @@ export function Dashboard({
                             textAlign: 'center', padding: 'var(--spacing-xl)',
                             borderRadius: 'var(--radius-xl)', maxWidth: '320px'
                         }}>
-                            <h2 style={{ marginBottom: '12px', fontSize: '1.5rem' }}>⏳ En attente</h2>
+                            <h2 style={{ marginBottom: '12px', fontSize: '1.5rem' }}>{t('dashboard.waiting')}</h2>
                             <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                                Ton défi commence le <br />
+                                {t('dashboard.challengeStarts')} <br />
                                 <strong style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>{effectiveStart}</strong>
                             </p>
                         </div>
@@ -507,7 +509,7 @@ export function Dashboard({
                         }}
                     >
                         <CalendarIcon size={18} />
-                        Calendrier
+                        {t('dashboard.calendar')}
                     </button>
 
                     {/* Session Button */}
@@ -524,7 +526,7 @@ export function Dashboard({
                         }}
                     >
                         <Play size={18} />
-                        Séance
+                        {t('dashboard.session')}
                     </button>
                 </div>
 
@@ -633,6 +635,7 @@ const ExerciseButton = React.memo(({
     ex, isActive, dayNumber, today, settings,
     getExerciseCount, completions, computedStats, onSelect
 }) => {
+    const { t } = useTranslation();
     // We import formatTime helper logic directly here or replicate it
     const formatTime = (seconds) => {
         const m = Math.floor(seconds / 60);
@@ -705,7 +708,7 @@ const ExerciseButton = React.memo(({
                 textAlign: 'center', lineHeight: '1.1',
                 transition: 'color 0.2s ease'
             }}>
-                {ex.label}
+                {t('exercises.' + ex.id)}
             </span>
             <span style={{
                 fontSize: 'clamp(0.65rem, 1.5vh, 0.85rem)', fontWeight: '700',

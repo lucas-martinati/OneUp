@@ -3,6 +3,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { cloudSync } from '../services/cloudSync';
 import { getLocalDateStr } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
+import i18n from '../i18n';
 
 const STORAGE_KEY = 'pushup_challenge_data';
 const NOTIFICATION_ID = 1;
@@ -308,10 +309,10 @@ export function useProgress() {
           const dayNum = getDayNumber(notificationDateStr);
 
           const messages = [
-            `🎯 Jour ${dayNum} — Des exercices t'attendent ! 💪`,
-            `💥 Challenge : maintiens ta série ! 🔥`,
-            `⚡ Entraîne-toi aujourd'hui et garde le cap ! ✨`,
-            `🚀 ${dayNum} reps pour garder la flamme ! 🏆`,
+            i18n.t('notifications.body1', { day: dayNum }),
+            i18n.t('notifications.body2'),
+            i18n.t('notifications.body3'),
+            i18n.t('notifications.body4', { day: dayNum }),
           ];
           const selectedMessage = messages[Math.floor(Math.random() * messages.length)];
 
@@ -319,7 +320,7 @@ export function useProgress() {
             notifications: [
               {
                 id: NOTIFICATION_ID,
-                title: '💪 OneUp — Défi du jour !',
+                title: i18n.t('notifications.title'),
                 body: selectedMessage,
                 schedule: { at: notificationTime, repeats: true, every: 'day' },
                 sound: null,

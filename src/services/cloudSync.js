@@ -20,6 +20,7 @@ import {
 } from 'firebase/database';
 import { Preferences } from '@capacitor/preferences';
 import { createLogger } from '../utils/logger';
+import i18n from '../i18n';
 
 const logger = createLogger('CloudSync');
 
@@ -849,14 +850,14 @@ class CloudSyncService {
   }
 
   // Send a interaction/nudge to a clan member
-  async sendClanNotification(targetUid, type = 'nudge', message = "t'a envoyé un poke !") {
+  async sendClanNotification(targetUid, type = 'nudge', message = i18n.t('common.poke')) {
     try {
       if (!auth?.currentUser || !database) return false;
       const fromUid = auth.currentUser.uid;
 
       // Get sender's pseudo
       const lbSnapshot = await get(ref(database, `leaderboard/${fromUid}`));
-      const pseudo = lbSnapshot.exists() && lbSnapshot.val().pseudo ? lbSnapshot.val().pseudo : 'Un membre';
+      const pseudo = lbSnapshot.exists() && lbSnapshot.val().pseudo ? lbSnapshot.val().pseudo : i18n.t('common.member');
       const photoURL = lbSnapshot.exists() && lbSnapshot.val().photoURL ? lbSnapshot.val().photoURL : null;
 
       const notifsRef = ref(database, `notifications/${targetUid}`);

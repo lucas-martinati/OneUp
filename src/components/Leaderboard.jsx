@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { X, Trophy, Medal, Crown, ChevronRight, ChevronLeft, User, Award, Flame, Calendar, TrendingUp, Activity, HeartHandshake, Link, UserPlus, LogOut, Check, Shield } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { EXERCISES } from '../config/exercises';
@@ -8,13 +9,14 @@ import { isDayDoneFromCompletions, getLocalDateStr, calculateStreak, calculateMa
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
-// Tab config: "global" + one per exercise
-const TABS = [
-    { id: 'global', label: 'Global', color: '#fbbf24', icon: Trophy },
-    ...EXERCISES.map(ex => ({ id: ex.id, label: ex.label, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
-];
-
 export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveClan }) {
+    const { t } = useTranslation();
+
+    const TABS = useMemo(() => [
+        { id: 'global', labelKey: 'common.global', color: '#fbbf24', icon: Trophy },
+        ...EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
+    ], []);
+
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('global');
@@ -36,7 +38,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
         e.stopPropagation();
         if (nudgedMember === uid) return;
         setNudgedMember(uid);
-        await cloudSync.sendClanNotification(uid, 'nudge', `t'a envoyé un poke !`);
+        await cloudSync.sendClanNotification(uid, 'nudge', t('common.poke'));
         setTimeout(() => setNudgedMember(null), 2000);
     };
 
@@ -100,7 +102,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                 {clanData ? (
                     <div>
                         <div style={{ fontSize: '0.75rem', color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '2px' }}>
-                            Ton Clan
+                            {t('leaderboard.yourClan')}
                         </div>
                         <h2 style={{ margin: 0, fontSize: '1.6rem', fontWeight: '800', color: 'white' }}>
                             {clanData.name}
@@ -113,7 +115,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                         WebkitBackgroundClip: 'text', backgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
                     }}>
-                        Classement
+                        {t('leaderboard.title')}
                     </h2>
                 )}
                 <button onClick={onClose} className="hover-lift glass" style={{
@@ -137,7 +139,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                     }}>
                         <div>
                             <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <UserPlus size={14} /> Code d'invitation
+                                <UserPlus size={14} /> {t('leaderboard.inviteCode')}
                             </div>
                             <div style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '2px', color: '#fbbf24' }}>
                                 {clanData.code}
@@ -150,7 +152,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                             color: 'white', fontSize: '0.85rem', fontWeight: '600',
                             display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer'
                         }}>
-                            {copied ? <><Check size={16} /> Copié</> : <><Link size={16} /> Copier</>}
+                            {copied ? <><Check size={16} /> {t('leaderboard.copied')}</> : <><Link size={16} /> {t('leaderboard.copy')}</>}
                         </button>
                     </div>
                 </div>
@@ -185,7 +187,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                             }}
                         >
                             <Icon size={14} />
-                            {tab.label}
+                            {t(tab.labelKey)}
                         </button>
                     );
                 })}
@@ -206,7 +208,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                             borderTopColor: '#fbbf24', borderRadius: '50%',
                             animation: 'spin 0.8s linear infinite'
                         }} />
-                        <span style={{ fontSize: '0.85rem' }}>Chargement...</span>
+                        <span style={{ fontSize: '0.85rem' }}>{t('leaderboard.loading')}</span>
                     </div>
                 ) : sorted.length === 0 ? (
                     <div style={{
@@ -215,14 +217,14 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                         textAlign: 'center', padding: 'var(--spacing-xl)'
                     }}>
                         <Trophy size={40} color="rgba(251,191,36,0.3)" />
-                        <p style={{ fontSize: '1rem', fontWeight: '600' }}>Personne ici pour l'instant</p>
+                        <p style={{ fontSize: '1rem', fontWeight: '600' }}>{t('leaderboard.empty')}</p>
                         {!cloudAuth?.isSignedIn ? (
                             <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>
-                                Connecte-toi avec Google pour apparaître dans le classement !
+                                {t('leaderboard.signInToAppear')}
                             </p>
                         ) : (
                             <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>
-                                Active le leaderboard dans les paramètres pour apparaître !
+                                {t('leaderboard.enableToAppear')}
                             </p>
                         )}
                     </div>
@@ -287,7 +289,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                                             overflow: 'hidden', textOverflow: 'ellipsis',
                                             whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px'
                                         }}>
-                                            {isMe ? `${entry.pseudo} (toi)` : entry.pseudo}
+                                            {isMe ? `${entry.pseudo} (${t('common.you')})` : entry.pseudo}
                                             {entry.lastActiveDay === todayStr && <Shield size={12} color="#10b981" />}
                                         </div>
                                     </div>
@@ -298,7 +300,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                                         color: activeTabConfig?.color || '#fbbf24',
                                         flexShrink: 0
                                     }}>
-                                        {reps.toLocaleString('fr-FR')}
+                                                {reps.toLocaleString()}
                                     </span>
 
                                     <ChevronRight size={16} color="var(--text-secondary)" style={{ opacity: 0.4, flexShrink: 0 }} />
@@ -334,7 +336,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                         background: 'transparent', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444',
                         fontSize: '0.9rem', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer'
                     }}>
-                        <LogOut size={16} /> Quitter le clan
+                        <LogOut size={16} /> {t('leaderboard.leaveClan')}
                     </button>
                 </div>
             )}
@@ -354,21 +356,23 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                         boxShadow: '0 20px 40px rgba(0,0,0,0.5)'
                     }}>
                         <LogOut size={48} color="#ef4444" style={{ marginBottom: '16px' }} />
-                        <h3 style={{ margin: '0 0 12px 0', fontSize: '1.4rem', color: 'white' }}>Quitter le clan ?</h3>
+                        <h3 style={{ margin: '0 0 12px 0', fontSize: '1.4rem', color: 'white' }}>{t('leaderboard.leaveClanConfirm')}</h3>
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px', lineHeight: '1.5' }}>
-                            Es-tu sûr de vouloir quitter <strong>{clanData.name}</strong> ? Tes statistiques personnelles sont protégées, mais tu n'apparaîtras plus dans leur classement.
+                            <Trans i18nKey="leaderboard.leaveClanWarning" values={{ name: clanData.name }}>
+                                Es-tu sûr de vouloir quitter <strong>{{name: clanData.name}}</strong> ? Tes statistiques personnelles sont protégées, mais tu n'apparaîtras plus dans leur classement.
+                            </Trans>
                         </p>
                         <div style={{ display: 'flex', gap: '12px' }}>
                             <button onClick={() => setShowLeaveConfirm(false)} className="hover-lift" style={{
                                 flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
                                 background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white',
                                 fontWeight: '600', cursor: 'pointer', minHeight: 'var(--touch-min)'
-                            }}>Annuler</button>
+                            }}>{t('common.cancel')}</button>
                             <button onClick={() => { setShowLeaveConfirm(false); onLeaveClan(); }} className="hover-lift" style={{
                                 flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
                                 background: '#ef4444', border: 'none', color: 'white',
                                 fontWeight: '700', cursor: 'pointer', minHeight: 'var(--touch-min)'
-                            }}>Quitter</button>
+                            }}>{t('leaderboard.leaveClan')}</button>
                         </div>
                     </div>
                 </div>
@@ -390,6 +394,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
 
 /* ── User Detail Sub-Component (with lazy-loaded progress) ──────────── */
 function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
+    const { t } = useTranslation();
     const rankColors = { 1: '#fbbf24', 2: '#c0c0c0', 3: '#cd7f32' };
     const rankColor = rankColors[rank] || '#818cf8';
 
@@ -478,7 +483,7 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                             fontSize: '1.1rem', fontWeight: '700',
                             color: isMe ? rankColor : 'var(--text-primary)'
                         }}>
-                            {entry.pseudo} {isMe && '(toi)'}
+                            {entry.pseudo} {isMe && `(${t('common.you')})`}
                         </div>
                         <div style={{
                             display: 'inline-flex', alignItems: 'center', gap: '4px',
@@ -506,7 +511,7 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                     {entry.difficultyMultiplier && entry.difficultyMultiplier !== 1 && (
                         <StatCard
                             icon={<Zap size={16} color="#6366f1" />}
-                            label="Difficulté"
+                            label={t('leaderboard.difficulty')}
                             value={`x${entry.difficultyMultiplier}`}
                             color="#6366f1"
                         />
@@ -514,42 +519,42 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                     {/* Total reps */}
                     <StatCard
                         icon={<Trophy size={16} color="#fbbf24" />}
-                        label="Reps totales"
-                        value={entry.totalReps.toLocaleString('fr-FR')}
+                        label={t('leaderboard.totalReps')}
+                        value={entry.totalReps.toLocaleString()}
                         color="#fbbf24"
                     />
                     {/* Achievements */}
                     <StatCard
                         icon={<Award size={16} color="#a855f7" />}
-                        label="Succès"
+                        label={t('leaderboard.achievements')}
                         value={entry.achievements || 0}
                         color="#a855f7"
                     />
                     {/* Streak (from lazy-loaded data) */}
                     <StatCard
                         icon={<Flame size={16} color="#f97316" />}
-                        label="Meilleure série"
+                        label={t('leaderboard.bestStreak')}
                         value={loadingDetails ? '…' : (stats.maxStreak || 0)}
                         color="#f97316"
                     />
                     {/* Total days */}
                     <StatCard
                         icon={<Calendar size={16} color="#22d3ee" />}
-                        label="Jours actifs"
+                        label={t('leaderboard.activeDays')}
                         value={loadingDetails ? '…' : (stats.totalDays || 0)}
                         color="#22d3ee"
                     />
                     {/* Current streak */}
                     <StatCard
                         icon={<TrendingUp size={16} color="#10b981" />}
-                        label="Série en cours"
+                        label={t('leaderboard.currentStreak')}
                         value={loadingDetails ? '…' : (stats.currentStreak || 0)}
                         color="#10b981"
                     />
                     {/* Perfect days */}
                     <StatCard
                         icon={<Activity size={16} color="#ec4899" />}
-                        label="Jours parfaits"
+                        label={t('leaderboard.perfectDays')}
                         value={loadingDetails ? '…' : (stats.perfectDays || 0)}
                         color="#ec4899"
                     />
@@ -583,7 +588,7 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                                     }}>
                                         <span style={{
                                             fontSize: '0.75rem', fontWeight: '600', color: ex.color
-                                        }}>{ex.label}</span>
+                                        }}>{t('exercises.' + ex.id)}</span>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                             {!loadingDetails && (stats.exerciseStreaks?.[ex.id] || 0) > 0 && (
                                                 <div style={{
@@ -601,7 +606,7 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                                                     <span style={{
                                                         fontSize: '0.65rem', fontWeight: '700',
                                                         color: stats.exerciseDoneToday?.[ex.id] ? '#f97316' : '#888'
-                                                    }}>{stats.exerciseStreaks[ex.id]}j</span>
+                                                    }}>{stats.exerciseStreaks[ex.id]}{t('common.daysAbbr')}</span>
                                                 </div>
                                             )}
                                             {exDays !== null && (
@@ -609,14 +614,14 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                                                     fontSize: '0.65rem', color: 'var(--text-secondary)',
                                                     opacity: 0.7
                                                 }}>
-                                                    {exDays}j
+                                                    {exDays}{t('common.daysAbbr')}
                                                 </span>
                                             )}
                                             <span style={{
                                                 fontSize: '0.75rem', fontWeight: '700',
                                                 color: 'var(--text-primary)'
                                             }}>
-                                                {reps.toLocaleString('fr-FR')}
+                                        {reps.toLocaleString()}
                                             </span>
                                         </div>
                                     </div>

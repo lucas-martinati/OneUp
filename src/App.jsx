@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, Suspense, lazy } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useProgress } from './hooks/useProgress';
 import { useSettings } from './hooks/useSettings';
 import { useGoogleAuth } from './hooks/useGoogleAuth';
@@ -16,6 +17,7 @@ const Onboarding = lazy(() => import('./components/Onboarding').then(module => (
 const logger = createLogger('App');
 
 function App() {
+  const { t } = useTranslation();
   const progress = useProgress();
   const { settings, updateSettings } = useSettings();
   const googleAuth = useGoogleAuth();
@@ -282,7 +284,7 @@ function App() {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: '600'
       }}>
-        Initialisation...
+        {t('app.initializing')}
       </div>
     }>
       {!isSetup ? (

@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe } from 'lucide-react';
 import { CloudSyncPanel } from './CloudSyncPanel';
 
 export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict }) {
+    const { t, i18n } = useTranslation();
     const [showSaved, setShowSaved] = useState(false);
     const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
 
@@ -45,7 +47,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
     const ToggleSwitch = ({ enabled, onClick, activeGradient }) => (
         <button
             onClick={onClick}
-            aria-label={enabled ? 'Désactiver' : 'Activer'}
+            aria-label={enabled ? t('settings.disable') : t('settings.enable')}
             style={{
                 width: '50px',
                 height: '28px',
@@ -127,7 +129,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                 marginBottom: 'var(--spacing-md)'
             }}>
                 <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: '800' }}>
-                    Paramètres
+                    {t('settings.title')}
                 </h2>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     {/* Auto-save indicator */}
@@ -145,7 +147,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                             boxShadow: 'var(--glow-success)'
                         }}>
                             <Check size={16} />
-                            Sauvegardé
+                            {t('common.saved')}
                         </div>
                     )}
                     <button onClick={onClose} className="hover-lift glass" style={{
@@ -167,12 +169,12 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                 marginBottom: 'var(--spacing-md)',
                 background: 'var(--surface-section)'
             }}>
-                <h3 style={sectionTitleStyle}>Préférences</h3>
+                <h3 style={sectionTitleStyle}>{t('settings.preferences')}</h3>
 
                 <SettingRow
                     icon={Bell}
-                    title="Notifications"
-                    description="Rappel d'entraînement"
+                    title={t('settings.notifications')}
+                    description={t('settings.reminder')}
                     color="#8b5cf6"
                     isLast={!settings.notificationsEnabled}
                 >
@@ -194,7 +196,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                             marginBottom: '10px', color: 'var(--text-secondary)'
                         }}>
                             <Clock size={14} />
-                            <div style={{ fontWeight: '600', fontSize: '0.8rem' }}>HEURE DU RAPPEL</div>
+                            <div style={{ fontWeight: '600', fontSize: '0.8rem' }}>{t('settings.reminderTime')}</div>
                         </div>
                         <div style={{
                             display: 'flex', gap: '12px', alignItems: 'center',
@@ -252,8 +254,8 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
 
                 <SettingRow
                     icon={Volume2}
-                    title="Effets sonores"
-                    description="Sons lors des actions"
+                    title={t('settings.soundEffects')}
+                    description={t('settings.soundsDescription')}
                     color="#0ea5e9"
                     isLast={true}
                 >
@@ -265,29 +267,80 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                 </SettingRow>
             </div>
 
+            {/* ── Langue ── */}
+            <div className="glass-premium" style={{
+                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                marginBottom: 'var(--spacing-md)',
+                background: 'var(--surface-section)'
+            }}>
+                <h3 style={sectionTitleStyle}>{t('settings.language')}</h3>
+                <SettingRow
+                    icon={Globe}
+                    title={t('settings.language')}
+                    description={t('settings.languageDesc')}
+                    color="#06b6d4"
+                    isLast={true}
+                >
+                    <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
+                        {[
+                            { value: 'fr', label: 'FR' },
+                            { value: 'en', label: 'EN' }
+                        ].map(opt => (
+                            <button
+                                key={opt.value}
+                                onClick={() => {
+                                    i18n.changeLanguage(opt.value);
+                                    localStorage.setItem('oneup_language', opt.value);
+                                }}
+                                style={{
+                                    padding: '6px 16px',
+                                    borderRadius: '10px',
+                                    border: i18n.language === opt.value
+                                        ? '2px solid #06b6d4'
+                                        : '2px solid var(--border-subtle)',
+                                    background: i18n.language === opt.value
+                                        ? 'rgba(6,182,212,0.2)'
+                                        : 'transparent',
+                                    color: i18n.language === opt.value
+                                        ? '#06b6d4'
+                                        : 'var(--text-secondary)',
+                                    fontSize: '0.85rem',
+                                    fontWeight: '700',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    minHeight: 'var(--touch-min)'
+                                }}
+                            >
+                                {opt.label}
+                            </button>
+                        ))}
+                    </div>
+                </SettingRow>
+            </div>
+
             {/* ── Performance ──────────────────────────────────────────── */}
             <div className="glass-premium" style={{
                 padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
                 marginBottom: 'var(--spacing-md)',
                 background: 'var(--surface-section)'
             }}>
-                <h3 style={sectionTitleStyle}>Performance</h3>
+                <h3 style={sectionTitleStyle}>{t('settings.performance')}</h3>
 
                 <SettingRow
                     icon={Gauge}
-                    title="Mode graphique"
+                    title={t('settings.graphicsMode')}
                     description={
                         settings.performanceMode === 'low'
-                            ? 'Effets visuels réduits'
-                            : 'Tous les effets activés'
+                            ? t('settings.reducedEffects')
+                            : t('settings.allEffects')
                     }
                     color="#10b981"
                     isLast={true}
                 >
                     <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
                         {[
-                            { value: 'low', label: 'Éco', color: '#f59e0b' },
-                            { value: 'high', label: 'Max', color: '#8b5cf6' }
+                            { value: 'low', label: t('settings.eco'), color: '#f59e0b' },
+                            { value: 'high', label: t('settings.max'), color: '#8b5cf6' }
                         ].map(opt => (
                             <button
                                 key={opt.value}
@@ -328,12 +381,12 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                 marginBottom: 'var(--spacing-md)',
                 background: 'var(--surface-section)'
             }}>
-                <h3 style={sectionTitleStyle}>Communauté</h3>
+                <h3 style={sectionTitleStyle}>{t('settings.community')}</h3>
 
                 <SettingRow
                     icon={Users}
-                    title="Classement"
-                    description="Apparaître dans le classement public"
+                    title={t('settings.leaderboard')}
+                    description={t('settings.leaderboardDesc')}
                     color="#fbbf24"
                     isLast={!settings.leaderboardEnabled}
                 >
@@ -355,7 +408,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                             fontWeight: '600', marginBottom: '8px', display: 'block',
                             textTransform: 'uppercase', letterSpacing: '0.5px'
                         }}>
-                            Pseudo affiché
+                            {t('settings.displayName')}
                         </label>
                         <input
                             type="text"
@@ -365,7 +418,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                                 onSave(newSettings);
                             }}
                             onBlur={() => showSavedIndicator()}
-                            placeholder={cloudAuth?.user?.displayName || 'Ton pseudo...'}
+                            placeholder={cloudAuth?.user?.displayName || t('settings.yourPseudo')}
                             maxLength={20}
                             style={{
                                 width: '100%', padding: '12px 16px',
@@ -386,7 +439,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                             fontSize: '0.75rem', color: 'var(--text-secondary)',
                             marginTop: '8px', opacity: 0.8
                         }}>
-                            Max 20 caractères · Ta photo Google sera utilisée
+                            {t('settings.maxChars')}
                         </div>
                     </div>
                 )}
@@ -399,7 +452,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                     marginBottom: 'var(--spacing-md)',
                     background: 'var(--surface-section)'
                 }}>
-                    <h3 style={sectionTitleStyle}>Données & Cloud</h3>
+                    <h3 style={sectionTitleStyle}>{t('settings.dataCloud')}</h3>
                     <CloudSyncPanel
                         authState={cloudAuth}
                         onSignIn={() => cloudSync.signIn()}
@@ -425,7 +478,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                 overflow: 'hidden',
                 flexShrink: 0
             }}>
-                <h3 style={{ ...sectionTitleStyle, color: isMultiplierUnlocked ? '#ef4444' : 'var(--text-secondary)' }}>Difficulté</h3>
+                <h3 style={{ ...sectionTitleStyle, color: isMultiplierUnlocked ? '#ef4444' : 'var(--text-secondary)' }}>{t('settings.difficulty')}</h3>
 
                 <div style={{ marginBottom: '16px' }}>
                     <div style={{
@@ -436,9 +489,9 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                         transition: 'all 0.3s ease'
                     }}>
                         <p style={{ margin: 0, fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px', color: '#ef4444' }}>
-                            <Lock size={14} /> PARAMÈTRE SENSIBLE
+                            <Lock size={14} /> {t('settings.sensitiveParam')}
                         </p>
-                        <p style={{ margin: 0, opacity: 0.9 }}>Modifier ceci changera vos objectifs de répétitions quotidiens. Un réglage à 0.5 divise vos objectifs par deux.</p>
+                        <p style={{ margin: 0, opacity: 0.9 }}>{t('settings.sensitiveWarning')}</p>
                     </div>
                 </div>
 
@@ -456,13 +509,13 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                             boxShadow: '0 4px 12px rgba(239, 68, 68, 0.1)'
                         }}
                     >
-                        DÉBLOQUER LES PARAMÈTRES <Lock size={18} />
+                        {t('settings.unlockSettings')} <Lock size={18} />
                     </button>
                 ) : (
                     <div className="scale-in">
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span style={{ fontWeight: '700', color: 'white', fontSize: '0.9rem' }}>Multiplicateur (Max 1.0)</span>
+                                <span style={{ fontWeight: '700', color: 'white', fontSize: '0.9rem' }}>{t('settings.multiplier')}</span>
                                 <button
                                     onClick={() => setIsMultiplierUnlocked(false)}
                                     style={{
@@ -471,7 +524,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                                         cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'
                                     }}
                                 >
-                                    Bloquer <Unlock size={12} />
+                                    {t('settings.lock')} <Unlock size={12} />
                                 </button>
                             </div>
                             <span style={{ fontWeight: '800', color: '#fbbf24', fontSize: '1.4rem', textShadow: '0 0 10px rgba(251,191,36,0.3)' }}>

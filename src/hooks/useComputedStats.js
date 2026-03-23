@@ -55,9 +55,9 @@ export function computeAllStats(completions, settings, getDayNumber) {
 
     // Pie chart data (time of day)
     const pieData = [
-        { name: 'Matin', value: 0, color: '#f59e0b' },
-        { name: 'Après-midi', value: 0, color: '#0ea5e9' },
-        { name: 'Soir', value: 0, color: '#8b5cf6' }
+        { name: 'Matin', id: 'morning', value: 0, color: '#f59e0b' },
+        { name: 'Après-midi', id: 'afternoon', value: 0, color: '#0ea5e9' },
+        { name: 'Soir', id: 'evening', value: 0, color: '#8b5cf6' }
     ];
     let trackedCount = 0;
 
@@ -252,6 +252,7 @@ export function computeAllStats(completions, settings, getDayNumber) {
     const maxExReps = Math.max(...exerciseStats.map(e => e.totalReps), 100);
     const radarData = exerciseStats.map(ex => ({
         subject: ex.label,
+        exId: ex.id,
         reps: ex.totalReps,
         fullMark: maxExReps
     }));

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { CSSConfetti } from './CSSConfetti';
 import {
@@ -15,6 +16,7 @@ const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, 
 
 export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext }) {
     useWakeLock();
+    const { t } = useTranslation();
     const [isAnimating, setIsAnimating] = useState(false);
     const [completeFlash, setCompleteFlash] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
@@ -86,7 +88,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     const activeColor = exerciseConfig?.color || '#818cf8';
     const [gradStart, gradEnd] = exerciseConfig?.gradient || ['#667eea', '#818cf8'];
     const ExIcon = ICON_MAP[exerciseConfig?.icon] || Dumbbell;
-    const exerciseLabel = exerciseConfig?.label || 'Exercice';
+    const exerciseLabel = t('exercises.' + exerciseConfig?.id) || t('common.exercise');
 
     // Unique SVG gradient id per exercise to avoid conflicts
     const gradientId = `counterGrad-${exerciseConfig?.id || 'default'}`;
@@ -128,7 +130,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                             minHeight: 'var(--touch-min)'
                         }}
                     >
-                        Suivant <ChevronRight size={16} />
+                        {t('counter.next')} <ChevronRight size={16} />
                     </button>
                 )}
                 <button
@@ -255,12 +257,12 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                         }}>
-                            {exerciseLabel} Valid&eacute; !
+                            {t('counter.validated', { exercise: exerciseLabel })}
                         </span>
                     </div>
                 ) : (
                     <div style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
-                        Encore <span style={{ color: activeColor, fontWeight: '600' }}>{remaining}</span> {exerciseLabel.toLowerCase()}
+                        {t('counter.remaining', { count: remaining, exercise: exerciseLabel.toLowerCase() })}
                     </div>
                 )}
 
@@ -353,7 +355,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                         }}
                     >
                         <RotateCcw size={18} />
-                        R&eacute;initialiser
+                        {t('counter.reset')}
                     </button>
 
                     {/* Complete All Button */}
@@ -378,7 +380,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                         }}
                     >
                         <CheckCheck size={18} />
-                        Tout compl&eacute;ter
+                        {t('counter.completeAll')}
                     </button>
                 </div>
             </div>
@@ -391,7 +393,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                 fontSize: '0.8rem', textAlign: 'center', alignSelf: 'center', width: '90%', maxWidth: '300px',
                 border: '1px solid rgba(255,255,255,0.05)'
             }}>
-                💡 {["Boire de l'eau booste les performances.", "Garde le dos droit !", "La constance bat l'intensité.", "Respire bien après l'effort.", "1% meilleur chaque jour."][(dayNumber || 0) % 5]}
+                💡 {t('counter.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
             </div>
         </div>
         </>

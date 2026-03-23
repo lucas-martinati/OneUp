@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { ChevronRight } from 'lucide-react';
 
 export function AchievementToast({ achievement, onClose, onView }) {
+    const { t } = useTranslation();
     const [isVisible, setIsVisible] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
     const [translateX, setTranslateX] = useState(0);
@@ -90,7 +92,7 @@ export function AchievementToast({ achievement, onClose, onView }) {
                 </div>
                 <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        Succès Débloqué!
+                        {t('achievementToast.title')}
                     </div>
                     <div style={{ fontSize: '1rem', fontWeight: '700', color: achievement.color }}>
                         {achievement.title}

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { getLocalDateStr } from '../utils/dateUtils';
 import { registerBackHandler } from '../utils/backHandler';
 import { getDailyGoal } from '../config/exercises'; // Added getDailyGoal import
@@ -8,6 +9,7 @@ import { getDailyGoal } from '../config/exercises'; // Added getDailyGoal import
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
 export function Calendar({ startDate, completions, exercises, getDayNumber, onClose, settings }) { // Added settings prop
+    const { t } = useTranslation();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
     const [isClosing, setIsClosing] = useState(false);
@@ -46,10 +48,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
 
-    const monthNames = [
-        "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-        "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
-    ];
+    const monthNames = t('calendar.months', { returnObjects: true });
 
     const todayStr = getLocalDateStr(new Date());
 
@@ -99,7 +98,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                 marginBottom: 'var(--spacing-md)'
             }}>
                 <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: '2rem', fontWeight: '800' }}>
-                    Historique
+                    {t('calendar.title')}
                 </h2>
                 <button onClick={onClose} className="hover-lift glass" style={{
                     background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
@@ -119,12 +118,12 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
             }}>
                 <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '1.8rem', fontWeight: '700', color: '#10b981' }}>{monthCompleted}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Complétés</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('calendar.completed')}</div>
                 </div>
                 <div style={{ width: '1px', background: 'var(--border-default)' }} />
                 <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '1.8rem', fontWeight: '700', color: '#8b5cf6' }}>{completionRate}%</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Réussite</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('calendar.success')}</div>
                 </div>
             </div>
 
@@ -154,7 +153,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                 gap: '6px', flex: 1, alignContent: 'start'
             }}>
                 {/* Weekday headers */}
-                {['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'].map(d => (
+                {t('calendar.weekdays', { returnObjects: true }).map(d => (
                     <div key={d} style={{
                         textAlign: 'center', color: 'var(--text-secondary)',
                         fontSize: '0.7rem', fontWeight: '700', textTransform: 'uppercase',
@@ -257,6 +256,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                         onClose={handleCloseDetail}
                         isClosing={isClosing}
                         settings={settings} // Pass settings to DayDetail
+                        t={t}
                     />
                 </>
             )}
@@ -273,7 +273,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                             width: '8px', height: '8px', borderRadius: '50%',
                             background: ex.color, boxShadow: `0 0 4px ${ex.color}`
                         }} />
-                        <span style={{ color: 'var(--text-secondary)' }}>{ex.label}</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>{t('exercises.' + ex.id)}</span>
                     </div>
                 ))}
             </div>
@@ -283,7 +283,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
 }
 
 /** Day detail bottom sheet */
-function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, settings }) { // Added settings prop
+function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, settings, t }) { // Added settings prop
     const dayNum = getDayNumber(dateString);
     const dayCompletions = completions[dateString] || {};
     const [dragY, setDragY] = useState(0);
@@ -413,7 +413,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                         {dateString}
                     </div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: '700' }}>Jour {dayNum}</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: '700' }}>{t('calendar.day', { num: dayNum })}</div>
                 </div>
             </div>
 
@@ -438,10 +438,10 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                             </div>
                             <div style={{ flex: 1 }}>
                                 <div style={{ fontSize: '0.9rem', fontWeight: '600', color: exData.isCompleted ? ex.color : 'var(--text-primary)' }}>
-                                    {ex.label}
+                                    {t('exercises.' + ex.id)}
                                 </div>
                                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                    {exData.isCompleted ? goal : 0} / {goal} reps
+                                    {t('calendar.repsCount', { done: exData.isCompleted ? goal : 0, goal })}
                                 </div>
                             </div>
                             {exData.isCompleted && (
