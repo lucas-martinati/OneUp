@@ -63,7 +63,7 @@
   "timer": {
     "validated": "Chrono Validé !",
     "remaining": "Encore {{time}} à tenir",
-    "reset": "RAZ",
+    "reset": "reset",
     "skip": "Skip",
     "next": "Suivant",
     "tips": [
@@ -101,7 +101,7 @@
     "english": "English",
     "difficulty": "Difficulté",
     "sensitiveParam": "PARAMÈTRE SENSIBLE",
-    "sensitiveWarning": "Modifier ceci changera vos objectifs de répétitions quotidiens. Un réglage à 0.5 divise vos objectifs par deux.",
+    "sensitiveWarning": "Modifier ceci changera tes objectifs de répétitions quotidiens. Un réglage à 0.5 divise tes objectifs par deux.",
     "unlockSettings": "DÉBLOQUER LES PARAMÈTRES",
     "multiplier": "Multiplicateur (Max 1.0)",
     "lock": "Bloquer",
@@ -133,7 +133,7 @@
     "muscleBalance": "🕸️ Équilibre Musculaire",
     "basedOnManual": "Basé sur {{count}} journée{{plural}} manuelles",
     "notEnoughData": "📊 Pas encore assez de données",
-    "completeForHabits": "Complete tes exercices quotidiens pour voir<br />tes habitudes ici !",
+    "completeForHabits": "Complète tes exercices quotidiens pour voir<br />tes habitudes ici !",
     "maxDays": "max {{count}}j",
     "loadingCharts": "Chargement des graphiques...",
     "byExercise": "Par exercice",
