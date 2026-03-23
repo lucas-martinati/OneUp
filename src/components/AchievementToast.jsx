@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronRight } from 'lucide-react';
 
@@ -6,8 +6,9 @@ export function AchievementToast({ achievement, onClose, onView }) {
     const [isVisible, setIsVisible] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
     const [translateX, setTranslateX] = useState(0);
-    const [isDragging, setIsDraggingState] = useState(false);
+    const [noTransition, setNoTransition] = useState(false);
     const startX = useRef(0);
+    const isDragging = useRef(false);
 
     useEffect(() => {
         requestAnimationFrame(() => setIsVisible(true));
@@ -33,25 +34,27 @@ export function AchievementToast({ achievement, onClose, onView }) {
 
     const handleTouchStart = (e) => {
         startX.current = e.touches[0].clientX;
-        setIsDraggingState(true);
+        isDragging.current = true;
+        setNoTransition(true);
     };
 
     const handleTouchMove = (e) => {
-        if (!isDragging) return;
+        if (!isDragging.current) return;
         const currentX = e.touches[0].clientX;
         const diff = currentX - startX.current;
         setTranslateX(diff * 0.5);
     };
 
-    const handleTouchEnd = () => {
-        setIsDraggingState(false);
+    const handleTouchEnd = useCallback(() => {
+        isDragging.current = false;
+        setNoTransition(false);
         if (Math.abs(translateX) > 25) {
             setIsExiting(true);
             setTimeout(onClose, 200);
         } else {
             setTranslateX(0);
         }
-    };
+    }, [translateX, onClose]);
 
     return createPortal(
         <div style={{
@@ -59,7 +62,7 @@ export function AchievementToast({ achievement, onClose, onView }) {
             transform: `translateX(calc(-50% + ${translateX}px)) translateY(${isExiting ? -20 : (isVisible ? 0 : -100)}px)`,
             zIndex: 9999,
             opacity: isExiting ? 0 : (isVisible ? 1 : 0),
-            transition: isDragging ? 'none' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: noTransition ? 'none' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             pointerEvents: isVisible && !isExiting ? 'auto' : 'none',
             maxWidth: 'calc(100vw - 32px)'
         }}>
