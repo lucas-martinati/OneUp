@@ -101,34 +101,14 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
             paddingTop: 'calc(var(--spacing-sm) + env(safe-area-inset-top))',
             paddingBottom: 'calc(var(--spacing-sm) + env(safe-area-inset-bottom))'
         }}>
-            {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-lg)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{
-                        width: 'var(--touch-min)', height: 'var(--touch-min)', borderRadius: '50%',
-                        background: `${activeColor}22`, border: `1.5px solid ${activeColor}55`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                        <ExIcon size={20} color={activeColor} />
-                    </div>
-                    <h2 style={{ fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', fontWeight: '700', color: activeColor, margin: 0 }}>
-                        {exerciseLabel}
-                    </h2>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <button
-                    onClick={onClose}
-                    className="glass hover-lift"
-                    style={{
-                        width: 'var(--touch-min)', height: 'var(--touch-min)', borderRadius: '50%',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'rgba(255,255,255,0.08)', border: 'none',
-                        color: 'var(--text-secondary)', cursor: 'pointer'
-                    }}
-                >
-                    <X size={20} />
-                </button>
-
+            {/* Top-right buttons */}
+            <div style={{
+                position: 'fixed',
+                top: 'calc(var(--spacing-sm) + env(safe-area-inset-top))',
+                right: 'var(--spacing-sm)',
+                display: 'flex', alignItems: 'center', gap: '8px',
+                zIndex: 1001
+            }}>
                 {/* Session: Next button */}
                 {onNext && (
                     <button
@@ -148,6 +128,33 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                         Suivant <ChevronRight size={16} />
                     </button>
                 )}
+                <button
+                    onClick={onClose}
+                    className="glass hover-lift"
+                    style={{
+                        width: 'var(--touch-min)', height: 'var(--touch-min)', borderRadius: '50%',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: 'rgba(255,255,255,0.08)', border: 'none',
+                        color: 'var(--text-secondary)', cursor: 'pointer'
+                    }}
+                >
+                    <X size={20} />
+                </button>
+            </div>
+
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 'var(--spacing-lg)', paddingRight: 'calc(var(--touch-min) + var(--spacing-sm))' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                        width: 'var(--touch-min)', height: 'var(--touch-min)', borderRadius: '50%',
+                        background: `${activeColor}22`, border: `1.5px solid ${activeColor}55`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        <ExIcon size={20} color={activeColor} />
+                    </div>
+                    <h2 style={{ fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', fontWeight: '700', color: activeColor, margin: 0 }}>
+                        {exerciseLabel}
+                    </h2>
                 </div>
             </div>
 

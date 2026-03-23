@@ -262,7 +262,7 @@ export function Onboarding({ onStart }) {
                                     minHeight: 'var(--touch-min)'
                                 }}
                             >
-                                {date < todayStr ? 'Suivant' : 'Lancer le D&eacute;fi'}
+                                {date < todayStr ? 'Suivant' : 'Lancer le Défi'}
                                 <ArrowRight size={20} strokeWidth={3} />
                             </button>
                         </div>
@@ -396,7 +396,7 @@ export function Onboarding({ onStart }) {
                                     minHeight: 'var(--touch-min)'
                                 }}
                             >
-                                Lancer le D&eacute;fi
+                                Lancer le Défi
                                 <ArrowRight size={20} strokeWidth={3} />
                             </button>
                         </div>
@@ -417,8 +417,8 @@ export function Onboarding({ onStart }) {
                         borderRadius: '4px',
                         background: step === s
                             ? s === 1 ? 'linear-gradient(90deg, #667eea, #764ba2)'
-                              : s === 2 ? 'linear-gradient(90deg, #f093fb, #f5576c)'
-                              : 'linear-gradient(90deg, #10b981, #34d399)'
+                                : s === 2 ? 'linear-gradient(90deg, #f093fb, #f5576c)'
+                                    : 'linear-gradient(90deg, #10b981, #34d399)'
                             : 'rgba(255,255,255,0.2)',
                         transition: 'all 0.3s ease'
                     }} />
