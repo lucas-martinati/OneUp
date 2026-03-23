@@ -172,6 +172,10 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                     const dayCompletions = completions[dateString] || {};
                     const isAnyDone = Object.values(dayCompletions).some(ex => ex?.isCompleted);
                     const isMissed = !isAnyDone && !isFuture && !isBeforeStart;
+                    const completedCount = exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length;
+                    const totalCount = completedCount + (isMissed ? 1 : 0);
+                    const dotSize = totalCount > 8 ? '5px' : '7px';
+                    const dotGap = totalCount > 8 ? '2px' : '3px';
 
                     let bgColor = 'var(--surface-subtle)';
                     if (isToday) bgColor = 'rgba(139, 92, 246, 0.1)';
@@ -214,13 +218,13 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
 
                             {/* Exercise dots */}
                             {!isFuture && !isBeforeStart && exercises && (
-                                <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                <div style={{ display: 'flex', gap: dotGap, flexWrap: 'wrap', justifyContent: 'center' }}>
                                     {exercises.map(ex => {
                                         const exData = dayCompletions[ex.id];
                                         if (!exData?.isCompleted) return null;
                                         return (
                                             <div key={ex.id} style={{
-                                                width: '7px', height: '7px', borderRadius: '50%',
+                                                width: dotSize, height: dotSize, borderRadius: '50%',
                                                 background: ex.color,
                                                 boxShadow: `0 0 4px ${ex.color}88`
                                             }} />
@@ -229,7 +233,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                                     {/* Red dot if nothing done and not future */}
                                     {isMissed && (
                                         <div style={{
-                                            width: '7px', height: '7px', borderRadius: '50%',
+                                            width: dotSize, height: dotSize, borderRadius: '50%',
                                             background: '#ef4444',
                                             boxShadow: '0 0 4px rgba(239,68,68,0.5)'
                                         }} />
