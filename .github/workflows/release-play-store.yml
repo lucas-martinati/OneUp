@@ -99,5 +99,5 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           packageName: com.lucasm548.oneup
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
-          track: internal
+          track: production
           status: completed
