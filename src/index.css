@@ -637,6 +637,31 @@ button:active {
   }
 }
 
+/* Calendar month slide animations */
+@keyframes cal-slide-left {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+}
+
+@keyframes cal-slide-right {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+
 /* Hide scrollbar for cleanly scrolling containers */
 .hide-scrollbar {
   -ms-overflow-style: none;

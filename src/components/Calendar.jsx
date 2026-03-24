@@ -13,7 +13,15 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
     const [isClosing, setIsClosing] = useState(false);
+    const [slideDirection, setSlideDirection] = useState(null); // 'left' | 'right' | null
+
+    // Swipe tracking refs (no re-renders during drag)
     const touchStartX = useRef(null);
+    const touchStartY = useRef(null);
+    const isDragging = useRef(false);
+    const isSwipeLocked = useRef(false); // locks axis after initial movement
+    const gridRef = useRef(null);
+    const swipeAnimating = useRef(false);
 
     const handleCloseDetail = () => {
         setIsClosing(true);
@@ -23,30 +31,112 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
         }, 150);
     };
 
-    const goToPrevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
-    const goToNextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
-
-    const handleTouchStart = (e) => {
-        touchStartX.current = e.touches[0].clientX;
-    };
-
-    const handleTouchEnd = (e) => {
-        if (touchStartX.current === null) return;
-        const touchEndX = e.changedTouches[0].clientX;
-        const diff = touchStartX.current - touchEndX;
-        const threshold = 50;
-        if (Math.abs(diff) > threshold) {
-            if (diff > 0) goToNextMonth();
-            else goToPrevMonth();
-        }
-        touchStartX.current = null;
-    };
-
     const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
     const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
+
+    const changeMonth = (direction) => {
+        if (swipeAnimating.current) return;
+        swipeAnimating.current = true;
+        // direction: 1 = next, -1 = prev
+        setSlideDirection(direction === 1 ? 'left' : 'right');
+        setTimeout(() => {
+            setCurrentDate(new Date(year, month + direction, 1));
+            setSlideDirection(null);
+            swipeAnimating.current = false;
+        }, 200);
+    };
+
+    const goToPrevMonth = () => changeMonth(-1);
+    const goToNextMonth = () => changeMonth(1);
+
+    const handleTouchStart = (e) => {
+        if (swipeAnimating.current || selectedDay) return;
+        touchStartX.current = e.touches[0].clientX;
+        touchStartY.current = e.touches[0].clientY;
+        isDragging.current = true;
+        isSwipeLocked.current = false;
+        if (gridRef.current) {
+            gridRef.current.style.transition = 'none';
+        }
+    };
+
+    const handleTouchMove = (e) => {
+        if (!isDragging.current || touchStartX.current === null) return;
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = currentX - touchStartX.current;
+        const diffY = currentY - touchStartY.current;
+
+        // Lock to horizontal axis after 10px of movement
+        if (!isSwipeLocked.current && (Math.abs(diffX) > 10 || Math.abs(diffY) > 10)) {
+            isSwipeLocked.current = true;
+            if (Math.abs(diffY) > Math.abs(diffX)) {
+                // Vertical scroll — abort swipe
+                isDragging.current = false;
+                return;
+            }
+        }
+
+        if (isSwipeLocked.current && gridRef.current) {
+            // Apply a dampened translateX to follow the finger
+            const dampened = diffX * 0.4;
+            const opacity = Math.max(0.3, 1 - Math.abs(diffX) / 600);
+            gridRef.current.style.transform = `translateX(${dampened}px)`;
+            gridRef.current.style.opacity = opacity;
+        }
+    };
+
+    const handleTouchEnd = (e) => {
+        if (!isDragging.current || touchStartX.current === null) {
+            isDragging.current = false;
+            return;
+        }
+        isDragging.current = false;
+        const touchEndX = e.changedTouches[0].clientX;
+        const diff = touchStartX.current - touchEndX;
+        const threshold = 50;
+
+        if (gridRef.current) {
+            gridRef.current.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+        }
+
+        if (Math.abs(diff) > threshold) {
+            // Animate out, then change month
+            if (gridRef.current) {
+                const direction = diff > 0 ? -1 : 1;
+                gridRef.current.style.transform = `translateX(${direction * 60}px)`;
+                gridRef.current.style.opacity = '0';
+            }
+            setTimeout(() => {
+                if (diff > 0) setCurrentDate(new Date(year, month + 1, 1));
+                else setCurrentDate(new Date(year, month - 1, 1));
+                // Reset grid for slide-in
+                if (gridRef.current) {
+                    gridRef.current.style.transition = 'none';
+                    gridRef.current.style.transform = `translateX(${diff > 0 ? 40 : -40}px)`;
+                    gridRef.current.style.opacity = '0';
+                    requestAnimationFrame(() => {
+                        if (gridRef.current) {
+                            gridRef.current.style.transition = 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease';
+                            gridRef.current.style.transform = 'translateX(0)';
+                            gridRef.current.style.opacity = '1';
+                        }
+                    });
+                }
+            }, 180);
+        } else {
+            // Snap back
+            if (gridRef.current) {
+                gridRef.current.style.transform = 'translateX(0)';
+                gridRef.current.style.opacity = '1';
+            }
+        }
+        touchStartX.current = null;
+        touchStartY.current = null;
+    };
 
     const monthNames = t('calendar.months', { returnObjects: true });
 
@@ -79,12 +169,18 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
         return { days: daysArr, monthCompleted: completed, completionRate: rate };
     }, [year, month, startDate, completions]);
 
+    // Slide-in animation for button navigation
+    const gridSlideStyle = slideDirection ? {
+        animation: `cal-slide-${slideDirection} 0.2s ease forwards`
+    } : {};
+
     return (
         <div
             className="fade-in modal-overlay"
             onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            style={{ zIndex: 100 }}
+            style={{ zIndex: 100, touchAction: 'pan-y', overflowX: 'hidden' }}
         >
             <div className="modal-content" style={{
                 maxWidth: '640px', width: '100%', margin: '0 auto',
@@ -132,7 +228,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 marginBottom: 'var(--spacing-md)', padding: '0 var(--spacing-xs)'
             }}>
-                <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="hover-lift glass" style={navBtnStyle}>
+                <button onClick={goToPrevMonth} className="hover-lift glass" style={navBtnStyle}>
                     <ChevronLeft size={24} />
                 </button>
                 <span style={{
@@ -142,15 +238,17 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                 }}>
                     {monthNames[month]} {year}
                 </span>
-                <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="hover-lift glass" style={navBtnStyle}>
+                <button onClick={goToNextMonth} className="hover-lift glass" style={navBtnStyle}>
                     <ChevronRight size={24} />
                 </button>
             </div>
 
             {/* Grid */}
-            <div style={{
+            <div ref={gridRef} style={{
                 display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)',
-                gap: '6px', flex: 1, alignContent: 'start'
+                gap: '6px', flex: 1, alignContent: 'start',
+                willChange: 'transform, opacity',
+                ...gridSlideStyle
             }}>
                 {/* Weekday headers */}
                 {t('calendar.weekdays', { returnObjects: true }).map(d => (
@@ -198,6 +296,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                                 alignItems: 'center', justifyContent: 'center',
                                 background: bgColor, borderRadius: 'var(--radius-md)',
                                 position: 'relative',
+                                minWidth: 0, overflow: 'hidden',
                                 opacity: isFuture || isBeforeStart ? 0.25 : 1,
                                 border: isSelected
                                     ? '2px solid var(--border-strong)'
@@ -218,14 +317,14 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
 
                             {/* Exercise dots */}
                             {!isFuture && !isBeforeStart && exercises && (
-                                <div style={{ display: 'flex', gap: dotGap, flexWrap: 'wrap', justifyContent: 'center' }}>
+                                <div style={{ display: 'flex', gap: dotGap, flexWrap: 'wrap', justifyContent: 'center', maxWidth: '100%', overflow: 'hidden', padding: '0 2px' }}>
                                     {exercises.map(ex => {
                                         const exData = dayCompletions[ex.id];
                                         if (!exData?.isCompleted) return null;
                                         return (
                                             <div key={ex.id} style={{
                                                 width: dotSize, height: dotSize, borderRadius: '50%',
-                                                background: ex.color,
+                                                background: ex.color, flexShrink: 0,
                                                 boxShadow: `0 0 4px ${ex.color}88`
                                             }} />
                                         );
@@ -234,7 +333,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                                     {isMissed && (
                                         <div style={{
                                             width: dotSize, height: dotSize, borderRadius: '50%',
-                                            background: '#ef4444',
+                                            background: '#ef4444', flexShrink: 0,
                                             boxShadow: '0 0 4px rgba(239,68,68,0.5)'
                                         }} />
                                     )}
