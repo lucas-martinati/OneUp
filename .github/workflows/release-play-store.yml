@@ -12,9 +12,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ── Checkout ──────────────────────────────────────────────
+      # ── Checkout (with token for push-back) ────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Auto-increment versionCode ─────────────────────────────
+      - name: Bump versionCode in build.gradle
+        run: |
+          GRADLE_FILE="android/app/build.gradle"
+          # Read current versionCode
+          CURRENT_CODE=$(grep -oP 'versionCode \K[0-9]+' "$GRADLE_FILE")
+          NEW_CODE=$((CURRENT_CODE + 1))
+          # Update versionCode
+          sed -i "s/versionCode $CURRENT_CODE/versionCode $NEW_CODE/" "$GRADLE_FILE"
+          # Update versionName from tag if available
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION_NAME="${GITHUB_REF#refs/tags/v}"
+            sed -i "s/versionName \"[^\"]*\"/versionName \"$VERSION_NAME\"/" "$GRADLE_FILE"
+          fi
+          echo "✅ versionCode: $CURRENT_CODE → $NEW_CODE"
+          echo "VERSION_CODE=$NEW_CODE" >> $GITHUB_ENV
 
       # ── Java 21 (required by Capacitor) ───────────────────────
       - name: Set up JDK 21
@@ -101,3 +120,12 @@ jobs:
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: production
           status: completed
+
+      # ── Commit updated versionCode back to repo ────────────────
+      - name: Push updated versionCode
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add android/app/build.gradle
+          git commit -m "chore: bump versionCode to ${{ env.VERSION_CODE }} [skip ci]"
+          git push origin HEAD:main
