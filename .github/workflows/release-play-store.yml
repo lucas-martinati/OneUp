@@ -73,9 +73,9 @@ jobs:
       - name: Build web app
         run: npm run build
 
-      # ── Sync Capacitor ────────────────────────────────────────
-      - name: Copy web assets to Android
-        run: npx cap copy android
+      # ── Sync Capacitor (copy assets + update native plugins) ──
+      - name: Sync Capacitor Android
+        run: npx cap sync android
 
       # ── Build AAB ─────────────────────────────────────────────
       - name: Build release AAB
