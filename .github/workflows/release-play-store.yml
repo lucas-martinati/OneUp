@@ -5,6 +5,19 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Nom de version (ex: 2.3.0) — laisser vide pour garder la version actuelle'
+        required: false
+        default: ''
+      release_notes_fr:
+        description: 'Notes de release (FR) — laisser vide pour aucune note'
+        required: false
+        default: ''
+      release_notes_en:
+        description: 'Release notes (EN) — leave empty for no notes'
+        required: false
+        default: ''
 
 jobs:
   build-and-deploy:
@@ -29,10 +42,15 @@ jobs:
           NEW_CODE=$((CURRENT_CODE + 1))
           # Update versionCode
           sed -i "s/versionCode $CURRENT_CODE/versionCode $NEW_CODE/" "$GRADLE_FILE"
-          # Update versionName from tag if available
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            VERSION_NAME="${GITHUB_REF#refs/tags/v}"
-            sed -i "s/versionName \"[^\"]*\"/versionName \"$VERSION_NAME\"/" "$GRADLE_FILE"
+          # Update versionName: input > tag > keep current
+          INPUT_VERSION="${{ github.event.inputs.version_name }}"
+          if [[ -n "$INPUT_VERSION" ]]; then
+            sed -i "s/versionName \"[^\"]*\"/versionName \"$INPUT_VERSION\"/" "$GRADLE_FILE"
+            echo "✅ versionName → $INPUT_VERSION"
+          elif [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+            sed -i "s/versionName \"[^\"]*\"/versionName \"$TAG_VERSION\"/" "$GRADLE_FILE"
+            echo "✅ versionName → $TAG_VERSION (from tag)"
           fi
           echo "✅ versionCode: $CURRENT_CODE → $NEW_CODE"
           echo "VERSION_CODE=$NEW_CODE" >> $GITHUB_ENV
@@ -113,6 +131,18 @@ jobs:
           path: android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 30
 
+      # ── Prepare release notes (if provided) ────────────────────
+      - name: Write release notes
+        if: ${{ github.event.inputs.release_notes_fr != '' || github.event.inputs.release_notes_en != '' }}
+        run: |
+          mkdir -p distribution/whatsnew
+          if [[ -n "${{ github.event.inputs.release_notes_fr }}" ]]; then
+            echo "${{ github.event.inputs.release_notes_fr }}" > distribution/whatsnew/whatsnew-fr-FR
+          fi
+          if [[ -n "${{ github.event.inputs.release_notes_en }}" ]]; then
+            echo "${{ github.event.inputs.release_notes_en }}" > distribution/whatsnew/whatsnew-en-US
+          fi
+
       # ── Deploy to Play Store ──────────────────────────────────
       - name: Upload to Google Play Store
         uses: r0adkll/upload-google-play@v1
@@ -122,6 +152,7 @@ jobs:
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: production
           status: completed
+          whatsNewDirectory: ${{ (github.event.inputs.release_notes_fr != '' || github.event.inputs.release_notes_en != '') && 'distribution/whatsnew' || '' }}
 
       # ── Commit updated versionCode back to repo ────────────────
       - name: Push updated versionCode
