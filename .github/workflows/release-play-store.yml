@@ -10,6 +10,8 @@ jobs:
   build-and-deploy:
     name: Build AAB & Deploy to Play Store
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       # ── Checkout (with token for push-back) ────────────────────
