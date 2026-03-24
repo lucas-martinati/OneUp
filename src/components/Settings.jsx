@@ -281,40 +281,33 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                     color="#06b6d4"
                     isLast={true}
                 >
-                    <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
-                        {[
-                            { value: 'fr', label: 'FR' },
-                            { value: 'en', label: 'EN' }
-                        ].map(opt => (
-                            <button
-                                key={opt.value}
-                                onClick={() => {
-                                    i18n.changeLanguage(opt.value);
-                                    localStorage.setItem('oneup_language', opt.value);
-                                }}
-                                style={{
-                                    padding: '6px 16px',
-                                    borderRadius: '10px',
-                                    border: i18n.language === opt.value
-                                        ? '2px solid #06b6d4'
-                                        : '2px solid var(--border-subtle)',
-                                    background: i18n.language === opt.value
-                                        ? 'rgba(6,182,212,0.2)'
-                                        : 'transparent',
-                                    color: i18n.language === opt.value
-                                        ? '#06b6d4'
-                                        : 'var(--text-secondary)',
-                                    fontSize: '0.85rem',
-                                    fontWeight: '700',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease',
-                                    minHeight: 'var(--touch-min)'
-                                }}
-                            >
-                                {opt.label}
-                            </button>
-                        ))}
-                    </div>
+                    <select
+                        value={i18n.language}
+                        onChange={(e) => {
+                            i18n.changeLanguage(e.target.value);
+                            localStorage.setItem('oneup_language', e.target.value);
+                        }}
+                        style={{
+                            padding: '8px 12px',
+                            borderRadius: '10px',
+                            border: '2px solid var(--border-subtle)',
+                            background: '#1a1a2e',
+                            color: '#ffffff',
+                            fontSize: '0.85rem',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            minHeight: 'var(--touch-min)',
+                            minWidth: '140px',
+                            outline: 'none'
+                        }}
+                    >
+                        <option value="fr" style={{ background: '#1a1a2e', color: '#ffffff' }}>{t('settings.french')}</option>
+                        <option value="en" style={{ background: '#1a1a2e', color: '#ffffff' }}>{t('settings.english')}</option>
+                        <option value="es" style={{ background: '#1a1a2e', color: '#ffffff' }}>{t('settings.spanish')}</option>
+                        <option value="zh" style={{ background: '#1a1a2e', color: '#ffffff' }}>{t('settings.chinese')}</option>
+                        <option value="ru" style={{ background: '#1a1a2e', color: '#ffffff' }}>{t('settings.russian')}</option>
+                    </select>
                 </SettingRow>
             </div>
 
