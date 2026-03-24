@@ -80,7 +80,9 @@ jobs:
       # ── Build AAB ─────────────────────────────────────────────
       - name: Build release AAB
         working-directory: android
-        run: ./gradlew bundleRelease
+        run: |
+          chmod +x ./gradlew
+          ./gradlew bundleRelease
 
       # ── Upload AAB artifact (for debugging) ───────────────────
       - name: Upload AAB as artifact
