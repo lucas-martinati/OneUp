@@ -9,14 +9,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // Force immediate update in development
       workbox: {
         cleanupOutdatedCaches: true,
         skipWaiting: true,
         clientsClaim: true
       },
       devOptions: {
-        enabled: false  // Disable SW completely in dev mode (npm run dev)
+        enabled: false
       },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
@@ -41,6 +40,15 @@ export default defineConfig({
       }
     })
   ],
+  server: {
+    watch: {
+      ignored: [
+        '**/android/**',
+        '**/ios/**',
+        '**/node_modules/**',
+      ]
+    }
+  },
   build: {
     cssCodeSplit: true,
     rollupOptions: {
