@@ -272,8 +272,8 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                     const isMissed = !isAnyDone && !isFuture && !isBeforeStart;
                     const completedCount = exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length;
                     const totalCount = completedCount + (isMissed ? 1 : 0);
-                    const dotSize = totalCount > 8 ? '5px' : '7px';
-                    const dotGap = totalCount > 8 ? '2px' : '3px';
+                    const dotSize = totalCount > 12 ? '4px' : totalCount > 8 ? '5px' : totalCount > 4 ? '6px' : '7px';
+                    const dotGap = totalCount > 12 ? '1px' : totalCount > 8 ? '2px' : '3px';
 
                     let bgColor = 'var(--surface-subtle)';
                     if (isToday) bgColor = 'rgba(139, 92, 246, 0.1)';
@@ -317,7 +317,19 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
 
                             {/* Exercise dots */}
                             {!isFuture && !isBeforeStart && exercises && (
-                                <div style={{ display: 'flex', gap: dotGap, flexWrap: 'wrap', justifyContent: 'center', maxWidth: '100%', overflow: 'hidden', padding: '0 2px' }}>
+                                <div style={{
+                                    display: 'flex',
+                                    gap: dotGap,
+                                    flexWrap: 'wrap',
+                                    justifyContent: 'center',
+                                    alignContent: 'center',
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    overflow: 'hidden',
+                                    padding: '0 2px',
+                                    flex: 1,
+                                    minHeight: 0
+                                }}>
                                     {exercises.map(ex => {
                                         const exData = dayCompletions[ex.id];
                                         if (!exData?.isCompleted) return null;
