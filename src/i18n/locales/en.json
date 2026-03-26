@@ -323,5 +323,15 @@
     "planche": "Plank (s)",
     "dips": "Dips",
     "mountain": "Mountain Climbers"
+  },
+  "supporter": {
+    "title": "Support the developer ❤️",
+    "description": "Become a Supporter!",
+    "explanation": "No hidden features — it's a voluntary support. In return, you get a ❤️ badge visible in the leaderboard.",
+    "buyButton": "Support OneUp",
+    "restore": "Restore my purchases",
+    "thankYou": "Thank you for your support! ❤️",
+    "badgeActive": "Your Supporter badge is active in the leaderboard.",
+    "androidOnly": "Purchase is only available in the Android app."
   }
 }

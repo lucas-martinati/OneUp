@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { X, Trophy, Medal, Crown, ChevronRight, ChevronLeft, User, Award, Flame, Calendar, TrendingUp, Activity, HeartHandshake, Link, UserPlus, LogOut, Check, Shield } from 'lucide-react';
+import { X, Trophy, Medal, Crown, ChevronRight, ChevronLeft, User, Award, Flame, Calendar, TrendingUp, Activity, HeartHandshake, Heart, Link, UserPlus, LogOut, Check, Shield } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { EXERCISES } from '../config/exercises';
 import { Avatar } from './Avatar';
@@ -290,6 +290,16 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                                             whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px'
                                         }}>
                                             {isMe ? `${entry.pseudo} (${t('common.you')})` : entry.pseudo}
+                                            {entry.isSupporter && (
+                                                <span style={{
+                                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                                    background: 'rgba(239,68,68,0.15)', borderRadius: '10px',
+                                                    padding: '1px 6px', gap: '3px',
+                                                    border: '1px solid rgba(239,68,68,0.25)'
+                                                }}>
+                                                    <Heart size={10} color="#ef4444" fill="#ef4444" />
+                                                </span>
+                                            )}
                                             {entry.lastActiveDay === todayStr && <Shield size={12} color="#10b981" />}
                                         </div>
                                     </div>
@@ -484,6 +494,17 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                             color: isMe ? rankColor : 'var(--text-primary)'
                         }}>
                             {entry.pseudo} {isMe && `(${t('common.you')})`}
+                            {entry.isSupporter && (
+                                <span style={{
+                                    display: 'inline-flex', alignItems: 'center',
+                                    background: 'rgba(239,68,68,0.15)', borderRadius: '12px',
+                                    padding: '2px 8px', gap: '4px', marginLeft: '4px',
+                                    border: '1px solid rgba(239,68,68,0.25)'
+                                }}>
+                                    <Heart size={12} color="#ef4444" fill="#ef4444" />
+                                    <span style={{ fontSize: '0.65rem', fontWeight: '700', color: '#ef4444' }}>Supporter</span>
+                                </span>
+                            )}
                         </div>
                         <div style={{
                             display: 'inline-flex', alignItems: 'center', gap: '4px',

@@ -42,7 +42,8 @@ export function Dashboard({
     scheduleNotification, cloudAuth, cloudSync, settings, updateSettings,
     conflictData, onResolveConflict, getExerciseCount, updateExerciseCount, getTotalReps,
     getExerciseDone, pauseCloudSync, resumeCloudSync, computedStats,
-    routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines
+    routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
+    isSupporter, onPurchaseSupporter, onRestorePurchases
 }) {
     const { t } = useTranslation();
     const [today, setToday] = useState(getLocalDateStr(new Date()));
@@ -564,6 +565,9 @@ export function Dashboard({
                             cloudSync={cloudSync}
                             conflictData={conflictData}
                             onResolveConflict={onResolveConflict}
+                            isSupporter={isSupporter}
+                            onPurchaseSupporter={onPurchaseSupporter}
+                            onRestorePurchases={onRestorePurchases}
                         />
                     )}
                     {showCounter && selectedExerciseId !== 'planche' && (

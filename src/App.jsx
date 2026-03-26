@@ -7,6 +7,7 @@ import { useComputedStats } from './hooks/useComputedStats';
 import { useUserDetailsCache } from './hooks/useUserDetailsCache';
 import { useRoutines } from './hooks/useRoutines';
 import { cloudSync } from './services/cloudSync';
+import { initPurchases, checkSupporterStatus, purchaseSupporter, restorePurchases } from './services/purchaseService';
 // Simple components stay static
 import { EXERCISES } from './config/exercises';
 import { createLogger } from './utils/logger';
@@ -27,6 +28,7 @@ function App() {
   const [conflictCheckDone, setConflictCheckDone] = useState(false);
   const [isInitialSyncDone, setIsInitialSyncDone] = useState(false);
   const [isSyncPaused, setIsSyncPaused] = useState(false);
+  const [isSupporter, setIsSupporter] = useState(() => localStorage.getItem('oneup_supporter') === 'true');
 
   const {
     startDate,
@@ -159,6 +161,22 @@ function App() {
     }
   }, [googleAuth.isSignedIn, googleAuth.loading]);
 
+  // Initialize purchases and check supporter status on sign-in
+  useEffect(() => {
+    if (googleAuth.isSignedIn && !googleAuth.loading) {
+      const initAndCheck = async () => {
+        try {
+          await initPurchases(cloudSync.getCurrentUserId());
+          const status = await checkSupporterStatus();
+          setIsSupporter(status);
+        } catch (error) {
+          logger.error('Purchase init error:', error);
+        }
+      };
+      initAndCheck();
+    }
+  }, [googleAuth.isSignedIn, googleAuth.loading]);
+
   // Auto-detect cloud data conflict on sign-in
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading && isSetup && !conflictCheckDone) {
@@ -251,7 +269,8 @@ function App() {
           achievements: computedStats.badgeCount, 
           isPublic, 
           lastActiveDay,
-          difficultyMultiplier: settings?.difficultyMultiplier
+          difficultyMultiplier: settings?.difficultyMultiplier,
+          isSupporter
         });
       } catch (error) {
         logger.error('Leaderboard publish failed:', error);
@@ -260,8 +279,29 @@ function App() {
     return () => clearTimeout(timer);
   }, [
     completions, settings.leaderboardEnabled, settings.leaderboardPseudo, settings.difficultyMultiplier,
-    googleAuth.isSignedIn, googleAuth.loading, isSetup, isInitialSyncDone, computedStats
+    googleAuth.isSignedIn, googleAuth.loading, isSetup, isInitialSyncDone, computedStats, isSupporter
   ]);
+
+  // ── Purchase handlers ──
+  const handlePurchaseSupporter = async () => {
+    const result = await purchaseSupporter();
+    if (result.webOnly) {
+      alert(t('supporter.androidOnly'));
+      return;
+    }
+    if (result.isSupporter) {
+      setIsSupporter(true);
+    }
+  };
+
+  const handleRestorePurchases = async () => {
+    const result = await restorePurchases();
+    if (result.webOnly) {
+      alert(t('supporter.androidOnly'));
+      return;
+    }
+    setIsSupporter(result.isSupporter);
+  };
 
   const handleResolveConflict = async (action) => {
     try {
@@ -345,6 +385,9 @@ function App() {
           deleteRoutine={deleteRoutine}
           updateRoutine={updateRoutine}
           maxRoutines={maxRoutines}
+          isSupporter={isSupporter}
+          onPurchaseSupporter={handlePurchaseSupporter}
+          onRestorePurchases={handleRestorePurchases}
         />
       )}
     </Suspense>

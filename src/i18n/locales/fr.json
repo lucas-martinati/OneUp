@@ -323,5 +323,15 @@
     "planche": "Gainage (s)",
     "dips": "Dips",
     "mountain": "Mountain Climbers"
+  },
+  "supporter": {
+    "title": "Soutenir le développeur ❤️",
+    "description": "Deviens Supporter !",
+    "explanation": "Aucune fonctionnalité cachée — c'est un soutien volontaire. En échange, tu reçois un badge ❤️ visible dans le classement.",
+    "buyButton": "Soutenir OneUp",
+    "restore": "Restaurer mes achats",
+    "thankYou": "Merci pour ton soutien ! ❤️",
+    "badgeActive": "Ton badge Supporter est actif dans le classement.",
+    "androidOnly": "L'achat est uniquement disponible dans l'application Android."
   }
 }

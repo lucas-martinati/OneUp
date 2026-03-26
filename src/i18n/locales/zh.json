@@ -323,5 +323,15 @@
     "planche": "平板支撑 (秒)",
     "dips": "双杠臂屈伸",
     "mountain": "登山者"
+  },
+  "supporter": {
+    "title": "支持开发者 ❤️",
+    "description": "成为支持者！",
+    "explanation": "没有隐藏功能——这是自愿支持。作为回报，你将获得一个在排行榜中可见的 ❤️ 徽章。",
+    "buyButton": "支持 OneUp",
+    "restore": "恢复购买",
+    "thankYou": "感谢你的支持！❤️",
+    "badgeActive": "你的支持者徽章已在排行榜中激活。",
+    "androidOnly": "购买仅在 Android 应用中可用。"
   }
 }

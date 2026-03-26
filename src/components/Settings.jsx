@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe } from 'lucide-react';
+import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw } from 'lucide-react';
 import { CloudSyncPanel } from './CloudSyncPanel';
+import { Capacitor } from '@capacitor/core';
 
-export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict }) {
+export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, onPurchaseSupporter, onRestorePurchases }) {
     const { t, i18n } = useTranslation();
     const [showSaved, setShowSaved] = useState(false);
     const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
@@ -458,6 +459,107 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                         onResolveConflict={onResolveConflict}
                     />
                 </div>
+            )}
+
+            {/* ── Supporter Badge ─────────────────────────────────────── */}
+            {(Capacitor.isNativePlatform() || isSupporter) && (
+            <div className="glass-premium" style={{
+                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                marginBottom: 'var(--spacing-md)',
+                background: isSupporter
+                    ? 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.02))'
+                    : 'var(--surface-section)',
+                border: isSupporter ? '1px solid rgba(239,68,68,0.2)' : '1px solid var(--border-subtle)'
+            }}>
+                <h3 style={sectionTitleStyle}>{t('supporter.title')}</h3>
+
+                {isSupporter ? (
+                    /* Already a supporter */
+                    <div style={{
+                        display: 'flex', alignItems: 'center', gap: '12px',
+                        padding: '16px', borderRadius: 'var(--radius-lg)',
+                        background: 'rgba(239,68,68,0.1)',
+                        border: '1px solid rgba(239,68,68,0.2)'
+                    }}>
+                        <div style={{
+                            width: '48px', height: '48px', borderRadius: '50%',
+                            background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            boxShadow: '0 4px 16px rgba(239,68,68,0.3)', flexShrink: 0
+                        }}>
+                            <Heart size={24} color="white" fill="white" />
+                        </div>
+                        <div>
+                            <div style={{ fontWeight: '800', fontSize: '1rem', color: '#ef4444' }}>
+                                {t('supporter.thankYou')}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                {t('supporter.badgeActive')}
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    /* Not a supporter yet */
+                    <div>
+                        <div style={{
+                            padding: '20px', borderRadius: 'var(--radius-lg)',
+                            background: 'linear-gradient(135deg, rgba(239,68,68,0.06), rgba(245,158,11,0.04))',
+                            border: '1px solid rgba(239,68,68,0.12)',
+                            textAlign: 'center', marginBottom: '12px'
+                        }}>
+                            <Heart size={32} color="#ef4444" style={{ marginBottom: '8px', opacity: 0.8 }} />
+                            <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
+                                {t('supporter.description')}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                                {t('supporter.explanation')}
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => {
+                                if (!cloudAuth?.isSignedIn) {
+                                    cloudAuth?.signIn?.();
+                                    return;
+                                }
+                                onPurchaseSupporter();
+                            }}
+                            className="hover-lift"
+                            style={{
+                                width: '100%', padding: '16px',
+                                borderRadius: 'var(--radius-lg)',
+                                background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                                border: 'none', color: 'white',
+                                fontWeight: '800', fontSize: '1rem',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                gap: '8px', cursor: 'pointer',
+                                boxShadow: '0 4px 16px rgba(239,68,68,0.3)',
+                                marginBottom: '8px'
+                            }}
+                        >
+                            <Heart size={20} fill="white" />
+                            {t('supporter.buyButton')}
+                        </button>
+
+                        <button
+                            onClick={onRestorePurchases}
+                            style={{
+                                width: '100%', padding: '10px',
+                                borderRadius: 'var(--radius-md)',
+                                background: 'transparent',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                color: 'var(--text-secondary)',
+                                fontSize: '0.8rem', fontWeight: '600',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                gap: '6px', cursor: 'pointer'
+                            }}
+                        >
+                            <RotateCcw size={14} />
+                            {t('supporter.restore')}
+                        </button>
+                    </div>
+                )}
+            </div>
             )}
 
             {/* ── Difficulté (Sensitive Setting) ─────────────────────────── */}

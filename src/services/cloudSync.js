@@ -490,7 +490,7 @@ class CloudSyncService {
    * Publish (or update) this user's leaderboard entry.
    * Stored at `leaderboard/{uid}`.
    */
-  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1 }) {
+  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter = false }) {
     try {
       if (!auth?.currentUser || !database) return false;
 
@@ -504,6 +504,7 @@ class CloudSyncService {
         lastActiveDay: lastActiveDay,
         difficultyMultiplier: difficultyMultiplier || 1,
         isPublic: isPublic !== false,
+        isSupporter: isSupporter || false,
         lastUpdated: serverTimestamp()
       };
 
