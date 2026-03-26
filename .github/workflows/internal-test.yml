@@ -16,11 +16,15 @@ jobs:
   build-and-deploy-internal:
     name: Build AAB & Deploy to Internal Testing
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       # ── Checkout ────────────────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # ── Auto-increment versionCode ─────────────────────────────
       - name: Bump versionCode in build.gradle
