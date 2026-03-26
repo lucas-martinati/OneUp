@@ -1,0 +1,17 @@
+# Configuration Firebase
+# Vous pouvez trouver ces informations dans la console Firebase :
+# Allez dans Project Settings > General > Your apps > Web app
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_FIREBASE_MEASUREMENT_ID=
+
+# Configuration Google OAuth
+# Pour le web : Console Google Cloud > APIs & Services > Credentials > OAuth 2.0 Client IDs
+VITE_GOOGLE_CLIENT_ID=
+
+# Configuration pour revenuecat
+VITE_REVENUECAT_API_KEY= 

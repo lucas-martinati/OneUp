@@ -1,0 +1,137 @@
+name: Internal Test - Google Play
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_notes_fr:
+        description: 'Notes de test (FR) — laisser vide pour aucune note'
+        required: false
+        default: ''
+      release_notes_en:
+        description: 'Test notes (EN) — leave empty for no notes'
+        required: false
+        default: ''
+
+jobs:
+  build-and-deploy-internal:
+    name: Build AAB & Deploy to Internal Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── Checkout ────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Auto-increment versionCode ─────────────────────────────
+      - name: Bump versionCode in build.gradle
+        run: |
+          GRADLE_FILE="android/app/build.gradle"
+          CURRENT_CODE=$(grep -oP 'versionCode \K[0-9]+' "$GRADLE_FILE")
+          NEW_CODE=$((CURRENT_CODE + 1))
+          sed -i "s/versionCode $CURRENT_CODE/versionCode $NEW_CODE/" "$GRADLE_FILE"
+          echo "✅ versionCode: $CURRENT_CODE → $NEW_CODE"
+          echo "VERSION_CODE=$NEW_CODE" >> $GITHUB_ENV
+
+      # ── Java 21 ────────────────────────────────────────────────
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      # ── Node.js ────────────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ── Generate .env from secrets ─────────────────────────────
+      - name: Create .env file
+        run: |
+          cat <<EOF > .env
+          VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID=${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+          VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_REVENUECAT_API_KEY=${{ secrets.VITE_REVENUECAT_API_KEY }}
+          EOF
+
+      # ── Generate config files ──────────────────────────────────
+      - name: Generate config files
+        run: npm run generate:config
+
+      # ── Decode signing keystore ────────────────────────────────
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/upload-keystore.jks
+
+      # ── Write keystore.properties ──────────────────────────────
+      - name: Create keystore.properties
+        run: |
+          cat <<EOF > android/keystore.properties
+          storeFile=../upload-keystore.jks
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          EOF
+
+      # ── Decode google-services.json ────────────────────────────
+      - name: Decode google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > android/app/google-services.json
+
+      # ── Build ──────────────────────────────────────────────────
+      - name: Build web app
+        run: npm run build
+
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      - name: Build release AAB
+        working-directory: android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew bundleRelease
+
+      # ── Upload AAB artifact ────────────────────────────────────
+      - name: Upload AAB as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-internal-test.aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 14
+
+      # ── Prepare release notes ──────────────────────────────────
+      - name: Write release notes
+        run: |
+          mkdir -p distribution/whatsnew
+          FR_NOTES="${{ github.event.inputs.release_notes_fr }}"
+          EN_NOTES="${{ github.event.inputs.release_notes_en }}"
+          echo "${FR_NOTES:-Test interne}" > distribution/whatsnew/whatsnew-fr-FR
+          echo "${EN_NOTES:-Internal test}" > distribution/whatsnew/whatsnew-en-US
+
+      # ── Deploy to Internal Testing ─────────────────────────────
+      - name: Upload to Google Play (Internal Testing)
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          packageName: com.lucasm548.oneup
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+          whatsNewDirectory: distribution/whatsnew
+
+      # ── Commit versionCode back ────────────────────────────────
+      - name: Push updated versionCode
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add android/app/build.gradle
+          git commit -m "chore: bump versionCode to ${{ env.VERSION_CODE }} (internal test) [skip ci]"
+          git push origin HEAD:main

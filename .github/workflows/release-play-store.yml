@@ -84,6 +84,7 @@ jobs:
           VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_MEASUREMENT_ID=${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
           VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_REVENUECAT_API_KEY=${{ secrets.VITE_REVENUECAT_API_KEY }}
           EOF
 
       # ── Generate capacitor.config.json & strings.xml ──────────
