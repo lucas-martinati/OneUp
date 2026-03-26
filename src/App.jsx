@@ -5,6 +5,7 @@ import { useSettings } from './hooks/useSettings';
 import { useGoogleAuth } from './hooks/useGoogleAuth';
 import { useComputedStats } from './hooks/useComputedStats';
 import { useUserDetailsCache } from './hooks/useUserDetailsCache';
+import { useRoutines } from './hooks/useRoutines';
 import { cloudSync } from './services/cloudSync';
 // Simple components stay static
 import { EXERCISES } from './config/exercises';
@@ -21,6 +22,7 @@ function App() {
   const progress = useProgress();
   const { settings, updateSettings } = useSettings();
   const googleAuth = useGoogleAuth();
+  const { routines, saveRoutine, deleteRoutine, updateRoutine, setRoutinesFromCloud, maxRoutines } = useRoutines();
   const [conflictData, setConflictData] = useState(null);
   const [conflictCheckDone, setConflictCheckDone] = useState(false);
   const [isInitialSyncDone, setIsInitialSyncDone] = useState(false);
@@ -140,6 +142,23 @@ function App() {
     }
   }, [googleAuth.isSignedIn, googleAuth.loading]);
 
+  // Sync routines with cloud on sign-in
+  useEffect(() => {
+    if (googleAuth.isSignedIn && !googleAuth.loading) {
+      const loadRoutines = async () => {
+        try {
+          const cloudRoutines = await cloudSync.loadRoutinesFromCloud();
+          if (cloudRoutines && Array.isArray(cloudRoutines)) {
+            setRoutinesFromCloud(cloudRoutines);
+          }
+        } catch (error) {
+          logger.error('Routines sync error:', error);
+        }
+      };
+      loadRoutines();
+    }
+  }, [googleAuth.isSignedIn, googleAuth.loading]);
+
   // Auto-detect cloud data conflict on sign-in
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading && isSetup && !conflictCheckDone) {
@@ -196,6 +215,16 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [settings, googleAuth.isSignedIn, googleAuth.loading, isSetup]);
+
+  // Auto-save routines
+  useEffect(() => {
+    if (googleAuth.isSignedIn && !googleAuth.loading && isSetup) {
+      const timer = setTimeout(() => {
+        cloudSync.saveRoutinesToCloud(routines);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [routines, googleAuth.isSignedIn, googleAuth.loading, isSetup]);
 
   // Auto-publish leaderboard when completions change (if opted in or in clan)
   useEffect(() => {
@@ -311,6 +340,11 @@ function App() {
           pauseCloudSync={() => setIsSyncPaused(true)}
           resumeCloudSync={() => setIsSyncPaused(false)}
           computedStats={computedStats}
+          routines={routines}
+          saveRoutine={saveRoutine}
+          deleteRoutine={deleteRoutine}
+          updateRoutine={updateRoutine}
+          maxRoutines={maxRoutines}
         />
       )}
     </Suspense>

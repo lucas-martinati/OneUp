@@ -649,6 +649,39 @@ class CloudSyncService {
     }
   }
 
+  // Save routines to cloud
+  async saveRoutinesToCloud(routines) {
+    try {
+      if (!auth?.currentUser || !database) return false;
+      const userId = auth.currentUser.uid;
+      const routinesRef = ref(database, `users/${userId}/routines`);
+      await set(routinesRef, routines || []);
+      logger.success('Routines synced to cloud');
+      return true;
+    } catch (error) {
+      logger.error('Error syncing routines:', error);
+      return false;
+    }
+  }
+
+  // Load routines from cloud
+  async loadRoutinesFromCloud() {
+    try {
+      if (!auth?.currentUser || !database) return null;
+      const userId = auth.currentUser.uid;
+      const routinesRef = ref(database, `users/${userId}/routines`);
+      const snapshot = await get(routinesRef);
+      if (snapshot.exists()) {
+        logger.success('Routines loaded from cloud');
+        return snapshot.val();
+      }
+      return null;
+    } catch (error) {
+      logger.error('Error loading routines:', error);
+      return null;
+    }
+  }
+
   // ── Clan System ──────────────────────────────────────────────────────
 
   // Create a new clan

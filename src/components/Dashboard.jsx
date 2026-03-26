@@ -41,7 +41,8 @@ export function Dashboard({
     getDayNumber, toggleCompletion, completions, startDate, userStartDate,
     scheduleNotification, cloudAuth, cloudSync, settings, updateSettings,
     conflictData, onResolveConflict, getExerciseCount, updateExerciseCount, getTotalReps,
-    getExerciseDone, pauseCloudSync, resumeCloudSync, computedStats
+    getExerciseDone, pauseCloudSync, resumeCloudSync, computedStats,
+    routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines
 }) {
     const { t } = useTranslation();
     const [today, setToday] = useState(getLocalDateStr(new Date()));
@@ -614,6 +615,11 @@ export function Dashboard({
                             updateExerciseCount={updateExerciseCount}
                             completions={completions}
                             settings={settings}
+                            routines={routines}
+                            saveRoutine={saveRoutine}
+                            deleteRoutine={deleteRoutine}
+                            updateRoutine={updateRoutine}
+                            maxRoutines={maxRoutines}
                         />
                     )}
                     {showClan && (

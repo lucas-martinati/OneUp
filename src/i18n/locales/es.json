@@ -19,6 +19,7 @@
     "day": "Día",
     "calendar": "Calendario",
     "session": "Sesión",
+    "routines": "Rutinas",
     "newAchievement": "¡Nuevo logro!",
     "doneAt": "Hecho a las {{time}}",
     "waiting": "⏳ Esperando",
@@ -259,6 +260,22 @@
     "allCompleted": "Todos los ejercicios completados 💪",
     "close": "Cerrar",
     "reps": "{{count}} repeticiones"
+  },
+  "routines": {
+    "title": "Mis Rutinas",
+    "empty": "Sin rutinas guardadas",
+    "emptyHint": "¡Guarda un orden de ejercicios para lanzarlo rápidamente!",
+    "newRoutine": "Nueva rutina",
+    "editRoutine": "Editar rutina",
+    "routineName": "Nombre de la rutina",
+    "namePlaceholder": "Ej: Cuerpo Completo, Día de Empujar...",
+    "selectExercises": "Selecciona los ejercicios (en orden)",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "launch": "Lanzar",
+    "load": "Cargar",
+    "maxReached": "Máximo 10 rutinas",
+    "nameRequired": "Se requiere un nombre"
   },
   "cloud": {
     "cloudDataDetected": "Datos en la Nube Detectados",

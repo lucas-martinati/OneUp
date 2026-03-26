@@ -19,6 +19,7 @@
     "day": "Jour",
     "calendar": "Calendrier",
     "session": "Séance",
+    "routines": "Routines",
     "newAchievement": "Nouveau Succès !",
     "doneAt": "Fait à {{time}}",
     "waiting": "⏳ En attente",
@@ -259,6 +260,22 @@
     "allCompleted": "Tous les exercices sont complétés 💪",
     "close": "Fermer",
     "reps": "{{count}} reps"
+  },
+  "routines": {
+    "title": "Mes Routines",
+    "empty": "Aucune routine sauvegardée",
+    "emptyHint": "Sauvegarde un ordre d'exercices pour le relancer rapidement !",
+    "newRoutine": "Nouvelle routine",
+    "editRoutine": "Modifier la routine",
+    "routineName": "Nom de la routine",
+    "namePlaceholder": "Ex : Full Body, Push Day...",
+    "selectExercises": "Sélectionne les exercices (dans l'ordre)",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "launch": "Lancer",
+    "load": "Charger",
+    "maxReached": "Maximum 10 routines",
+    "nameRequired": "Un nom est requis"
   },
   "cloud": {
     "cloudDataDetected": "Données cloud détectées",

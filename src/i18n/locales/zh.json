@@ -19,6 +19,7 @@
     "day": "天",
     "calendar": "日历",
     "session": "训练",
+    "routines": "日常",
     "newAchievement": "新成就！",
     "doneAt": "完成于 {{time}}",
     "waiting": "⏳ 等待中",
@@ -259,6 +260,22 @@
     "allCompleted": "所有运动已完成 💪",
     "close": "关闭",
     "reps": "{{count}} 次"
+  },
+  "routines": {
+    "title": "我的日常训练",
+    "empty": "没有保存的日常训练",
+    "emptyHint": "保存一个练习顺序，快速启动！",
+    "newRoutine": "新建日常",
+    "editRoutine": "编辑日常",
+    "routineName": "日常名称",
+    "namePlaceholder": "例: 全身, 推日...",
+    "selectExercises": "选择练习（按顺序）",
+    "save": "保存",
+    "delete": "删除",
+    "launch": "启动",
+    "load": "加载",
+    "maxReached": "最多10个日常",
+    "nameRequired": "需要一个名称"
   },
   "cloud": {
     "cloudDataDetected": "检测到云端数据",

@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    X, Play, Check, Trophy,
+    X, Play, Check, Trophy, Save, FolderOpen, Trash2, GripVertical, Pencil,
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
     Flame, Square, MoveDown, MoveDiagonal
 } from 'lucide-react';
@@ -14,16 +14,38 @@ import { registerBackHandler } from '../utils/backHandler';
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
 
 export function WorkoutSession({
-    onClose, today, dayNumber, getExerciseCount, updateExerciseCount, completions, settings
+    onClose, today, dayNumber, getExerciseCount, updateExerciseCount, completions, settings,
+    routines = [], saveRoutine, deleteRoutine, updateRoutine, maxRoutines = 10
 }) {
     const { t } = useTranslation();
     const [phase, setPhase] = useState('config'); // 'config' | 'running' | 'done'
     const [queue, setQueue] = useState([]); // ordered list of exercise IDs
     const [currentIdx, setCurrentIdx] = useState(0);
+    const [showSaveRoutine, setShowSaveRoutine] = useState(false);
+    const [routineName, setRoutineName] = useState('');
+    const [showRoutineList, setShowRoutineList] = useState(false);
+    const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+    const [editingRoutineId, setEditingRoutineId] = useState(null);
+
+    // Drag & drop state
+    const [dragIdx, setDragIdx] = useState(null);
+    const [dragOverIdx, setDragOverIdx] = useState(null);
+    const touchStartY = useRef(null);
+    const touchStartIdx = useRef(null);
+    const queueListRef = useRef(null);
+    const itemRefs = useRef({});
 
     // Back handler
     useEffect(() => {
         const unreg = registerBackHandler(() => {
+            if (showSaveRoutine) {
+                setShowSaveRoutine(false);
+                return true;
+            }
+            if (showRoutineList) {
+                setShowRoutineList(false);
+                return true;
+            }
             if (phase === 'running') {
                 setPhase('config');
                 return true;
@@ -32,7 +54,7 @@ export function WorkoutSession({
             return true;
         });
         return unreg;
-    }, [phase, onClose]);
+    }, [phase, onClose, showSaveRoutine, showRoutineList]);
 
     // Exercise info with current state
     const exerciseInfo = useMemo(() => {
@@ -58,18 +80,100 @@ export function WorkoutSession({
         setPhase('running');
     };
 
-    // ── Running phase ──────────────────────────────────────────
+    // Load a routine into the queue
+    const loadRoutine = (routine) => {
+        // Filter out exercises that don't exist anymore
+        const validIds = routine.exerciseIds.filter(id => EXERCISES.find(e => e.id === id));
+        setQueue(validIds);
+        setShowRoutineList(false);
+    };
 
-    // Current exercise
+    // Save current queue as routine (new or update)
+    const handleSaveRoutine = () => {
+        if (!routineName.trim() || queue.length < 1) return;
+        if (editingRoutineId) {
+            updateRoutine?.(editingRoutineId, routineName, queue);
+            setEditingRoutineId(null);
+        } else {
+            saveRoutine?.(routineName, queue);
+        }
+        setShowSaveRoutine(false);
+        setRoutineName('');
+    };
+
+    // Edit a routine: load it into queue and open save form
+    const editRoutine = (routine) => {
+        const validIds = routine.exerciseIds.filter(id => EXERCISES.find(e => e.id === id));
+        setQueue(validIds);
+        setRoutineName(routine.name);
+        setEditingRoutineId(routine.id);
+        setShowSaveRoutine(true);
+        setShowRoutineList(false);
+    };
+
+    // ── Drag & Drop handlers (touch-based for mobile) ──
+    const handleDragStart = useCallback((idx) => {
+        setDragIdx(idx);
+    }, []);
+
+    const handleDragOver = useCallback((idx) => {
+        if (dragIdx === null || dragIdx === idx) return;
+        setDragOverIdx(idx);
+    }, [dragIdx]);
+
+    const handleDragEnd = useCallback(() => {
+        if (dragIdx !== null && dragOverIdx !== null && dragIdx !== dragOverIdx) {
+            setQueue(prev => {
+                const newQueue = [...prev];
+                const [removed] = newQueue.splice(dragIdx, 1);
+                newQueue.splice(dragOverIdx, 0, removed);
+                return newQueue;
+            });
+        }
+        setDragIdx(null);
+        setDragOverIdx(null);
+    }, [dragIdx, dragOverIdx]);
+
+    // Touch handlers for mobile drag & drop
+    const handleTouchStart = useCallback((e, idx) => {
+        touchStartY.current = e.touches[0].clientY;
+        touchStartIdx.current = idx;
+        setDragIdx(idx);
+    }, []);
+
+    const handleTouchMove = useCallback((e) => {
+        if (touchStartIdx.current === null || !queueListRef.current) return;
+        const currentY = e.touches[0].clientY;
+
+        // Determine which item we're hovering over based on Y position
+        const items = Object.entries(itemRefs.current);
+        for (const [idxStr, el] of items) {
+            if (!el) continue;
+            const rect = el.getBoundingClientRect();
+            if (currentY >= rect.top && currentY <= rect.bottom) {
+                const overIdx = parseInt(idxStr, 10);
+                if (overIdx !== touchStartIdx.current) {
+                    setDragOverIdx(overIdx);
+                }
+                break;
+            }
+        }
+    }, []);
+
+    const handleTouchEnd = useCallback(() => {
+        handleDragEnd();
+        touchStartY.current = null;
+        touchStartIdx.current = null;
+    }, [handleDragEnd]);
+
+    // ── Running phase ──
     const currentExId = queue[currentIdx];
     const currentEx = currentExId ? EXERCISES.find(e => e.id === currentExId) : null;
     const currentGoal = currentEx ? getDailyGoal(currentEx, dayNumber, settings?.difficultyMultiplier) : 0;
     const currentCount = currentEx ? getExerciseCount(today, currentExId) : 0;
     const currentDone = currentEx ? (completions[today]?.[currentExId]?.isCompleted || currentCount >= currentGoal) : false;
 
-    // Advance to next non-completed exercise
     const advanceToNext = () => {
-        // Find next non-completed exercise in queue after current
         for (let offset = 1; offset <= queue.length; offset++) {
             const nextIdx = (currentIdx + offset) % queue.length;
             const nextId = queue[nextIdx];
@@ -79,7 +183,6 @@ export function WorkoutSession({
                 return;
             }
         }
-        // All done
         setPhase('done');
     };
 
@@ -105,20 +208,135 @@ export function WorkoutSession({
                     }}>
                         {t('workout.newSession')}
                     </h2>
-                    <button onClick={onClose} className="hover-lift" style={{
-                        background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
-                        width: '40px', height: '40px', display: 'flex', alignItems: 'center',
-                        justifyContent: 'center', color: 'white', cursor: 'pointer'
-                    }}>
-                        <X size={22} />
-                    </button>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                        {/* Load Routine button */}
+                        <button
+                            onClick={() => setShowRoutineList(!showRoutineList)}
+                            className="hover-lift"
+                            style={{
+                                background: showRoutineList ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.1)',
+                                border: showRoutineList ? '1px solid rgba(245,158,11,0.4)' : 'none',
+                                borderRadius: '20px', height: '40px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                gap: '5px', padding: '0 14px',
+                                color: showRoutineList ? '#f59e0b' : 'white', cursor: 'pointer',
+                                fontSize: '0.75rem', fontWeight: '600'
+                            }}
+                        >
+                            <FolderOpen size={16} />
+                            {t('routines.title')}
+                        </button>
+                        <button onClick={onClose} className="hover-lift" style={{
+                            background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
+                            width: '40px', height: '40px', display: 'flex', alignItems: 'center',
+                            justifyContent: 'center', color: 'white', cursor: 'pointer'
+                        }}>
+                            <X size={22} />
+                        </button>
+                    </div>
                 </div>
 
                 <div style={{
                     flex: 1, overflowY: 'auto', padding: '0 var(--spacing-md)',
                     display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)'
                 }}>
-                    {/* Exercise selection */}
+                    {/* ── Routine list (collapsible) ── */}
+                    {showRoutineList && (
+                        <div style={{
+                            background: 'rgba(245,158,11,0.05)',
+                            border: '1px solid rgba(245,158,11,0.15)',
+                            borderRadius: 'var(--radius-lg)',
+                            padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px'
+                        }}>
+                            {routines.length === 0 ? (
+                                <div style={{
+                                    textAlign: 'center', color: 'var(--text-secondary)',
+                                    fontSize: '0.8rem', padding: '12px'
+                                }}>
+                                    {t('routines.empty')}
+                                </div>
+                            ) : (
+                                routines.map(routine => (
+                                    <div key={routine.id} style={{
+                                        display: 'flex', alignItems: 'center', gap: '8px',
+                                        padding: '10px 12px', borderRadius: 'var(--radius-md)',
+                                        background: 'rgba(255,255,255,0.04)',
+                                        border: '1px solid rgba(255,255,255,0.06)'
+                                    }}>
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{
+                                                fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)',
+                                                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+                                            }}>{routine.name}</div>
+                                            <div style={{
+                                                display: 'flex', gap: '3px', flexWrap: 'wrap', marginTop: '4px'
+                                            }}>
+                                                {routine.exerciseIds.map(exId => {
+                                                    const ex = EXERCISES.find(e => e.id === exId);
+                                                    if (!ex) return null;
+                                                    const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                                                    return <Icon key={exId} size={12} color={ex.color} />;
+                                                })}
+                                            </div>
+                                        </div>
+                                        {confirmDeleteId === routine.id ? (
+                                            <div style={{ display: 'flex', gap: '4px' }}>
+                                                <button onClick={() => { deleteRoutine?.(routine.id); setConfirmDeleteId(null); }}
+                                                    style={{
+                                                        width: '30px', height: '30px', borderRadius: '50%',
+                                                        background: '#ef4444', border: 'none', color: 'white',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        cursor: 'pointer'
+                                                    }}><Check size={14} /></button>
+                                                <button onClick={() => setConfirmDeleteId(null)}
+                                                    style={{
+                                                        width: '30px', height: '30px', borderRadius: '50%',
+                                                        background: 'rgba(255,255,255,0.08)', border: 'none',
+                                                        color: 'var(--text-secondary)',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        cursor: 'pointer'
+                                                    }}><X size={14} /></button>
+                                            </div>
+                                        ) : (
+                                            <div style={{ display: 'flex', gap: '4px' }}>
+                                                <button onClick={() => setConfirmDeleteId(routine.id)}
+                                                    style={{
+                                                        width: '30px', height: '30px', borderRadius: '50%',
+                                                        background: 'rgba(239,68,68,0.08)', border: 'none',
+                                                        color: '#ef4444',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        cursor: 'pointer'
+                                                    }}><Trash2 size={12} /></button>
+                                                <button onClick={() => editRoutine(routine)}
+                                                    style={{
+                                                        width: '30px', height: '30px', borderRadius: '50%',
+                                                        background: 'rgba(245,158,11,0.1)', border: 'none',
+                                                        color: '#f59e0b',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        cursor: 'pointer'
+                                                    }}><Pencil size={12} /></button>
+                                                <button onClick={() => loadRoutine(routine)}
+                                                    className="hover-lift"
+                                                    style={{
+                                                        height: '30px', borderRadius: '16px',
+                                                        background: 'linear-gradient(135deg, #818cf8, #6366f1)',
+                                                        border: 'none', color: 'white',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        gap: '4px', padding: '0 12px', cursor: 'pointer',
+                                                        fontSize: '0.7rem', fontWeight: '700'
+                                                    }}>
+                                                    <Play size={12} />
+                                                    {t('routines.load')}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
+
+                    {/* Exercise selection label */}
                     <div style={{
                         fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px',
                         color: 'var(--text-secondary)', fontWeight: '600'
@@ -126,32 +344,66 @@ export function WorkoutSession({
                         {t('workout.chooseOrder')}
                     </div>
 
-                    {/* Selected order */}
+                    {/* ── Selected order (drag & drop) ── */}
                     {queue.length > 0 && (
-                        <div style={{
-                            display: 'flex', gap: '6px', flexWrap: 'wrap',
-                            padding: '10px', borderRadius: 'var(--radius-md)',
-                            background: 'rgba(129,140,248,0.06)',
-                            border: '1px solid rgba(129,140,248,0.12)'
-                        }}>
+                        <div
+                            ref={queueListRef}
+                            style={{
+                                display: 'flex', flexDirection: 'column', gap: '4px',
+                                padding: '8px', borderRadius: 'var(--radius-md)',
+                                background: 'rgba(129,140,248,0.06)',
+                                border: '1px solid rgba(129,140,248,0.12)'
+                            }}
+                        >
                             {queue.map((id, i) => {
                                 const ex = EXERCISES.find(e => e.id === id);
                                 if (!ex) return null;
                                 const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                                const isDragging = dragIdx === i;
+                                const isDragOver = dragOverIdx === i;
                                 return (
-                                    <div key={id} style={{
-                                        display: 'flex', alignItems: 'center', gap: '4px',
-                                        padding: '4px 10px', borderRadius: '16px',
-                                        background: `${ex.color}20`, border: `1px solid ${ex.color}40`
-                                    }}>
+                                    <div
+                                        key={id}
+                                        ref={el => itemRefs.current[i] = el}
+                                        draggable
+                                        onDragStart={() => handleDragStart(i)}
+                                        onDragOver={(e) => { e.preventDefault(); handleDragOver(i); }}
+                                        onDragEnd={handleDragEnd}
+                                        onTouchStart={(e) => handleTouchStart(e, i)}
+                                        onTouchMove={handleTouchMove}
+                                        onTouchEnd={handleTouchEnd}
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '8px',
+                                            padding: '8px 10px', borderRadius: '12px',
+                                            background: isDragging ? `${ex.color}20` : isDragOver ? 'rgba(129,140,248,0.15)' : `${ex.color}08`,
+                                            border: isDragOver ? '1.5px dashed rgba(129,140,248,0.4)' : `1px solid ${ex.color}20`,
+                                            cursor: 'grab', userSelect: 'none',
+                                            opacity: isDragging ? 0.6 : 1,
+                                            transition: isDragging ? 'none' : 'all 0.15s ease',
+                                            touchAction: 'none'
+                                        }}
+                                    >
+                                        <GripVertical size={14} color="var(--text-secondary)" style={{ opacity: 0.4, flexShrink: 0 }} />
                                         <span style={{
-                                            fontSize: '0.65rem', fontWeight: '800', color: 'var(--text-secondary)',
-                                            width: '14px', textAlign: 'center'
+                                            fontSize: '0.65rem', fontWeight: '800', color: ex.color,
+                                            width: '16px', textAlign: 'center', flexShrink: 0
                                         }}>{i + 1}</span>
                                         <Icon size={14} color={ex.color} />
                                         <span style={{
-                                            fontSize: '0.7rem', fontWeight: '600', color: ex.color
+                                            fontSize: '0.75rem', fontWeight: '600', color: ex.color, flex: 1
                                         }}>{t('exercises.' + ex.id)}</span>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
+                                            style={{
+                                                width: '22px', height: '22px', borderRadius: '50%',
+                                                background: 'rgba(255,255,255,0.06)', border: 'none',
+                                                color: 'var(--text-secondary)', cursor: 'pointer',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                flexShrink: 0
+                                            }}
+                                        >
+                                            <X size={10} />
+                                        </button>
                                     </div>
                                 );
                             })}
@@ -227,14 +479,93 @@ export function WorkoutSession({
                     </div>
                 </div>
 
-                {/* Launch button */}
-                <div style={{ padding: 'var(--spacing-md)' }}>
+                {/* ── Save routine inline form ── */}
+                {showSaveRoutine && (
+                    <div style={{
+                        padding: '12px var(--spacing-md)', background: 'rgba(245,158,11,0.05)',
+                        borderTop: '1px solid rgba(245,158,11,0.15)',
+                        display: 'flex', gap: '8px', alignItems: 'center'
+                    }}>
+                        <input
+                            value={routineName}
+                            onChange={e => setRoutineName(e.target.value.slice(0, 30))}
+                            placeholder={t('routines.namePlaceholder')}
+                            autoFocus
+                            style={{
+                                flex: 1, padding: '10px 14px',
+                                background: 'rgba(255,255,255,0.06)',
+                                border: '1.5px solid rgba(245,158,11,0.3)',
+                                borderRadius: 'var(--radius-md)',
+                                color: 'white', fontSize: '0.85rem', fontWeight: '600',
+                                outline: 'none', boxSizing: 'border-box'
+                            }}
+                            onKeyDown={e => e.key === 'Enter' && handleSaveRoutine()}
+                            maxLength={30}
+                        />
+                        <button
+                            onClick={handleSaveRoutine}
+                            disabled={!routineName.trim()}
+                            style={{
+                                padding: '10px 16px', borderRadius: 'var(--radius-md)',
+                                background: routineName.trim() ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'rgba(255,255,255,0.05)',
+                                border: 'none', color: 'white', fontWeight: '700',
+                                cursor: routineName.trim() ? 'pointer' : 'default',
+                                opacity: routineName.trim() ? 1 : 0.4,
+                                fontSize: '0.8rem'
+                            }}
+                        >
+                            <Check size={18} />
+                        </button>
+                        <button
+                            onClick={() => { setShowSaveRoutine(false); setRoutineName(''); }}
+                            style={{
+                                padding: '10px', borderRadius: 'var(--radius-md)',
+                                background: 'rgba(255,255,255,0.06)', border: 'none',
+                                color: 'var(--text-secondary)', cursor: 'pointer'
+                            }}
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+                )}
+
+                {/* Bottom buttons */}
+                <div style={{
+                    padding: 'var(--spacing-md)', display: 'flex', gap: '8px'
+                }}>
+                    {/* Save as routine */}
+                    {!showSaveRoutine && queue.length >= 1 && (
+                        <button
+                            onClick={() => {
+                                if (routines.length >= maxRoutines) return;
+                                setShowSaveRoutine(true);
+                            }}
+                            className="hover-lift"
+                            disabled={routines.length >= maxRoutines}
+                            style={{
+                                padding: '14px', borderRadius: 'var(--radius-lg)',
+                                background: routines.length >= maxRoutines
+                                    ? 'rgba(255,255,255,0.05)'
+                                    : 'rgba(245,158,11,0.15)',
+                                border: routines.length >= maxRoutines ? 'none' : '1px solid rgba(245,158,11,0.3)',
+                                color: routines.length >= maxRoutines ? 'var(--text-secondary)' : '#f59e0b',
+                                cursor: routines.length >= maxRoutines ? 'default' : 'pointer',
+                                opacity: routines.length >= maxRoutines ? 0.4 : 1,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                transition: 'all 0.2s ease'
+                            }}
+                        >
+                            <Save size={20} />
+                        </button>
+                    )}
+
+                    {/* Launch button */}
                     <button
                         onClick={startSession}
                         disabled={queue.length < 1}
                         className="hover-lift"
                         style={{
-                            width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
+                            flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
                             background: queue.length >= 1
                                 ? 'linear-gradient(135deg, #818cf8, #6366f1)'
                                 : 'rgba(255,255,255,0.05)',
@@ -257,7 +588,6 @@ export function WorkoutSession({
     // ── RUNNING PHASE = render Counter or Timer ─────────────────
     if (phase === 'running' && currentEx) {
         const isTimer = currentExId === 'planche';
-
         const Component = isTimer ? Timer : Counter;
 
         return (
@@ -274,7 +604,7 @@ export function WorkoutSession({
         );
     }
 
-    // ── DONE PHASE ──────────────────────────────────────────────
+    // ── DONE PHASE ───────────────────────────────────────────────
     if (phase === 'done') {
         return (
             <div className="fade-in" style={{

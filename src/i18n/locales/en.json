@@ -19,6 +19,7 @@
     "day": "Day",
     "calendar": "Calendar",
     "session": "Session",
+    "routines": "Routines",
     "newAchievement": "New Achievement!",
     "doneAt": "Done at {{time}}",
     "waiting": "⏳ Waiting",
@@ -259,6 +260,22 @@
     "allCompleted": "All exercises completed 💪",
     "close": "Close",
     "reps": "{{count}} reps"
+  },
+  "routines": {
+    "title": "My Routines",
+    "empty": "No saved routines",
+    "emptyHint": "Save an exercise order to launch it quickly!",
+    "newRoutine": "New Routine",
+    "editRoutine": "Edit Routine",
+    "routineName": "Routine name",
+    "namePlaceholder": "E.g. Full Body, Push Day...",
+    "selectExercises": "Select exercises (in order)",
+    "save": "Save",
+    "delete": "Delete",
+    "launch": "Launch",
+    "load": "Load",
+    "maxReached": "Maximum 10 routines",
+    "nameRequired": "A name is required"
   },
   "cloud": {
     "cloudDataDetected": "Cloud Data Detected",
