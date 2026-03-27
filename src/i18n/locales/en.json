@@ -359,7 +359,7 @@
     "buyButton": "Join the Club",
     "activeTitle": "Club Member",
     "activeDesc": "You have access to all friend challenges.",
-    "price": "€4.99/month",
+    "price": "€0.99/month",
     "locked": "Club subscription required",
     "lockedDesc": "Upgrade to Club to challenge your friends!"
   },
@@ -376,7 +376,7 @@
     "buyButton": "Go Pro",
     "activeTitle": "Pro Member",
     "activeDesc": "You can create custom programs.",
-    "price": "€6.99/month",
+    "price": "€1.99/month",
     "locked": "Pro subscription required",
     "lockedDesc": "Upgrade to Pro to create your programs!"
   },

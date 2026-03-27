@@ -13,8 +13,10 @@ const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints }
 export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveClan, activeSlide = 0 }) {
     const { t } = useTranslation();
 
+    const [domain, setDomain] = useState(activeSlide === 1 ? 'weights' : 'classic');
+
     const VISIBLE_TABS = useMemo(() => {
-        if (activeSlide === 1) { // Weights Dashboard View
+        if (domain === 'weights') { // Weights Dashboard View
             return [
                 { id: 'global_weights', labelKey: 'common.global_weights', color: '#8b5cf6', icon: Dumbbell },
                 ...WEIGHT_EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
@@ -25,7 +27,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
             { id: 'global_classic', labelKey: 'common.global_classic', color: '#fbbf24', icon: Trophy },
             ...EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
         ];
-    }, [activeSlide]);
+    }, [domain]);
 
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -72,12 +74,16 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
     }, []);
 
     const sorted = useMemo(() => {
-        return [...entries].sort((a, b) => {
+        let filteredEntries = entries;
+        if (domain === 'weights') {
+            filteredEntries = entries.filter(e => e.isPro);
+        }
+        return [...filteredEntries].sort((a, b) => {
             if (activeTab === 'global_classic') return (b.totalReps || 0) - (a.totalReps || 0);
             if (activeTab === 'global_weights') return (b.weightsTotalReps || 0) - (a.weightsTotalReps || 0);
             return (b.exerciseReps?.[activeTab] || 0) - (a.exerciseReps?.[activeTab] || 0);
         });
-    }, [entries, activeTab]);
+    }, [entries, activeTab, domain]);
 
     // Compute ranks with ties (same score = same rank)
     const getRank = (index) => {
@@ -169,10 +175,45 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                 </div>
             )}
 
+            {/* ── Domain Filter ── */}
+            <div style={{
+                display: 'flex', gap: '8px', padding: 'var(--spacing-md) var(--spacing-md) 0'
+            }}>
+                <button
+                    onClick={() => { setDomain('classic'); setActiveTab('global_classic'); }}
+                    className="hover-lift"
+                    style={{
+                        flex: 1, padding: '10px', borderRadius: 'var(--radius-md)',
+                        background: domain === 'classic' ? '#ffffff' : 'rgba(255,255,255,0.05)',
+                        color: domain === 'classic' ? '#000000' : 'var(--text-secondary)',
+                        border: 'none', fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                        transition: 'all 0.2s', boxShadow: domain === 'classic' ? '0 4px 12px rgba(255,255,255,0.1)' : 'none'
+                    }}
+                >
+                    <Trophy size={16} /> Classique
+                </button>
+                <button
+                    onClick={() => { setDomain('weights'); setActiveTab('global_weights'); }}
+                    className="hover-lift"
+                    style={{
+                        flex: 1, padding: '10px', borderRadius: 'var(--radius-md)',
+                        background: domain === 'weights' ? 'linear-gradient(135deg, #8b5cf6, #6366f1)' : 'rgba(255,255,255,0.05)',
+                        color: domain === 'weights' ? '#ffffff' : 'var(--text-secondary)',
+                        border: domain === 'weights' ? '1px solid rgba(139,92,246,0.4)' : '1px solid transparent',
+                        fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                        transition: 'all 0.2s', boxShadow: domain === 'weights' ? '0 4px 12px rgba(139,92,246,0.2)' : 'none'
+                    }}
+                >
+                    <Dumbbell size={16} /> Musculation
+                </button>
+            </div>
+
             {/* ── Tabs (wrapping) ───────────────────────────────── */}
             <div style={{
                 display: 'flex', flexWrap: 'wrap', gap: '6px',
-                padding: 'var(--spacing-sm) var(--spacing-md)'
+                padding: 'var(--spacing-md)'
             }}>
                 {VISIBLE_TABS.map(tab => {
                     const isActive = tab.id === activeTab || (!VISIBLE_TABS.find(t => t.id === activeTab) && tab.id === VISIBLE_TABS[0].id);

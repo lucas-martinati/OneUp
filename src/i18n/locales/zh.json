@@ -349,7 +349,7 @@
     "buyButton": "加入俱乐部",
     "activeTitle": "俱乐部会员",
     "activeDesc": "你可以访问所有好友挑战。",
-    "price": "€4.99/月",
+    "price": "€0.99/月",
     "locked": "需要俱乐部订阅",
     "lockedDesc": "升级到俱乐部以挑战你的朋友！"
   },
@@ -366,7 +366,7 @@
     "buyButton": "升级 Pro",
     "activeTitle": "Pro 会员",
     "activeDesc": "你可以创建自定义计划。",
-    "price": "€6.99/月",
+    "price": "€1.99/月",
     "locked": "需要 Pro 订阅",
     "lockedDesc": "升级到 Pro 以创建你的计划！"
   },
