@@ -1,7 +1,7 @@
 /**
  * Purchase Service — RevenueCat wrapper for OneUp Supporter Badge
  * 
- * Product: "supporter" — one-time purchase (~2–5€)
+ * Product: "supporter" — (~2–5€)
  * Entitlement: "supporter" — grants the ❤️ badge on leaderboard
  * 
  * Falls back gracefully on web/dev where native SDK is unavailable.
@@ -75,7 +75,6 @@ export async function getSupporterOffering() {
 
   try {
     const offerings = await Purchases.getOfferings();
-    logger.info('Offerings response:', JSON.stringify(offerings, null, 2));
     const current = offerings?.current;
     if (!current) {
       logger.error('No current offering set in RevenueCat dashboard');
@@ -131,7 +130,16 @@ export async function purchaseSupporter() {
     localStorage.setItem('oneup_supporter', isSupporter ? 'true' : 'false');
     
     logger.success('Purchase completed, supporter:', isSupporter);
-    return { success: true, isSupporter };
+    return { 
+      success: true, 
+      isSupporter,
+      product: {
+        id: offering.id,
+        title: offering.title,
+        price: offering.price,
+        date: new Date().toISOString()
+      }
+    };
   } catch (error) {
     // User cancelled or error
     if (error.code === 1 || error.userCancelled) {

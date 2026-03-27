@@ -4,7 +4,7 @@ import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, 
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
 
-export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, onPurchaseSupporter, onRestorePurchases }) {
+export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, purchaseHistory, onPurchaseSupporter, onRestorePurchases }) {
     const { t, i18n } = useTranslation();
     const [showSaved, setShowSaved] = useState(false);
     const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
@@ -557,6 +557,39 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                             <RotateCcw size={14} />
                             {t('supporter.restore')}
                         </button>
+                    </div>
+                )}
+
+                {/* --- Historique des achats --- */}
+                {purchaseHistory && purchaseHistory.length > 0 && (
+                    <div style={{ marginTop: '24px', borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
+                        <div style={{ 
+                            fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)',
+                            textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'
+                        }}>
+                            {t('supporter.history') || 'Historique des reçus'}
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            {purchaseHistory.map((receipt, index) => (
+                                <div key={index} style={{
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    padding: '12px', borderRadius: 'var(--radius-md)',
+                                    background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)'
+                                }}>
+                                    <div>
+                                        <div style={{ fontWeight: '600', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                                            {receipt.title || 'Donation Supporter'}
+                                        </div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                            {new Date(receipt.date).toLocaleDateString(i18n.language, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' })}
+                                        </div>
+                                    </div>
+                                    <div style={{ fontWeight: '800', color: '#10b981', fontSize: '0.9rem' }}>
+                                        {receipt.price || '€'}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>

@@ -43,7 +43,7 @@ export function Dashboard({
     conflictData, onResolveConflict, getExerciseCount, updateExerciseCount, getTotalReps,
     getExerciseDone, pauseCloudSync, resumeCloudSync, computedStats,
     routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
-    isSupporter, onPurchaseSupporter, onRestorePurchases
+    isSupporter, purchaseHistory, onPurchaseSupporter, onRestorePurchases
 }) {
     const { t } = useTranslation();
     const [today, setToday] = useState(getLocalDateStr(new Date()));
@@ -566,6 +566,7 @@ export function Dashboard({
                             conflictData={conflictData}
                             onResolveConflict={onResolveConflict}
                             isSupporter={isSupporter}
+                            purchaseHistory={purchaseHistory}
                             onPurchaseSupporter={onPurchaseSupporter}
                             onRestorePurchases={onRestorePurchases}
                         />

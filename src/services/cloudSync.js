@@ -564,7 +564,8 @@ class CloudSyncService {
           achievements: entry.achievements || 0,
           lastActiveDay: entry.lastActiveDay || null,
           difficultyMultiplier: entry.difficultyMultiplier || 1,
-          lastUpdated: entry.lastUpdated || null
+          lastUpdated: entry.lastUpdated || null,
+          isSupporter: !!entry.isSupporter
         }));
 
       // Sort by total reps descending
@@ -647,6 +648,37 @@ class CloudSyncService {
     } catch (error) {
       logger.error('Error loading settings:', error);
       return null;
+    }
+  }
+
+  // Save purchase history to cloud
+  async savePurchaseHistoryToCloud(history) {
+    try {
+      if (!auth?.currentUser || !database) return false;
+      const userId = auth.currentUser.uid;
+      const historyRef = ref(database, `users/${userId}/purchaseHistory`);
+      await set(historyRef, history);
+      return true;
+    } catch (error) {
+      logger.error('Error syncing purchase history:', error);
+      return false;
+    }
+  }
+
+  // Load purchase history from cloud
+  async loadPurchaseHistoryFromCloud() {
+    try {
+      if (!auth?.currentUser || !database) return [];
+      const userId = auth.currentUser.uid;
+      const historyRef = ref(database, `users/${userId}/purchaseHistory`);
+      const snapshot = await get(historyRef);
+      if (snapshot.exists()) {
+        return snapshot.val() || [];
+      }
+      return [];
+    } catch (error) {
+      logger.error('Error loading purchase history:', error);
+      return [];
     }
   }
 
@@ -864,6 +896,7 @@ class CloudSyncService {
           lastActiveDay: lbData.lastActiveDay || null,
           difficultyMultiplier: lbData.difficultyMultiplier || 1,
           lastUpdated: lbData.lastUpdated || null,
+          isSupporter: !!lbData.isSupporter,
           isCurrentUser: memberUid === uid
         };
       });

@@ -29,6 +29,7 @@ function App() {
   const [isInitialSyncDone, setIsInitialSyncDone] = useState(false);
   const [isSyncPaused, setIsSyncPaused] = useState(false);
   const [isSupporter, setIsSupporter] = useState(() => localStorage.getItem('oneup_supporter') === 'true');
+  const [purchaseHistory, setPurchaseHistory] = useState([]);
 
   const {
     startDate,
@@ -144,20 +145,24 @@ function App() {
     }
   }, [googleAuth.isSignedIn, googleAuth.loading]);
 
-  // Sync routines with cloud on sign-in
+  // Sync routines and purchase history with cloud on sign-in
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading) {
-      const loadRoutines = async () => {
+      const loadData = async () => {
         try {
           const cloudRoutines = await cloudSync.loadRoutinesFromCloud();
           if (cloudRoutines && Array.isArray(cloudRoutines)) {
             setRoutinesFromCloud(cloudRoutines);
           }
+          const history = await cloudSync.loadPurchaseHistoryFromCloud();
+          if (history && Array.isArray(history)) {
+            setPurchaseHistory(history);
+          }
         } catch (error) {
-          logger.error('Routines sync error:', error);
+          logger.error('Data sync error:', error);
         }
       };
-      loadRoutines();
+      loadData();
     }
   }, [googleAuth.isSignedIn, googleAuth.loading]);
 
@@ -292,6 +297,11 @@ function App() {
     if (result.isSupporter) {
       setIsSupporter(true);
     }
+    if (result.success && result.product) {
+      const newHistory = [...purchaseHistory, result.product];
+      setPurchaseHistory(newHistory);
+      cloudSync.savePurchaseHistoryToCloud(newHistory);
+    }
   };
 
   const handleRestorePurchases = async () => {
@@ -386,6 +396,7 @@ function App() {
           updateRoutine={updateRoutine}
           maxRoutines={maxRoutines}
           isSupporter={isSupporter}
+          purchaseHistory={purchaseHistory}
           onPurchaseSupporter={handlePurchaseSupporter}
           onRestorePurchases={handleRestorePurchases}
         />
