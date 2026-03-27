@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw } from 'lucide-react';
+import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
 
 export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, purchaseHistory, onPurchaseSupporter, onRestorePurchases }) {
     const { t, i18n } = useTranslation();
     const [showSaved, setShowSaved] = useState(false);
+    const [showStore, setShowStore] = useState(false);
     const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
 
     const handleToggleNotifications = () => {
@@ -129,9 +130,21 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 marginBottom: 'var(--spacing-md)'
             }}>
-                <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: '800' }}>
-                    {t('settings.title')}
-                </h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    {showStore && (
+                        <button onClick={() => setShowStore(false)} className="hover-lift glass" style={{
+                            background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
+                            width: 'var(--touch-min)', height: 'var(--touch-min)',
+                            display: 'flex', alignItems: 'center',
+                            justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
+                        }}>
+                            <ArrowLeft size={22} />
+                        </button>
+                    )}
+                    <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: '800' }}>
+                        {showStore ? 'Boutique' : t('settings.title')}
+                    </h2>
+                </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     {/* Auto-save indicator */}
                     {showSaved && (
@@ -164,6 +177,142 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
 
             {/* ── Settings Content ────────────────────────────────────── */}
 
+            {showStore ? (
+                /* ── BOUTIQUE VIEW ────────────────────────────────────────── */
+                <div>
+                   <div className="glass-premium" style={{
+                        padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                        marginBottom: 'var(--spacing-md)',
+                        background: isSupporter
+                            ? 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.02))'
+                            : 'var(--surface-section)',
+                        border: isSupporter ? '1px solid rgba(239,68,68,0.2)' : '1px solid var(--border-subtle)'
+                    }}>
+                        <h3 style={sectionTitleStyle}>{t('supporter.title')}</h3>
+
+                        {isSupporter ? (
+                            /* Already a supporter */
+                            <div style={{
+                                display: 'flex', alignItems: 'center', gap: '12px',
+                                padding: '16px', borderRadius: 'var(--radius-lg)',
+                                background: 'rgba(239,68,68,0.1)',
+                                border: '1px solid rgba(239,68,68,0.2)'
+                            }}>
+                                <div style={{
+                                    width: '48px', height: '48px', borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    boxShadow: '0 4px 16px rgba(239,68,68,0.3)', flexShrink: 0
+                                }}>
+                                    <Heart size={24} color="white" fill="white" />
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: '800', fontSize: '1rem', color: '#ef4444' }}>
+                                        {t('supporter.thankYou')}
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                        {t('supporter.badgeActive')}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            /* Not a supporter yet */
+                            <div>
+                                <div style={{
+                                    padding: '20px', borderRadius: 'var(--radius-lg)',
+                                    background: 'linear-gradient(135deg, rgba(239,68,68,0.06), rgba(245,158,11,0.04))',
+                                    border: '1px solid rgba(239,68,68,0.12)',
+                                    textAlign: 'center', marginBottom: '12px'
+                                }}>
+                                    <Heart size={32} color="#ef4444" style={{ marginBottom: '8px', opacity: 0.8 }} />
+                                    <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
+                                        {t('supporter.description')}
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                                        {t('supporter.explanation')}
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={() => {
+                                        if (!cloudAuth?.isSignedIn) {
+                                            cloudAuth?.signIn?.();
+                                            return;
+                                        }
+                                        onPurchaseSupporter();
+                                    }}
+                                    className="hover-lift"
+                                    style={{
+                                        width: '100%', padding: '16px',
+                                        borderRadius: 'var(--radius-lg)',
+                                        background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                                        border: 'none', color: 'white',
+                                        fontWeight: '800', fontSize: '1rem',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        gap: '8px', cursor: 'pointer',
+                                        boxShadow: '0 4px 16px rgba(239,68,68,0.3)',
+                                        marginBottom: '8px'
+                                    }}
+                                >
+                                    <Heart size={20} fill="white" />
+                                    {t('supporter.buyButton')}
+                                </button>
+
+                                <button
+                                    onClick={onRestorePurchases}
+                                    style={{
+                                        width: '100%', padding: '10px',
+                                        borderRadius: 'var(--radius-md)',
+                                        background: 'transparent',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        color: 'var(--text-secondary)',
+                                        fontSize: '0.8rem', fontWeight: '600',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        gap: '6px', cursor: 'pointer'
+                                    }}
+                                >
+                                    <RotateCcw size={14} />
+                                    {t('supporter.restore')}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* --- Historique des achats --- */}
+                        {purchaseHistory && purchaseHistory.length > 0 && (
+                            <div style={{ marginTop: '24px', borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
+                                <div style={{ 
+                                    fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)',
+                                    textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'
+                                }}>
+                                    {t('supporter.history') || 'Historique des reçus'}
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    {purchaseHistory.map((receipt, index) => (
+                                        <div key={index} style={{
+                                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                            padding: '12px', borderRadius: 'var(--radius-md)',
+                                            background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)'
+                                        }}>
+                                            <div>
+                                                <div style={{ fontWeight: '600', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                                                    {receipt.title || 'Donation Supporter'}
+                                                </div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                                    {new Date(receipt.date).toLocaleDateString(i18n.language, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' })}
+                                                </div>
+                                            </div>
+                                            <div style={{ fontWeight: '800', color: '#10b981', fontSize: '0.9rem' }}>
+                                                {receipt.price || '€'}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            ) : (
+                <>
             {/* ── Préférences ─────────────────────────────────────────── */}
             <div className="glass-premium" style={{
                 padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
@@ -461,139 +610,35 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                 </div>
             )}
 
-            {/* ── Supporter Badge ─────────────────────────────────────── */}
-            {(Capacitor.isNativePlatform() || isSupporter) && (
-            <div className="glass-premium" style={{
+            {/* ── Boutique Button ─────────────────────────────────────── */}
+            <div className="glass-premium hover-lift" 
+                onClick={() => setShowStore(true)}
+                style={{
                 padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
                 marginBottom: 'var(--spacing-md)',
-                background: isSupporter
-                    ? 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.02))'
-                    : 'var(--surface-section)',
-                border: isSupporter ? '1px solid rgba(239,68,68,0.2)' : '1px solid var(--border-subtle)'
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.05))',
+                border: '1px solid rgba(16, 185, 129, 0.2)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between'
             }}>
-                <h3 style={sectionTitleStyle}>{t('supporter.title')}</h3>
-
-                {isSupporter ? (
-                    /* Already a supporter */
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <div style={{
-                        display: 'flex', alignItems: 'center', gap: '12px',
-                        padding: '16px', borderRadius: 'var(--radius-lg)',
-                        background: 'rgba(239,68,68,0.1)',
-                        border: '1px solid rgba(239,68,68,0.2)'
+                        width: '42px', height: '42px', borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #10b981, #059669)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
                     }}>
-                        <div style={{
-                            width: '48px', height: '48px', borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: '0 4px 16px rgba(239,68,68,0.3)', flexShrink: 0
-                        }}>
-                            <Heart size={24} color="white" fill="white" />
-                        </div>
-                        <div>
-                            <div style={{ fontWeight: '800', fontSize: '1rem', color: '#ef4444' }}>
-                                {t('supporter.thankYou')}
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                                {t('supporter.badgeActive')}
-                            </div>
-                        </div>
+                        <ShoppingBag size={20} color="white" />
                     </div>
-                ) : (
-                    /* Not a supporter yet */
                     <div>
-                        <div style={{
-                            padding: '20px', borderRadius: 'var(--radius-lg)',
-                            background: 'linear-gradient(135deg, rgba(239,68,68,0.06), rgba(245,158,11,0.04))',
-                            border: '1px solid rgba(239,68,68,0.12)',
-                            textAlign: 'center', marginBottom: '12px'
-                        }}>
-                            <Heart size={32} color="#ef4444" style={{ marginBottom: '8px', opacity: 0.8 }} />
-                            <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
-                                {t('supporter.description')}
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                                {t('supporter.explanation')}
-                            </div>
+                        <div style={{ fontWeight: '800', fontSize: '1.05rem', color: 'var(--text-primary)' }}>
+                            Boutique & Achats
                         </div>
-
-                        <button
-                            onClick={() => {
-                                if (!cloudAuth?.isSignedIn) {
-                                    cloudAuth?.signIn?.();
-                                    return;
-                                }
-                                onPurchaseSupporter();
-                            }}
-                            className="hover-lift"
-                            style={{
-                                width: '100%', padding: '16px',
-                                borderRadius: 'var(--radius-lg)',
-                                background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-                                border: 'none', color: 'white',
-                                fontWeight: '800', fontSize: '1rem',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                gap: '8px', cursor: 'pointer',
-                                boxShadow: '0 4px 16px rgba(239,68,68,0.3)',
-                                marginBottom: '8px'
-                            }}
-                        >
-                            <Heart size={20} fill="white" />
-                            {t('supporter.buyButton')}
-                        </button>
-
-                        <button
-                            onClick={onRestorePurchases}
-                            style={{
-                                width: '100%', padding: '10px',
-                                borderRadius: 'var(--radius-md)',
-                                background: 'transparent',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                color: 'var(--text-secondary)',
-                                fontSize: '0.8rem', fontWeight: '600',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                gap: '6px', cursor: 'pointer'
-                            }}
-                        >
-                            <RotateCcw size={14} />
-                            {t('supporter.restore')}
-                        </button>
-                    </div>
-                )}
-
-                {/* --- Historique des achats --- */}
-                {purchaseHistory && purchaseHistory.length > 0 && (
-                    <div style={{ marginTop: '24px', borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
-                        <div style={{ 
-                            fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)',
-                            textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'
-                        }}>
-                            {t('supporter.history') || 'Historique des reçus'}
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            {purchaseHistory.map((receipt, index) => (
-                                <div key={index} style={{
-                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                    padding: '12px', borderRadius: 'var(--radius-md)',
-                                    background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)'
-                                }}>
-                                    <div>
-                                        <div style={{ fontWeight: '600', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                                            {receipt.title || 'Donation Supporter'}
-                                        </div>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                            {new Date(receipt.date).toLocaleDateString(i18n.language, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' })}
-                                        </div>
-                                    </div>
-                                    <div style={{ fontWeight: '800', color: '#10b981', fontSize: '0.9rem' }}>
-                                        {receipt.price || '€'}
-                                    </div>
-                                </div>
-                            ))}
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                            Badge supporter, reçu...
                         </div>
                     </div>
-                )}
+                </div>
             </div>
-            )}
 
             {/* ── Difficulté (Sensitive Setting) ─────────────────────────── */}
             <div className="glass-premium" style={{
@@ -681,7 +726,9 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                     </div>
                 )}
             </div>
-            </div>
+            </>
+            )}
         </div>
+    </div>
     );
 }

@@ -296,6 +296,30 @@ function App() {
     }
     if (result.isSupporter) {
       setIsSupporter(true);
+      
+      // Force an immediate publish to leaderboard
+      try {
+        let lastActiveDay = null;
+        for (const dateStr of computedStats.sortedDates) {
+          const day = completions[dateStr];
+          if (day && EXERCISES.some(ex => day[ex.id]?.isCompleted)) {
+            lastActiveDay = dateStr;
+          }
+        }
+        const pseudo = settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme';
+        cloudSync.publishToLeaderboard({ 
+          pseudo, 
+          totalReps: computedStats.globalTotalReps, 
+          exerciseReps: computedStats.exerciseReps, 
+          achievements: computedStats.badgeCount, 
+          isPublic: !!settings.leaderboardEnabled, 
+          lastActiveDay,
+          difficultyMultiplier: settings?.difficultyMultiplier,
+          isSupporter: true
+        });
+      } catch (e) {
+        logger.error('Immediate leaderboard publish failed:', e);
+      }
     }
     if (result.success && result.product) {
       const newHistory = [...purchaseHistory, result.product];
