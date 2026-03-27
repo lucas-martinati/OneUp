@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Swords, Sparkles, Star, Smartphone } from 'lucide-react';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
+import { getPurchaseHistory } from '../services/purchaseService';
 
 export function Settings({ defaultShowStore = false, settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isClub, isPro, purchaseHistory, onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases }) {
     const { t, i18n } = useTranslation();
@@ -10,6 +11,13 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
     const [showStore, setShowStore] = useState(defaultShowStore);
     const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
     const [showWebPaymentModal, setShowWebPaymentModal] = useState(false);
+    const [revenueCatHistory, setRevenueCatHistory] = useState([]);
+
+    useEffect(() => {
+        if (showStore) {
+            getPurchaseHistory().then(hist => setRevenueCatHistory(hist));
+        }
+    }, [showStore]);
 
     const handleToggleNotifications = () => {
         const newSettings = { ...settings, notificationsEnabled: !settings.notificationsEnabled };
@@ -477,8 +485,8 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                         {t('supporter.restore')}
                     </button>
 
-                    {/* --- Historique des achats (Déplacé tout en bas) --- */}
-                    {purchaseHistory && purchaseHistory.length > 0 && (
+                    {/* --- Historique des achats --- */}
+                    {revenueCatHistory && revenueCatHistory.length > 0 && (
                         <div className="glass-premium" style={{
                             padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
                             marginBottom: 'var(--spacing-md)',
@@ -491,22 +499,39 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                                 Historique des achats
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                {purchaseHistory.map((receipt, index) => (
+                                {revenueCatHistory.map((receipt, index) => (
                                     <div key={index} style={{
-                                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                        display: 'flex', flexDirection: 'column',
                                         padding: '12px', borderRadius: 'var(--radius-md)',
                                         background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)'
                                     }}>
-                                        <div>
-                                            <div style={{ fontWeight: '600', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                                                {receipt.title || (receipt.type ? `${receipt.type.charAt(0).toUpperCase() + receipt.type.slice(1)}` : 'Achat')}
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
+                                            <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                                                {receipt.title}
                                             </div>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                                {receipt.date ? new Date(receipt.date).toLocaleDateString(i18n.language, { year: 'numeric', month: 'short', day: 'numeric' }) : ''}
+                                            <div style={{ 
+                                                fontWeight: '800', fontSize: '0.9rem', 
+                                                color: receipt.isActive ? '#10b981' : 'var(--text-secondary)'
+                                            }}>
+                                                {receipt.price}
                                             </div>
                                         </div>
-                                        <div style={{ fontWeight: '800', color: '#10b981', fontSize: '0.9rem' }}>
-                                            {receipt.price || '€'}
+                                        
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                                            {receipt.desc}
+                                        </div>
+
+                                        <div style={{ 
+                                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                            fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', borderTop: '1px dashed rgba(255,255,255,0.05)',
+                                            paddingTop: '8px', opacity: 0.8
+                                        }}>
+                                            <span style={{ fontFamily: 'monospace', letterSpacing: '0.5px' }}>
+                                                ID: {receipt.id || 'N/A'}
+                                            </span>
+                                            <span>
+                                                {receipt.date ? new Date(receipt.date).toLocaleDateString() : ''}
+                                            </span>
                                         </div>
                                     </div>
                                 ))}

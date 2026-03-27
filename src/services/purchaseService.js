@@ -249,3 +249,60 @@ export async function restorePurchases() {
     return { success: false, supporter: false, club: false, pro: false };
   }
 }
+
+/**
+ * Fetch formatted purchase history directly from RevenueCat securely.
+ */
+export async function getPurchaseHistory() {
+  if (!isInitialized || !Capacitor.isNativePlatform()) return [];
+
+  try {
+    const { customerInfo } = await Purchases.getCustomerInfo();
+    const history = [];
+
+    const getProductDetails = (identifier) => {
+      if (identifier?.includes('supporter')) return { title: 'Soutien OneUp ❤️', desc: 'Achat unique premium' };
+      if (identifier?.includes('club')) return { title: 'Abonnement Club', desc: 'Renouvellement automatique' };
+      if (identifier?.includes('pro')) return { title: 'Abonnement Pro', desc: 'Renouvellement automatique' };
+      return { title: 'Achat In-App', desc: 'Transaction OneUp' };
+    };
+
+    // 1. Active & Expired Entitlements
+    if (customerInfo?.entitlements?.all) {
+      for (const [key, ent] of Object.entries(customerInfo.entitlements.all)) {
+        const details = getProductDetails(ent.productIdentifier);
+        history.push({
+          id: ent.productIdentifier || key,
+          title: details.title,
+          desc: details.desc,
+          date: ent.latestPurchaseDate || ent.originalPurchaseDate,
+          price: ent.isActive ? 'Actif' : 'Expiré',
+          isActive: ent.isActive
+        });
+      }
+    }
+
+    // 2. Hard Purchases (One-Time)
+    if (customerInfo?.nonSubscriptionTransactions?.length > 0) {
+      for (const tx of customerInfo.nonSubscriptionTransactions) {
+        if (!history.some(h => h.id === tx.productIdentifier)) {
+          const details = getProductDetails(tx.productIdentifier);
+          history.push({
+            id: tx.transactionIdentifier || tx.productIdentifier,
+            title: details.title,
+            desc: details.desc,
+            date: tx.purchaseDate,
+            price: 'Payé',
+            isActive: true
+          });
+        }
+      }
+    }
+
+    // Newest first
+    return history.sort((a, b) => new Date(b.date) - new Date(a.date));
+  } catch (error) {
+    logger.error('Failed to parse active purchase history from RC:', error);
+    return [];
+  }
+}

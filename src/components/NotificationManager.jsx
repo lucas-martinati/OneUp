@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { HeartHandshake, X } from 'lucide-react';
 import { cloudSync } from '../services/cloudSync';
 import { sounds } from '../utils/soundManager';
+import { Avatar } from './Avatar';
 
 export function NotificationManager() {
     const [notifications, setNotifications] = useState([]);
@@ -96,17 +97,8 @@ export function NotificationManager() {
                     pointerEvents: 'auto',
                     maxWidth: '90%', minWidth: '280px'
                 }}>
-                    <div style={{
-                        width: '36px', height: '36px', borderRadius: '50%',
-                        background: toast.fromPhoto ? 'transparent' : 'linear-gradient(135deg, #6366f1, #a78bfa)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'white', fontWeight: '700', overflow: 'hidden', flexShrink: 0
-                    }}>
-                        {toast.fromPhoto ? (
-                            <img src={toast.fromPhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : (
-                            toast.fromName.charAt(0).toUpperCase()
-                        )}
+                    <div style={{ flexShrink: 0 }}>
+                        <Avatar photoURL={toast.fromPhoto} name={toast.fromName} size={36} />
                     </div>
                     
                     <div style={{ flex: 1 }}>
