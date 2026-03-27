@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, Suspense, lazy } from 'react';
+import { useEffect, useState, useCallback, useRef, Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProgress } from './hooks/useProgress';
 import { useSettings } from './hooks/useSettings';
@@ -6,13 +6,15 @@ import { useGoogleAuth } from './hooks/useGoogleAuth';
 import { useComputedStats } from './hooks/useComputedStats';
 import { useUserDetailsCache } from './hooks/useUserDetailsCache';
 import { useRoutines } from './hooks/useRoutines';
+import { useCustomPrograms } from './hooks/useCustomPrograms';
 import { cloudSync } from './services/cloudSync';
-import { initPurchases, checkSupporterStatus, purchaseSupporter, restorePurchases } from './services/purchaseService';
-// Simple components stay static
+import {
+  initPurchases, checkSupporterStatus, purchaseSupporter, restorePurchases,
+  checkClubStatus, purchaseClub, checkProStatus, purchasePro
+} from './services/purchaseService';
 import { EXERCISES } from './config/exercises';
 import { createLogger } from './utils/logger';
 
-// Heavy components are lazy loaded
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
 const Onboarding = lazy(() => import('./components/Onboarding').then(module => ({ default: module.Onboarding })));
 
@@ -24,38 +26,84 @@ function App() {
   const { settings, updateSettings } = useSettings();
   const googleAuth = useGoogleAuth();
   const { routines, saveRoutine, deleteRoutine, updateRoutine, setRoutinesFromCloud, maxRoutines } = useRoutines();
+  const customPrograms = useCustomPrograms();
+
   const [conflictData, setConflictData] = useState(null);
   const [conflictCheckDone, setConflictCheckDone] = useState(false);
   const [isInitialSyncDone, setIsInitialSyncDone] = useState(false);
   const [isSyncPaused, setIsSyncPaused] = useState(false);
+
+  // Subscription tiers
   const [isSupporter, setIsSupporter] = useState(() => localStorage.getItem('oneup_supporter') === 'true');
+  const [isClub, setIsClub] = useState(() => localStorage.getItem('oneup_club') === 'true');
+  const [isPro, setIsPro] = useState(() => localStorage.getItem('oneup_pro') === 'true');
+
+  // Refs to always read latest subscription state (avoid stale closures)
+  const isSupporterRef = useRef(isSupporter);
+  const isClubRef = useRef(isClub);
+  const isProRef = useRef(isPro);
+  useEffect(() => { isSupporterRef.current = isSupporter; }, [isSupporter]);
+  useEffect(() => { isClubRef.current = isClub; }, [isClub]);
+  useEffect(() => { isProRef.current = isPro; }, [isPro]);
   const [purchaseHistory, setPurchaseHistory] = useState([]);
 
   const {
-    startDate,
-    completions,
-    startChallenge,
-    toggleCompletion,
-    getDayNumber,
-    getTotalReps,
-    isDayDone,
-    isSetup,
-    userStartDate,
-    scheduleNotification,
-    requestNotificationPermission,
-    getExerciseCount,
-    updateExerciseCount,
-    saveToCloud,
-    loadFromCloud,
-    syncWithCloud,
-    startCloudListener
+    startDate, completions, startChallenge, toggleCompletion,
+    getDayNumber, getTotalReps, isDayDone, isSetup, userStartDate,
+    scheduleNotification, requestNotificationPermission,
+    getExerciseCount, updateExerciseCount,
+    saveToCloud, loadFromCloud, syncWithCloud, startCloudListener
   } = progress;
 
-  // Centralized stats computation (single pass over completions)
   const computedStats = useComputedStats(completions, settings, getDayNumber);
-
-  // Cached user details for leaderboard
   const userDetailsCache = useUserDetailsCache(cloudSync);
+
+  // ── Helper: publish leaderboard with current state ────────────────────
+  // Uses refs to always read latest subscription state (no stale closures)
+  const publishLeaderboardNow = useCallback(async (overrides = {}) => {
+    try {
+      if (!googleAuth.isSignedIn) return;
+      let lastActiveDay = null;
+      for (const dateStr of computedStats.sortedDates) {
+        const day = completions[dateStr];
+        if (day && EXERCISES.some(ex => day[ex.id]?.isCompleted)) {
+          lastActiveDay = dateStr;
+        }
+      }
+      const pseudo = settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme';
+      const sup = overrides.isSupporter !== undefined ? overrides.isSupporter : isSupporterRef.current;
+      const clb = overrides.isClub !== undefined ? overrides.isClub : isClubRef.current;
+      const pr = overrides.isPro !== undefined ? overrides.isPro : isProRef.current;
+      await cloudSync.publishToLeaderboard({
+        pseudo,
+        totalReps: computedStats.globalTotalReps,
+        exerciseReps: computedStats.exerciseReps,
+        achievements: computedStats.badgeCount,
+        isPublic: !!settings.leaderboardEnabled,
+        lastActiveDay,
+        difficultyMultiplier: settings?.difficultyMultiplier,
+        isSupporter: sup,
+        isClub: clb,
+        isPro: pr,
+      });
+      logger.debug('Leaderboard published:', { isSupporter: sup, isClub: clb, isPro: pr });
+    } catch (e) {
+      logger.error('Leaderboard publish failed:', e);
+    }
+  }, [googleAuth, computedStats, completions, settings]);
+
+  // ── Helper: save all entitlements to Firebase + localStorage ──────────
+  const saveEntitlementsToCloud = useCallback(async ({ isSupporter: sup, isClub: clb, isPro: pr }) => {
+    // Save to localStorage
+    localStorage.setItem('oneup_supporter', sup ? 'true' : 'false');
+    localStorage.setItem('oneup_club', clb ? 'true' : 'false');
+    localStorage.setItem('oneup_pro', pr ? 'true' : 'false');
+    // Save to Firebase
+    await cloudSync.saveSubscriptionStatus({ isSupporter: sup, isClub: clb, isPro: pr });
+    // Publish to leaderboard
+    await publishLeaderboardNow({ isSupporter: sup, isClub: clb, isPro: pr });
+    logger.info('Entitlements saved:', { isSupporter: sup, isClub: clb, isPro: pr });
+  }, [publishLeaderboardNow]);
 
   // Apply performance mode on document root
   useEffect(() => {
@@ -85,41 +133,27 @@ function App() {
   useEffect(() => {
     if (isSetup && settings.notificationsEnabled) {
       scheduleNotification(settings);
-
       const now = new Date();
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(0, 0, 30, 0);
-
       const midnightTimer = setTimeout(() => {
         scheduleNotification(settings);
       }, tomorrow.getTime() - now.getTime());
-
       return () => clearTimeout(midnightTimer);
     }
   }, [isSetup, settings.notificationsEnabled, settings.notificationTime, completions]);
 
-  // Save to cloud only when an exercise completion status changes (not on count changes)
+  // Save to cloud when completion changes
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading && !conflictData && conflictCheckDone && isInitialSyncDone) {
-      logger.debug('Auto-save triggered by completion change');
       const doSave = async () => {
-        try {
-          await saveToCloud();
-          logger.success('Auto-save: Progression synchronisée');
-        } catch (error) {
-          logger.error('Auto-save failed:', error);
-        }
+        try { await saveToCloud(); } catch (error) { logger.error('Auto-save failed:', error); }
       };
       const timer = setTimeout(doSave, 1000);
       return () => clearTimeout(timer);
-    } else if (googleAuth.isSignedIn && !isInitialSyncDone && !googleAuth.loading) {
-      logger.debug('Auto-save skipped: Initial sync still in progress');
     }
-  }, [
-    progress.lastCompletionChange,
-    googleAuth.isSignedIn, googleAuth.loading, conflictData, conflictCheckDone, isInitialSyncDone, saveToCloud
-  ]);
+  }, [progress.lastCompletionChange, googleAuth.isSignedIn, googleAuth.loading, conflictData, conflictCheckDone, isInitialSyncDone, saveToCloud]);
 
   // Sync settings with cloud on sign-in
   useEffect(() => {
@@ -137,50 +171,76 @@ function App() {
             }
             updateSettings(safeSettings);
           }
-        } catch (error) {
-          logger.error('Settings sync error:', error);
-        }
+        } catch (error) { logger.error('Settings sync error:', error); }
       };
       loadSettings();
     }
   }, [googleAuth.isSignedIn, googleAuth.loading]);
 
-  // Sync routines and purchase history with cloud on sign-in
+  // Sync routines, purchase history, custom programs with cloud on sign-in
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading) {
       const loadData = async () => {
         try {
           const cloudRoutines = await cloudSync.loadRoutinesFromCloud();
-          if (cloudRoutines && Array.isArray(cloudRoutines)) {
-            setRoutinesFromCloud(cloudRoutines);
-          }
+          if (cloudRoutines && Array.isArray(cloudRoutines)) setRoutinesFromCloud(cloudRoutines);
           const history = await cloudSync.loadPurchaseHistoryFromCloud();
-          if (history && Array.isArray(history)) {
-            setPurchaseHistory(history);
-          }
-        } catch (error) {
-          logger.error('Data sync error:', error);
-        }
+          if (history && Array.isArray(history)) setPurchaseHistory(history);
+          const cloudPrograms = await cloudSync.loadCustomProgramsFromCloud();
+          if (cloudPrograms && Array.isArray(cloudPrograms)) customPrograms.setProgramsFromCloud(cloudPrograms);
+        } catch (error) { logger.error('Data sync error:', error); }
       };
       loadData();
     }
   }, [googleAuth.isSignedIn, googleAuth.loading]);
 
-  // Initialize purchases and check supporter status on sign-in
+  // Initialize purchases and check ALL tier statuses on sign-in
+  // FIX: auto-publish to leaderboard when any entitlement is detected
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading) {
       const initAndCheck = async () => {
         try {
           await initPurchases(cloudSync.getCurrentUserId());
-          const status = await checkSupporterStatus();
-          setIsSupporter(status);
+
+          let supporterStatus = false;
+          let clubStatus = false;
+          let proStatus = false;
+
+          try {
+            supporterStatus = await checkSupporterStatus();
+            clubStatus = await checkClubStatus();
+            proStatus = await checkProStatus();
+          } catch (rcErr) {
+            logger.warn('RevenueCat check failed, trying Firebase fallback:', rcErr);
+            // Fallback: load from Firebase if RevenueCat fails
+            const cloudSubs = await cloudSync.loadSubscriptionStatus();
+            if (cloudSubs) {
+              supporterStatus = !!cloudSubs.isSupporter;
+              clubStatus = !!cloudSubs.isClub;
+              proStatus = !!cloudSubs.isPro;
+            }
+          }
+
+          setIsSupporter(supporterStatus);
+          setIsClub(clubStatus);
+          setIsPro(proStatus);
+
+          // Save to Firebase + publish to leaderboard if any entitlement active
+          if (supporterStatus || clubStatus || proStatus) {
+            logger.info('Entitlements detected on init — syncing to Firebase + leaderboard');
+            await saveEntitlementsToCloud({
+              isSupporter: supporterStatus,
+              isClub: clubStatus,
+              isPro: proStatus,
+            });
+          }
         } catch (error) {
           logger.error('Purchase init error:', error);
         }
       };
       initAndCheck();
     }
-  }, [googleAuth.isSignedIn, googleAuth.loading]);
+  }, [googleAuth.isSignedIn, googleAuth.loading, saveEntitlementsToCloud]);
 
   // Auto-detect cloud data conflict on sign-in
   useEffect(() => {
@@ -191,8 +251,6 @@ function App() {
           if (cloudData && cloudData.completions) {
             const cloudKeys = Object.keys(cloudData.completions);
             const localKeys = Object.keys(completions);
-
-            // Compare only isCompleted status per exercise (count is stripped in cloud)
             const hasConflict = cloudKeys.length > 0 && (
               cloudKeys.some(key => !completions[key]) ||
               localKeys.some(key => !cloudData.completions[key]) ||
@@ -200,21 +258,15 @@ function App() {
                 const cloudDay = cloudData.completions[key];
                 const localDay = completions[key];
                 if (!cloudDay || !localDay) return true;
-                // Compare per exercise: only check isCompleted
                 const allExIds = new Set([...Object.keys(cloudDay), ...Object.keys(localDay)]);
                 for (const exId of allExIds) {
-                  const cloudDone = cloudDay[exId]?.isCompleted || false;
-                  const localDone = localDay[exId]?.isCompleted || false;
-                  if (cloudDone !== localDone) return true;
+                  if ((cloudDay[exId]?.isCompleted || false) !== (localDay[exId]?.isCompleted || false)) return true;
                 }
                 return false;
               })
             );
-            if (hasConflict) {
-              setConflictData(cloudData);
-            } else {
-              setConflictCheckDone(true);
-            }
+            if (hasConflict) setConflictData(cloudData);
+            else setConflictCheckDone(true);
           } else {
             setConflictCheckDone(true);
           }
@@ -232,9 +284,7 @@ function App() {
   // Auto-save settings
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading && isSetup) {
-      const timer = setTimeout(() => {
-        cloudSync.saveSettingsToCloud(settings);
-      }, 2000);
+      const timer = setTimeout(() => { cloudSync.saveSettingsToCloud(settings); }, 2000);
       return () => clearTimeout(timer);
     }
   }, [settings, googleAuth.isSignedIn, googleAuth.loading, isSetup]);
@@ -242,84 +292,65 @@ function App() {
   // Auto-save routines
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading && isSetup) {
-      const timer = setTimeout(() => {
-        cloudSync.saveRoutinesToCloud(routines);
-      }, 2000);
+      const timer = setTimeout(() => { cloudSync.saveRoutinesToCloud(routines); }, 2000);
       return () => clearTimeout(timer);
     }
   }, [routines, googleAuth.isSignedIn, googleAuth.loading, isSetup]);
 
-  // Auto-publish leaderboard when completions change (if opted in or in clan)
+  // Auto-save custom programs
   useEffect(() => {
-    if (!googleAuth.isSignedIn || googleAuth.loading || !isSetup) return;
-    if (!isInitialSyncDone) return;
+    if (googleAuth.isSignedIn && !googleAuth.loading && isSetup && isPro) {
+      const timer = setTimeout(() => { cloudSync.saveCustomProgramsToCloud(customPrograms.programs); }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [customPrograms.programs, googleAuth.isSignedIn, googleAuth.loading, isSetup, isPro]);
 
-    const timer = setTimeout(async () => {
-      try {
-        // Find last active day from sorted dates
-        let lastActiveDay = null;
-        for (const dateStr of computedStats.sortedDates) {
-          const day = completions[dateStr];
-          if (day && EXERCISES.some(ex => day[ex.id]?.isCompleted)) {
-            lastActiveDay = dateStr;
-          }
-        }
-
-        const pseudo = settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme';
-        const isPublic = !!settings.leaderboardEnabled;
-        await cloudSync.publishToLeaderboard({ 
-          pseudo, 
-          totalReps: computedStats.globalTotalReps, 
-          exerciseReps: computedStats.exerciseReps, 
-          achievements: computedStats.badgeCount, 
-          isPublic, 
-          lastActiveDay,
-          difficultyMultiplier: settings?.difficultyMultiplier,
-          isSupporter
-        });
-      } catch (error) {
-        logger.error('Leaderboard publish failed:', error);
-      }
-    }, 2000);
+  // Auto-publish leaderboard when completions change
+  useEffect(() => {
+    if (!googleAuth.isSignedIn || googleAuth.loading || !isSetup || !isInitialSyncDone) return;
+    const timer = setTimeout(() => publishLeaderboardNow(), 2000);
     return () => clearTimeout(timer);
   }, [
     completions, settings.leaderboardEnabled, settings.leaderboardPseudo, settings.difficultyMultiplier,
-    googleAuth.isSignedIn, googleAuth.loading, isSetup, isInitialSyncDone, computedStats, isSupporter
+    googleAuth.isSignedIn, googleAuth.loading, isSetup, isInitialSyncDone, computedStats
   ]);
 
-  // ── Purchase handlers ──
+  // ── Purchase handlers ────────────────────────────────────────────────
+
   const handlePurchaseSupporter = async () => {
     const result = await purchaseSupporter();
-    if (result.webOnly) {
-      alert(t('supporter.androidOnly'));
-      return;
-    }
+    if (result.webOnly) { alert(t('supporter.androidOnly')); return; }
     if (result.isSupporter) {
       setIsSupporter(true);
-      
-      // Force an immediate publish to leaderboard
-      try {
-        let lastActiveDay = null;
-        for (const dateStr of computedStats.sortedDates) {
-          const day = completions[dateStr];
-          if (day && EXERCISES.some(ex => day[ex.id]?.isCompleted)) {
-            lastActiveDay = dateStr;
-          }
-        }
-        const pseudo = settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme';
-        cloudSync.publishToLeaderboard({ 
-          pseudo, 
-          totalReps: computedStats.globalTotalReps, 
-          exerciseReps: computedStats.exerciseReps, 
-          achievements: computedStats.badgeCount, 
-          isPublic: !!settings.leaderboardEnabled, 
-          lastActiveDay,
-          difficultyMultiplier: settings?.difficultyMultiplier,
-          isSupporter: true
-        });
-      } catch (e) {
-        logger.error('Immediate leaderboard publish failed:', e);
-      }
+      await saveEntitlementsToCloud({ isSupporter: true, isClub, isPro });
+    }
+    if (result.success && result.product) {
+      const newHistory = [...purchaseHistory, result.product];
+      setPurchaseHistory(newHistory);
+      cloudSync.savePurchaseHistoryToCloud(newHistory);
+    }
+  };
+
+  const handlePurchaseClub = async () => {
+    const result = await purchaseClub();
+    if (result.webOnly) { alert(t('supporter.androidOnly')); return; }
+    if (result.isActive) {
+      setIsClub(true);
+      await saveEntitlementsToCloud({ isSupporter, isClub: true, isPro });
+    }
+    if (result.success && result.product) {
+      const newHistory = [...purchaseHistory, result.product];
+      setPurchaseHistory(newHistory);
+      cloudSync.savePurchaseHistoryToCloud(newHistory);
+    }
+  };
+
+  const handlePurchasePro = async () => {
+    const result = await purchasePro();
+    if (result.webOnly) { alert(t('supporter.androidOnly')); return; }
+    if (result.isActive) {
+      setIsPro(true);
+      await saveEntitlementsToCloud({ isSupporter, isClub, isPro: true });
     }
     if (result.success && result.product) {
       const newHistory = [...purchaseHistory, result.product];
@@ -330,39 +361,34 @@ function App() {
 
   const handleRestorePurchases = async () => {
     const result = await restorePurchases();
-    if (result.webOnly) {
-      alert(t('supporter.androidOnly'));
-      return;
+    if (result.webOnly) { alert(t('supporter.androidOnly')); return; }
+    const sup = result.supporter || result.isSupporter;
+    const clb = result.club;
+    const pr = result.pro;
+    setIsSupporter(sup);
+    setIsClub(clb);
+    setIsPro(pr);
+    // Save all entitlements to Firebase + leaderboard
+    if (sup || clb || pr) {
+      await saveEntitlementsToCloud({ isSupporter: sup, isClub: clb, isPro: pr });
     }
-    setIsSupporter(result.isSupporter);
   };
 
   const handleResolveConflict = async (action) => {
     try {
-      if (action === 'restore') {
-        await loadFromCloud();
-      } else if (action === 'upload') {
-        await saveToCloud();
-      }
+      if (action === 'restore') await loadFromCloud();
+      else if (action === 'upload') await saveToCloud();
       setConflictData(null);
       setConflictCheckDone(true);
-    } catch (error) {
-      logger.error('Conflict resolution failed:', error);
-    }
+    } catch (error) { logger.error('Conflict resolution failed:', error); }
   };
 
   // Full sync on app startup once conflict check is resolved
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading && conflictCheckDone && isSetup && !isInitialSyncDone) {
       const initialSync = async () => {
-        try {
-          await syncWithCloud();
-          setIsInitialSyncDone(true);
-          logger.success('Initial sync completed on app launch');
-        } catch (error) {
-          logger.error('Initial sync failed:', error);
-          setIsInitialSyncDone(true); // allow saves even if sync fails
-        }
+        try { await syncWithCloud(); setIsInitialSyncDone(true); }
+        catch (error) { logger.error('Initial sync failed:', error); setIsInitialSyncDone(true); }
       };
       initialSync();
     }
@@ -371,12 +397,8 @@ function App() {
   // Real-time cloud sync listener
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading && conflictCheckDone && isInitialSyncDone && !isSyncPaused && !conflictData) {
-      logger.info('Starting real-time cloud listener');
       const unsubscribe = startCloudListener();
-      return () => {
-        logger.info('Stopping real-time cloud listener');
-        if (unsubscribe) unsubscribe();
-      };
+      return () => { if (unsubscribe) unsubscribe(); };
     }
   }, [googleAuth.isSignedIn, googleAuth.loading, conflictCheckDone, isInitialSyncDone, isSyncPaused, conflictData, startCloudListener]);
 
@@ -405,7 +427,14 @@ function App() {
           settings={settings}
           updateSettings={updateSettings}
           cloudAuth={googleAuth}
-          cloudSync={{ saveToCloud, loadFromCloud, syncWithCloud, signIn: googleAuth.signIn, signOut: googleAuth.signOut, loadLeaderboard: () => cloudSync.loadLeaderboard(), loadUserDetails: (uid) => userDetailsCache.loadUserDetails(uid), getCurrentUserId: () => cloudSync.getCurrentUserId(), deleteAccount: () => cloudSync.deleteAccount() }}
+          cloudSync={{
+            saveToCloud, loadFromCloud, syncWithCloud,
+            signIn: googleAuth.signIn, signOut: googleAuth.signOut,
+            loadLeaderboard: () => cloudSync.loadLeaderboard(),
+            loadUserDetails: (uid) => userDetailsCache.loadUserDetails(uid),
+            getCurrentUserId: () => cloudSync.getCurrentUserId(),
+            deleteAccount: () => cloudSync.deleteAccount(),
+          }}
           conflictData={conflictData}
           onResolveConflict={handleResolveConflict}
           getExerciseCount={getExerciseCount}
@@ -420,9 +449,14 @@ function App() {
           updateRoutine={updateRoutine}
           maxRoutines={maxRoutines}
           isSupporter={isSupporter}
+          isClub={isClub}
+          isPro={isPro}
           purchaseHistory={purchaseHistory}
           onPurchaseSupporter={handlePurchaseSupporter}
+          onPurchaseClub={handlePurchaseClub}
+          onPurchasePro={handlePurchasePro}
           onRestorePurchases={handleRestorePurchases}
+          customPrograms={customPrograms}
         />
       )}
     </Suspense>

@@ -490,7 +490,7 @@ class CloudSyncService {
    * Publish (or update) this user's leaderboard entry.
    * Stored at `leaderboard/{uid}`.
    */
-  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter = false }) {
+  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter = false, isClub = false, isPro = false }) {
     try {
       if (!auth?.currentUser || !database) return false;
 
@@ -505,6 +505,8 @@ class CloudSyncService {
         difficultyMultiplier: difficultyMultiplier || 1,
         isPublic: isPublic !== false,
         isSupporter: isSupporter || false,
+        isClub: isClub || false,
+        isPro: isPro || false,
         lastUpdated: serverTimestamp()
       };
 
@@ -565,7 +567,9 @@ class CloudSyncService {
           lastActiveDay: entry.lastActiveDay || null,
           difficultyMultiplier: entry.difficultyMultiplier || 1,
           lastUpdated: entry.lastUpdated || null,
-          isSupporter: !!entry.isSupporter
+          isSupporter: !!entry.isSupporter,
+          isClub: !!entry.isClub,
+          isPro: !!entry.isPro
         }));
 
       // Sort by total reps descending
@@ -679,6 +683,45 @@ class CloudSyncService {
     } catch (error) {
       logger.error('Error loading purchase history:', error);
       return [];
+    }
+  }
+
+  // Save active subscription entitlements to cloud
+  // Stored at `users/{uid}/subscriptions`
+  async saveSubscriptionStatus({ isSupporter, isClub, isPro }) {
+    try {
+      if (!auth?.currentUser || !database) return false;
+      const userId = auth.currentUser.uid;
+      const subRef = ref(database, `users/${userId}/subscriptions`);
+      await set(subRef, {
+        isSupporter: !!isSupporter,
+        isClub: !!isClub,
+        isPro: !!isPro,
+        updatedAt: serverTimestamp(),
+      });
+      logger.success('Subscription status synced to cloud');
+      return true;
+    } catch (error) {
+      logger.error('Error syncing subscription status:', error);
+      return false;
+    }
+  }
+
+  // Load active subscription entitlements from cloud
+  async loadSubscriptionStatus() {
+    try {
+      if (!auth?.currentUser || !database) return null;
+      const userId = auth.currentUser.uid;
+      const subRef = ref(database, `users/${userId}/subscriptions`);
+      const snapshot = await get(subRef);
+      if (snapshot.exists()) {
+        logger.success('Subscription status loaded from cloud');
+        return snapshot.val();
+      }
+      return null;
+    } catch (error) {
+      logger.error('Error loading subscription status:', error);
+      return null;
     }
   }
 
@@ -954,7 +997,6 @@ class CloudSyncService {
       if (!auth?.currentUser || !database) return null;
       const uid = auth.currentUser.uid;
 
-      // Listen specifically for unread logic, but we can query them later and set to read.
       const notifsRef = ref(database, `notifications/${uid}`);
 
       const unsubscribe = onValue(notifsRef, (snapshot) => {
@@ -989,6 +1031,309 @@ class CloudSyncService {
     } catch (error) {
       logger.error('Error deleting notification:', error);
       return false;
+    }
+  }
+
+  // ── Friend Challenges (Club) ──────────────────────────────────────────
+
+  /**
+   * Create a new challenge between friends.
+   * Stored at `challenges/{challengeId}`.
+   */
+  async createChallenge({ name, exerciseIds, duration, invitedPseudos }) {
+    try {
+      if (!auth?.currentUser || !database) throw new Error('Not initialized');
+      const uid = auth.currentUser.uid;
+
+      // Generate random 6-char code
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+
+      const challengesRef = ref(database, 'challenges');
+      const newRef = push(challengesRef);
+      const challengeId = newRef.key;
+
+      // Get creator pseudo
+      const lbSnapshot = await get(ref(database, `leaderboard/${uid}`));
+      const pseudo = lbSnapshot.exists() && lbSnapshot.val().pseudo
+        ? lbSnapshot.val().pseudo
+        : 'Anonyme';
+
+      const challengeData = {
+        name,
+        exerciseIds: exerciseIds || [],
+        duration: duration || 7,
+        code,
+        createdBy: uid,
+        createdAt: serverTimestamp(),
+        status: 'pending',
+        participants: {
+          [uid]: { role: 'admin', status: 'accepted', score: 0 }
+        },
+        invitedPseudos: invitedPseudos || [],
+      };
+
+      await set(newRef, challengeData);
+
+      // Add challenge ref to user
+      await set(ref(database, `users/${uid}/challenges/${challengeId}`), 'admin');
+
+      logger.success(`Challenge ${name} created with code ${code}`);
+      return { success: true, challengeId, code };
+    } catch (error) {
+      logger.error('Error creating challenge:', error);
+      return { success: false, error: 'Une erreur est survenue' };
+    }
+  }
+
+  /**
+   * Join a challenge by code.
+   */
+  async joinChallenge(code) {
+    try {
+      if (!auth?.currentUser || !database) throw new Error('Not initialized');
+      const uid = auth.currentUser.uid;
+      const cleanCode = code.toUpperCase().trim();
+
+      const challengesRef = ref(database, 'challenges');
+      const snapshot = await get(challengesRef);
+      if (!snapshot.exists()) return { success: false, error: 'Code invalide' };
+
+      const challenges = snapshot.val();
+      let foundId = null;
+
+      for (const [id, ch] of Object.entries(challenges)) {
+        if (ch.code === cleanCode) {
+          foundId = id;
+          break;
+        }
+      }
+
+      if (!foundId) return { success: false, error: 'Code invalide' };
+
+      // Check if already participant
+      const existingSnap = await get(ref(database, `users/${uid}/challenges/${foundId}`));
+      if (existingSnap.exists()) return { success: false, error: 'Tu participes déjà à ce défi' };
+
+      // Add user
+      await set(ref(database, `challenges/${foundId}/participants/${uid}`), {
+        role: 'member',
+        status: 'accepted',
+        score: 0,
+      });
+      await set(ref(database, `users/${uid}/challenges/${foundId}`), 'member');
+
+      logger.success(`Joined challenge ${foundId}`);
+      return { success: true, challengeId: foundId };
+    } catch (error) {
+      logger.error('Error joining challenge:', error);
+      return { success: false, error: 'Erreur lors de la connexion au défi' };
+    }
+  }
+
+  /**
+   * Get all challenges for the current user.
+   */
+  async getUserChallenges() {
+    try {
+      if (!auth?.currentUser || !database) return [];
+      const uid = auth.currentUser.uid;
+
+      const userChSnap = await get(ref(database, `users/${uid}/challenges`));
+      if (!userChSnap.exists()) return [];
+
+      const challengeIds = Object.keys(userChSnap.val());
+      const results = [];
+
+      for (const chId of challengeIds) {
+        const chSnap = await get(ref(database, `challenges/${chId}`));
+        if (chSnap.exists()) {
+          const data = chSnap.val();
+          results.push({
+            id: chId,
+            name: data.name,
+            code: data.code,
+            exerciseIds: data.exerciseIds || [],
+            duration: data.duration || 7,
+            status: data.status || 'pending',
+            createdBy: data.createdBy,
+            createdAt: data.createdAt,
+            participantCount: Object.keys(data.participants || {}).length,
+            myRole: data.participants?.[uid]?.role || 'member',
+            myScore: data.participants?.[uid]?.score || 0,
+          });
+        }
+      }
+      return results;
+    } catch (error) {
+      logger.error('Error fetching user challenges:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get full challenge details with leaderboard.
+   */
+  async getChallengeDetails(challengeId) {
+    try {
+      if (!auth?.currentUser || !database) return null;
+      if (!challengeId) return null;
+
+      const chSnap = await get(ref(database, `challenges/${challengeId}`));
+      if (!chSnap.exists()) return null;
+
+      const data = chSnap.val();
+      const lbSnapshot = await get(ref(database, 'leaderboard'));
+      const leaderboards = lbSnapshot.exists() ? lbSnapshot.val() : {};
+
+      const participantIds = Object.keys(data.participants || {});
+      const participants = participantIds.map((pUid) => {
+        const lbData = leaderboards[pUid] || {};
+        const pData = data.participants[pUid] || {};
+        return {
+          uid: pUid,
+          role: pData.role || 'member',
+          status: pData.status || 'accepted',
+          score: pData.score || 0,
+          pseudo: lbData.pseudo || 'Anonyme',
+          photoURL: lbData.photoURL || null,
+          isCurrentUser: pUid === auth.currentUser.uid,
+        };
+      });
+
+      participants.sort((a, b) => b.score - a.score);
+
+      return {
+        id: challengeId,
+        name: data.name,
+        code: data.code,
+        exerciseIds: data.exerciseIds || [],
+        duration: data.duration || 7,
+        status: data.status || 'pending',
+        createdBy: data.createdBy,
+        createdAt: data.createdAt,
+        participants,
+      };
+    } catch (error) {
+      logger.error('Error fetching challenge details:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Update a participant's score in a challenge.
+   */
+  async updateChallengeScore(challengeId, score) {
+    try {
+      if (!auth?.currentUser || !database) return false;
+      const uid = auth.currentUser.uid;
+      await set(ref(database, `challenges/${challengeId}/participants/${uid}/score`), score);
+      return true;
+    } catch (error) {
+      logger.error('Error updating challenge score:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Leave a challenge.
+   */
+  async leaveChallenge(challengeId) {
+    try {
+      if (!auth?.currentUser || !database) return false;
+      const uid = auth.currentUser.uid;
+
+      await remove(ref(database, `challenges/${challengeId}/participants/${uid}`));
+      await remove(ref(database, `users/${uid}/challenges/${challengeId}`));
+
+      // Delete challenge if empty
+      const chSnap = await get(ref(database, `challenges/${challengeId}`));
+      if (chSnap.exists()) {
+        const remaining = chSnap.val().participants || {};
+        if (Object.keys(remaining).length === 0) {
+          await remove(ref(database, `challenges/${challengeId}`));
+        }
+      }
+
+      return true;
+    } catch (error) {
+      logger.error('Error leaving challenge:', error);
+      return false;
+    }
+  }
+
+  // ── Custom Programs (Pro) ────────────────────────────────────────────
+
+  /**
+   * Save custom programs to cloud.
+   */
+  async saveCustomProgramsToCloud(programs) {
+    try {
+      if (!auth?.currentUser || !database) return false;
+      const userId = auth.currentUser.uid;
+      const progRef = ref(database, `users/${userId}/customPrograms`);
+      await set(progRef, programs || []);
+      logger.success('Custom programs synced to cloud');
+      return true;
+    } catch (error) {
+      logger.error('Error syncing custom programs:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Load custom programs from cloud.
+   */
+  async loadCustomProgramsFromCloud() {
+    try {
+      if (!auth?.currentUser || !database) return null;
+      const userId = auth.currentUser.uid;
+      const progRef = ref(database, `users/${userId}/customPrograms`);
+      const snapshot = await get(progRef);
+      if (snapshot.exists()) {
+        logger.success('Custom programs loaded from cloud');
+        return snapshot.val();
+      }
+      return null;
+    } catch (error) {
+      logger.error('Error loading custom programs:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Save program completions to cloud.
+   */
+  async saveProgramCompletionsToCloud(programId, completions) {
+    try {
+      if (!auth?.currentUser || !database) return false;
+      const userId = auth.currentUser.uid;
+      const compRef = ref(database, `users/${userId}/programCompletions/${programId}`);
+      await set(compRef, completions || {});
+      return true;
+    } catch (error) {
+      logger.error('Error syncing program completions:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Load program completions from cloud.
+   */
+  async loadProgramCompletionsFromCloud(programId) {
+    try {
+      if (!auth?.currentUser || !database) return null;
+      const userId = auth.currentUser.uid;
+      const compRef = ref(database, `users/${userId}/programCompletions/${programId}`);
+      const snapshot = await get(compRef);
+      if (snapshot.exists()) return snapshot.val();
+      return null;
+    } catch (error) {
+      logger.error('Error loading program completions:', error);
+      return null;
     }
   }
 }

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Swords, Sparkles, Star } from 'lucide-react';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
 
-export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, purchaseHistory, onPurchaseSupporter, onRestorePurchases }) {
+export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isClub, isPro, purchaseHistory, onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases }) {
     const { t, i18n } = useTranslation();
     const [showSaved, setShowSaved] = useState(false);
     const [showStore, setShowStore] = useState(false);
@@ -310,6 +310,197 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                             </div>
                         )}
                     </div>
+
+                    {/* ── ABONNEMENT CLUB ─────────────────────────────────── */}
+                    <div className="glass-premium" style={{
+                        padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                        marginBottom: 'var(--spacing-md)',
+                        background: isClub
+                            ? 'linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02))'
+                            : 'var(--surface-section)',
+                        border: isClub ? '1px solid rgba(245,158,11,0.2)' : '1px solid var(--border-subtle)'
+                    }}>
+                        <h3 style={sectionTitleStyle}>{t('club.title')}</h3>
+
+                        {isClub ? (
+                            <div style={{
+                                display: 'flex', alignItems: 'center', gap: '12px',
+                                padding: '16px', borderRadius: 'var(--radius-lg)',
+                                background: 'rgba(245,158,11,0.1)',
+                                border: '1px solid rgba(245,158,11,0.2)'
+                            }}>
+                                <div style={{
+                                    width: '48px', height: '48px', borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    boxShadow: '0 4px 16px rgba(245,158,11,0.3)', flexShrink: 0
+                                }}>
+                                    <Swords size={24} color="white" />
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: '800', fontSize: '1rem', color: '#f59e0b' }}>
+                                        {t('club.activeTitle')}
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                        {t('club.activeDesc')}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div>
+                                <div style={{
+                                    padding: '20px', borderRadius: 'var(--radius-lg)',
+                                    background: 'linear-gradient(135deg, rgba(245,158,11,0.06), rgba(217,119,6,0.04))',
+                                    border: '1px solid rgba(245,158,11,0.12)',
+                                    textAlign: 'center', marginBottom: '12px'
+                                }}>
+                                    <Swords size={32} color="#f59e0b" style={{ marginBottom: '8px', opacity: 0.8 }} />
+                                    <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
+                                        {t('club.description')}
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '12px' }}>
+                                        {t('club.explanation')}
+                                    </div>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center' }}>
+                                        {['challenges', 'leagues', 'ranking', 'notifications'].map(f => (
+                                            <span key={f} style={{
+                                                padding: '4px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '600',
+                                                background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)'
+                                            }}>
+                                                {t(`club.features.${f}`)}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        if (!cloudAuth?.isSignedIn) { cloudAuth?.signIn?.(); return; }
+                                        onPurchaseClub?.();
+                                    }}
+                                    className="hover-lift"
+                                    style={{
+                                        width: '100%', padding: '16px',
+                                        borderRadius: 'var(--radius-lg)',
+                                        background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                        border: 'none', color: 'white',
+                                        fontWeight: '800', fontSize: '1rem',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        gap: '8px', cursor: 'pointer',
+                                        boxShadow: '0 4px 16px rgba(245,158,11,0.3)',
+                                        marginBottom: '8px'
+                                    }}
+                                >
+                                    <Swords size={20} />
+                                    {t('club.buyButton')} — {t('club.price')}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* ── ABONNEMENT PRO ───────────────────────────────────── */}
+                    <div className="glass-premium" style={{
+                        padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                        marginBottom: 'var(--spacing-md)',
+                        background: isPro
+                            ? 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(139,92,246,0.02))'
+                            : 'var(--surface-section)',
+                        border: isPro ? '1px solid rgba(139,92,246,0.2)' : '1px solid var(--border-subtle)'
+                    }}>
+                        <h3 style={sectionTitleStyle}>{t('pro.title')}</h3>
+
+                        {isPro ? (
+                            <div style={{
+                                display: 'flex', alignItems: 'center', gap: '12px',
+                                padding: '16px', borderRadius: 'var(--radius-lg)',
+                                background: 'rgba(139,92,246,0.1)',
+                                border: '1px solid rgba(139,92,246,0.2)'
+                            }}>
+                                <div style={{
+                                    width: '48px', height: '48px', borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    boxShadow: '0 4px 16px rgba(139,92,246,0.3)', flexShrink: 0
+                                }}>
+                                    <Sparkles size={24} color="white" />
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: '800', fontSize: '1rem', color: '#8b5cf6' }}>
+                                        {t('pro.activeTitle')}
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                        {t('pro.activeDesc')}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div>
+                                <div style={{
+                                    padding: '20px', borderRadius: 'var(--radius-lg)',
+                                    background: 'linear-gradient(135deg, rgba(139,92,246,0.06), rgba(124,58,237,0.04))',
+                                    border: '1px solid rgba(139,92,246,0.12)',
+                                    textAlign: 'center', marginBottom: '12px'
+                                }}>
+                                    <Sparkles size={32} color="#8b5cf6" style={{ marginBottom: '8px', opacity: 0.8 }} />
+                                    <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
+                                        {t('pro.description')}
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '12px' }}>
+                                        {t('pro.explanation')}
+                                    </div>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center' }}>
+                                        {['customPrograms', 'exerciseChoice', 'dailyProgression', 'dedicatedPanel'].map(f => (
+                                            <span key={f} style={{
+                                                padding: '4px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '600',
+                                                background: 'rgba(139,92,246,0.12)', color: '#8b5cf6', border: '1px solid rgba(139,92,246,0.2)'
+                                            }}>
+                                                {t(`pro.features.${f}`)}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        if (!cloudAuth?.isSignedIn) { cloudAuth?.signIn?.(); return; }
+                                        onPurchasePro?.();
+                                    }}
+                                    className="hover-lift"
+                                    style={{
+                                        width: '100%', padding: '16px',
+                                        borderRadius: 'var(--radius-lg)',
+                                        background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                                        border: 'none', color: 'white',
+                                        fontWeight: '800', fontSize: '1rem',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        gap: '8px', cursor: 'pointer',
+                                        boxShadow: '0 4px 16px rgba(139,92,246,0.3)',
+                                        marginBottom: '8px'
+                                    }}
+                                >
+                                    <Sparkles size={20} />
+                                    {t('pro.buyButton')} — {t('pro.price')}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Restore purchases button (shared for all tiers) */}
+                    <button
+                        onClick={onRestorePurchases}
+                        style={{
+                            width: '100%', padding: '10px',
+                            borderRadius: 'var(--radius-md)',
+                            background: 'transparent',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            color: 'var(--text-secondary)',
+                            fontSize: '0.8rem', fontWeight: '600',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            gap: '6px', cursor: 'pointer',
+                            marginBottom: 'var(--spacing-md)'
+                        }}
+                    >
+                        <RotateCcw size={14} />
+                        {t('supporter.restore')}
+                    </button>
                 </div>
             ) : (
                 <>

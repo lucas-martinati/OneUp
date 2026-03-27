@@ -1,9 +1,16 @@
 /**
- * Purchase Service — RevenueCat wrapper for OneUp Supporter Badge
- * 
- * Product: "supporter" — (~2–5€)
- * Entitlement: "supporter" — grants the ❤️ badge on leaderboard
- * 
+ * Purchase Service — RevenueCat wrapper for OneUp subscriptions
+ *
+ * Tiers:
+ *   supporter — one-time ~2-5€ — ❤️ badge on leaderboard
+ *   club      — 4.99€/mo  — friend challenges, mini-leagues
+ *   pro       — 6.99€/mo  — custom programs, dedicated panel
+ *
+ * Entitlements (configured in RevenueCat dashboard):
+ *   "supporter" — non-consumable or lifetime
+ *   "club"      — auto-renewable subscription
+ *   "pro"       — auto-renewable subscription
+ *
  * Falls back gracefully on web/dev where native SDK is unavailable.
  */
 
@@ -13,9 +20,24 @@ import { createLogger } from '../utils/logger';
 
 const logger = createLogger('Purchases');
 
-// Product identifier configured in RevenueCat dashboard
-const SUPPORTER_PRODUCT_ID = 'supporter';
-const SUPPORTER_ENTITLEMENT_ID = 'supporter';
+// Product identifiers configured in RevenueCat dashboard
+const PRODUCTS = {
+  supporter: {
+    productId: 'supporter',
+    entitlementId: 'supporter',
+    localStorageKey: 'oneup_supporter',
+  },
+  club: {
+    productId: 'oneup_club_monthly',
+    entitlementId: 'club',
+    localStorageKey: 'oneup_club',
+  },
+  pro: {
+    productId: 'oneup_pro_monthly',
+    entitlementId: 'pro',
+    localStorageKey: 'oneup_pro',
+  },
+};
 
 let isInitialized = false;
 
@@ -32,7 +54,7 @@ export async function initPurchases(userId) {
   try {
     await Purchases.configure({
       apiKey: import.meta.env.VITE_REVENUECAT_API_KEY,
-      appUserID: userId || null
+      appUserID: userId || null,
     });
 
     isInitialized = true;
@@ -44,33 +66,29 @@ export async function initPurchases(userId) {
   }
 }
 
-/**
- * Check if user has the "supporter" entitlement.
- * Returns true if user is a supporter.
- */
-export async function checkSupporterStatus() {
+// ── Generic helpers ────────────────────────────────────────────────────
+
+async function _checkEntitlement(tier) {
+  const cfg = PRODUCTS[tier];
+  if (!cfg) return false;
+
   if (!isInitialized) {
-    // On web, check localStorage fallback
-    return localStorage.getItem('oneup_supporter') === 'true';
+    return localStorage.getItem(cfg.localStorageKey) === 'true';
   }
 
   try {
     const { customerInfo } = await Purchases.getCustomerInfo();
-    const isSupporter = !!customerInfo.entitlements.active[SUPPORTER_ENTITLEMENT_ID];
-    // Cache locally for offline access
-    localStorage.setItem('oneup_supporter', isSupporter ? 'true' : 'false');
-    return isSupporter;
+    const active = !!customerInfo.entitlements.active[cfg.entitlementId];
+    localStorage.setItem(cfg.localStorageKey, active ? 'true' : 'false');
+    return active;
   } catch (error) {
-    logger.error('Error checking supporter status:', error);
-    return localStorage.getItem('oneup_supporter') === 'true';
+    logger.error(`Error checking ${tier} status:`, error);
+    return localStorage.getItem(cfg.localStorageKey) === 'true';
   }
 }
 
-/**
- * Get the supporter product offering (price, description).
- * Returns null if unavailable.
- */
-export async function getSupporterOffering() {
+async function _getOffering(tier) {
+  const cfg = PRODUCTS[tier];
   if (!isInitialized) return null;
 
   try {
@@ -81,97 +99,146 @@ export async function getSupporterOffering() {
       return null;
     }
 
-    // Find the supporter package
-    const pkg = current.availablePackages?.find(
-      p => p.product?.identifier === SUPPORTER_PRODUCT_ID
-    ) || current.availablePackages?.[0];
+    const pkg =
+      current.availablePackages?.find(
+        (p) => p.product?.identifier === cfg.productId
+      ) || current.availablePackages?.[0];
 
     if (!pkg) return null;
 
     return {
       id: pkg.identifier,
-      price: pkg.product?.priceString || '2,99€',
-      title: pkg.product?.title || 'Supporter',
+      price: pkg.product?.priceString || '',
+      title: pkg.product?.title || tier,
       description: pkg.product?.description || '',
-      product: pkg
+      product: pkg,
     };
   } catch (error) {
-    logger.error('Error getting offerings:', error);
+    logger.error(`Error getting ${tier} offering:`, error);
     return null;
   }
 }
 
-/**
- * Purchase the supporter badge.
- * Returns { success: boolean, isSupporter: boolean }
- */
-export async function purchaseSupporter() {
+async function _purchase(tier) {
+  const cfg = PRODUCTS[tier];
+
   if (!isInitialized) {
     if (!Capacitor.isNativePlatform()) {
       logger.info('Purchases: not available on web — use the Android app');
-      return { success: false, isSupporter: false, webOnly: true };
+      return { success: false, isActive: false, webOnly: true };
     }
     logger.error('Purchases not initialized');
-    return { success: false, isSupporter: false };
+    return { success: false, isActive: false };
   }
 
   try {
-    const offering = await getSupporterOffering();
+    const offering = await _getOffering(tier);
     if (!offering?.product) {
-      logger.error('No supporter product found');
-      return { success: false, isSupporter: false };
+      logger.error(`No ${tier} product found`);
+      return { success: false, isActive: false };
     }
 
     const { customerInfo } = await Purchases.purchasePackage({
-      aPackage: offering.product
+      aPackage: offering.product,
     });
 
-    const isSupporter = !!customerInfo.entitlements.active[SUPPORTER_ENTITLEMENT_ID];
-    localStorage.setItem('oneup_supporter', isSupporter ? 'true' : 'false');
-    
-    logger.success('Purchase completed, supporter:', isSupporter);
-    return { 
-      success: true, 
-      isSupporter,
+    const isActive = !!customerInfo.entitlements.active[cfg.entitlementId];
+    localStorage.setItem(cfg.localStorageKey, isActive ? 'true' : 'false');
+
+    logger.success(`Purchase completed, ${tier}:`, isActive);
+    return {
+      success: true,
+      isActive,
       product: {
         id: offering.id,
         title: offering.title,
         price: offering.price,
-        date: new Date().toISOString()
-      }
+        date: new Date().toISOString(),
+      },
     };
   } catch (error) {
-    // User cancelled or error
     if (error.code === 1 || error.userCancelled) {
       logger.info('Purchase cancelled by user');
     } else {
-      logger.error('Purchase failed:', error);
+      logger.error(`Purchase ${tier} failed:`, error);
     }
-    return { success: false, isSupporter: false };
+    return { success: false, isActive: false };
   }
 }
 
+// ── Public API — Supporter ─────────────────────────────────────────────
+
+export async function checkSupporterStatus() {
+  return _checkEntitlement('supporter');
+}
+
+export async function getSupporterOffering() {
+  return _getOffering('supporter');
+}
+
+export async function purchaseSupporter() {
+  const res = await _purchase('supporter');
+  // Keep backward-compatible field name
+  return { ...res, isSupporter: res.isActive };
+}
+
+// ── Public API — Club ──────────────────────────────────────────────────
+
+export async function checkClubStatus() {
+  return _checkEntitlement('club');
+}
+
+export async function getClubOffering() {
+  return _getOffering('club');
+}
+
+export async function purchaseClub() {
+  return _purchase('club');
+}
+
+// ── Public API — Pro ───────────────────────────────────────────────────
+
+export async function checkProStatus() {
+  return _checkEntitlement('pro');
+}
+
+export async function getProOffering() {
+  return _getOffering('pro');
+}
+
+export async function purchasePro() {
+  return _purchase('pro');
+}
+
+// ── Restore ────────────────────────────────────────────────────────────
+
 /**
  * Restore previous purchases (for users who reinstall).
- * Returns { success: boolean, isSupporter: boolean }
+ * Returns status for all tiers.
  */
 export async function restorePurchases() {
   if (!isInitialized) {
     if (!Capacitor.isNativePlatform()) {
-      return { success: false, isSupporter: false, webOnly: true };
+      return { success: false, supporter: false, club: false, pro: false, webOnly: true };
     }
-    return { success: false, isSupporter: false };
+    return { success: false, supporter: false, club: false, pro: false };
   }
 
   try {
     const { customerInfo } = await Purchases.restorePurchases();
-    const isSupporter = !!customerInfo.entitlements.active[SUPPORTER_ENTITLEMENT_ID];
-    localStorage.setItem('oneup_supporter', isSupporter ? 'true' : 'false');
-    
-    logger.success('Purchases restored, supporter:', isSupporter);
-    return { success: true, isSupporter };
+
+    const supporter = !!customerInfo.entitlements.active[PRODUCTS.supporter.entitlementId];
+    const club = !!customerInfo.entitlements.active[PRODUCTS.club.entitlementId];
+    const pro = !!customerInfo.entitlements.active[PRODUCTS.pro.entitlementId];
+
+    localStorage.setItem(PRODUCTS.supporter.localStorageKey, supporter ? 'true' : 'false');
+    localStorage.setItem(PRODUCTS.club.localStorageKey, club ? 'true' : 'false');
+    localStorage.setItem(PRODUCTS.pro.localStorageKey, pro ? 'true' : 'false');
+
+    logger.success('Purchases restored:', { supporter, club, pro });
+    return { success: true, supporter, club, pro, isSupporter: supporter };
   } catch (error) {
     logger.error('Restore failed:', error);
-    return { success: false, isSupporter: false };
+    return { success: false, supporter: false, club: false, pro: false };
   }
 }

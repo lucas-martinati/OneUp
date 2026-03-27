@@ -4,14 +4,13 @@ import { App as CapacitorApp } from '@capacitor/app';
 import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users, Check, Award,
-    Target, TrendingUp, Star, Activity, Play, Square, MoveDown, MoveDiagonal, Shield
+    Target, TrendingUp, Star, Activity, Play, Square, MoveDown, MoveDiagonal, Shield,
+    Swords, Sparkles
 } from 'lucide-react';
-// Static imports for core/immediate components
 import { AchievementToast } from './AchievementToast';
 import { CSSConfetti } from './CSSConfetti';
 import { NotificationManager } from './NotificationManager';
 
-// Lazy imports for heavy modal-based components
 const Calendar = lazy(() => import('./Calendar').then(m => ({ default: m.Calendar })));
 const Stats = lazy(() => import('./Stats').then(m => ({ default: m.Stats })));
 const Settings = lazy(() => import('./Settings').then(m => ({ default: m.Settings })));
@@ -21,6 +20,8 @@ const Achievements = lazy(() => import('./Achievements').then(m => ({ default: m
 const Timer = lazy(() => import('./Timer').then(m => ({ default: m.Timer })));
 const WorkoutSession = lazy(() => import('./WorkoutSession').then(m => ({ default: m.WorkoutSession })));
 const ClanModal = lazy(() => import('./ClanModal').then(m => ({ default: m.ClanModal })));
+const ChallengeModal = lazy(() => import('./ChallengeModal').then(m => ({ default: m.ChallengeModal })));
+const CustomProgramPanel = lazy(() => import('./CustomProgramPanel').then(m => ({ default: m.CustomProgramPanel })));
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';
@@ -43,7 +44,9 @@ export function Dashboard({
     conflictData, onResolveConflict, getExerciseCount, updateExerciseCount, getTotalReps,
     getExerciseDone, pauseCloudSync, resumeCloudSync, computedStats,
     routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
-    isSupporter, purchaseHistory, onPurchaseSupporter, onRestorePurchases
+    isSupporter, isClub, isPro, purchaseHistory,
+    onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases,
+    customPrograms
 }) {
     const { t } = useTranslation();
     const [today, setToday] = useState(getLocalDateStr(new Date()));
@@ -55,6 +58,8 @@ export function Dashboard({
     const [showAchievements, setShowAchievements] = useState(false);
     const [showSession, setShowSession] = useState(false);
     const [showClan, setShowClan] = useState(false);
+    const [showChallenge, setShowChallenge] = useState(false);
+    const [showCustomPrograms, setShowCustomPrograms] = useState(false);
     const [newAchievement, setNewAchievement] = useState(null);
     const [selectedExerciseId, setSelectedExerciseId] = useState('pushups');
     const [numberKey, setNumberKey] = useState(0);
@@ -157,6 +162,12 @@ export function Dashboard({
             } else if (showSession) {
                 setShowSession(false);
                 resumeCloudSync?.();
+            } else if (showChallenge) {
+                setShowChallenge(false);
+                resumeCloudSync?.();
+            } else if (showCustomPrograms) {
+                setShowCustomPrograms(false);
+                resumeCloudSync?.();
             } else if (showClan) {
                 setShowClan(false);
                 resumeCloudSync?.();
@@ -187,7 +198,7 @@ export function Dashboard({
                 backButtonListener.remove();
             }
         };
-    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, showAchievements, showSession, showClan, resumeCloudSync]);
+    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, showAchievements, showSession, showClan, showChallenge, showCustomPrograms, resumeCloudSync]);
 
     // Progress circle for year (day X / 365)
     const circumference = 2 * Math.PI * 45;
@@ -260,6 +271,30 @@ export function Dashboard({
                             style={iconBtnStyle}
                         >
                             <Shield size={19} />
+                        </button>
+                        <button
+                            onClick={() => { setShowChallenge(true); pauseCloudSync?.(); }}
+                            title={t('challenge.title')}
+                            className="hover-lift"
+                            style={{
+                                ...iconBtnStyle,
+                                background: isClub ? 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.1))' : iconBtnStyle.background,
+                                border: isClub ? '1px solid rgba(245,158,11,0.3)' : 'none'
+                            }}
+                        >
+                            <Swords size={19} color={isClub ? '#f59e0b' : undefined} />
+                        </button>
+                        <button
+                            onClick={() => { setShowCustomPrograms(true); pauseCloudSync?.(); }}
+                            title={t('customProgram.title')}
+                            className="hover-lift"
+                            style={{
+                                ...iconBtnStyle,
+                                background: isPro ? 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(124,58,237,0.1))' : iconBtnStyle.background,
+                                border: isPro ? '1px solid rgba(139,92,246,0.3)' : 'none'
+                            }}
+                        >
+                            <Sparkles size={19} color={isPro ? '#8b5cf6' : undefined} />
                         </button>
 
                         {/* Global streak badge — Duolingo style: gray if not done today */}
@@ -566,8 +601,12 @@ export function Dashboard({
                             conflictData={conflictData}
                             onResolveConflict={onResolveConflict}
                             isSupporter={isSupporter}
+                            isClub={isClub}
+                            isPro={isPro}
                             purchaseHistory={purchaseHistory}
                             onPurchaseSupporter={onPurchaseSupporter}
+                            onPurchaseClub={onPurchaseClub}
+                            onPurchasePro={onPurchasePro}
                             onRestorePurchases={onRestorePurchases}
                         />
                     )}
@@ -633,6 +672,32 @@ export function Dashboard({
                             cloudAuth={cloudAuth}
                             settings={settings}
                             updateSettings={updateSettings}
+                        />
+                    )}
+                    {showChallenge && (
+                        <ChallengeModal
+                            onClose={() => { setShowChallenge(false); resumeCloudSync?.(); }}
+                            cloudAuth={cloudAuth}
+                            isClub={isClub}
+                        />
+                    )}
+                    {showCustomPrograms && (
+                        <CustomProgramPanel
+                            onClose={() => { setShowCustomPrograms(false); resumeCloudSync?.(); }}
+                            isPro={isPro}
+                            programs={customPrograms?.programs || []}
+                            saveProgram={customPrograms?.saveProgram}
+                            updateProgram={customPrograms?.updateProgram}
+                            deleteProgram={customPrograms?.deleteProgram}
+                            startProgram={customPrograms?.startProgram}
+                            pauseProgram={customPrograms?.pauseProgram}
+                            resumeProgram={customPrograms?.resumeProgram}
+                            toggleProgramExerciseCompletion={customPrograms?.toggleProgramExerciseCompletion}
+                            getProgramDayNumber={customPrograms?.getProgramDayNumber}
+                            isProgramExerciseDone={customPrograms?.isProgramExerciseDone}
+                            getProgramStreak={customPrograms?.getProgramStreak}
+                            getProgramStats={customPrograms?.getProgramStats}
+                            maxPrograms={customPrograms?.maxPrograms || 5}
                         />
                     )}
                 </Suspense>
