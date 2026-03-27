@@ -20,3 +20,6 @@
 
 # Keep Cordova plugins (used by Capacitor)
 -keep class org.apache.cordova.** { *; }
+
+# Keep MainActivity (ensures WebView debug enabling is not stripped by R8)
+-keep class com.lucasm548.oneup.MainActivity { *; }
