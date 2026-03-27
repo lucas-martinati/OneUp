@@ -8,6 +8,7 @@
  */
 
 import { Capacitor } from '@capacitor/core';
+import { Purchases } from '@revenuecat/purchases-capacitor';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('Purchases');
@@ -16,7 +17,6 @@ const logger = createLogger('Purchases');
 const SUPPORTER_PRODUCT_ID = 'supporter';
 const SUPPORTER_ENTITLEMENT_ID = 'supporter';
 
-let Purchases = null;
 let isInitialized = false;
 
 /**
@@ -30,11 +30,6 @@ export async function initPurchases(userId) {
   }
 
   try {
-    // Dynamic import with variable path — prevents Vite static analysis
-    const pkgName = '@revenuecat/purchases-capacitor';
-    const mod = await import(/* @vite-ignore */ pkgName);
-    Purchases = mod.Purchases;
-
     await Purchases.configure({
       apiKey: import.meta.env.VITE_REVENUECAT_API_KEY,
       appUserID: userId || null
@@ -54,7 +49,7 @@ export async function initPurchases(userId) {
  * Returns true if user is a supporter.
  */
 export async function checkSupporterStatus() {
-  if (!isInitialized || !Purchases) {
+  if (!isInitialized) {
     // On web, check localStorage fallback
     return localStorage.getItem('oneup_supporter') === 'true';
   }
@@ -76,7 +71,7 @@ export async function checkSupporterStatus() {
  * Returns null if unavailable.
  */
 export async function getSupporterOffering() {
-  if (!isInitialized || !Purchases) return null;
+  if (!isInitialized) return null;
 
   try {
     const { offerings } = await Purchases.getOfferings();
@@ -108,7 +103,7 @@ export async function getSupporterOffering() {
  * Returns { success: boolean, isSupporter: boolean }
  */
 export async function purchaseSupporter() {
-  if (!isInitialized || !Purchases) {
+  if (!isInitialized) {
     if (!Capacitor.isNativePlatform()) {
       logger.info('Purchases: not available on web — use the Android app');
       return { success: false, isSupporter: false, webOnly: true };
@@ -149,7 +144,7 @@ export async function purchaseSupporter() {
  * Returns { success: boolean, isSupporter: boolean }
  */
 export async function restorePurchases() {
-  if (!isInitialized || !Purchases) {
+  if (!isInitialized) {
     if (!Capacitor.isNativePlatform()) {
       return { success: false, isSupporter: false, webOnly: true };
     }
