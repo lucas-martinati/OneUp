@@ -7,26 +7,26 @@ import {
     Target, TrendingUp, Star, Activity, Play, Square, MoveDown, MoveDiagonal, Shield,
     Swords, Sparkles, Lock, ShoppingBag
 } from 'lucide-react';
-import { AchievementToast } from './AchievementToast';
-import { CSSConfetti } from './CSSConfetti';
-import { NotificationManager } from './NotificationManager';
+import { AchievementToast } from './feedback/AchievementToast';
+import { CSSConfetti } from './feedback/CSSConfetti';
+import { NotificationManager } from './social/NotificationManager';
 import { DashboardHeader } from './dashboard/DashboardHeader';
 import { DashboardSlide } from './dashboard/DashboardSlide';
 import { DashboardActions } from './dashboard/DashboardActions';
 import { ProPaywall } from './dashboard/ProPaywall';
 import { useHardwareBack } from '../hooks/useHardwareBack';
 
-const Calendar = lazy(() => import('./Calendar').then(m => ({ default: m.Calendar })));
-const Stats = lazy(() => import('./Stats').then(m => ({ default: m.Stats })));
-const Settings = lazy(() => import('./Settings').then(m => ({ default: m.Settings })));
-const Counter = lazy(() => import('./Counter').then(m => ({ default: m.Counter })));
-const Leaderboard = lazy(() => import('./Leaderboard').then(m => ({ default: m.Leaderboard })));
-const Achievements = lazy(() => import('./Achievements').then(m => ({ default: m.Achievements })));
-const Timer = lazy(() => import('./Timer').then(m => ({ default: m.Timer })));
-const WorkoutSession = lazy(() => import('./WorkoutSession').then(m => ({ default: m.WorkoutSession })));
-const Onboarding = lazy(() => import('./Onboarding').then(module => ({ default: module.Onboarding })));
-const ClanModal = lazy(() => import('./ClanModal').then(m => ({ default: m.ClanModal })));
-const CustomExercisesModal = lazy(() => import('./CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
+const Calendar = lazy(() => import('./stats/Calendar').then(m => ({ default: m.Calendar })));
+const Stats = lazy(() => import('./stats/Stats').then(m => ({ default: m.Stats })));
+const Settings = lazy(() => import('./settings/Settings').then(m => ({ default: m.Settings })));
+const Counter = lazy(() => import('./exercises/Counter').then(m => ({ default: m.Counter })));
+const Leaderboard = lazy(() => import('./social/Leaderboard').then(m => ({ default: m.Leaderboard })));
+const Achievements = lazy(() => import('./feedback/Achievements').then(m => ({ default: m.Achievements })));
+const Timer = lazy(() => import('./exercises/Timer').then(m => ({ default: m.Timer })));
+const WorkoutSession = lazy(() => import('./exercises/WorkoutSession').then(m => ({ default: m.WorkoutSession })));
+const Onboarding = lazy(() => import('./settings/Onboarding').then(module => ({ default: module.Onboarding })));
+const ClanModal = lazy(() => import('./social/ClanModal').then(m => ({ default: m.ClanModal })));
+const CustomExercisesModal = lazy(() => import('./exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';

@@ -2,9 +2,9 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { getLocalDateStr } from '../utils/dateUtils';
-import { registerBackHandler } from '../utils/backHandler';
-import { getDailyGoal } from '../config/exercises'; // Added getDailyGoal import
+import { getLocalDateStr } from '../../utils/dateUtils';
+import { registerBackHandler } from '../../utils/backHandler';
+import { getDailyGoal } from '../../config/exercises'; // Added getDailyGoal import
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 

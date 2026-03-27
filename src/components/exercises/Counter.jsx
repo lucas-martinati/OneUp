@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useWakeLock } from '../hooks/useWakeLock';
-import { CSSConfetti } from './CSSConfetti';
+import { useWakeLock } from '../../hooks/useWakeLock';
+import { CSSConfetti } from '../feedback/CSSConfetti';
 import {
     X, Check, CheckCheck, RotateCcw, Plus, Minus, ChevronRight,
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
     Flame, Square, MoveDown, MoveDiagonal
 } from 'lucide-react';
-import { sounds } from '../utils/soundManager';
+import { sounds } from '../../utils/soundManager';
 
 // Map icon name strings to lucide components
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };

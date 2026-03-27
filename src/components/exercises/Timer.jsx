@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useWakeLock } from '../hooks/useWakeLock';
-import { CSSConfetti } from './CSSConfetti';
+import { useWakeLock } from '../../hooks/useWakeLock';
+import { CSSConfetti } from '../feedback/CSSConfetti';
 import {
     X, Check, CheckCheck, RotateCcw, Play, Pause,
     Square, ChevronRight
 } from 'lucide-react';
-import { sounds } from '../utils/soundManager';
+import { sounds } from '../../utils/soundManager';
 
 export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext }) {
     useWakeLock();

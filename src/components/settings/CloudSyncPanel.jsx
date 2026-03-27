@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { Cloud, CloudOff, User, AlertCircle, Upload, Trash2, AlertTriangle } from 'lucide-react';
-import { Avatar } from './Avatar';
+import { Avatar } from '../ui/Avatar';
 
 export function CloudSyncPanel({
   authState,

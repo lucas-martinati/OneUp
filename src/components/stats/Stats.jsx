@@ -2,100 +2,12 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { computeAllStats } from '../hooks/useComputedStats';
+import { computeAllStats } from '../../hooks/useComputedStats';
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
 // Lazy load Recharts components
-const RechartsComponents = lazy(() => import('recharts').then(module => ({
-    default: ({ activeData, radarData, trackedCount, globalTotalReps, t_muscleBalance, t_consistency, t_basedOnManual, t_notEnoughData, t_completeForHabits }) => {
-        const { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } = module;
-        return (
-            <>
-                {radarData.length > 2 && globalTotalReps > 0 && (
-                    <div className="glass-premium" style={{
-                        padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                        display: 'flex', flexDirection: 'column', alignItems: 'center',
-                        marginBottom: 'var(--spacing-md)',
-                        background: 'linear-gradient(135deg, rgba(52,211,153,0.1), rgba(16,185,129,0.1))'
-                    }}>
-                        <h3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', textAlign: 'center', width: '100%' }}>
-                            {t_muscleBalance}
-                        </h3>
-                        <div style={{ width: '100%', height: '220px', minHeight: '220px' }}>
-                            <ResponsiveContainer width="100%" height={220} debounce={100}>
-                                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                                    <PolarGrid stroke="rgba(255,255,255,0.2)" />
-                                    <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-secondary)', fontSize: 10, fontWeight: 600 }} />
-                                    <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={false} axisLine={false} />
-                                    <Radar name="Reps" dataKey="reps" stroke="#10b981" fill="#34d399" fillOpacity={0.5} />
-                                    <Tooltip contentStyle={{
-                                        background: 'var(--tooltip-bg)', border: '1px solid var(--border-default)',
-                                        borderRadius: '8px'
-                                    }} itemStyle={{ color: '#10b981', fontWeight: '800' }} />
-                                </RadarChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-                )}
-                <div className="glass-premium" style={{
-                    padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    marginBottom: 'var(--spacing-md)',
-                    background: 'linear-gradient(135deg, rgba(109,40,217,0.1), rgba(139,92,246,0.1))'
-                }}>
-                    <h3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', textAlign: 'center', width: '100%' }}>
-                            {t_consistency}
-                    </h3>
-
-                    {trackedCount > 0 ? (
-                        <>
-                            <div style={{ width: '100%', minHeight: '180px' }}>
-                                <ResponsiveContainer width="100%" height={180} minWidth={0} minHeight={0} debounce={100}>
-                                    <PieChart>
-                                        <Pie data={activeData} cx="50%" cy="50%"
-                                            innerRadius={45} outerRadius={68}
-                                            paddingAngle={4} dataKey="value" stroke="none"
-                                            animationBegin={0} animationDuration={800}>
-                                            {activeData.map((entry, idx) => (
-                                                <Cell key={`cell-${idx}`} fill={entry.color}
-                                                    style={{ filter: 'drop-shadow(0 0 6px rgba(0,0,0,0.3))' }} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip contentStyle={{
-                                            background: 'var(--tooltip-bg)',
-                                            border: '1px solid var(--border-default)',
-                                            borderRadius: '8px'
-                                        }} itemStyle={{ color: 'var(--text-primary)', fontWeight: '600' }} />
-                                        <Legend verticalAlign="bottom" height={36} iconType="circle"
-                                            wrapperStyle={{ fontSize: '0.8rem', fontWeight: '600' }} />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
-                            <p style={{
-                                textAlign: 'center', color: 'var(--text-secondary)',
-                                fontSize: '0.7rem', marginTop: '4px', fontStyle: 'italic'
-                            }}>
-                                {t_basedOnManual(trackedCount)}
-                            </p>
-                        </>
-                    ) : (
-                        <div style={{
-                            textAlign: 'center', color: 'var(--text-secondary)',
-                            padding: 'var(--spacing-lg)'
-                        }}>
-                            <p style={{ fontSize: '0.9rem', marginBottom: '6px' }}>
-                                {t_notEnoughData}
-                            </p>
-                            <p style={{ fontSize: '0.78rem', opacity: 0.7, lineHeight: '1.5' }}>
-                                {t_completeForHabits}
-                            </p>
-                        </div>
-                    )}
-                </div>
-            </>
-        );
-    }
-})));
+const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
+const ConsistencyPieChart = lazy(() => import('./ConsistencyPieChart'));
 
 export function Stats({ completions, exercisesList, initialCategory, isPro, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats: globalStats, onOpenStore }) {
     const { t } = useTranslation();
@@ -547,16 +459,18 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                         <div style={{ color: 'var(--text-secondary)' }}>{t('stats.loadingCharts')}</div>
                     </div>
                 }>
-                    <RechartsComponents
-                        activeData={activeData}
-                        radarData={translatedRadarData}
-                        trackedCount={trackedCount}
+                    <RadarChartPanel 
+                        radarData={translatedRadarData} 
                         globalTotalReps={globalTotalReps}
-                        t_muscleBalance={t('stats.muscleBalance')}
-                        t_consistency={t('stats.consistency')}
-                        t_basedOnManual={(count) => t('stats.basedOnManual', { count, plural: count !== 1 ? 's' : '' })}
-                        t_notEnoughData={t('stats.notEnoughData')}
-                        t_completeForHabits={t('stats.completeForHabits')}
+                        title={t('stats.muscleBalance')}
+                    />
+                    <ConsistencyPieChart 
+                        activeData={activeData}
+                        trackedCount={trackedCount}
+                        title={t('stats.consistency')}
+                        subTitle={t('stats.basedOnManual', { count: trackedCount, plural: trackedCount !== 1 ? 's' : '' })}
+                        emptyTitle={t('stats.notEnoughData')}
+                        emptySub={t('stats.completeForHabits')}
                     />
                 </Suspense>
             ) : null}

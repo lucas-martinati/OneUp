@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { Calendar, ArrowRight, Zap, Target, Dumbbell, ArrowDownUp, ArrowUp, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal } from 'lucide-react';
-import { getLocalDateStr } from '../utils/dateUtils';
-import { EXERCISES } from '../config/exercises';
+import { getLocalDateStr } from '../../utils/dateUtils';
+import { EXERCISES } from '../../config/exercises';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
 

@@ -5,8 +5,8 @@ import {
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
     Flame, Square, MoveDown, MoveDiagonal, FolderOpen
 } from 'lucide-react';
-import { EXERCISES } from '../config/exercises';
-import { registerBackHandler } from '../utils/backHandler';
+import { EXERCISES } from '../../config/exercises';
+import { registerBackHandler } from '../../utils/backHandler';
 import { useEffect } from 'react';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };

@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Swords, Sparkles, Star, Smartphone } from 'lucide-react';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
-import { getPurchaseHistory } from '../services/purchaseService';
-import { ToggleSwitch } from './ui/ToggleSwitch';
-import { SettingRow } from './ui/SettingRow';
-import { WebPaymentModal } from './store/WebPaymentModal';
-import { StoreCard } from './store/StoreCard';
+import { getPurchaseHistory } from '../../services/purchaseService';
+import { ToggleSwitch } from '../ui/ToggleSwitch';
+import { SettingRow } from '../ui/SettingRow';
+import { WebPaymentModal } from '../store/WebPaymentModal';
+import { StoreCard } from '../store/StoreCard';
 
 export function Settings({ defaultShowStore = false, settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isClub, isPro, purchaseHistory, onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases }) {
     const { t, i18n } = useTranslation();

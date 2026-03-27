@@ -17,7 +17,7 @@ import { WEIGHT_EXERCISES } from './config/weights';
 import { createLogger } from './utils/logger';
 
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
-const Onboarding = lazy(() => import('./components/Onboarding').then(module => ({ default: module.Onboarding })));
+const Onboarding = lazy(() => import('./components/settings/Onboarding').then(module => ({ default: module.Onboarding })));
 
 const logger = createLogger('App');
 

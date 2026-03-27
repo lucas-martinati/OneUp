@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Users, LogIn, Plus, X, Check, Shield } from 'lucide-react';
-import { cloudSync } from '../services/cloudSync';
+import { cloudSync } from '../../services/cloudSync';
 import { Leaderboard } from './Leaderboard';
-import { registerBackHandler } from '../utils/backHandler';
-import { CSSConfetti } from './CSSConfetti';
+import { registerBackHandler } from '../../utils/backHandler';
+import { CSSConfetti } from '../feedback/CSSConfetti';
 
 export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
     const { t } = useTranslation();

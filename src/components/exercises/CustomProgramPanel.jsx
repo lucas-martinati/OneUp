@@ -4,9 +4,9 @@ import {
   Sparkles, Plus, X, Check, Trash2, Play, Pause, ChevronRight,
   Lock, Calendar, Flame, BarChart3, Edit3, ArrowLeft
 } from 'lucide-react';
-import { EXERCISES, EXERCISES_MAP } from '../config/exercises';
-import { getLocalDateStr } from '../utils/dateUtils';
-import { registerBackHandler } from '../utils/backHandler';
+import { EXERCISES, EXERCISES_MAP } from '../../config/exercises';
+import { getLocalDateStr } from '../../utils/dateUtils';
+import { registerBackHandler } from '../../utils/backHandler';
 
 export function CustomProgramPanel({
   onClose, isPro, programs,

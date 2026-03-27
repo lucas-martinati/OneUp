@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { HeartHandshake, X } from 'lucide-react';
-import { cloudSync } from '../services/cloudSync';
-import { sounds } from '../utils/soundManager';
-import { Avatar } from './Avatar';
+import { cloudSync } from '../../services/cloudSync';
+import { sounds } from '../../utils/soundManager';
+import { Avatar } from '../ui/Avatar';
 
 export function NotificationManager() {
     const [notifications, setNotifications] = useState([]);
