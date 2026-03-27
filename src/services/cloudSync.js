@@ -934,6 +934,8 @@ class CloudSyncService {
           difficultyMultiplier: lbData.difficultyMultiplier || 1,
           lastUpdated: lbData.lastUpdated || null,
           isSupporter: !!lbData.isSupporter,
+          isClub: !!lbData.isClub,
+          isPro: !!lbData.isPro,
           isCurrentUser: memberUid === uid
         };
       });
