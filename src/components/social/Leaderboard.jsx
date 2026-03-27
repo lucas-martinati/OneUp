@@ -99,7 +99,9 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
             background: 'var(--overlay-bg)', zIndex: 110,
             display: 'flex', flexDirection: 'column',
             paddingTop: 'env(safe-area-inset-top)',
-            paddingBottom: 'env(safe-area-inset-bottom)'
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            overscrollBehavior: 'none',
+            touchAction: 'auto'
         }}>
             {/* Header */}
             <div style={{

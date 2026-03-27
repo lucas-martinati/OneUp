@@ -837,6 +837,8 @@ button:focus:not(:focus-visible) {
   flex-direction: column;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+  touch-action: auto;
 }
 
 .modal-overlay .modal-content {

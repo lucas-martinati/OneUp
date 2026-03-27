@@ -116,13 +116,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
             {/* ── Filters ────────────────────────────────────────────── */}
             <div style={{ marginBottom: 'var(--spacing-md)' }}>
                 <button
-                    onClick={(e) => {
-                        if (React.startTransition) {
-                            React.startTransition(() => setShowFilters(!showFilters));
-                        } else {
-                            setShowFilters(!showFilters);
-                        }
-                    }}
+                    onClick={() => setShowFilters(!showFilters)}
                     className="hover-lift"
                     style={{
                         display: 'flex', alignItems: 'center', gap: '8px',
@@ -169,15 +163,11 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                                             checked={activeCategories.includes(cat.id)}
                                             onChange={(e) => {
                                                 const checked = e.target.checked;
-                                                const apply = () => {
-                                                    setActiveCategories(prev => {
-                                                        if (checked) return [...prev, cat.id];
-                                                        if (prev.length === 1) return prev; // prevent unchecking last
-                                                        return prev.filter(id => id !== cat.id);
-                                                    });
-                                                };
-                                                if (React.startTransition) React.startTransition(apply);
-                                                else apply();
+                                                setActiveCategories(prev => {
+                                                    if (checked) return [...prev, cat.id];
+                                                    if (prev.length === 1) return prev;
+                                                    return prev.filter(id => id !== cat.id);
+                                                });
                                             }}
                                         />
                                         {cat.label}

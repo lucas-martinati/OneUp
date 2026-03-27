@@ -198,6 +198,27 @@ export function Dashboard({
         }, 100);
     }, []);
 
+    // React to any modal being open to prevent background scrolling (iOS Safari fix)
+    const anyModalOpen = showCalendar || showStats || showSettings || showCounter || showLeaderboard || showAchievements || showSession || showClan || showCustomExercisesModal;
+
+    // Lock body scroll when any modal is open (critical for iOS Safari)
+    useEffect(() => {
+        if (anyModalOpen) {
+            document.body.style.overflow = 'hidden';
+            document.body.style.touchAction = 'none';
+            document.documentElement.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+            document.body.style.touchAction = '';
+            document.documentElement.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+            document.body.style.touchAction = '';
+            document.documentElement.style.overflow = '';
+        };
+    }, [anyModalOpen]);
+
     return (
         <>
             <NotificationManager />
@@ -247,7 +268,7 @@ export function Dashboard({
                             }
                         }}
                         style={{
-                            flex: 1, overflowY: 'auto', overflowX: 'hidden',
+                            flex: 1, overflowY: anyModalOpen ? 'hidden' : 'auto', overflowX: 'hidden',
                             scrollSnapType: 'y mandatory', scrollBehavior: 'smooth',
                             display: 'flex', flexDirection: 'column', width: '100%',
                             scrollbarWidth: 'none', msOverflowStyle: 'none'
