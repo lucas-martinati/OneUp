@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app';
+import { Capacitor } from '@capacitor/core';
 import {
   getAuth,
   GoogleAuthProvider,
@@ -490,11 +491,17 @@ class CloudSyncService {
    * Publish (or update) this user's leaderboard entry.
    * Stored at `leaderboard/{uid}`.
    */
-  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter = false, isClub = false, isPro = false }) {
+  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1 }) {
     try {
       if (!auth?.currentUser || !database) return false;
 
       const uid = auth.currentUser.uid;
+
+      // Read existing leaderboard entry to preserve server-set purchase flags
+      const lbRef = ref(database, `leaderboard/${uid}`);
+      const existing = await get(lbRef);
+      const existingData = existing.exists() ? existing.val() : {};
+
       const entry = {
         pseudo: pseudo || auth.currentUser.displayName || 'Anonyme',
         photoURL: auth.currentUser.photoURL || null,
@@ -504,13 +511,13 @@ class CloudSyncService {
         lastActiveDay: lastActiveDay,
         difficultyMultiplier: difficultyMultiplier || 1,
         isPublic: isPublic !== false,
-        isSupporter: isSupporter || false,
-        isClub: isClub || false,
-        isPro: isPro || false,
+        // Preserve server-set purchase flags (only the webhook can change these)
+        isSupporter: existingData.isSupporter || false,
+        isClub: existingData.isClub || false,
+        isPro: existingData.isPro || false,
         lastUpdated: serverTimestamp()
       };
 
-      const lbRef = ref(database, `leaderboard/${uid}`);
       await set(lbRef, entry);
       logger.success('Leaderboard entry published');
       return true;
@@ -688,8 +695,14 @@ class CloudSyncService {
 
   // Save purchase status to cloud (3 booleans)
   // Stored at `users/{uid}/purchase`
+  // SECURITY: Only allowed on native platforms (Android) where RevenueCat validates the purchase.
+  // On web, purchase status is managed exclusively by the server webhook.
   async savePurchase({ isSupporter, isClub, isPro }) {
     try {
+      if (!Capacitor.isNativePlatform()) {
+        logger.info('savePurchase: blocked on web (server-only)');
+        return false;
+      }
       if (!auth?.currentUser || !database) return false;
       const userId = auth.currentUser.uid;
       await set(ref(database, `users/${userId}/purchase`), {

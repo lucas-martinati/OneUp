@@ -60,27 +60,15 @@ function App() {
   const userDetailsCache = useUserDetailsCache(cloudSync);
 
   // ── Helper: publish leaderboard with current state ────────────────────
-  // Uses refs to always read latest subscription state (no stale closures)
-  const publishLeaderboardNow = useCallback(async (overrides = {}) => {
+  const publishLeaderboardNow = useCallback(async () => {
     try {
       if (!googleAuth.isSignedIn) return;
-      let lastActiveDay = null;
-      for (const dateStr of computedStats.sortedDates) {
-        const day = completions[dateStr];
-        if (day && EXERCISES.some(ex => day[ex.id]?.isCompleted)) {
-          lastActiveDay = dateStr;
-        }
-      }
-      const pseudo = settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme';
-      const sup = overrides.isSupporter !== undefined ? overrides.isSupporter : isSupporterRef.current;
-      const clb = overrides.isClub !== undefined ? overrides.isClub : isClubRef.current;
-      const pr = overrides.isPro !== undefined ? overrides.isPro : isProRef.current;
-
       const classicTotalReps = EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
       const weightsTotalReps = WEIGHT_EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
+      const lastActiveDay = computedStats.sortedDates.find(d => completions[d] && EXERCISES.some(ex => completions[d][ex.id]?.isCompleted)) || null;
 
       await cloudSync.publishToLeaderboard({
-        pseudo,
+        pseudo: settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme',
         totalReps: classicTotalReps,
         weightsTotalReps: weightsTotalReps,
         exerciseReps: computedStats.exerciseReps,
@@ -88,11 +76,8 @@ function App() {
         isPublic: !!settings.leaderboardEnabled,
         lastActiveDay,
         difficultyMultiplier: settings?.difficultyMultiplier,
-        isSupporter: sup,
-        isClub: clb,
-        isPro: pr,
       });
-      logger.debug('Leaderboard published:', { isSupporter: sup, isClub: clb, isPro: pr });
+      logger.debug('Leaderboard published');
     } catch (e) {
       logger.error('Leaderboard publish failed:', e);
     }
@@ -103,23 +88,10 @@ function App() {
     localStorage.setItem('oneup_supporter', sup ? 'true' : 'false');
     localStorage.setItem('oneup_club', clb ? 'true' : 'false');
     localStorage.setItem('oneup_pro', pr ? 'true' : 'false');
+    // savePurchase is blocked on web (native-only) — see cloudSync.js
     await cloudSync.savePurchase({ isSupporter: sup, isClub: clb, isPro: pr });
-    const classicTotalReps = EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
-    const weightsTotalReps = WEIGHT_EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
-
-    await cloudSync.publishToLeaderboard({
-      pseudo: settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme',
-      totalReps: classicTotalReps,
-      weightsTotalReps: weightsTotalReps,
-      exerciseReps: computedStats.exerciseReps,
-      achievements: computedStats.badgeCount,
-      isPublic: !!settings.leaderboardEnabled,
-      lastActiveDay: computedStats.sortedDates.find(d => completions[d] && EXERCISES.some(ex => completions[d][ex.id]?.isCompleted)) || null,
-      difficultyMultiplier: settings?.difficultyMultiplier,
-      isSupporter: sup,
-      isClub: clb,
-      isPro: pr,
-    });
+    // Publish leaderboard WITHOUT purchase flags (they are preserved from server)
+    await publishLeaderboardNow();
     logger.info('Saved + published:', { isSupporter: sup, isClub: clb, isPro: pr });
   }, [googleAuth, computedStats, completions, settings]);
 
