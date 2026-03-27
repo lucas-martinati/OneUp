@@ -116,7 +116,13 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
             {/* ── Filters ────────────────────────────────────────────── */}
             <div style={{ marginBottom: 'var(--spacing-md)' }}>
                 <button
-                    onClick={() => setShowFilters(!showFilters)}
+                    onClick={(e) => {
+                        if (React.startTransition) {
+                            React.startTransition(() => setShowFilters(!showFilters));
+                        } else {
+                            setShowFilters(!showFilters);
+                        }
+                    }}
                     className="hover-lift"
                     style={{
                         display: 'flex', alignItems: 'center', gap: '8px',
@@ -162,11 +168,16 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                                             style={{ display: 'none' }}
                                             checked={activeCategories.includes(cat.id)}
                                             onChange={(e) => {
-                                                setActiveCategories(prev => {
-                                                    if (e.target.checked) return [...prev, cat.id];
-                                                    if (prev.length === 1) return prev; // prevent unchecking last
-                                                    return prev.filter(id => id !== cat.id);
-                                                });
+                                                const checked = e.target.checked;
+                                                const apply = () => {
+                                                    setActiveCategories(prev => {
+                                                        if (checked) return [...prev, cat.id];
+                                                        if (prev.length === 1) return prev; // prevent unchecking last
+                                                        return prev.filter(id => id !== cat.id);
+                                                    });
+                                                };
+                                                if (React.startTransition) React.startTransition(apply);
+                                                else apply();
                                             }}
                                         />
                                         {cat.label}

@@ -18,8 +18,9 @@ export const DashboardHeader = React.memo(({
             boxShadow: 'var(--shadow-md)', minWidth: 0,
             containerType: 'inline-size', containerName: 'header'
         }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'visible' }}>
                 <img
+                    onClick={() => window.location.reload()}
                     src={`${import.meta.env.BASE_URL}pwa-192x192.webp`} alt="OneUp Logo"
                     className="bounce-on-hover hide-logo-mobile"
                     style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', objectFit: 'cover', cursor: 'pointer', transition: 'transform 0.3s ease' }}

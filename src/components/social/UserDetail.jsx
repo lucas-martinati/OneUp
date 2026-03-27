@@ -86,7 +86,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                     <div style={{ textAlign: 'center' }}>
                         <div style={{
                             fontSize: '1.4rem', fontWeight: '800', color: isMe ? '#fbbf24' : 'var(--text-primary)',
-                            display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap'
+                            display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', justifyContent: 'center'
                         }}>
                             <span style={{ wordBreak: 'break-all' }}>
                                 {entry.pseudo} {isMe && <span style={{ fontSize: '1rem', opacity: 0.8 }}>({t('common.you')})</span>}
@@ -119,19 +119,20 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                     </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: 'var(--spacing-md)' }}>
-                    {entry.difficultyMultiplier && entry.difficultyMultiplier !== 1 && (
-                        <StatCard icon={<Zap size={16} color="#6366f1" />} label={t('leaderboard.difficulty')} value={`x${entry.difficultyMultiplier}`} color="#6366f1" />
-                    )}
-                    <StatCard icon={<Trophy size={16} color="#fbbf24" />} label={t('leaderboard.totalReps')} value={entry.totalReps.toLocaleString()} color="#fbbf24" />
-                    <StatCard icon={<Award size={16} color="#a855f7" />} label={t('leaderboard.achievements')} value={entry.achievements || 0} color="#a855f7" />
-                    <StatCard icon={<Flame size={16} color="#f97316" />} label={t('leaderboard.bestStreak')} value={loadingDetails ? '…' : (stats.maxStreak || 0)} color="#f97316" />
-                    <StatCard icon={<Calendar size={16} color="#22d3ee" />} label={t('leaderboard.activeDays')} value={loadingDetails ? '…' : (stats.totalDays || 0)} color="#22d3ee" />
-                    <StatCard icon={<TrendingUp size={16} color="#10b981" />} label={t('leaderboard.currentStreak')} value={loadingDetails ? '…' : (stats.currentStreak || 0)} color="#10b981" />
-                    <StatCard icon={<Activity size={16} color="#ec4899" />} label={t('leaderboard.perfectDays')} value={loadingDetails ? '…' : (stats.perfectDays || 0)} color="#ec4899" />
-                </div>
+                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', paddingRight: '4px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: 'var(--spacing-md)', flexShrink: 0 }}>
+                        {entry.difficultyMultiplier && entry.difficultyMultiplier !== 1 && (
+                            <StatCard icon={<Zap size={16} color="#6366f1" />} label={t('leaderboard.difficulty')} value={`x${entry.difficultyMultiplier}`} color="#6366f1" />
+                        )}
+                        <StatCard icon={<Trophy size={16} color="#fbbf24" />} label={t('leaderboard.totalReps')} value={entry.totalReps.toLocaleString()} color="#fbbf24" />
+                        <StatCard icon={<Award size={16} color="#a855f7" />} label={t('leaderboard.achievements')} value={entry.achievements || 0} color="#a855f7" />
+                        <StatCard icon={<Flame size={16} color="#f97316" />} label={t('leaderboard.bestStreak')} value={loadingDetails ? '…' : (stats.maxStreak || 0)} color="#f97316" />
+                        <StatCard icon={<Calendar size={16} color="#22d3ee" />} label={t('leaderboard.activeDays')} value={loadingDetails ? '…' : (stats.totalDays || 0)} color="#22d3ee" />
+                        <StatCard icon={<TrendingUp size={16} color="#10b981" />} label={t('leaderboard.currentStreak')} value={loadingDetails ? '…' : (stats.currentStreak || 0)} color="#10b981" />
+                        <StatCard icon={<Activity size={16} color="#ec4899" />} label={t('leaderboard.perfectDays')} value={loadingDetails ? '…' : (stats.perfectDays || 0)} color="#ec4899" />
+                    </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1, overflowY: 'auto', scrollbarWidth: 'thin' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0, paddingBottom: '16px' }}>
                     {EXERCISES.map(ex => {
                         const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
                         const reps = entry.exerciseReps?.[ex.id] || 0;
@@ -171,6 +172,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                             </div>
                         );
                     })}
+                    </div>
                 </div>
             </div>
         </div>

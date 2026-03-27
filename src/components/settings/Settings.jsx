@@ -33,13 +33,11 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
     const handleToggleNotifications = () => {
         const newSettings = { ...settings, notificationsEnabled: !settings.notificationsEnabled };
         onSave(newSettings);
-        showSavedIndicator();
     };
 
     const handleToggleSounds = () => {
         const newSettings = { ...settings, soundsEnabled: !settings.soundsEnabled };
         onSave(newSettings);
-        showSavedIndicator();
     };
 
     const handleHourChange = (hour) => {
@@ -48,7 +46,6 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
             notificationTime: { ...settings.notificationTime, hour: parseInt(hour) }
         };
         onSave(newSettings);
-        showSavedIndicator();
     };
 
     const handleMinuteChange = (minute) => {
@@ -57,12 +54,6 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
             notificationTime: { ...settings.notificationTime, minute: parseInt(minute) }
         };
         onSave(newSettings);
-        showSavedIndicator();
-    };
-
-    const showSavedIndicator = () => {
-        setShowSaved(true);
-        setTimeout(() => setShowSaved(false), 1500);
     };
 
     const sectionTitleStyle = {
@@ -464,7 +455,6 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                                 onClick={() => {
                                     const newSettings = { ...settings, performanceMode: opt.value };
                                     onSave(newSettings);
-                                    showSavedIndicator();
                                 }}
                                 style={{
                                     padding: '6px 16px',
@@ -512,7 +502,6 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                         onClick={() => {
                             const newSettings = { ...settings, leaderboardEnabled: !settings.leaderboardEnabled };
                             onSave(newSettings);
-                            showSavedIndicator();
                         }}
                         activeGradient="linear-gradient(135deg, #fbbf24, #d97706)"
                     />
