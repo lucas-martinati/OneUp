@@ -74,9 +74,13 @@ export async function getSupporterOffering() {
   if (!isInitialized) return null;
 
   try {
-    const { offerings } = await Purchases.getOfferings();
-    const current = offerings.current;
-    if (!current) return null;
+    const offerings = await Purchases.getOfferings();
+    logger.info('Offerings response:', JSON.stringify(offerings, null, 2));
+    const current = offerings?.current;
+    if (!current) {
+      logger.error('No current offering set in RevenueCat dashboard');
+      return null;
+    }
 
     // Find the supporter package
     const pkg = current.availablePackages?.find(
