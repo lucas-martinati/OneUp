@@ -202,32 +202,7 @@ function App() {
     }
   }, [googleAuth.isSignedIn, googleAuth.loading]);
 
-  // When purchaseHistory changes, check if it contains entitlements not yet synced
-  useEffect(() => {
-    if (!googleAuth.isSignedIn || googleAuth.loading || purchaseHistory.length === 0) return;
-    let sup = false;
-    let clb = false;
-    let pr = false;
-    for (const p of purchaseHistory) {
-      const t = (p.type || p.id || '').toLowerCase();
-      if (t.includes('supporter')) sup = true;
-      if (t.includes('club')) clb = true;
-      if (t.includes('pro')) pr = true;
-    }
-    // Only update if history shows entitlements not in current state
-    if ((sup && !isSupporterRef.current) || (clb && !isClubRef.current) || (pr && !isProRef.current)) {
-      logger.info('Entitlements found in purchase history, syncing');
-      const newSup = sup || isSupporterRef.current;
-      const newClb = clb || isClubRef.current;
-      const newPr = pr || isProRef.current;
-      setIsSupporter(newSup);
-      setIsClub(newClb);
-      setIsPro(newPr);
-      saveAndPublish({ isSupporter: newSup, isClub: newClb, isPro: newPr });
-    }
-  }, [purchaseHistory]);
-
-  // Sync routines, purchase history, custom programs, custom exercises with cloud on sign-in
+    // The history is merely a log, not a source of truth for active subscription states.  // Sync routines, purchase history, custom programs, custom exercises with cloud on sign-in
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading) {
       const loadData = async () => {
@@ -264,18 +239,7 @@ function App() {
             logger.warn('RevenueCat check failed:', rcErr);
           }
 
-          // 2. Fallback: scan purchase history
-          if (!sup && !clb && !pr && purchaseHistory.length > 0) {
-            for (const p of purchaseHistory) {
-              const t = (p.type || p.id || '').toLowerCase();
-              if (t.includes('supporter')) sup = true;
-              if (t.includes('club')) clb = true;
-              if (t.includes('pro')) pr = true;
-            }
-            if (sup || clb || pr) logger.info('Loaded from purchase history');
-          }
-
-          // 3. Fallback: check Firebase purchase object
+          // 2. Fallback: check Firebase purchase object
           if (!sup && !clb && !pr) {
             const cloudPurchase = await cloudSync.loadPurchase();
             if (cloudPurchase) {
@@ -441,20 +405,7 @@ function App() {
       }
     }
 
-    // 2. Fallback: scan purchase history from Firebase
-    let sup = false;
-    let clb = false;
-    let pr = false;
-    if (purchaseHistory.length > 0) {
-      for (const p of purchaseHistory) {
-        const t = (p.type || p.id || '').toLowerCase();
-        if (t.includes('supporter')) sup = true;
-        if (t.includes('club')) clb = true;
-        if (t.includes('pro')) pr = true;
-      }
-    }
-
-    // 3. Also check Firebase purchase object directly
+    // 2. Fallback: check Firebase purchase object directly
     const cloudPurchase = await cloudSync.loadPurchase();
     if (cloudPurchase) {
       sup = sup || !!cloudPurchase.isSupporter;

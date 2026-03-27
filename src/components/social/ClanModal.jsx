@@ -174,7 +174,7 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
                                     <p style={{ color: 'var(--text-secondary)', textAlign: 'center', maxWidth: '300px', margin: '0 0 20px 0', lineHeight: '1.5' }}>
                                         {t('clan.signInRequired')}
                                     </p>
-                                    <button onClick={() => cloudSync.signIn()} className="hover-lift" style={{
+                                    <button onClick={() => cloudAuth.signIn()} className="hover-lift" style={{
                                         width: '100%', maxWidth: '300px', padding: '16px', borderRadius: 'var(--radius-lg)',
                                         background: 'linear-gradient(135deg, #818cf8, #6366f1)', border: 'none', color: 'white',
                                         fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
