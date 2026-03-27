@@ -22,7 +22,6 @@
 export const EXERCISES = [
     {
         id: 'pushups',
-        label: 'Pompes',
         icon: 'Dumbbell',          // lucide-react icon name
         color: '#818cf8',           // Indigo-400
         colorDim: 'rgba(129,140,248,0.15)',
@@ -32,7 +31,6 @@ export const EXERCISES = [
     },
     {
         id: 'squats',
-        label: 'Squats',
         icon: 'ArrowDownUp',
         color: '#34d399',           // Emerald-400
         colorDim: 'rgba(52,211,153,0.15)',
@@ -42,7 +40,6 @@ export const EXERCISES = [
     },
     {
         id: 'pullups',
-        label: 'Tractions',
         icon: 'ArrowUp',
         color: '#fbbf24',           // Amber-400
         colorDim: 'rgba(251,191,36,0.15)',
@@ -52,7 +49,6 @@ export const EXERCISES = [
     },
     {
         id: 'abs',
-        label: 'Abdos',
         icon: 'Zap',
         color: '#f472b6',           // Pink-400
         colorDim: 'rgba(244,114,182,0.15)',
@@ -62,7 +58,6 @@ export const EXERCISES = [
     },
     {
         id: 'jumpingjacks',
-        label: 'Jumping Jack',
         icon: 'ChevronsUp',
         color: '#22d3ee',           // Cyan-400
         colorDim: 'rgba(34,211,238,0.15)',
@@ -72,7 +67,6 @@ export const EXERCISES = [
     },
     {
         id: 'lunges',
-        label: 'Fentes',
         icon: 'Footprints',
         color: '#fb923c',           // Orange-400
         colorDim: 'rgba(251,146,60,0.15)',
@@ -82,7 +76,6 @@ export const EXERCISES = [
     },
     {
         id: 'burpees',
-        label: 'Burpees',
         icon: 'Flame',
         color: '#ef4444',           // Red-500
         colorDim: 'rgba(239,68,68,0.15)',
@@ -92,7 +85,6 @@ export const EXERCISES = [
     },
     {
         id: 'planche',
-        label: 'Gainage (s)',
         icon: 'Square',
         color: '#8b5cf6',           // Violet-500
         colorDim: 'rgba(139,92,246,0.15)',
@@ -102,7 +94,6 @@ export const EXERCISES = [
     },
     {
         id: 'dips',
-        label: 'Dips',
         icon: 'MoveDown',
         color: '#ec4899',           // Pink-500
         colorDim: 'rgba(236,72,153,0.15)',
@@ -112,7 +103,6 @@ export const EXERCISES = [
     },
     {
         id: 'mountain',
-        label: 'Climbers',
         icon: 'MoveDiagonal',
         color: '#10b981',           // Emerald-500
         colorDim: 'rgba(16,185,129,0.15)',
