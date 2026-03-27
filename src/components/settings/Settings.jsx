@@ -110,21 +110,23 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                         </div>
                     )}
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <button onClick={() => setShowStore(true)} className="hover-lift" style={{
-                            background: 'linear-gradient(135deg, #10b981, #059669)',
-                            border: '1px solid rgba(16, 185, 129, 0.4)',
-                            borderRadius: '24px',
-                            padding: '0 16px',
-                            height: 'var(--touch-min)',
-                            display: 'flex', alignItems: 'center', gap: '8px',
-                            justifyContent: 'center', color: 'white', cursor: 'pointer',
-                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
-                            fontWeight: '800', fontSize: '0.85rem',
-                            letterSpacing: '0.5px'
-                        }}>
-                            <ShoppingBag size={18} />
-                            <span>Boutique</span>
-                        </button>
+                        {!showStore && (
+                            <button onClick={() => setShowStore(true)} className="hover-lift" style={{
+                                background: 'linear-gradient(135deg, #10b981, #059669)',
+                                border: '1px solid rgba(16, 185, 129, 0.4)',
+                                borderRadius: '24px',
+                                padding: '0 16px',
+                                height: 'var(--touch-min)',
+                                display: 'flex', alignItems: 'center', gap: '8px',
+                                justifyContent: 'center', color: 'white', cursor: 'pointer',
+                                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                                fontWeight: '800', fontSize: '0.85rem',
+                                letterSpacing: '0.5px'
+                            }}>
+                                <ShoppingBag size={18} />
+                                <span>Boutique</span>
+                            </button>
+                        )}
                         <button onClick={onClose} className="hover-lift glass" style={{
                             background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
                             width: 'var(--touch-min)', height: 'var(--touch-min)',
