@@ -505,7 +505,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
             onMouseLeave={handleMouseUp}
             style={{
                 position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
-                background: 'var(--sheet-bg)', 
+                background: 'var(--card-bg)',
                 backdropFilter: isDragging ? 'none' : 'blur(20px)',
                 WebkitBackdropFilter: isDragging ? 'none' : 'blur(20px)',
                 borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
@@ -513,7 +513,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                 paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))',
                 boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
                 transform: `translateY(${isClosing ? 100 : (isVisible ? translateY : 100)}%)`,
-                transition: isDragging ? 'none' : 'transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.3s ease',
+                transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), backdrop-filter 0.3s ease',
                 willChange: 'transform',
                 maxHeight: '80vh', display: 'flex', flexDirection: 'column'
             }}>

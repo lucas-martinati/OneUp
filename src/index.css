@@ -1,7 +1,7 @@
 :root {
   /* Base Colors */
   --bg-color: #050505;
-  --card-bg: #121214;
+  --card-bg: rgba(10, 10, 15);
   --text-primary: #ffffff;
   --text-secondary: #b0b0ba;
   --accent: #6d28d9;
