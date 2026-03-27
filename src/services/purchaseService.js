@@ -68,6 +68,12 @@ export async function initPurchases(userId) {
 
 // ── Generic helpers ────────────────────────────────────────────────────
 
+function hasActiveEntitlement(customerInfo, entitlementId) {
+  if (!customerInfo?.entitlements?.active) return false;
+  const targetId = entitlementId.toLowerCase();
+  return Object.keys(customerInfo.entitlements.active).some(k => k.toLowerCase() === targetId);
+}
+
 async function _checkEntitlement(tier) {
   const cfg = PRODUCTS[tier];
   if (!cfg) return false;
@@ -78,7 +84,7 @@ async function _checkEntitlement(tier) {
 
   try {
     const { customerInfo } = await Purchases.getCustomerInfo();
-    const active = !!customerInfo.entitlements.active[cfg.entitlementId];
+    const active = hasActiveEntitlement(customerInfo, cfg.entitlementId);
     localStorage.setItem(cfg.localStorageKey, active ? 'true' : 'false');
     return active;
   } catch (error) {
@@ -142,7 +148,7 @@ async function _purchase(tier) {
       aPackage: offering.product,
     });
 
-    const isActive = !!customerInfo.entitlements.active[cfg.entitlementId];
+    const isActive = hasActiveEntitlement(customerInfo, cfg.entitlementId);
     localStorage.setItem(cfg.localStorageKey, isActive ? 'true' : 'false');
 
     logger.success(`Purchase completed, ${tier}:`, isActive);
@@ -154,6 +160,7 @@ async function _purchase(tier) {
         title: offering.title,
         price: offering.price,
         date: new Date().toISOString(),
+        type: tier,
       },
     };
   } catch (error) {
@@ -227,9 +234,9 @@ export async function restorePurchases() {
   try {
     const { customerInfo } = await Purchases.restorePurchases();
 
-    const supporter = !!customerInfo.entitlements.active[PRODUCTS.supporter.entitlementId];
-    const club = !!customerInfo.entitlements.active[PRODUCTS.club.entitlementId];
-    const pro = !!customerInfo.entitlements.active[PRODUCTS.pro.entitlementId];
+    const supporter = hasActiveEntitlement(customerInfo, PRODUCTS.supporter.entitlementId);
+    const club = hasActiveEntitlement(customerInfo, PRODUCTS.club.entitlementId);
+    const pro = hasActiveEntitlement(customerInfo, PRODUCTS.pro.entitlementId);
 
     localStorage.setItem(PRODUCTS.supporter.localStorageKey, supporter ? 'true' : 'false');
     localStorage.setItem(PRODUCTS.club.localStorageKey, club ? 'true' : 'false');

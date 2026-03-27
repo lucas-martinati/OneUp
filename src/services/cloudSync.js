@@ -686,41 +686,35 @@ class CloudSyncService {
     }
   }
 
-  // Save active subscription entitlements to cloud
-  // Stored at `users/{uid}/subscriptions`
-  async saveSubscriptionStatus({ isSupporter, isClub, isPro }) {
+  // Save purchase status to cloud (3 booleans)
+  // Stored at `users/{uid}/purchase`
+  async savePurchase({ isSupporter, isClub, isPro }) {
     try {
       if (!auth?.currentUser || !database) return false;
       const userId = auth.currentUser.uid;
-      const subRef = ref(database, `users/${userId}/subscriptions`);
-      await set(subRef, {
+      await set(ref(database, `users/${userId}/purchase`), {
         isSupporter: !!isSupporter,
         isClub: !!isClub,
         isPro: !!isPro,
-        updatedAt: serverTimestamp(),
       });
-      logger.success('Subscription status synced to cloud');
+      logger.success('Purchase saved to cloud');
       return true;
     } catch (error) {
-      logger.error('Error syncing subscription status:', error);
+      logger.error('Error saving purchase:', error);
       return false;
     }
   }
 
-  // Load active subscription entitlements from cloud
-  async loadSubscriptionStatus() {
+  // Load purchase status from cloud
+  async loadPurchase() {
     try {
       if (!auth?.currentUser || !database) return null;
       const userId = auth.currentUser.uid;
-      const subRef = ref(database, `users/${userId}/subscriptions`);
-      const snapshot = await get(subRef);
-      if (snapshot.exists()) {
-        logger.success('Subscription status loaded from cloud');
-        return snapshot.val();
-      }
+      const snapshot = await get(ref(database, `users/${userId}/purchase`));
+      if (snapshot.exists()) return snapshot.val();
       return null;
     } catch (error) {
-      logger.error('Error loading subscription status:', error);
+      logger.error('Error loading purchase:', error);
       return null;
     }
   }

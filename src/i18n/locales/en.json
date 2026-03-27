@@ -332,7 +332,9 @@
     "restore": "Restore my purchases",
     "thankYou": "Thank you for your support! ❤️",
     "badgeActive": "Your Supporter badge is active in the leaderboard.",
-    "androidOnly": "Purchase is only available in the Android app."
+    "androidOnly": "Purchase is only available in the Android app.",
+    "history": "Purchase history",
+    "noHistory": "No purchases recorded"
   },
   "club": {
     "title": "Club Subscription",

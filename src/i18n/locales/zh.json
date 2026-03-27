@@ -332,7 +332,9 @@
     "restore": "恢复购买",
     "thankYou": "感谢你的支持！❤️",
     "badgeActive": "你的支持者徽章已在排行榜中激活。",
-    "androidOnly": "购买仅在 Android 应用中可用。"
+    "androidOnly": "购买仅在 Android 应用中可用。",
+    "history": "购买历史",
+    "noHistory": "没有购买记录"
   },
   "club": {
     "title": "俱乐部订阅",

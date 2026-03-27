@@ -332,7 +332,9 @@
     "restore": "Restaurer mes achats",
     "thankYou": "Merci pour ton soutien ! ❤️",
     "badgeActive": "Ton badge Supporter est actif dans le classement.",
-    "androidOnly": "L'achat est uniquement disponible dans l'application Android."
+    "androidOnly": "L'achat est uniquement disponible dans l'application Android.",
+    "history": "Historique des achats",
+    "noHistory": "Aucun achat enregistré"
   },
   "club": {
     "title": "Abonnement Club",

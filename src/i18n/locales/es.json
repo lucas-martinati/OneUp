@@ -332,7 +332,9 @@
     "restore": "Restaurar mis compras",
     "thankYou": "¡Gracias por tu apoyo! ❤️",
     "badgeActive": "Tu insignia Supporter está activa en la clasificación.",
-    "androidOnly": "La compra solo está disponible en la aplicación Android."
+    "androidOnly": "La compra solo está disponible en la aplicación Android.",
+    "history": "Historial de compras",
+    "noHistory": "Sin compras registradas"
   },
   "club": {
     "title": "Suscripción Club",
