@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter } from 'lucide-react';
+import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../hooks/useComputedStats';
@@ -97,7 +97,7 @@ const RechartsComponents = lazy(() => import('recharts').then(module => ({
     }
 })));
 
-export function Stats({ completions, exercisesList, initialCategory, isPro, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats: globalStats }) {
+export function Stats({ completions, exercisesList, initialCategory, isPro, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats: globalStats, onOpenStore }) {
     const { t } = useTranslation();
     const [chartsReady, setChartsReady] = useState(false);
     const [activeCategories, setActiveCategories] = useState(() => {
@@ -123,8 +123,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
     }, [activeCategories, exercisesList]);
 
     const computedStats = React.useMemo(() => {
-        const isAllSelected = !isPro || (activeCategories.length === 3);
-        if (isAllSelected) return globalStats;
+        if (isPro && activeCategories.length === 3) return globalStats;
         return computeAllStats(completions, settings, getDayNumber, exercises);
     }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, isPro]);
 
@@ -203,61 +202,69 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
             </div>
 
             {/* ── Filters ────────────────────────────────────────────── */}
-            {isPro && (
-                <div style={{ marginBottom: 'var(--spacing-md)' }}>
-                    <button
-                        onClick={() => setShowFilters(!showFilters)}
-                        className="hover-lift"
-                        style={{
-                            display: 'flex', alignItems: 'center', gap: '8px',
-                            background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
-                            padding: '10px 16px', borderRadius: 'var(--radius-lg)',
-                            color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: '700',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        <Filter size={16} />
-                        Filtres ({activeCategories.length})
-                    </button>
-                    {showFilters && (
-                        <div className="fade-in" style={{
-                            marginTop: '8px', padding: '12px', background: 'rgba(255,255,255,0.03)',
-                            border: '1px solid rgba(255,255,255,0.06)', borderRadius: 'var(--radius-lg)',
-                            display: 'flex', flexWrap: 'wrap', gap: '8px'
-                        }}>
-                            {[
-                                { id: 'standard', label: 'Classique' },
-                                { id: 'weights', label: 'Musculation' },
-                                { id: 'custom', label: 'Spécial' }
-                            ].map(cat => (
-                                <label key={cat.id} style={{
-                                    display: 'flex', alignItems: 'center', gap: '6px',
-                                    background: activeCategories.includes(cat.id) ? 'linear-gradient(135deg, #8b5cf6, #6366f1)' : 'rgba(255,255,255,0.05)',
-                                    color: activeCategories.includes(cat.id) ? '#ffffff' : 'var(--text-secondary)',
-                                    border: activeCategories.includes(cat.id) ? '1px solid rgba(139, 92, 246, 0.4)' : '1px solid transparent',
-                                    padding: '8px 16px', borderRadius: 'var(--radius-full)',
-                                    fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer',
-                                    transition: 'all 0.2s'
-                                }}>
-                                    <input
-                                        type="checkbox"
-                                        style={{ display: 'none' }}
-                                        checked={activeCategories.includes(cat.id)}
-                                        onChange={(e) => {
-                                            setActiveCategories(prev => {
-                                                if (e.target.checked) return [...prev, cat.id];
-                                                if (prev.length === 1) return prev; // prevent unchecking last
-                                                return prev.filter(id => id !== cat.id);
-                                            });
-                                        }}
-                                    />
-                                    {cat.label}
-                                </label>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            )}
+            <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="hover-lift"
+                    style={{
+                        display: 'flex', alignItems: 'center', gap: '8px',
+                        background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
+                        padding: '10px 16px', borderRadius: 'var(--radius-lg)',
+                        color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: '700',
+                        cursor: 'pointer'
+                    }}
+                >
+                    <Filter size={16} />
+                    Filtres ({activeCategories.length})
+                </button>
+                {showFilters && (
+                    <div className="fade-in" style={{
+                        marginTop: '8px', padding: '12px', background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.06)', borderRadius: 'var(--radius-lg)',
+                        display: 'flex', flexWrap: 'wrap', gap: '8px'
+                    }}>
+                        {[
+                            { id: 'standard', label: 'Classique', locked: false },
+                            { id: 'weights', label: 'Musculation', locked: !isPro },
+                            { id: 'custom', label: 'Spécial', locked: !isPro }
+                        ].map(cat => (
+                            <label key={cat.id} style={{
+                                display: 'flex', alignItems: 'center', gap: '6px',
+                                background: activeCategories.includes(cat.id) ? 'linear-gradient(135deg, #8b5cf6, #6366f1)' : 'rgba(255,255,255,0.05)',
+                                color: activeCategories.includes(cat.id) ? '#ffffff' : (cat.locked ? 'var(--text-disabled)' : 'var(--text-secondary)'),
+                                border: activeCategories.includes(cat.id) ? '1px solid rgba(139, 92, 246, 0.4)' : '1px solid transparent',
+                                padding: '8px 16px', borderRadius: 'var(--radius-full)',
+                                fontSize: '0.8rem', fontWeight: '600', cursor: cat.locked ? 'pointer' : 'pointer',
+                                transition: 'all 0.2s',
+                                opacity: cat.locked ? 0.6 : 1
+                            }}>
+                                {cat.locked ? (
+                                    <div onClick={(e) => { e.preventDefault(); onOpenStore(); }} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <Lock size={12} color="#fca5a5" />
+                                        {cat.label}
+                                    </div>
+                                ) : (
+                                    <>
+                                        <input
+                                            type="checkbox"
+                                            style={{ display: 'none' }}
+                                            checked={activeCategories.includes(cat.id)}
+                                            onChange={(e) => {
+                                                setActiveCategories(prev => {
+                                                    if (e.target.checked) return [...prev, cat.id];
+                                                    if (prev.length === 1) return prev; // prevent unchecking last
+                                                    return prev.filter(id => id !== cat.id);
+                                                });
+                                            }}
+                                        />
+                                        {cat.label}
+                                    </>
+                                )}
+                            </label>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             {/* ── Hero: Global Total Reps ─────────────────────────────── */}
             <div className="glass-premium scale-in" style={{

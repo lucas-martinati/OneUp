@@ -4,10 +4,10 @@ import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, 
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
 
-export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isClub, isPro, purchaseHistory, onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases }) {
+export function Settings({ defaultShowStore = false, settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isClub, isPro, purchaseHistory, onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases }) {
     const { t, i18n } = useTranslation();
     const [showSaved, setShowSaved] = useState(false);
-    const [showStore, setShowStore] = useState(false);
+    const [showStore, setShowStore] = useState(defaultShowStore);
     const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
 
     const handleToggleNotifications = () => {
@@ -164,14 +164,31 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                             {t('common.saved')}
                         </div>
                     )}
-                    <button onClick={onClose} className="hover-lift glass" style={{
-                        background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-                        width: 'var(--touch-min)', height: 'var(--touch-min)',
-                        display: 'flex', alignItems: 'center',
-                        justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
-                    }}>
-                        <X size={22} />
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <button onClick={() => setShowStore(true)} className="hover-lift" style={{
+                            background: 'linear-gradient(135deg, #10b981, #059669)',
+                            border: '1px solid rgba(16, 185, 129, 0.4)',
+                            borderRadius: '24px',
+                            padding: '0 16px',
+                            height: 'var(--touch-min)',
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            justifyContent: 'center', color: 'white', cursor: 'pointer',
+                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                            fontWeight: '800', fontSize: '0.85rem',
+                            letterSpacing: '0.5px'
+                        }}>
+                            <ShoppingBag size={18} />
+                            <span>Boutique</span>
+                        </button>
+                        <button onClick={onClose} className="hover-lift glass" style={{
+                            background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
+                            width: 'var(--touch-min)', height: 'var(--touch-min)',
+                            display: 'flex', alignItems: 'center',
+                            justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
+                        }}>
+                            <X size={22} />
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -179,7 +196,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
 
             {showStore ? (
                 /* ── BOUTIQUE VIEW ────────────────────────────────────────── */
-                <div>
+                <div className="fade-in slide-up" style={{ animationDuration: '0.4s' }}>
                    <div className="glass-premium" style={{
                         padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
                         marginBottom: 'var(--spacing-md)',
@@ -264,6 +281,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                     </div>
 
                     {/* ── ABONNEMENT CLUB ─────────────────────────────────── */}
+                    {false && (
                     <div className="glass-premium" style={{
                         padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
                         marginBottom: 'var(--spacing-md)',
@@ -348,6 +366,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                             </div>
                         )}
                     </div>
+                    )}
 
                     {/* ── ABONNEMENT PRO ───────────────────────────────────── */}
                     <div className="glass-premium" style={{
@@ -790,38 +809,7 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                 </div>
             )}
 
-            {/* ── Boutique Button ─────────────────────────────────────── */}
-            <div className="glass-premium hover-lift" 
-                onClick={() => setShowStore(true)}
-                style={{
-                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                marginBottom: 'var(--spacing-md)',
-                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.05))',
-                border: '1px solid rgba(16, 185, 129, 0.2)', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{
-                        width: '42px', height: '42px', borderRadius: '12px',
-                        background: 'linear-gradient(135deg, #10b981, #059669)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
-                    }}>
-                        <ShoppingBag size={20} color="white" />
-                    </div>
-                    <div>
-                        <div style={{ fontWeight: '800', fontSize: '1.05rem', color: 'var(--text-primary)' }}>
-                            Boutique & Achats
-                        </div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px', display: 'flex', gap: '6px', alignItems: 'center' }}>
-                            {!isSupporter && !isClub && !isPro && "Badge supporter, reçu..."}
-                            {isSupporter && <span style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', padding: '2px 8px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}><Heart size={10} fill="#ef4444" /> Supporter</span>}
-                            {isClub && <span style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', padding: '2px 8px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}><Swords size={10} /> Club</span>}
-                            {isPro && <span style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', color: '#8b5cf6', padding: '2px 8px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}><Sparkles size={10} /> Pro</span>}
-                        </div>
-                    </div>
-                </div>
-            </div>
+
 
             {/* ── Difficulté (Sensitive Setting) ─────────────────────────── */}
             <div className="glass-premium" style={{

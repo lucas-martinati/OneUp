@@ -5,7 +5,7 @@ import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users, Check, Award,
     Target, TrendingUp, Star, Activity, Play, Square, MoveDown, MoveDiagonal, Shield,
-    Swords, Sparkles
+    Swords, Sparkles, Lock, ShoppingBag
 } from 'lucide-react';
 import { AchievementToast } from './AchievementToast';
 import { CSSConfetti } from './CSSConfetti';
@@ -21,7 +21,6 @@ const Timer = lazy(() => import('./Timer').then(m => ({ default: m.Timer })));
 const WorkoutSession = lazy(() => import('./WorkoutSession').then(m => ({ default: m.WorkoutSession })));
 const Onboarding = lazy(() => import('./Onboarding').then(module => ({ default: module.Onboarding })));
 const ClanModal = lazy(() => import('./ClanModal').then(m => ({ default: m.ClanModal })));
-const ChallengeModal = lazy(() => import('./ChallengeModal').then(module => ({ default: module.ChallengeModal })));
 const CustomExercisesModal = lazy(() => import('./CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
@@ -60,7 +59,6 @@ export function Dashboard({
     const [showAchievements, setShowAchievements] = useState(false);
     const [showSession, setShowSession] = useState(false);
     const [showClan, setShowClan] = useState(false);
-    const [showChallenge, setShowChallenge] = useState(false);
     const [showCustomExercisesModal, setShowCustomExercisesModal] = useState(false);
     const [newAchievement, setNewAchievement] = useState(null);
     const [activeSlide, setActiveSlide] = useState(0); // 0: Classic, 1: Weights, 2: Custom
@@ -80,14 +78,16 @@ export function Dashboard({
     const [isCounterTransitioning, setIsCounterTransitioning] = useState(false);
     const [prevDayNumber, setPrevDayNumber] = useState(null);
     const [showDayConfetti, setShowDayConfetti] = useState(false);
+    const [openStoreDirectly, setOpenStoreDirectly] = useState(false);
 
     // Dynamic global selection for Header badge styling
-    const globalSelectedId = activeSlide === 0 ? classicSelected : activeSlide === 1 ? weightsSelected : customSelected;
+    const effectiveSlide = isPro ? activeSlide : 0;
+    const globalSelectedId = effectiveSlide === 0 ? classicSelected : effectiveSlide === 1 ? weightsSelected : customSelected;
     const selectedExercise = useMemo(() => {
-        if (activeSlide === 0) return EXERCISES_MAP[globalSelectedId] || EXERCISES[0];
-        if (activeSlide === 1) return WEIGHT_EXERCISES_MAP[globalSelectedId] || WEIGHT_EXERCISES[0];
+        if (effectiveSlide === 0) return EXERCISES_MAP[globalSelectedId] || EXERCISES[0];
+        if (effectiveSlide === 1) return WEIGHT_EXERCISES_MAP[globalSelectedId] || WEIGHT_EXERCISES[0];
         return customExercisesMap[globalSelectedId] || customExercises[0] || { id: 'custom_placeholder', color: '#8b5cf6', gradient: ['#8b5cf6', '#7c3aed'], icon: 'Star', name: 'Exercice Perso' };
-    }, [activeSlide, globalSelectedId, customExercises, customExercisesMap]);
+    }, [effectiveSlide, globalSelectedId, customExercises, customExercisesMap]);
 
     useEffect(() => {
         setSoundSettingsGetter(() => settings);
@@ -129,8 +129,8 @@ export function Dashboard({
     const streakActive = computedStats.streakActive;
 
     const handleSelectExercise = (id) => {
-        if (activeSlide === 0) setClassicSelected(id);
-        else if (activeSlide === 1) setWeightsSelected(id);
+        if (effectiveSlide === 0) setClassicSelected(id);
+        else if (effectiveSlide === 1) setWeightsSelected(id);
         else setCustomSelected(id);
     };
 
@@ -174,9 +174,6 @@ export function Dashboard({
             } else if (showSession) {
                 setShowSession(false);
                 resumeCloudSync?.();
-            } else if (showChallenge) {
-                setShowChallenge(false);
-                resumeCloudSync?.();
             } else if (showClan) {
                 setShowClan(false);
                 resumeCloudSync?.();
@@ -207,7 +204,7 @@ export function Dashboard({
                 backButtonListener.remove();
             }
         };
-    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, showAchievements, showSession, showClan, showChallenge, resumeCloudSync]);
+    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, showAchievements, showSession, showClan, resumeCloudSync]);
 
     // Progress circle for year (day X / 365)
     const circumference = 2 * Math.PI * 45;
@@ -281,18 +278,6 @@ export function Dashboard({
                         >
                             <Shield size={19} />
                         </button>
-                        <button
-                            onClick={() => { setShowChallenge(true); pauseCloudSync?.(); }}
-                            title={t('challenge.title')}
-                            className="hover-lift"
-                            style={{
-                                ...iconBtnStyle,
-                                background: isClub ? 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.1))' : iconBtnStyle.background,
-                                border: isClub ? '1px solid rgba(245,158,11,0.3)' : 'none'
-                            }}
-                        >
-                            <Swords size={19} color={isClub ? '#f59e0b' : undefined} />
-                        </button>
 
                         {/* Global streak badge — Duolingo style: gray if not done today */}
                         <div style={{
@@ -362,8 +347,8 @@ export function Dashboard({
                             />
                         </div>
 
-                        {isPro && (
-                            <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                        <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                            {isPro ? (
                                 <DashboardSlide
                                     title="Musculation (Poids)"
                                     isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
@@ -373,11 +358,16 @@ export function Dashboard({
                                     activeExerciseId={weightsSelected} onSelectExercise={handleSelectExercise}
                                     exercisesList={WEIGHT_EXERCISES} exercisesMap={WEIGHT_EXERCISES_MAP}
                                 />
-                            </div>
-                        )}
+                            ) : (
+                                <ProPaywall
+                                    title="Musculation (Poids)"
+                                    onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
+                                />
+                            )}
+                        </div>
 
-                        {isPro && (
-                            <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                        <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                            {isPro ? (
                                 <DashboardSlide
                                     title="Exercices Personnalisés"
                                     isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
@@ -388,27 +378,30 @@ export function Dashboard({
                                     exercisesList={customExercises} exercisesMap={customExercisesMap}
                                     onManageCustom={() => { setShowCustomExercisesModal(true); pauseCloudSync?.(); }}
                                 />
-                            </div>
-                        )}
+                            ) : (
+                                <ProPaywall
+                                    title="Exercices Personnalisés"
+                                    onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
+                                />
+                            )}
+                        </div>
                     </div>
 
-                    {isPro && (
-                        <div style={{
-                            position: 'absolute', right: '4px', top: '50%', transform: 'translateY(-50%)',
-                            display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10,
-                            pointerEvents: 'none'
-                        }}>
-                            {[0, 1, 2].map(i => (
-                                <div key={i} style={{
-                                    width: '4px', height: activeSlide === i ? '24px' : '6px',
-                                    borderRadius: '4px',
-                                    background: activeSlide === i ? 'var(--text-primary)' : 'var(--text-secondary)',
-                                    opacity: activeSlide === i ? 1 : 0.4,
-                                    transition: 'all 0.3s ease'
-                                }} />
-                            ))}
-                        </div>
-                    )}
+                    <div style={{
+                        position: 'absolute', right: '4px', top: '50%', transform: 'translateY(-50%)',
+                        display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10,
+                        pointerEvents: 'none'
+                    }}>
+                        {[0, 1, 2].map(i => (
+                            <div key={i} style={{
+                                width: '4px', height: activeSlide === i ? '24px' : '6px',
+                                borderRadius: '4px',
+                                background: activeSlide === i ? 'var(--text-primary)' : 'var(--text-secondary)',
+                                opacity: activeSlide === i ? 1 : 0.4,
+                                transition: 'all 0.3s ease'
+                            }} />
+                        ))}
+                    </div>
                 </main>
 
                 {/* Bottom Actions Row */}
@@ -457,7 +450,7 @@ export function Dashboard({
                         <Calendar
                             startDate={startDate}
                             completions={completions}
-                            exercises={activeSlide === 0 ? EXERCISES : activeSlide === 1 ? WEIGHT_EXERCISES : customExercises}
+                            exercises={effectiveSlide === 0 ? EXERCISES : effectiveSlide === 1 ? WEIGHT_EXERCISES : customExercises}
                             getDayNumber={getDayNumber}
                             onClose={() => setShowCalendar(false)}
                             settings={settings}
@@ -471,7 +464,7 @@ export function Dashboard({
                                 weights: WEIGHT_EXERCISES,
                                 custom: customExercises
                             }}
-                            initialCategory={activeSlide === 0 ? 'standard' : activeSlide === 1 ? 'weights' : 'custom'}
+                            initialCategory={effectiveSlide === 0 ? 'standard' : effectiveSlide === 1 ? 'weights' : 'custom'}
                             isPro={isPro}
                             onClose={() => setShowStats(false)}
                             onOpenAchievements={() => { setShowAchievements(true); }}
@@ -479,12 +472,20 @@ export function Dashboard({
                             settings={settings}
                             getDayNumber={getDayNumber}
                             computedStats={computedStats}
+                            onOpenStore={() => {
+                                setShowSettings(true);
+                                setOpenStoreDirectly(true);
+                            }}
                         />
                     )}
                     {showSettings && (
                         <Settings
+                            defaultShowStore={openStoreDirectly}
                             settings={settings}
-                            onClose={() => setShowSettings(false)}
+                            onClose={() => {
+                                setShowSettings(false);
+                                setOpenStoreDirectly(false);
+                            }}
                             onSave={handleSaveSettings}
                             cloudAuth={cloudAuth}
                             cloudSync={cloudSync}
@@ -527,7 +528,7 @@ export function Dashboard({
                             onClose={() => setShowLeaderboard(false)}
                             cloudSync={cloudSync}
                             cloudAuth={cloudAuth}
-                            activeSlide={activeSlide}
+                            activeSlide={effectiveSlide}
                         />
                     )}
                     {showAchievements && (
@@ -556,7 +557,7 @@ export function Dashboard({
                             updateRoutine={updateRoutine}
                             maxRoutines={maxRoutines}
                             isPro={isPro}
-                            activeSlide={activeSlide}
+                            activeSlide={effectiveSlide}
                             customExercises={customExercises}
                         />
                     )}
@@ -568,17 +569,11 @@ export function Dashboard({
                             updateSettings={updateSettings}
                         />
                     )}
-                    {showChallenge && (
-                        <ChallengeModal
-                            onClose={() => { setShowChallenge(false); resumeCloudSync?.(); }}
-                            cloudAuth={cloudAuth}
-                            isClub={isClub}
-                        />
-                    )}
                     {showCustomExercisesModal && (
                         <CustomExercisesModal
                             onClose={() => { setShowCustomExercisesModal(false); resumeCloudSync?.(); }}
                             customExercisesHook={customExercisesHook}
+                            computedStats={computedStats}
                         />
                     )}
                 </Suspense>
@@ -586,6 +581,39 @@ export function Dashboard({
         </>
     );
 }
+
+const ProPaywall = ({ title, onOpenStore }) => (
+    <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        height: '100%', padding: '20px', textAlign: 'center', gap: '16px'
+    }}>
+        <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8 }}>
+            {title}
+        </div>
+        <div style={{
+            width: '64px', height: '64px', borderRadius: '50%',
+            background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.05))',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            border: '1px solid rgba(139,92,246,0.3)', marginBottom: '8px'
+        }}>
+            <Lock size={28} color="#8b5cf6" />
+        </div>
+        <h2 style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>
+            Mode Pro Requis
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5', margin: 0, maxWidth: '280px' }}>
+            Accédez aux tableaux de bord de musculation et créez vos propres exercices personnalisés.
+        </p>
+        <button onClick={onOpenStore} className="hover-lift" style={{
+            marginTop: '8px', padding: '12px 24px', borderRadius: '24px',
+            background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white',
+            fontWeight: '800', border: 'none', cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)', display: 'flex', gap: '8px', alignItems: 'center'
+        }}>
+            <ShoppingBag size={18} /> Voir la Boutique
+        </button>
+    </div>
+);
 
 // Memoized exercise button to avoid re-rendering all 10 exercises when one changes
 const DashboardSlide = React.memo(({

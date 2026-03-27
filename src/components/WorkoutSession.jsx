@@ -69,6 +69,10 @@ export function WorkoutSession({
         return [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises];
     }, [customExercises]);
 
+    const allowedExercises = useMemo(() => {
+        return isPro ? allExercises : EXERCISES;
+    }, [isPro, allExercises]);
+
     const [showAll, setShowAll] = useState(false);
     const availableExercises = isPro && showAll ? allExercises : localExercises;
 
@@ -98,8 +102,15 @@ export function WorkoutSession({
 
     // Load a routine into the queue
     const loadRoutine = (routine) => {
-        // Filter out exercises that don't exist anymore
-        const validIds = routine.exerciseIds.filter(id => allExercises.find(e => e.id === id));
+        // Filter out exercises that don't exist anymore, aren't allowed, or are already completed
+        const validIds = routine.exerciseIds.filter(id => {
+            const ex = allowedExercises.find(e => e.id === id);
+            if (!ex) return false;
+            const goal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
+            const count = getExerciseCount(today, ex.id);
+            const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
+            return !done;
+        });
         setQueue(validIds);
         setShowRoutineList(false);
     };
@@ -119,7 +130,14 @@ export function WorkoutSession({
 
     // Edit a routine: load it into queue and open save form
     const editRoutine = (routine) => {
-        const validIds = routine.exerciseIds.filter(id => allExercises.find(e => e.id === id));
+        const validIds = routine.exerciseIds.filter(id => {
+            const ex = allowedExercises.find(e => e.id === id);
+            if (!ex) return false;
+            const goal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
+            const count = getExerciseCount(today, ex.id);
+            const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
+            return !done;
+        });
         setQueue(validIds);
         setRoutineName(routine.name);
         setEditingRoutineId(routine.id);

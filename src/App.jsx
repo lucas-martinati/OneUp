@@ -53,10 +53,10 @@ function App() {
     getDayNumber, getTotalReps, isDayDone, isSetup, userStartDate,
     scheduleNotification, requestNotificationPermission,
     getExerciseCount, updateExerciseCount,
-    saveToCloud, loadFromCloud, syncWithCloud, startCloudListener
+    saveToCloud, loadFromCloud, syncWithCloud, startCloudListener, deleteExerciseHistory
   } = progress;
 
-  const computedStats = useComputedStats(completions, settings, getDayNumber);
+  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesHook.customExercises);
   const userDetailsCache = useUserDetailsCache(cloudSync);
 
   // ── Helper: publish leaderboard with current state ────────────────────
@@ -495,6 +495,35 @@ function App() {
     }
   }, [googleAuth.isSignedIn, googleAuth.loading, conflictCheckDone, isInitialSyncDone, isSyncPaused, conflictData, startCloudListener]);
 
+  // Wrap deleteCustomExercise to also remove from completions and routines
+  const handleDeleteCustomExercise = useCallback(async (id) => {
+    // 1. Delete from custom exercises config
+    customExercisesHook.deleteCustomExercise(id);
+
+    // 2. Erase from completion history
+    const newState = deleteExerciseHistory(id);
+    if (newState) {
+      await saveToCloud(newState);
+    }
+
+    // 3. Remove from all routines and delete routine if empty
+    routines.forEach(r => {
+      if (r.exerciseIds && r.exerciseIds.includes(id)) {
+        const newExercises = r.exerciseIds.filter(ex => ex !== id);
+        if (newExercises.length === 0) {
+          deleteRoutine(r.id);
+        } else {
+          updateRoutine(r.id, r.name, newExercises);
+        }
+      }
+    });
+  }, [customExercisesHook.deleteCustomExercise, deleteExerciseHistory, saveToCloud, routines, deleteRoutine, updateRoutine]);
+
+  const customExercisesHookWrapped = {
+    ...customExercisesHook,
+    deleteCustomExercise: handleDeleteCustomExercise
+  };
+
   return (
     <Suspense fallback={
       <div style={{
@@ -509,7 +538,7 @@ function App() {
         <Onboarding onStart={startChallenge} />
       ) : (
         <Dashboard
-          customExercisesHook={customExercisesHook}
+          customExercisesHook={customExercisesHookWrapped}
           getDayNumber={getDayNumber}
           getTotalReps={getTotalReps}
           isDayDone={isDayDone}

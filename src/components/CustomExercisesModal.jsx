@@ -11,13 +11,15 @@ const ICONS = {
 
 const PRESET_COLORS = [
   '#ef4444', '#f97316', '#f59e0b', '#10b981', 
-  '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'
+  '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899',
+  '#f43f5e', '#6366f1', '#14b8a6', '#64748b'
 ];
 
-export function CustomExercisesModal({ onClose, customExercisesHook }) {
+export function CustomExercisesModal({ onClose, customExercisesHook, computedStats }) {
   const { t } = useTranslation();
   const { customExercises, saveCustomExercise, deleteCustomExercise, maxCustomExercises } = customExercisesHook;
   
+  const [confirmDeleteEx, setConfirmDeleteEx] = useState(null);
   const [view, setView] = useState('list'); // 'list' | 'create'
   const [label, setLabel] = useState('');
   const [iconName, setIconName] = useState('Star');
@@ -57,10 +59,8 @@ export function CustomExercisesModal({ onClose, customExercisesHook }) {
     }
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Supprimer cet exercice personnalisé ? Vos statistiques passées seront conservées en mémoire.")) {
-      deleteCustomExercise(id);
-    }
+  const handleDelete = (ex) => {
+    setConfirmDeleteEx(ex);
   };
 
   return (
@@ -115,7 +115,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook }) {
                           </div>
                         </div>
                       </div>
-                      <button onClick={() => handleDelete(ex.id)} style={{
+                      <button onClick={() => handleDelete(ex)} style={{
                         background: 'transparent', border: 'none', color: '#ef4444',
                         padding: '8px', cursor: 'pointer', opacity: 0.8
                       }}>
@@ -128,7 +128,16 @@ export function CustomExercisesModal({ onClose, customExercisesHook }) {
             )}
 
             {customExercises.length < maxCustomExercises && (
-              <button onClick={() => setView('create')} className="hover-lift" style={{
+              <button onClick={() => {
+                setLabel('');
+                const iconKeys = Object.keys(ICONS);
+                setIconName(iconKeys[Math.floor(Math.random() * iconKeys.length)]);
+                setColor(PRESET_COLORS[Math.floor(Math.random() * PRESET_COLORS.length)]);
+                setType('counter');
+                setMultiplier(1.0);
+                setError('');
+                setView('create');
+              }} className="hover-lift" style={{
                 width: '100%', padding: '16px', borderRadius: 'var(--radius-lg)',
                 background: 'linear-gradient(135deg, #8b5cf6, #6366f1)', border: 'none', color: 'white',
                 fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
@@ -145,36 +154,68 @@ export function CustomExercisesModal({ onClose, customExercisesHook }) {
         )}
 
         {view === 'create' && (
-          <div style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase' }}>Nom de l'exercice</label>
-              <input
-                type="text"
-                value={label}
-                onChange={e => setLabel(e.target.value)}
-                placeholder="Ex: Gainage chaise, Corde à sauter..."
-                style={{
-                  width: '100%', padding: '14px', borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--border-subtle)', background: 'var(--surface-muted)',
-                  color: 'white', fontSize: '1rem', outline: 'none', boxSizing: 'border-box'
-                }}
-              />
+          <div className="fade-in" style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* NAME */}
+            <div style={{ position: 'relative' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Nom de l'exercice
+              </label>
+              <div style={{ position: 'relative' }}>
+                <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: color }}>
+                  {(() => { const SelectedIcon = ICONS[iconName] || Star; return <SelectedIcon size={20} />; })()}
+                </div>
+                <input
+                  type="text"
+                  maxLength={20}
+                  value={label}
+                  onChange={e => setLabel(e.target.value)}
+                  placeholder="Ex: Gainage chaise, Corde à sauter..."
+                  style={{
+                    width: '100%', padding: '16px 16px 16px 44px', borderRadius: 'var(--radius-lg)',
+                    border: `2px solid ${label ? color + '50' : 'var(--border-subtle)'}`,
+                    background: 'rgba(255,255,255,0.03)', color: 'white', fontSize: '1.05rem', fontWeight: '600',
+                    outline: 'none', boxSizing: 'border-box', transition: 'all 0.3s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = color}
+                  onBlur={(e) => e.target.style.borderColor = label ? color + '50' : 'var(--border-subtle)'}
+                />
+              </div>
             </div>
 
+            {/* COLOR */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase' }}>Icône</label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Couleur de thème
+              </label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', justifyContent: 'space-between' }}>
+                {PRESET_COLORS.map(c => (
+                  <button key={c} onClick={() => setColor(c)} className="hover-lift" style={{
+                    width: '38px', height: '38px', borderRadius: '50%',
+                    background: c, border: color === c ? '3px solid white' : 'none',
+                    boxShadow: color === c ? `0 0 0 3px ${c}50` : 'none',
+                    cursor: 'pointer', transition: 'all 0.2s', padding: 0
+                  }} />
+                ))}
+              </div>
+            </div>
+
+            {/* ICON */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Icône
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
                 {Object.keys(ICONS).map(name => {
                   const IconComp = ICONS[name];
                   const isSelected = iconName === name;
                   return (
-                    <button key={name} onClick={() => setIconName(name)} style={{
-                      width: '48px', height: '48px', borderRadius: 'var(--radius-md)',
-                      background: isSelected ? 'rgba(139,92,246,0.2)' : 'var(--surface-muted)',
-                      border: isSelected ? '2px solid #8b5cf6' : '1px solid var(--border-subtle)',
-                      color: isSelected ? '#8b5cf6' : 'var(--text-secondary)',
+                    <button key={name} onClick={() => setIconName(name)} className={isSelected ? 'hover-lift' : ''} style={{
+                      aspectRatio: '1', borderRadius: 'var(--radius-md)',
+                      background: isSelected ? `${color}20` : 'rgba(255,255,255,0.03)',
+                      border: isSelected ? `2px solid ${color}` : '1px solid transparent',
+                      color: isSelected ? color : 'var(--text-secondary)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      cursor: 'pointer', transition: 'all 0.2s'
+                      cursor: 'pointer', transition: 'all 0.2s', padding: 0
                     }}>
                       <IconComp size={24} />
                     </button>
@@ -183,69 +224,57 @@ export function CustomExercisesModal({ onClose, customExercisesHook }) {
               </div>
             </div>
 
+            {/* TYPE */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase' }}>Type de suivi</label>
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Type de suivi
+              </label>
+              <div style={{ display: 'flex', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-lg)', padding: '4px' }}>
                 <button
                   onClick={() => setType('counter')}
                   style={{
                     flex: 1, padding: '12px', borderRadius: 'var(--radius-md)',
-                    background: type === 'counter' ? 'rgba(139,92,246,0.2)' : 'var(--surface-muted)',
-                    border: type === 'counter' ? '2px solid #8b5cf6' : '1px solid var(--border-subtle)',
-                    color: type === 'counter' ? '#8b5cf6' : 'var(--text-secondary)',
-                    fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s'
+                    background: type === 'counter' ? `${color}20` : 'transparent',
+                    border: 'none', color: type === 'counter' ? color : 'var(--text-secondary)',
+                    fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s'
                   }}
                 >
-                  Compteur (Reps)
+                  <Dumbbell size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} /> Reps
                 </button>
                 <button
                   onClick={() => setType('timer')}
                   style={{
                     flex: 1, padding: '12px', borderRadius: 'var(--radius-md)',
-                    background: type === 'timer' ? 'rgba(139,92,246,0.2)' : 'var(--surface-muted)',
-                    border: type === 'timer' ? '2px solid #8b5cf6' : '1px solid var(--border-subtle)',
-                    color: type === 'timer' ? '#8b5cf6' : 'var(--text-secondary)',
-                    fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s'
+                    background: type === 'timer' ? `${color}20` : 'transparent',
+                    border: 'none', color: type === 'timer' ? color : 'var(--text-secondary)',
+                    fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s'
                   }}
                 >
-                  Chronomètre (Secondes)
+                  <Activity size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} /> Temps
                 </button>
               </div>
             </div>
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase' }}>Couleur</label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-                {PRESET_COLORS.map(c => (
-                  <button key={c} onClick={() => setColor(c)} style={{
-                    width: '36px', height: '36px', borderRadius: '50%',
-                    background: c, border: color === c ? '3px solid white' : 'none',
-                    boxShadow: color === c ? `0 0 0 2px ${c}` : 'none',
-                    cursor: 'pointer', transition: 'all 0.2s'
-                  }} />
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase' }}>
-                Multiplicateur d'objectif
-              </label>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '8px', marginTop: 0 }}>
-                Définit la difficulté. L'objectif {type === 'timer' ? 'en secondes' : 'de répétitions'} = Jour x Multiplicateur.
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <input
-                  type="range"
-                  min="0.1" max="5" step="0.1"
-                  value={multiplier}
-                  onChange={e => setMultiplier(parseFloat(e.target.value))}
-                  style={{ flex: 1, accentColor: '#8b5cf6' }}
-                />
-                <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#8b5cf6', width: '40px', textAlign: 'right' }}>
+            {/* MULTIPLIER */}
+            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 'var(--radius-lg)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  Multiplicateur d'objectif
+                </label>
+                <div style={{ fontSize: '1.4rem', fontWeight: '900', color: color }}>
                   x{multiplier.toFixed(1)}
                 </div>
               </div>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '16px', marginTop: 0, lineHeight: 1.4 }}>
+                Objectif visé : Jour n°X multiplié par {multiplier.toFixed(1)} {type === 'timer' ? '(Secondes)' : '(Reps)'}.
+              </p>
+              <input
+                type="range"
+                min="0.1" max="5" step="0.1"
+                value={multiplier}
+                onChange={e => setMultiplier(parseFloat(e.target.value))}
+                style={{ width: '100%', accentColor: color }}
+              />
             </div>
 
             {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
@@ -266,6 +295,68 @@ export function CustomExercisesModal({ onClose, customExercisesHook }) {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {confirmDeleteEx && (
+        <div className="fade-in" style={{
+          position: 'absolute', inset: 0, background: 'rgba(5,5,5,0.92)',
+          zIndex: 1010, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', padding: 'var(--spacing-md)'
+        }}>
+          <div style={{
+            background: 'var(--surface-primary)', border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-lg)', padding: '24px', width: '100%', maxWidth: '340px',
+            textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px'
+          }}>
+            <div style={{
+              width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(239,68,68,0.1)',
+              color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto'
+            }}>
+              <Trash2 size={32} />
+            </div>
+            
+            <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '800' }}>
+              Supprimer l'exercice ?
+            </h3>
+            
+            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
+              Êtes-vous sûr de vouloir supprimer <b>{confirmDeleteEx.label}</b> ?
+              {computedStats?.exerciseReps?.[confirmDeleteEx.id] > 0 && (
+                <span style={{ display: 'block', marginTop: '12px', color: '#fbbf24', fontSize: '0.85rem', fontWeight: '700', padding: '8px', background: 'rgba(251,191,36,0.1)', borderRadius: '8px' }}>
+                  Attention : vous perdrez {computedStats.exerciseReps[confirmDeleteEx.id].toLocaleString()} {(confirmDeleteEx.type === 'timer' ? 'secondes' : 'répétitions')} de votre total mondial.
+                </span>
+              )}
+            </p>
+            
+            <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+              <button 
+                onClick={() => setConfirmDeleteEx(null)}
+                className="hover-lift"
+                style={{
+                  flex: 1, padding: '12px', borderRadius: 'var(--radius-md)',
+                  background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
+                  color: 'white', fontWeight: '700'
+                }}
+              >
+                Annuler
+              </button>
+              <button 
+                onClick={() => {
+                  deleteCustomExercise(confirmDeleteEx.id);
+                  setConfirmDeleteEx(null);
+                }}
+                className="hover-lift"
+                style={{
+                  flex: 1, padding: '12px', borderRadius: 'var(--radius-md)',
+                  background: '#ef4444', border: 'none', color: 'white', fontWeight: '700'
+                }}
+              >
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

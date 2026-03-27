@@ -338,10 +338,13 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                                         <div style={{
                                             fontSize: '0.85rem', fontWeight: '600',
                                             color: isMe ? '#fbbf24' : 'var(--text-primary)',
-                                            overflow: 'hidden', textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px'
+                                            display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap'
                                         }}>
-                                            {isMe ? `${entry.pseudo} (${t('common.you')})` : entry.pseudo}
+                                            <span style={{ 
+                                                maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+                                            }}>
+                                                {isMe ? `${entry.pseudo} (${t('common.you')})` : entry.pseudo}
+                                            </span>
                                             {entry.isSupporter && (
                                                 <span style={{
                                                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -352,16 +355,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                                                     <Heart size={10} color="#ef4444" fill="#ef4444" />
                                                 </span>
                                             )}
-                                            {entry.isClub && (
-                                                <span style={{
-                                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                                    background: 'rgba(59,130,246,0.15)', borderRadius: '10px',
-                                                    padding: '1px 6px', gap: '3px',
-                                                    border: '1px solid rgba(59,130,246,0.25)'
-                                                }}>
-                                                    <Medal size={10} color="#3b82f6" fill="#3b82f6" />
-                                                </span>
-                                            )}
+
                                             {entry.isPro && (
                                                 <span style={{
                                                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -562,10 +556,12 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
 
                     <div style={{ textAlign: 'center' }}>
                         <div style={{
-                            fontSize: '1.1rem', fontWeight: '700',
-                            color: isMe ? rankColor : 'var(--text-primary)'
+                            fontSize: '1.4rem', fontWeight: '800', color: isMe ? '#fbbf24' : 'var(--text-primary)',
+                            display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap'
                         }}>
-                            {entry.pseudo} {isMe && `(${t('common.you')})`}
+                            <span style={{ wordBreak: 'break-all' }}>
+                                {entry.pseudo} {isMe && <span style={{ fontSize: '1rem', opacity: 0.8 }}>({t('common.you')})</span>}
+                            </span>
                             {entry.isSupporter && (
                                 <span style={{
                                     display: 'inline-flex', alignItems: 'center',
@@ -577,17 +573,7 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                                     <span style={{ fontSize: '0.65rem', fontWeight: '700', color: '#ef4444' }}>Supporter</span>
                                 </span>
                             )}
-                            {entry.isClub && (
-                                <span style={{
-                                    display: 'inline-flex', alignItems: 'center',
-                                    background: 'rgba(59,130,246,0.15)', borderRadius: '12px',
-                                    padding: '2px 8px', gap: '4px', marginLeft: '4px',
-                                    border: '1px solid rgba(59,130,246,0.25)'
-                                }}>
-                                    <Medal size={12} color="#3b82f6" fill="#3b82f6" />
-                                    <span style={{ fontSize: '0.65rem', fontWeight: '700', color: '#3b82f6' }}>Club</span>
-                                </span>
-                            )}
+
                             {entry.isPro && (
                                 <span style={{
                                     display: 'inline-flex', alignItems: 'center',

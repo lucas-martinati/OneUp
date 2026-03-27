@@ -409,6 +409,32 @@ export function useProgress() {
    * When another device writes, this callback fires and merges the incoming data.
    * Returns an unsubscribe function.
    */
+  // ─── Delete Exercise Data (Full Purgation) ──────────────────────────────
+  const deleteExerciseHistory = useCallback((exId) => {
+    let newStateToSync = null;
+    setState(prev => {
+      const nextCompletions = { ...prev.completions };
+      let changed = false;
+
+      for (const date in nextCompletions) {
+        if (nextCompletions[date] && nextCompletions[date][exId]) {
+          const newDay = { ...nextCompletions[date] };
+          delete newDay[exId];
+          nextCompletions[date] = newDay;
+          changed = true;
+        }
+      }
+
+      if (!changed) return prev;
+
+      const newState = { ...prev, completions: nextCompletions, lastCompletionChange: Date.now() };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+      newStateToSync = newState;
+      return newState;
+    });
+    return newStateToSync;
+  }, []);
+
   const startCloudListener = useCallback(() => {
     return cloudSync.listenToCloudChanges((cloudData) => {
       // Skip if this change was triggered by our own write
@@ -454,6 +480,7 @@ export function useProgress() {
     userStartDate: state.userStartDate || state.startDate,
     scheduleNotification,
     requestNotificationPermission,
+    deleteExerciseHistory,
     saveToCloud,
     loadFromCloud,
     syncWithCloud,
