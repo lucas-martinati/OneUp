@@ -538,7 +538,7 @@ export function WorkoutSession({
                                     <span style={{
                                         fontSize: '0.6rem', opacity: 0.6
                                     }}>
-                                        {ex.done ? t('workout.completed') : (ex.type === 'timer' || ex.id === 'planche' ? `${ex.goal - ex.count}s` : t('workout.remaining', { count: ex.goal - ex.count }))}
+                                        {ex.done ? t('workout.completed') : (ex.type === 'timer' ? `${ex.goal - ex.count}s` : t('workout.remaining', { count: ex.goal - ex.count }))}
                                     </span>
                                 </button>
                             );
@@ -654,7 +654,7 @@ export function WorkoutSession({
 
     // ── RUNNING PHASE = render Counter or Timer ─────────────────
     if (phase === 'running' && currentEx) {
-        const isTimer = currentExId === 'planche' || currentEx.type === 'timer';
+        const isTimer = currentEx.type === 'timer';
         const Component = isTimer ? Timer : Counter;
 
         return (
@@ -730,7 +730,7 @@ export function WorkoutSession({
                                     <Check size={14} color="#10b981" />
                                     <span style={{
                                         fontSize: '0.75rem', fontWeight: '700', color: '#10b981'
-                                    }}>{ex.type === 'timer' || ex.id === 'planche' ? `${ex.goal}s` : t('workout.reps', { count: ex.goal })}</span>
+                                    }}>{ex.type === 'timer' ? `${ex.goal}s` : t('workout.reps', { count: ex.goal })}</span>
                                 </div>
                             </div>
                         );

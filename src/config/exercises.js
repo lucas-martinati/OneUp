@@ -86,6 +86,7 @@ export const EXERCISES = [
     {
         id: 'planche',
         icon: 'Square',
+        type: 'timer',
         color: '#8b5cf6',           // Violet-500
         colorDim: 'rgba(139,92,246,0.15)',
         gradient: ['#7c3aed', '#8b5cf6'],

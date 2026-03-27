@@ -4,6 +4,10 @@ import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, 
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
 import { getPurchaseHistory } from '../services/purchaseService';
+import { ToggleSwitch } from './ui/ToggleSwitch';
+import { SettingRow } from './ui/SettingRow';
+import { WebPaymentModal } from './store/WebPaymentModal';
+import { StoreCard } from './store/StoreCard';
 
 export function Settings({ defaultShowStore = false, settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isClub, isPro, purchaseHistory, onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases }) {
     const { t, i18n } = useTranslation();
@@ -53,72 +57,6 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
         setShowSaved(true);
         setTimeout(() => setShowSaved(false), 1500);
     };
-
-    // Composant local pour simplifier les toggles
-    const ToggleSwitch = ({ enabled, onClick, activeGradient }) => (
-        <button
-            onClick={onClick}
-            aria-label={enabled ? t('settings.disable') : t('settings.enable')}
-            style={{
-                width: '50px',
-                height: '28px',
-                borderRadius: '14px',
-                background: enabled ? activeGradient : 'var(--surface-hover)',
-                border: 'none',
-                cursor: 'pointer',
-                position: 'relative',
-                transition: 'all 0.3s ease',
-                boxShadow: enabled ? '0 4px 12px rgba(0,0,0,0.15)' : 'none',
-                flexShrink: 0,
-                display: 'flex',
-                alignItems: 'center',
-                padding: '0 4px'
-            }}
-        >
-            <div style={{
-                width: '22px',
-                height: '22px',
-                borderRadius: '50%',
-                background: 'white',
-                position: 'absolute',
-                left: enabled ? 'calc(100% - 26px)' : '4px',
-                transition: 'left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-            }} />
-        </button>
-    );
-
-    // Composant local pour les lignes de paramètres
-    const SettingRow = ({ icon: Icon, title, description, color, children, isLast }) => (
-        <div style={{
-            padding: '12px 0',
-            borderBottom: isLast ? 'none' : '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px'
-        }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{
-                    background: `linear-gradient(135deg, ${color}20, ${color}08)`,
-                    padding: '10px',
-                    borderRadius: '12px',
-                    border: `1px solid ${color}30`
-                }}>
-                    <Icon size={20} color={color} />
-                </div>
-                <div>
-                    <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)' }}>{title}</div>
-                    {description && (
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                            {description}
-                        </div>
-                    )}
-                </div>
-            </div>
-            {children}
-        </div>
-    );
 
     const sectionTitleStyle = {
         marginBottom: 'var(--spacing-md)', fontSize: '0.85rem', fontWeight: '700',
@@ -206,265 +144,66 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
             {showStore ? (
                 /* ── BOUTIQUE VIEW ────────────────────────────────────────── */
                 <div className="fade-in slide-up" style={{ animationDuration: '0.4s' }}>
-                   <div className="glass-premium" style={{
-                        padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                        marginBottom: 'var(--spacing-md)',
-                        background: isSupporter
-                            ? 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.02))'
-                            : 'var(--surface-section)',
-                        border: isSupporter ? '1px solid rgba(239,68,68,0.2)' : '1px solid var(--border-subtle)'
-                    }}>
-                        <h3 style={sectionTitleStyle}>{t('supporter.title')}</h3>
-
-                        {isSupporter && (
-                            /* Already a supporter */
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: '12px',
-                                padding: '16px', borderRadius: 'var(--radius-lg)',
-                                background: 'rgba(239,68,68,0.1)',
-                                border: '1px solid rgba(239,68,68,0.2)',
-                                marginBottom: '16px'
-                            }}>
-                                <div style={{
-                                    width: '48px', height: '48px', borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    boxShadow: '0 4px 16px rgba(239,68,68,0.3)', flexShrink: 0
-                                }}>
-                                    <Heart size={24} color="white" fill="white" />
-                                </div>
-                                <div>
-                                    <div style={{ fontWeight: '800', fontSize: '1rem', color: '#ef4444' }}>
-                                        {t('supporter.thankYou')}
-                                    </div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                                        {t('supporter.badgeActive')}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Always show buy button to allow multiple donations */}
-                        <div>
-                            {!isSupporter && (
-                                <div style={{
-                                    padding: '20px', borderRadius: 'var(--radius-lg)',
-                                    background: 'linear-gradient(135deg, rgba(239,68,68,0.06), rgba(245,158,11,0.04))',
-                                    border: '1px solid rgba(239,68,68,0.12)',
-                                    textAlign: 'center', marginBottom: '12px'
-                                }}>
-                                    <Heart size={32} color="#ef4444" style={{ marginBottom: '8px', opacity: 0.8 }} />
-                                    <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
-                                        {t('supporter.description')}
-                                    </div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                                        {t('supporter.explanation')}
-                                    </div>
-                                </div>
-                            )}
-
-                            <button
-                                onClick={async () => {
-                                    if (!cloudAuth?.isSignedIn) {
-                                        cloudAuth?.signIn?.();
-                                        return;
-                                    }
-                                    const res = await onPurchaseSupporter();
-                                    if (res?.webOnly) setShowWebPaymentModal(true);
-                                }}
-                                className="hover-lift"
-                                style={{
-                                    width: '100%', padding: '16px',
-                                    borderRadius: 'var(--radius-lg)',
-                                    background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-                                    border: 'none', color: 'white',
-                                    fontWeight: '800', fontSize: '1rem',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    gap: '8px', cursor: 'pointer',
-                                    boxShadow: '0 4px 16px rgba(239,68,68,0.3)'
-                                }}
-                            >
-                                <Heart size={20} fill="white" />
-                                {isSupporter ? "Faire un nouveau don" : t('supporter.buyButton')}
-                            </button>
-                        </div>
-                    </div>
+                    <StoreCard
+                        isActive={isSupporter}
+                        title={t('supporter.title')}
+                        icon={Heart}
+                        colorMain="#ef4444"
+                        colorRGB="239,68,68"
+                        colorGradientStart="#ef4444"
+                        colorGradientEnd="#dc2626"
+                        activeTitle={t('supporter.thankYou')}
+                        activeDesc={t('supporter.badgeActive')}
+                        idleDescription={t('supporter.description')}
+                        idleExplanation={t('supporter.explanation')}
+                        buyButtonText={isSupporter ? "Faire un nouveau don" : t('supporter.buyButton')}
+                        onPurchase={onPurchaseSupporter}
+                        cloudAuth={cloudAuth}
+                        setShowWebPaymentModal={setShowWebPaymentModal}
+                        allowMultiplePurchases={true}
+                    />
 
                     {/* ── ABONNEMENT CLUB ─────────────────────────────────── */}
                     {false && (
-                    <div className="glass-premium" style={{
-                        padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                        marginBottom: 'var(--spacing-md)',
-                        background: isClub
-                            ? 'linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02))'
-                            : 'var(--surface-section)',
-                        border: isClub ? '1px solid rgba(245,158,11,0.2)' : '1px solid var(--border-subtle)'
-                    }}>
-                        <h3 style={sectionTitleStyle}>{t('club.title')}</h3>
-
-                        {isClub ? (
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: '12px',
-                                padding: '16px', borderRadius: 'var(--radius-lg)',
-                                background: 'rgba(245,158,11,0.1)',
-                                border: '1px solid rgba(245,158,11,0.2)'
-                            }}>
-                                <div style={{
-                                    width: '48px', height: '48px', borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    boxShadow: '0 4px 16px rgba(245,158,11,0.3)', flexShrink: 0
-                                }}>
-                                    <Swords size={24} color="white" />
-                                </div>
-                                <div>
-                                    <div style={{ fontWeight: '800', fontSize: '1rem', color: '#f59e0b' }}>
-                                        {t('club.activeTitle')}
-                                    </div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                                        {t('club.activeDesc')}
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div>
-                                <div style={{
-                                    padding: '20px', borderRadius: 'var(--radius-lg)',
-                                    background: 'linear-gradient(135deg, rgba(245,158,11,0.06), rgba(217,119,6,0.04))',
-                                    border: '1px solid rgba(245,158,11,0.12)',
-                                    textAlign: 'center', marginBottom: '12px'
-                                }}>
-                                    <Swords size={32} color="#f59e0b" style={{ marginBottom: '8px', opacity: 0.8 }} />
-                                    <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
-                                        {t('club.description')}
-                                    </div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '12px' }}>
-                                        {t('club.explanation')}
-                                    </div>
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center' }}>
-                                        {['challenges', 'leagues', 'ranking', 'notifications'].map(f => (
-                                            <span key={f} style={{
-                                                padding: '4px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '600',
-                                                background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)'
-                                            }}>
-                                                {t(`club.features.${f}`)}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={async () => {
-                                        if (!cloudAuth?.isSignedIn) { cloudAuth?.signIn?.(); return; }
-                                        const res = await onPurchaseClub?.();
-                                        if (res?.webOnly) setShowWebPaymentModal(true);
-                                    }}
-                                    className="hover-lift"
-                                    style={{
-                                        width: '100%', padding: '16px',
-                                        borderRadius: 'var(--radius-lg)',
-                                        background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                                        border: 'none', color: 'white',
-                                        fontWeight: '800', fontSize: '1rem',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        gap: '8px', cursor: 'pointer',
-                                        boxShadow: '0 4px 16px rgba(245,158,11,0.3)',
-                                        marginBottom: '8px'
-                                    }}
-                                >
-                                    <Swords size={20} />
-                                    {t('club.buyButton')} — {t('club.price')}
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                        <StoreCard
+                            isActive={isClub}
+                            title={t('club.title')}
+                            icon={Swords}
+                            colorMain="#f59e0b"
+                            colorRGB="245,158,11"
+                            colorGradientStart="#f59e0b"
+                            colorGradientEnd="#d97706"
+                            activeTitle={t('club.activeTitle')}
+                            activeDesc={t('club.activeDesc')}
+                            idleDescription={t('club.description')}
+                            idleExplanation={t('club.explanation')}
+                            features={['challenges', 'leagues', 'ranking', 'notifications'].map(f => t(`club.features.${f}`))}
+                            buyButtonText={`${t('club.buyButton')} — ${t('club.price')}`}
+                            onPurchase={onPurchaseClub}
+                            cloudAuth={cloudAuth}
+                            setShowWebPaymentModal={setShowWebPaymentModal}
+                        />
                     )}
 
                     {/* ── ABONNEMENT PRO ───────────────────────────────────── */}
-                    <div className="glass-premium" style={{
-                        padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                        marginBottom: 'var(--spacing-md)',
-                        background: isPro
-                            ? 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(139,92,246,0.02))'
-                            : 'var(--surface-section)',
-                        border: isPro ? '1px solid rgba(139,92,246,0.2)' : '1px solid var(--border-subtle)'
-                    }}>
-                        <h3 style={sectionTitleStyle}>{t('pro.title')}</h3>
-
-                        {isPro ? (
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: '12px',
-                                padding: '16px', borderRadius: 'var(--radius-lg)',
-                                background: 'rgba(139,92,246,0.1)',
-                                border: '1px solid rgba(139,92,246,0.2)'
-                            }}>
-                                <div style={{
-                                    width: '48px', height: '48px', borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    boxShadow: '0 4px 16px rgba(139,92,246,0.3)', flexShrink: 0
-                                }}>
-                                    <Sparkles size={24} color="white" />
-                                </div>
-                                <div>
-                                    <div style={{ fontWeight: '800', fontSize: '1rem', color: '#8b5cf6' }}>
-                                        {t('pro.activeTitle')}
-                                    </div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                                        {t('pro.activeDesc')}
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div>
-                                <div style={{
-                                    padding: '20px', borderRadius: 'var(--radius-lg)',
-                                    background: 'linear-gradient(135deg, rgba(139,92,246,0.06), rgba(124,58,237,0.04))',
-                                    border: '1px solid rgba(139,92,246,0.12)',
-                                    textAlign: 'center', marginBottom: '12px'
-                                }}>
-                                    <Sparkles size={32} color="#8b5cf6" style={{ marginBottom: '8px', opacity: 0.8 }} />
-                                    <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
-                                        {t('pro.description')}
-                                    </div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '12px' }}>
-                                        {t('pro.explanation')}
-                                    </div>
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center' }}>
-                                        {['Exercices 100% Personnalisés', 'Dashboard Musculation (Poids)', 'Leaderboards Exclusifs'].map(f => (
-                                            <span key={f} style={{
-                                                padding: '4px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '600',
-                                                background: 'rgba(139,92,246,0.12)', color: '#8b5cf6', border: '1px solid rgba(139,92,246,0.2)'
-                                            }}>
-                                                {f}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={async () => {
-                                        if (!cloudAuth?.isSignedIn) { cloudAuth?.signIn?.(); return; }
-                                        const res = await onPurchasePro?.();
-                                        if (res?.webOnly) setShowWebPaymentModal(true);
-                                    }}
-                                    className="hover-lift"
-                                    style={{
-                                        width: '100%', padding: '16px',
-                                        borderRadius: 'var(--radius-lg)',
-                                        background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-                                        border: 'none', color: 'white',
-                                        fontWeight: '800', fontSize: '1rem',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        gap: '8px', cursor: 'pointer',
-                                        boxShadow: '0 4px 16px rgba(139,92,246,0.3)',
-                                        marginBottom: '8px'
-                                    }}
-                                >
-                                    <Sparkles size={20} />
-                                    {t('pro.buyButton')} — {t('pro.price')}
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                    <StoreCard
+                        isActive={isPro}
+                        title={t('pro.title')}
+                        icon={Sparkles}
+                        colorMain="#8b5cf6"
+                        colorRGB="139,92,246"
+                        colorGradientStart="#8b5cf6"
+                        colorGradientEnd="#7c3aed"
+                        activeTitle={t('pro.activeTitle')}
+                        activeDesc={t('pro.activeDesc')}
+                        idleDescription={t('pro.description')}
+                        idleExplanation={t('pro.explanation')}
+                        features={['Exercices 100% Personnalisés', 'Dashboard Musculation (Poids)', 'Leaderboards Exclusifs']}
+                        buyButtonText={`${t('pro.buyButton')} — ${t('pro.price')}`}
+                        onPurchase={onPurchasePro}
+                        cloudAuth={cloudAuth}
+                        setShowWebPaymentModal={setShowWebPaymentModal}
+                    />
 
                     {/* Restore purchases button (shared for all tiers) */}
                     <button
@@ -930,61 +669,7 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
             )}
 
             {showWebPaymentModal && (
-                <div className="fade-in" style={{
-                    position: 'fixed', inset: 0,
-                    zIndex: 9999,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(0,0,0,0.75)',
-                    backdropFilter: 'blur(24px)',
-                    WebkitBackdropFilter: 'blur(24px)'
-                }}>
-                    <div className="scale-in" style={{
-                        maxWidth: '360px', width: '85%',
-                        padding: '32px 24px', textAlign: 'center',
-                        background: 'linear-gradient(180deg, var(--surface-section) 0%, rgba(20,20,20,0.95) 100%)',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        borderRadius: '24px',
-                        boxShadow: '0 24px 64px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)'
-                    }}>
-                        <div style={{
-                            width: '64px', height: '64px', borderRadius: '50%',
-                            background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02))',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            margin: '0 auto 20px auto', fontSize: '32px',
-                            boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.05)'
-                        }}>
-                            😕
-                        </div>
-                        
-                        <h2 style={{
-                            fontSize: '1.4rem', fontWeight: '800', margin: '0 0 12px 0',
-                            color: 'var(--text-primary)'
-                        }}>
-                            Oups...
-                        </h2>
-                        
-                        <p style={{
-                            fontSize: '0.9rem', color: 'var(--text-secondary)',
-                            lineHeight: '1.6', margin: '0 0 28px 0',
-                            padding: '0 10px'
-                        }}>
-                            Les paiements In-App ne sont pas disponibles sur la version Web.<br/><br/>Veuillez utiliser l'application Android pour accéder à la boutique et débloquer ces fonctionnalités !
-                        </p>
-
-                        <button onClick={() => setShowWebPaymentModal(false)} className="hover-lift" style={{
-                            width: '100%', padding: '16px', borderRadius: 'var(--radius-lg)',
-                            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-                            border: 'none', color: 'white', fontWeight: '700',
-                            fontSize: '1rem', cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
-                        }}>
-                            <Smartphone size={18} />
-                            J'ai compris
-                        </button>
-                    </div>
-                </div>
+                <WebPaymentModal onClose={() => setShowWebPaymentModal(false)} />
             )}
         </div>
     </div>
