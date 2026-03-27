@@ -60,7 +60,8 @@ export default defineConfig({
             '@capacitor/core',
             '@capacitor/app',
             '@capacitor/local-notifications',
-            '@capacitor/preferences'
+            '@capacitor/preferences',
+            '@revenuecat/purchases-capacitor'
           ],
           'charts-vendor': ['recharts'],
           'ui-vendor': ['lucide-react']
