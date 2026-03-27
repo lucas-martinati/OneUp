@@ -17,11 +17,18 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
     const [showWebPaymentModal, setShowWebPaymentModal] = useState(false);
     const [revenueCatHistory, setRevenueCatHistory] = useState([]);
 
+    const displayHistory = revenueCatHistory?.length > 0 ? revenueCatHistory : (purchaseHistory || []);
+
     useEffect(() => {
         if (showStore) {
-            getPurchaseHistory().then(hist => setRevenueCatHistory(hist));
+            getPurchaseHistory().then(hist => {
+                setRevenueCatHistory(hist);
+                if (hist && hist.length > 0 && cloudSync && cloudAuth?.isSignedIn) {
+                    cloudSync.savePurchaseHistoryToCloud(hist);
+                }
+            });
         }
-    }, [showStore]);
+    }, [showStore, cloudSync, cloudAuth]);
 
     const handleToggleNotifications = () => {
         const newSettings = { ...settings, notificationsEnabled: !settings.notificationsEnabled };
@@ -225,7 +232,7 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                     </button>
 
                     {/* --- Historique des achats --- */}
-                    {revenueCatHistory && revenueCatHistory.length > 0 && (
+                    {displayHistory && displayHistory.length > 0 && (
                         <div className="glass-premium" style={{
                             padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
                             marginBottom: 'var(--spacing-md)',
@@ -238,7 +245,7 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                                 Historique des achats
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                {revenueCatHistory.map((receipt, index) => (
+                                {displayHistory.map((receipt, index) => (
                                     <div key={index} style={{
                                         display: 'flex', flexDirection: 'column',
                                         padding: '12px', borderRadius: 'var(--radius-md)',

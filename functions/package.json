@@ -1,0 +1,16 @@
+{
+  "name": "oneup-functions",
+  "description": "Firebase Cloud Functions for OneUp Webhooks",
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^4.5.0"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "private": true
+}

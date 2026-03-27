@@ -271,8 +271,9 @@ export async function getPurchaseHistory() {
     if (customerInfo?.entitlements?.all) {
       for (const [key, ent] of Object.entries(customerInfo.entitlements.all)) {
         const details = getProductDetails(ent.productIdentifier);
+        const rawId = ent.productIdentifier || key;
         history.push({
-          id: ent.productIdentifier || key,
+          id: rawId.replace(/^\$/, ''),
           title: details.title,
           desc: details.desc,
           date: ent.latestPurchaseDate || ent.originalPurchaseDate,
@@ -287,8 +288,9 @@ export async function getPurchaseHistory() {
       for (const tx of customerInfo.nonSubscriptionTransactions) {
         if (!history.some(h => h.id === tx.productIdentifier)) {
           const details = getProductDetails(tx.productIdentifier);
+          const rawId = tx.transactionIdentifier || tx.productIdentifier;
           history.push({
-            id: tx.transactionIdentifier || tx.productIdentifier,
+            id: rawId.replace(/^\$/, ''),
             title: details.title,
             desc: details.desc,
             date: tx.purchaseDate,
