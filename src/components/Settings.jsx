@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Swords, Sparkles, Star } from 'lucide-react';
+import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Swords, Sparkles, Star, Smartphone } from 'lucide-react';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
 
@@ -9,6 +9,7 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
     const [showSaved, setShowSaved] = useState(false);
     const [showStore, setShowStore] = useState(defaultShowStore);
     const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
+    const [showWebPaymentModal, setShowWebPaymentModal] = useState(false);
 
     const handleToggleNotifications = () => {
         const newSettings = { ...settings, notificationsEnabled: !settings.notificationsEnabled };
@@ -255,12 +256,13 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                             )}
 
                             <button
-                                onClick={() => {
+                                onClick={async () => {
                                     if (!cloudAuth?.isSignedIn) {
                                         cloudAuth?.signIn?.();
                                         return;
                                     }
-                                    onPurchaseSupporter();
+                                    const res = await onPurchaseSupporter();
+                                    if (res?.webOnly) setShowWebPaymentModal(true);
                                 }}
                                 className="hover-lift"
                                 style={{
@@ -343,9 +345,10 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                                     </div>
                                 </div>
                                 <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                         if (!cloudAuth?.isSignedIn) { cloudAuth?.signIn?.(); return; }
-                                        onPurchaseClub?.();
+                                        const res = await onPurchaseClub?.();
+                                        if (res?.webOnly) setShowWebPaymentModal(true);
                                     }}
                                     className="hover-lift"
                                     style={{
@@ -430,9 +433,10 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                                     </div>
                                 </div>
                                 <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                         if (!cloudAuth?.isSignedIn) { cloudAuth?.signIn?.(); return; }
-                                        onPurchasePro?.();
+                                        const res = await onPurchasePro?.();
+                                        if (res?.webOnly) setShowWebPaymentModal(true);
                                     }}
                                     className="hover-lift"
                                     style={{
@@ -898,6 +902,64 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                 )}
             </div>
             </>
+            )}
+
+            {showWebPaymentModal && (
+                <div className="fade-in" style={{
+                    position: 'fixed', inset: 0,
+                    zIndex: 9999,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(0,0,0,0.75)',
+                    backdropFilter: 'blur(24px)',
+                    WebkitBackdropFilter: 'blur(24px)'
+                }}>
+                    <div className="scale-in" style={{
+                        maxWidth: '360px', width: '85%',
+                        padding: '32px 24px', textAlign: 'center',
+                        background: 'linear-gradient(180deg, var(--surface-section) 0%, rgba(20,20,20,0.95) 100%)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '24px',
+                        boxShadow: '0 24px 64px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)'
+                    }}>
+                        <div style={{
+                            width: '64px', height: '64px', borderRadius: '50%',
+                            background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02))',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            margin: '0 auto 20px auto', fontSize: '32px',
+                            boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.05)'
+                        }}>
+                            😕
+                        </div>
+                        
+                        <h2 style={{
+                            fontSize: '1.4rem', fontWeight: '800', margin: '0 0 12px 0',
+                            color: 'var(--text-primary)'
+                        }}>
+                            Oups...
+                        </h2>
+                        
+                        <p style={{
+                            fontSize: '0.9rem', color: 'var(--text-secondary)',
+                            lineHeight: '1.6', margin: '0 0 28px 0',
+                            padding: '0 10px'
+                        }}>
+                            Les paiements In-App ne sont pas disponibles sur la version Web.<br/><br/>Veuillez utiliser l'application Android pour accéder à la boutique et débloquer ces fonctionnalités !
+                        </p>
+
+                        <button onClick={() => setShowWebPaymentModal(false)} className="hover-lift" style={{
+                            width: '100%', padding: '16px', borderRadius: 'var(--radius-lg)',
+                            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                            border: 'none', color: 'white', fontWeight: '700',
+                            fontSize: '1rem', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                        }}>
+                            <Smartphone size={18} />
+                            J'ai compris
+                        </button>
+                    </div>
+                </div>
             )}
         </div>
     </div>

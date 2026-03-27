@@ -379,7 +379,7 @@ function App() {
 
   const handlePurchaseSupporter = async () => {
     const result = await purchaseSupporter();
-    if (result.webOnly) { alert(t('supporter.androidOnly')); return; }
+    if (result.webOnly) { return result; }
     if (result.success || result.isSupporter || result.isActive) {
       setIsSupporter(true);
       await saveAndPublish({ isSupporter: true, isClub: isClubRef.current, isPro: isProRef.current });
@@ -390,11 +390,12 @@ function App() {
       setPurchaseHistory(newHistory);
       cloudSync.savePurchaseHistoryToCloud(newHistory);
     }
+    return result;
   };
 
   const handlePurchaseClub = async () => {
     const result = await purchaseClub();
-    if (result.webOnly) { alert(t('supporter.androidOnly')); return; }
+    if (result.webOnly) { return result; }
     if (result.success || result.isActive) {
       setIsClub(true);
       await saveAndPublish({ isSupporter: isSupporterRef.current, isClub: true, isPro: isProRef.current });
@@ -405,11 +406,12 @@ function App() {
       setPurchaseHistory(newHistory);
       cloudSync.savePurchaseHistoryToCloud(newHistory);
     }
+    return result;
   };
 
   const handlePurchasePro = async () => {
     const result = await purchasePro();
-    if (result.webOnly) { alert(t('supporter.androidOnly')); return; }
+    if (result.webOnly) { return result; }
     if (result.success || result.isActive) {
       setIsPro(true);
       await saveAndPublish({ isSupporter: isSupporterRef.current, isClub: isClubRef.current, isPro: true });
@@ -420,6 +422,7 @@ function App() {
       setPurchaseHistory(newHistory);
       cloudSync.savePurchaseHistoryToCloud(newHistory);
     }
+    return result;
   };
 
   const handleRestorePurchases = async () => {
