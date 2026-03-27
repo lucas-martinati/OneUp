@@ -12,6 +12,8 @@
     "daysAbbr": "d",
     "exercise": "Exercise",
     "global": "Global",
+    "global_classic": "Classic",
+    "global_weights": "Weights",
     "poke": "sent you a poke!",
     "member": "A member"
   },
@@ -284,6 +286,8 @@
     "restoreDesc": "Get my data from the cloud",
     "replaceCloud": "Replace Cloud",
     "replaceDesc": "Overwrite cloud with my local data",
+    "areYouSure": "Are you sure?",
+    "cannotBeUndone": "This action will overwrite your cloud data.",
     "cloudBackup": "Cloud Backup",
     "connectedGooglePlay": "Connected with Google Play",
     "notConnected": "Not connected",
@@ -322,7 +326,13 @@
     "burpees": "Burpees",
     "planche": "Plank (s)",
     "dips": "Dips",
-    "mountain": "Mountain Climbers"
+    "mountain": "Mountain Climbers",
+    "biceps_curl": "Biceps Curls",
+    "bench_press": "Bench Press",
+    "overhead_press": "Overhead Press",
+    "squat_weights": "Weighted Squat",
+    "deadlift": "Deadlift",
+    "barbell_row": "Barbell Row"
   },
   "supporter": {
     "title": "Support the developer ❤️",

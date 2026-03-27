@@ -6,13 +6,14 @@ import { useGoogleAuth } from './hooks/useGoogleAuth';
 import { useComputedStats } from './hooks/useComputedStats';
 import { useUserDetailsCache } from './hooks/useUserDetailsCache';
 import { useRoutines } from './hooks/useRoutines';
-import { useCustomPrograms } from './hooks/useCustomPrograms';
+import { useCustomExercises } from './hooks/useCustomExercises';
 import { cloudSync } from './services/cloudSync';
 import {
   initPurchases, checkSupporterStatus, purchaseSupporter, restorePurchases,
   checkClubStatus, purchaseClub, checkProStatus, purchasePro
 } from './services/purchaseService';
 import { EXERCISES } from './config/exercises';
+import { WEIGHT_EXERCISES } from './config/weights';
 import { createLogger } from './utils/logger';
 
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
@@ -26,7 +27,7 @@ function App() {
   const { settings, updateSettings } = useSettings();
   const googleAuth = useGoogleAuth();
   const { routines, saveRoutine, deleteRoutine, updateRoutine, setRoutinesFromCloud, maxRoutines } = useRoutines();
-  const customPrograms = useCustomPrograms();
+  const customExercisesHook = useCustomExercises();
 
   const [conflictData, setConflictData] = useState(null);
   const [conflictCheckDone, setConflictCheckDone] = useState(false);
@@ -74,9 +75,14 @@ function App() {
       const sup = overrides.isSupporter !== undefined ? overrides.isSupporter : isSupporterRef.current;
       const clb = overrides.isClub !== undefined ? overrides.isClub : isClubRef.current;
       const pr = overrides.isPro !== undefined ? overrides.isPro : isProRef.current;
+
+      const classicTotalReps = EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
+      const weightsTotalReps = WEIGHT_EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
+
       await cloudSync.publishToLeaderboard({
         pseudo,
-        totalReps: computedStats.globalTotalReps,
+        totalReps: classicTotalReps,
+        weightsTotalReps: weightsTotalReps,
         exerciseReps: computedStats.exerciseReps,
         achievements: computedStats.badgeCount,
         isPublic: !!settings.leaderboardEnabled,
@@ -98,9 +104,13 @@ function App() {
     localStorage.setItem('oneup_club', clb ? 'true' : 'false');
     localStorage.setItem('oneup_pro', pr ? 'true' : 'false');
     await cloudSync.savePurchase({ isSupporter: sup, isClub: clb, isPro: pr });
+    const classicTotalReps = EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
+    const weightsTotalReps = WEIGHT_EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
+
     await cloudSync.publishToLeaderboard({
       pseudo: settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme',
-      totalReps: computedStats.globalTotalReps,
+      totalReps: classicTotalReps,
+      weightsTotalReps: weightsTotalReps,
       exerciseReps: computedStats.exerciseReps,
       achievements: computedStats.badgeCount,
       isPublic: !!settings.leaderboardEnabled,
@@ -124,6 +134,13 @@ function App() {
       setConflictCheckDone(false);
       setIsInitialSyncDone(false);
       setConflictData(null);
+      setIsSupporter(false);
+      setIsClub(false);
+      setIsPro(false);
+      setPurchaseHistory([]);
+      localStorage.removeItem('oneup_supporter');
+      localStorage.removeItem('oneup_club');
+      localStorage.removeItem('oneup_pro');
     }
   }, [googleAuth.isSignedIn, googleAuth.user?.uid]);
 
@@ -210,7 +227,7 @@ function App() {
     }
   }, [purchaseHistory]);
 
-  // Sync routines, purchase history, custom programs with cloud on sign-in
+  // Sync routines, purchase history, custom programs, custom exercises with cloud on sign-in
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading) {
       const loadData = async () => {
@@ -219,8 +236,8 @@ function App() {
           if (cloudRoutines && Array.isArray(cloudRoutines)) setRoutinesFromCloud(cloudRoutines);
           const history = await cloudSync.loadPurchaseHistoryFromCloud();
           if (history && Array.isArray(history)) setPurchaseHistory(history);
-          const cloudPrograms = await cloudSync.loadCustomProgramsFromCloud();
-          if (cloudPrograms && Array.isArray(cloudPrograms)) customPrograms.setProgramsFromCloud(cloudPrograms);
+          const cloudExercises = await cloudSync.loadCustomExercisesFromCloud();
+          if (cloudExercises && Array.isArray(cloudExercises)) customExercisesHook.setCustomExercisesFromCloud(cloudExercises);
         } catch (error) { logger.error('Data sync error:', error); }
       };
       loadData();
@@ -340,13 +357,13 @@ function App() {
     }
   }, [routines, googleAuth.isSignedIn, googleAuth.loading, isSetup]);
 
-  // Auto-save custom programs
+  // Auto-save custom exercises
   useEffect(() => {
     if (googleAuth.isSignedIn && !googleAuth.loading && isSetup && isPro) {
-      const timer = setTimeout(() => { cloudSync.saveCustomProgramsToCloud(customPrograms.programs); }, 2000);
+      const timer = setTimeout(() => { cloudSync.saveCustomExercisesToCloud(customExercisesHook.customExercises); }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [customPrograms.programs, googleAuth.isSignedIn, googleAuth.loading, isSetup, isPro]);
+  }, [customExercisesHook.customExercises, googleAuth.isSignedIn, googleAuth.loading, isSetup, isPro]);
 
   // Auto-publish leaderboard when completions change
   useEffect(() => {
@@ -492,6 +509,7 @@ function App() {
         <Onboarding onStart={startChallenge} />
       ) : (
         <Dashboard
+          customExercisesHook={customExercisesHook}
           getDayNumber={getDayNumber}
           getTotalReps={getTotalReps}
           isDayDone={isDayDone}
@@ -524,15 +542,14 @@ function App() {
           deleteRoutine={deleteRoutine}
           updateRoutine={updateRoutine}
           maxRoutines={maxRoutines}
-          isSupporter={isSupporter}
-          isClub={isClub}
-          isPro={isPro}
+          isSupporter={googleAuth.isSignedIn ? isSupporter : false}
+          isClub={googleAuth.isSignedIn ? isClub : false}
+          isPro={googleAuth.isSignedIn ? isPro : false}
           purchaseHistory={purchaseHistory}
           onPurchaseSupporter={handlePurchaseSupporter}
           onPurchaseClub={handlePurchaseClub}
           onPurchasePro={handlePurchasePro}
           onRestorePurchases={handleRestorePurchases}
-          customPrograms={customPrograms}
         />
       )}
     </Suspense>

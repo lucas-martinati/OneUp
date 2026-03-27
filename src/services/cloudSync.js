@@ -1239,7 +1239,6 @@ class CloudSyncService {
     try {
       if (!auth?.currentUser || !database) return false;
       const uid = auth.currentUser.uid;
-
       await remove(ref(database, `challenges/${challengeId}/participants/${uid}`));
       await remove(ref(database, `users/${uid}/challenges/${challengeId}`));
 
@@ -1259,41 +1258,40 @@ class CloudSyncService {
     }
   }
 
-  // ── Custom Programs (Pro) ────────────────────────────────────────────
 
   /**
-   * Save custom programs to cloud.
+   * Save custom exercises to cloud.
    */
-  async saveCustomProgramsToCloud(programs) {
+  async saveCustomExercisesToCloud(exercises) {
     try {
       if (!auth?.currentUser || !database) return false;
       const userId = auth.currentUser.uid;
-      const progRef = ref(database, `users/${userId}/customPrograms`);
-      await set(progRef, programs || []);
-      logger.success('Custom programs synced to cloud');
+      const exRef = ref(database, `users/${userId}/customExercises`);
+      await set(exRef, exercises || []);
+      logger.success('Custom exercises synced to cloud');
       return true;
     } catch (error) {
-      logger.error('Error syncing custom programs:', error);
+      logger.error('Error syncing custom exercises:', error);
       return false;
     }
   }
 
   /**
-   * Load custom programs from cloud.
+   * Load custom exercises from cloud.
    */
-  async loadCustomProgramsFromCloud() {
+  async loadCustomExercisesFromCloud() {
     try {
       if (!auth?.currentUser || !database) return null;
       const userId = auth.currentUser.uid;
-      const progRef = ref(database, `users/${userId}/customPrograms`);
-      const snapshot = await get(progRef);
+      const exRef = ref(database, `users/${userId}/customExercises`);
+      const snapshot = await get(exRef);
       if (snapshot.exists()) {
-        logger.success('Custom programs loaded from cloud');
+        logger.success('Custom exercises loaded from cloud');
         return snapshot.val();
       }
       return null;
     } catch (error) {
-      logger.error('Error loading custom programs:', error);
+      logger.error('Error loading custom exercises:', error);
       return null;
     }
   }

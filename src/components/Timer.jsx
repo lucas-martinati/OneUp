@@ -87,7 +87,8 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
     const activeColor = exerciseConfig?.color || '#8b5cf6';
     const [gradStart, gradEnd] = exerciseConfig?.gradient || ['#7c3aed', '#8b5cf6'];
     const ExIcon = Square;
-    const exerciseLabel = t('exercises.' + exerciseConfig?.id) || t('common.exercise');
+    const isCustom = exerciseConfig?.id?.startsWith('custom_');
+    const exerciseLabel = isCustom ? (exerciseConfig.label || exerciseConfig.name) : (t('exercises.' + exerciseConfig?.id) || t('common.exercise'));
     const gradientId = `timerGrad-${exerciseConfig?.id || 'timer'}`;
 
     return (

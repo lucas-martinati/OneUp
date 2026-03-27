@@ -16,6 +16,7 @@ export function CloudSyncPanel({
   const { t } = useTranslation();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmUpload, setConfirmUpload] = useState(false);
 
   const handleResolve = async (action) => {
     setResolving(true);
@@ -51,14 +52,22 @@ export function CloudSyncPanel({
               </div>
             </button>
             <button
-              className="btn-conflict btn-upload"
-              onClick={() => handleResolve('upload')}
+              className={`btn-conflict btn-upload ${confirmUpload ? 'confirming' : ''}`}
+              onClick={() => {
+                if (!confirmUpload) {
+                  setConfirmUpload(true);
+                  setTimeout(() => setConfirmUpload(false), 3000);
+                } else {
+                  handleResolve('upload');
+                }
+              }}
               disabled={resolving}
+              style={confirmUpload ? { background: 'linear-gradient(135deg, #ef4444, #dc2626)' } : {}}
             >
-              <Upload />
+              {confirmUpload ? <AlertTriangle /> : <Upload />}
               <div>
-                <strong>{t('cloud.replaceCloud')}</strong>
-                <span>{t('cloud.replaceDesc')}</span>
+                <strong>{confirmUpload ? t('cloud.areYouSure') : t('cloud.replaceCloud')}</strong>
+                <span>{confirmUpload ? t('cloud.cannotBeUndone') : t('cloud.replaceDesc')}</span>
               </div>
             </button>
           </div>

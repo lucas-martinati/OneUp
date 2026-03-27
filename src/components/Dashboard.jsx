@@ -19,13 +19,15 @@ const Leaderboard = lazy(() => import('./Leaderboard').then(m => ({ default: m.L
 const Achievements = lazy(() => import('./Achievements').then(m => ({ default: m.Achievements })));
 const Timer = lazy(() => import('./Timer').then(m => ({ default: m.Timer })));
 const WorkoutSession = lazy(() => import('./WorkoutSession').then(m => ({ default: m.WorkoutSession })));
+const Onboarding = lazy(() => import('./Onboarding').then(module => ({ default: module.Onboarding })));
 const ClanModal = lazy(() => import('./ClanModal').then(m => ({ default: m.ClanModal })));
-const ChallengeModal = lazy(() => import('./ChallengeModal').then(m => ({ default: m.ChallengeModal })));
-const CustomProgramPanel = lazy(() => import('./CustomProgramPanel').then(m => ({ default: m.CustomProgramPanel })));
+const ChallengeModal = lazy(() => import('./ChallengeModal').then(module => ({ default: module.ChallengeModal })));
+const CustomExercisesModal = lazy(() => import('./CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';
 import { EXERCISES, EXERCISES_MAP, getDailyGoal } from '../config/exercises';
+import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
 import { runBackHandler } from '../utils/backHandler';
 
 // Map icon name → lucide component
@@ -46,7 +48,7 @@ export function Dashboard({
     routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
     isSupporter, isClub, isPro, purchaseHistory,
     onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases,
-    customPrograms
+    customExercisesHook
 }) {
     const { t } = useTranslation();
     const [today, setToday] = useState(getLocalDateStr(new Date()));
@@ -59,17 +61,33 @@ export function Dashboard({
     const [showSession, setShowSession] = useState(false);
     const [showClan, setShowClan] = useState(false);
     const [showChallenge, setShowChallenge] = useState(false);
-    const [showCustomPrograms, setShowCustomPrograms] = useState(false);
+    const [showCustomExercisesModal, setShowCustomExercisesModal] = useState(false);
     const [newAchievement, setNewAchievement] = useState(null);
-    const [selectedExerciseId, setSelectedExerciseId] = useState('pushups');
+    const [activeSlide, setActiveSlide] = useState(0); // 0: Classic, 1: Weights, 2: Custom
+    
+    // Custom exercises integration
+    const customExercises = customExercisesHook?.customExercises || [];
+    const customExercisesMap = useMemo(() => {
+        const map = {};
+        customExercises.forEach(ex => { map[ex.id] = ex; });
+        return map;
+    }, [customExercises]);
+
+    const [classicSelected, setClassicSelected] = useState('pushups');
+    const [weightsSelected, setWeightsSelected] = useState('biceps_curl');
+    const [customSelected, setCustomSelected] = useState(customExercises[0]?.id || 'custom_placeholder');
     const [numberKey, setNumberKey] = useState(0);
     const [isCounterTransitioning, setIsCounterTransitioning] = useState(false);
     const [prevDayNumber, setPrevDayNumber] = useState(null);
     const [showDayConfetti, setShowDayConfetti] = useState(false);
 
-    const handleSelectExercise = useCallback((exerciseId) => {
-        setSelectedExerciseId(exerciseId);
-    }, []);
+    // Dynamic global selection for Header badge styling
+    const globalSelectedId = activeSlide === 0 ? classicSelected : activeSlide === 1 ? weightsSelected : customSelected;
+    const selectedExercise = useMemo(() => {
+        if (activeSlide === 0) return EXERCISES_MAP[globalSelectedId] || EXERCISES[0];
+        if (activeSlide === 1) return WEIGHT_EXERCISES_MAP[globalSelectedId] || WEIGHT_EXERCISES[0];
+        return customExercisesMap[globalSelectedId] || customExercises[0] || { id: 'custom_placeholder', color: '#8b5cf6', gradient: ['#8b5cf6', '#7c3aed'], icon: 'Star', name: 'Exercice Perso' };
+    }, [activeSlide, globalSelectedId, customExercises, customExercisesMap]);
 
     useEffect(() => {
         setSoundSettingsGetter(() => settings);
@@ -90,37 +108,31 @@ export function Dashboard({
     }, [computedStats.badgeCount]);
 
     const dayNumber = useMemo(() => getDayNumber(today), [getDayNumber, today]);
-    const selectedExercise = useMemo(() => EXERCISES_MAP[selectedExerciseId], [selectedExerciseId]);
 
-    // Goal = ceil(dayNumber * multiplier * difficultyMultiplier), minimum 1
-    const dailyGoal = useMemo(() =>
-        getDailyGoal(selectedExercise, dayNumber, settings?.difficultyMultiplier),
-        [selectedExercise, dayNumber, settings?.difficultyMultiplier]
-    );
-
+    const selectedExerciseId = globalSelectedId;
+    const isExerciseDone = completions[today]?.[selectedExerciseId]?.isCompleted || false;
     const currentCount = getExerciseCount(today, selectedExerciseId);
-    const isExerciseDone = useMemo(() =>
-        completions[today]?.[selectedExerciseId]?.isCompleted || currentCount >= dailyGoal,
-        [completions, today, selectedExerciseId, currentCount, dailyGoal]
-    );
-    const isDayComplete = useMemo(() =>
-        isDayDoneFromCompletions(completions, today),
-        [completions, today]
-    );
+    const dailyGoal = getDailyGoal(selectedExercise, dayNumber, settings?.difficultyMultiplier) || 1;
 
-    const totalReps = computedStats.exerciseReps[selectedExerciseId] || 0;
+    const totalReps = computedStats.exerciseReps[globalSelectedId] || 0;
 
     const effectiveStart = userStartDate || startDate;
     const isFuture = today < effectiveStart;
 
     // Pre-computed streaks from computedStats
-    const exerciseStreak = computedStats.exerciseDoneToday[selectedExerciseId]
-        ? computedStats.exerciseCurrentStreaks[selectedExerciseId]
-        : (computedStats.exerciseCurrentStreaks[selectedExerciseId] > 0 ? computedStats.exerciseCurrentStreaks[selectedExerciseId] : 0);
+    const exerciseStreak = computedStats.exerciseDoneToday[globalSelectedId]
+        ? computedStats.exerciseCurrentStreaks[globalSelectedId]
+        : (computedStats.exerciseCurrentStreaks[globalSelectedId] > 0 ? computedStats.exerciseCurrentStreaks[globalSelectedId] : 0);
 
     // Duolingo-style streak from computedStats
     const displayStreak = computedStats.displayStreak;
     const streakActive = computedStats.streakActive;
+
+    const handleSelectExercise = (id) => {
+        if (activeSlide === 0) setClassicSelected(id);
+        else if (activeSlide === 1) setWeightsSelected(id);
+        else setCustomSelected(id);
+    };
 
     // Day change detection
     useEffect(() => {
@@ -165,9 +177,6 @@ export function Dashboard({
             } else if (showChallenge) {
                 setShowChallenge(false);
                 resumeCloudSync?.();
-            } else if (showCustomPrograms) {
-                setShowCustomPrograms(false);
-                resumeCloudSync?.();
             } else if (showClan) {
                 setShowClan(false);
                 resumeCloudSync?.();
@@ -198,7 +207,7 @@ export function Dashboard({
                 backButtonListener.remove();
             }
         };
-    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, showAchievements, showSession, showClan, showChallenge, showCustomPrograms, resumeCloudSync]);
+    }, [showCounter, showCalendar, showStats, showSettings, showLeaderboard, showAchievements, showSession, showClan, showChallenge, resumeCloudSync]);
 
     // Progress circle for year (day X / 365)
     const circumference = 2 * Math.PI * 45;
@@ -284,18 +293,6 @@ export function Dashboard({
                         >
                             <Swords size={19} color={isClub ? '#f59e0b' : undefined} />
                         </button>
-                        <button
-                            onClick={() => { setShowCustomPrograms(true); pauseCloudSync?.(); }}
-                            title={t('customProgram.title')}
-                            className="hover-lift"
-                            style={{
-                                ...iconBtnStyle,
-                                background: isPro ? 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(124,58,237,0.1))' : iconBtnStyle.background,
-                                border: isPro ? '1px solid rgba(139,92,246,0.3)' : 'none'
-                            }}
-                        >
-                            <Sparkles size={19} color={isPro ? '#8b5cf6' : undefined} />
-                        </button>
 
                         {/* Global streak badge — Duolingo style: gray if not done today */}
                         <div style={{
@@ -329,200 +326,87 @@ export function Dashboard({
                 {/* ── Main ── */}
                 <main style={{
                     flex: 1, display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', justifyContent: 'space-evenly', gap: 'clamp(4px, 0.8vh, 12px)',
-                    minHeight: 0
+                    minHeight: 0, position: 'relative'
                 }}>
-                    {!isFuture ? (
-                        <>
-                            {/* Day & Goal Hero Section */}
-                            <div style={{ textAlign: 'center', position: 'relative' }}>
-                                <div style={{
-                                    fontSize: 'clamp(0.75rem, 1.6vh, 1rem)', color: 'var(--text-secondary)',
-                                    textTransform: 'uppercase', letterSpacing: '4px',
-                                    marginBottom: '2px', fontWeight: '700'
-                                }}>
-                                    {t('dashboard.day')}
-                                </div>
+                    <div 
+                        onScroll={(e) => {
+                            const slideHeight = e.target.clientHeight;
+                            if (slideHeight === 0) return;
+                            const newSlide = Math.round(e.target.scrollTop / slideHeight);
+                            if (newSlide >= 0 && newSlide <= 2) {
+                                document.getElementById('active-slide-updater').click();
+                                window.__latestSlide = newSlide;
+                            }
+                        }}
+                        style={{
+                            flex: 1, overflowY: 'auto', overflowX: 'hidden',
+                            scrollSnapType: 'y mandatory', scrollBehavior: 'smooth',
+                            display: 'flex', flexDirection: 'column', width: '100%',
+                            scrollbarWidth: 'none', msOverflowStyle: 'none'
+                        }}
+                    >
+                        <button id="active-slide-updater" style={{display:'none'}} onClick={() => {
+                            if (window.__latestSlide !== undefined && window.__latestSlide !== activeSlide) {
+                                setActiveSlide(window.__latestSlide);
+                            }
+                        }}></button>
 
-                                {/* Big animated day number */}
-                                <div style={{
-                                    position: 'relative', height: 'clamp(3.2rem, 9vh, 7rem)', overflow: 'hidden',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    marginBottom: 'clamp(2px, 0.5vh, 6px)'
-                                }}>
-                                    {isCounterTransitioning && prevDayNumber && (
-                                        <div className="rainbow-gradient" style={{
-                                            position: 'absolute', fontSize: 'clamp(3rem, 8.5vh, 6.5rem)', fontWeight: '800', lineHeight: 1,
-                                            animation: 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards'
-                                        }}>
-                                            {prevDayNumber}
-                                        </div>
-                                    )}
-                                    <div
-                                        key={isCounterTransitioning ? `new-${dayNumber}` : numberKey}
-                                        className="rainbow-gradient"
-                                        style={{
-                                            fontSize: 'clamp(3rem, 8.5vh, 6.5rem)', fontWeight: '800', lineHeight: 1,
-                                            animation: isCounterTransitioning
-                                                ? 'rainbowFlow 6s ease infinite, counterSlideUp 1s ease-out'
-                                                : 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out'
-                                        }}
-                                    >
-                                        {dayNumber}
-                                    </div>
-                                </div>
+                        <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                            <DashboardSlide
+                                isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
+                                getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
+                                isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber} numberKey={numberKey}
+                                pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
+                                activeExerciseId={classicSelected} onSelectExercise={handleSelectExercise}
+                                exercisesList={EXERCISES} exercisesMap={EXERCISES_MAP}
+                            />
+                        </div>
+
+                        {isPro && (
+                            <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                                <DashboardSlide
+                                    title="Musculation (Poids)"
+                                    isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
+                                    getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
+                                    isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber} numberKey={numberKey}
+                                    pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
+                                    activeExerciseId={weightsSelected} onSelectExercise={handleSelectExercise}
+                                    exercisesList={WEIGHT_EXERCISES} exercisesMap={WEIGHT_EXERCISES_MAP}
+                                />
                             </div>
+                        )}
 
-                            {/* ── Exercise Selector ── */}
-                            <div className="exercise-grid" style={{
-                                display: 'flex', flexWrap: 'wrap', justifyContent: 'center',
-                                gap: 'clamp(6px, 1.2vw, 10px)', width: '100%', maxWidth: '640px',
-                                padding: '2px'
-                            }}>
-                                {EXERCISES.map(ex => (
-                                    <ExerciseButton
-                                        key={ex.id}
-                                        ex={ex}
-                                        isActive={ex.id === selectedExerciseId}
-                                        dayNumber={dayNumber}
-                                        today={today}
-                                        settings={settings}
-                                        getExerciseCount={getExerciseCount}
-                                        completions={completions}
-                                        computedStats={computedStats}
-                                        onSelect={handleSelectExercise}
-                                    />
-                                ))}
+                        {isPro && (
+                            <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                                <DashboardSlide
+                                    title="Exercices Personnalisés"
+                                    isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
+                                    getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
+                                    isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber} numberKey={numberKey}
+                                    pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
+                                    activeExerciseId={customExercisesMap[customSelected] ? customSelected : (customExercises[0]?.id || null)} onSelectExercise={handleSelectExercise}
+                                    exercisesList={customExercises} exercisesMap={customExercisesMap}
+                                    onManageCustom={() => { setShowCustomExercisesModal(true); pauseCloudSync?.(); }}
+                                />
                             </div>
+                        )}
+                    </div>
 
-                            {/* ── Progress ring + Counter button + Completion status (grouped) ── */}
-                            <div style={{
-                                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                                gap: 'clamp(4px, 0.8vh, 10px)'
-                            }}>
-                                <div style={{ position: 'relative', display: 'inline-block' }}>
-                                    {/* Year progress ring */}
-                                    <svg viewBox="0 0 100 100" style={{
-                                        position: 'absolute', top: '-8%', left: '-8%',
-                                        width: 'clamp(90px, 14vh, 130px)', height: 'clamp(90px, 14vh, 130px)'
-                                    }}>
-                                        <circle cx="50" cy="50" r="42" fill="none" stroke="var(--progress-track)" strokeWidth="3.5" />
-                                        <circle
-                                            className="progress-ring-circle"
-                                            cx="50" cy="50" r="42" fill="none"
-                                            stroke={`url(#dashGrad-${selectedExerciseId})`}
-                                            strokeWidth="3.5"
-                                            strokeDasharray={2 * Math.PI * 42}
-                                            strokeDashoffset={2 * Math.PI * 42 - (progress / 100) * 2 * Math.PI * 42}
-                                            strokeLinecap="round"
-                                            transform="rotate(-90 50 50)"
-                                        />
-                                        <defs>
-                                            <linearGradient id={`dashGrad-${selectedExerciseId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stopColor={selectedExercise.gradient[0]} />
-                                                <stop offset="100%" stopColor={selectedExercise.gradient[1]} />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-
-                                    {/* Counter open button */}
-                                    <button
-                                        onClick={() => { pauseCloudSync?.(); setShowCounter(true); }}
-                                        className="ripple"
-                                        style={{
-                                            width: 'clamp(72px, 12vh, 110px)', height: 'clamp(72px, 12vh, 110px)', borderRadius: '50%',
-                                            background: isExerciseDone
-                                                ? `linear-gradient(135deg, ${selectedExercise.color} 0%, ${selectedExercise.gradient[1]} 100%)`
-                                                : 'transparent',
-                                            border: isExerciseDone ? 'none' : `2.5px solid ${selectedExercise.color}`,
-                                            display: 'flex', flexDirection: 'column',
-                                            alignItems: 'center', justifyContent: 'center', gap: '1px',
-                                            transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                                            willChange: 'transform',
-                                            transform: isExerciseDone ? 'scale(1.1)' : 'scale(1)',
-                                            boxShadow: isExerciseDone
-                                                ? `0 0 50px ${selectedExercise.color}aa, 0 8px 30px ${selectedExercise.color}55, 0 0 0 4px ${selectedExercise.color}33, inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.1)`
-                                                : `0 0 16px ${selectedExercise.color}33`,
-                                            cursor: 'pointer',
-                                            position: 'relative',
-                                            overflow: 'hidden'
-                                        }}
-                                    >
-                                        {isExerciseDone ? (
-                                            <>
-                                                <div style={{
-                                                    position: 'absolute',
-                                                    inset: 0,
-                                                    background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
-                                                    pointerEvents: 'none'
-                                                }} />
-                                                <div style={{
-                                                    position: 'absolute',
-                                                    top: '-50%',
-                                                    left: '-50%',
-                                                    width: '200%',
-                                                    height: '200%',
-                                                    background: `conic-gradient(from 0deg, transparent, ${selectedExercise.color}44, transparent, ${selectedExercise.color}44, transparent)`,
-                                                    animation: 'spin 2s linear infinite',
-                                                    pointerEvents: 'none'
-                                                }} />
-                                                <Check size={26} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
-                                                <span style={{
-                                                    fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)',
-                                                    color: 'white',
-                                                    fontWeight: '800',
-                                                    textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-                                                    position: 'relative',
-                                                    zIndex: 1
-                                                }}>
-                                                    {selectedExerciseId === 'planche'
-                                                        ? `${formatTime(dailyGoal)}/${formatTime(dailyGoal)}`
-                                                        : `${dailyGoal}/${dailyGoal}`
-                                                    }
-                                                </span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                {(() => { const I = ICON_MAP[selectedExercise.icon] || Dumbbell; return <I size={22} color={selectedExercise.color} />; })()}
-                                                <span style={{ fontSize: 'clamp(0.45rem, 1.2vh, 0.65rem)', color: selectedExercise.color, fontWeight: '700' }}>
-                                                    {selectedExerciseId === 'planche'
-                                                        ? `${formatTime(currentCount)}/${formatTime(dailyGoal)}`
-                                                        : `${currentCount}/${dailyGoal}`}
-                                                </span>
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-
-                                {/* Completion status (under button with spacing) */}
-                                {isExerciseDone && (() => {
-                                    const exData = completions[today]?.[selectedExerciseId];
-                                    const completedAt = exData?.timestamp ? new Date(exData.timestamp) : null;
-                                    const timeStr = completedAt
-                                        ? completedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-                                        : null;
-                                    return timeStr ? (
-                                        <div className="scale-in" style={{
-                                            color: 'var(--text-secondary)', fontWeight: '500',
-                                            marginTop: '8px', opacity: 0.75,
-                                            fontSize: 'clamp(0.7rem, 2.8vw, 0.95rem)'
-                                        }}>
-                                            {t('dashboard.doneAt', { time: timeStr })}
-                                        </div>
-                                    ) : null;
-                                })()}
-                            </div>
-                        </>
-                    ) : (
-                        <div className="glass-premium" style={{
-                            textAlign: 'center', padding: 'var(--spacing-xl)',
-                            borderRadius: 'var(--radius-xl)', maxWidth: '320px'
+                    {isPro && (
+                        <div style={{
+                            position: 'absolute', right: '4px', top: '50%', transform: 'translateY(-50%)',
+                            display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10,
+                            pointerEvents: 'none'
                         }}>
-                            <h2 style={{ marginBottom: '12px', fontSize: '1.5rem' }}>{t('dashboard.waiting')}</h2>
-                            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                                {t('dashboard.challengeStarts')} <br />
-                                <strong style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>{effectiveStart}</strong>
-                            </p>
+                            {[0, 1, 2].map(i => (
+                                <div key={i} style={{
+                                    width: '4px', height: activeSlide === i ? '24px' : '6px',
+                                    borderRadius: '4px',
+                                    background: activeSlide === i ? 'var(--text-primary)' : 'var(--text-secondary)',
+                                    opacity: activeSlide === i ? 1 : 0.4,
+                                    transition: 'all 0.3s ease'
+                                }} />
+                            ))}
                         </div>
                     )}
                 </main>
@@ -573,7 +457,7 @@ export function Dashboard({
                         <Calendar
                             startDate={startDate}
                             completions={completions}
-                            exercises={EXERCISES}
+                            exercises={activeSlide === 0 ? EXERCISES : activeSlide === 1 ? WEIGHT_EXERCISES : customExercises}
                             getDayNumber={getDayNumber}
                             onClose={() => setShowCalendar(false)}
                             settings={settings}
@@ -582,7 +466,13 @@ export function Dashboard({
                     {showStats && (
                         <Stats
                             completions={completions}
-                            exercises={EXERCISES}
+                            exercisesList={{
+                                standard: EXERCISES,
+                                weights: WEIGHT_EXERCISES,
+                                custom: customExercises
+                            }}
+                            initialCategory={activeSlide === 0 ? 'standard' : activeSlide === 1 ? 'weights' : 'custom'}
+                            isPro={isPro}
                             onClose={() => setShowStats(false)}
                             onOpenAchievements={() => { setShowAchievements(true); }}
                             highlightedBadgeId={newAchievement?.id}
@@ -610,7 +500,7 @@ export function Dashboard({
                             onRestorePurchases={onRestorePurchases}
                         />
                     )}
-                    {showCounter && selectedExerciseId !== 'planche' && (
+                    {showCounter && selectedExerciseId !== 'planche' && selectedExercise?.type !== 'timer' && (
                         <Counter
                             exerciseConfig={selectedExercise}
                             onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
@@ -621,7 +511,7 @@ export function Dashboard({
                             dayNumber={dayNumber}
                         />
                     )}
-                    {showCounter && selectedExerciseId === 'planche' && (
+                    {showCounter && (selectedExerciseId === 'planche' || selectedExercise?.type === 'timer') && (
                         <Timer
                             exerciseConfig={selectedExercise}
                             onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
@@ -637,6 +527,7 @@ export function Dashboard({
                             onClose={() => setShowLeaderboard(false)}
                             cloudSync={cloudSync}
                             cloudAuth={cloudAuth}
+                            activeSlide={activeSlide}
                         />
                     )}
                     {showAchievements && (
@@ -664,6 +555,9 @@ export function Dashboard({
                             deleteRoutine={deleteRoutine}
                             updateRoutine={updateRoutine}
                             maxRoutines={maxRoutines}
+                            isPro={isPro}
+                            activeSlide={activeSlide}
+                            customExercises={customExercises}
                         />
                     )}
                     {showClan && (
@@ -681,23 +575,10 @@ export function Dashboard({
                             isClub={isClub}
                         />
                     )}
-                    {showCustomPrograms && (
-                        <CustomProgramPanel
-                            onClose={() => { setShowCustomPrograms(false); resumeCloudSync?.(); }}
-                            isPro={isPro}
-                            programs={customPrograms?.programs || []}
-                            saveProgram={customPrograms?.saveProgram}
-                            updateProgram={customPrograms?.updateProgram}
-                            deleteProgram={customPrograms?.deleteProgram}
-                            startProgram={customPrograms?.startProgram}
-                            pauseProgram={customPrograms?.pauseProgram}
-                            resumeProgram={customPrograms?.resumeProgram}
-                            toggleProgramExerciseCompletion={customPrograms?.toggleProgramExerciseCompletion}
-                            getProgramDayNumber={customPrograms?.getProgramDayNumber}
-                            isProgramExerciseDone={customPrograms?.isProgramExerciseDone}
-                            getProgramStreak={customPrograms?.getProgramStreak}
-                            getProgramStats={customPrograms?.getProgramStats}
-                            maxPrograms={customPrograms?.maxPrograms || 5}
+                    {showCustomExercisesModal && (
+                        <CustomExercisesModal
+                            onClose={() => { setShowCustomExercisesModal(false); resumeCloudSync?.(); }}
+                            customExercisesHook={customExercisesHook}
                         />
                     )}
                 </Suspense>
@@ -707,6 +588,256 @@ export function Dashboard({
 }
 
 // Memoized exercise button to avoid re-rendering all 10 exercises when one changes
+const DashboardSlide = React.memo(({
+    isFuture, effectiveStart, dayNumber, today, settings, getExerciseCount, completions, computedStats,
+    isCounterTransitioning, prevDayNumber, numberKey, pauseCloudSync, setShowCounter,
+    activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, onManageCustom
+}) => {
+    const { t } = useTranslation();
+    const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
+    
+    if (!safeSelectedExercise) {
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '20px', textAlign: 'center' }}>
+                {title && <h2 style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>{title}</h2>}
+                <div style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>Vous n'avez pas encore configuré d'exercices ici.</div>
+                {onManageCustom && (
+                    <button onClick={onManageCustom} className="hover-lift" style={{
+                        padding: '12px 24px', borderRadius: 'var(--radius-md)', background: '#8b5cf6', color: 'white', fontWeight: '700', border: 'none'
+                    }}>
+                        Configurer
+                    </button>
+                )}
+            </div>
+        );
+    }
+
+    const dailyGoal = getDailyGoal(safeSelectedExercise, dayNumber, settings?.difficultyMultiplier) || 1;
+    const currentCount = getExerciseCount(today, safeSelectedExercise.id);
+    const isExerciseDone = completions[today]?.[safeSelectedExercise.id]?.isCompleted || currentCount >= dailyGoal;
+    const progress = Math.min((dayNumber / 365) * 100, 100);
+
+    const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60);
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    };
+
+    return (
+        <div style={{
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'space-evenly', gap: 'clamp(4px, 0.8vh, 12px)',
+            height: '100%', width: '100%', paddingTop: title ? '12px' : '0'
+        }}>
+            {title && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8 }}>
+                        {title}
+                    </div>
+                    {onManageCustom && (
+                        <button onClick={onManageCustom} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', opacity: 0.6, padding: '4px' }}>
+                            <SettingsIcon size={14} />
+                        </button>
+                    )}
+                </div>
+            )}
+            {!isFuture ? (
+                <>
+                    {/* Day & Goal Hero Section */}
+                    <div style={{ textAlign: 'center', position: 'relative' }}>
+                        <div style={{
+                            fontSize: 'clamp(0.75rem, 1.6vh, 1rem)', color: 'var(--text-secondary)',
+                            textTransform: 'uppercase', letterSpacing: '4px',
+                            marginBottom: '2px', fontWeight: '700'
+                        }}>
+                            {t('dashboard.day')}
+                        </div>
+
+                        {/* Big animated day number */}
+                        <div style={{
+                            position: 'relative', height: 'clamp(3.2rem, 9vh, 7rem)', overflow: 'hidden',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            marginBottom: 'clamp(2px, 0.5vh, 6px)'
+                        }}>
+                            {isCounterTransitioning && prevDayNumber && (
+                                <div className="rainbow-gradient" style={{
+                                    position: 'absolute', fontSize: 'clamp(3rem, 8.5vh, 6.5rem)', fontWeight: '800', lineHeight: 1,
+                                    animation: 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards'
+                                }}>
+                                    {prevDayNumber}
+                                </div>
+                            )}
+                            <div
+                                key={isCounterTransitioning ? `new-${dayNumber}` : numberKey}
+                                className="rainbow-gradient"
+                                style={{
+                                    fontSize: 'clamp(3rem, 8.5vh, 6.5rem)', fontWeight: '800', lineHeight: 1,
+                                    animation: isCounterTransitioning
+                                        ? 'rainbowFlow 6s ease infinite, counterSlideUp 1s ease-out'
+                                        : 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out'
+                                }}
+                            >
+                                {dayNumber}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── Exercise Selector ── */}
+                    <div className="exercise-grid" style={{
+                        display: 'flex', flexWrap: 'wrap', justifyContent: 'center',
+                        gap: 'clamp(6px, 1.2vw, 10px)', width: '100%', maxWidth: '640px',
+                        padding: '2px'
+                    }}>
+                        {exercisesList.map(ex => (
+                            <ExerciseButton
+                                key={ex.id}
+                                ex={ex}
+                                isActive={ex.id === activeExerciseId}
+                                dayNumber={dayNumber}
+                                today={today}
+                                settings={settings}
+                                getExerciseCount={getExerciseCount}
+                                completions={completions}
+                                computedStats={computedStats}
+                                onSelect={onSelectExercise}
+                            />
+                        ))}
+                    </div>
+
+                    {/* ── Progress ring + Counter button + Completion status (grouped) ── */}
+                    <div style={{
+                        display: 'flex', flexDirection: 'column', alignItems: 'center',
+                        gap: 'clamp(4px, 0.8vh, 10px)'
+                    }}>
+                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                            {/* Year progress ring */}
+                            <svg viewBox="0 0 100 100" style={{
+                                position: 'absolute', top: '-8%', left: '-8%',
+                                width: 'clamp(90px, 14vh, 130px)', height: 'clamp(90px, 14vh, 130px)'
+                            }}>
+                                <circle cx="50" cy="50" r="42" fill="none" stroke="var(--progress-track)" strokeWidth="3.5" />
+                                <circle
+                                    className="progress-ring-circle"
+                                    cx="50" cy="50" r="42" fill="none"
+                                    stroke={`url(#dashGrad-${activeExerciseId})`}
+                                    strokeWidth="3.5"
+                                    strokeDasharray={2 * Math.PI * 42}
+                                    strokeDashoffset={2 * Math.PI * 42 - (progress / 100) * 2 * Math.PI * 42}
+                                    strokeLinecap="round"
+                                    transform="rotate(-90 50 50)"
+                                />
+                                <defs>
+                                    <linearGradient id={`dashGrad-${activeExerciseId}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stopColor={safeSelectedExercise.gradient[0]} />
+                                        <stop offset="100%" stopColor={safeSelectedExercise.gradient[1]} />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+
+                            {/* Counter open button */}
+                            <button
+                                onClick={() => { pauseCloudSync?.(); setShowCounter(true); }}
+                                className="ripple"
+                                style={{
+                                    width: 'clamp(72px, 12vh, 110px)', height: 'clamp(72px, 12vh, 110px)', borderRadius: '50%',
+                                    background: isExerciseDone
+                                        ? `linear-gradient(135deg, ${safeSelectedExercise.color} 0%, ${safeSelectedExercise.gradient[1]} 100%)`
+                                        : 'transparent',
+                                    border: isExerciseDone ? 'none' : `2.5px solid ${safeSelectedExercise.color}`,
+                                    display: 'flex', flexDirection: 'column',
+                                    alignItems: 'center', justifyContent: 'center', gap: '1px',
+                                    transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                    willChange: 'transform',
+                                    transform: isExerciseDone ? 'scale(1.1)' : 'scale(1)',
+                                    boxShadow: isExerciseDone
+                                        ? `0 0 50px ${safeSelectedExercise.color}aa, 0 8px 30px ${safeSelectedExercise.color}55, 0 0 0 4px ${safeSelectedExercise.color}33, inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.1)`
+                                        : `0 0 16px ${safeSelectedExercise.color}33`,
+                                    cursor: 'pointer',
+                                    position: 'relative',
+                                    overflow: 'hidden'
+                                }}
+                            >
+                                {isExerciseDone ? (
+                                    <>
+                                        <div style={{
+                                            position: 'absolute',
+                                            inset: 0,
+                                            background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
+                                            pointerEvents: 'none'
+                                        }} />
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '-50%',
+                                            left: '-50%',
+                                            width: '200%',
+                                            height: '200%',
+                                            background: `conic-gradient(from 0deg, transparent, ${safeSelectedExercise.color}44, transparent, ${safeSelectedExercise.color}44, transparent)`,
+                                            animation: 'spin 2s linear infinite',
+                                            pointerEvents: 'none'
+                                        }} />
+                                        <Check size={26} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
+                                        <span style={{
+                                            fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)',
+                                            color: 'white',
+                                            fontWeight: '800',
+                                            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                                            position: 'relative',
+                                            zIndex: 1
+                                        }}>
+                                            {activeExerciseId === 'planche' || safeSelectedExercise.type === 'timer'
+                                                ? `${formatTime(dailyGoal)}/${formatTime(dailyGoal)}`
+                                                : `${dailyGoal}/${dailyGoal}`
+                                            }
+                                        </span>
+                                    </>
+                                ) : (
+                                    <>
+                                        {(() => { const I = ICON_MAP[safeSelectedExercise.icon] || Dumbbell; return <I size={22} color={safeSelectedExercise.color} />; })()}
+                                        <span style={{ fontSize: 'clamp(0.45rem, 1.2vh, 0.65rem)', color: safeSelectedExercise.color, fontWeight: '700' }}>
+                                            {activeExerciseId === 'planche' || safeSelectedExercise.type === 'timer'
+                                                ? `${formatTime(currentCount)}/${formatTime(dailyGoal)}`
+                                                : `${currentCount}/${dailyGoal}`}
+                                        </span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+
+                        {/* Completion status (under button with spacing) */}
+                        {isExerciseDone && (() => {
+                            const exData = completions[today]?.[activeExerciseId];
+                            const completedAt = exData?.timestamp ? new Date(exData.timestamp) : null;
+                            const timeStr = completedAt
+                                ? completedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                                : null;
+                            return timeStr ? (
+                                <div className="scale-in" style={{
+                                    color: 'var(--text-secondary)', fontWeight: '500',
+                                    marginTop: '8px', opacity: 0.75,
+                                    fontSize: 'clamp(0.7rem, 2.8vw, 0.95rem)'
+                                }}>
+                                    {t('dashboard.doneAt', { time: timeStr })}
+                                </div>
+                            ) : null;
+                        })()}
+                    </div>
+                </>
+            ) : (
+                <div className="glass-premium" style={{
+                    textAlign: 'center', padding: 'var(--spacing-xl)',
+                    borderRadius: 'var(--radius-xl)', maxWidth: '320px'
+                }}>
+                    <h2 style={{ marginBottom: '12px', fontSize: '1.5rem' }}>{t('dashboard.waiting')}</h2>
+                    <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                        {t('dashboard.challengeStarts')} <br />
+                        <strong style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>{effectiveStart}</strong>
+                    </p>
+                </div>
+            )}
+        </div>
+    );
+});
+
 const ExerciseButton = React.memo(({
     ex, isActive, dayNumber, today, settings,
     getExerciseCount, completions, computedStats, onSelect
@@ -784,7 +915,7 @@ const ExerciseButton = React.memo(({
                 textAlign: 'center', lineHeight: '1.1',
                 transition: 'color 0.2s ease'
             }}>
-                {t('exercises.' + ex.id)}
+                {ex.id.startsWith('custom_') ? (ex.label || ex.name) : t('exercises.' + ex.id)}
             </span>
             <span style={{
                 fontSize: 'clamp(0.65rem, 1.5vh, 0.85rem)', fontWeight: '700',
@@ -794,7 +925,7 @@ const ExerciseButton = React.memo(({
                 textDecorationLine: exDone ? 'line-through' : 'none',
                 textDecorationColor: `${ex.color}88`
             }}>
-                {ex.id === 'planche'
+                {ex.id === 'planche' || ex.type === 'timer'
                     ? (exDone ? formatTime(exGoal) : `${formatTime(exCount)}/${formatTime(exGoal)}`)
                     : (exDone ? exGoal : `${exCount}/${exGoal}`)
                 }

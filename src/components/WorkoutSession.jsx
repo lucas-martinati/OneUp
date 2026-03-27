@@ -6,6 +6,7 @@ import {
     Flame, Square, MoveDown, MoveDiagonal
 } from 'lucide-react';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
+import { WEIGHT_EXERCISES } from '../config/weights';
 import { Counter } from './Counter';
 import { Timer } from './Timer';
 import { CSSConfetti } from './CSSConfetti';
@@ -15,7 +16,8 @@ const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, 
 
 export function WorkoutSession({
     onClose, today, dayNumber, getExerciseCount, updateExerciseCount, completions, settings,
-    routines = [], saveRoutine, deleteRoutine, updateRoutine, maxRoutines = 10
+    routines = [], saveRoutine, deleteRoutine, updateRoutine, maxRoutines = 10,
+    isPro, activeSlide, customExercises = []
 }) {
     const { t } = useTranslation();
     const [phase, setPhase] = useState('config'); // 'config' | 'running' | 'done'
@@ -56,15 +58,29 @@ export function WorkoutSession({
         return unreg;
     }, [phase, onClose, showSaveRoutine, showRoutineList]);
 
+    const localExercises = useMemo(() => {
+        if (activeSlide === 0) return EXERCISES;
+        if (activeSlide === 1) return WEIGHT_EXERCISES;
+        if (activeSlide === 2) return customExercises;
+        return EXERCISES;
+    }, [activeSlide, customExercises]);
+
+    const allExercises = useMemo(() => {
+        return [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises];
+    }, [customExercises]);
+
+    const [showAll, setShowAll] = useState(false);
+    const availableExercises = isPro && showAll ? allExercises : localExercises;
+
     // Exercise info with current state
     const exerciseInfo = useMemo(() => {
-        return EXERCISES.map(ex => {
+        return availableExercises.map(ex => {
             const goal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
             const count = getExerciseCount(today, ex.id);
             const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
             return { ...ex, goal, count, done };
         });
-    }, [dayNumber, today, completions, getExerciseCount, settings?.difficultyMultiplier]);
+    }, [availableExercises, dayNumber, today, completions, getExerciseCount, settings?.difficultyMultiplier]);
 
     // Toggle in queue
     const toggleExercise = (id) => {
@@ -83,7 +99,7 @@ export function WorkoutSession({
     // Load a routine into the queue
     const loadRoutine = (routine) => {
         // Filter out exercises that don't exist anymore
-        const validIds = routine.exerciseIds.filter(id => EXERCISES.find(e => e.id === id));
+        const validIds = routine.exerciseIds.filter(id => allExercises.find(e => e.id === id));
         setQueue(validIds);
         setShowRoutineList(false);
     };
@@ -103,7 +119,7 @@ export function WorkoutSession({
 
     // Edit a routine: load it into queue and open save form
     const editRoutine = (routine) => {
-        const validIds = routine.exerciseIds.filter(id => EXERCISES.find(e => e.id === id));
+        const validIds = routine.exerciseIds.filter(id => allExercises.find(e => e.id === id));
         setQueue(validIds);
         setRoutineName(routine.name);
         setEditingRoutineId(routine.id);
@@ -168,7 +184,7 @@ export function WorkoutSession({
 
     // ── Running phase ──
     const currentExId = queue[currentIdx];
-    const currentEx = currentExId ? EXERCISES.find(e => e.id === currentExId) : null;
+    const currentEx = currentExId ? allExercises.find(e => e.id === currentExId) : null;
     const currentGoal = currentEx ? getDailyGoal(currentEx, dayNumber, settings?.difficultyMultiplier) : 0;
     const currentCount = currentEx ? getExerciseCount(today, currentExId) : 0;
     const currentDone = currentEx ? (completions[today]?.[currentExId]?.isCompleted || currentCount >= currentGoal) : false;
@@ -272,7 +288,7 @@ export function WorkoutSession({
                                                 display: 'flex', gap: '3px', flexWrap: 'wrap', marginTop: '4px'
                                             }}>
                                                 {routine.exerciseIds.map(exId => {
-                                                    const ex = EXERCISES.find(e => e.id === exId);
+                                                    const ex = allExercises.find(e => e.id === exId);
                                                     if (!ex) return null;
                                                     const Icon = ICON_MAP[ex.icon] || Dumbbell;
                                                     return <Icon key={exId} size={12} color={ex.color} />;
@@ -336,6 +352,36 @@ export function WorkoutSession({
                         </div>
                     )}
 
+                    {/* Inter-Dashboard Toggle for Pro Users */}
+                    {isPro && (
+                        <div style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            background: 'rgba(139, 92, 246, 0.1)', padding: '12px',
+                            borderRadius: 'var(--radius-md)', border: '1px solid rgba(139, 92, 246, 0.2)'
+                        }}>
+                            <div>
+                                <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+                                    {t('workout.interDashboard', { defaultValue: 'Mixer les exercices' })}
+                                </div>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                    {t('workout.interDashboardDesc', { defaultValue: 'Mélanger les exercices de tous les tableaux de bord.' })}
+                                </div>
+                            </div>
+                            <label className="toggle-switch">
+                                <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
+                                <span className="slider"></span>
+                            </label>
+                            <style>{`
+                            .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+                            .toggle-switch input { opacity: 0; width: 0; height: 0; }
+                            .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 24px; }
+                            .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+                            input:checked + .slider { background-color: #8b5cf6; }
+                            input:checked + .slider:before { transform: translateX(20px); }
+                            `}</style>
+                        </div>
+                    )}
+
                     {/* Exercise selection label */}
                     <div style={{
                         fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px',
@@ -356,7 +402,7 @@ export function WorkoutSession({
                             }}
                         >
                             {queue.map((id, i) => {
-                                const ex = EXERCISES.find(e => e.id === id);
+                                const ex = allExercises.find(e => e.id === id);
                                 if (!ex) return null;
                                 const Icon = ICON_MAP[ex.icon] || Dumbbell;
                                 const isDragging = dragIdx === i;
@@ -391,7 +437,7 @@ export function WorkoutSession({
                                         <Icon size={14} color={ex.color} />
                                         <span style={{
                                             fontSize: '0.75rem', fontWeight: '600', color: ex.color, flex: 1
-                                        }}>{t('exercises.' + ex.id)}</span>
+                                        }}>{ex.label || t('exercises.' + ex.id)}</span>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
                                             style={{
@@ -406,7 +452,10 @@ export function WorkoutSession({
                                         </button>
                                     </div>
                                 );
-                            })}
+                            })
+                            // If an exercise from another dashboard is queued but we are not showing all, still render it!
+                            // (Because allExercises always contains all).
+                            }
                         </div>
                     )}
 
@@ -467,11 +516,11 @@ export function WorkoutSession({
                                     <Icon size={24} />
                                     <span style={{
                                         fontSize: '0.75rem', fontWeight: '600'
-                                    }}>{t('exercises.' + ex.id)}</span>
+                                    }}>{ex.label || t('exercises.' + ex.id)}</span>
                                     <span style={{
                                         fontSize: '0.6rem', opacity: 0.6
                                     }}>
-                                        {ex.done ? t('workout.completed') : t('workout.remaining', { count: ex.goal - ex.count })}
+                                        {ex.done ? t('workout.completed') : (ex.type === 'timer' || ex.id === 'planche' ? `${ex.goal - ex.count}s` : t('workout.remaining', { count: ex.goal - ex.count }))}
                                     </span>
                                 </button>
                             );
@@ -587,7 +636,7 @@ export function WorkoutSession({
 
     // ── RUNNING PHASE = render Counter or Timer ─────────────────
     if (phase === 'running' && currentEx) {
-        const isTimer = currentExId === 'planche';
+        const isTimer = currentExId === 'planche' || currentEx.type === 'timer';
         const Component = isTimer ? Timer : Counter;
 
         return (
@@ -656,14 +705,14 @@ export function WorkoutSession({
                                 <Icon size={16} color={ex.color} />
                                 <span style={{
                                     flex: 1, fontSize: '0.8rem', fontWeight: '600', color: ex.color
-                                }}>{t('exercises.' + ex.id)}</span>
+                                }}>{ex.label || t('exercises.' + ex.id)}</span>
                                 <div style={{
                                     display: 'flex', alignItems: 'center', gap: '4px'
                                 }}>
                                     <Check size={14} color="#10b981" />
                                     <span style={{
                                         fontSize: '0.75rem', fontWeight: '700', color: '#10b981'
-                                    }}>{t('workout.reps', { count: ex.goal })}</span>
+                                    }}>{ex.type === 'timer' || ex.id === 'planche' ? `${ex.goal}s` : t('workout.reps', { count: ex.goal })}</span>
                                 </div>
                             </div>
                         );

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { getLocalDateStr, isDayDoneFromCompletions, calculateStreak, calculateExerciseStreak } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
+import { WEIGHT_EXERCISES } from '../config/weights';
 
 /**
  * Centralized computation hook.
@@ -10,19 +11,21 @@ import { EXERCISES, getDailyGoal } from '../config/exercises';
  * @param {Object} completions - { [dateStr]: { [exerciseId]: { isCompleted, timestamp, timeOfDay, count } } }
  * @param {Object} settings - { difficultyMultiplier, ... }
  * @param {Function} getDayNumber - (dateStr) => number
+ * @param {Array} customExercises - User defined exercises
  * @returns {Object} computedStats
  */
-export function useComputedStats(completions, settings, getDayNumber) {
+export function useComputedStats(completions, settings, getDayNumber, customExercises = []) {
+    const allExercises = useMemo(() => [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises], [customExercises]);
     return useMemo(() => {
-        return computeAllStats(completions, settings, getDayNumber);
-    }, [completions, settings?.difficultyMultiplier, getDayNumber]);
+        return computeAllStats(completions, settings, getDayNumber, allExercises);
+    }, [completions, settings?.difficultyMultiplier, getDayNumber, allExercises]);
 }
 
 /**
  * Pure function that computes all stats in a single pass.
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
  */
-export function computeAllStats(completions, settings, getDayNumber) {
+export function computeAllStats(completions, settings, getDayNumber, allExercises) {
     const difficultyMultiplier = settings?.difficultyMultiplier ?? 1.0;
     const todayStr = getLocalDateStr(new Date());
     const today = new Date(todayStr);
@@ -41,7 +44,7 @@ export function computeAllStats(completions, settings, getDayNumber) {
     // Per-exercise accumulators
     const exerciseReps = {};      // { exId: totalReps }
     const exerciseDays = {};      // { exId: daysCompleted }
-    EXERCISES.forEach(ex => { exerciseReps[ex.id] = 0; exerciseDays[ex.id] = 0; });
+    allExercises.forEach(ex => { exerciseReps[ex.id] = 0; exerciseDays[ex.id] = 0; });
 
     // Best day tracking
     let bestDayDate = null;
@@ -50,7 +53,7 @@ export function computeAllStats(completions, settings, getDayNumber) {
     let bestDayExReps = {};
 
     // Monthly activity
-    const monthlyActivityByExercise = EXERCISES.map(() => Array(12).fill(0));
+    const monthlyActivityByExercise = allExercises.map(() => Array(12).fill(0));
     const monthlyActivityTotal = Array(12).fill(0);
 
     // Pie chart data (time of day)
@@ -80,7 +83,7 @@ export function computeAllStats(completions, settings, getDayNumber) {
         totalDays++;
         if (!firstActiveDate) firstActiveDate = dateStr;
 
-        // Perfect day check
+        // Perfect day check (only considering standard EXERCISES for simplicity/retro-compatibility)
         const allDone = EXERCISES.every(ex => day[ex.id]?.isCompleted);
         if (allDone) perfectDays++;
 
@@ -115,7 +118,7 @@ export function computeAllStats(completions, settings, getDayNumber) {
             completedExIds.add(exId);
 
             // Exercise reps
-            const ex = EXERCISES.find(e => e.id === exId);
+            const ex = allExercises.find(e => e.id === exId);
             if (ex) {
                 const reps = getDailyGoal(ex, dayNum, difficultyMultiplier);
                 exerciseReps[exId] = (exerciseReps[exId] || 0) + reps;
@@ -124,7 +127,7 @@ export function computeAllStats(completions, settings, getDayNumber) {
                 currentDayExReps[exId] = reps;
 
                 // Monthly by exercise
-                const exIndex = EXERCISES.findIndex(e => e.id === exId);
+                const exIndex = allExercises.findIndex(e => e.id === exId);
                 if (exIndex !== -1) {
                     monthlyActivityByExercise[exIndex][monthIdx]++;
                 }
@@ -204,7 +207,7 @@ export function computeAllStats(completions, settings, getDayNumber) {
     const exerciseYesterdayStreaks = {};
     const exerciseDoneToday = {};
 
-    for (const ex of EXERCISES) {
+    for (const ex of allExercises) {
         exerciseCurrentStreaks[ex.id] = calculateExerciseStreak(completions, todayStr, ex.id);
         exerciseYesterdayStreaks[ex.id] = calculateExerciseStreak(completions, getLocalDateStr(yesterdayDate), ex.id);
         exerciseDoneToday[ex.id] = !!completions[todayStr]?.[ex.id]?.isCompleted;
@@ -233,7 +236,7 @@ export function computeAllStats(completions, settings, getDayNumber) {
     const streakActive = todayDone;
 
     // Exercise stats array (for Stats.jsx)
-    const exerciseStats = EXERCISES.map(ex => {
+    const exerciseStats = allExercises.map(ex => {
         const exDoneToday = exerciseDoneToday[ex.id];
         const streak = exDoneToday ? exerciseCurrentStreaks[ex.id] : exerciseYesterdayStreaks[ex.id];
         const completionRate = totalDays > 0 ? Math.round(((exerciseDays[ex.id] || 0) / totalDays) * 100) : 0;
@@ -259,7 +262,7 @@ export function computeAllStats(completions, settings, getDayNumber) {
 
     // Champion exercise
     const champion = exerciseStats.length > 0
-        ? exerciseStats.reduce((best, ex) => ex.totalReps > best.totalReps ? ex : best, exerciseStats[0])
+        ? exerciseStats.reduce((best, ex) => ex.totalReps > (best?.totalReps || 0) ? ex : best, exerciseStats[0])
         : null;
 
     // ─── Badge count (matches achievements.js exactly) ───────────────────

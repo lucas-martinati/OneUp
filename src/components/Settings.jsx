@@ -400,12 +400,12 @@ export function Settings({ settings, onClose, onSave, cloudAuth, cloudSync, conf
                                         {t('pro.explanation')}
                                     </div>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center' }}>
-                                        {['customPrograms', 'exerciseChoice', 'dailyProgression', 'dedicatedPanel'].map(f => (
+                                        {['Exercices 100% Personnalisés', 'Dashboard Musculation (Poids)', 'Leaderboards Exclusifs'].map(f => (
                                             <span key={f} style={{
                                                 padding: '4px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '600',
                                                 background: 'rgba(139,92,246,0.12)', color: '#8b5cf6', border: '1px solid rgba(139,92,246,0.2)'
                                             }}>
-                                                {t(`pro.features.${f}`)}
+                                                {f}
                                             </span>
                                         ))}
                                     </div>

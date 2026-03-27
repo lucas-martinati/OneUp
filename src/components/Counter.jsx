@@ -88,7 +88,8 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     const activeColor = exerciseConfig?.color || '#818cf8';
     const [gradStart, gradEnd] = exerciseConfig?.gradient || ['#667eea', '#818cf8'];
     const ExIcon = ICON_MAP[exerciseConfig?.icon] || Dumbbell;
-    const exerciseLabel = t('exercises.' + exerciseConfig?.id) || t('common.exercise');
+    const isCustom = exerciseConfig?.id?.startsWith('custom_');
+    const exerciseLabel = isCustom ? (exerciseConfig.label || exerciseConfig.name) : (t('exercises.' + exerciseConfig?.id) || t('common.exercise'));
 
     // Unique SVG gradient id per exercise to avoid conflicts
     const gradientId = `counterGrad-${exerciseConfig?.id || 'default'}`;

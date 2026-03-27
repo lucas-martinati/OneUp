@@ -1,8 +1,8 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star } from 'lucide-react';
+import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
+import { computeAllStats } from '../hooks/useComputedStats';
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
 // Lazy load Recharts components
@@ -97,9 +97,14 @@ const RechartsComponents = lazy(() => import('recharts').then(module => ({
     }
 })));
 
-export function Stats({ completions, exercises, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats }) {
+export function Stats({ completions, exercisesList, initialCategory, isPro, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats: globalStats }) {
     const { t } = useTranslation();
     const [chartsReady, setChartsReady] = useState(false);
+    const [activeCategories, setActiveCategories] = useState(() => {
+        if (initialCategory === 'global') return ['standard', 'weights', 'custom'];
+        return [initialCategory || 'standard'];
+    });
+    const [showFilters, setShowFilters] = useState(false);
 
     // Wait for the modal transition to finish before attempting to load huge charting libraries
     useEffect(() => {
@@ -108,7 +113,22 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
         }, 500); // Wait for transition
         return () => clearTimeout(timer);
     }, []);
-    // All values come from computedStats — no local calculations needed
+
+    const exercises = React.useMemo(() => {
+        let list = [];
+        if (activeCategories.includes('standard')) list.push(...(exercisesList.standard || []));
+        if (activeCategories.includes('weights')) list.push(...(exercisesList.weights || []));
+        if (activeCategories.includes('custom')) list.push(...(exercisesList.custom || []));
+        return list;
+    }, [activeCategories, exercisesList]);
+
+    const computedStats = React.useMemo(() => {
+        const isAllSelected = !isPro || (activeCategories.length === 3);
+        if (isAllSelected) return globalStats;
+        return computeAllStats(completions, settings, getDayNumber, exercises);
+    }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, isPro]);
+
+    // All values come from computedStats
     const {
         totalDays, maxStreak, displayStreak, streakActive, successRate,
         perfectDays, totalExerciseCompletions, globalTotalReps,
@@ -123,15 +143,18 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
         ...d,
         name: t('stats.pieLabels.' + d.id)
     }));
-    const translatedRadarData = radarData.map(d => ({
-        ...d,
-        subject: t('exercises.' + d.exId)
-    }));
+    const translatedRadarData = radarData.map(d => {
+        const ex = exercises?.find(e => e.id === d.exId);
+        return {
+            ...d,
+            subject: ex?.label || t('exercises.' + d.exId)
+        };
+    });
     const maxMonthly = Math.max(...monthlyActivityTotal, 1);
     const monthNames = t('stats.monthAbbreviations', { returnObjects: true });
     const today = new Date();
 
-    const ChampionIcon = champion ? (ICON_MAP[champion.icon] || Dumbbell) : null;
+    const ChampionIcon = champion && ICON_MAP[champion.icon] ? ICON_MAP[champion.icon] : Dumbbell;
 
     const formatDate = (dateStr) => {
         if (!dateStr) return '—';
@@ -165,7 +188,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     }}>
                         <Award size={18} />
                         <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>
-                            {badgeCount}/40
+                           {globalStats.badgeCount}/40
                         </span>
                     </button>
                     <button onClick={onClose} className="hover-lift glass" style={{
@@ -178,6 +201,63 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                     </button>
                 </div>
             </div>
+
+            {/* ── Filters ────────────────────────────────────────────── */}
+            {isPro && (
+                <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="hover-lift"
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
+                            padding: '10px 16px', borderRadius: 'var(--radius-lg)',
+                            color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: '700',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <Filter size={16} />
+                        Filtres ({activeCategories.length})
+                    </button>
+                    {showFilters && (
+                        <div className="fade-in" style={{
+                            marginTop: '8px', padding: '12px', background: 'rgba(255,255,255,0.03)',
+                            border: '1px solid rgba(255,255,255,0.06)', borderRadius: 'var(--radius-lg)',
+                            display: 'flex', flexWrap: 'wrap', gap: '8px'
+                        }}>
+                            {[
+                                { id: 'standard', label: 'Classique' },
+                                { id: 'weights', label: 'Musculation' },
+                                { id: 'custom', label: 'Spécial' }
+                            ].map(cat => (
+                                <label key={cat.id} style={{
+                                    display: 'flex', alignItems: 'center', gap: '6px',
+                                    background: activeCategories.includes(cat.id) ? 'linear-gradient(135deg, #8b5cf6, #6366f1)' : 'rgba(255,255,255,0.05)',
+                                    color: activeCategories.includes(cat.id) ? '#ffffff' : 'var(--text-secondary)',
+                                    border: activeCategories.includes(cat.id) ? '1px solid rgba(139, 92, 246, 0.4)' : '1px solid transparent',
+                                    padding: '8px 16px', borderRadius: 'var(--radius-full)',
+                                    fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}>
+                                    <input
+                                        type="checkbox"
+                                        style={{ display: 'none' }}
+                                        checked={activeCategories.includes(cat.id)}
+                                        onChange={(e) => {
+                                            setActiveCategories(prev => {
+                                                if (e.target.checked) return [...prev, cat.id];
+                                                if (prev.length === 1) return prev; // prevent unchecking last
+                                                return prev.filter(id => id !== cat.id);
+                                            });
+                                        }}
+                                    />
+                                    {cat.label}
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* ── Hero: Global Total Reps ─────────────────────────────── */}
             <div className="glass-premium scale-in" style={{
@@ -295,7 +375,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                             }}>
                                 {ChampionIcon && <ChampionIcon size={16} color={champion.color} />}
                                 <span style={{ fontSize: '0.85rem', fontWeight: '700', color: champion.color }}>
-                                    {t('exercises.' + champion.id)}
+                                    {exercises?.find(e => e.id === champion.id)?.label || t('exercises.' + champion.id)}
                                 </span>
                             </div>
                             <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)' }}>
@@ -337,7 +417,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                                                 background: ex.color
                                             }} />
                                             <span style={{ fontWeight: '600', color: ex.color }}>{reps}</span>
-                                            <span>{t('exercises.' + ex.id)}</span>
+                                            <span>{ex.label || t('exercises.' + ex.id)}</span>
                                         </div>
                                     );
                                 })}
@@ -361,7 +441,7 @@ export function Stats({ completions, exercises, onClose, onOpenAchievements, hig
                                 width: '8px', height: '8px', borderRadius: '2px',
                                 background: ex.color
                             }} />
-                            <span>{t('exercises.' + ex.id)}</span>
+                            <span>{ex.label || t('exercises.' + ex.id)}</span>
                         </div>
                     ))}
                 </div>

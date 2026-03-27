@@ -3,23 +3,33 @@ import { useTranslation, Trans } from 'react-i18next';
 import { X, Trophy, Medal, Crown, ChevronRight, ChevronLeft, User, Award, Flame, Calendar, TrendingUp, Activity, HeartHandshake, Heart, Link, UserPlus, LogOut, Check, Shield } from 'lucide-react';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { EXERCISES } from '../config/exercises';
+import { WEIGHT_EXERCISES } from '../config/weights';
 import { Avatar } from './Avatar';
 import { registerBackHandler } from '../utils/backHandler';
 import { isDayDoneFromCompletions, getLocalDateStr, calculateStreak, calculateMaxStreak } from '../utils/dateUtils';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
-export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveClan }) {
+export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveClan, activeSlide = 0 }) {
     const { t } = useTranslation();
 
-    const TABS = useMemo(() => [
-        { id: 'global', labelKey: 'common.global', color: '#fbbf24', icon: Trophy },
-        ...EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
-    ], []);
+    const VISIBLE_TABS = useMemo(() => {
+        if (activeSlide === 1) { // Weights Dashboard View
+            return [
+                { id: 'global_weights', labelKey: 'common.global_weights', color: '#8b5cf6', icon: Dumbbell },
+                ...WEIGHT_EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
+            ];
+        }
+        // Classic and Custom fall back to Classic Leaderboard
+        return [
+            { id: 'global_classic', labelKey: 'common.global_classic', color: '#fbbf24', icon: Trophy },
+            ...EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
+        ];
+    }, [activeSlide]);
 
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('global');
+    const [activeTab, setActiveTab] = useState(activeSlide === 1 ? 'global_weights' : 'global_classic');
     const [selectedUser, setSelectedUser] = useState(null);
     const [copied, setCopied] = useState(false);
     const [nudgedMember, setNudgedMember] = useState(null);
@@ -61,10 +71,10 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
         loadData();
     }, []);
 
-    // Sort entries based on active tab
     const sorted = useMemo(() => {
         return [...entries].sort((a, b) => {
-            if (activeTab === 'global') return b.totalReps - a.totalReps;
+            if (activeTab === 'global_classic') return (b.totalReps || 0) - (a.totalReps || 0);
+            if (activeTab === 'global_weights') return (b.weightsTotalReps || 0) - (a.weightsTotalReps || 0);
             return (b.exerciseReps?.[activeTab] || 0) - (a.exerciseReps?.[activeTab] || 0);
         });
     }, [entries, activeTab]);
@@ -79,11 +89,12 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
     };
 
     const getReps = (entry) => {
-        if (activeTab === 'global') return entry.totalReps;
+        if (activeTab === 'global_classic') return entry.totalReps || 0;
+        if (activeTab === 'global_weights') return entry.weightsTotalReps || 0;
         return entry.exerciseReps?.[activeTab] || 0;
     };
 
-    const activeTabConfig = TABS.find(t => t.id === activeTab);
+    const activeTabConfig = VISIBLE_TABS.find(t => t.id === activeTab) || VISIBLE_TABS[0];
     const TabIcon = activeTabConfig?.icon || Trophy;
 
     return (
@@ -163,8 +174,8 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                 display: 'flex', flexWrap: 'wrap', gap: '6px',
                 padding: 'var(--spacing-sm) var(--spacing-md)'
             }}>
-                {TABS.map(tab => {
-                    const isActive = tab.id === activeTab;
+                {VISIBLE_TABS.map(tab => {
+                    const isActive = tab.id === activeTab || (!VISIBLE_TABS.find(t => t.id === activeTab) && tab.id === VISIBLE_TABS[0].id);
                     const Icon = tab.icon;
                     return (
                         <button
@@ -298,6 +309,26 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
                                                     border: '1px solid rgba(239,68,68,0.25)'
                                                 }}>
                                                     <Heart size={10} color="#ef4444" fill="#ef4444" />
+                                                </span>
+                                            )}
+                                            {entry.isClub && (
+                                                <span style={{
+                                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                                    background: 'rgba(59,130,246,0.15)', borderRadius: '10px',
+                                                    padding: '1px 6px', gap: '3px',
+                                                    border: '1px solid rgba(59,130,246,0.25)'
+                                                }}>
+                                                    <Medal size={10} color="#3b82f6" fill="#3b82f6" />
+                                                </span>
+                                            )}
+                                            {entry.isPro && (
+                                                <span style={{
+                                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                                    background: 'rgba(139,92,246,0.15)', borderRadius: '10px',
+                                                    padding: '1px 6px', gap: '3px',
+                                                    border: '1px solid rgba(139,92,246,0.25)'
+                                                }}>
+                                                    <Crown size={10} color="#8b5cf6" fill="#8b5cf6" />
                                                 </span>
                                             )}
                                             {entry.lastActiveDay === todayStr && <Shield size={12} color="#10b981" />}
@@ -503,6 +534,28 @@ function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                                 }}>
                                     <Heart size={12} color="#ef4444" fill="#ef4444" />
                                     <span style={{ fontSize: '0.65rem', fontWeight: '700', color: '#ef4444' }}>Supporter</span>
+                                </span>
+                            )}
+                            {entry.isClub && (
+                                <span style={{
+                                    display: 'inline-flex', alignItems: 'center',
+                                    background: 'rgba(59,130,246,0.15)', borderRadius: '12px',
+                                    padding: '2px 8px', gap: '4px', marginLeft: '4px',
+                                    border: '1px solid rgba(59,130,246,0.25)'
+                                }}>
+                                    <Medal size={12} color="#3b82f6" fill="#3b82f6" />
+                                    <span style={{ fontSize: '0.65rem', fontWeight: '700', color: '#3b82f6' }}>Club</span>
+                                </span>
+                            )}
+                            {entry.isPro && (
+                                <span style={{
+                                    display: 'inline-flex', alignItems: 'center',
+                                    background: 'rgba(139,92,246,0.15)', borderRadius: '12px',
+                                    padding: '2px 8px', gap: '4px', marginLeft: '4px',
+                                    border: '1px solid rgba(139,92,246,0.25)'
+                                }}>
+                                    <Crown size={12} color="#8b5cf6" fill="#8b5cf6" />
+                                    <span style={{ fontSize: '0.65rem', fontWeight: '700', color: '#8b5cf6' }}>Pro</span>
                                 </span>
                             )}
                         </div>
