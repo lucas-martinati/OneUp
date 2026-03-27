@@ -26,17 +26,17 @@ exports.onRevenueCatWebhook = onRequest(async (req, res) => {
 
     const { type, app_user_id, entitlement_ids } = event;
 
-    // We only process lifecycle events that alter boolean entitlement status
+    // We process lifecycle events that alter boolean entitlement status
     const actionableEvents = [
       "INITIAL_PURCHASE",
       "RENEWAL",
       "UNCANCELLATION",  // User resumed before expiration
       "TRANSFER",        // Subscription moved to another UI
-      "EXPIRATION"
+      "EXPIRATION",
+      "CANCELLATION"     // Sandbox refunds or immediate billing error cancellations
     ];
 
     if (!actionableEvents.includes(type)) {
-      // NOTE: CANCELLATION is ignored because canceling auto-renew does NOT revoke access until EXPIRATION.
       res.status(200).send(`Event type ${type} ignored by design.`);
       return;
     }
@@ -47,8 +47,19 @@ exports.onRevenueCatWebhook = onRequest(async (req, res) => {
     }
 
     // Determine target boolean status:
-    // If purchased or renewed, isActive is true. If expired, isActive is false.
-    const isActive = ["INITIAL_PURCHASE", "RENEWAL", "UNCANCELLATION", "TRANSFER"].includes(type);
+    let isActive = false;
+    if (["INITIAL_PURCHASE", "RENEWAL", "UNCANCELLATION", "TRANSFER"].includes(type)) {
+      isActive = true;
+    } else if (["EXPIRATION", "CANCELLATION"].includes(type)) {
+      // For cancellations, sometimes they are immediate (like test refunds or billing errors).
+      // We keep isActive = true ONLY if the expiration date is still in the future.
+      const now = event.event_timestamp_ms || Date.now();
+      if (event.expiration_at_ms && event.expiration_at_ms > now) {
+        isActive = true;
+      } else {
+        isActive = false;
+      }
+    }
 
     const updatePayload = {};
 
