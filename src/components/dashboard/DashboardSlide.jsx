@@ -267,9 +267,8 @@ const ExerciseButton = React.memo(({
     };
 
     const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
-    const exStreak = computedStats.exerciseDoneToday[ex.id]
-        ? (computedStats.exerciseCurrentStreaks[ex.id] || 0)
-        : (computedStats.exerciseCurrentStreaks[ex.id] > 0 ? computedStats.exerciseCurrentStreaks[ex.id] : 0);
+    const statsEx = computedStats.exerciseStats?.find(e => e.id === ex.id);
+    const exStreak = statsEx ? statsEx.streak : 0;
     const exCount = getExerciseCount(today, ex.id);
     const exGoal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
     const exDone = completions[today]?.[ex.id]?.isCompleted || exCount >= exGoal;
@@ -350,7 +349,8 @@ const ExerciseButton = React.memo(({
                 <span style={{
                     fontSize: 'clamp(0.5rem, 1.1vh, 0.65rem)',
                     color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
-                    opacity: 0.8
+                    opacity: exDone ? 1 : 0.6,
+                    filter: exDone ? 'none' : 'grayscale(100%)'
                 }}>
                     🔥{exStreak}
                 </span>

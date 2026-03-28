@@ -125,9 +125,8 @@ export function Dashboard({
     const isFuture = today < effectiveStart;
 
     // Pre-computed streaks from computedStats
-    const exerciseStreak = computedStats.exerciseDoneToday[globalSelectedId]
-        ? computedStats.exerciseCurrentStreaks[globalSelectedId]
-        : (computedStats.exerciseCurrentStreaks[globalSelectedId] > 0 ? computedStats.exerciseCurrentStreaks[globalSelectedId] : 0);
+    const statsSelectedEx = computedStats.exerciseStats?.find(e => e.id === globalSelectedId);
+    const exerciseStreak = statsSelectedEx ? statsSelectedEx.streak : 0;
 
     // Duolingo-style streak from computedStats
     const displayStreak = computedStats.displayStreak;
