@@ -348,20 +348,19 @@
   },
   "club": {
     "title": "Club Subscription",
-    "description": "Challenge your friends!",
-    "explanation": "Access private challenges between friends and mini-leagues. Create closed groups with internal rankings and launch motivating challenges!",
+    "description": "Mini-Leagues & Community",
+    "explanation": "Access exclusive mini-leagues with friends. Create closed groups with internal rankings and track your progress together!",
     "features": {
-      "challenges": "Private friend challenges",
       "leagues": "Closed mini-leagues",
       "ranking": "Internal ranking",
-      "notifications": "Challenge notifications"
+      "notifications": "League notifications"
     },
     "buyButton": "Join the Club",
     "activeTitle": "Club Member",
-    "activeDesc": "You have access to all friend challenges.",
+    "activeDesc": "You have access to all Club features.",
     "price": "€0.99/month",
     "locked": "Club subscription required",
-    "lockedDesc": "Upgrade to Club to challenge your friends!"
+    "lockedDesc": "Upgrade to Club to unlock exclusive features!"
   },
   "pro": {
     "title": "Pro Subscription",

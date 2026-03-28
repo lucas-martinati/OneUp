@@ -172,7 +172,7 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                         activeDesc={t('club.activeDesc')}
                         idleDescription={t('club.description')}
                         idleExplanation={t('club.explanation')}
-                        features={['challenges', 'leagues', 'ranking', 'notifications'].map(f => t(`club.features.${f}`))}
+                        features={['leagues', 'ranking', 'notifications'].map(f => t(`club.features.${f}`))}
                         buyButtonText={`${t('club.buyButton')} — ${t('club.price')}`}
                         onPurchase={onPurchaseClub}
                         cloudAuth={cloudAuth}

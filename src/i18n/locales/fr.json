@@ -348,7 +348,7 @@
   },
   "club": {
     "title": "Abonnement Club",
-    "description": "Mini-Ligue & Défis",
+    "description": "Mini-Ligue & Communauté",
     "explanation": "Pimente tes entraînements ! Débloque la création d'un Club privé pour inviter tes amis, comparer vos performances en temps réel et organiser des compétitions acharnées.",
     "features": {
       "createClub": "Création d'un Club VIP privé",

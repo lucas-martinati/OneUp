@@ -338,20 +338,19 @@
   },
   "club": {
     "title": "Suscripción Club",
-    "description": "¡Desafía a tus amigos!",
-    "explanation": "Accede a desafíos privados entre amigos y mini-ligas. Crea grupos cerrados con clasificación interna y lanza desafíos motivadores.",
+    "description": "Mini-Ligas y Comunidad",
+    "explanation": "Accede a mini-ligas exclusivas con amigos. Crea grupos cerrados con clasificación interna y sigue tu progreso juntos.",
     "features": {
-      "challenges": "Desafíos privados entre amigos",
       "leagues": "Mini-ligas cerradas",
       "ranking": "Clasificación interna",
-      "notifications": "Notificaciones de desafío"
+      "notifications": "Notificaciones de liga"
     },
     "buyButton": "Unirse al Club",
     "activeTitle": "Miembro Club",
-    "activeDesc": "Tienes acceso a todos los desafíos entre amigos.",
+    "activeDesc": "Tienes acceso a todas las funciones del Club.",
     "price": "4,99€/mes",
     "locked": "Suscripción Club requerida",
-    "lockedDesc": "¡Pásate a Club para desafiar a tus amigos!"
+    "lockedDesc": "¡Pásate a Club para desbloquear funciones exclusivas!"
   },
   "pro": {
     "title": "Suscripción Pro",

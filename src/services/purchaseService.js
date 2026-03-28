@@ -3,7 +3,7 @@
  *
  * Tiers:
  *   supporter — one-time ~2-5€ — ❤️ badge on leaderboard
- *   club      — 0.99€/mo  — friend challenges, mini-leagues
+ *   club      — 0.99€/mo  — mini-leagues, community features
  *   pro       — 6.99€/mo  — custom programs, dedicated panel
  *
  * Entitlements (configured in RevenueCat dashboard):

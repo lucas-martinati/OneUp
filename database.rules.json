@@ -1,0 +1,26 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "leaderboard": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "clans": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "notifications": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "auth != null"
+      }
+    }
+  }
+}
