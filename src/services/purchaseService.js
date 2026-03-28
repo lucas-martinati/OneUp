@@ -11,14 +11,18 @@
  *   "club"      — auto-renewable subscription
  *   "pro"       — auto-renewable subscription
  *
- * Falls back gracefully on web/dev where native SDK is unavailable.
+ * Uses the Capacitor SDK on native (Android/iOS) and the Web SDK
+ * (@revenuecat/purchases-js) on web for Stripe-based Web Billing.
  */
 
 import { Capacitor } from '@capacitor/core';
-import { Purchases } from '@revenuecat/purchases-capacitor';
+import { Purchases as PurchasesNative } from '@revenuecat/purchases-capacitor';
+import { Purchases as PurchasesWeb } from '@revenuecat/purchases-js';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('Purchases');
+
+const isNative = Capacitor.isNativePlatform();
 
 // Product identifiers configured in RevenueCat dashboard
 const PRODUCTS = {
@@ -41,24 +45,32 @@ const PRODUCTS = {
 
 let isInitialized = false;
 
+// ── Initialization ─────────────────────────────────────────────────────
+
 /**
- * Initialize RevenueCat SDK.
+ * Initialize RevenueCat SDK (native or web).
  * Call once at app startup after auth.
  */
 export async function initPurchases(userId) {
-  if (!Capacitor.isNativePlatform()) {
-    logger.info('Purchases: skipping init on web');
-    return false;
-  }
-
   try {
-    await Purchases.configure({
-      apiKey: import.meta.env.VITE_REVENUECAT_API_KEY,
-      appUserID: userId || null,
-    });
+    if (isNative) {
+      // Native (Android / iOS) — Capacitor SDK
+      await PurchasesNative.configure({
+        apiKey: import.meta.env.VITE_REVENUECAT_API_KEY,
+        appUserID: userId || null,
+      });
+    } else {
+      // Web — purchases-js SDK (Stripe / Web Billing)
+      const webKey = import.meta.env.VITE_REVENUECAT_WEB_API_KEY;
+      if (!webKey) {
+        logger.warn('No Web Billing API key configured, skipping web init');
+        return false;
+      }
+      PurchasesWeb.configure(webKey, userId || 'anonymous');
+    }
 
     isInitialized = true;
-    logger.success('RevenueCat initialized');
+    logger.success(`RevenueCat initialized (${isNative ? 'native' : 'web'})`);
     return true;
   } catch (error) {
     logger.error('RevenueCat init failed:', error);
@@ -74,6 +86,14 @@ function hasActiveEntitlement(customerInfo, entitlementId) {
   return Object.keys(customerInfo.entitlements.active).some(k => k.toLowerCase() === targetId);
 }
 
+async function _getCustomerInfo() {
+  if (isNative) {
+    const { customerInfo } = await PurchasesNative.getCustomerInfo();
+    return customerInfo;
+  }
+  return await PurchasesWeb.getSharedInstance().getCustomerInfo();
+}
+
 async function _checkEntitlement(tier) {
   const cfg = PRODUCTS[tier];
   if (!cfg) return false;
@@ -83,7 +103,7 @@ async function _checkEntitlement(tier) {
   }
 
   try {
-    const { customerInfo } = await Purchases.getCustomerInfo();
+    const customerInfo = await _getCustomerInfo();
     const active = hasActiveEntitlement(customerInfo, cfg.entitlementId);
     localStorage.setItem(cfg.localStorageKey, active ? 'true' : 'false');
     return active;
@@ -98,7 +118,13 @@ async function _getOffering(tier) {
   if (!isInitialized) return null;
 
   try {
-    const offerings = await Purchases.getOfferings();
+    let offerings;
+    if (isNative) {
+      offerings = await PurchasesNative.getOfferings();
+    } else {
+      offerings = await PurchasesWeb.getSharedInstance().getOfferings();
+    }
+
     const current = offerings?.current;
     if (!current) {
       logger.error('No current offering set in RevenueCat dashboard');
@@ -107,16 +133,23 @@ async function _getOffering(tier) {
 
     const pkg =
       current.availablePackages?.find(
-        (p) => p.product?.identifier === cfg.productId
+        (p) => {
+          // Native uses product.identifier, Web uses webBillingProduct.identifier
+          const identifier = p.product?.identifier || p.webBillingProduct?.identifier;
+          return identifier === cfg.productId;
+        }
       ) || current.availablePackages?.[0];
 
     if (!pkg) return null;
 
+    // Normalize product info across native/web
+    const product = pkg.product || pkg.webBillingProduct;
+
     return {
       id: pkg.identifier,
-      price: pkg.product?.priceString || '',
-      title: pkg.product?.title || tier,
-      description: pkg.product?.description || '',
+      price: product?.priceString || '',
+      title: product?.title || tier,
+      description: product?.description || '',
       product: pkg,
     };
   } catch (error) {
@@ -129,10 +162,6 @@ async function _purchase(tier) {
   const cfg = PRODUCTS[tier];
 
   if (!isInitialized) {
-    if (!Capacitor.isNativePlatform()) {
-      logger.info('Purchases: not available on web — use the Android app');
-      return { success: false, isActive: false, webOnly: true };
-    }
     logger.error('Purchases not initialized');
     return { success: false, isActive: false };
   }
@@ -144,9 +173,21 @@ async function _purchase(tier) {
       return { success: false, isActive: false };
     }
 
-    const { customerInfo } = await Purchases.purchasePackage({
-      aPackage: offering.product,
-    });
+    let customerInfo;
+
+    if (isNative) {
+      // Native: Capacitor SDK
+      const result = await PurchasesNative.purchasePackage({
+        aPackage: offering.product,
+      });
+      customerInfo = result.customerInfo;
+    } else {
+      // Web: purchases-js SDK — opens Stripe checkout
+      const result = await PurchasesWeb.getSharedInstance().purchase({
+        rcPackage: offering.product,
+      });
+      customerInfo = result.customerInfo;
+    }
 
     const isActive = hasActiveEntitlement(customerInfo, cfg.entitlementId);
     localStorage.setItem(cfg.localStorageKey, isActive ? 'true' : 'false');
@@ -164,7 +205,7 @@ async function _purchase(tier) {
       },
     };
   } catch (error) {
-    if (error.code === 1 || error.userCancelled) {
+    if (error.code === 1 || error.userCancelled || error.errorCode === 'UserCancelledError') {
       logger.info('Purchase cancelled by user');
     } else {
       logger.error(`Purchase ${tier} failed:`, error);
@@ -222,17 +263,23 @@ export async function purchasePro() {
 /**
  * Restore previous purchases (for users who reinstall).
  * Returns status for all tiers.
+ * On web, we just re-check customer info (Stripe purchases are server-side).
  */
 export async function restorePurchases() {
   if (!isInitialized) {
-    if (!Capacitor.isNativePlatform()) {
-      return { success: false, supporter: false, club: false, pro: false, webOnly: true };
-    }
     return { success: false, supporter: false, club: false, pro: false };
   }
 
   try {
-    const { customerInfo } = await Purchases.restorePurchases();
+    let customerInfo;
+
+    if (isNative) {
+      const result = await PurchasesNative.restorePurchases();
+      customerInfo = result.customerInfo;
+    } else {
+      // Web SDK: no restorePurchases — just re-fetch customer info
+      customerInfo = await PurchasesWeb.getSharedInstance().getCustomerInfo();
+    }
 
     const supporter = hasActiveEntitlement(customerInfo, PRODUCTS.supporter.entitlementId);
     const club = hasActiveEntitlement(customerInfo, PRODUCTS.club.entitlementId);
@@ -254,10 +301,10 @@ export async function restorePurchases() {
  * Fetch formatted purchase history directly from RevenueCat securely.
  */
 export async function getPurchaseHistory() {
-  if (!isInitialized || !Capacitor.isNativePlatform()) return [];
+  if (!isInitialized) return [];
 
   try {
-    const { customerInfo } = await Purchases.getCustomerInfo();
+    const customerInfo = await _getCustomerInfo();
     const history = [];
 
     const getProductDetails = (identifier) => {
@@ -283,8 +330,8 @@ export async function getPurchaseHistory() {
       }
     }
 
-    // 2. Hard Purchases (One-Time)
-    if (customerInfo?.nonSubscriptionTransactions?.length > 0) {
+    // 2. Hard Purchases (One-Time) — native only (nonSubscriptionTransactions)
+    if (isNative && customerInfo?.nonSubscriptionTransactions?.length > 0) {
       for (const tx of customerInfo.nonSubscriptionTransactions) {
         if (!history.some(h => h.id === tx.productIdentifier)) {
           const details = getProductDetails(tx.productIdentifier);

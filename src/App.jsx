@@ -315,7 +315,6 @@ function App() {
 
   const handlePurchaseSupporter = async () => {
     const result = await purchaseSupporter();
-    if (result.webOnly) { return result; }
     if (result.success || result.isSupporter || result.isActive) {
       setIsSupporter(true);
       await saveAndPublish({ isSupporter: true, isClub: isClubRef.current, isPro: isProRef.current });
@@ -331,7 +330,6 @@ function App() {
 
   const handlePurchaseClub = async () => {
     const result = await purchaseClub();
-    if (result.webOnly) { return result; }
     if (result.success || result.isActive) {
       setIsClub(true);
       await saveAndPublish({ isSupporter: isSupporterRef.current, isClub: true, isPro: isProRef.current });
@@ -347,7 +345,6 @@ function App() {
 
   const handlePurchasePro = async () => {
     const result = await purchasePro();
-    if (result.webOnly) { return result; }
     if (result.success || result.isActive) {
       setIsPro(true);
       await saveAndPublish({ isSupporter: isSupporterRef.current, isClub: isClubRef.current, isPro: true });
@@ -362,33 +359,27 @@ function App() {
   };
 
   const handleRestorePurchases = async () => {
-    // 1. Try RevenueCat restore (native only)
+    // 1. Try RevenueCat restore (works on both native and web)
     const result = await restorePurchases();
-    if (!result.webOnly) {
-      const sup = result.supporter || result.isSupporter;
-      const clb = result.club;
-      const pr = result.pro;
-      setIsSupporter(sup);
-      setIsClub(clb);
-      setIsPro(pr);
-      if (sup || clb || pr) {
-        await saveAndPublish({ isSupporter: sup, isClub: clb, isPro: pr });
-        return;
+    let sup = result.supporter || result.isSupporter || false;
+    let clb = result.club || false;
+    let pr = result.pro || false;
+
+    // 2. Fallback: check Firebase purchase object directly
+    if (!sup && !clb && !pr) {
+      const cloudPurchase = await cloudSync.loadPurchase();
+      if (cloudPurchase) {
+        sup = !!cloudPurchase.isSupporter;
+        clb = !!cloudPurchase.isClub;
+        pr = !!cloudPurchase.isPro;
       }
     }
 
-    // 2. Fallback: check Firebase purchase object directly
-    const cloudPurchase = await cloudSync.loadPurchase();
-    if (cloudPurchase) {
-      sup = sup || !!cloudPurchase.isSupporter;
-      clb = clb || !!cloudPurchase.isClub;
-      pr = pr || !!cloudPurchase.isPro;
-    }
+    setIsSupporter(sup);
+    setIsClub(clb);
+    setIsPro(pr);
 
     if (sup || clb || pr) {
-      setIsSupporter(sup);
-      setIsClub(clb);
-      setIsPro(pr);
       await saveAndPublish({ isSupporter: sup, isClub: clb, isPro: pr });
     }
   };

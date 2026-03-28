@@ -14,7 +14,6 @@ export function StoreCard({
     buyButtonText,
     onPurchase,
     cloudAuth,
-    setShowWebPaymentModal,
     allowMultiplePurchases = false
 }) {
     const sectionTitleStyle = {
@@ -28,8 +27,7 @@ export function StoreCard({
             cloudAuth?.signIn?.();
             return;
         }
-        const res = await onPurchase?.();
-        if (res?.webOnly) setShowWebPaymentModal(true);
+        await onPurchase?.();
     };
 
     return (

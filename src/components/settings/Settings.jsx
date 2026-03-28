@@ -6,7 +6,6 @@ import { Capacitor } from '@capacitor/core';
 import { getPurchaseHistory } from '../../services/purchaseService';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { SettingRow } from '../ui/SettingRow';
-import { WebPaymentModal } from '../store/WebPaymentModal';
 import { StoreCard } from '../store/StoreCard';
 
 export function Settings({ defaultShowStore = false, settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isClub, isPro, purchaseHistory, onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases }) {
@@ -14,7 +13,7 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
     const [showSaved, setShowSaved] = useState(false);
     const [showStore, setShowStore] = useState(defaultShowStore);
     const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
-    const [showWebPaymentModal, setShowWebPaymentModal] = useState(false);
+
     const [revenueCatHistory, setRevenueCatHistory] = useState([]);
 
     const displayHistory = revenueCatHistory?.length > 0 ? revenueCatHistory : (purchaseHistory || []);
@@ -159,7 +158,6 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                         buyButtonText={isSupporter ? "Faire un nouveau don" : t('supporter.buyButton')}
                         onPurchase={onPurchaseSupporter}
                         cloudAuth={cloudAuth}
-                        setShowWebPaymentModal={setShowWebPaymentModal}
                         allowMultiplePurchases={true}
                     />
 
@@ -181,7 +179,6 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                             buyButtonText={`${t('club.buyButton')} — ${t('club.price')}`}
                             onPurchase={onPurchaseClub}
                             cloudAuth={cloudAuth}
-                            setShowWebPaymentModal={setShowWebPaymentModal}
                         />
                     )}
 
@@ -202,7 +199,6 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                         buyButtonText={`${t('pro.buyButton')} — ${t('pro.price')}`}
                         onPurchase={onPurchasePro}
                         cloudAuth={cloudAuth}
-                        setShowWebPaymentModal={setShowWebPaymentModal}
                     />
 
                     {/* Restore purchases button (shared for all tiers) */}
@@ -666,9 +662,7 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
             </>
             )}
 
-            {showWebPaymentModal && (
-                <WebPaymentModal onClose={() => setShowWebPaymentModal(false)} />
-            )}
+
         </div>
     </div>
     );

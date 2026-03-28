@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { Capacitor } from '@capacitor/core';
+
 import {
   getAuth,
   GoogleAuthProvider,
@@ -695,14 +695,10 @@ class CloudSyncService {
 
   // Save purchase status to cloud (3 booleans)
   // Stored at `users/{uid}/purchase`
-  // SECURITY: Only allowed on native platforms (Android) where RevenueCat validates the purchase.
-  // On web, purchase status is managed exclusively by the server webhook.
+  // SECURITY: RevenueCat validates the purchase on both native (Google Play)
+  // and web (Stripe), so saving from either platform is safe.
   async savePurchase({ isSupporter, isClub, isPro }) {
     try {
-      if (!Capacitor.isNativePlatform()) {
-        logger.info('savePurchase: blocked on web (server-only)');
-        return false;
-      }
       if (!auth?.currentUser || !database) return false;
       const userId = auth.currentUser.uid;
       await set(ref(database, `users/${userId}/purchase`), {
