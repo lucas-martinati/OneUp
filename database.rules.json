@@ -14,12 +14,21 @@
     },
     "clans": {
       ".read": "auth != null",
-      ".write": "auth != null"
+      "$clanId": {
+        ".write": "auth != null && (!data.exists() || (!newData.exists() && !data.child('members').exists()))",
+        "members": {
+          "$memberUid": {
+            ".write": "auth != null && $memberUid === auth.uid"
+          }
+        }
+      }
     },
     "notifications": {
       "$uid": {
-        ".read": "$uid === auth.uid",
-        ".write": "auth != null"
+        ".read": "auth != null && $uid === auth.uid",
+        "$notifId": {
+          ".write": "auth != null && (!data.exists() && newData.child('fromUid').val() === auth.uid || $uid === auth.uid)"
+        }
       }
     }
   }
