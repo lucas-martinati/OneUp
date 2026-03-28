@@ -118,13 +118,6 @@ export const EXERCISES_MAP = Object.fromEntries(EXERCISES.map(e => [e.id, e]));
 
 export const getDailyGoal = (exercise, dayNumber, userMultiplier = 1.0) => {
     if (!exercise) return 1;
-    // For weights/custom using baseReps
-    if (exercise.baseReps !== undefined) {
-        let goal = exercise.baseReps + ((dayNumber - 1) * (exercise.incrementReps || 0));
-        if (exercise.maxReps && goal > exercise.maxReps) goal = exercise.maxReps;
-        return Math.max(1, Math.ceil(goal * userMultiplier));
-    }
-    // Classical items logic
     const mult = exercise.multiplier !== undefined ? exercise.multiplier : 1;
     return Math.max(1, Math.ceil(dayNumber * mult * userMultiplier));
 };
