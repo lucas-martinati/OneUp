@@ -491,7 +491,7 @@ class CloudSyncService {
    * Publish (or update) this user's leaderboard entry.
    * Stored at `leaderboard/{uid}`.
    */
-  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1 }) {
+  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter, isClub, isPro }) {
     try {
       if (!auth?.currentUser || !database) return false;
 
@@ -511,10 +511,10 @@ class CloudSyncService {
         lastActiveDay: lastActiveDay,
         difficultyMultiplier: difficultyMultiplier || 1,
         isPublic: isPublic !== false,
-        // Preserve server-set purchase flags (only the webhook can change these)
-        isSupporter: existingData.isSupporter || false,
-        isClub: existingData.isClub || false,
-        isPro: existingData.isPro || false,
+        // Preserve server-set purchase flags, but allow client to update them if provided
+        isSupporter: isSupporter !== undefined ? isSupporter : (existingData.isSupporter || false),
+        isClub: isClub !== undefined ? isClub : (existingData.isClub || false),
+        isPro: isPro !== undefined ? isPro : (existingData.isPro || false),
         lastUpdated: serverTimestamp()
       };
 

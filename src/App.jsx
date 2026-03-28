@@ -75,6 +75,9 @@ function App() {
         isPublic: !!settings.leaderboardEnabled,
         lastActiveDay,
         difficultyMultiplier: settings?.difficultyMultiplier,
+        isSupporter: isSupporterRef.current,
+        isClub: isClubRef.current,
+        isPro: isProRef.current,
       });
       logger.debug('Leaderboard published');
     } catch (e) {

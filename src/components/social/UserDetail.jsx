@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Medal, Crown, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Heart, Zap, Dumbbell, ArrowDownUp, ArrowUp, ChevronsUp, Footprints } from 'lucide-react';
+import { Trophy, Medal, Crown, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Heart, Zap, Dumbbell, ArrowDownUp, ArrowUp, ChevronsUp, Footprints, Swords } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { EXERCISES } from '../../config/exercises';
 import { registerBackHandler } from '../../utils/backHandler';
@@ -97,6 +97,14 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                                     padding: '2px 8px', gap: '4px', marginLeft: '4px', border: '1px solid rgba(239,68,68,0.25)'
                                 }}>
                                     <Heart size={12} color="#ef4444" fill="#ef4444" />
+                                </span>
+                            )}
+                            {entry.isClub && (
+                                <span style={{
+                                    display: 'inline-flex', alignItems: 'center', background: 'rgba(245,158,11,0.15)', borderRadius: '12px',
+                                    padding: '2px 8px', gap: '4px', marginLeft: '4px', border: '1px solid rgba(245,158,11,0.25)'
+                                }}>
+                                    <Swords size={12} color="#f59e0b" fill="#f59e0b" />
                                 </span>
                             )}
                             {entry.isPro && (
