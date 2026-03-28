@@ -126,20 +126,28 @@ export const DashboardSlide = React.memo(({
                         display: 'flex', flexDirection: 'column', alignItems: 'center',
                         gap: 'clamp(4px, 0.8vh, 10px)'
                     }}>
-                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                        <div style={{ 
+                            position: 'relative', 
+                            width: 'clamp(72px, 12vh, 110px)', 
+                            height: 'clamp(72px, 12vh, 110px)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center' 
+                        }}>
                             {/* Year progress ring */}
                             <svg viewBox="0 0 100 100" style={{
-                                position: 'absolute', top: '-8%', left: '-8%',
-                                width: 'clamp(90px, 14vh, 130px)', height: 'clamp(90px, 14vh, 130px)'
+                                position: 'absolute', top: '50%', left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: '100%', height: '100%',
+                                pointerEvents: 'none',
+                                overflow: 'visible'
                             }}>
-                                <circle cx="50" cy="50" r="42" fill="none" stroke="var(--progress-track)" strokeWidth="3.5" />
+                                <circle cx="50" cy="50" r="52" fill="none" stroke="var(--progress-track)" strokeWidth="3.5" />
                                 <circle
                                     className="progress-ring-circle"
-                                    cx="50" cy="50" r="42" fill="none"
+                                    cx="50" cy="50" r="51" fill="none"
                                     stroke={`url(#dashGrad-${activeExerciseId})`}
-                                    strokeWidth="3.5"
-                                    strokeDasharray={2 * Math.PI * 42}
-                                    strokeDashoffset={2 * Math.PI * 42 - (progress / 100) * 2 * Math.PI * 42}
+                                    strokeWidth="4"
+                                    strokeDasharray={2 * Math.PI * 52}
+                                    strokeDashoffset={2 * Math.PI * 52 - (progress / 100) * 2 * Math.PI * 52}
                                     strokeLinecap="round"
                                     transform="rotate(-90 50 50)"
                                 />
@@ -156,7 +164,7 @@ export const DashboardSlide = React.memo(({
                                 onClick={() => { pauseCloudSync?.(); setShowCounter(true); }}
                                 className="ripple"
                                 style={{
-                                    width: 'clamp(72px, 12vh, 110px)', height: 'clamp(72px, 12vh, 110px)', borderRadius: '50%',
+                                    width: '100%', height: '100%', borderRadius: '50%',
                                     background: isExerciseDone
                                         ? `linear-gradient(135deg, ${safeSelectedExercise.color} 0%, ${safeSelectedExercise.gradient[1]} 100%)`
                                         : 'transparent',
