@@ -8,7 +8,7 @@ import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { SettingRow } from '../ui/SettingRow';
 import { StoreCard } from '../store/StoreCard';
 
-export function Settings({ defaultShowStore = false, settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isClub, isPro, purchaseHistory, onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases }) {
+export function Settings({ defaultShowStore = false, settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isClub, isPro, onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases }) {
     const { t, i18n } = useTranslation();
     const [showSaved, setShowSaved] = useState(false);
     const [showStore, setShowStore] = useState(defaultShowStore);
@@ -16,18 +16,15 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
 
     const [revenueCatHistory, setRevenueCatHistory] = useState([]);
 
-    const displayHistory = revenueCatHistory?.length > 0 ? revenueCatHistory : (purchaseHistory || []);
+    const displayHistory = revenueCatHistory || [];
 
     useEffect(() => {
         if (showStore) {
             getPurchaseHistory().then(hist => {
                 setRevenueCatHistory(hist);
-                if (hist && hist.length > 0 && cloudSync && cloudAuth?.isSignedIn) {
-                    cloudSync.savePurchaseHistoryToCloud(hist);
-                }
             });
         }
-    }, [showStore, cloudSync, cloudAuth]);
+    }, [showStore]);
 
     const handleToggleNotifications = () => {
         const newSettings = { ...settings, notificationsEnabled: !settings.notificationsEnabled };
@@ -163,23 +160,23 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
 
                     {/* ── ABONNEMENT CLUB ─────────────────────────────────── */}
                     {false && (
-                        <StoreCard
-                            isActive={isClub}
-                            title={t('club.title')}
-                            icon={Swords}
-                            colorMain="#f59e0b"
-                            colorRGB="245,158,11"
-                            colorGradientStart="#f59e0b"
-                            colorGradientEnd="#d97706"
-                            activeTitle={t('club.activeTitle')}
-                            activeDesc={t('club.activeDesc')}
-                            idleDescription={t('club.description')}
-                            idleExplanation={t('club.explanation')}
-                            features={['challenges', 'leagues', 'ranking', 'notifications'].map(f => t(`club.features.${f}`))}
-                            buyButtonText={`${t('club.buyButton')} — ${t('club.price')}`}
-                            onPurchase={onPurchaseClub}
-                            cloudAuth={cloudAuth}
-                        />
+                    <StoreCard
+                        isActive={isClub}
+                        title={t('club.title')}
+                        icon={Swords}
+                        colorMain="#f59e0b"
+                        colorRGB="245,158,11"
+                        colorGradientStart="#f59e0b"
+                        colorGradientEnd="#d97706"
+                        activeTitle={t('club.activeTitle')}
+                        activeDesc={t('club.activeDesc')}
+                        idleDescription={t('club.description')}
+                        idleExplanation={t('club.explanation')}
+                        features={['challenges', 'leagues', 'ranking', 'notifications'].map(f => t(`club.features.${f}`))}
+                        buyButtonText={`${t('club.buyButton')} — ${t('club.price')}`}
+                        onPurchase={onPurchaseClub}
+                        cloudAuth={cloudAuth}
+                    />
                     )}
 
                     {/* ── ABONNEMENT PRO ───────────────────────────────────── */}

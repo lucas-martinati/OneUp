@@ -662,36 +662,7 @@ class CloudSyncService {
     }
   }
 
-  // Save purchase history to cloud
-  async savePurchaseHistoryToCloud(history) {
-    try {
-      if (!auth?.currentUser || !database) return false;
-      const userId = auth.currentUser.uid;
-      const historyRef = ref(database, `users/${userId}/purchaseHistory`);
-      await set(historyRef, history);
-      return true;
-    } catch (error) {
-      logger.error('Error syncing purchase history:', error);
-      return false;
-    }
-  }
 
-  // Load purchase history from cloud
-  async loadPurchaseHistoryFromCloud() {
-    try {
-      if (!auth?.currentUser || !database) return [];
-      const userId = auth.currentUser.uid;
-      const historyRef = ref(database, `users/${userId}/purchaseHistory`);
-      const snapshot = await get(historyRef);
-      if (snapshot.exists()) {
-        return snapshot.val() || [];
-      }
-      return [];
-    } catch (error) {
-      logger.error('Error loading purchase history:', error);
-      return [];
-    }
-  }
 
   // Save purchase status to cloud (3 booleans)
   // Stored at `users/{uid}/purchase`

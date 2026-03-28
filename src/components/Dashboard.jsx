@@ -50,7 +50,7 @@ export function Dashboard({
     conflictData, onResolveConflict, getExerciseCount, updateExerciseCount, getTotalReps,
     getExerciseDone, pauseCloudSync, resumeCloudSync, computedStats,
     routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
-    isSupporter, isClub, isPro, purchaseHistory,
+    isSupporter, isClub, isPro,
     onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases,
     customExercisesHook
 }) {
@@ -406,7 +406,6 @@ export function Dashboard({
                             isSupporter={isSupporter}
                             isClub={isClub}
                             isPro={isPro}
-                            purchaseHistory={purchaseHistory}
                             onPurchaseSupporter={onPurchaseSupporter}
                             onPurchaseClub={onPurchaseClub}
                             onPurchasePro={onPurchasePro}
@@ -479,7 +478,7 @@ export function Dashboard({
                             cloudAuth={cloudAuth}
                             settings={settings}
                             updateSettings={updateSettings}
-                        />
+                                                    />
                     )}
                     {showCustomExercisesModal && (
                         <CustomExercisesModal

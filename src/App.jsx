@@ -46,7 +46,6 @@ function App() {
   useEffect(() => { isSupporterRef.current = isSupporter; }, [isSupporter]);
   useEffect(() => { isClubRef.current = isClub; }, [isClub]);
   useEffect(() => { isProRef.current = isPro; }, [isPro]);
-  const [purchaseHistory, setPurchaseHistory] = useState([]);
 
   const {
     startDate, completions, startChallenge, toggleCompletion,
@@ -109,7 +108,6 @@ function App() {
       setIsSupporter(false);
       setIsClub(false);
       setIsPro(false);
-      setPurchaseHistory([]);
       localStorage.removeItem('oneup_supporter');
       localStorage.removeItem('oneup_club');
       localStorage.removeItem('oneup_pro');
@@ -181,8 +179,6 @@ function App() {
         try {
           const cloudRoutines = await cloudSync.loadRoutinesFromCloud();
           if (cloudRoutines && Array.isArray(cloudRoutines)) setRoutinesFromCloud(cloudRoutines);
-          const history = await cloudSync.loadPurchaseHistoryFromCloud();
-          if (history && Array.isArray(history)) setPurchaseHistory(history);
           const cloudExercises = await cloudSync.loadCustomExercisesFromCloud();
           if (cloudExercises && Array.isArray(cloudExercises)) customExercisesHook.setCustomExercisesFromCloud(cloudExercises);
         } catch (error) { logger.error('Data sync error:', error); }
@@ -319,12 +315,6 @@ function App() {
       setIsSupporter(true);
       await saveAndPublish({ isSupporter: true, isClub: isClubRef.current, isPro: isProRef.current });
     }
-    if (result.success && result.product) {
-      const product = { ...result.product, type: 'supporter' };
-      const newHistory = [...purchaseHistory, product];
-      setPurchaseHistory(newHistory);
-      cloudSync.savePurchaseHistoryToCloud(newHistory);
-    }
     return result;
   };
 
@@ -334,12 +324,6 @@ function App() {
       setIsClub(true);
       await saveAndPublish({ isSupporter: isSupporterRef.current, isClub: true, isPro: isProRef.current });
     }
-    if (result.success && result.product) {
-      const product = { ...result.product, type: 'club' };
-      const newHistory = [...purchaseHistory, product];
-      setPurchaseHistory(newHistory);
-      cloudSync.savePurchaseHistoryToCloud(newHistory);
-    }
     return result;
   };
 
@@ -348,12 +332,6 @@ function App() {
     if (result.success || result.isActive) {
       setIsPro(true);
       await saveAndPublish({ isSupporter: isSupporterRef.current, isClub: isClubRef.current, isPro: true });
-    }
-    if (result.success && result.product) {
-      const product = { ...result.product, type: 'pro' };
-      const newHistory = [...purchaseHistory, product];
-      setPurchaseHistory(newHistory);
-      cloudSync.savePurchaseHistoryToCloud(newHistory);
     }
     return result;
   };
@@ -491,7 +469,6 @@ function App() {
           isSupporter={googleAuth.isSignedIn ? isSupporter : false}
           isClub={googleAuth.isSignedIn ? isClub : false}
           isPro={googleAuth.isSignedIn ? isPro : false}
-          purchaseHistory={purchaseHistory}
           onPurchaseSupporter={handlePurchaseSupporter}
           onPurchaseClub={handlePurchaseClub}
           onPurchasePro={handlePurchasePro}
