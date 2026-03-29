@@ -17,6 +17,13 @@ export const WEIGHT_EXERCISES = [
     multiplier: 0.5,
   },
   {
+    id: "hammer_curl",
+    color: "#ea580c",
+    gradient: ["#ea580c", "#c2410c"], // dark orange
+    icon: "Dumbbell",
+    multiplier: 0.5,
+  },
+  {
     id: "bench_press",
     color: "#3b82f6",
     gradient: ["#3b82f6", "#2563eb"], // blue
