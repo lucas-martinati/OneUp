@@ -6,77 +6,92 @@ import i18n from '../i18n';
 const logger = createLogger('Clan');
 
 export async function createClan(name) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) throw new Error('Not initialized');
+  try {
+    const auth = getAuthInstance();
+    const database = getDatabaseInstance();
+    if (!auth?.currentUser || !database) throw new Error('Not initialized');
 
-  const uid = auth.currentUser.uid;
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = '';
-  for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+    const uid = auth.currentUser.uid;
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
 
-  const newClanRef = push(ref(database, 'clans'));
-  const clanId = newClanRef.key;
+    const newClanRef = push(ref(database, 'clans'));
+    const clanId = newClanRef.key;
 
-  await set(newClanRef, { name, code, createdBy: uid, createdAt: serverTimestamp(), members: { [uid]: 'admin' } });
-  await set(ref(database, `users/${uid}/clans/${clanId}`), 'admin');
+    await set(newClanRef, { name, code, createdBy: uid, createdAt: serverTimestamp(), members: { [uid]: 'admin' } });
+    await set(ref(database, `users/${uid}/clans/${clanId}`), 'admin');
 
-  logger.success(`Clan ${name} created with code ${code}`);
-  return { success: true, clanId, code };
+    logger.success(`Clan ${name} created with code ${code}`);
+    return { success: true, clanId, code };
+  } catch (error) {
+    logger.error('Error creating clan:', error);
+    return { success: false, error: i18n.t('clan.createError') };
+  }
 }
 
 export async function joinClan(code) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) throw new Error('Not initialized');
+  try {
+    const auth = getAuthInstance();
+    const database = getDatabaseInstance();
+    if (!auth?.currentUser || !database) throw new Error('Not initialized');
 
-  const uid = auth.currentUser.uid;
-  const cleanCode = code.toUpperCase().trim();
+    const uid = auth.currentUser.uid;
+    const cleanCode = code.toUpperCase().trim();
 
-  const snapshot = await get(ref(database, 'clans'));
-  if (!snapshot.exists()) return { success: false, error: i18n.t('clan.invalidCode') };
+    const snapshot = await get(ref(database, 'clans'));
+    if (!snapshot.exists()) return { success: false, error: i18n.t('clan.invalidCode') };
 
-  const clans = snapshot.val();
-  let foundClanId = null;
-  for (const [id, clan] of Object.entries(clans)) {
-    if (clan.code === cleanCode) { foundClanId = id; break; }
+    const clans = snapshot.val();
+    let foundClanId = null;
+    for (const [id, clan] of Object.entries(clans)) {
+      if (clan.code === cleanCode) { foundClanId = id; break; }
+    }
+    if (!foundClanId) return { success: false, error: i18n.t('clan.invalidCode') };
+
+    const userClanSnapshot = await get(ref(database, `users/${uid}/clans/${foundClanId}`));
+    if (userClanSnapshot.exists()) return { success: false, error: i18n.t('clan.alreadyMember') };
+
+    await set(ref(database, `clans/${foundClanId}/members/${uid}`), 'member');
+    await set(ref(database, `users/${uid}/clans/${foundClanId}`), 'member');
+
+    logger.success(`Joined clan ${foundClanId}`);
+    return { success: true, clanId: foundClanId };
+  } catch (error) {
+    logger.error('Error joining clan:', error);
+    return { success: false, error: i18n.t('clan.joinError') };
   }
-  if (!foundClanId) return { success: false, error: i18n.t('clan.invalidCode') };
-
-  const userClanSnapshot = await get(ref(database, `users/${uid}/clans/${foundClanId}`));
-  if (userClanSnapshot.exists()) return { success: false, error: i18n.t('clan.alreadyMember') };
-
-  await set(ref(database, `clans/${foundClanId}/members/${uid}`), 'member');
-  await set(ref(database, `users/${uid}/clans/${foundClanId}`), 'member');
-
-  logger.success(`Joined clan ${foundClanId}`);
-  return { success: true, clanId: foundClanId };
 }
 
 export async function leaveClan(clanId) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) throw new Error('Not initialized');
-  if (!clanId) return { success: false, error: i18n.t('clan.missingId') };
+  try {
+    const auth = getAuthInstance();
+    const database = getDatabaseInstance();
+    if (!auth?.currentUser || !database) throw new Error('Not initialized');
+    if (!clanId) return { success: false, error: i18n.t('clan.missingId') };
 
-  const uid = auth.currentUser.uid;
-  const userSnapshot = await get(ref(database, `users/${uid}/clans/${clanId}`));
-  if (!userSnapshot.exists()) return { success: true };
+    const uid = auth.currentUser.uid;
+    const userSnapshot = await get(ref(database, `users/${uid}/clans/${clanId}`));
+    if (!userSnapshot.exists()) return { success: true };
 
-  await remove(ref(database, `clans/${clanId}/members/${uid}`));
-  await remove(ref(database, `users/${uid}/clans/${clanId}`));
+    await remove(ref(database, `clans/${clanId}/members/${uid}`));
+    await remove(ref(database, `users/${uid}/clans/${clanId}`));
 
-  const clanSnapshot = await get(ref(database, `clans/${clanId}`));
-  if (clanSnapshot.exists()) {
-    const remainingMembers = clanSnapshot.val().members || {};
-    if (Object.keys(remainingMembers).length === 0) {
-      await remove(ref(database, `clans/${clanId}`));
-      logger.success(`Clan ${clanId} deleted because it became empty.`);
+    const clanSnapshot = await get(ref(database, `clans/${clanId}`));
+    if (clanSnapshot.exists()) {
+      const remainingMembers = clanSnapshot.val().members || {};
+      if (Object.keys(remainingMembers).length === 0) {
+        await remove(ref(database, `clans/${clanId}`));
+        logger.success(`Clan ${clanId} deleted because it became empty.`);
+      }
     }
-  }
 
-  logger.success(`Left clan ${clanId} successfully`);
-  return { success: true };
+    logger.success(`Left clan ${clanId} successfully`);
+    return { success: true };
+  } catch (error) {
+    logger.error('Error leaving clan:', error);
+    return { success: false, error: i18n.t('clan.leaveError') };
+  }
 }
 
 export async function getUserClans() {

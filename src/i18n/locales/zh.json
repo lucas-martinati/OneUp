@@ -411,10 +411,12 @@
     "nameRequired": "需要部落名称",
     "codeRequired": "需要6位代码",
     "invalidCode": "无效代码",
-    "createError": "创建部落时出错",
+    "createError": "发生错误",
     "loadingBtn": "加载中...",
     "alreadyMember": "您已经在这个公会中",
-    "missingId": "缺少公会ID"
+    "missingId": "缺少公会ID",
+    "joinError": "加入公会时出错",
+    "leaveError": "离开公会时出错"
   },
   "workout": {
     "newSession": "新训练",

@@ -1,6 +1,7 @@
 import { ref, set, get, serverTimestamp } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance, initializeFirebase } from './firebase';
+import i18n from '../i18n';
 
 const logger = createLogger('Leaderboard');
 
@@ -15,7 +16,7 @@ export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps
   const existingData = existing.exists() ? existing.val() : {};
 
   await set(lbRef, {
-    pseudo: pseudo || auth.currentUser.displayName || 'Anonyme',
+    pseudo: pseudo || auth.currentUser.displayName || i18n.t('common.anonymous'),
     photoURL: auth.currentUser.photoURL || null,
     totalReps: totalReps || 0,
     weightsTotalReps: weightsTotalReps || 0,
@@ -55,7 +56,7 @@ export async function loadLeaderboard() {
     .filter(([, entry]) => entry.isPublic !== false)
     .map(([uid, entry]) => ({
       uid,
-      pseudo: entry.pseudo || 'Anonyme',
+      pseudo: entry.pseudo || i18n.t('common.anonymous'),
       photoURL: entry.photoURL || null,
       totalReps: entry.totalReps || 0,
       weightsTotalReps: entry.weightsTotalReps || 0,

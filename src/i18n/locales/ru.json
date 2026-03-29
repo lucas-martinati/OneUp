@@ -411,10 +411,12 @@
     "nameRequired": "Название клана обязательно",
     "codeRequired": "Нужен код из 6 символов",
     "invalidCode": "Неверный код",
-    "createError": "Ошибка создания клана",
+    "createError": "Произошла ошибка",
     "loadingBtn": "Загрузка...",
     "alreadyMember": "Вы уже в этом клане",
-    "missingId": "Отсутствует ID клана"
+    "missingId": "Отсутствует ID клана",
+    "joinError": "Ошибка при входе в клан",
+    "leaveError": "Ошибка при выходе из клана"
   },
   "workout": {
     "newSession": "Новая тренировка",

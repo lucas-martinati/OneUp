@@ -411,10 +411,12 @@
     "nameRequired": "Se requiere el nombre del clan",
     "codeRequired": "Código de 6 caracteres requerido",
     "invalidCode": "Código inválido",
-    "createError": "Error al crear el clan",
+    "createError": "Se produjo un error",
     "loadingBtn": "Cargando...",
     "alreadyMember": "Ya estás en este clan",
-    "missingId": "ID de clan faltante"
+    "missingId": "ID de clan faltante",
+    "joinError": "Error al unirse al clan",
+    "leaveError": "Error al salir del clan"
   },
   "workout": {
     "newSession": "Nueva Sesión",

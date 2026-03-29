@@ -17,7 +17,7 @@ const PRESET_COLORS = [
 ];
 
 export function CustomExercisesModal({ onClose, customExercisesHook, computedStats }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { customExercises, saveCustomExercise, deleteCustomExercise, maxCustomExercises } = customExercisesHook;
   
   const [confirmDeleteEx, setConfirmDeleteEx] = useState(null);
@@ -324,7 +324,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
               {t('customExercises.deleteConfirm', { name: confirmDeleteEx.label })}
               {computedStats?.exerciseReps?.[confirmDeleteEx.id] > 0 && (
                 <span style={{ display: 'block', marginTop: '12px', color: '#fbbf24', fontSize: '0.85rem', fontWeight: '700', padding: '8px', background: 'rgba(251,191,36,0.1)', borderRadius: '8px' }}>
-                  {t('customExercises.deleteWarning', { count: computedStats.exerciseReps[confirmDeleteEx.id].toLocaleString(), unit: confirmDeleteEx.type === 'timer' ? t('customExercises.seconds') : t('customExercises.repetitions') })}
+                  {t('customExercises.deleteWarning', { count: computedStats.exerciseReps[confirmDeleteEx.id].toLocaleString(i18n.language), unit: confirmDeleteEx.type === 'timer' ? t('customExercises.seconds') : t('customExercises.repetitions') })}
                 </span>
               )}
             </p>
