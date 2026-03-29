@@ -27,7 +27,9 @@
     "doneAt": "Done at {{time}}",
     "waiting": "⏳ Waiting",
     "challengeStarts": "Your challenge starts on",
-    "date": "{{date}}"
+    "date": "{{date}}",
+    "noExercisesConfigured": "You haven't configured any exercises here yet.",
+    "configure": "Configure"
   },
   "onboarding": {
     "concept": "The Concept",
@@ -185,7 +187,8 @@
       "evening": "Evening"
     },
     "quote": "\"Consistency beats perfection\"",
-    "quoteSub": "Show up every day, one step at a time!"
+    "quoteSub": "Show up every day, one step at a time!",
+    "filters": "Filters"
   },
   "achievements": {
     "badgesUnlocked": "Badges Unlocked",
@@ -528,5 +531,33 @@
   },
   "store": {
     "title": "Store"
+  },
+  "customExercises": {
+    "title": "Custom Exercises",
+    "empty": "You haven't created any custom exercises yet.",
+    "create": "Create an exercise",
+    "limitReached": "Limit of {{count}} exercises reached.",
+    "nameLabel": "Exercise name",
+    "namePlaceholder": "Ex: Chair plank, Jump rope...",
+    "colorLabel": "Theme color",
+    "iconLabel": "Icon",
+    "typeLabel": "Tracking type",
+    "typeReps": "Reps",
+    "typeTime": "Time",
+    "multiplierLabel": "Goal multiplier",
+    "multiplierHint": "Target goal: Day #X multiplied by {{value}} {{unit}}.",
+    "cancel": "Cancel",
+    "save": "Save",
+    "deleteTitle": "Delete exercise?",
+    "deleteConfirm": "Are you sure you want to delete",
+    "deleteWarning": "Warning: you will lose {{count}} {{unit}} from your global total.",
+    "delete": "Delete",
+    "typeTimer": "Timer",
+    "typeCounter": "Counter",
+    "multiplierShort": "Multiplier",
+    "errorNameRequired": "Name is required",
+    "errorLimit": "Exercise limit reached or error.",
+    "seconds": "seconds",
+    "repetitions": "repetitions"
   }
 }

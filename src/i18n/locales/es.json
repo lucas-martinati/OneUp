@@ -27,7 +27,9 @@
     "doneAt": "Hecho a las {{time}}",
     "waiting": "⏳ Esperando",
     "challengeStarts": "Tu desafío comienza el",
-    "date": "{{date}}"
+    "date": "{{date}}",
+    "noExercisesConfigured": "Aún no has configurado ejercicios aquí.",
+    "configure": "Configurar"
   },
   "onboarding": {
     "concept": "El Concepto",
@@ -185,7 +187,8 @@
       "evening": "Noche"
     },
     "quote": "\"La constancia vence a la perfección\"",
-    "quoteSub": "¡Preséntate cada día, un paso a la vez!"
+    "quoteSub": "¡Preséntate cada día, un paso a la vez!",
+    "filters": "Filtros"
   },
   "achievements": {
     "badgesUnlocked": "Insignias Desbloqueadas",
@@ -519,5 +522,33 @@
   },
   "store": {
     "title": "Tienda"
+  },
+  "customExercises": {
+    "title": "Ejercicios Personalizados",
+    "empty": "Aún no has creado ejercicios personalizados.",
+    "create": "Crear un ejercicio",
+    "limitReached": "Límite de {{count}} ejercicios alcanzado.",
+    "nameLabel": "Nombre del ejercicio",
+    "namePlaceholder": "Ej: Plancha en soga, Cuerda para saltar...",
+    "colorLabel": "Color del tema",
+    "iconLabel": "Icono",
+    "typeLabel": "Tipo de seguimiento",
+    "typeReps": "Reps",
+    "typeTime": "Tiempo",
+    "multiplierLabel": "Multiplicador de objetivo",
+    "multiplierHint": "Objetivo: Día #X multiplicado por {{value}} {{unit}}.",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "deleteTitle": "¿Eliminar ejercicio?",
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar",
+    "deleteWarning": "Atención: perderás {{count}} {{unit}} de tu total global.",
+    "delete": "Eliminar",
+    "typeTimer": "Cronómetro",
+    "typeCounter": "Contador",
+    "multiplierShort": "Multiplicador",
+    "errorNameRequired": "El nombre es obligatorio",
+    "errorLimit": "Límite de ejercicios alcanzado o error.",
+    "seconds": "segundos",
+    "repetitions": "repeticiones"
   }
 }

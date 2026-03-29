@@ -31,7 +31,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
 
   const handleCreate = () => {
     if (!label.trim()) {
-      setError(t('common.required', { field: 'Nom' }) || 'Le nom est requis');
+      setError(t('customExercises.errorNameRequired'));
       return;
     }
     
@@ -56,7 +56,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
       setError('');
       setView('list');
     } else {
-      setError("Limite d'exercices atteinte ou erreur.");
+      setError(t('customExercises.errorLimit'));
     }
   };
 
@@ -73,7 +73,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
     }}>
       <div style={{ padding: 'var(--spacing-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0, color: 'var(--text-primary)' }}>
-          Exercices Personnalisés
+          {t('customExercises.title')}
         </h2>
         <button onClick={onClose} className="glass hover-lift" style={{
           width: '40px', height: '40px', borderRadius: '50%',
@@ -89,7 +89,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
             {customExercises.length === 0 ? (
               <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 20px' }}>
                 <Settings2 size={48} style={{ opacity: 0.5, marginBottom: '16px' }} />
-                <p>Vous n'avez pas encore créé d'exercices personnalisés.</p>
+                <p>{t('customExercises.empty')}</p>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
@@ -112,7 +112,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                         <div>
                           <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{ex.label}</div>
                           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                            {ex.type === 'timer' ? 'Chronomètre' : 'Compteur'} • Multiplicateur: x{ex.multiplier}
+                            {ex.type === 'timer' ? t('customExercises.typeTimer') : t('customExercises.typeCounter')} • {t('customExercises.multiplierShort')}: x{ex.multiplier}
                           </div>
                         </div>
                       </div>
@@ -143,12 +143,12 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                 background: 'linear-gradient(135deg, #8b5cf6, #6366f1)', border: 'none', color: 'white',
                 fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}>
-                <Plus size={20} /> Créer un exercice
+                <Plus size={20} /> {t('customExercises.create')}
               </button>
             )}
             {customExercises.length >= maxCustomExercises && (
               <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                Limite de {maxCustomExercises} exercices atteinte.
+                {t('customExercises.limitReached', { count: maxCustomExercises })}
               </p>
             )}
           </div>
@@ -159,7 +159,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
             {/* NAME */}
             <div style={{ position: 'relative' }}>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Nom de l'exercice
+                {t('customExercises.nameLabel')}
               </label>
               <div style={{ position: 'relative' }}>
                 <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: color }}>
@@ -170,7 +170,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                   maxLength={20}
                   value={label}
                   onChange={e => setLabel(e.target.value)}
-                  placeholder="Ex: Gainage chaise, Corde à sauter..."
+                  placeholder={t('customExercises.namePlaceholder')}
                   style={{
                     width: '100%', padding: '16px 16px 16px 44px', borderRadius: 'var(--radius-lg)',
                     border: `2px solid ${label ? color + '50' : 'var(--border-subtle)'}`,
@@ -186,7 +186,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
             {/* COLOR */}
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Couleur de thème
+                {t('customExercises.colorLabel')}
               </label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', justifyContent: 'space-between' }}>
                 {PRESET_COLORS.map(c => (
@@ -203,7 +203,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
             {/* ICON */}
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Icône
+                {t('customExercises.iconLabel')}
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
                 {Object.keys(ICONS).map(name => {
@@ -228,7 +228,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
             {/* TYPE */}
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Type de suivi
+                {t('customExercises.typeLabel')}
               </label>
               <div style={{ display: 'flex', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-lg)', padding: '4px' }}>
                 <button
@@ -240,7 +240,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                     fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s'
                   }}
                 >
-                  <Dumbbell size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} /> Reps
+                  <Dumbbell size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} /> {t('customExercises.typeReps')}
                 </button>
                 <button
                   onClick={() => setType('timer')}
@@ -251,7 +251,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                     fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s'
                   }}
                 >
-                  <Activity size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} /> Temps
+                  <Activity size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} /> {t('customExercises.typeTime')}
                 </button>
               </div>
             </div>
@@ -260,14 +260,14 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
             <div style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 'var(--radius-lg)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <label style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  Multiplicateur d'objectif
+                  {t('customExercises.multiplierLabel')}
                 </label>
                 <div style={{ fontSize: '1.4rem', fontWeight: '900', color: color }}>
                   x{multiplier.toFixed(1)}
                 </div>
               </div>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '16px', marginTop: 0, lineHeight: 1.4 }}>
-                Objectif visé : Jour n°X multiplié par {multiplier.toFixed(1)} {type === 'timer' ? '(Secondes)' : '(Reps)'}.
+                {t('customExercises.multiplierHint', { value: multiplier.toFixed(1), unit: type === 'timer' ? `(${t('customExercises.seconds')})` : `(${t('customExercises.repetitions')})` })}
               </p>
               <input
                 type="range"
@@ -285,13 +285,13 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                 flex: 1, padding: '14px', borderRadius: 'var(--radius-md)',
                 background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
                 color: 'var(--text-primary)', fontSize: '1rem', fontWeight: '600'
-              }}>Annuler</button>
+              }}>{t('customExercises.cancel')}</button>
               
               <button onClick={handleCreate} style={{
                 flex: 1, padding: '14px', borderRadius: 'var(--radius-md)',
                 background: '#8b5cf6', border: 'none',
                 color: 'white', fontSize: '1rem', fontWeight: '700'
-              }}>Sauvegarder</button>
+              }}>{t('customExercises.save')}</button>
             </div>
           </div>
         )}
@@ -317,14 +317,14 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
             </div>
             
             <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '800' }}>
-              Supprimer l'exercice ?
+              {t('customExercises.deleteTitle')}
             </h3>
             
             <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
-              Êtes-vous sûr de vouloir supprimer <b>{confirmDeleteEx.label}</b> ?
+              {t('customExercises.deleteConfirm')} <b>{confirmDeleteEx.label}</b> ?
               {computedStats?.exerciseReps?.[confirmDeleteEx.id] > 0 && (
                 <span style={{ display: 'block', marginTop: '12px', color: '#fbbf24', fontSize: '0.85rem', fontWeight: '700', padding: '8px', background: 'rgba(251,191,36,0.1)', borderRadius: '8px' }}>
-                  Attention : vous perdrez {computedStats.exerciseReps[confirmDeleteEx.id].toLocaleString()} {(confirmDeleteEx.type === 'timer' ? 'secondes' : 'répétitions')} de votre total mondial.
+                  {t('customExercises.deleteWarning', { count: computedStats.exerciseReps[confirmDeleteEx.id].toLocaleString(), unit: confirmDeleteEx.type === 'timer' ? t('customExercises.seconds') : t('customExercises.repetitions') })}
                 </span>
               )}
             </p>
@@ -339,7 +339,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                   color: 'white', fontWeight: '700'
                 }}
               >
-                Annuler
+                {t('customExercises.cancel')}
               </button>
               <button 
                 onClick={() => {
@@ -352,7 +352,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                   background: '#ef4444', border: 'none', color: 'white', fontWeight: '700'
                 }}
               >
-                Supprimer
+                {t('customExercises.delete')}
               </button>
             </div>
           </div>

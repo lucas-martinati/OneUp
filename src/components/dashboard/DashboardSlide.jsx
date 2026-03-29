@@ -10,19 +10,19 @@ export const DashboardSlide = React.memo(({
     isCounterTransitioning, prevDayNumber, numberKey, pauseCloudSync, setShowCounter,
     activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, onManageCustom
 }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
     
     if (!safeSelectedExercise) {
         return (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '20px', textAlign: 'center' }}>
                 {title && <h2 style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>{title}</h2>}
-                <div style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>Vous n'avez pas encore configuré d'exercices ici.</div>
+                <div style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>{t('dashboard.noExercisesConfigured')}</div>
                 {onManageCustom && (
                     <button onClick={onManageCustom} className="hover-lift" style={{
                         padding: '12px 24px', borderRadius: 'var(--radius-md)', background: '#8b5cf6', color: 'white', fontWeight: '700', border: 'none'
                     }}>
-                        Configurer
+                        {t('dashboard.configure')}
                     </button>
                 )}
             </div>
@@ -227,7 +227,7 @@ export const DashboardSlide = React.memo(({
                             const exData = completions[today]?.[activeExerciseId];
                             const completedAt = exData?.timestamp ? new Date(exData.timestamp) : null;
                             const timeStr = completedAt
-                                ? completedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                                ? completedAt.toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' })
                                 : null;
                             return timeStr ? (
                                 <div className="scale-in" style={{

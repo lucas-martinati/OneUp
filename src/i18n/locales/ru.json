@@ -27,7 +27,9 @@
     "doneAt": "Выполнено в {{time}}",
     "waiting": "⏳ Ожидание",
     "challengeStarts": "Ваш челлендж начинается",
-    "date": "{{date}}"
+    "date": "{{date}}",
+    "noExercisesConfigured": "Вы еще не настроили упражнения здесь.",
+    "configure": "Настроить"
   },
   "onboarding": {
     "concept": "Концепция",
@@ -185,7 +187,8 @@
       "evening": "Вечер"
     },
     "quote": "\"Постоянство важнее совершенства\"",
-    "quoteSub": "Показывайтесь каждый день, шаг за шагом!"
+    "quoteSub": "Показывайтесь каждый день, шаг за шагом!",
+    "filters": "Фильтры"
   },
   "achievements": {
     "badgesUnlocked": "Разблокированные значки",
@@ -519,5 +522,33 @@
   },
   "store": {
     "title": "Магазин"
+  },
+  "customExercises": {
+    "title": "Пользовательские упражнения",
+    "empty": "Вы еще не создали пользовательских упражнений.",
+    "create": "Создать упражнение",
+    "limitReached": "Достигнут лимит {{count}} упражнений.",
+    "nameLabel": "Название упражнения",
+    "namePlaceholder": "Напр: Планка на стуле, Скакалка...",
+    "colorLabel": "Цвет темы",
+    "iconLabel": "Иконка",
+    "typeLabel": "Тип отслеживания",
+    "typeReps": "Повторения",
+    "typeTime": "Время",
+    "multiplierLabel": "Множитель цели",
+    "multiplierHint": "Цель: День №X умноженный на {{value}} {{unit}}.",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "deleteTitle": "Удалить упражнение?",
+    "deleteConfirm": "Вы уверены, что хотите удалить",
+    "deleteWarning": "Внимание: вы потеряете {{count}} {{unit}} из вашего общего мирового счета.",
+    "delete": "Удалить",
+    "typeTimer": "Таймер",
+    "typeCounter": "Счетчик",
+    "multiplierShort": "Множитель",
+    "errorNameRequired": "Имя обязательно",
+    "errorLimit": "Достигнут лимит упражнений или ошибка.",
+    "seconds": "секунд",
+    "repetitions": "повторений"
   }
 }

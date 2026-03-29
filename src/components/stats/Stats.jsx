@@ -12,7 +12,7 @@ const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
 const ConsistencyPieChart = lazy(() => import('./ConsistencyPieChart'));
 
 export function Stats({ completions, exercisesList, initialCategory, isPro, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats: globalStats, onOpenStore }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [chartsReady, setChartsReady] = useState(false);
     const [activeCategories, setActiveCategories] = useState(() => {
         if (initialCategory === 'global') return ['standard', 'weights', 'custom'];
@@ -72,7 +72,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
     const formatDate = (dateStr) => {
         if (!dateStr) return '—';
         const d = new Date(dateStr);
-        return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+        return d.toLocaleDateString(i18n.language, { day: 'numeric', month: 'short' });
     };
 
     return (
@@ -129,7 +129,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                     }}
                 >
                     <Filter size={16} />
-                    Filtres ({activeCategories.length})
+                    {t('stats.filters')} ({activeCategories.length})
                 </button>
                 {showFilters && (
                     <div className="fade-in" style={{

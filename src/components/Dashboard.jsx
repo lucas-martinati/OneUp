@@ -15,6 +15,7 @@ import { DashboardSlide } from './dashboard/DashboardSlide';
 import { DashboardActions } from './dashboard/DashboardActions';
 import { ProPaywall } from './dashboard/ProPaywall';
 import { useHardwareBack } from '../hooks/useHardwareBack';
+import { useModalManager } from '../hooks/useModalManager';
 
 const Calendar = lazy(() => import('./stats/Calendar').then(m => ({ default: m.Calendar })));
 const Stats = lazy(() => import('./stats/Stats').then(m => ({ default: m.Stats })));
@@ -49,15 +50,30 @@ export function Dashboard({
 }) {
     const { t } = useTranslation();
     const [today, setToday] = useState(getLocalDateStr(new Date()));
-    const [showCalendar, setShowCalendar] = useState(false);
-    const [showStats, setShowStats] = useState(false);
-    const [showSettings, setShowSettings] = useState(false);
-    const [showCounter, setShowCounter] = useState(false);
-    const [showLeaderboard, setShowLeaderboard] = useState(false);
-    const [showAchievements, setShowAchievements] = useState(false);
-    const [showSession, setShowSession] = useState(false);
-    const [showClan, setShowClan] = useState(false);
-    const [showCustomExercisesModal, setShowCustomExercisesModal] = useState(false);
+
+    const { modals, openModal, closeModal, anyModalOpen, activeModals } = useModalManager(
+        { calendar: false, stats: false, settings: false, counter: false, leaderboard: false, achievements: false, session: false, clan: false, customExercises: false },
+        ['counter', 'session', 'clan'] // shouldResumeSync modals
+    );
+    // Aliases for child components expecting setShowX boolean setters
+    const setShowCalendar = (v) => v ? openModal('calendar') : closeModal('calendar');
+    const setShowStats = (v) => v ? openModal('stats') : closeModal('stats');
+    const setShowSettings = (v) => v ? openModal('settings') : closeModal('settings');
+    const setShowCounter = (v) => v ? openModal('counter') : closeModal('counter');
+    const setShowLeaderboard = (v) => v ? openModal('leaderboard') : closeModal('leaderboard');
+    const setShowAchievements = (v) => v ? openModal('achievements') : closeModal('achievements');
+    const setShowSession = (v) => v ? openModal('session') : closeModal('session');
+    const setShowClan = (v) => v ? openModal('clan') : closeModal('clan');
+    const setShowCustomExercisesModal = (v) => v ? openModal('customExercises') : closeModal('customExercises');
+    const showCalendar = modals.calendar;
+    const showStats = modals.stats;
+    const showSettings = modals.settings;
+    const showCounter = modals.counter;
+    const showLeaderboard = modals.leaderboard;
+    const showAchievements = modals.achievements;
+    const showSession = modals.session;
+    const showClan = modals.clan;
+    const showCustomExercisesModal = modals.customExercises;
     const [newAchievement, setNewAchievement] = useState(null);
     const [activeSlide, setActiveSlide] = useState(0); // 0: Classic, 1: Weights, 2: Custom
     
@@ -161,18 +177,6 @@ export function Dashboard({
         return () => clearInterval(interval);
     }, [today, getDayNumber, settings, scheduleNotification]);
 
-    // Android Hardware Back handling
-    const activeModals = useMemo(() => [
-        { isOpen: showCounter, close: () => setShowCounter(false), shouldResumeSync: true },
-        { isOpen: showSession, close: () => setShowSession(false), shouldResumeSync: true },
-        { isOpen: showClan, close: () => setShowClan(false), shouldResumeSync: true },
-        { isOpen: showAchievements, close: () => setShowAchievements(false) },
-        { isOpen: showLeaderboard, close: () => setShowLeaderboard(false) },
-        { isOpen: showSettings, close: () => setShowSettings(false) },
-        { isOpen: showStats, close: () => setShowStats(false) },
-        { isOpen: showCalendar, close: () => setShowCalendar(false) }
-    ], [showCounter, showSession, showClan, showAchievements, showLeaderboard, showSettings, showStats, showCalendar]);
-
     useHardwareBack(activeModals, resumeCloudSync);
 
 
@@ -189,9 +193,6 @@ export function Dashboard({
             setShowAchievements(true);
         }, 100);
     }, []);
-
-    // React to any modal being open to prevent background scrolling (iOS Safari fix)
-    const anyModalOpen = showCalendar || showStats || showSettings || showCounter || showLeaderboard || showAchievements || showSession || showClan || showCustomExercisesModal;
 
     // Lock body scroll when any modal is open (critical for iOS Safari)
     useEffect(() => {

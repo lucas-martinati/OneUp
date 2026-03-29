@@ -27,7 +27,9 @@
     "doneAt": "完成于 {{time}}",
     "waiting": "⏳ 等待中",
     "challengeStarts": "你的挑战开始于",
-    "date": "{{date}}"
+    "date": "{{date}}",
+    "noExercisesConfigured": "您尚未在此处配置任何练习。",
+    "configure": "配置"
   },
   "onboarding": {
     "concept": "概念",
@@ -185,7 +187,8 @@
       "evening": "晚上"
     },
     "quote": "\"坚持胜过完美\"",
-    "quoteSub": "每天出现，一步一个脚印！"
+    "quoteSub": "每天出现，一步一个脚印！",
+    "filters": "筛选"
   },
   "achievements": {
     "badgesUnlocked": "已解锁徽章",
@@ -463,7 +466,9 @@
     "promoText": "用你的 Google 账户登录，将你的进度保存到云端并在设备间同步。",
     "autoBackup": "自动备份",
     "multiDevice": "多设备同步",
-    "neverLose": "永不丢失你的进度"
+    "neverLose": "永不丢失你的进度",
+    "areYouSure": "您确定吗？",
+    "cannotBeUndone": "此操作将覆盖您的云端数据。"
   },
   "notifications": {
     "title": "💪 OneUp — 每日挑战！",
@@ -482,7 +487,14 @@
     "burpees": "波比跳",
     "planche": "平板支撑 (秒)",
     "dips": "双杠臂屈伸",
-    "mountain": "登山者"
+    "mountain": "登山者",
+    "biceps_curl": "二头弯举",
+    "hammer_curl": "锤式弯举",
+    "bench_press": "卧推",
+    "overhead_press": "推举",
+    "squat_weights": "负重深蹲",
+    "deadlift": "硬拉",
+    "barbell_row": "杠铃划船"
   },
   "supporter": {
     "title": "支持开发者 ❤️",
@@ -503,9 +515,9 @@
     "explanation": "创建你自己的训练计划：选择你的运动，设定每日进度，并通过连续天数和日历跟踪你的专属统计数据。",
     "features": {
       "customPrograms": "100% 自定义计划",
-      "exerciseChoice": "自由选择运动",
-      "dailyProgression": "量身定制的每日进度",
-      "dedicatedPanel": "专属面板，完整跟踪",
+      "specialExercises": "负重和哑铃模式",
+      "dailyProgression": "多运动混合训练",
+      "proStats": "专家统计和图表",
       "customExercises": "100%自定义练习",
       "weightDashboard": "力量训练面板",
       "exclusiveLeaderboards": "专属排行榜"
@@ -519,5 +531,33 @@
   },
   "store": {
     "title": "商店"
+  },
+  "customExercises": {
+    "title": "自定义练习",
+    "empty": "您还没有创建任何自定义练习。",
+    "create": "创建练习",
+    "limitReached": "已达到 {{count}} 个练习的限制。",
+    "nameLabel": "练习名称",
+    "namePlaceholder": "例如：椅子平板支撑、跳绳...",
+    "colorLabel": "主题颜色",
+    "iconLabel": "图标",
+    "typeLabel": "追踪类型",
+    "typeReps": "次数",
+    "typeTime": "时间",
+    "multiplierLabel": "目标倍率",
+    "multiplierHint": "目标：第X天乘以 {{value}} {{unit}}。",
+    "cancel": "取消",
+    "save": "保存",
+    "deleteTitle": "删除练习？",
+    "deleteConfirm": "您确定要删除",
+    "deleteWarning": "注意：您将从全球总数中丢失 {{count}} {{unit}}。",
+    "delete": "删除",
+    "typeTimer": "计时器",
+    "typeCounter": "计数器",
+    "multiplierShort": "倍率",
+    "errorNameRequired": "名称为必填项",
+    "errorLimit": "已达到练习限制或出现错误。",
+    "seconds": "秒",
+    "repetitions": "次"
   }
 }

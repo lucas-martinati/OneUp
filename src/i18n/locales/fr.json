@@ -27,7 +27,9 @@
     "doneAt": "Fait à {{time}}",
     "waiting": "⏳ En attente",
     "challengeStarts": "Ton défi commence le",
-    "date": "{{date}}"
+    "date": "{{date}}",
+    "noExercisesConfigured": "Vous n'avez pas encore configuré d'exercices ici.",
+    "configure": "Configurer"
   },
   "onboarding": {
     "concept": "Le Concept",
@@ -185,7 +187,8 @@
       "evening": "Soir"
     },
     "quote": "\"La régularité bat la perfection\"",
-    "quoteSub": "Montre-toi chaque jour, un pas à la fois !"
+    "quoteSub": "Montre-toi chaque jour, un pas à la fois !",
+    "filters": "Filtres"
   },
   "achievements": {
     "badgesUnlocked": "Badges Débloqués",
@@ -528,5 +531,33 @@
   },
   "store": {
     "title": "Boutique"
+  },
+  "customExercises": {
+    "title": "Exercices Personnalisés",
+    "empty": "Vous n'avez pas encore créé d'exercices personnalisés.",
+    "create": "Créer un exercice",
+    "limitReached": "Limite de {{count}} exercices atteinte.",
+    "nameLabel": "Nom de l'exercice",
+    "namePlaceholder": "Ex: Gainage chaise, Corde à sauter...",
+    "colorLabel": "Couleur de thème",
+    "iconLabel": "Icône",
+    "typeLabel": "Type de suivi",
+    "typeReps": "Reps",
+    "typeTime": "Temps",
+    "multiplierLabel": "Multiplicateur d'objectif",
+    "multiplierHint": "Objectif visé : Jour n°X multiplié par {{value}} {{unit}}.",
+    "cancel": "Annuler",
+    "save": "Sauvegarder",
+    "deleteTitle": "Supprimer l'exercice ?",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer",
+    "deleteWarning": "Attention : vous perdrez {{count}} {{unit}} de votre total mondial.",
+    "delete": "Supprimer",
+    "typeTimer": "Chronomètre",
+    "typeCounter": "Compteur",
+    "multiplierShort": "Multiplicateur",
+    "errorNameRequired": "Le nom est requis",
+    "errorLimit": "Limite d'exercices atteinte ou erreur.",
+    "seconds": "secondes",
+    "repetitions": "répétitions"
   }
 }

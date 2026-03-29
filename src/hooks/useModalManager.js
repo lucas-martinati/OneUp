@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 
-export function useModalManager(initialModals = {}) {
+export function useModalManager(initialModals = {}, syncModals = []) {
     const keys = useMemo(() => Object.keys(initialModals), []);
 
     const [modals, setModals] = useState(() => ({ ...initialModals }));
@@ -22,9 +22,14 @@ export function useModalManager(initialModals = {}) {
         [modals, keys]
     );
 
+    // activeModals for useHardwareBack: { isOpen, close, shouldResumeSync? }
     const activeModals = useMemo(
-        () => keys.filter(k => modals[k]).map(k => ({ key: k, active: true })),
-        [modals, keys]
+        () => keys.filter(k => modals[k]).map(k => ({
+            isOpen: true,
+            close: () => closeModal(k),
+            shouldResumeSync: syncModals.includes(k),
+        })),
+        [modals, keys, syncModals, closeModal]
     );
 
     return { modals, openModal, closeModal, toggleModal, anyModalOpen, activeModals };
