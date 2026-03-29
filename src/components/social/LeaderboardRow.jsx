@@ -1,7 +1,8 @@
 import React from 'react';
-import { ChevronRight, Heart, Crown, Shield, HeartHandshake, Check } from 'lucide-react';
+import { ChevronRight, Shield, HeartHandshake, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '../ui/Avatar';
+import { getTierBadgeConfigs } from '../../utils/entitlements';
 
 export function LeaderboardRow({
     entry,
@@ -76,27 +77,19 @@ export function LeaderboardRow({
                     }}>
                         {isMe ? `${entry.pseudo} (${t('common.you')})` : entry.pseudo}
                     </span>
-                    {entry.isSupporter && (
-                        <span style={{
-                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                            background: 'rgba(239,68,68,0.15)', borderRadius: '10px',
-                            padding: '1px 6px', gap: '3px',
-                            border: '1px solid rgba(239,68,68,0.25)'
-                        }}>
-                            <Heart size={10} color="#ef4444" fill="#ef4444" />
-                        </span>
-                    )}
-
-                    {entry.isPro && (
-                        <span style={{
-                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                            background: 'rgba(139,92,246,0.15)', borderRadius: '10px',
-                            padding: '1px 6px', gap: '3px',
-                            border: '1px solid rgba(139,92,246,0.25)'
-                        }}>
-                            <Crown size={10} color="#8b5cf6" fill="#8b5cf6" />
-                        </span>
-                    )}
+                    {getTierBadgeConfigs(entry).map(badge => {
+                        const BadgeIcon = badge.icon;
+                        return (
+                            <span key={badge.key} style={{
+                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                background: badge.bgColor, borderRadius: '10px',
+                                padding: '1px 6px', gap: '3px',
+                                border: `1px solid ${badge.borderColor}`
+                            }}>
+                                <BadgeIcon size={10} color={badge.color} fill={badge.fill} />
+                            </span>
+                        );
+                    })}
                     {entry.lastActiveDay === todayStr && <Shield size={12} color="#10b981" />}
                 </div>
             </div>

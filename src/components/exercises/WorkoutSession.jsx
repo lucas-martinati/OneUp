@@ -11,6 +11,7 @@ import { Counter } from './Counter';
 import { Timer } from './Timer';
 import { SessionSummary } from './SessionSummary';
 import { registerBackHandler } from '../../utils/backHandler';
+import { canAccessFeature } from '../../utils/entitlements';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
 
@@ -74,7 +75,8 @@ export function WorkoutSession({
     }, [isPro, allExercises]);
 
     const [showAll, setShowAll] = useState(false);
-    const availableExercises = isPro && showAll ? allExercises : localExercises;
+    const canMixDashboards = canAccessFeature('interDashboard', { isPro });
+    const availableExercises = canMixDashboards && showAll ? allExercises : localExercises;
 
     // Exercise info with current state
     const exerciseInfo = useMemo(() => {
@@ -376,7 +378,7 @@ export function WorkoutSession({
                     )}
 
                     {/* Inter-Dashboard Toggle for Pro Users */}
-                    {isPro && (
+                    {canMixDashboards && (
                         <div style={{
                             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                             background: 'rgba(139, 92, 246, 0.1)', padding: '12px',

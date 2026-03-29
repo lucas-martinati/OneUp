@@ -7,6 +7,7 @@ import {
 import { EXERCISES, EXERCISES_MAP } from '../../config/exercises';
 import { getLocalDateStr } from '../../utils/dateUtils';
 import { registerBackHandler } from '../../utils/backHandler';
+import { canAccessFeature } from '../../utils/entitlements';
 
 export function CustomProgramPanel({
   onClose, isPro, programs,
@@ -116,7 +117,7 @@ export function CustomProgramPanel({
   };
 
   // ── Pro locked gate ──────────────────────────────────────────────────
-  if (!isPro) {
+  if (!canAccessFeature('customPrograms', { isPro })) {
     return (
       <div className="fade-in" style={{
         position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.92)',

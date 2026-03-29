@@ -15,6 +15,7 @@ import {
 import { EXERCISES } from './config/exercises';
 import { WEIGHT_EXERCISES } from './config/weights';
 import { createLogger } from './utils/logger';
+import { loadCachedEntitlements, saveCachedEntitlements, clearCachedEntitlements, resolveEntitlements } from './utils/entitlements';
 
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
 const Onboarding = lazy(() => import('./components/settings/Onboarding').then(module => ({ default: module.Onboarding })));
@@ -35,8 +36,8 @@ function App() {
   const [isSyncPaused, setIsSyncPaused] = useState(false);
 
   // Subscription tiers
-  const [isSupporter, setIsSupporter] = useState(() => localStorage.getItem('oneup_supporter') === 'true');
-  const [isPro, setIsPro] = useState(() => localStorage.getItem('oneup_pro') === 'true');
+  const [isSupporter, setIsSupporter] = useState(() => loadCachedEntitlements().isSupporter);
+  const [isPro, setIsPro] = useState(() => loadCachedEntitlements().isPro);
 
   // Refs to always read latest subscription state (avoid stale closures)
   const isSupporterRef = useRef(isSupporter);
@@ -83,8 +84,7 @@ function App() {
 
   // ── Helper: save purchase to Firebase + publish leaderboard ───────────
   const saveAndPublish = useCallback(async ({ isSupporter: sup, isPro: pr }) => {
-    localStorage.setItem('oneup_supporter', sup ? 'true' : 'false');
-    localStorage.setItem('oneup_pro', pr ? 'true' : 'false');
+    saveCachedEntitlements({ isSupporter: sup, isPro: pr });
     // savePurchase is blocked on web (native-only) — see cloudSync.js
     await cloudSync.savePurchase({ isSupporter: sup, isPro: pr });
     // Publish leaderboard WITHOUT purchase flags (they are preserved from server)
@@ -105,8 +105,7 @@ function App() {
       setConflictData(null);
       setIsSupporter(false);
       setIsPro(false);
-      localStorage.removeItem('oneup_supporter');
-      localStorage.removeItem('oneup_pro');
+      clearCachedEntitlements();
     }
   }, [googleAuth.isSignedIn, googleAuth.user?.uid]);
 
@@ -190,33 +189,34 @@ function App() {
         try {
           await initPurchases(cloudSync.getCurrentUserId());
 
-          let sup = false;
-          let pr = false;
-
           // 1. Check RevenueCat
+          let rcEntitlements = { isSupporter: false, isPro: false };
           try {
-            sup = await checkSupporterStatus();
-            pr = await checkProStatus();
+            rcEntitlements = {
+              isSupporter: await checkSupporterStatus(),
+              isPro: await checkProStatus(),
+            };
           } catch (rcErr) {
             logger.warn('RevenueCat check failed:', rcErr);
           }
 
           // 2. Fallback: check Firebase purchase object
-          if (!sup && !pr) {
+          let fbEntitlements = { isSupporter: false, isPro: false };
+          if (!rcEntitlements.isSupporter && !rcEntitlements.isPro) {
             const cloudPurchase = await cloudSync.loadPurchase();
             if (cloudPurchase) {
-              sup = !!cloudPurchase.isSupporter;
-              pr = !!cloudPurchase.isPro;
-              if (sup || pr) logger.info('Loaded purchase from Firebase');
+              fbEntitlements = { isSupporter: !!cloudPurchase.isSupporter, isPro: !!cloudPurchase.isPro };
+              if (fbEntitlements.isSupporter || fbEntitlements.isPro) logger.info('Loaded purchase from Firebase');
             }
           }
 
-          setIsSupporter(sup);
-          setIsPro(pr);
+          const resolved = resolveEntitlements(rcEntitlements, fbEntitlements);
+          setIsSupporter(resolved.isSupporter);
+          setIsPro(resolved.isPro);
 
-          // 4. Sync to Firebase + leaderboard if any entitlement active
-          if (sup || pr) {
-            await saveAndPublish({ isSupporter: sup, isPro: pr });
+          // 3. Sync to Firebase + leaderboard if any entitlement active
+          if (resolved.hasAnyEntitlement) {
+            await saveAndPublish(resolved);
           }
         } catch (error) {
           logger.error('Purchase init error:', error);
@@ -322,23 +322,27 @@ function App() {
   const handleRestorePurchases = async () => {
     // 1. Try RevenueCat restore (works on both native and web)
     const result = await restorePurchases();
-    let sup = result.supporter || result.isSupporter || false;
-    let pr = result.pro || false;
+    let resolved = resolveEntitlements(
+      { isSupporter: result.supporter || result.isSupporter || false, isPro: result.pro || false },
+      { isSupporter: false, isPro: false }
+    );
 
     // 2. Fallback: check Firebase purchase object directly
-    if (!sup && !pr) {
+    if (!resolved.hasAnyEntitlement) {
       const cloudPurchase = await cloudSync.loadPurchase();
       if (cloudPurchase) {
-        sup = !!cloudPurchase.isSupporter;
-        pr = !!cloudPurchase.isPro;
+        resolved = resolveEntitlements(resolved, {
+          isSupporter: !!cloudPurchase.isSupporter,
+          isPro: !!cloudPurchase.isPro,
+        });
       }
     }
 
-    setIsSupporter(sup);
-    setIsPro(pr);
+    setIsSupporter(resolved.isSupporter);
+    setIsPro(resolved.isPro);
 
-    if (sup || pr) {
-      await saveAndPublish({ isSupporter: sup, isPro: pr });
+    if (resolved.hasAnyEntitlement) {
+      await saveAndPublish(resolved);
     }
   };
 

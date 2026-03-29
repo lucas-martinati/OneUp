@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Medal, Crown, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Heart, Zap, Dumbbell, ArrowDownUp, ArrowUp, ChevronsUp, Footprints } from 'lucide-react';
+import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Zap, Dumbbell, ArrowDownUp, ArrowUp, ChevronsUp, Footprints } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { registerBackHandler } from '../../utils/backHandler';
 import { getLocalDateStr } from '../../utils/dateUtils';
+import { getTierBadgeConfigs, canAccessFeature } from '../../utils/entitlements';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square: Activity, MoveDown: ArrowDownUp, MoveDiagonal: ArrowUp };
 
@@ -133,22 +134,17 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                             <span style={{ wordBreak: 'break-all' }}>
                                 {entry.pseudo} {isMe && <span style={{ fontSize: '1rem', opacity: 0.8 }}>({t('common.you')})</span>}
                             </span>
-                            {entry.isSupporter && (
-                                <span style={{
-                                    display: 'inline-flex', alignItems: 'center', background: 'rgba(239,68,68,0.15)', borderRadius: '12px',
-                                    padding: '2px 8px', gap: '4px', marginLeft: '4px', border: '1px solid rgba(239,68,68,0.25)'
-                                }}>
-                                    <Heart size={12} color="#ef4444" fill="#ef4444" />
-                                </span>
-                            )}
-                            {entry.isPro && (
-                                <span style={{
-                                    display: 'inline-flex', alignItems: 'center', background: 'rgba(139,92,246,0.15)', borderRadius: '12px',
-                                    padding: '2px 8px', gap: '4px', marginLeft: '4px', border: '1px solid rgba(139,92,246,0.25)'
-                                }}>
-                                    <Crown size={12} color="#8b5cf6" fill="#8b5cf6" />
-                                </span>
-                            )}
+                            {getTierBadgeConfigs(entry).map(badge => {
+                                const BadgeIcon = badge.icon;
+                                return (
+                                    <span key={badge.key} style={{
+                                        display: 'inline-flex', alignItems: 'center', background: badge.bgColor, borderRadius: '12px',
+                                        padding: '2px 8px', gap: '4px', marginLeft: '4px', border: `1px solid ${badge.borderColor}`
+                                    }}>
+                                        <BadgeIcon size={12} color={badge.color} fill={badge.fill} />
+                                    </span>
+                                );
+                            })}
                         </div>
                         <div style={{
                             display: 'inline-flex', alignItems: 'center', gap: '4px',
@@ -167,7 +163,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                             <StatCard icon={<Zap size={16} color="#6366f1" />} label={t('leaderboard.difficulty')} value={`x${entry.difficultyMultiplier}`} color="#6366f1" />
                         )}
                         
-                        {entry.isPro && entry.weightsTotalReps > 0 && (
+                        {canAccessFeature('weights', entry) && entry.weightsTotalReps > 0 && (
                             <StatCard 
                                 icon={<Activity size={16} color="#f43f5e" />} 
                                 label={t('common.global')} 
@@ -183,7 +179,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                             color="#fbbf24" 
                         />
                         
-                        {entry.isPro && entry.weightsTotalReps > 0 && (
+                        {canAccessFeature('weights', entry) && entry.weightsTotalReps > 0 && (
                             <StatCard 
                                 icon={<Dumbbell size={16} color="#8b5cf6" />} 
                                 label={t('common.global_weights')} 
@@ -205,7 +201,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                         </div>
                         {EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
                         
-                        {entry.isPro && (
+                        {canAccessFeature('weights', entry) && (
                             <>
                                 <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '16px', letterSpacing: '1px' }}>
                                     {t('common.global_weights')}
