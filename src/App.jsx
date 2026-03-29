@@ -10,7 +10,7 @@ import { useCustomExercises } from './hooks/useCustomExercises';
 import { cloudSync } from './services/cloudSync';
 import {
   initPurchases, checkSupporterStatus, purchaseSupporter, restorePurchases,
-  checkClubStatus, purchaseClub, checkProStatus, purchasePro
+  checkProStatus, purchasePro
 } from './services/purchaseService';
 import { EXERCISES } from './config/exercises';
 import { WEIGHT_EXERCISES } from './config/weights';
@@ -36,15 +36,12 @@ function App() {
 
   // Subscription tiers
   const [isSupporter, setIsSupporter] = useState(() => localStorage.getItem('oneup_supporter') === 'true');
-  const [isClub, setIsClub] = useState(() => localStorage.getItem('oneup_club') === 'true');
   const [isPro, setIsPro] = useState(() => localStorage.getItem('oneup_pro') === 'true');
 
   // Refs to always read latest subscription state (avoid stale closures)
   const isSupporterRef = useRef(isSupporter);
-  const isClubRef = useRef(isClub);
   const isProRef = useRef(isPro);
   useEffect(() => { isSupporterRef.current = isSupporter; }, [isSupporter]);
-  useEffect(() => { isClubRef.current = isClub; }, [isClub]);
   useEffect(() => { isProRef.current = isPro; }, [isPro]);
 
   const {
@@ -76,7 +73,6 @@ function App() {
         lastActiveDay,
         difficultyMultiplier: settings?.difficultyMultiplier,
         isSupporter: isSupporterRef.current,
-        isClub: isClubRef.current,
         isPro: isProRef.current,
       });
       logger.debug('Leaderboard published');
@@ -86,15 +82,14 @@ function App() {
   }, [googleAuth, computedStats, completions, settings]);
 
   // ── Helper: save purchase to Firebase + publish leaderboard ───────────
-  const saveAndPublish = useCallback(async ({ isSupporter: sup, isClub: clb, isPro: pr }) => {
+  const saveAndPublish = useCallback(async ({ isSupporter: sup, isPro: pr }) => {
     localStorage.setItem('oneup_supporter', sup ? 'true' : 'false');
-    localStorage.setItem('oneup_club', clb ? 'true' : 'false');
     localStorage.setItem('oneup_pro', pr ? 'true' : 'false');
     // savePurchase is blocked on web (native-only) — see cloudSync.js
-    await cloudSync.savePurchase({ isSupporter: sup, isClub: clb, isPro: pr });
+    await cloudSync.savePurchase({ isSupporter: sup, isPro: pr });
     // Publish leaderboard WITHOUT purchase flags (they are preserved from server)
     await publishLeaderboardNow();
-    logger.info('Saved + published:', { isSupporter: sup, isClub: clb, isPro: pr });
+    logger.info('Saved + published:', { isSupporter: sup, isPro: pr });
   }, [googleAuth, computedStats, completions, settings]);
 
   // Apply performance mode on document root
@@ -109,10 +104,8 @@ function App() {
       setIsInitialSyncDone(false);
       setConflictData(null);
       setIsSupporter(false);
-      setIsClub(false);
       setIsPro(false);
       localStorage.removeItem('oneup_supporter');
-      localStorage.removeItem('oneup_club');
       localStorage.removeItem('oneup_pro');
     }
   }, [googleAuth.isSignedIn, googleAuth.user?.uid]);
@@ -198,36 +191,32 @@ function App() {
           await initPurchases(cloudSync.getCurrentUserId());
 
           let sup = false;
-          let clb = false;
           let pr = false;
 
           // 1. Check RevenueCat
           try {
             sup = await checkSupporterStatus();
-            clb = await checkClubStatus();
             pr = await checkProStatus();
           } catch (rcErr) {
             logger.warn('RevenueCat check failed:', rcErr);
           }
 
           // 2. Fallback: check Firebase purchase object
-          if (!sup && !clb && !pr) {
+          if (!sup && !pr) {
             const cloudPurchase = await cloudSync.loadPurchase();
             if (cloudPurchase) {
               sup = !!cloudPurchase.isSupporter;
-              clb = !!cloudPurchase.isClub;
               pr = !!cloudPurchase.isPro;
-              if (sup || clb || pr) logger.info('Loaded purchase from Firebase');
+              if (sup || pr) logger.info('Loaded purchase from Firebase');
             }
           }
 
           setIsSupporter(sup);
-          setIsClub(clb);
           setIsPro(pr);
 
           // 4. Sync to Firebase + leaderboard if any entitlement active
-          if (sup || clb || pr) {
-            await saveAndPublish({ isSupporter: sup, isClub: clb, isPro: pr });
+          if (sup || pr) {
+            await saveAndPublish({ isSupporter: sup, isPro: pr });
           }
         } catch (error) {
           logger.error('Purchase init error:', error);
@@ -316,16 +305,7 @@ function App() {
     const result = await purchaseSupporter();
     if (result.success || result.isSupporter || result.isActive) {
       setIsSupporter(true);
-      await saveAndPublish({ isSupporter: true, isClub: isClubRef.current, isPro: isProRef.current });
-    }
-    return result;
-  };
-
-  const handlePurchaseClub = async () => {
-    const result = await purchaseClub();
-    if (result.success || result.isActive) {
-      setIsClub(true);
-      await saveAndPublish({ isSupporter: isSupporterRef.current, isClub: true, isPro: isProRef.current });
+      await saveAndPublish({ isSupporter: true, isPro: isProRef.current });
     }
     return result;
   };
@@ -334,7 +314,7 @@ function App() {
     const result = await purchasePro();
     if (result.success || result.isActive) {
       setIsPro(true);
-      await saveAndPublish({ isSupporter: isSupporterRef.current, isClub: isClubRef.current, isPro: true });
+      await saveAndPublish({ isSupporter: isSupporterRef.current, isPro: true });
     }
     return result;
   };
@@ -343,25 +323,22 @@ function App() {
     // 1. Try RevenueCat restore (works on both native and web)
     const result = await restorePurchases();
     let sup = result.supporter || result.isSupporter || false;
-    let clb = result.club || false;
     let pr = result.pro || false;
 
     // 2. Fallback: check Firebase purchase object directly
-    if (!sup && !clb && !pr) {
+    if (!sup && !pr) {
       const cloudPurchase = await cloudSync.loadPurchase();
       if (cloudPurchase) {
         sup = !!cloudPurchase.isSupporter;
-        clb = !!cloudPurchase.isClub;
         pr = !!cloudPurchase.isPro;
       }
     }
 
     setIsSupporter(sup);
-    setIsClub(clb);
     setIsPro(pr);
 
-    if (sup || clb || pr) {
-      await saveAndPublish({ isSupporter: sup, isClub: clb, isPro: pr });
+    if (sup || pr) {
+      await saveAndPublish({ isSupporter: sup, isPro: pr });
     }
   };
 
@@ -470,10 +447,8 @@ function App() {
           updateRoutine={updateRoutine}
           maxRoutines={maxRoutines}
           isSupporter={googleAuth.isSignedIn ? isSupporter : false}
-          isClub={googleAuth.isSignedIn ? isClub : false}
           isPro={googleAuth.isSignedIn ? isPro : false}
           onPurchaseSupporter={handlePurchaseSupporter}
-          onPurchaseClub={handlePurchaseClub}
           onPurchasePro={handlePurchasePro}
           onRestorePurchases={handleRestorePurchases}
         />

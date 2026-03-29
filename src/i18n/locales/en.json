@@ -347,22 +347,6 @@
     "history": "Purchase history",
     "noHistory": "No purchases recorded"
   },
-  "club": {
-    "title": "Club Subscription",
-    "description": "Mini-Leagues & Community",
-    "explanation": "Access exclusive mini-leagues with friends. Create closed groups with internal rankings and track your progress together!",
-    "features": {
-      "leagues": "Closed mini-leagues",
-      "ranking": "Internal ranking",
-      "notifications": "League notifications"
-    },
-    "buyButton": "Join the Club",
-    "activeTitle": "Club Member",
-    "activeDesc": "You have access to all Club features.",
-    "price": "€0.99/month",
-    "locked": "Club subscription required",
-    "lockedDesc": "Upgrade to Club to unlock exclusive features!"
-  },
   "pro": {
     "title": "Pro Subscription",
     "description": "Custom programs",

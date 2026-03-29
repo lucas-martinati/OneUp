@@ -347,23 +347,6 @@
     "history": "Historique des achats",
     "noHistory": "Aucun achat enregistré"
   },
-  "club": {
-    "title": "Abonnement Club",
-    "description": "Mini-Ligue & Communauté",
-    "explanation": "Pimente tes entraînements ! Débloque la création d'un Club privé pour inviter tes amis, comparer vos performances en temps réel et organiser des compétitions acharnées.",
-    "features": {
-      "createClub": "Création d'un Club VIP privé",
-      "inviteFriends": "Inviter tes amis en illimité",
-      "privateLeaderboard": "Classement privé 100% dédié",
-      "clubChat": "Badge exclusif 'Club' au classement"
-    },
-    "buyButton": "Rejoindre le Club",
-    "activeTitle": "Membre Club",
-    "activeDesc": "Tu es le fondateur de ton clan privé.",
-    "price": "0,99€/mois",
-    "locked": "Abonnement Club requis",
-    "lockedDesc": "Passe au Club pour créer ta propre ligue sportive !"
-  },
   "pro": {
     "title": "Abonnement Pro",
     "description": "L'Expérience Ultime",

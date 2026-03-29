@@ -5,7 +5,7 @@ import {
     Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users, Check, Award,
     Target, TrendingUp, Star, Activity, Play, Square, MoveDown, MoveDiagonal, Shield,
-    Swords, Sparkles, Lock, ShoppingBag
+    Sparkles, Lock, ShoppingBag
 } from 'lucide-react';
 import { AchievementToast } from './feedback/AchievementToast';
 import { CSSConfetti } from './feedback/CSSConfetti';
@@ -50,8 +50,8 @@ export function Dashboard({
     conflictData, onResolveConflict, getExerciseCount, updateExerciseCount, getTotalReps,
     getExerciseDone, pauseCloudSync, resumeCloudSync, computedStats,
     routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
-    isSupporter, isClub, isPro,
-    onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases,
+    isSupporter, isPro,
+    onPurchaseSupporter, onPurchasePro, onRestorePurchases,
     customExercisesHook
 }) {
     const { t } = useTranslation();
@@ -403,10 +403,8 @@ export function Dashboard({
                             conflictData={conflictData}
                             onResolveConflict={onResolveConflict}
                             isSupporter={isSupporter}
-                            isClub={isClub}
                             isPro={isPro}
                             onPurchaseSupporter={onPurchaseSupporter}
-                            onPurchaseClub={onPurchaseClub}
                             onPurchasePro={onPurchasePro}
                             onRestorePurchases={onRestorePurchases}
                         />

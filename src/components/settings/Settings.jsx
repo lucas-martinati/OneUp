@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Swords, Sparkles, Star, Smartphone } from 'lucide-react';
+import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Sparkles, Star, Smartphone } from 'lucide-react';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
 import { getPurchaseHistory } from '../../services/purchaseService';
@@ -8,7 +8,7 @@ import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { SettingRow } from '../ui/SettingRow';
 import { StoreCard } from '../store/StoreCard';
 
-export function Settings({ defaultShowStore = false, settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isClub, isPro, onPurchaseSupporter, onPurchaseClub, onPurchasePro, onRestorePurchases }) {
+export function Settings({ defaultShowStore = false, settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isPro, onPurchaseSupporter, onPurchasePro, onRestorePurchases }) {
     const { t, i18n } = useTranslation();
     const [showSaved, setShowSaved] = useState(false);
     const [showStore, setShowStore] = useState(defaultShowStore);
@@ -157,27 +157,6 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                         cloudAuth={cloudAuth}
                         allowMultiplePurchases={true}
                     />
-
-                    {/* ── ABONNEMENT CLUB ─────────────────────────────────── */}
-                    {false && (
-                    <StoreCard
-                        isActive={isClub}
-                        title={t('club.title')}
-                        icon={Swords}
-                        colorMain="#f59e0b"
-                        colorRGB="245,158,11"
-                        colorGradientStart="#f59e0b"
-                        colorGradientEnd="#d97706"
-                        activeTitle={t('club.activeTitle')}
-                        activeDesc={t('club.activeDesc')}
-                        idleDescription={t('club.description')}
-                        idleExplanation={t('club.explanation')}
-                        features={['leagues', 'ranking', 'notifications'].map(f => t(`club.features.${f}`))}
-                        buyButtonText={`${t('club.buyButton')} — ${t('club.price')}`}
-                        onPurchase={onPurchaseClub}
-                        cloudAuth={cloudAuth}
-                    />
-                    )}
 
                     {/* ── ABONNEMENT PRO ───────────────────────────────────── */}
                     <StoreCard

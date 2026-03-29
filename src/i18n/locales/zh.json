@@ -338,22 +338,6 @@
     "history": "购买历史",
     "noHistory": "没有购买记录"
   },
-  "club": {
-    "title": "俱乐部订阅",
-    "description": "迷你联赛与社区",
-    "explanation": "与朋友一起参加专属迷你联赛。创建封闭小组，内部排名，一起追踪进度！",
-    "features": {
-      "leagues": "封闭迷你联赛",
-      "ranking": "内部排名",
-      "notifications": "联赛通知"
-    },
-    "buyButton": "加入俱乐部",
-    "activeTitle": "俱乐部会员",
-    "activeDesc": "你可以访问所有俱乐部功能。",
-    "price": "€0.99/月",
-    "locked": "需要俱乐部订阅",
-    "lockedDesc": "升级到俱乐部以解锁专属功能！"
-  },
   "pro": {
     "title": "Pro 订阅",
     "description": "自定义训练计划",

@@ -3,12 +3,10 @@
  *
  * Tiers:
  *   supporter — one-time ~2-5€ — ❤️ badge on leaderboard
- *   club      — 0.99€/mo  — mini-leagues, community features
- *   pro       — 6.99€/mo  — custom programs, dedicated panel
+ *   pro       — 1.99€/mo  — custom programs, dedicated panel
  *
  * Entitlements (configured in RevenueCat dashboard):
- *   "supporter" — non-consumable or lifetime
- *   "club"      — auto-renewable subscription
+ *   "supporter" — non-consumable
  *   "pro"       — auto-renewable subscription
  *
  * Uses the Capacitor SDK on native (Android/iOS) and the Web SDK
@@ -30,11 +28,6 @@ const PRODUCTS = {
     productId: 'supporter',
     entitlementId: 'supporter',
     localStorageKey: 'oneup_supporter',
-  },
-  club: {
-    productId: 'oneup_club_monthly',
-    entitlementId: 'club',
-    localStorageKey: 'oneup_club',
   },
   pro: {
     productId: 'oneup_pro_monthly',
@@ -230,20 +223,6 @@ export async function purchaseSupporter() {
   return { ...res, isSupporter: res.isActive };
 }
 
-// ── Public API — Club ──────────────────────────────────────────────────
-
-export async function checkClubStatus() {
-  return _checkEntitlement('club');
-}
-
-export async function getClubOffering() {
-  return _getOffering('club');
-}
-
-export async function purchaseClub() {
-  return _purchase('club');
-}
-
 // ── Public API — Pro ───────────────────────────────────────────────────
 
 export async function checkProStatus() {
@@ -267,7 +246,7 @@ export async function purchasePro() {
  */
 export async function restorePurchases() {
   if (!isInitialized) {
-    return { success: false, supporter: false, club: false, pro: false };
+    return { success: false, supporter: false, pro: false };
   }
 
   try {
@@ -282,18 +261,16 @@ export async function restorePurchases() {
     }
 
     const supporter = hasActiveEntitlement(customerInfo, PRODUCTS.supporter.entitlementId);
-    const club = hasActiveEntitlement(customerInfo, PRODUCTS.club.entitlementId);
     const pro = hasActiveEntitlement(customerInfo, PRODUCTS.pro.entitlementId);
 
     localStorage.setItem(PRODUCTS.supporter.localStorageKey, supporter ? 'true' : 'false');
-    localStorage.setItem(PRODUCTS.club.localStorageKey, club ? 'true' : 'false');
     localStorage.setItem(PRODUCTS.pro.localStorageKey, pro ? 'true' : 'false');
 
-    logger.success('Purchases restored:', { supporter, club, pro });
-    return { success: true, supporter, club, pro, isSupporter: supporter };
+    logger.success('Purchases restored:', { supporter, pro });
+    return { success: true, supporter, pro, isSupporter: supporter };
   } catch (error) {
     logger.error('Restore failed:', error);
-    return { success: false, supporter: false, club: false, pro: false };
+    return { success: false, supporter: false, pro: false };
   }
 }
 
@@ -309,7 +286,6 @@ export async function getPurchaseHistory() {
 
     const getProductDetails = (identifier) => {
       if (identifier?.includes('supporter')) return { title: 'Soutien OneUp ❤️', desc: 'Achat unique premium' };
-      if (identifier?.includes('club')) return { title: 'Abonnement Club', desc: 'Renouvellement automatique' };
       if (identifier?.includes('pro')) return { title: 'Abonnement Pro', desc: 'Renouvellement automatique' };
       return { title: 'Achat In-App', desc: 'Transaction OneUp' };
     };

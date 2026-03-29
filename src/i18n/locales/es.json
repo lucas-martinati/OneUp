@@ -338,22 +338,6 @@
     "history": "Historial de compras",
     "noHistory": "Sin compras registradas"
   },
-  "club": {
-    "title": "Suscripción Club",
-    "description": "Mini-Ligas y Comunidad",
-    "explanation": "Accede a mini-ligas exclusivas con amigos. Crea grupos cerrados con clasificación interna y sigue tu progreso juntos.",
-    "features": {
-      "leagues": "Mini-ligas cerradas",
-      "ranking": "Clasificación interna",
-      "notifications": "Notificaciones de liga"
-    },
-    "buyButton": "Unirse al Club",
-    "activeTitle": "Miembro Club",
-    "activeDesc": "Tienes acceso a todas las funciones del Club.",
-    "price": "4,99€/mes",
-    "locked": "Suscripción Club requerida",
-    "lockedDesc": "¡Pásate a Club para desbloquear funciones exclusivas!"
-  },
   "pro": {
     "title": "Suscripción Pro",
     "description": "Programas personalizados",

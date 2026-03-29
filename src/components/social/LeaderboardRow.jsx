@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Heart, Crown, Shield, HeartHandshake, Check, Swords } from 'lucide-react';
+import { ChevronRight, Heart, Crown, Shield, HeartHandshake, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '../ui/Avatar';
 
@@ -95,17 +95,6 @@ export function LeaderboardRow({
                             border: '1px solid rgba(139,92,246,0.25)'
                         }}>
                             <Crown size={10} color="#8b5cf6" fill="#8b5cf6" />
-                        </span>
-                    )}
-
-                    {entry.isClub && (
-                        <span style={{
-                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                            background: 'rgba(245,158,11,0.15)', borderRadius: '10px',
-                            padding: '1px 6px', gap: '3px',
-                            border: '1px solid rgba(245,158,11,0.25)'
-                        }}>
-                            <Swords size={10} color="#f59e0b" fill="#f59e0b" />
                         </span>
                     )}
                     {entry.lastActiveDay === todayStr && <Shield size={12} color="#10b981" />}

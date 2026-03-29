@@ -491,7 +491,7 @@ class CloudSyncService {
    * Publish (or update) this user's leaderboard entry.
    * Stored at `leaderboard/{uid}`.
    */
-  async publishToLeaderboard({ pseudo, totalReps, weightsTotalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter, isClub, isPro }) {
+  async publishToLeaderboard({ pseudo, totalReps, weightsTotalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter, isPro }) {
     try {
       if (!auth?.currentUser || !database) return false;
 
@@ -514,7 +514,6 @@ class CloudSyncService {
         isPublic: isPublic !== false,
         // Preserve server-set purchase flags, but allow client to update them if provided
         isSupporter: isSupporter !== undefined ? isSupporter : (existingData.isSupporter || false),
-        isClub: isClub !== undefined ? isClub : (existingData.isClub || false),
         isPro: isPro !== undefined ? isPro : (existingData.isPro || false),
         lastUpdated: serverTimestamp()
       };
@@ -577,7 +576,6 @@ class CloudSyncService {
           difficultyMultiplier: entry.difficultyMultiplier || 1,
           lastUpdated: entry.lastUpdated || null,
           isSupporter: !!entry.isSupporter,
-          isClub: !!entry.isClub,
           isPro: !!entry.isPro
         }));
 
@@ -670,13 +668,12 @@ class CloudSyncService {
   // Stored at `users/{uid}/purchase`
   // SECURITY: RevenueCat validates the purchase on both native (Google Play)
   // and web (Stripe), so saving from either platform is safe.
-  async savePurchase({ isSupporter, isClub, isPro }) {
+  async savePurchase({ isSupporter, isPro }) {
     try {
       if (!auth?.currentUser || !database) return false;
       const userId = auth.currentUser.uid;
       await set(ref(database, `users/${userId}/purchase`), {
         isSupporter: !!isSupporter,
-        isClub: !!isClub,
         isPro: !!isPro,
       });
       logger.success('Purchase saved to cloud');
@@ -917,7 +914,6 @@ class CloudSyncService {
           difficultyMultiplier: lbData.difficultyMultiplier || 1,
           lastUpdated: lbData.lastUpdated || null,
           isSupporter: !!lbData.isSupporter,
-          isClub: !!lbData.isClub,
           isPro: !!lbData.isPro,
           isCurrentUser: memberUid === uid
         };
