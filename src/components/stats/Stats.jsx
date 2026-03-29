@@ -4,6 +4,7 @@ import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'luc
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../../hooks/useComputedStats';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
+import { BADGE_DEFINITIONS } from '../../config/badgeDefinitions';
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
 // Lazy load Recharts components
@@ -100,7 +101,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                     }}>
                         <Award size={18} />
                         <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>
-                           {globalStats.badgeCount}/40
+                           {globalStats.badgeCount}/{BADGE_DEFINITIONS.length}
                         </span>
                     </button>
                     <button onClick={onClose} className="hover-lift glass" style={{

@@ -5,7 +5,7 @@ import { Avatar } from '../ui/Avatar';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { registerBackHandler } from '../../utils/backHandler';
-import { getLocalDateStr } from '../../utils/dateUtils';
+import { getLocalDateStr, isDayDoneFromCompletions, calculateStreak, calculateExerciseStreak } from '../../utils/dateUtils';
 import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '../../utils/entitlements';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square: Activity, MoveDown: ArrowDownUp, MoveDiagonal: ArrowUp };
@@ -246,14 +246,12 @@ function computeStats(details) {
 
         let anyDone = false;
         let allDone = true;
-        
-        // Count overall completion logic
+
         for (const ex of ALL_EXERCISES) {
             if (day[ex.id]?.isCompleted) {
                 anyDone = true;
                 exerciseDays[ex.id]++;
             } else if (EXERCISES.find(e => e.id === ex.id)) {
-                // Classic perfect day only evaluates standard EXERCISES
                 allDone = false;
             }
         }
@@ -261,85 +259,31 @@ function computeStats(details) {
         if (allDone) perfectDays++;
     }
 
-    const { maxStreak, currentStreak } = calculateGlobalStreak(completions, today);
+    const currentStreak = calculateStreak(completions, today);
+    const maxStreak = calculateMaxStreak(completions);
+
     const exerciseStreaks = {};
     const exerciseDoneToday = {};
-
     ALL_EXERCISES.forEach(ex => {
-        const streakData = calculateExerciseStreak(completions, ex.id, today);
-        exerciseStreaks[ex.id] = streakData.currentStreak;
-        exerciseDoneToday[ex.id] = streakData.doneToday;
+        exerciseStreaks[ex.id] = calculateExerciseStreak(completions, today, ex.id);
+        exerciseDoneToday[ex.id] = !!completions[today]?.[ex.id]?.isCompleted;
     });
 
     return { totalDays, perfectDays, maxStreak, currentStreak, exerciseDays, exerciseStreaks, exerciseDoneToday };
 }
 
-function calculateGlobalStreak(completions, today) {
-    const ALL_EXERCISES = [...EXERCISES, ...WEIGHT_EXERCISES];
-    let dates = Object.keys(completions).filter(d => {
-        const day = completions[d];
-        return ALL_EXERCISES.some(ex => day?.[ex.id]?.isCompleted);
-    }).sort();
-
-    if (dates.length === 0) return { currentStreak: 0, maxStreak: 0 };
-
-    let maxStreak = 1;
-    let currentStreak = 1;
-    let currentSpan = 1;
-
-    for (let i = 1; i < dates.length; i++) {
-        const prev = new Date(dates[i - 1]);
-        const curr = new Date(dates[i]);
-        const diffDays = Math.round((curr - prev) / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 1) {
-            currentSpan++;
-            maxStreak = Math.max(maxStreak, currentSpan);
-        } else if (diffDays > 1) {
-            currentSpan = 1;
-        }
-    }
-
-    const lastDate = dates[dates.length - 1];
-    const diffToToday = Math.round((new Date(today) - new Date(lastDate)) / (1000 * 60 * 60 * 24));
-
-    if (diffToToday > 1) {
-        currentStreak = 0;
-    } else {
-        currentStreak = currentSpan;
-    }
-
-    return { currentStreak, maxStreak };
-}
-
-function calculateExerciseStreak(completions, exId, today) {
-    let dates = Object.keys(completions).filter(d => completions[d]?.[exId]?.isCompleted).sort();
-    if (dates.length === 0) return { currentStreak: 0, doneToday: false };
-
-    let currentStreak = 1;
-    const lastDate = dates[dates.length - 1];
-    const diffToToday = Math.round((new Date(today) - new Date(lastDate)) / (1000 * 60 * 60 * 24));
-    
-    // Reverse iterate to find streak
-    let currentSpan = 1;
-    for (let i = dates.length - 1; i > 0; i--) {
-        const curr = new Date(dates[i]);
-        const prev = new Date(dates[i - 1]);
-        const diffDays = Math.round((curr - prev) / (1000 * 60 * 60 * 24));
-        if (diffDays === 1) {
-            currentSpan++;
+function calculateMaxStreak(completions) {
+    let max = 0, temp = 0;
+    const today = new Date();
+    for (let i = 0; i < 365; i++) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        if (isDayDoneFromCompletions(completions, getLocalDateStr(d))) {
+            temp++;
+            if (temp > max) max = temp;
         } else {
-            break;
+            temp = 0;
         }
     }
-
-    const doneToday = diffToToday === 0;
-
-    if (diffToToday > 1) {
-        currentStreak = 0;
-    } else {
-        currentStreak = currentSpan;
-    }
-
-    return { currentStreak, doneToday };
+    return max;
 }

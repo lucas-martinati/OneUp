@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { getLocalDateStr, isDayDoneFromCompletions, calculateStreak, calculateExerciseStreak } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
+import { BADGE_DEFINITIONS } from '../config/badgeDefinitions';
 
 /**
  * Centralized computation hook.
@@ -265,64 +266,13 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         ? exerciseStats.reduce((best, ex) => ex.totalReps > (best?.totalReps || 0) ? ex : best, exerciseStats[0])
         : null;
 
-    // ─── Badge count (matches achievements.js exactly) ───────────────────
-    let badgeCount = 0;
-
-    // Streak
-    if (totalDays >= 1) badgeCount++;
-    if (maxStreak >= 3) badgeCount++;
-    if (maxStreak >= 7) badgeCount++;
-    if (maxStreak >= 14) badgeCount++;
-    if (maxStreak >= 30) badgeCount++;
-    if (maxStreak >= 60) badgeCount++;
-    if (maxStreak >= 90) badgeCount++;
-    if (maxStreak >= 180) badgeCount++;
-    if (maxStreak >= 365) badgeCount++;
-
-    // Quantity
-    if (totalDays >= 10) badgeCount++;
-    if (totalDays >= 50) badgeCount++;
-    if (totalDays >= 100) badgeCount++;
-    if (totalDays >= 200) badgeCount++;
-    if (totalDays >= 500) badgeCount++;
-
-    // Volume
-    if (globalTotalReps >= 500) badgeCount++;
-    if (globalTotalReps >= 1000) badgeCount++;
-    if (globalTotalReps >= 5000) badgeCount++;
-    if (globalTotalReps >= 10000) badgeCount++;
-    if (globalTotalReps >= 50000) badgeCount++;
-
-    // Perfection
-    if (perfectDays >= 1) badgeCount++;
-    if (perfectDays >= 5) badgeCount++;
-    if (perfectDays >= 50) badgeCount++;
-    if (perfectDays >= 100) badgeCount++;
-    if (perfectDays >= 200) badgeCount++;
-
-    // All exercises
-    if (hasCompletedAllExercisesOnce) badgeCount++;
-
-    // Weekday/Weekend
-    if (weekdayWorkouts >= 25) badgeCount++;
-    if (weekendWorkouts >= 25) badgeCount++;
-    if (weekdayWorkouts >= 10 && weekendWorkouts >= 10) badgeCount++;
-
-    // Schedule (9 badges)
-    if (morningWorkouts >= 5) badgeCount++;
-    if (morningWorkouts >= 10) badgeCount++;
-    if (morningWorkouts >= 25) badgeCount++;
-    if (afternoonWorkouts >= 5) badgeCount++;
-    if (afternoonWorkouts >= 10) badgeCount++;
-    if (afternoonWorkouts >= 25) badgeCount++;
-    if (eveningWorkouts >= 5) badgeCount++;
-    if (eveningWorkouts >= 10) badgeCount++;
-    if (eveningWorkouts >= 25) badgeCount++;
-
-    // Secrets
-    if (ghostWorkout) badgeCount++;
-    if (maxPerfectStreak >= 30) badgeCount++;
-    if (globalTotalReps >= 100000) badgeCount++;
+    // ─── Badge count (from single source of truth) ─────────────────────
+    const badgeCount = BADGE_DEFINITIONS.filter(b => b.test({
+        totalDays, maxStreak, totalRepsAll: globalTotalReps, perfectDays,
+        hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts,
+        morningWorkouts, afternoonWorkouts, eveningWorkouts,
+        ghostWorkout, perfectStreak: maxPerfectStreak,
+    })).length;
 
     // ─── Return everything ───────────────────────────────────────────────
     return {
