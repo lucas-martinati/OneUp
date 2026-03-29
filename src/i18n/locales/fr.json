@@ -16,7 +16,8 @@
     "global_weights": "Musculation",
     "global_custom": "Personnalisés",
     "poke": "t'a envoyé un poke !",
-    "member": "Un membre"
+    "member": "Un membre",
+    "anonymous": "Anonyme"
   },
   "dashboard": {
     "day": "Jour",
@@ -411,7 +412,9 @@
     "codeRequired": "Code à 6 caractères requis",
     "invalidCode": "Code invalide",
     "createError": "Erreur lors de la création",
-    "loadingBtn": "Chargement..."
+    "loadingBtn": "Chargement...",
+    "alreadyMember": "Tu es déjà dans ce clan",
+    "missingId": "ID de clan manquant"
   },
   "workout": {
     "newSession": "Nouvelle séance",

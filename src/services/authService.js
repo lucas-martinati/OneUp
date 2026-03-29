@@ -5,9 +5,10 @@ import {
   onAuthStateChanged,
   deleteUser
 } from 'firebase/auth';
+import { ref, remove } from 'firebase/database';
 import { Preferences } from '@capacitor/preferences';
 import { createLogger } from '../utils/logger';
-import { getAuthInstance, initializeFirebase } from './firebase';
+import { getAuthInstance, getDatabaseInstance, initializeFirebase } from './firebase';
 
 const logger = createLogger('Auth');
 
@@ -98,12 +99,11 @@ export async function deleteAccount(listeners, leaveClanFn, getUserClansFn) {
     logger.warn('Failed to leave some clans during account deletion', clanErr);
   }
 
-  const { ref, remove } = await import('firebase/database');
-  const { database } = await import('./firebase');
-  const db = database || (await (async () => { initializeFirebase(); return (await import('./firebase')).getDatabaseInstance(); })());
+  const database = getDatabaseInstance();
+  if (!database) { initializeFirebase(); }
 
-  await remove(ref(db, `users/${userId}`));
-  await remove(ref(db, `leaderboard/${userId}`));
+  await remove(ref(getDatabaseInstance(), `users/${userId}`));
+  await remove(ref(getDatabaseInstance(), `leaderboard/${userId}`));
 
   await Preferences.remove({ key: 'user_signed_in' });
   await Preferences.remove({ key: 'user_id' });

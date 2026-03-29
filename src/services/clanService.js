@@ -34,17 +34,17 @@ export async function joinClan(code) {
   const cleanCode = code.toUpperCase().trim();
 
   const snapshot = await get(ref(database, 'clans'));
-  if (!snapshot.exists()) return { success: false, error: 'Code invalide' };
+  if (!snapshot.exists()) return { success: false, error: i18n.t('clan.invalidCode') };
 
   const clans = snapshot.val();
   let foundClanId = null;
   for (const [id, clan] of Object.entries(clans)) {
     if (clan.code === cleanCode) { foundClanId = id; break; }
   }
-  if (!foundClanId) return { success: false, error: 'Code invalide' };
+  if (!foundClanId) return { success: false, error: i18n.t('clan.invalidCode') };
 
   const userClanSnapshot = await get(ref(database, `users/${uid}/clans/${foundClanId}`));
-  if (userClanSnapshot.exists()) return { success: false, error: 'Tu es déjà dans ce clan' };
+  if (userClanSnapshot.exists()) return { success: false, error: i18n.t('clan.alreadyMember') };
 
   await set(ref(database, `clans/${foundClanId}/members/${uid}`), 'member');
   await set(ref(database, `users/${uid}/clans/${foundClanId}`), 'member');
@@ -57,7 +57,7 @@ export async function leaveClan(clanId) {
   const auth = getAuthInstance();
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) throw new Error('Not initialized');
-  if (!clanId) return { success: false, error: 'ID de clan manquant' };
+  if (!clanId) return { success: false, error: i18n.t('clan.missingId') };
 
   const uid = auth.currentUser.uid;
   const userSnapshot = await get(ref(database, `users/${uid}/clans/${clanId}`));
@@ -120,7 +120,7 @@ export async function getClanDetails(clanId) {
     const lbData = leaderboards[memberUid] || {};
     return {
       uid: memberUid, role: clanData.members[memberUid],
-      pseudo: lbData.pseudo || 'Anonyme', photoURL: lbData.photoURL || null,
+      pseudo: lbData.pseudo || i18n.t('common.anonymous'), photoURL: lbData.photoURL || null,
       totalReps: lbData.totalReps || 0, weightsTotalReps: lbData.weightsTotalReps || 0,
       exerciseReps: lbData.exerciseReps || {}, achievements: lbData.achievements || 0,
       lastActiveDay: lbData.lastActiveDay || null, difficultyMultiplier: lbData.difficultyMultiplier || 1,

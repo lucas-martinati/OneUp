@@ -16,7 +16,8 @@
     "global_weights": "Weights",
     "global_custom": "Custom",
     "poke": "sent you a poke!",
-    "member": "A member"
+    "member": "A member",
+    "anonymous": "Anonymous"
   },
   "dashboard": {
     "day": "Day",
@@ -411,7 +412,9 @@
     "codeRequired": "6-character code required",
     "invalidCode": "Invalid code",
     "createError": "Error creating clan",
-    "loadingBtn": "Loading..."
+    "loadingBtn": "Loading...",
+    "alreadyMember": "You are already in this clan",
+    "missingId": "Missing clan ID"
   },
   "workout": {
     "newSession": "New Session",

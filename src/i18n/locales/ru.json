@@ -16,7 +16,8 @@
     "global_weights": "Отягощения",
     "global_custom": "Свои",
     "poke": "отправил(а) вам тычок!",
-    "member": "Участник"
+    "member": "Участник",
+    "anonymous": "Аноним"
   },
   "dashboard": {
     "day": "День",
@@ -411,7 +412,9 @@
     "codeRequired": "Нужен код из 6 символов",
     "invalidCode": "Неверный код",
     "createError": "Ошибка создания клана",
-    "loadingBtn": "Загрузка..."
+    "loadingBtn": "Загрузка...",
+    "alreadyMember": "Вы уже в этом клане",
+    "missingId": "Отсутствует ID клана"
   },
   "workout": {
     "newSession": "Новая тренировка",

@@ -16,7 +16,8 @@
     "global_weights": "负重",
     "global_custom": "自定义",
     "poke": "给你发了一个戳！",
-    "member": "一位成员"
+    "member": "一位成员",
+    "anonymous": "匿名"
   },
   "dashboard": {
     "day": "天",
@@ -409,9 +410,11 @@
     "pseudoRequired": "需要一个名字",
     "nameRequired": "需要部落名称",
     "codeRequired": "需要6位代码",
-    "invalidCode": "代码无效",
+    "invalidCode": "无效代码",
     "createError": "创建部落时出错",
-    "loadingBtn": "加载中..."
+    "loadingBtn": "加载中...",
+    "alreadyMember": "您已经在这个公会中",
+    "missingId": "缺少公会ID"
   },
   "workout": {
     "newSession": "新训练",
