@@ -540,7 +540,7 @@
     "cancel": "Cancelar",
     "save": "Guardar",
     "deleteTitle": "¿Eliminar ejercicio?",
-    "deleteConfirm": "¿Estás seguro de que quieres eliminar",
+    "deleteConfirm": "¿Eliminar {{name}}?",
     "deleteWarning": "Atención: perderás {{count}} {{unit}} de tu total global.",
     "delete": "Eliminar",
     "typeTimer": "Cronómetro",

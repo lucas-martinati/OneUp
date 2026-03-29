@@ -28,7 +28,7 @@
     "waiting": "⏳ En attente",
     "challengeStarts": "Ton défi commence le",
     "date": "{{date}}",
-    "noExercisesConfigured": "Vous n'avez pas encore configuré d'exercices ici.",
+    "noExercisesConfigured": "Tu n'as pas encore configuré d'exercices ici.",
     "configure": "Configurer"
   },
   "onboarding": {
@@ -549,7 +549,7 @@
     "cancel": "Annuler",
     "save": "Sauvegarder",
     "deleteTitle": "Supprimer l'exercice ?",
-    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer",
+    "deleteConfirm": "Supprimer {{name}} ?",
     "deleteWarning": "Attention : vous perdrez {{count}} {{unit}} de votre total mondial.",
     "delete": "Supprimer",
     "typeTimer": "Chronomètre",

@@ -549,7 +549,7 @@
     "cancel": "Cancel",
     "save": "Save",
     "deleteTitle": "Delete exercise?",
-    "deleteConfirm": "Are you sure you want to delete",
+    "deleteConfirm": "Delete {{name}}?",
     "deleteWarning": "Warning: you will lose {{count}} {{unit}} from your global total.",
     "delete": "Delete",
     "typeTimer": "Timer",

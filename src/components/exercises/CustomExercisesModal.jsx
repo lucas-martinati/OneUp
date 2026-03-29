@@ -321,7 +321,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
             </h3>
             
             <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
-              {t('customExercises.deleteConfirm')} <b>{confirmDeleteEx.label}</b> ?
+              {t('customExercises.deleteConfirm', { name: confirmDeleteEx.label })}
               {computedStats?.exerciseReps?.[confirmDeleteEx.id] > 0 && (
                 <span style={{ display: 'block', marginTop: '12px', color: '#fbbf24', fontSize: '0.85rem', fontWeight: '700', padding: '8px', background: 'rgba(251,191,36,0.1)', borderRadius: '8px' }}>
                   {t('customExercises.deleteWarning', { count: computedStats.exerciseReps[confirmDeleteEx.id].toLocaleString(), unit: confirmDeleteEx.type === 'timer' ? t('customExercises.seconds') : t('customExercises.repetitions') })}

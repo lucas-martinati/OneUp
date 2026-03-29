@@ -549,7 +549,7 @@
     "cancel": "取消",
     "save": "保存",
     "deleteTitle": "删除练习？",
-    "deleteConfirm": "您确定要删除",
+    "deleteConfirm": "删除 {{name}}？",
     "deleteWarning": "注意：您将从全球总数中丢失 {{count}} {{unit}}。",
     "delete": "删除",
     "typeTimer": "计时器",
