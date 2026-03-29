@@ -119,8 +119,29 @@
     "title": "Historique",
     "completed": "Complétés",
     "success": "Réussite",
-    "months": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
-    "weekdays": ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"],
+    "months": [
+      "Janvier",
+      "Février",
+      "Mars",
+      "Avril",
+      "Mai",
+      "Juin",
+      "Juillet",
+      "Août",
+      "Septembre",
+      "Octobre",
+      "Novembre",
+      "Décembre"
+    ],
+    "weekdays": [
+      "Di",
+      "Lu",
+      "Ma",
+      "Me",
+      "Je",
+      "Ve",
+      "Sa"
+    ],
     "day": "Jour {{num}}",
     "repsCount": "{{done}} / {{goal}} reps"
   },
@@ -144,8 +165,25 @@
     "maxDays": "max {{count}}j",
     "loadingCharts": "Chargement des graphiques...",
     "byExercise": "Par exercice",
-    "monthAbbreviations": ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"],
-    "pieLabels": { "morning": "Matin", "afternoon": "Après-midi", "evening": "Soir" },
+    "monthAbbreviations": [
+      "Jan",
+      "Fév",
+      "Mar",
+      "Avr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Aoû",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Déc"
+    ],
+    "pieLabels": {
+      "morning": "Matin",
+      "afternoon": "Après-midi",
+      "evening": "Soir"
+    },
     "quote": "\"La régularité bat la perfection\"",
     "quoteSub": "Montre-toi chaque jour, un pas à la fois !"
   },
@@ -161,46 +199,166 @@
     },
     "validated": "Validé",
     "badges": {
-      "first_blood": { "title": "Premier Pas", "desc": "Valide ton premier entraînement" },
-      "consistent": { "title": "Régularité", "desc": "Entraînement 3 jours de suite" },
-      "week_warrior": { "title": "Guerrier de la Semaine", "desc": "7 jours d'affilée" },
-      "two_weeks": { "title": "Ténacité", "desc": "14 jours d'affilée" },
-      "month_warrior": { "title": "Soldat du Mois", "desc": "30 jours d'affilée" },
-      "two_months": { "title": "Discipline de Fer", "desc": "60 jours d'affilée" },
-      "quarter_year": { "title": "Quarterback", "desc": "90 jours d'affilée" },
-      "half_year": { "title": "Demi-Année", "desc": "180 jours d'affilée" },
-      "year_beast": { "title": "Bête de Compétition", "desc": "365 jours d'affilée" },
-      "ten_sessions": { "title": "Dix de der", "desc": "10 entraînements total" },
-      "fifty_sessions": { "title": "Cinquante", "desc": "50 entraînements total" },
-      "hundred_sessions": { "title": "Centurion", "desc": "100 entraînements total" },
-      "two_hundred_sessions": { "title": "Légende", "desc": "200 entraînements total" },
-      "five_hundred_sessions": { "title": "Mythique", "desc": "500 entraînements total" },
-      "rep_500": { "title": "500 Répétitions", "desc": "500 reps au total" },
-      "rep_1000": { "title": "Millier", "desc": "1 000 reps au total" },
-      "rep_5000": { "title": "Cinq Milliers", "desc": "5 000 reps au total" },
-      "rep_10000": { "title": "Compteur", "desc": "10 000 reps au total" },
-      "rep_50000": { "title": "Massacreur", "desc": "50 000 reps au total" },
-      "perfect_one": { "title": "Premier Jour Parfait", "desc": "Un jour parfait (tous exos)" },
-      "perfect_five": { "title": "Excellence", "desc": "5 jours parfaits" },
-      "perfect_fifty": { "title": "Maîtrise", "desc": "50 jours parfaits" },
-      "perfect_hundred": { "title": "Perfectionniste", "desc": "100 jours parfaits" },
-      "perfect_two_hundred": { "title": "Pas Humain!", "desc": "200 jours parfaits" },
-      "all_exercises": { "title": "Polyvalent", "desc": "Faire tous les exercices au moins une fois" },
-      "weekday_warrior": { "title": "Lundi au Vendredi", "desc": "25 entraînements en semaine" },
-      "weekend_warrior": { "title": "Week-end", "desc": "25 entraînements le week-end" },
-      "balanced": { "title": "Équilibré", "desc": "Autant weekday que week-end" },
-      "morning_5": { "title": "Lève-Tôt", "desc": "5 entraînements le matin" },
-      "morning_10": { "title": "Matinal", "desc": "10 entraînements le matin" },
-      "morning_25": { "title": "Aurore", "desc": "25 entraînements le matin" },
-      "afternoon_5": { "title": "Coup de Pied", "desc": "5 entraînements l'après-midi" },
-      "afternoon_10": { "title": "Après-Midi", "desc": "10 entraînements l'après-midi" },
-      "afternoon_25": { "title": "Rythme", "desc": "25 entraînements l'après-midi" },
-      "evening_5": { "title": "Couche-Tard", "desc": "5 entraînements le soir" },
-      "evening_10": { "title": "Noctambule", "desc": "10 entraînements le soir" },
-      "evening_25": { "title": "Lune", "desc": "25 entraînements le soir" },
-      "ghost": { "title": "Fantôme", "desc": "Entraînement entre 3h et 4h" },
-      "perfectionist_secret": { "title": "Inarrêtable", "desc": "30 jours parfaits consécutifs" },
-      "beast": { "title": "Bête", "desc": "100 000 répétitions au total" },
+      "first_blood": {
+        "title": "Premier Pas",
+        "desc": "Valide ton premier entraînement"
+      },
+      "consistent": {
+        "title": "Régularité",
+        "desc": "Entraînement 3 jours de suite"
+      },
+      "week_warrior": {
+        "title": "Guerrier de la Semaine",
+        "desc": "7 jours d'affilée"
+      },
+      "two_weeks": {
+        "title": "Ténacité",
+        "desc": "14 jours d'affilée"
+      },
+      "month_warrior": {
+        "title": "Soldat du Mois",
+        "desc": "30 jours d'affilée"
+      },
+      "two_months": {
+        "title": "Discipline de Fer",
+        "desc": "60 jours d'affilée"
+      },
+      "quarter_year": {
+        "title": "Quarterback",
+        "desc": "90 jours d'affilée"
+      },
+      "half_year": {
+        "title": "Demi-Année",
+        "desc": "180 jours d'affilée"
+      },
+      "year_beast": {
+        "title": "Bête de Compétition",
+        "desc": "365 jours d'affilée"
+      },
+      "ten_sessions": {
+        "title": "Dix de der",
+        "desc": "10 entraînements total"
+      },
+      "fifty_sessions": {
+        "title": "Cinquante",
+        "desc": "50 entraînements total"
+      },
+      "hundred_sessions": {
+        "title": "Centurion",
+        "desc": "100 entraînements total"
+      },
+      "two_hundred_sessions": {
+        "title": "Légende",
+        "desc": "200 entraînements total"
+      },
+      "five_hundred_sessions": {
+        "title": "Mythique",
+        "desc": "500 entraînements total"
+      },
+      "rep_500": {
+        "title": "500 Répétitions",
+        "desc": "500 reps au total"
+      },
+      "rep_1000": {
+        "title": "Millier",
+        "desc": "1 000 reps au total"
+      },
+      "rep_5000": {
+        "title": "Cinq Milliers",
+        "desc": "5 000 reps au total"
+      },
+      "rep_10000": {
+        "title": "Compteur",
+        "desc": "10 000 reps au total"
+      },
+      "rep_50000": {
+        "title": "Massacreur",
+        "desc": "50 000 reps au total"
+      },
+      "perfect_one": {
+        "title": "Premier Jour Parfait",
+        "desc": "Un jour parfait (tous exos)"
+      },
+      "perfect_five": {
+        "title": "Excellence",
+        "desc": "5 jours parfaits"
+      },
+      "perfect_fifty": {
+        "title": "Maîtrise",
+        "desc": "50 jours parfaits"
+      },
+      "perfect_hundred": {
+        "title": "Perfectionniste",
+        "desc": "100 jours parfaits"
+      },
+      "perfect_two_hundred": {
+        "title": "Pas Humain!",
+        "desc": "200 jours parfaits"
+      },
+      "all_exercises": {
+        "title": "Polyvalent",
+        "desc": "Faire tous les exercices au moins une fois"
+      },
+      "weekday_warrior": {
+        "title": "Lundi au Vendredi",
+        "desc": "25 entraînements en semaine"
+      },
+      "weekend_warrior": {
+        "title": "Week-end",
+        "desc": "25 entraînements le week-end"
+      },
+      "balanced": {
+        "title": "Équilibré",
+        "desc": "Autant weekday que week-end"
+      },
+      "morning_5": {
+        "title": "Lève-Tôt",
+        "desc": "5 entraînements le matin"
+      },
+      "morning_10": {
+        "title": "Matinal",
+        "desc": "10 entraînements le matin"
+      },
+      "morning_25": {
+        "title": "Aurore",
+        "desc": "25 entraînements le matin"
+      },
+      "afternoon_5": {
+        "title": "Coup de Pied",
+        "desc": "5 entraînements l'après-midi"
+      },
+      "afternoon_10": {
+        "title": "Après-Midi",
+        "desc": "10 entraînements l'après-midi"
+      },
+      "afternoon_25": {
+        "title": "Rythme",
+        "desc": "25 entraînements l'après-midi"
+      },
+      "evening_5": {
+        "title": "Couche-Tard",
+        "desc": "5 entraînements le soir"
+      },
+      "evening_10": {
+        "title": "Noctambule",
+        "desc": "10 entraînements le soir"
+      },
+      "evening_25": {
+        "title": "Lune",
+        "desc": "25 entraînements le soir"
+      },
+      "ghost": {
+        "title": "Fantôme",
+        "desc": "Entraînement entre 3h et 4h"
+      },
+      "perfectionist_secret": {
+        "title": "Inarrêtable",
+        "desc": "30 jours parfaits consécutifs"
+      },
+      "beast": {
+        "title": "Bête",
+        "desc": "100 000 répétitions au total"
+      },
       "secret": "Secret"
     }
   },
@@ -345,7 +503,8 @@
     "badgeActive": "Ton badge Supporter est actif dans le classement.",
     "androidOnly": "L'achat est uniquement disponible dans l'application Android.",
     "history": "Historique des achats",
-    "noHistory": "Aucun achat enregistré"
+    "noHistory": "Aucun achat enregistré",
+    "donateAgain": "Faire un nouveau don"
   },
   "pro": {
     "title": "Abonnement Pro",
@@ -355,7 +514,10 @@
       "customPrograms": "Programmes 100% ajustables",
       "specialExercises": "Mode Musculation et Haltères",
       "dailyProgression": "Sessions hybrides multi-exercices",
-      "proStats": "Statistiques et graphiques experts"
+      "proStats": "Statistiques et graphiques experts",
+      "customExercises": "Exercices 100% Personnalisés",
+      "weightDashboard": "Dashboard Musculation (Poids)",
+      "exclusiveLeaderboards": "Leaderboards Exclusifs"
     },
     "buyButton": "Devenir Pro",
     "activeTitle": "Membre Pro",
@@ -363,5 +525,8 @@
     "price": "1,99€/mois",
     "locked": "Abonnement Pro exclusif",
     "lockedDesc": "Passe au Pro pour débloquer ces fonctionnalités !"
+  },
+  "store": {
+    "title": "Boutique"
   }
 }

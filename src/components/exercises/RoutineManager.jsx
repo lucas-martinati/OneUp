@@ -8,6 +8,7 @@ import {
 import { EXERCISES } from '../../config/exercises';
 import { registerBackHandler } from '../../utils/backHandler';
 import ICON_MAP from '../../utils/iconMap';
+import { Z_INDEX } from '../../utils/zIndex';
 
 export function RoutineManager({
     onClose, routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, onLaunchRoutine
@@ -79,7 +80,7 @@ export function RoutineManager({
         return (
             <div className="fade-in" style={{
                 position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.97)',
-                zIndex: 1000, display: 'flex', flexDirection: 'column',
+                zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
                 paddingTop: 'env(safe-area-inset-top)',
                 paddingBottom: 'env(safe-area-inset-bottom)'
             }}>
@@ -285,7 +286,7 @@ export function RoutineManager({
     return (
         <div className="fade-in" style={{
             position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.97)',
-            zIndex: 1000, display: 'flex', flexDirection: 'column',
+            zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)'
         }}>

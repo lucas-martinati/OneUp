@@ -8,6 +8,7 @@ import { EXERCISES, EXERCISES_MAP } from '../../config/exercises';
 import { getLocalDateStr } from '../../utils/dateUtils';
 import { registerBackHandler } from '../../utils/backHandler';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
+import { Z_INDEX } from '../../utils/zIndex';
 
 export function CustomProgramPanel({
   onClose, isPro, programs,
@@ -121,7 +122,7 @@ export function CustomProgramPanel({
     return (
       <div className="fade-in" style={{
         position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.92)',
-        zIndex: 1000, display: 'flex', flexDirection: 'column',
+        zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}>
@@ -154,7 +155,7 @@ export function CustomProgramPanel({
     return (
       <div className="fade-in" style={{
         position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.92)',
-        zIndex: 1000, display: 'flex', flexDirection: 'column',
+        zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}>
@@ -300,7 +301,7 @@ export function CustomProgramPanel({
     return (
       <div className="fade-in" style={{
         position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.92)',
-        zIndex: 1000, display: 'flex', flexDirection: 'column',
+        zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}>
@@ -461,7 +462,7 @@ export function CustomProgramPanel({
   return (
     <div className="fade-in" style={{
       position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.92)',
-      zIndex: 1000, display: 'flex', flexDirection: 'column',
+      zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
       paddingTop: 'env(safe-area-inset-top)',
       paddingBottom: 'env(safe-area-inset-bottom)'
     }}>

@@ -1,10 +1,11 @@
 import { Smartphone } from 'lucide-react';
+import { Z_INDEX } from '../../utils/zIndex';
 
 export function WebPaymentModal({ onClose }) {
     return (
         <div className="fade-in" style={{
             position: 'fixed', inset: 0,
-            zIndex: 9999,
+            zIndex: Z_INDEX.DELETE_OVERLAY,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: 'rgba(0,0,0,0.75)',
             backdropFilter: 'blur(24px)',

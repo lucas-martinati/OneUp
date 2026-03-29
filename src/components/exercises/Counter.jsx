@@ -8,6 +8,7 @@ import {
     Flame, Square, MoveDown, MoveDiagonal
 } from 'lucide-react';
 import { sounds } from '../../utils/soundManager';
+import { Z_INDEX } from '../../utils/zIndex';
 import ICON_MAP from '../../utils/iconMap';
 
 
@@ -100,7 +101,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
             onDone={() => setShowConfetti(false)}
         />
         <div className="fade-in modal-overlay" style={{
-            zIndex: 1000,
+            zIndex: Z_INDEX.TOAST,
             padding: 'var(--spacing-sm)',
             paddingTop: 'calc(var(--spacing-sm) + env(safe-area-inset-top))',
             paddingBottom: 'calc(var(--spacing-sm) + env(safe-area-inset-bottom))'
@@ -111,7 +112,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                 top: 'calc(var(--spacing-sm) + env(safe-area-inset-top))',
                 right: 'var(--spacing-sm)',
                 display: 'flex', alignItems: 'center', gap: '8px',
-                zIndex: 1001
+                zIndex: Z_INDEX.TIMER_OVERLAY
             }}>
                 {/* Session: Next button */}
                 {onNext && (

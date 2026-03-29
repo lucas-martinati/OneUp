@@ -7,6 +7,7 @@ import { getLocalDateStr } from '../../utils/dateUtils';
 import { ClanInviteCard } from './ClanInviteCard';
 import { LeaderboardTabs } from './LeaderboardTabs';
 import { LeaderboardRow } from './LeaderboardRow';
+import { Z_INDEX } from '../../utils/zIndex';
 import { UserDetail } from './UserDetail';
 import ICON_MAP from '../../utils/iconMap';
 
@@ -104,7 +105,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
     return (
         <div className="fade-in" style={{
             position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'var(--overlay-bg)', zIndex: 110,
+            background: 'var(--overlay-bg)', zIndex: Z_INDEX.MODAL,
             display: 'flex', flexDirection: 'column',
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)',

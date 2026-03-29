@@ -3,6 +3,7 @@ import { Trophy, Check, Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footpri
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import ICON_MAP from '../../utils/iconMap';
+import { Z_INDEX } from '../../utils/zIndex';
 
 export function SessionSummary({ queue, exerciseInfo, onClose }) {
     const { t } = useTranslation();
@@ -10,7 +11,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose }) {
     return (
         <div className="fade-in" style={{
             position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.97)',
-            zIndex: 1000, display: 'flex', flexDirection: 'column',
+            zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
             padding: 'var(--spacing-lg)', gap: '20px',
             paddingTop: 'env(safe-area-inset-top)',

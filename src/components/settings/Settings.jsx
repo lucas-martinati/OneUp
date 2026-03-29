@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Z_INDEX } from '../../utils/zIndex';
 import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Sparkles, Star, Smartphone } from 'lucide-react';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
@@ -10,14 +11,8 @@ import { StoreCard } from '../store/StoreCard';
 
 export function Settings({ defaultShowStore = false, settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isPro, onPurchaseSupporter, onPurchasePro, onRestorePurchases }) {
     const { t, i18n } = useTranslation();
-    const [showSaved, setShowSaved] = useState(false);
     const [showStore, setShowStore] = useState(defaultShowStore);
     const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
-
-    const showSavedIndicator = () => {
-        setShowSaved(true);
-        setTimeout(() => setShowSaved(false), 1500);
-    };
 
     const [revenueCatHistory, setRevenueCatHistory] = useState([]);
 
@@ -64,7 +59,7 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
     };
 
     return (
-        <div className="fade-in modal-overlay" style={{ zIndex: 110 }}>
+        <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.MODAL }}>
             <div className="modal-content" style={{
                 maxWidth: '600px', width: '100%', margin: '0 auto',
                 padding: 'var(--spacing-md)',
@@ -88,28 +83,10 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                         </button>
                     )}
                     <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: '800' }}>
-                        {showStore ? 'Boutique' : t('settings.title')}
+                        {showStore ? t('store.title') : t('settings.title')}
                     </h2>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    {/* Auto-save indicator */}
-                    {showSaved && (
-                        <div className="scale-in" style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            padding: '6px 12px',
-                            borderRadius: '20px',
-                            background: 'var(--success)',
-                            color: 'white',
-                            fontSize: '0.85rem',
-                            fontWeight: '600',
-                            boxShadow: 'var(--glow-success)'
-                        }}>
-                            <Check size={16} />
-                            {t('common.saved')}
-                        </div>
-                    )}
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                         {!showStore && (
                             <button onClick={() => setShowStore(true)} className="hover-lift" style={{
@@ -125,7 +102,7 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                                 letterSpacing: '0.5px'
                             }}>
                                 <ShoppingBag size={18} />
-                                <span>Boutique</span>
+                                <span>{t('store.title')}</span>
                             </button>
                         )}
                         <button onClick={onClose} className="hover-lift glass" style={{
@@ -157,7 +134,7 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                         activeDesc={t('supporter.badgeActive')}
                         idleDescription={t('supporter.description')}
                         idleExplanation={t('supporter.explanation')}
-                        buyButtonText={isSupporter ? "Faire un nouveau don" : t('supporter.buyButton')}
+                        buyButtonText={isSupporter ? t('supporter.donateAgain') : t('supporter.buyButton')}
                         onPurchase={onPurchaseSupporter}
                         cloudAuth={cloudAuth}
                         allowMultiplePurchases={true}
@@ -176,7 +153,7 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                         activeDesc={t('pro.activeDesc')}
                         idleDescription={t('pro.description')}
                         idleExplanation={t('pro.explanation')}
-                        features={['Exercices 100% Personnalisés', 'Dashboard Musculation (Poids)', 'Leaderboards Exclusifs']}
+                        features={[t('pro.features.customExercises'), t('pro.features.weightDashboard'), t('pro.features.exclusiveLeaderboards')]}
                         buyButtonText={`${t('pro.buyButton')} — ${t('pro.price')}`}
                         onPurchase={onPurchasePro}
                         cloudAuth={cloudAuth}
@@ -212,7 +189,7 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                                 fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)',
                                 textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'
                             }}>
-                                Historique des achats
+                                {t('supporter.history')}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 {displayHistory.map((receipt, index) => (
@@ -502,7 +479,6 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                                 const newSettings = { ...settings, leaderboardPseudo: e.target.value.slice(0, 20) };
                                 onSave(newSettings);
                             }}
-                            onBlur={() => showSavedIndicator()}
                             placeholder={cloudAuth?.user?.displayName || t('settings.yourPseudo')}
                             maxLength={20}
                             style={{
@@ -627,8 +603,6 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                                 const val = Math.min(1.0, Math.max(0.1, parseFloat(e.target.value)));
                                 onSave({ ...settings, difficultyMultiplier: val });
                             }}
-                            onMouseUp={() => showSavedIndicator()}
-                            onTouchEnd={() => showSavedIndicator()}
                             style={{
                                 width: '100%',
                                 height: '6px',

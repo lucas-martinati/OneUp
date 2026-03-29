@@ -7,6 +7,7 @@ import { useComputedStats } from './hooks/useComputedStats';
 import { useUserDetailsCache } from './hooks/useUserDetailsCache';
 import { useRoutines } from './hooks/useRoutines';
 import { useCustomExercises } from './hooks/useCustomExercises';
+import { useCloudAutoSave } from './hooks/useCloudAutoSave';
 import { cloudSync } from './services/cloudSync';
 import {
   initPurchases, checkSupporterStatus, purchaseSupporter, restorePurchases,
@@ -265,29 +266,11 @@ function App() {
     }
   }, [googleAuth.isSignedIn, googleAuth.loading, isSetup, conflictCheckDone, completions]);
 
-  // Auto-save settings
-  useEffect(() => {
-    if (googleAuth.isSignedIn && !googleAuth.loading && isSetup) {
-      const timer = setTimeout(() => { cloudSync.saveSettingsToCloud(settings); }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [settings, googleAuth.isSignedIn, googleAuth.loading, isSetup]);
+  useCloudAutoSave(googleAuth.isSignedIn && !googleAuth.loading && isSetup, settings, cloudSync.saveSettingsToCloud, { delay: 2000 });
 
-  // Auto-save routines
-  useEffect(() => {
-    if (googleAuth.isSignedIn && !googleAuth.loading && isSetup) {
-      const timer = setTimeout(() => { cloudSync.saveRoutinesToCloud(routines); }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [routines, googleAuth.isSignedIn, googleAuth.loading, isSetup]);
+  useCloudAutoSave(googleAuth.isSignedIn && !googleAuth.loading && isSetup, routines, cloudSync.saveRoutinesToCloud, { delay: 2000 });
 
-  // Auto-save custom exercises
-  useEffect(() => {
-    if (googleAuth.isSignedIn && !googleAuth.loading && isSetup && isPro) {
-      const timer = setTimeout(() => { cloudSync.saveCustomExercisesToCloud(customExercisesHook.customExercises); }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [customExercisesHook.customExercises, googleAuth.isSignedIn, googleAuth.loading, isSetup, isPro]);
+  useCloudAutoSave(googleAuth.isSignedIn && !googleAuth.loading && isSetup && isPro, customExercisesHook.customExercises, cloudSync.saveCustomExercisesToCloud, { delay: 2000 });
 
   // Auto-publish leaderboard when completions change
   useEffect(() => {

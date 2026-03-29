@@ -4,6 +4,7 @@ import {
   X, Plus, Settings2, Trash2, 
   Dumbbell, Activity, Flame, Heart, Zap, Star, Target, Trophy, Swords
 } from 'lucide-react';
+import { Z_INDEX } from '../../utils/zIndex';
 
 const ICONS = {
   Dumbbell, Activity, Flame, Heart, Zap, Star, Target, Trophy, Swords
@@ -66,7 +67,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
   return (
     <div className="fade-in" style={{
       position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.92)',
-      zIndex: 1000, display: 'flex', flexDirection: 'column',
+      zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
       paddingTop: 'env(safe-area-inset-top)',
       paddingBottom: 'env(safe-area-inset-bottom)'
     }}>

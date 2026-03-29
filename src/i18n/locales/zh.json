@@ -119,8 +119,29 @@
     "title": "历史记录",
     "completed": "已完成",
     "success": "成功",
-    "months": ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
-    "weekdays": ["日", "一", "二", "三", "四", "五", "六"],
+    "months": [
+      "一月",
+      "二月",
+      "三月",
+      "四月",
+      "五月",
+      "六月",
+      "七月",
+      "八月",
+      "九月",
+      "十月",
+      "十一月",
+      "十二月"
+    ],
+    "weekdays": [
+      "日",
+      "一",
+      "二",
+      "三",
+      "四",
+      "五",
+      "六"
+    ],
     "day": "第{{num}}天",
     "repsCount": "{{done}} / {{goal}} 次"
   },
@@ -144,8 +165,25 @@
     "maxDays": "最多{{count}}天",
     "loadingCharts": "加载图表中...",
     "byExercise": "按运动",
-    "monthAbbreviations": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
-    "pieLabels": { "morning": "上午", "afternoon": "下午", "evening": "晚上" },
+    "monthAbbreviations": [
+      "1月",
+      "2月",
+      "3月",
+      "4月",
+      "5月",
+      "6月",
+      "7月",
+      "8月",
+      "9月",
+      "10月",
+      "11月",
+      "12月"
+    ],
+    "pieLabels": {
+      "morning": "上午",
+      "afternoon": "下午",
+      "evening": "晚上"
+    },
     "quote": "\"坚持胜过完美\"",
     "quoteSub": "每天出现，一步一个脚印！"
   },
@@ -161,46 +199,166 @@
     },
     "validated": "完成",
     "badges": {
-      "first_blood": { "title": "第一步", "desc": "完成你的第一次锻炼" },
-      "consistent": { "title": "坚持", "desc": "连续锻炼3天" },
-      "week_warrior": { "title": "周战士", "desc": "连续7天" },
-      "two_weeks": { "title": "坚韧", "desc": "连续14天" },
-      "month_warrior": { "title": "月战士", "desc": "连续30天" },
-      "two_months": { "title": "铁律", "desc": "连续60天" },
-      "quarter_year": { "title": "季度王", "desc": "连续90天" },
-      "half_year": { "title": "半年", "desc": "连续180天" },
-      "year_beast": { "title": "竞技之兽", "desc": "连续365天" },
-      "ten_sessions": { "title": "前十", "desc": "共10次锻炼" },
-      "fifty_sessions": { "title": "五十", "desc": "共50次锻炼" },
-      "hundred_sessions": { "title": "百夫长", "desc": "共100次锻炼" },
-      "two_hundred_sessions": { "title": "传奇", "desc": "共200次锻炼" },
-      "five_hundred_sessions": { "title": "神话", "desc": "共500次锻炼" },
-      "rep_500": { "title": "500次", "desc": "共500次" },
-      "rep_1000": { "title": "千次", "desc": "共1,000次" },
-      "rep_5000": { "title": "五千", "desc": "共5,000次" },
-      "rep_10000": { "title": "万次", "desc": "共10,000次" },
-      "rep_50000": { "title": "收割者", "desc": "共50,000次" },
-      "perfect_one": { "title": "首个完美日", "desc": "一个完美天（所有运动）" },
-      "perfect_five": { "title": "卓越", "desc": "5个完美天" },
-      "perfect_fifty": { "title": "大师", "desc": "50个完美天" },
-      "perfect_hundred": { "title": "完美主义者", "desc": "100个完美天" },
-      "perfect_two_hundred": { "title": "非人类！", "desc": "200个完美天" },
-      "all_exercises": { "title": "全能", "desc": "每项运动至少做一次" },
-      "weekday_warrior": { "title": "工作日", "desc": "25次工作日锻炼" },
-      "weekend_warrior": { "title": "周末", "desc": "25次周末锻炼" },
-      "balanced": { "title": "均衡", "desc": "工作日和周末锻炼次数相等" },
-      "morning_5": { "title": "早起鸟", "desc": "5次晨练" },
-      "morning_10": { "title": "晨型人", "desc": "10次晨练" },
-      "morning_25": { "title": "黎明", "desc": "25次晨练" },
-      "afternoon_5": { "title": "下午起步", "desc": "5次下午锻炼" },
-      "afternoon_10": { "title": "午后", "desc": "10次下午锻炼" },
-      "afternoon_25": { "title": "节奏", "desc": "25次下午锻炼" },
-      "evening_5": { "title": "夜猫子", "desc": "5次晚间锻炼" },
-      "evening_10": { "title": "夜行者", "desc": "10次晚间锻炼" },
-      "evening_25": { "title": "月光", "desc": "25次晚间锻炼" },
-      "ghost": { "title": "幽灵", "desc": "在凌晨3点到4点之间锻炼" },
-      "perfectionist_secret": { "title": "势不可挡", "desc": "连续30个完美天" },
-      "beast": { "title": "猛兽", "desc": "共100,000次" },
+      "first_blood": {
+        "title": "第一步",
+        "desc": "完成你的第一次锻炼"
+      },
+      "consistent": {
+        "title": "坚持",
+        "desc": "连续锻炼3天"
+      },
+      "week_warrior": {
+        "title": "周战士",
+        "desc": "连续7天"
+      },
+      "two_weeks": {
+        "title": "坚韧",
+        "desc": "连续14天"
+      },
+      "month_warrior": {
+        "title": "月战士",
+        "desc": "连续30天"
+      },
+      "two_months": {
+        "title": "铁律",
+        "desc": "连续60天"
+      },
+      "quarter_year": {
+        "title": "季度王",
+        "desc": "连续90天"
+      },
+      "half_year": {
+        "title": "半年",
+        "desc": "连续180天"
+      },
+      "year_beast": {
+        "title": "竞技之兽",
+        "desc": "连续365天"
+      },
+      "ten_sessions": {
+        "title": "前十",
+        "desc": "共10次锻炼"
+      },
+      "fifty_sessions": {
+        "title": "五十",
+        "desc": "共50次锻炼"
+      },
+      "hundred_sessions": {
+        "title": "百夫长",
+        "desc": "共100次锻炼"
+      },
+      "two_hundred_sessions": {
+        "title": "传奇",
+        "desc": "共200次锻炼"
+      },
+      "five_hundred_sessions": {
+        "title": "神话",
+        "desc": "共500次锻炼"
+      },
+      "rep_500": {
+        "title": "500次",
+        "desc": "共500次"
+      },
+      "rep_1000": {
+        "title": "千次",
+        "desc": "共1,000次"
+      },
+      "rep_5000": {
+        "title": "五千",
+        "desc": "共5,000次"
+      },
+      "rep_10000": {
+        "title": "万次",
+        "desc": "共10,000次"
+      },
+      "rep_50000": {
+        "title": "收割者",
+        "desc": "共50,000次"
+      },
+      "perfect_one": {
+        "title": "首个完美日",
+        "desc": "一个完美天（所有运动）"
+      },
+      "perfect_five": {
+        "title": "卓越",
+        "desc": "5个完美天"
+      },
+      "perfect_fifty": {
+        "title": "大师",
+        "desc": "50个完美天"
+      },
+      "perfect_hundred": {
+        "title": "完美主义者",
+        "desc": "100个完美天"
+      },
+      "perfect_two_hundred": {
+        "title": "非人类！",
+        "desc": "200个完美天"
+      },
+      "all_exercises": {
+        "title": "全能",
+        "desc": "每项运动至少做一次"
+      },
+      "weekday_warrior": {
+        "title": "工作日",
+        "desc": "25次工作日锻炼"
+      },
+      "weekend_warrior": {
+        "title": "周末",
+        "desc": "25次周末锻炼"
+      },
+      "balanced": {
+        "title": "均衡",
+        "desc": "工作日和周末锻炼次数相等"
+      },
+      "morning_5": {
+        "title": "早起鸟",
+        "desc": "5次晨练"
+      },
+      "morning_10": {
+        "title": "晨型人",
+        "desc": "10次晨练"
+      },
+      "morning_25": {
+        "title": "黎明",
+        "desc": "25次晨练"
+      },
+      "afternoon_5": {
+        "title": "下午起步",
+        "desc": "5次下午锻炼"
+      },
+      "afternoon_10": {
+        "title": "午后",
+        "desc": "10次下午锻炼"
+      },
+      "afternoon_25": {
+        "title": "节奏",
+        "desc": "25次下午锻炼"
+      },
+      "evening_5": {
+        "title": "夜猫子",
+        "desc": "5次晚间锻炼"
+      },
+      "evening_10": {
+        "title": "夜行者",
+        "desc": "10次晚间锻炼"
+      },
+      "evening_25": {
+        "title": "月光",
+        "desc": "25次晚间锻炼"
+      },
+      "ghost": {
+        "title": "幽灵",
+        "desc": "在凌晨3点到4点之间锻炼"
+      },
+      "perfectionist_secret": {
+        "title": "势不可挡",
+        "desc": "连续30个完美天"
+      },
+      "beast": {
+        "title": "猛兽",
+        "desc": "共100,000次"
+      },
       "secret": "秘密"
     }
   },
@@ -336,7 +494,8 @@
     "badgeActive": "你的支持者徽章已在排行榜中激活。",
     "androidOnly": "购买仅在 Android 应用中可用。",
     "history": "购买历史",
-    "noHistory": "没有购买记录"
+    "noHistory": "没有购买记录",
+    "donateAgain": "再次捐赠"
   },
   "pro": {
     "title": "Pro 订阅",
@@ -346,7 +505,10 @@
       "customPrograms": "100% 自定义计划",
       "exerciseChoice": "自由选择运动",
       "dailyProgression": "量身定制的每日进度",
-      "dedicatedPanel": "专属面板，完整跟踪"
+      "dedicatedPanel": "专属面板，完整跟踪",
+      "customExercises": "100%自定义练习",
+      "weightDashboard": "力量训练面板",
+      "exclusiveLeaderboards": "专属排行榜"
     },
     "buyButton": "升级 Pro",
     "activeTitle": "Pro 会员",
@@ -354,5 +516,8 @@
     "price": "€1.99/月",
     "locked": "需要 Pro 订阅",
     "lockedDesc": "升级到 Pro 以创建你的计划！"
+  },
+  "store": {
+    "title": "商店"
   }
 }

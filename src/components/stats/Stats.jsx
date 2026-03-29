@@ -5,6 +5,7 @@ import { computeAllStats } from '../../hooks/useComputedStats';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { BADGE_DEFINITIONS } from '../../config/badgeDefinitions';
 import ICON_MAP from '../../utils/iconMap';
+import { Z_INDEX } from '../../utils/zIndex';
 
 // Lazy load Recharts components
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
@@ -75,7 +76,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
     };
 
     return (
-        <div className="fade-in modal-overlay" style={{ zIndex: 110 }}>
+        <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.MODAL }}>
             <div className="modal-content" style={{
                 maxWidth: '640px', width: '100%', margin: '0 auto',
                 padding: 'var(--spacing-md)',

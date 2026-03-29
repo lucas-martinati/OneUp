@@ -119,8 +119,29 @@
     "title": "History",
     "completed": "Completed",
     "success": "Success",
-    "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "weekdays": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ],
     "day": "Day {{num}}",
     "repsCount": "{{done}} / {{goal}} reps"
   },
@@ -144,8 +165,25 @@
     "maxDays": "max {{count}}d",
     "loadingCharts": "Loading charts...",
     "byExercise": "By Exercise",
-    "monthAbbreviations": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    "pieLabels": { "morning": "Morning", "afternoon": "Afternoon", "evening": "Evening" },
+    "monthAbbreviations": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
+    "pieLabels": {
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
     "quote": "\"Consistency beats perfection\"",
     "quoteSub": "Show up every day, one step at a time!"
   },
@@ -161,46 +199,166 @@
     },
     "validated": "Done",
     "badges": {
-      "first_blood": { "title": "First Step", "desc": "Complete your first workout" },
-      "consistent": { "title": "Consistency", "desc": "Work out 3 days in a row" },
-      "week_warrior": { "title": "Week Warrior", "desc": "7 days in a row" },
-      "two_weeks": { "title": "Tenacity", "desc": "14 days in a row" },
-      "month_warrior": { "title": "Month Soldier", "desc": "30 days in a row" },
-      "two_months": { "title": "Iron Discipline", "desc": "60 days in a row" },
-      "quarter_year": { "title": "Quarterback", "desc": "90 days in a row" },
-      "half_year": { "title": "Half Year", "desc": "180 days in a row" },
-      "year_beast": { "title": "Competition Beast", "desc": "365 days in a row" },
-      "ten_sessions": { "title": "Top Ten", "desc": "10 workouts total" },
-      "fifty_sessions": { "title": "Fifty", "desc": "50 workouts total" },
-      "hundred_sessions": { "title": "Centurion", "desc": "100 workouts total" },
-      "two_hundred_sessions": { "title": "Legend", "desc": "200 workouts total" },
-      "five_hundred_sessions": { "title": "Mythical", "desc": "500 workouts total" },
-      "rep_500": { "title": "500 Reps", "desc": "500 total reps" },
-      "rep_1000": { "title": "Thousand", "desc": "1,000 total reps" },
-      "rep_5000": { "title": "Five Thousand", "desc": "5,000 total reps" },
-      "rep_10000": { "title": "Counter", "desc": "10,000 total reps" },
-      "rep_50000": { "title": "Slaughterer", "desc": "50,000 total reps" },
-      "perfect_one": { "title": "First Perfect Day", "desc": "One perfect day (all exercises)" },
-      "perfect_five": { "title": "Excellence", "desc": "5 perfect days" },
-      "perfect_fifty": { "title": "Mastery", "desc": "50 perfect days" },
-      "perfect_hundred": { "title": "Perfectionist", "desc": "100 perfect days" },
-      "perfect_two_hundred": { "title": "Not Human!", "desc": "200 perfect days" },
-      "all_exercises": { "title": "All-Rounder", "desc": "Do every exercise at least once" },
-      "weekday_warrior": { "title": "Monday to Friday", "desc": "25 weekday workouts" },
-      "weekend_warrior": { "title": "Weekend", "desc": "25 weekend workouts" },
-      "balanced": { "title": "Balanced", "desc": "Equal weekday and weekend workouts" },
-      "morning_5": { "title": "Early Bird", "desc": "5 morning workouts" },
-      "morning_10": { "title": "Morning Person", "desc": "10 morning workouts" },
-      "morning_25": { "title": "Dawn", "desc": "25 morning workouts" },
-      "afternoon_5": { "title": "Kickstart", "desc": "5 afternoon workouts" },
-      "afternoon_10": { "title": "Afternoon", "desc": "10 afternoon workouts" },
-      "afternoon_25": { "title": "Rhythm", "desc": "25 afternoon workouts" },
-      "evening_5": { "title": "Night Owl", "desc": "5 evening workouts" },
-      "evening_10": { "title": "Nocturnal", "desc": "10 evening workouts" },
-      "evening_25": { "title": "Moon", "desc": "25 evening workouts" },
-      "ghost": { "title": "Ghost", "desc": "Workout between 3am and 4am" },
-      "perfectionist_secret": { "title": "Unstoppable", "desc": "30 consecutive perfect days" },
-      "beast": { "title": "Beast", "desc": "100,000 total reps" },
+      "first_blood": {
+        "title": "First Step",
+        "desc": "Complete your first workout"
+      },
+      "consistent": {
+        "title": "Consistency",
+        "desc": "Work out 3 days in a row"
+      },
+      "week_warrior": {
+        "title": "Week Warrior",
+        "desc": "7 days in a row"
+      },
+      "two_weeks": {
+        "title": "Tenacity",
+        "desc": "14 days in a row"
+      },
+      "month_warrior": {
+        "title": "Month Soldier",
+        "desc": "30 days in a row"
+      },
+      "two_months": {
+        "title": "Iron Discipline",
+        "desc": "60 days in a row"
+      },
+      "quarter_year": {
+        "title": "Quarterback",
+        "desc": "90 days in a row"
+      },
+      "half_year": {
+        "title": "Half Year",
+        "desc": "180 days in a row"
+      },
+      "year_beast": {
+        "title": "Competition Beast",
+        "desc": "365 days in a row"
+      },
+      "ten_sessions": {
+        "title": "Top Ten",
+        "desc": "10 workouts total"
+      },
+      "fifty_sessions": {
+        "title": "Fifty",
+        "desc": "50 workouts total"
+      },
+      "hundred_sessions": {
+        "title": "Centurion",
+        "desc": "100 workouts total"
+      },
+      "two_hundred_sessions": {
+        "title": "Legend",
+        "desc": "200 workouts total"
+      },
+      "five_hundred_sessions": {
+        "title": "Mythical",
+        "desc": "500 workouts total"
+      },
+      "rep_500": {
+        "title": "500 Reps",
+        "desc": "500 total reps"
+      },
+      "rep_1000": {
+        "title": "Thousand",
+        "desc": "1,000 total reps"
+      },
+      "rep_5000": {
+        "title": "Five Thousand",
+        "desc": "5,000 total reps"
+      },
+      "rep_10000": {
+        "title": "Counter",
+        "desc": "10,000 total reps"
+      },
+      "rep_50000": {
+        "title": "Slaughterer",
+        "desc": "50,000 total reps"
+      },
+      "perfect_one": {
+        "title": "First Perfect Day",
+        "desc": "One perfect day (all exercises)"
+      },
+      "perfect_five": {
+        "title": "Excellence",
+        "desc": "5 perfect days"
+      },
+      "perfect_fifty": {
+        "title": "Mastery",
+        "desc": "50 perfect days"
+      },
+      "perfect_hundred": {
+        "title": "Perfectionist",
+        "desc": "100 perfect days"
+      },
+      "perfect_two_hundred": {
+        "title": "Not Human!",
+        "desc": "200 perfect days"
+      },
+      "all_exercises": {
+        "title": "All-Rounder",
+        "desc": "Do every exercise at least once"
+      },
+      "weekday_warrior": {
+        "title": "Monday to Friday",
+        "desc": "25 weekday workouts"
+      },
+      "weekend_warrior": {
+        "title": "Weekend",
+        "desc": "25 weekend workouts"
+      },
+      "balanced": {
+        "title": "Balanced",
+        "desc": "Equal weekday and weekend workouts"
+      },
+      "morning_5": {
+        "title": "Early Bird",
+        "desc": "5 morning workouts"
+      },
+      "morning_10": {
+        "title": "Morning Person",
+        "desc": "10 morning workouts"
+      },
+      "morning_25": {
+        "title": "Dawn",
+        "desc": "25 morning workouts"
+      },
+      "afternoon_5": {
+        "title": "Kickstart",
+        "desc": "5 afternoon workouts"
+      },
+      "afternoon_10": {
+        "title": "Afternoon",
+        "desc": "10 afternoon workouts"
+      },
+      "afternoon_25": {
+        "title": "Rhythm",
+        "desc": "25 afternoon workouts"
+      },
+      "evening_5": {
+        "title": "Night Owl",
+        "desc": "5 evening workouts"
+      },
+      "evening_10": {
+        "title": "Nocturnal",
+        "desc": "10 evening workouts"
+      },
+      "evening_25": {
+        "title": "Moon",
+        "desc": "25 evening workouts"
+      },
+      "ghost": {
+        "title": "Ghost",
+        "desc": "Workout between 3am and 4am"
+      },
+      "perfectionist_secret": {
+        "title": "Unstoppable",
+        "desc": "30 consecutive perfect days"
+      },
+      "beast": {
+        "title": "Beast",
+        "desc": "100,000 total reps"
+      },
       "secret": "Secret"
     }
   },
@@ -345,7 +503,8 @@
     "badgeActive": "Your Supporter badge is active in the leaderboard.",
     "androidOnly": "Purchase is only available in the Android app.",
     "history": "Purchase history",
-    "noHistory": "No purchases recorded"
+    "noHistory": "No purchases recorded",
+    "donateAgain": "Make another donation"
   },
   "pro": {
     "title": "Pro Subscription",
@@ -355,7 +514,10 @@
       "customPrograms": "100% custom programs",
       "exerciseChoice": "Free exercise choice",
       "dailyProgression": "Tailored daily progression",
-      "dedicatedPanel": "Dedicated panel with full tracking"
+      "dedicatedPanel": "Dedicated panel with full tracking",
+      "customExercises": "100% Custom Exercises",
+      "weightDashboard": "Weight Training Dashboard",
+      "exclusiveLeaderboards": "Exclusive Leaderboards"
     },
     "buyButton": "Go Pro",
     "activeTitle": "Pro Member",
@@ -363,5 +525,8 @@
     "price": "€1.99/month",
     "locked": "Pro subscription required",
     "lockedDesc": "Upgrade to Pro to create your programs!"
+  },
+  "store": {
+    "title": "Store"
   }
 }

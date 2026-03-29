@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { ChevronRight } from 'lucide-react';
+import { Z_INDEX } from '../../utils/zIndex';
 
 export function AchievementToast({ achievement, onClose, onView }) {
     const { t } = useTranslation();
@@ -62,7 +63,7 @@ export function AchievementToast({ achievement, onClose, onView }) {
         <div style={{
             position: 'fixed', top: 'calc(var(--spacing-md) + env(safe-area-inset-top))', left: '50%',
             transform: `translateX(calc(-50% + ${translateX}px)) translateY(${isExiting ? -20 : (isVisible ? 0 : -100)}px)`,
-            zIndex: 9999,
+            zIndex: Z_INDEX.DELETE_OVERLAY,
             opacity: isExiting ? 0 : (isVisible ? 1 : 0),
             transition: noTransition ? 'none' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             pointerEvents: isVisible && !isExiting ? 'auto' : 'none',

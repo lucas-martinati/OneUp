@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Z_INDEX } from '../../utils/zIndex';
 
 /**
  * Pure CSS confetti — 3D tumbling & realistic parabolic burst.
@@ -129,7 +130,7 @@ export function CSSConfetti({
                 position: 'fixed',
                 inset: 0,
                 pointerEvents: 'none',
-                zIndex: 9999,
+                zIndex: Z_INDEX.DELETE_OVERLAY,
                 overflow: 'hidden',
                 perspective: '1000px', // Ajoute une profondeur pour la rotation 3D
             }}

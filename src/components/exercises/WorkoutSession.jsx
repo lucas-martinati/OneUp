@@ -8,11 +8,70 @@ import {
 import { EXERCISES, getDailyGoal } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { Counter } from './Counter';
+import { Z_INDEX } from '../../utils/zIndex';
 import { Timer } from './Timer';
 import { SessionSummary } from './SessionSummary';
 import { registerBackHandler } from '../../utils/backHandler';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import ICON_MAP from '../../utils/iconMap';
+
+// ── Exercise grid item ──────────────────────────────────────────────────
+function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
+    const Icon = ICON_MAP[ex.icon] || Dumbbell;
+    return (
+        <button
+            onClick={() => !ex.done && onToggle(ex.id)}
+            disabled={ex.done}
+            style={{
+                padding: '14px 10px', borderRadius: 'var(--radius-md)',
+                background: ex.done
+                    ? 'rgba(255,255,255,0.03)'
+                    : selected
+                        ? `linear-gradient(135deg, ${ex.color}25, ${ex.color}12)`
+                        : 'rgba(255,255,255,0.05)',
+                border: selected
+                    ? `2px solid ${ex.color}80`
+                    : '2px solid rgba(255,255,255,0.08)',
+                color: ex.done ? '#555' : selected ? ex.color : 'var(--text-secondary)',
+                cursor: ex.done ? 'default' : 'pointer',
+                opacity: ex.done ? 0.4 : 1,
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: '6px',
+                transition: 'all 0.2s ease',
+                position: 'relative'
+            }}
+        >
+            {ex.done && (
+                <div style={{
+                    position: 'absolute', top: '6px', right: '6px',
+                    background: '#10b981', borderRadius: '50%',
+                    width: '16px', height: '16px', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center'
+                }}>
+                    <Check size={10} color="white" />
+                </div>
+            )}
+            {orderNum && (
+                <div style={{
+                    position: 'absolute', top: '6px', left: '6px',
+                    background: ex.color, borderRadius: '50%',
+                    width: '18px', height: '18px', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center',
+                    fontSize: '0.6rem', fontWeight: '800', color: 'white'
+                }}>
+                    {orderNum}
+                </div>
+            )}
+            <Icon size={24} />
+            <span style={{ fontSize: '0.75rem', fontWeight: '600', textAlign: 'center' }}>
+                {ex.label || t('exercises.' + ex.id)}
+            </span>
+            <span style={{ fontSize: '0.6rem', opacity: 0.6 }}>
+                {ex.done ? t('workout.completed') : (ex.type === 'timer' ? `${ex.goal - ex.count}s` : t('workout.remaining', { count: ex.goal - ex.count }))}
+            </span>
+        </button>
+    );
+}
 
 export function WorkoutSession({
     onClose, today, dayNumber, getExerciseCount, updateExerciseCount, completions, settings,
@@ -231,7 +290,7 @@ export function WorkoutSession({
         return (
             <div className="fade-in" style={{
                 position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.97)',
-                zIndex: 1000, display: 'flex', flexDirection: 'column',
+                zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
                 paddingTop: 'env(safe-area-inset-top)',
                 paddingBottom: 'env(safe-area-inset-bottom)'
             }}>
@@ -507,66 +566,9 @@ export function WorkoutSession({
                                             display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px'
                                         }}>
                                             {catExercises.map(ex => {
-                                                const Icon = ICON_MAP[ex.icon] || Dumbbell;
                                                 const selected = queue.includes(ex.id);
                                                 const orderNum = selected ? queue.indexOf(ex.id) + 1 : null;
-                                                return (
-                                                    <button
-                                                        key={ex.id}
-                                                        onClick={() => !ex.done && toggleExercise(ex.id)}
-                                                        disabled={ex.done}
-                                                        style={{
-                                                            padding: '14px 10px', borderRadius: 'var(--radius-md)',
-                                                            background: ex.done
-                                                                ? 'rgba(255,255,255,0.03)'
-                                                                : selected
-                                                                    ? `linear-gradient(135deg, ${ex.color}25, ${ex.color}12)`
-                                                                    : 'rgba(255,255,255,0.05)',
-                                                            border: selected
-                                                                ? `2px solid ${ex.color}80`
-                                                                : '2px solid rgba(255,255,255,0.08)',
-                                                            color: ex.done ? '#555' : selected ? ex.color : 'var(--text-secondary)',
-                                                            cursor: ex.done ? 'default' : 'pointer',
-                                                            opacity: ex.done ? 0.4 : 1,
-                                                            display: 'flex', flexDirection: 'column',
-                                                            alignItems: 'center', gap: '6px',
-                                                            transition: 'all 0.2s ease',
-                                                            position: 'relative'
-                                                        }}
-                                                    >
-                                                        {ex.done && (
-                                                            <div style={{
-                                                                position: 'absolute', top: '6px', right: '6px',
-                                                                background: '#10b981', borderRadius: '50%',
-                                                                width: '16px', height: '16px', display: 'flex',
-                                                                alignItems: 'center', justifyContent: 'center'
-                                                            }}>
-                                                                <Check size={10} color="white" />
-                                                            </div>
-                                                        )}
-                                                        {orderNum && (
-                                                            <div style={{
-                                                                position: 'absolute', top: '6px', left: '6px',
-                                                                background: ex.color, borderRadius: '50%',
-                                                                width: '18px', height: '18px', display: 'flex',
-                                                                alignItems: 'center', justifyContent: 'center',
-                                                                fontSize: '0.6rem', fontWeight: '800', color: 'white'
-                                                            }}>
-                                                                {orderNum}
-                                                            </div>
-                                                        )}
-                                                        <Icon size={24} />
-                                                        <span style={{
-                                                            fontSize: '0.75rem', fontWeight: '600',
-                                                            textAlign: 'center'
-                                                        }}>{ex.label || t('exercises.' + ex.id)}</span>
-                                                        <span style={{
-                                                            fontSize: '0.6rem', opacity: 0.6
-                                                        }}>
-                                                            {ex.done ? t('workout.completed') : (ex.type === 'timer' ? `${ex.goal - ex.count}s` : t('workout.remaining', { count: ex.goal - ex.count }))}
-                                                        </span>
-                                                    </button>
-                                                );
+                                                return <ExerciseGridItem key={ex.id} ex={ex} selected={selected} orderNum={orderNum} onToggle={toggleExercise} t={t} />;
                                             })}
                                         </div>
                                     </div>
@@ -579,66 +581,9 @@ export function WorkoutSession({
                             gap: '8px'
                         }}>
                             {exerciseInfo.map(ex => {
-                                const Icon = ICON_MAP[ex.icon] || Dumbbell;
                                 const selected = queue.includes(ex.id);
                                 const orderNum = selected ? queue.indexOf(ex.id) + 1 : null;
-                                return (
-                                    <button
-                                        key={ex.id}
-                                        onClick={() => !ex.done && toggleExercise(ex.id)}
-                                        disabled={ex.done}
-                                        style={{
-                                            padding: '14px 10px', borderRadius: 'var(--radius-md)',
-                                            background: ex.done
-                                                ? 'rgba(255,255,255,0.03)'
-                                                : selected
-                                                    ? `linear-gradient(135deg, ${ex.color}25, ${ex.color}12)`
-                                                    : 'rgba(255,255,255,0.05)',
-                                            border: selected
-                                                ? `2px solid ${ex.color}80`
-                                                : '2px solid rgba(255,255,255,0.08)',
-                                            color: ex.done ? '#555' : selected ? ex.color : 'var(--text-secondary)',
-                                            cursor: ex.done ? 'default' : 'pointer',
-                                            opacity: ex.done ? 0.4 : 1,
-                                            display: 'flex', flexDirection: 'column',
-                                            alignItems: 'center', gap: '6px',
-                                            transition: 'all 0.2s ease',
-                                            position: 'relative'
-                                        }}
-                                    >
-                                        {ex.done && (
-                                            <div style={{
-                                                position: 'absolute', top: '6px', right: '6px',
-                                                background: '#10b981', borderRadius: '50%',
-                                                width: '16px', height: '16px', display: 'flex',
-                                                alignItems: 'center', justifyContent: 'center'
-                                            }}>
-                                                <Check size={10} color="white" />
-                                            </div>
-                                        )}
-                                        {orderNum && (
-                                            <div style={{
-                                                position: 'absolute', top: '6px', left: '6px',
-                                                background: ex.color, borderRadius: '50%',
-                                                width: '18px', height: '18px', display: 'flex',
-                                                alignItems: 'center', justifyContent: 'center',
-                                                fontSize: '0.6rem', fontWeight: '800', color: 'white'
-                                            }}>
-                                                {orderNum}
-                                            </div>
-                                        )}
-                                        <Icon size={24} />
-                                        <span style={{
-                                            fontSize: '0.75rem', fontWeight: '600',
-                                            textAlign: 'center'
-                                        }}>{ex.label || t('exercises.' + ex.id)}</span>
-                                        <span style={{
-                                            fontSize: '0.6rem', opacity: 0.6
-                                        }}>
-                                            {ex.done ? t('workout.completed') : (ex.type === 'timer' ? `${ex.goal - ex.count}s` : t('workout.remaining', { count: ex.goal - ex.count }))}
-                                        </span>
-                                    </button>
-                                );
+                                return <ExerciseGridItem key={ex.id} ex={ex} selected={selected} orderNum={orderNum} onToggle={toggleExercise} t={t} />;
                             })}
                         </div>
                     )}

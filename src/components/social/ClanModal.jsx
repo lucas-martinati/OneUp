@@ -5,6 +5,7 @@ import { cloudSync } from '../../services/cloudSync';
 import { Leaderboard } from './Leaderboard';
 import { registerBackHandler } from '../../utils/backHandler';
 import { CSSConfetti } from '../feedback/CSSConfetti';
+import { Z_INDEX } from '../../utils/zIndex';
 
 export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
     const { t } = useTranslation();
@@ -135,7 +136,7 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
         return (
             <div className="fade-in" style={{
                 position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.92)',
-                zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
+                zIndex: Z_INDEX.TOAST, display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>
                 <div style={{ color: 'var(--text-secondary)' }}>{t('clan.loading')}</div>
             </div>
@@ -147,7 +148,7 @@ export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
         return (
             <div className="fade-in" style={{
                 position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.92)',
-                zIndex: 1000, display: 'flex', flexDirection: 'column',
+                zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
                 paddingTop: 'env(safe-area-inset-top)',
                 paddingBottom: 'env(safe-area-inset-bottom)'
             }}>

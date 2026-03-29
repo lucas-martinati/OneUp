@@ -119,8 +119,29 @@
     "title": "Historial",
     "completed": "Completado",
     "success": "Éxito",
-    "months": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-    "weekdays": ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+    "months": [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+    ],
+    "weekdays": [
+      "Dom",
+      "Lun",
+      "Mar",
+      "Mié",
+      "Jue",
+      "Vie",
+      "Sáb"
+    ],
     "day": "Día {{num}}",
     "repsCount": "{{done}} / {{goal}} repeticiones"
   },
@@ -144,8 +165,25 @@
     "maxDays": "máx {{count}}d",
     "loadingCharts": "Cargando gráficos...",
     "byExercise": "Por Ejercicio",
-    "monthAbbreviations": ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
-    "pieLabels": { "morning": "Mañana", "afternoon": "Tarde", "evening": "Noche" },
+    "monthAbbreviations": [
+      "Ene",
+      "Feb",
+      "Mar",
+      "Abr",
+      "May",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dic"
+    ],
+    "pieLabels": {
+      "morning": "Mañana",
+      "afternoon": "Tarde",
+      "evening": "Noche"
+    },
     "quote": "\"La constancia vence a la perfección\"",
     "quoteSub": "¡Preséntate cada día, un paso a la vez!"
   },
@@ -161,46 +199,166 @@
     },
     "validated": "Hecho",
     "badges": {
-      "first_blood": { "title": "Primer Paso", "desc": "Completa tu primer entrenamiento" },
-      "consistent": { "title": "Constancia", "desc": "Entrena 3 días seguidos" },
-      "week_warrior": { "title": "Guerrero Semanal", "desc": "7 días seguidos" },
-      "two_weeks": { "title": "Tenacidad", "desc": "14 días seguidos" },
-      "month_warrior": { "title": "Soldado Mensual", "desc": "30 días seguidos" },
-      "two_months": { "title": "Disciplina de Hierro", "desc": "60 días seguidos" },
-      "quarter_year": { "title": "Mariscal", "desc": "90 días seguidos" },
-      "half_year": { "title": "Medio Año", "desc": "180 días seguidos" },
-      "year_beast": { "title": "Bestia de Competición", "desc": "365 días seguidos" },
-      "ten_sessions": { "title": "Top Diez", "desc": "10 entrenamientos en total" },
-      "fifty_sessions": { "title": "Cincuenta", "desc": "50 entrenamientos en total" },
-      "hundred_sessions": { "title": "Centurión", "desc": "100 entrenamientos en total" },
-      "two_hundred_sessions": { "title": "Leyenda", "desc": "200 entrenamientos en total" },
-      "five_hundred_sessions": { "title": "Mítico", "desc": "500 entrenamientos en total" },
-      "rep_500": { "title": "500 Reps", "desc": "500 repeticiones en total" },
-      "rep_1000": { "title": "Mil", "desc": "1,000 repeticiones en total" },
-      "rep_5000": { "title": "Cinco Mil", "desc": "5,000 repeticiones en total" },
-      "rep_10000": { "title": "Contador", "desc": "10,000 repeticiones en total" },
-      "rep_50000": { "title": "Destructor", "desc": "50,000 repeticiones en total" },
-      "perfect_one": { "title": "Primer Día Perfecto", "desc": "Un día perfecto (todos los ejercicios)" },
-      "perfect_five": { "title": "Excelencia", "desc": "5 días perfectos" },
-      "perfect_fifty": { "title": "Maestría", "desc": "50 días perfectos" },
-      "perfect_hundred": { "title": "Perfeccionista", "desc": "100 días perfectos" },
-      "perfect_two_hundred": { "title": "¡No Humano!", "desc": "200 días perfectos" },
-      "all_exercises": { "title": "Todoterreno", "desc": "Haz cada ejercicio al menos una vez" },
-      "weekday_warrior": { "title": "Lunes a Viernes", "desc": "25 entrenamientos entre semana" },
-      "weekend_warrior": { "title": "Fin de Semana", "desc": "25 entrenamientos de fin de semana" },
-      "balanced": { "title": "Equilibrado", "desc": "Igual entrenamientos entre semana y fin de semana" },
-      "morning_5": { "title": "Madrugador", "desc": "5 entrenamientos por la mañana" },
-      "morning_10": { "title": "Matutino", "desc": "10 entrenamientos por la mañana" },
-      "morning_25": { "title": "Amanecer", "desc": "25 entrenamientos por la mañana" },
-      "afternoon_5": { "title": "Impulso", "desc": "5 entrenamientos por la tarde" },
-      "afternoon_10": { "title": "Tardes", "desc": "10 entrenamientos por la tarde" },
-      "afternoon_25": { "title": "Ritmo", "desc": "25 entrenamientos por la tarde" },
-      "evening_5": { "title": "Noctámbulo", "desc": "5 entrenamientos por la noche" },
-      "evening_10": { "title": "Nocturno", "desc": "10 entrenamientos por la noche" },
-      "evening_25": { "title": "Luna", "desc": "25 entrenamientos por la noche" },
-      "ghost": { "title": "Fantasma", "desc": "Entrena entre las 3am y las 4am" },
-      "perfectionist_secret": { "title": "Imparable", "desc": "30 días perfectos consecutivos" },
-      "beast": { "title": "Bestia", "desc": "100,000 repeticiones en total" },
+      "first_blood": {
+        "title": "Primer Paso",
+        "desc": "Completa tu primer entrenamiento"
+      },
+      "consistent": {
+        "title": "Constancia",
+        "desc": "Entrena 3 días seguidos"
+      },
+      "week_warrior": {
+        "title": "Guerrero Semanal",
+        "desc": "7 días seguidos"
+      },
+      "two_weeks": {
+        "title": "Tenacidad",
+        "desc": "14 días seguidos"
+      },
+      "month_warrior": {
+        "title": "Soldado Mensual",
+        "desc": "30 días seguidos"
+      },
+      "two_months": {
+        "title": "Disciplina de Hierro",
+        "desc": "60 días seguidos"
+      },
+      "quarter_year": {
+        "title": "Mariscal",
+        "desc": "90 días seguidos"
+      },
+      "half_year": {
+        "title": "Medio Año",
+        "desc": "180 días seguidos"
+      },
+      "year_beast": {
+        "title": "Bestia de Competición",
+        "desc": "365 días seguidos"
+      },
+      "ten_sessions": {
+        "title": "Top Diez",
+        "desc": "10 entrenamientos en total"
+      },
+      "fifty_sessions": {
+        "title": "Cincuenta",
+        "desc": "50 entrenamientos en total"
+      },
+      "hundred_sessions": {
+        "title": "Centurión",
+        "desc": "100 entrenamientos en total"
+      },
+      "two_hundred_sessions": {
+        "title": "Leyenda",
+        "desc": "200 entrenamientos en total"
+      },
+      "five_hundred_sessions": {
+        "title": "Mítico",
+        "desc": "500 entrenamientos en total"
+      },
+      "rep_500": {
+        "title": "500 Reps",
+        "desc": "500 repeticiones en total"
+      },
+      "rep_1000": {
+        "title": "Mil",
+        "desc": "1,000 repeticiones en total"
+      },
+      "rep_5000": {
+        "title": "Cinco Mil",
+        "desc": "5,000 repeticiones en total"
+      },
+      "rep_10000": {
+        "title": "Contador",
+        "desc": "10,000 repeticiones en total"
+      },
+      "rep_50000": {
+        "title": "Destructor",
+        "desc": "50,000 repeticiones en total"
+      },
+      "perfect_one": {
+        "title": "Primer Día Perfecto",
+        "desc": "Un día perfecto (todos los ejercicios)"
+      },
+      "perfect_five": {
+        "title": "Excelencia",
+        "desc": "5 días perfectos"
+      },
+      "perfect_fifty": {
+        "title": "Maestría",
+        "desc": "50 días perfectos"
+      },
+      "perfect_hundred": {
+        "title": "Perfeccionista",
+        "desc": "100 días perfectos"
+      },
+      "perfect_two_hundred": {
+        "title": "¡No Humano!",
+        "desc": "200 días perfectos"
+      },
+      "all_exercises": {
+        "title": "Todoterreno",
+        "desc": "Haz cada ejercicio al menos una vez"
+      },
+      "weekday_warrior": {
+        "title": "Lunes a Viernes",
+        "desc": "25 entrenamientos entre semana"
+      },
+      "weekend_warrior": {
+        "title": "Fin de Semana",
+        "desc": "25 entrenamientos de fin de semana"
+      },
+      "balanced": {
+        "title": "Equilibrado",
+        "desc": "Igual entrenamientos entre semana y fin de semana"
+      },
+      "morning_5": {
+        "title": "Madrugador",
+        "desc": "5 entrenamientos por la mañana"
+      },
+      "morning_10": {
+        "title": "Matutino",
+        "desc": "10 entrenamientos por la mañana"
+      },
+      "morning_25": {
+        "title": "Amanecer",
+        "desc": "25 entrenamientos por la mañana"
+      },
+      "afternoon_5": {
+        "title": "Impulso",
+        "desc": "5 entrenamientos por la tarde"
+      },
+      "afternoon_10": {
+        "title": "Tardes",
+        "desc": "10 entrenamientos por la tarde"
+      },
+      "afternoon_25": {
+        "title": "Ritmo",
+        "desc": "25 entrenamientos por la tarde"
+      },
+      "evening_5": {
+        "title": "Noctámbulo",
+        "desc": "5 entrenamientos por la noche"
+      },
+      "evening_10": {
+        "title": "Nocturno",
+        "desc": "10 entrenamientos por la noche"
+      },
+      "evening_25": {
+        "title": "Luna",
+        "desc": "25 entrenamientos por la noche"
+      },
+      "ghost": {
+        "title": "Fantasma",
+        "desc": "Entrena entre las 3am y las 4am"
+      },
+      "perfectionist_secret": {
+        "title": "Imparable",
+        "desc": "30 días perfectos consecutivos"
+      },
+      "beast": {
+        "title": "Bestia",
+        "desc": "100,000 repeticiones en total"
+      },
       "secret": "Secreto"
     }
   },
@@ -336,7 +494,8 @@
     "badgeActive": "Tu insignia Supporter está activa en la clasificación.",
     "androidOnly": "La compra solo está disponible en la aplicación Android.",
     "history": "Historial de compras",
-    "noHistory": "Sin compras registradas"
+    "noHistory": "Sin compras registradas",
+    "donateAgain": "Hacer otra donación"
   },
   "pro": {
     "title": "Suscripción Pro",
@@ -346,7 +505,10 @@
       "customPrograms": "Programas 100% personalizados",
       "exerciseChoice": "Elección libre de ejercicios",
       "dailyProgression": "Progresión diaria a medida",
-      "dedicatedPanel": "Panel dedicado con seguimiento completo"
+      "dedicatedPanel": "Panel dedicado con seguimiento completo",
+      "customExercises": "Ejercicios 100% Personalizados",
+      "weightDashboard": "Panel de Pesas",
+      "exclusiveLeaderboards": "Clasificaciones Exclusivas"
     },
     "buyButton": "Hazte Pro",
     "activeTitle": "Miembro Pro",
@@ -354,5 +516,8 @@
     "price": "6,99€/mes",
     "locked": "Suscripción Pro requerida",
     "lockedDesc": "¡Pásate a Pro para crear tus programas!"
+  },
+  "store": {
+    "title": "Tienda"
   }
 }

@@ -3,6 +3,7 @@ import { HeartHandshake, X } from 'lucide-react';
 import { cloudSync } from '../../services/cloudSync';
 import { sounds } from '../../utils/soundManager';
 import { Avatar } from '../ui/Avatar';
+import { Z_INDEX } from '../../utils/zIndex';
 
 export function NotificationManager() {
     const [notifications, setNotifications] = useState([]);
@@ -84,7 +85,7 @@ export function NotificationManager() {
             top: 'calc(var(--spacing-md) + env(safe-area-inset-top))',
             left: 0, right: 0,
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
-            zIndex: 9999, pointerEvents: 'none'
+            zIndex: Z_INDEX.DELETE_OVERLAY, pointerEvents: 'none'
         }}>
             {activeToasts.map(toast => (
                 <div key={toast.id} className="slide-down" style={{
