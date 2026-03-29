@@ -1,112 +1,104 @@
-# OneUp
+<div align="center">
+  <img src="./public/pwa-512x512.png" alt="OneUp Logo" width="50" style="border-radius: 10%;" />
+  <h1>OneUp: Le Défi Fitness Ultime sur 365 Jours 🚀</h1>
+  <p><b>Transformez votre corps et votre mental avec une progression jour après jour.</b></p>
+</div>
 
-**OneUp** est un défi fitness quotidien sur 365 jours. Chaque jour, le nombre de répétitions augmente progressivement sur 10 exercices. L'objectif ? Tenir toute l'année.
+**OneUp** n'est pas qu'une simple application de fitness. C'est un défi quotidien sur 365 jours conçu pour bâtir la discipline. Chaque jour, le nombre de répétitions de vos exercices augmente progressivement. L'objectif ? Ne jamais briser la chaîne et tenir toute l'année.
+
+Avec un savant mélange de gamification, d'aspects sociaux (Clans) et de statistiques poussées, OneUp vous aide à devenir la meilleure version de vous-même.
 
 Built with **Vibe Coding**.
 
-## 🚀 Features
+---
 
-- **10 exercices** : Pompes, Squats, Tractions, Abdos, Jumping Jacks, Fentes, Burpees, Gainage (s), Dips, Climbers
-- **Objectifs progressifs** : Le nombre de reps augmente chaque jour pendant 365 jours
-- **Streak Duolingo-style** : Toujours visible, passe en gris si vous manquez un jour
-- **Leaderboard** : Classement global et par exercice, profil joueur avec pseudo et photo Google
-- **Statistiques completes** : Reps totales, exercice champion, meilleur jour, activite mensuelle, taux de completion, moyenne hebdomadaire
-- **Calendrier visuel** : Suivez votre progression jour par jour sur l'annee
-- **Cloud Sync** : Synchronisation via compte Google (Firebase Realtime Database)
-- **Notifications** : Rappels quotidiens configurables
-- **Design dark premium** : Animations, confettis CSS, sons
+## 🔥 Fonctionnalités Principales
 
-## 📱 Installer l'app sur Android
+### 🏋️‍♂️ Exercices Progressifs
+- **Plusieurs Exercices au Poids du Corps** : Pompes, Squats, Tractions, Abdos, Jumping Jacks, Fentes, Burpees, Gainage (s), Dips, Mountain Climbers.
+- **Le Concept** : Le nombre de répétitions augmente chaque jour pendant 365 jours selon un multiplicateur adapté à chaque exercice.
+- **Exercices Lestés (Premium)** : Intégration d'exercices avec haltères et barres (Biceps Curl, Hammer Curl, Bench Press, Overhead Press, Squats, Deadlift, Barbell Row) pour aller encore plus loin.
 
-Vous pouvez télécharger l'application directement depuis le Google Play Store :
-[Lien vers Google Play Store](https://play.google.com/store/apps/details?id=com.lucasm548.oneup&pcampaignid=web_share)
+### 🎮 Gamification & Motivation
+- **Streak** : Maintenez votre flamme en vie ! Elle s'affiche fièrement sur votre Dashboard.
+- **Système de Clans** : Ne souffrez pas seul. Créez ou rejoignez un clan, affrontez vos amis, et envoyez des "pokes" (notifications) aux membres de votre clan pour les motiver !
+- **Leaderboard Global & Mini-Ligues** : Classement global par exercice, système de rangs et de grades (pour les membres Club) pour vous mesurer aux autres. 
 
-## 🛠 Installation (Développeur)
+### 📊 Statistiques & Suivi (Data-Driven)
+- **Tableau de Bord Complet** : Répétitions totales, exercice champion, meilleur jour, moyenne hebdomadaire, etc.
+- **Calendrier Visuel** : Suivez votre régularité et votre taux de complétion d'un coup d'œil.
+- **Suivi Avancé de la Performance** : Graphiques, répartition de l'effort et métriques approfondies pour ajuster vos entraînements.
 
-### Prerequisites
-- Node.js
-- Android SDK (pour le build mobile)
+## 📱 Installer l'Application
 
-### Setup
+L'application est cross-platform (PWA / Android). Vous pouvez la télécharger directement depuis le Play Store :
+
+[![Disponible sur Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.lucasm548.oneup&pcampaignid=web_share)
+
+---
+
+## 🛠 Technique & Architecture
+
+OneUp mise sur une architecture moderne, fluide et sécurisée :
+
+- **Front-end** : **React 19 + Vite** pour une UI ultra-réactive.
+- **Mobile** : **Capacitor** pour un runtime natif fluide sur Android.
+- **Interface & Design** : Design "Dark Premium" avec animations fluides, confettis CSS, UI adaptative en onglets sur mobile, et composants réalisés avec Tailwind CSS / Lucide React.
+- **Backend & Données** : **Firebase Realtime Database** avec un système robuste de *Security Rules* granulaires (pour protéger les Clans, Profils et Données Premium).
+- **Authentification** : Authentification Google via Firebase Auth.
+- **Paiements** : Intégration RevenueCat renforcée par des webhooks serveur pour vérifier et sécuriser les abonnements.
+
+---
+
+## 🧑‍💻 Installation & Build (Pour les développeurs)
+
+### Prérequis
+- Node.js (v18+)
+- Android SDK (pour le build via Capacitor)
+
+### Démarrage Rapide
 
 ```bash
 git clone https://github.com/LucasM548/OneUp.git
 cd OneUp
 npm install
-```
-
-### Lancer en local
-
-```bash
 npm run dev
 ```
 
-### Commandes de build
-
-Plusieurs commandes sont disponibles pour générer l'application :
+### Commandes de Build
 
 | Commande | Description |
 |----------|-------------|
-| `npm run build` | Build web (dist/) pour PWA |
-| `npm run build:bundle` | Build AAB (Android App Bundle) signé pour Play Store |
-| `npm run build:apk` | Build APK (fichier directement installable) |
+| `npm run build` | Build l'application web (dossier `dist/`) idéale pour l'hébergement PWA |
+| `npm run build:bundle` | Génère un Android App Bundle (AAB) signé pour le Google Play Store |
+| `npm run build:apk` | Génère un APK natif installable manuellement pour les tests Android |
 
-#### Exemple - Build APK pour tester :
+*Note: Les APK se trouvent dans `android/app/build/outputs/apk/release/`.*
 
-```bash
-npm run build:apk
-```
+### Configuration Cloud (Firebase)
 
-L'APK se trouve dans `android/app/build/outputs/apk/release/`.
-
-#### Exemple - Build Bundle pour Play Store :
-
-```bash
-npm run build:bundle
-```
-
-Le bundle se trouve dans `android/app/build/outputs/bundle/release/`.
-
-### Cloud Sync Setup
-
-Pour activer la synchronisation cloud :
-
-1. Suivre le guide dans [`CLOUD_SETUP.md`](./CLOUD_SETUP.md)
-2. Configurer Firebase et Realtime Database
-3. Mettre à jour les credentials Firebase dans `.env`
-
-### Deploy GitHub Pages
-
-```bash
-npm run deploy
-```
-
-## 🛠 Built With
-
-- **React 19 + Vite** - Framework web
-- **Capacitor** - Runtime natif cross-platform
-- **Firebase Realtime Database** - Cloud sync et authentification Google
-- **Recharts** - Graphiques (pie chart statistiques)
-- **Lucide React** - Icones
+Afin d'activer la synchronisation temps réel, l'authentification et les clans :
+1. Créez un projet sur la console Firebase.
+2. Activez Google Auth, Realtime Database et configurez vos [Règles de Sécurité](./database.rules.json).
+3. Adaptez vos variables d'environnement dans le fichier `.env` (inspirez-vous du `.env example`).
+4. Suivez le guide détaillé dans [`CLOUD_SETUP.md`](./CLOUD_SETUP.md).
 
 ---
 
 ## ✍️ Auteur
 
-Ce projet a été conçu et développé par **[Lucas Martinati](https://github.com/lucas-martinati)**.
-N'hésitez pas à me suivre ou à me contacter pour toute question !
+Conçu, développé et maintenu par **[Lucas Martinati](https://github.com/lucas-martinati)**.
+N'hésitez pas à me suivre ou à me contacter pour toute question, idée ou retour !
 
-## 🤝 Contribution
+## 🤝 Contribuer
 
-Les contributions sont les bienvenues ! Si vous souhaitez améliorer **OneUp**, merci de :
-1. Fork le projet
-2. Créer une branche pour votre fonctionnalité (`git checkout -b feature/AmazingFeature`)
-3. Commit vos changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push sur la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une **Pull Request**
+Les contributions, issues, et pull requests sont les bienvenues. L'application évoluant rapidement (nouveaux exercices, optimisations UI, nouvelles features back-end), toute aide est appréciée :
+1. **Fork** le repo
+2. Créez une branche feature (`git checkout -b feature/AmazingIdea`)
+3. Commitez vos ajouts (`git commit -m 'Add: feature AmazingIdea'`)
+4. Poussez sur la branche (`git push origin feature/AmazingIdea`)
+5. Ouvrez une **Pull Request** descriptives !
 
 ## 📄 Licence
 
-Ce projet est distribué sous la licence **MIT**. Cela signifie que vous pouvez l'utiliser librement, mais vous devez impérativement citer l'auteur original (**Lucas Martinati**) dans toute copie ou modification du code. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
-
-Copyright (c) 2026 Lucas Martinati
+Distribué sous la licence **MIT**. Vous êtes libre d'utiliser et modifier ce projet, à condition de citer explicitement l'auteur original (**Lucas Martinati**) dans toute copie ou modification. Voir [LICENSE](LICENSE) pour plus de détails.
