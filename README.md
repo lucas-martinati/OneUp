@@ -21,8 +21,7 @@ Built with **Vibe Coding**.
 
 ### 🎮 Gamification & Motivation
 - **Streak** : Maintenez votre flamme en vie ! Elle s'affiche fièrement sur votre Dashboard.
-- **Système de Clans** : Ne souffrez pas seul. Créez ou rejoignez un clan, affrontez vos amis, et envoyez des "pokes" (notifications) aux membres de votre clan pour les motiver !
-- **Leaderboard Global & Mini-Ligues** : Classement global par exercice, système de rangs et de grades (pour les membres Club) pour vous mesurer aux autres. 
+- **Système de Clans** : Ne souffrez pas seul. Créez ou rejoignez un clan, affrontez vos amis, et envoyez des "pokes" (notifications) aux membres de votre clan pour les motiver ! 
 
 ### 📊 Statistiques & Suivi (Data-Driven)
 - **Tableau de Bord Complet** : Répétitions totales, exercice champion, meilleur jour, moyenne hebdomadaire, etc.
