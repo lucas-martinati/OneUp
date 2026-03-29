@@ -6,7 +6,7 @@ const logger = createLogger('DataSync');
 
 let syncInProgress = false;
 
-function sanitizeForCloud(data) {
+export function sanitizeForCloud(data) {
   if (!data || !data.completions) return data;
   const sanitizedCompletions = {};
   Object.keys(data.completions).forEach(dateStr => {

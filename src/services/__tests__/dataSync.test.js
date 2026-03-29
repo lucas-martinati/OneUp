@@ -1,69 +1,25 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Test the pure functions by extracting them.
-// We import the module and test the exported pure functions.
+// Mock firebase/database — we only need ref/set/get/onValue/serverTimestamp to be callable
+vi.mock('firebase/database', () => ({
+  ref: vi.fn((db, path) => path),
+  set: vi.fn(),
+  get: vi.fn(),
+  onValue: vi.fn(),
+  serverTimestamp: vi.fn(() => 'SERVER_TIMESTAMP'),
+}));
 
-// Since dataSyncService imports firebase/database (which requires mocking),
-// we'll test mergeData and sanitizeForCloud logic inline.
+// Mock ./firebase — provide fake auth and database instances
+vi.mock('../firebase', () => ({
+  getAuthInstance: vi.fn(() => ({ currentUser: { uid: 'test-uid' } })),
+  getDatabaseInstance: vi.fn(() => ({})),
+  initializeFirebase: vi.fn(),
+}));
 
-// ── mergeData logic ─────────────────────────────────────────────────────
+// Now we can import directly — the mocked Firebase won't blow up
+import { mergeData, sanitizeForCloud, saveToCloud, loadFromCloud } from '../dataSyncService';
 
-function mergeData(localData, cloudData) {
-  if (!cloudData) return localData;
-  if (!localData) return cloudData;
-
-  const mergedCompletions = { ...localData.completions };
-  if (cloudData.completions) {
-    Object.keys(cloudData.completions).forEach(dateStr => {
-      const cloudDay = cloudData.completions[dateStr];
-      const localDay = mergedCompletions[dateStr];
-      if (!localDay) {
-        mergedCompletions[dateStr] = cloudDay;
-      } else if (cloudDay && typeof cloudDay === 'object') {
-        const merged = { ...localDay };
-        Object.keys(cloudDay).forEach(exId => {
-          const cloudEx = cloudDay[exId];
-          const localEx = merged[exId];
-          if (!localEx || (cloudEx?.timestamp && localEx?.timestamp && new Date(cloudEx.timestamp) > new Date(localEx.timestamp)) || (cloudEx?.timestamp && !localEx?.timestamp)) {
-            merged[exId] = { ...localEx, ...cloudEx };
-          }
-        });
-        mergedCompletions[dateStr] = merged;
-      }
-    });
-  }
-
-  return {
-    startDate: localData.startDate || cloudData.startDate,
-    userStartDate: localData.userStartDate || cloudData.userStartDate,
-    completions: mergedCompletions,
-    isSetup: localData.isSetup || cloudData.isSetup,
-    lastSyncedAt: new Date().toISOString()
-  };
-}
-
-function sanitizeForCloud(data) {
-  if (!data || !data.completions) return data;
-  const sanitizedCompletions = {};
-  Object.keys(data.completions).forEach(dateStr => {
-    const dayEntry = data.completions[dateStr];
-    if (!dayEntry || typeof dayEntry !== 'object') return;
-    const sanitizedDay = {};
-    Object.keys(dayEntry).forEach(exerciseId => {
-      const ex = dayEntry[exerciseId];
-      if (!ex || typeof ex !== 'object') return;
-      sanitizedDay[exerciseId] = {
-        isCompleted: ex.isCompleted || false,
-        timestamp: ex.timestamp || null,
-        timeOfDay: ex.timeOfDay || null,
-      };
-    });
-    sanitizedCompletions[dateStr] = sanitizedDay;
-  });
-  return { ...data, completions: sanitizedCompletions };
-}
-
-// ── Tests ───────────────────────────────────────────────────────────────
+// ── mergeData ───────────────────────────────────────────────────────────
 
 describe('mergeData', () => {
   it('returns localData when cloudData is null', () => {
@@ -146,6 +102,8 @@ describe('mergeData', () => {
   });
 });
 
+// ── sanitizeForCloud ────────────────────────────────────────────────────
+
 describe('sanitizeForCloud', () => {
   it('returns data unchanged when completions is missing', () => {
     const data = { startDate: '2025-01-01' };
@@ -178,10 +136,7 @@ describe('sanitizeForCloud', () => {
     const data = {
       startDate: '2025-01-01',
       completions: {
-        '2025-01-01': {
-          pushups: null,
-          squats: { isCompleted: true }
-        }
+        '2025-01-01': { pushups: null, squats: { isCompleted: true } }
       }
     };
     const sanitized = sanitizeForCloud(data);
