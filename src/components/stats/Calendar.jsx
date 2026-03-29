@@ -4,9 +4,8 @@ import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'luc
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr } from '../../utils/dateUtils';
 import { registerBackHandler } from '../../utils/backHandler';
-import { getDailyGoal } from '../../config/exercises'; // Added getDailyGoal import
-
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
+import { getDailyGoal } from '../../config/exercises';
+import ICON_MAP from '../../utils/iconMap';
 
 export function Calendar({ startDate, completions, exercises, getDayNumber, onClose, settings }) { // Added settings prop
     const { t } = useTranslation();

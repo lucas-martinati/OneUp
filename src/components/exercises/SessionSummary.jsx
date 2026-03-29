@@ -2,8 +2,7 @@ import React from 'react';
 import { Trophy, Check, Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
-
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
+import ICON_MAP from '../../utils/iconMap';
 
 export function SessionSummary({ queue, exerciseInfo, onClose }) {
     const { t } = useTranslation();

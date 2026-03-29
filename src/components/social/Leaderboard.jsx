@@ -8,8 +8,7 @@ import { ClanInviteCard } from './ClanInviteCard';
 import { LeaderboardTabs } from './LeaderboardTabs';
 import { LeaderboardRow } from './LeaderboardRow';
 import { UserDetail } from './UserDetail';
-
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
+import ICON_MAP from '../../utils/iconMap';
 
 export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveClan, activeSlide = 0 }) {
     const { t } = useTranslation();

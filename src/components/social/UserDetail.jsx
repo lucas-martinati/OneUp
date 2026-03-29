@@ -5,10 +5,9 @@ import { Avatar } from '../ui/Avatar';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { registerBackHandler } from '../../utils/backHandler';
-import { getLocalDateStr, isDayDoneFromCompletions, calculateStreak, calculateExerciseStreak } from '../../utils/dateUtils';
+import { getLocalDateStr, isDayDoneFromCompletions, calculateStreak, calculateExerciseStreak, calculateMaxStreak } from '../../utils/dateUtils';
 import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '../../utils/entitlements';
-
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square: Activity, MoveDown: ArrowDownUp, MoveDiagonal: ArrowUp };
+import ICON_MAP from '../../utils/iconMap';
 
 export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
     const { t } = useTranslation();
@@ -270,20 +269,4 @@ function computeStats(details) {
     });
 
     return { totalDays, perfectDays, maxStreak, currentStreak, exerciseDays, exerciseStreaks, exerciseDoneToday };
-}
-
-function calculateMaxStreak(completions) {
-    let max = 0, temp = 0;
-    const today = new Date();
-    for (let i = 0; i < 365; i++) {
-        const d = new Date(today);
-        d.setDate(d.getDate() - i);
-        if (isDayDoneFromCompletions(completions, getLocalDateStr(d))) {
-            temp++;
-            if (temp > max) max = temp;
-        } else {
-            temp = 0;
-        }
-    }
-    return max;
 }

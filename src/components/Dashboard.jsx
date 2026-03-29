@@ -34,16 +34,8 @@ import { EXERCISES, EXERCISES_MAP, getDailyGoal } from '../config/exercises';
 import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
 import { runBackHandler } from '../utils/backHandler';
 import { canAccessFeature, FEATURES } from '../utils/entitlements';
-
-// Map icon name → lucide component
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
-
-// Helper for time formatting - moved outside to avoid re-creation
-const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = (seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-};
+import ICON_MAP from '../utils/iconMap';
+import { formatTime } from '../utils/dateUtils';
 
 export function Dashboard({
     getDayNumber, toggleCompletion, completions, startDate, userStartDate,

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getLocalDateStr, isDayDoneFromCompletions, calculateStreak, calculateExerciseStreak } from '../utils/dateUtils';
+import { getLocalDateStr, isDayDoneFromCompletions, calculateStreak, calculateExerciseStreak, MAX_STREAK_WINDOW } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
 import { BADGE_DEFINITIONS } from '../config/badgeDefinitions';
@@ -170,7 +170,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
 
     // ─── Streak calculations (require backward day iteration) ────────────
     let maxStreak = 0, tempStreak = 0;
-    for (let i = 0; i < 365; i++) {
+    for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const d = new Date(today);
         d.setDate(d.getDate() - i);
         if (isDayDoneFromCompletions(completions, getLocalDateStr(d))) {
@@ -188,7 +188,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
 
     // Perfect streak (consecutive perfect days)
     let perfectStreak = 0, maxPerfectStreak = 0;
-    for (let i = 0; i < 365; i++) {
+    for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const d = new Date(today);
         d.setDate(d.getDate() - i);
         const dateStr = d.toISOString().split('T')[0];
@@ -215,7 +215,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
 
         // Max streak
         let maxExStreak = 0, tempExStreak = 0;
-        for (let i = 0; i < 365; i++) {
+        for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
             const d = new Date(today);
             d.setDate(d.getDate() - i);
             if (completions[getLocalDateStr(d)]?.[ex.id]?.isCompleted) {
@@ -230,7 +230,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
 
     // ─── Derived values ──────────────────────────────────────────────────
     const globalTotalReps = Object.values(exerciseReps).reduce((sum, r) => sum + r, 0);
-    const successRate = totalDays > 0 ? Math.round((totalDays / 365) * 100) : 0;
+    const successRate = totalDays > 0 ? Math.round((totalDays / MAX_STREAK_WINDOW) * 100) : 0;
     const hasCompletedAllExercisesOnce = EXERCISES.every(ex => completedExIds.has(ex.id));
     const todayDone = isDayDoneFromCompletions(completions, todayStr);
     const displayStreak = todayDone ? currentStreak : yesterdayStreak;

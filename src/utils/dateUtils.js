@@ -3,6 +3,8 @@
  * Centralizes date formatting and streak calculation logic.
  */
 
+export const MAX_STREAK_WINDOW = 365;
+
 /**
  * Format a Date object as YYYY-MM-DD in local time.
  * @param {Date} d
@@ -25,7 +27,7 @@ export function getLocalDateStr(d) {
 export function calculateStreak(completions, todayStr) {
     let streak = 0;
     const todayDate = new Date(todayStr);
-    for (let i = 0; i < 365; i++) {
+    for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const checkDate = new Date(todayDate);
         checkDate.setDate(checkDate.getDate() - i);
         const dateStr = getLocalDateStr(checkDate);
@@ -49,7 +51,7 @@ export function calculateStreak(completions, todayStr) {
 export function calculateExerciseStreak(completions, todayStr, exerciseId) {
     let streak = 0;
     const todayDate = new Date(todayStr);
-    for (let i = 0; i < 365; i++) {
+    for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const checkDate = new Date(todayDate);
         checkDate.setDate(checkDate.getDate() - i);
         const dateStr = getLocalDateStr(checkDate);
@@ -85,8 +87,8 @@ export function calculateMaxStreak(completions) {
     let temp = 0;
     const today = new Date();
     
-    // We check last 365 days to find the longest sequence
-    for (let i = 0; i < 365; i++) {
+    // We check last MAX_STREAK_WINDOW days to find the longest sequence
+    for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const d = new Date(today);
         d.setDate(d.getDate() - i);
         const dateStr = getLocalDateStr(d);
@@ -99,4 +101,12 @@ export function calculateMaxStreak(completions) {
         }
     }
     return max;
+}
+
+// ── Time formatting ────────────────────────────────────────────────────
+
+export function formatTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
 }

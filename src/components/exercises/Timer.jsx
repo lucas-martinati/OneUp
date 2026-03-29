@@ -7,6 +7,7 @@ import {
     Square, ChevronRight
 } from 'lucide-react';
 import { sounds } from '../../utils/soundManager';
+import { formatTime } from '../../utils/dateUtils';
 
 export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext }) {
     useWakeLock();
@@ -17,13 +18,6 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
 
     const prevCompletedRef = useRef(isCompleted);
     const hasCelebratedRef = useRef(false);
-
-    // Format seconds to MM:SS
-    const formatTime = (seconds) => {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${m}:${s.toString().padStart(2, '0')}`;
-    };
 
     // Timer logic - using refs to track values
     const countRef = useRef(currentCount);

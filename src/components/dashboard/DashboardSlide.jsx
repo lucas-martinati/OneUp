@@ -2,8 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal, Check, Settings as SettingsIcon } from 'lucide-react';
 import { getDailyGoal } from '../../config/exercises';
-
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
+import ICON_MAP from '../../utils/iconMap';
+import { formatTime } from '../../utils/dateUtils';
 
 export const DashboardSlide = React.memo(({
     isFuture, effectiveStart, dayNumber, today, settings, getExerciseCount, completions, computedStats,
@@ -33,12 +33,6 @@ export const DashboardSlide = React.memo(({
     const currentCount = getExerciseCount(today, safeSelectedExercise.id);
     const isExerciseDone = completions[today]?.[safeSelectedExercise.id]?.isCompleted || currentCount >= dailyGoal;
     const progress = Math.min((dayNumber / 365) * 100, 100);
-
-    const formatTime = (seconds) => {
-        const m = Math.floor(seconds / 60);
-        const s = (seconds % 60).toString().padStart(2, '0');
-        return `${m}:${s}`;
-    };
 
     return (
         <div style={{
@@ -268,11 +262,6 @@ const ExerciseButton = React.memo(({
     getExerciseCount, completions, computedStats, onSelect
 }) => {
     const { t } = useTranslation();
-    const formatTime = (seconds) => {
-        const m = Math.floor(seconds / 60);
-        const s = (seconds % 60).toString().padStart(2, '0');
-        return `${m}:${s}`;
-    };
 
     const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
     const statsEx = computedStats.exerciseStats?.find(e => e.id === ex.id);

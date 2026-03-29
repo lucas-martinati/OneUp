@@ -8,9 +8,7 @@ import {
     Flame, Square, MoveDown, MoveDiagonal
 } from 'lucide-react';
 import { sounds } from '../../utils/soundManager';
-
-// Map icon name strings to lucide components
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
+import ICON_MAP from '../../utils/iconMap';
 
 
 

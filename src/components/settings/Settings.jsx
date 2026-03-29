@@ -14,6 +14,11 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
     const [showStore, setShowStore] = useState(defaultShowStore);
     const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
 
+    const showSavedIndicator = () => {
+        setShowSaved(true);
+        setTimeout(() => setShowSaved(false), 1500);
+    };
+
     const [revenueCatHistory, setRevenueCatHistory] = useState([]);
 
     const displayHistory = revenueCatHistory || [];

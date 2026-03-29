@@ -12,8 +12,7 @@ import { Timer } from './Timer';
 import { SessionSummary } from './SessionSummary';
 import { registerBackHandler } from '../../utils/backHandler';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
-
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
+import ICON_MAP from '../../utils/iconMap';
 
 export function WorkoutSession({
     onClose, today, dayNumber, getExerciseCount, updateExerciseCount, completions, settings,

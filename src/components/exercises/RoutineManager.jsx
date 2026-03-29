@@ -7,9 +7,7 @@ import {
 } from 'lucide-react';
 import { EXERCISES } from '../../config/exercises';
 import { registerBackHandler } from '../../utils/backHandler';
-import { useEffect } from 'react';
-
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
+import ICON_MAP from '../../utils/iconMap';
 
 export function RoutineManager({
     onClose, routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, onLaunchRoutine
