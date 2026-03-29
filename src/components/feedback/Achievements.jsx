@@ -189,8 +189,8 @@ export function Achievements({ completions, exercises, onClose, settings, getDay
         color: def.color,
         category: def.category,
         secret: def.secret || false,
-        titleKey: def.secret && !def.test(statsSnapshot) ? null : `achievements.badges.${def.key}.title`,
-        descKey: def.secret && !def.test(statsSnapshot) ? null : `achievements.badges.${def.key}.desc`,
+        titleKey: def.secret && !def.test(statsSnapshot) ? null : `achievements.badges.${def.id}.title`,
+        descKey: def.secret && !def.test(statsSnapshot) ? null : `achievements.badges.${def.id}.desc`,
         unlocked: def.test(statsSnapshot),
     })), [statsSnapshot]);
 
