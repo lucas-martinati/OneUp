@@ -126,6 +126,7 @@
   },
   "stats": {
     "title": "Statistiques",
+    "totalReps": "Reps totales",
     "overExercises": "sur {{count}} exercices · {{days}} jour{{plural}} d'effort",
     "currentStreak": "Série actuelle",
     "bestStreak": "Meilleure série",

@@ -126,6 +126,7 @@
   },
   "stats": {
     "title": "统计",
+    "totalReps": "总次数",
     "overExercises": "共{{count}}项运动 · {{days}}天努力",
     "currentStreak": "当前连续",
     "bestStreak": "最佳连续",

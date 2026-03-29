@@ -126,6 +126,7 @@
   },
   "stats": {
     "title": "Статистика",
+    "totalReps": "Всего повторений",
     "overExercises": "в {{count}} упражнени{{plural}} · {{days}} дне{{dayPlural}} работы",
     "currentStreak": "Текущая серия",
     "bestStreak": "Лучшая серия",

@@ -126,6 +126,7 @@
   },
   "stats": {
     "title": "Estadísticas",
+    "totalReps": "Repeticiones Totales",
     "overExercises": "en {{count}} ejercicio{{plural}} · {{days}} día{{dayPlural}} de esfuerzo",
     "currentStreak": "Racha Actual",
     "bestStreak": "Mejor Racha",

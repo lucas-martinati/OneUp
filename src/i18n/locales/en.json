@@ -126,6 +126,7 @@
   },
   "stats": {
     "title": "Statistics",
+    "totalReps": "Total Reps",
     "overExercises": "across {{count}} exercise{{plural}} · {{days}} day{{dayPlural}} of effort",
     "currentStreak": "Current Streak",
     "bestStreak": "Best Streak",
