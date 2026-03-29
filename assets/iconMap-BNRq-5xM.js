@@ -1,0 +1,1 @@
+import{w as a,x as o,h as s,F as r,y as e,z as p,Z as t,B as n,E as i,D as w}from"./ui-vendor-UuwbG7QG.js";const l={Dumbbell:w,ArrowDownUp:i,ArrowUp:n,Zap:t,ChevronsUp:p,Footprints:e,Flame:r,Square:s,MoveDown:o,MoveDiagonal:a};export{l as I};
