@@ -102,8 +102,9 @@ export async function deleteAccount(listeners, leaveClanFn, getUserClansFn) {
   const database = getDatabaseInstance();
   if (!database) { initializeFirebase(); }
 
-  await remove(ref(getDatabaseInstance(), `users/${userId}`));
-  await remove(ref(getDatabaseInstance(), `leaderboard/${userId}`));
+  const db = getDatabaseInstance()
+  await remove(ref(db, `users/${userId}`));
+  await remove(ref(db, `leaderboard/${userId}`));
 
   await Preferences.remove({ key: 'user_signed_in' });
   await Preferences.remove({ key: 'user_id' });
