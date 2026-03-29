@@ -6,7 +6,7 @@ import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { registerBackHandler } from '../../utils/backHandler';
 import { getLocalDateStr } from '../../utils/dateUtils';
-import { getTierBadgeConfigs, canAccessFeature } from '../../utils/entitlements';
+import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '../../utils/entitlements';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square: Activity, MoveDown: ArrowDownUp, MoveDiagonal: ArrowUp };
 
@@ -163,7 +163,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                             <StatCard icon={<Zap size={16} color="#6366f1" />} label={t('leaderboard.difficulty')} value={`x${entry.difficultyMultiplier}`} color="#6366f1" />
                         )}
                         
-                        {canAccessFeature('weights', entry) && entry.weightsTotalReps > 0 && (
+                        {canAccessFeature(FEATURES.WEIGHTS, entry) && entry.weightsTotalReps > 0 && (
                             <StatCard 
                                 icon={<Activity size={16} color="#f43f5e" />} 
                                 label={t('common.global')} 
@@ -179,7 +179,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                             color="#fbbf24" 
                         />
                         
-                        {canAccessFeature('weights', entry) && entry.weightsTotalReps > 0 && (
+                        {canAccessFeature(FEATURES.WEIGHTS, entry) && entry.weightsTotalReps > 0 && (
                             <StatCard 
                                 icon={<Dumbbell size={16} color="#8b5cf6" />} 
                                 label={t('common.global_weights')} 
@@ -201,7 +201,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                         </div>
                         {EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
                         
-                        {canAccessFeature('weights', entry) && (
+                        {canAccessFeature(FEATURES.WEIGHTS, entry) && (
                             <>
                                 <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '16px', letterSpacing: '1px' }}>
                                     {t('common.global_weights')}

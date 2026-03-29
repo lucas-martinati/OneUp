@@ -8,7 +8,6 @@ import { ClanInviteCard } from './ClanInviteCard';
 import { LeaderboardTabs } from './LeaderboardTabs';
 import { LeaderboardRow } from './LeaderboardRow';
 import { UserDetail } from './UserDetail';
-import { filterLeaderboardByTier } from '../../utils/entitlements';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
@@ -77,7 +76,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
     }, []);
 
     const sorted = useMemo(() => {
-        const filteredEntries = filterLeaderboardByTier(entries, domain);
+        const filteredEntries = domain === 'weights' ? entries.filter(e => e.isPro) : entries;
         return [...filteredEntries].sort((a, b) => {
             if (activeTab === 'global_combined') return ((b.totalReps || 0) + (b.weightsTotalReps || 0)) - ((a.totalReps || 0) + (a.weightsTotalReps || 0));
             if (activeTab === 'global_classic') return (b.totalReps || 0) - (a.totalReps || 0);

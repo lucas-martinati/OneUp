@@ -3,7 +3,7 @@ import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Sta
 import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../../hooks/useComputedStats';
-import { canAccessFeature } from '../../utils/entitlements';
+import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
 
 // Lazy load Recharts components
@@ -36,7 +36,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
     }, [activeCategories, exercisesList]);
 
     const computedStats = React.useMemo(() => {
-        if (canAccessFeature('mergedStats', { isPro }) && activeCategories.length === 3) return globalStats;
+        if (canAccessFeature(FEATURES.MERGED_STATS, { isPro }) && activeCategories.length === 3) return globalStats;
         return computeAllStats(completions, settings, getDayNumber, exercises);
     }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, isPro]);
 
@@ -138,8 +138,8 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                     }}>
                         {[
                             { id: 'standard', label: t('common.global_classic'), locked: false },
-                            { id: 'weights', label: t('common.global_weights'), locked: !canAccessFeature('weights', { isPro }) },
-                            { id: 'custom', label: t('common.global_custom'), locked: !canAccessFeature('customExercises', { isPro }) }
+                            { id: 'weights', label: t('common.global_weights'), locked: !canAccessFeature(FEATURES.WEIGHTS, { isPro }) },
+                            { id: 'custom', label: t('common.global_custom'), locked: !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) }
                         ].map(cat => (
                             <label key={cat.id} style={{
                                 display: 'flex', alignItems: 'center', gap: '6px',

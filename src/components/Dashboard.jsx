@@ -33,7 +33,7 @@ import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';
 import { EXERCISES, EXERCISES_MAP, getDailyGoal } from '../config/exercises';
 import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
 import { runBackHandler } from '../utils/backHandler';
-import { canAccessFeature } from '../utils/entitlements';
+import { canAccessFeature, FEATURES } from '../utils/entitlements';
 
 // Map icon name → lucide component
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
@@ -292,7 +292,7 @@ export function Dashboard({
                         </div>
 
                         <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
-                            {canAccessFeature('weights', { isPro }) ? (
+                            {canAccessFeature(FEATURES.WEIGHTS, { isPro }) ? (
                                 <DashboardSlide
                                     title={t('common.global_weights')}
                                     isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
@@ -311,7 +311,7 @@ export function Dashboard({
                         </div>
 
                         <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
-                            {canAccessFeature('customExercises', { isPro }) ? (
+                            {canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) ? (
                                 <DashboardSlide
                                     title={t('common.global_custom')}
                                     isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}

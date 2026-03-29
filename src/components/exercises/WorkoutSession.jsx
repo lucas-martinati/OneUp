@@ -11,7 +11,7 @@ import { Counter } from './Counter';
 import { Timer } from './Timer';
 import { SessionSummary } from './SessionSummary';
 import { registerBackHandler } from '../../utils/backHandler';
-import { canAccessFeature } from '../../utils/entitlements';
+import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 
 const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal };
 
@@ -75,7 +75,7 @@ export function WorkoutSession({
     }, [isPro, allExercises]);
 
     const [showAll, setShowAll] = useState(false);
-    const canMixDashboards = canAccessFeature('interDashboard', { isPro });
+    const canMixDashboards = canAccessFeature(FEATURES.INTER_DASHBOARD, { isPro });
     const availableExercises = canMixDashboards && showAll ? allExercises : localExercises;
 
     // Exercise info with current state

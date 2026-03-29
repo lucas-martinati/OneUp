@@ -1,8 +1,25 @@
 import { Heart, Crown } from 'lucide-react';
 
-const PRO_FEATURES = ['weights', 'customExercises', 'customPrograms', 'interDashboard', 'mergedStats'];
 const LS_SUPPORTER = 'oneup_supporter';
 const LS_PRO = 'oneup_pro';
+
+// ── Feature → required tier map ─────────────────────────────────────────
+
+export const FEATURES = Object.freeze({
+  WEIGHTS: 'weights',
+  CUSTOM_EXERCISES: 'customExercises',
+  CUSTOM_PROGRAMS: 'customPrograms',
+  INTER_DASHBOARD: 'interDashboard',
+  MERGED_STATS: 'mergedStats',
+});
+
+const FEATURE_TIER = Object.freeze({
+  [FEATURES.WEIGHTS]: 'pro',
+  [FEATURES.CUSTOM_EXERCISES]: 'pro',
+  [FEATURES.CUSTOM_PROGRAMS]: 'pro',
+  [FEATURES.INTER_DASHBOARD]: 'pro',
+  [FEATURES.MERGED_STATS]: 'pro',
+});
 
 // ── localStorage helpers ────────────────────────────────────────────────
 
@@ -26,13 +43,11 @@ export function clearCachedEntitlements() {
 // ── Access checks ───────────────────────────────────────────────────────
 
 export function canAccessFeature(feature, { isPro } = {}) {
-  if (PRO_FEATURES.includes(feature)) return !!isPro;
-  return true;
-}
-
-export function filterLeaderboardByTier(entries, domain) {
-  if (domain === 'weights') return entries.filter(e => e.isPro);
-  return entries;
+  const requiredTier = FEATURE_TIER[feature];
+  if (requiredTier === undefined) {
+    throw new Error(`Unknown feature: "${feature}". Valid: ${Object.values(FEATURES).join(', ')}`);
+  }
+  return requiredTier === 'pro' ? !!isPro : true;
 }
 
 // ── Entitlement resolution ──────────────────────────────────────────────
