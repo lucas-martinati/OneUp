@@ -12,6 +12,9 @@
     "daysAbbr": "d",
     "exercise": "Ejercicio",
     "global": "Global",
+    "global_classic": "Peso corporal",
+    "global_weights": "Pesas",
+    "global_custom": "Personalizados",
     "poke": "te envió un toque!",
     "member": "Un miembro"
   },

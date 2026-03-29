@@ -293,7 +293,7 @@ export function Dashboard({
                         <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                             {isPro ? (
                                 <DashboardSlide
-                                    title="Musculation (Poids)"
+                                    title={t('common.global_weights')}
                                     isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
                                     getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
                                     isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber} numberKey={numberKey}
@@ -303,7 +303,7 @@ export function Dashboard({
                                 />
                             ) : (
                                 <ProPaywall
-                                    title="Musculation (Poids)"
+                                    title={t('common.global_weights')}
                                     onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
                                 />
                             )}
@@ -312,7 +312,7 @@ export function Dashboard({
                         <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                             {isPro ? (
                                 <DashboardSlide
-                                    title="Exercices Personnalisés"
+                                    title={t('common.global_custom')}
                                     isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
                                     getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
                                     isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber} numberKey={numberKey}
@@ -323,7 +323,7 @@ export function Dashboard({
                                 />
                             ) : (
                                 <ProPaywall
-                                    title="Exercices Personnalisés"
+                                    title={t('common.global_custom')}
                                     onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
                                 />
                             )}

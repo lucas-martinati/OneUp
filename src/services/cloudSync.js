@@ -491,7 +491,7 @@ class CloudSyncService {
    * Publish (or update) this user's leaderboard entry.
    * Stored at `leaderboard/{uid}`.
    */
-  async publishToLeaderboard({ pseudo, totalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter, isClub, isPro }) {
+  async publishToLeaderboard({ pseudo, totalReps, weightsTotalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter, isClub, isPro }) {
     try {
       if (!auth?.currentUser || !database) return false;
 
@@ -506,6 +506,7 @@ class CloudSyncService {
         pseudo: pseudo || auth.currentUser.displayName || 'Anonyme',
         photoURL: auth.currentUser.photoURL || null,
         totalReps: totalReps || 0,
+        weightsTotalReps: weightsTotalReps || 0,
         exerciseReps: exerciseReps || {},
         achievements: achievements || 0,
         lastActiveDay: lastActiveDay,
@@ -569,6 +570,7 @@ class CloudSyncService {
           pseudo: entry.pseudo || 'Anonyme',
           photoURL: entry.photoURL || null,
           totalReps: entry.totalReps || 0,
+          weightsTotalReps: entry.weightsTotalReps || 0,
           exerciseReps: entry.exerciseReps || {},
           achievements: entry.achievements || 0,
           lastActiveDay: entry.lastActiveDay || null,
@@ -908,6 +910,7 @@ class CloudSyncService {
           pseudo: lbData.pseudo || 'Anonyme',
           photoURL: lbData.photoURL || null,
           totalReps: lbData.totalReps || 0,
+          weightsTotalReps: lbData.weightsTotalReps || 0,
           exerciseReps: lbData.exerciseReps || {},
           achievements: lbData.achievements || 0,
           lastActiveDay: lbData.lastActiveDay || null,

@@ -12,6 +12,9 @@
     "daysAbbr": "д",
     "exercise": "Упражнение",
     "global": "Глобально",
+    "global_classic": "С весом тела",
+    "global_weights": "Отягощения",
+    "global_custom": "Свои",
     "poke": "отправил(а) вам тычок!",
     "member": "Участник"
   },

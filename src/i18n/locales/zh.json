@@ -12,6 +12,9 @@
     "daysAbbr": "天",
     "exercise": "运动",
     "global": "全球",
+    "global_classic": "自重",
+    "global_weights": "负重",
+    "global_custom": "自定义",
     "poke": "给你发了一个戳！",
     "member": "一位成员"
   },

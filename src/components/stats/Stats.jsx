@@ -136,9 +136,9 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                         display: 'flex', flexWrap: 'wrap', gap: '8px'
                     }}>
                         {[
-                            { id: 'standard', label: 'Classique', locked: false },
-                            { id: 'weights', label: 'Musculation', locked: !isPro },
-                            { id: 'custom', label: 'Spécial', locked: !isPro }
+                            { id: 'standard', label: t('common.global_classic'), locked: false },
+                            { id: 'weights', label: t('common.global_weights'), locked: !isPro },
+                            { id: 'custom', label: t('common.global_custom'), locked: !isPro }
                         ].map(cat => (
                             <label key={cat.id} style={{
                                 display: 'flex', alignItems: 'center', gap: '6px',

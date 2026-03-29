@@ -82,7 +82,12 @@ export function WorkoutSession({
             const goal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
             const count = getExerciseCount(today, ex.id);
             const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
-            return { ...ex, goal, count, done };
+            
+            let category = 'custom';
+            if (EXERCISES.some(e => e.id === ex.id)) category = 'bodyweight';
+            else if (WEIGHT_EXERCISES.some(e => e.id === ex.id)) category = 'weights';
+
+            return { ...ex, goal, count, done, category };
         });
     }, [availableExercises, dayNumber, today, completions, getExerciseCount, settings?.difficultyMultiplier]);
 
@@ -478,72 +483,164 @@ export function WorkoutSession({
                     )}
 
                     {/* Exercise grid */}
-                    <div style={{
-                        display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
-                        gap: '8px'
-                    }}>
-                        {exerciseInfo.map(ex => {
-                            const Icon = ICON_MAP[ex.icon] || Dumbbell;
-                            const selected = queue.includes(ex.id);
-                            const orderNum = selected ? queue.indexOf(ex.id) + 1 : null;
-                            return (
-                                <button
-                                    key={ex.id}
-                                    onClick={() => !ex.done && toggleExercise(ex.id)}
-                                    disabled={ex.done}
-                                    style={{
-                                        padding: '14px 10px', borderRadius: 'var(--radius-md)',
-                                        background: ex.done
-                                            ? 'rgba(255,255,255,0.03)'
-                                            : selected
-                                                ? `linear-gradient(135deg, ${ex.color}25, ${ex.color}12)`
-                                                : 'rgba(255,255,255,0.05)',
-                                        border: selected
-                                            ? `2px solid ${ex.color}80`
-                                            : '2px solid rgba(255,255,255,0.08)',
-                                        color: ex.done ? '#555' : selected ? ex.color : 'var(--text-secondary)',
-                                        cursor: ex.done ? 'default' : 'pointer',
-                                        opacity: ex.done ? 0.4 : 1,
-                                        display: 'flex', flexDirection: 'column',
-                                        alignItems: 'center', gap: '6px',
-                                        transition: 'all 0.2s ease',
-                                        position: 'relative'
-                                    }}
-                                >
-                                    {ex.done && (
+                    {showAll ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            {['bodyweight', 'weights', 'custom'].map(cat => {
+                                const catExercises = exerciseInfo.filter(ex => ex.category === cat);
+                                if (catExercises.length === 0) return null;
+                                const catTitle = cat === 'bodyweight' 
+                                    ? t('common.global_classic', { defaultValue: 'Poids du corps' })
+                                    : cat === 'weights' 
+                                        ? t('common.global_weights', { defaultValue: 'Musculation' })
+                                        : t('workout.custom', { defaultValue: 'Personnalisés' });
+
+                                return (
+                                    <div key={cat} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                         <div style={{
-                                            position: 'absolute', top: '6px', right: '6px',
-                                            background: '#10b981', borderRadius: '50%',
-                                            width: '16px', height: '16px', display: 'flex',
-                                            alignItems: 'center', justifyContent: 'center'
+                                            fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)',
+                                            textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '4px'
                                         }}>
-                                            <Check size={10} color="white" />
+                                            {catTitle}
                                         </div>
-                                    )}
-                                    {orderNum && (
                                         <div style={{
-                                            position: 'absolute', top: '6px', left: '6px',
-                                            background: ex.color, borderRadius: '50%',
-                                            width: '18px', height: '18px', display: 'flex',
-                                            alignItems: 'center', justifyContent: 'center',
-                                            fontSize: '0.6rem', fontWeight: '800', color: 'white'
+                                            display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px'
                                         }}>
-                                            {orderNum}
+                                            {catExercises.map(ex => {
+                                                const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                                                const selected = queue.includes(ex.id);
+                                                const orderNum = selected ? queue.indexOf(ex.id) + 1 : null;
+                                                return (
+                                                    <button
+                                                        key={ex.id}
+                                                        onClick={() => !ex.done && toggleExercise(ex.id)}
+                                                        disabled={ex.done}
+                                                        style={{
+                                                            padding: '14px 10px', borderRadius: 'var(--radius-md)',
+                                                            background: ex.done
+                                                                ? 'rgba(255,255,255,0.03)'
+                                                                : selected
+                                                                    ? `linear-gradient(135deg, ${ex.color}25, ${ex.color}12)`
+                                                                    : 'rgba(255,255,255,0.05)',
+                                                            border: selected
+                                                                ? `2px solid ${ex.color}80`
+                                                                : '2px solid rgba(255,255,255,0.08)',
+                                                            color: ex.done ? '#555' : selected ? ex.color : 'var(--text-secondary)',
+                                                            cursor: ex.done ? 'default' : 'pointer',
+                                                            opacity: ex.done ? 0.4 : 1,
+                                                            display: 'flex', flexDirection: 'column',
+                                                            alignItems: 'center', gap: '6px',
+                                                            transition: 'all 0.2s ease',
+                                                            position: 'relative'
+                                                        }}
+                                                    >
+                                                        {ex.done && (
+                                                            <div style={{
+                                                                position: 'absolute', top: '6px', right: '6px',
+                                                                background: '#10b981', borderRadius: '50%',
+                                                                width: '16px', height: '16px', display: 'flex',
+                                                                alignItems: 'center', justifyContent: 'center'
+                                                            }}>
+                                                                <Check size={10} color="white" />
+                                                            </div>
+                                                        )}
+                                                        {orderNum && (
+                                                            <div style={{
+                                                                position: 'absolute', top: '6px', left: '6px',
+                                                                background: ex.color, borderRadius: '50%',
+                                                                width: '18px', height: '18px', display: 'flex',
+                                                                alignItems: 'center', justifyContent: 'center',
+                                                                fontSize: '0.6rem', fontWeight: '800', color: 'white'
+                                                            }}>
+                                                                {orderNum}
+                                                            </div>
+                                                        )}
+                                                        <Icon size={24} />
+                                                        <span style={{
+                                                            fontSize: '0.75rem', fontWeight: '600',
+                                                            textAlign: 'center'
+                                                        }}>{ex.label || t('exercises.' + ex.id)}</span>
+                                                        <span style={{
+                                                            fontSize: '0.6rem', opacity: 0.6
+                                                        }}>
+                                                            {ex.done ? t('workout.completed') : (ex.type === 'timer' ? `${ex.goal - ex.count}s` : t('workout.remaining', { count: ex.goal - ex.count }))}
+                                                        </span>
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
-                                    )}
-                                    <Icon size={24} />
-                                    <span style={{
-                                        fontSize: '0.75rem', fontWeight: '600'
-                                    }}>{ex.label || t('exercises.' + ex.id)}</span>
-                                    <span style={{
-                                        fontSize: '0.6rem', opacity: 0.6
-                                    }}>
-                                        {ex.done ? t('workout.completed') : (ex.type === 'timer' ? `${ex.goal - ex.count}s` : t('workout.remaining', { count: ex.goal - ex.count }))}
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div style={{
+                            display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
+                            gap: '8px'
+                        }}>
+                            {exerciseInfo.map(ex => {
+                                const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                                const selected = queue.includes(ex.id);
+                                const orderNum = selected ? queue.indexOf(ex.id) + 1 : null;
+                                return (
+                                    <button
+                                        key={ex.id}
+                                        onClick={() => !ex.done && toggleExercise(ex.id)}
+                                        disabled={ex.done}
+                                        style={{
+                                            padding: '14px 10px', borderRadius: 'var(--radius-md)',
+                                            background: ex.done
+                                                ? 'rgba(255,255,255,0.03)'
+                                                : selected
+                                                    ? `linear-gradient(135deg, ${ex.color}25, ${ex.color}12)`
+                                                    : 'rgba(255,255,255,0.05)',
+                                            border: selected
+                                                ? `2px solid ${ex.color}80`
+                                                : '2px solid rgba(255,255,255,0.08)',
+                                            color: ex.done ? '#555' : selected ? ex.color : 'var(--text-secondary)',
+                                            cursor: ex.done ? 'default' : 'pointer',
+                                            opacity: ex.done ? 0.4 : 1,
+                                            display: 'flex', flexDirection: 'column',
+                                            alignItems: 'center', gap: '6px',
+                                            transition: 'all 0.2s ease',
+                                            position: 'relative'
+                                        }}
+                                    >
+                                        {ex.done && (
+                                            <div style={{
+                                                position: 'absolute', top: '6px', right: '6px',
+                                                background: '#10b981', borderRadius: '50%',
+                                                width: '16px', height: '16px', display: 'flex',
+                                                alignItems: 'center', justifyContent: 'center'
+                                            }}>
+                                                <Check size={10} color="white" />
+                                            </div>
+                                        )}
+                                        {orderNum && (
+                                            <div style={{
+                                                position: 'absolute', top: '6px', left: '6px',
+                                                background: ex.color, borderRadius: '50%',
+                                                width: '18px', height: '18px', display: 'flex',
+                                                alignItems: 'center', justifyContent: 'center',
+                                                fontSize: '0.6rem', fontWeight: '800', color: 'white'
+                                            }}>
+                                                {orderNum}
+                                            </div>
+                                        )}
+                                        <Icon size={24} />
+                                        <span style={{
+                                            fontSize: '0.75rem', fontWeight: '600',
+                                            textAlign: 'center'
+                                        }}>{ex.label || t('exercises.' + ex.id)}</span>
+                                        <span style={{
+                                            fontSize: '0.6rem', opacity: 0.6
+                                        }}>
+                                            {ex.done ? t('workout.completed') : (ex.type === 'timer' ? `${ex.goal - ex.count}s` : t('workout.remaining', { count: ex.goal - ex.count }))}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
 
                 {/* ── Save routine inline form ── */}

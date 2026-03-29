@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Trophy, Medal, Crown, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Heart, Zap, Dumbbell, ArrowDownUp, ArrowUp, ChevronsUp, Footprints, Swords } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { EXERCISES } from '../../config/exercises';
+import { WEIGHT_EXERCISES } from '../../config/weights';
 import { registerBackHandler } from '../../utils/backHandler';
 import { getLocalDateStr } from '../../utils/dateUtils';
 
-const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints };
+const ICON_MAP = { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square: Activity, MoveDown: ArrowDownUp, MoveDiagonal: ArrowUp };
 
 export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
     const { t } = useTranslation();
@@ -41,6 +42,47 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
     }, [entry.uid, cloudSync]);
 
     const stats = computeStats(details);
+
+    const renderExerciseRow = (ex, index) => {
+        const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
+        const reps = entry.exerciseReps?.[ex.id] || 0;
+        const allList = [...EXERCISES, ...WEIGHT_EXERCISES];
+        const maxReps = Math.max(...allList.map(e => entry.exerciseReps?.[e.id] || 0), 1);
+        const barWidth = (reps / maxReps) * 100;
+        const exDays = loadingDetails ? null : (stats.exerciseDays?.[ex.id] || 0);
+        return (
+            <div key={ex.id} style={{
+                display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px',
+                borderRadius: 'var(--radius-md)', background: `${ex.color}08`
+            }}>
+                <ExIcon size={16} color={ex.color} style={{ flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: '600', color: ex.color }}>{t('exercises.' + ex.id)}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            {!loadingDetails && (stats.exerciseStreaks?.[ex.id] || 0) > 0 && (
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', gap: '2px',
+                                    background: stats.exerciseDoneToday?.[ex.id] ? 'rgba(249,115,22,0.12)' : 'rgba(120,120,120,0.08)',
+                                    padding: '2px 6px', borderRadius: '8px'
+                                }}>
+                                    <span style={{ fontSize: '0.6rem', opacity: stats.exerciseDoneToday?.[ex.id] ? 1 : 0.5, filter: stats.exerciseDoneToday?.[ex.id] ? 'none' : 'grayscale(1)' }}>🔥</span>
+                                    <span style={{ fontSize: '0.65rem', fontWeight: '700', color: stats.exerciseDoneToday?.[ex.id] ? '#f97316' : '#888' }}>{stats.exerciseStreaks[ex.id]}{t('common.daysAbbr')}</span>
+                                </div>
+                            )}
+                            {exDays !== null && (
+                                <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', opacity: 0.7 }}>{exDays}{t('common.daysAbbr')}</span>
+                            )}
+                            <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-primary)' }}>{reps.toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <div style={{ height: '3px', borderRadius: '2px', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', borderRadius: '2px', width: `${barWidth}%`, background: `linear-gradient(90deg, ${ex.color}, ${ex.color}88)`, transition: 'width 0.4s ease' }} />
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div
@@ -132,7 +174,32 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                         {entry.difficultyMultiplier && entry.difficultyMultiplier !== 1 && (
                             <StatCard icon={<Zap size={16} color="#6366f1" />} label={t('leaderboard.difficulty')} value={`x${entry.difficultyMultiplier}`} color="#6366f1" />
                         )}
-                        <StatCard icon={<Trophy size={16} color="#fbbf24" />} label={t('leaderboard.totalReps')} value={entry.totalReps.toLocaleString()} color="#fbbf24" />
+                        
+                        {entry.isPro && entry.weightsTotalReps > 0 && (
+                            <StatCard 
+                                icon={<Activity size={16} color="#f43f5e" />} 
+                                label={t('common.global')} 
+                                value={(entry.totalReps + entry.weightsTotalReps).toLocaleString()} 
+                                color="#f43f5e" 
+                            />
+                        )}
+
+                        <StatCard 
+                            icon={<Trophy size={16} color="#fbbf24" />} 
+                            label={t('common.global_classic')}
+                            value={entry.totalReps.toLocaleString()} 
+                            color="#fbbf24" 
+                        />
+                        
+                        {entry.isPro && entry.weightsTotalReps > 0 && (
+                            <StatCard 
+                                icon={<Dumbbell size={16} color="#8b5cf6" />} 
+                                label={t('common.global_weights')} 
+                                value={entry.weightsTotalReps.toLocaleString()} 
+                                color="#8b5cf6" 
+                            />
+                        )}
+
                         <StatCard icon={<Award size={16} color="#a855f7" />} label={t('leaderboard.achievements')} value={entry.achievements || 0} color="#a855f7" />
                         <StatCard icon={<Flame size={16} color="#f97316" />} label={t('leaderboard.bestStreak')} value={loadingDetails ? '…' : (stats.maxStreak || 0)} color="#f97316" />
                         <StatCard icon={<Calendar size={16} color="#22d3ee" />} label={t('leaderboard.activeDays')} value={loadingDetails ? '…' : (stats.totalDays || 0)} color="#22d3ee" />
@@ -141,45 +208,19 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0, paddingBottom: '16px' }}>
-                    {EXERCISES.map(ex => {
-                        const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
-                        const reps = entry.exerciseReps?.[ex.id] || 0;
-                        const maxReps = Math.max(...EXERCISES.map(e => entry.exerciseReps?.[e.id] || 0), 1);
-                        const barWidth = (reps / maxReps) * 100;
-                        const exDays = loadingDetails ? null : (stats.exerciseDays?.[ex.id] || 0);
-                        return (
-                            <div key={ex.id} style={{
-                                display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px',
-                                borderRadius: 'var(--radius-md)', background: `${ex.color}08`
-                            }}>
-                                <ExIcon size={16} color={ex.color} style={{ flexShrink: 0 }} />
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                                        <span style={{ fontSize: '0.75rem', fontWeight: '600', color: ex.color }}>{t('exercises.' + ex.id)}</span>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                            {!loadingDetails && (stats.exerciseStreaks?.[ex.id] || 0) > 0 && (
-                                                <div style={{
-                                                    display: 'flex', alignItems: 'center', gap: '2px',
-                                                    background: stats.exerciseDoneToday?.[ex.id] ? 'rgba(249,115,22,0.12)' : 'rgba(120,120,120,0.08)',
-                                                    padding: '2px 6px', borderRadius: '8px'
-                                                }}>
-                                                    <span style={{ fontSize: '0.6rem', opacity: stats.exerciseDoneToday?.[ex.id] ? 1 : 0.5, filter: stats.exerciseDoneToday?.[ex.id] ? 'none' : 'grayscale(1)' }}>🔥</span>
-                                                    <span style={{ fontSize: '0.65rem', fontWeight: '700', color: stats.exerciseDoneToday?.[ex.id] ? '#f97316' : '#888' }}>{stats.exerciseStreaks[ex.id]}{t('common.daysAbbr')}</span>
-                                                </div>
-                                            )}
-                                            {exDays !== null && (
-                                                <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', opacity: 0.7 }}>{exDays}{t('common.daysAbbr')}</span>
-                                            )}
-                                            <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-primary)' }}>{reps.toLocaleString()}</span>
-                                        </div>
-                                    </div>
-                                    <div style={{ height: '3px', borderRadius: '2px', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-                                        <div style={{ height: '100%', borderRadius: '2px', width: `${barWidth}%`, background: `linear-gradient(90deg, ${ex.color}, ${ex.color}88)`, transition: 'width 0.4s ease' }} />
-                                    </div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '4px', letterSpacing: '1px' }}>
+                            {t('common.global_classic')}
+                        </div>
+                        {EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
+                        
+                        {entry.isPro && (
+                            <>
+                                <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '16px', letterSpacing: '1px' }}>
+                                    {t('common.global_weights')}
                                 </div>
-                            </div>
-                        );
-                    })}
+                                {WEIGHT_EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
@@ -202,13 +243,14 @@ function StatCard({ icon, label, value, color }) {
 function computeStats(details) {
     if (!details?.completions) return { maxStreak: 0, currentStreak: 0, totalDays: 0, perfectDays: 0, exerciseDays: {} };
 
+    const ALL_EXERCISES = [...EXERCISES, ...WEIGHT_EXERCISES];
     const completions = details.completions;
     const today = getLocalDateStr(new Date());
 
     let totalDays = 0;
     let perfectDays = 0;
     const exerciseDays = {};
-    EXERCISES.forEach(ex => { exerciseDays[ex.id] = 0; });
+    ALL_EXERCISES.forEach(ex => { exerciseDays[ex.id] = 0; });
 
     for (const date in completions) {
         const day = completions[date];
@@ -216,11 +258,14 @@ function computeStats(details) {
 
         let anyDone = false;
         let allDone = true;
-        for (const ex of EXERCISES) {
-            if (day[ex.id] > 0) {
+        
+        // Count overall completion logic
+        for (const ex of ALL_EXERCISES) {
+            if (day[ex.id]?.isCompleted) {
                 anyDone = true;
                 exerciseDays[ex.id]++;
-            } else {
+            } else if (EXERCISES.find(e => e.id === ex.id)) {
+                // Classic perfect day only evaluates standard EXERCISES
                 allDone = false;
             }
         }
@@ -232,7 +277,7 @@ function computeStats(details) {
     const exerciseStreaks = {};
     const exerciseDoneToday = {};
 
-    EXERCISES.forEach(ex => {
+    ALL_EXERCISES.forEach(ex => {
         const streakData = calculateExerciseStreak(completions, ex.id, today);
         exerciseStreaks[ex.id] = streakData.currentStreak;
         exerciseDoneToday[ex.id] = streakData.doneToday;
@@ -242,9 +287,10 @@ function computeStats(details) {
 }
 
 function calculateGlobalStreak(completions, today) {
+    const ALL_EXERCISES = [...EXERCISES, ...WEIGHT_EXERCISES];
     let dates = Object.keys(completions).filter(d => {
         const day = completions[d];
-        return EXERCISES.some(ex => day?.[ex.id] > 0);
+        return ALL_EXERCISES.some(ex => day?.[ex.id]?.isCompleted);
     }).sort();
 
     if (dates.length === 0) return { currentStreak: 0, maxStreak: 0 };
@@ -279,7 +325,7 @@ function calculateGlobalStreak(completions, today) {
 }
 
 function calculateExerciseStreak(completions, exId, today) {
-    let dates = Object.keys(completions).filter(d => completions[d]?.[exId] > 0).sort();
+    let dates = Object.keys(completions).filter(d => completions[d]?.[exId]?.isCompleted).sort();
     if (dates.length === 0) return { currentStreak: 0, doneToday: false };
 
     let currentStreak = 1;

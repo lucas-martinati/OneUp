@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { X, Trophy, Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, LogOut } from 'lucide-react';
+import { X, Trophy, Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, LogOut, Activity } from 'lucide-react';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { getLocalDateStr } from '../../utils/dateUtils';
@@ -17,17 +17,27 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
     const [domain, setDomain] = useState(activeSlide === 1 ? 'weights' : 'classic');
 
     const VISIBLE_TABS = useMemo(() => {
+        const combinedTab = { 
+            id: 'global_combined', 
+            labelKey: 'common.global', 
+            color: '#ec4899', 
+            icon: Activity,
+            isSpecial: true
+        };
+
         if (domain === 'weights') { 
             return [
-                { id: 'global_weights', labelKey: 'common.global_weights', color: '#8b5cf6', icon: Dumbbell },
+                combinedTab,
+                { id: 'global_weights', customLabel: `${t('common.global')} ${t('common.global_weights')}`, color: '#8b5cf6', icon: Dumbbell },
                 ...WEIGHT_EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
             ];
         }
         return [
-            { id: 'global_classic', labelKey: 'common.global_classic', color: '#fbbf24', icon: Trophy },
+            combinedTab,
+            { id: 'global_classic', customLabel: `${t('common.global')} ${t('common.global_classic')}`, color: '#fbbf24', icon: Trophy },
             ...EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
         ];
-    }, [domain]);
+    }, [domain, t]);
 
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -71,6 +81,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
             filteredEntries = entries.filter(e => e.isPro);
         }
         return [...filteredEntries].sort((a, b) => {
+            if (activeTab === 'global_combined') return ((b.totalReps || 0) + (b.weightsTotalReps || 0)) - ((a.totalReps || 0) + (a.weightsTotalReps || 0));
             if (activeTab === 'global_classic') return (b.totalReps || 0) - (a.totalReps || 0);
             if (activeTab === 'global_weights') return (b.weightsTotalReps || 0) - (a.weightsTotalReps || 0);
             return (b.exerciseReps?.[activeTab] || 0) - (a.exerciseReps?.[activeTab] || 0);
@@ -86,6 +97,7 @@ export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveCl
     };
 
     const getReps = (entry) => {
+        if (activeTab === 'global_combined') return (entry.totalReps || 0) + (entry.weightsTotalReps || 0);
         if (activeTab === 'global_classic') return entry.totalReps || 0;
         if (activeTab === 'global_weights') return entry.weightsTotalReps || 0;
         return entry.exerciseReps?.[activeTab] || 0;
