@@ -126,7 +126,6 @@
   },
   "stats": {
     "title": "Statistics",
-    "totalReps": "Total Reps",
     "overExercises": "across {{count}} exercise{{plural}} · {{days}} day{{dayPlural}} of effort",
     "currentStreak": "Current Streak",
     "bestStreak": "Best Streak",
@@ -221,7 +220,6 @@
     "leaveClanConfirm": "Leave Clan?",
     "leaveClanWarning": "Are you sure you want to leave <1>{{name}}</1>? Your personal stats are safe, but you won't appear in their leaderboard anymore.",
     "difficulty": "Difficulty",
-    "totalReps": "Total Reps",
     "achievements": "Achievements",
     "bestStreak": "Best Streak",
     "activeDays": "Active Days",

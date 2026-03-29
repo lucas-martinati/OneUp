@@ -126,7 +126,6 @@
   },
   "stats": {
     "title": "统计",
-    "totalReps": "总次数",
     "overExercises": "共{{count}}项运动 · {{days}}天努力",
     "currentStreak": "当前连续",
     "bestStreak": "最佳连续",
@@ -221,7 +220,6 @@
     "leaveClanConfirm": "离开部落？",
     "leaveClanWarning": "你确定要离开 <1>{{name}}</1> 吗？你的个人数据是安全的，但你将不再出现在他们的排行榜中。",
     "difficulty": "难度",
-    "totalReps": "总次数",
     "achievements": "成就",
     "bestStreak": "最佳连续",
     "activeDays": "活跃天数",

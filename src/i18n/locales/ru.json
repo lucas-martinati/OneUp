@@ -126,7 +126,6 @@
   },
   "stats": {
     "title": "Статистика",
-    "totalReps": "Всего повторений",
     "overExercises": "в {{count}} упражнени{{plural}} · {{days}} дне{{dayPlural}} работы",
     "currentStreak": "Текущая серия",
     "bestStreak": "Лучшая серия",
@@ -221,7 +220,6 @@
     "leaveClanConfirm": "Покинуть клан?",
     "leaveClanWarning": "Вы уверены, что хотите покинуть <1>{{name}}</1>? Ваши личные данные в безопасности, но вы больше не будете появляться в их таблице.",
     "difficulty": "Сложность",
-    "totalReps": "Всего повторений",
     "achievements": "Достижения",
     "bestStreak": "Лучшая серия",
     "activeDays": "Активных дней",

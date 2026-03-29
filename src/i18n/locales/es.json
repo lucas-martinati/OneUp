@@ -126,7 +126,6 @@
   },
   "stats": {
     "title": "Estadísticas",
-    "totalReps": "Repeticiones Totales",
     "overExercises": "en {{count}} ejercicio{{plural}} · {{days}} día{{dayPlural}} de esfuerzo",
     "currentStreak": "Racha Actual",
     "bestStreak": "Mejor Racha",
@@ -221,7 +220,6 @@
     "leaveClanConfirm": "¿Salir del Clan?",
     "leaveClanWarning": "¿Estás seguro de que quieres salir de <1>{{name}}</1>? Tus estadísticas personales están a salvo, pero ya no aparecerás en su clasificación.",
     "difficulty": "Dificultad",
-    "totalReps": "Repeticiones Totales",
     "achievements": "Logros",
     "bestStreak": "Mejor Racha",
     "activeDays": "Días Activos",

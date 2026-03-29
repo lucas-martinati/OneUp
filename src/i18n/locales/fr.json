@@ -126,7 +126,6 @@
   },
   "stats": {
     "title": "Statistiques",
-    "totalReps": "Reps totales",
     "overExercises": "sur {{count}} exercices · {{days}} jour{{plural}} d'effort",
     "currentStreak": "Série actuelle",
     "bestStreak": "Meilleure série",
@@ -221,7 +220,6 @@
     "leaveClanConfirm": "Quitter le clan ?",
     "leaveClanWarning": "Es-tu sûr de vouloir quitter <1>{{name}}</1> ? Tes statistiques personnelles sont protégées, mais tu n'apparaîtras plus dans leur classement.",
     "difficulty": "Difficulté",
-    "totalReps": "Reps totales",
     "achievements": "Succès",
     "bestStreak": "Meilleure série",
     "activeDays": "Jours actifs",
