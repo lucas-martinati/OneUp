@@ -12,6 +12,8 @@
     "build:bundle": "npm run build && npx cap copy android && cd android && ./gradlew bundleRelease",
     "build:apk": "npm run build && npx cap copy android && cd android && ./gradlew assembleRelease",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "preview": "vite preview",
     "deploy:functions": "npx firebase-tools deploy --only functions --project oneup-1c3f5",
     "deploy": "GITHUB_PAGES=true npm run build && gh-pages -d dist -b gh-pages --dotfiles"
@@ -55,7 +57,9 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "gh-pages": "^6.3.0",
     "globals": "^16.5.0",
+    "jsdom": "^29.0.1",
     "vite": "^7.2.4",
-    "vite-plugin-pwa": "^1.2.0"
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^4.1.2"
   }
 }
