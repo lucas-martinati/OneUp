@@ -67,7 +67,7 @@ function App() {
       const todayStr = getLocalDateStr(new Date());
       const lastActiveDay = isDayDoneFromCompletions(completions, todayStr)
         ? todayStr
-        : computedStats.sortedDates.slice().reverse().find(d => completions[d] && EXERCISES.some(ex => completions[d][ex.id]?.isCompleted)) || null;
+        : computedStats.sortedDates.slice().reverse().find(d => isDayDoneFromCompletions(completions, d)) || null;
 
       await cloudSync.publishToLeaderboard({
         pseudo: settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme',
