@@ -16,6 +16,7 @@ import {
 import { EXERCISES } from './config/exercises';
 import { WEIGHT_EXERCISES } from './config/weights';
 import { createLogger } from './utils/logger';
+import { getLocalDateStr, isDayDoneFromCompletions } from './utils/dateUtils';
 import { loadCachedEntitlements, saveCachedEntitlements, clearCachedEntitlements, resolveEntitlements } from './utils/entitlements';
 
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
@@ -63,7 +64,10 @@ function App() {
       if (!googleAuth.isSignedIn) return;
       const classicTotalReps = EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
       const weightsTotalReps = WEIGHT_EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
-      const lastActiveDay = computedStats.sortedDates.find(d => completions[d] && EXERCISES.some(ex => completions[d][ex.id]?.isCompleted)) || null;
+      const todayStr = getLocalDateStr(new Date());
+      const lastActiveDay = isDayDoneFromCompletions(completions, todayStr)
+        ? todayStr
+        : computedStats.sortedDates.slice().reverse().find(d => completions[d] && EXERCISES.some(ex => completions[d][ex.id]?.isCompleted)) || null;
 
       await cloudSync.publishToLeaderboard({
         pseudo: settings.leaderboardPseudo || googleAuth.user?.displayName || 'Anonyme',
