@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
 import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../../hooks/useComputedStats';
@@ -6,6 +6,7 @@ import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { BADGE_DEFINITIONS } from '../../config/badgeDefinitions';
 import ICON_MAP from '../../utils/iconMap';
 import { Z_INDEX } from '../../utils/zIndex';
+import { registerBackHandler } from '../../utils/backHandler';
 
 // Lazy load Recharts components
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
@@ -20,6 +21,30 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
         return [initialCategory || 'standard'];
     });
     const [showFilters, setShowFilters] = useState(false);
+    const isClosingRef = useRef(false);
+
+    const handleClose = useCallback(() => {
+        if (isClosingRef.current) return;
+        isClosingRef.current = true;
+        onClose();
+    }, [onClose]);
+
+    // Back button handling
+    useEffect(() => {
+        history.pushState({ statsOpen: true }, '');
+        const handlePopState = () => handleClose();
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [handleClose]);
+
+    // Android hardware back button
+    useEffect(() => {
+        const unregister = registerBackHandler(() => {
+            handleClose();
+            return true;
+        });
+        return unregister;
+    }, [handleClose]);
 
     // Wait for the modal transition to finish before attempting to load huge charting libraries
     useEffect(() => {
