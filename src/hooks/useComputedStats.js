@@ -71,6 +71,9 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     // First active date
     let firstActiveDate = null;
 
+    // Daily reps for line chart
+    const dailyRepsData = [];
+
     // ─── SINGLE PASS over completions ────────────────────────────────────
     const sortedDates = Object.keys(completions).sort();
 
@@ -158,6 +161,11 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         if (dayHasMorning) morningWorkouts++;
         if (dayHasAfternoon) afternoonWorkouts++;
         if (dayHasEvening) eveningWorkouts++;
+
+        // Daily reps for line chart
+        if (dayReps > 0) {
+            dailyRepsData.push({ date: dateStr, reps: dayReps });
+        }
 
         // Best day
         if (dayReps > bestDayReps || (dayReps === bestDayReps && dayExCount > bestDayExCount)) {
@@ -326,6 +334,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         monthlyActivityTotal,
         radarData,
         champion,
+        dailyRepsData,
 
         // Sorted dates
         sortedDates

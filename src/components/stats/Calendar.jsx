@@ -529,6 +529,17 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                     </div>
                     <div style={{ fontSize: '1.2rem', fontWeight: '700' }}>{t('calendar.day', { num: dayNum })}</div>
                 </div>
+                <div style={{
+                    fontSize: '1.4rem', fontWeight: '800',
+                    background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
+                    WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
+                }}>
+                    {exercises.reduce((sum, ex) => {
+                        const exData = dayCompletions[ex.id];
+                        if (!exData?.isCompleted) return sum;
+                        return sum + getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
+                    }, 0)} <span style={{ fontSize: '0.7rem', WebkitTextFillColor: 'var(--text-secondary)' }}>{t('common.reps')}</span>
+                </div>
             </div>
 
             <div data-scroll-content style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">

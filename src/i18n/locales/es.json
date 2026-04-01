@@ -160,6 +160,7 @@
     "perfectDays": "Días Perfectos",
     "champion": "Campeón",
     "monthlyActivity": "📅 Actividad Mensual",
+    "dailyReps": "📈 Evolución de Reps",
     "consistency": "⏰ Constancia",
     "muscleBalance": "🕸️ Equilibrio Muscular",
     "basedOnManual": "Basado en {{count}} día{{plural}} manual{{plural}}",

@@ -10,6 +10,7 @@ import { Z_INDEX } from '../../utils/zIndex';
 // Lazy load Recharts components
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
 const ConsistencyPieChart = lazy(() => import('./ConsistencyPieChart'));
+const DailyRepsChart = lazy(() => import('./DailyRepsChart'));
 
 export function Stats({ completions, exercisesList, initialCategory, isPro, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats: globalStats, onOpenStore }) {
     const { t, i18n } = useTranslation();
@@ -49,7 +50,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
         monthlyActivityByExercise, monthlyActivityTotal,
         pieData, trackedCount, badgeCount,
         bestDayDate, bestDayReps, bestDayExReps,
-        firstActiveDate
+        firstActiveDate, dailyRepsData
     } = computedStats;
 
     const activeData = pieData.filter(d => d.value > 0).map(d => ({
@@ -451,7 +452,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                 </div>
             </div>
 
-            {/* ── Equilibre Musculaire + Time-of-day pie (Lazy Loaded) ────────────────────────── */}
+            {/* ── Equilibre Musculaire + Time-of-day pie + Daily Reps (Lazy Loaded) ────────────────────────── */}
             {chartsReady ? (
                 <Suspense fallback={
                     <div className="glass-premium" style={{
@@ -462,6 +463,11 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                         <div style={{ color: 'var(--text-secondary)' }}>{t('stats.loadingCharts')}</div>
                     </div>
                 }>
+                    <DailyRepsChart
+                        dailyRepsData={dailyRepsData}
+                        title={t('stats.dailyReps')}
+                        t={t}
+                    />
                     <RadarChartPanel 
                         radarData={translatedRadarData} 
                         globalTotalReps={globalTotalReps}
