@@ -512,6 +512,8 @@
     "badgeActive": "Your Supporter badge is active in the leaderboard.",
     "androidOnly": "Purchase is only available in the Android app.",
     "history": "Purchase history",
+    "historyTitle": "OneUp Support ❤️",
+    "historyDesc": "Thank you for your support!",
     "noHistory": "No purchases recorded",
     "donateAgain": "Make another donation"
   },
@@ -533,10 +535,27 @@
     "activeDesc": "You can create custom programs.",
     "price": "€1.99/month",
     "locked": "Pro subscription required",
-    "lockedDesc": "Upgrade to Pro to create your programs!"
+    "lockedDesc": "Upgrade to Pro to create your programs!",
+    "historyTitle": "Pro Subscription",
+    "historyDesc": "Auto-renewal"
   },
   "store": {
-    "title": "Store"
+    "title": "Store",
+    "historyTitle": "In-App Purchase",
+    "historyDesc": "OneUp Transaction",
+    "statusActive": "Active",
+    "statusExpired": "Expired",
+    "statusPaid": "Paid"
+  },
+  "paywall": {
+    "proRequired": "Pro Mode Required",
+    "proRequiredDesc": "Access weight training dashboards and create your own custom exercises.",
+    "viewStore": "View Store"
+  },
+  "webPayment": {
+    "oops": "Oops...",
+    "description": "In-App payments are not available on the Web version.<br/><br/>Please use the Android app to access the store and unlock these features!",
+    "gotIt": "Got it"
   },
   "customExercises": {
     "title": "Custom Exercises",

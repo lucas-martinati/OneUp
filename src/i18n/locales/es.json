@@ -494,15 +494,17 @@
     "mountain": "Escaladores"
   },
   "supporter": {
-    "title": "Apoyar al desarrollador ❤️",
-    "description": "¡Conviértete en Supporter!",
-    "explanation": "Sin funciones ocultas — es un apoyo voluntario. A cambio, recibes una insignia ❤️ visible en la clasificación.",
+    "title": "Apoya al desarrollador ❤️",
+    "description": "¡Hazte Supporter!",
+    "explanation": "Sin funciones ocultas — es un apoyo voluntario. A cambio, obtienes una insignia ❤️ visible en la clasificación.",
     "buyButton": "Apoyar OneUp",
     "restore": "Restaurar mis compras",
     "thankYou": "¡Gracias por tu apoyo! ❤️",
     "badgeActive": "Tu insignia Supporter está activa en la clasificación.",
     "androidOnly": "La compra solo está disponible en la aplicación Android.",
     "history": "Historial de compras",
+    "historyTitle": "Apoyo a OneUp ❤️",
+    "historyDesc": "¡Gracias por tu apoyo!",
     "noHistory": "Sin compras registradas",
     "donateAgain": "Hacer otra donación"
   },
@@ -524,10 +526,27 @@
     "activeDesc": "Puedes crear programas personalizados.",
     "price": "6,99€/mes",
     "locked": "Suscripción Pro requerida",
-    "lockedDesc": "¡Pásate a Pro para crear tus programas!"
+    "lockedDesc": "¡Pásate a Pro para crear tus programas!",
+    "historyTitle": "Suscripción Pro",
+    "historyDesc": "Renovación automática"
   },
   "store": {
-    "title": "Tienda"
+    "title": "Tienda",
+    "historyTitle": "Compra In-App",
+    "historyDesc": "Transacción OneUp",
+    "statusActive": "Activo",
+    "statusExpired": "Expirado",
+    "statusPaid": "Pagado"
+  },
+  "paywall": {
+    "proRequired": "Modo Pro Requerido",
+    "proRequiredDesc": "Accede a los paneles de pesas y crea tus propios ejercicios personalizados.",
+    "viewStore": "Ver Tienda"
+  },
+  "webPayment": {
+    "oops": "Ups...",
+    "description": "Los pagos In-App no están disponibles en la versión Web.<br/><br/>¡Usa la aplicación Android para acceder a la tienda y desbloquear estas funciones!",
+    "gotIt": "Entendido"
   },
   "customExercises": {
     "title": "Ejercicios Personalizados",

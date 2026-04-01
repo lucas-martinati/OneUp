@@ -285,9 +285,9 @@ export async function getPurchaseHistory() {
     const history = [];
 
     const getProductDetails = (identifier) => {
-      if (identifier?.includes('supporter')) return { title: 'Soutien OneUp ❤️', desc: 'Achat unique premium' };
-      if (identifier?.includes('pro')) return { title: 'Abonnement Pro', desc: 'Renouvellement automatique' };
-      return { title: 'Achat In-App', desc: 'Transaction OneUp' };
+      if (identifier?.includes('supporter')) return { titleKey: 'supporter.historyTitle', descKey: 'supporter.historyDesc' };
+      if (identifier?.includes('pro')) return { titleKey: 'pro.historyTitle', descKey: 'pro.historyDesc' };
+      return { titleKey: 'store.historyTitle', descKey: 'store.historyDesc' };
     };
 
     // 1. Active & Expired Entitlements
@@ -297,10 +297,10 @@ export async function getPurchaseHistory() {
         const rawId = ent.productIdentifier || key;
         history.push({
           id: rawId.replace(/^\$/, ''),
-          title: details.title,
-          desc: details.desc,
+          titleKey: details.titleKey,
+          descKey: details.descKey,
           date: ent.latestPurchaseDate || ent.originalPurchaseDate,
-          price: ent.isActive ? 'Actif' : 'Expiré',
+          priceKey: ent.isActive ? 'store.statusActive' : 'store.statusExpired',
           isActive: ent.isActive
         });
       }
@@ -314,10 +314,10 @@ export async function getPurchaseHistory() {
           const rawId = tx.transactionIdentifier || tx.productIdentifier;
           history.push({
             id: rawId.replace(/^\$/, ''),
-            title: details.title,
-            desc: details.desc,
+            titleKey: details.titleKey,
+            descKey: details.descKey,
             date: tx.purchaseDate,
-            price: 'Payé',
+            priceKey: 'store.statusPaid',
             isActive: true
           });
         }

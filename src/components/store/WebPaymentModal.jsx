@@ -1,7 +1,10 @@
 import { Smartphone } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Z_INDEX } from '../../utils/zIndex';
 
 export function WebPaymentModal({ onClose }) {
+    const { t } = useTranslation();
+    
     return (
         <div className="fade-in" style={{
             position: 'fixed', inset: 0,
@@ -34,7 +37,7 @@ export function WebPaymentModal({ onClose }) {
                     fontSize: '1.4rem', fontWeight: '800', margin: '0 0 12px 0',
                     color: 'var(--text-primary)'
                 }}>
-                    Oups...
+                    {t('webPayment.oops')}
                 </h2>
                 
                 <p style={{
@@ -42,7 +45,7 @@ export function WebPaymentModal({ onClose }) {
                     lineHeight: '1.6', margin: '0 0 28px 0',
                     padding: '0 10px'
                 }}>
-                    Les paiements In-App ne sont pas disponibles sur la version Web.<br/><br/>Veuillez utiliser l'application Android pour accéder à la boutique et débloquer ces fonctionnalités !
+                    {t('webPayment.description')}
                 </p>
 
                 <button onClick={onClose} className="hover-lift" style={{
@@ -54,7 +57,7 @@ export function WebPaymentModal({ onClose }) {
                     boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
                 }}>
                     <Smartphone size={18} />
-                    J'ai compris
+                    {t('webPayment.gotIt')}
                 </button>
             </div>
         </div>

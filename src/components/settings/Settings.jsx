@@ -200,18 +200,18 @@ export function Settings({ defaultShowStore = false, settings, onClose, onSave, 
                                     }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
                                             <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                                                {receipt.title}
+                                                {t(receipt.titleKey)}
                                             </div>
                                             <div style={{ 
                                                 fontWeight: '800', fontSize: '0.9rem', 
                                                 color: receipt.isActive ? '#10b981' : 'var(--text-secondary)'
                                             }}>
-                                                {receipt.price}
+                                                {t(receipt.priceKey)}
                                             </div>
                                         </div>
                                         
                                         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
-                                            {receipt.desc}
+                                            {t(receipt.descKey)}
                                         </div>
 
                                         <div style={{ 

@@ -512,6 +512,8 @@
     "badgeActive": "Ton badge Supporter est actif dans le classement.",
     "androidOnly": "L'achat est uniquement disponible dans l'application Android.",
     "history": "Historique des achats",
+    "historyTitle": "Soutien OneUp ❤️",
+    "historyDesc": "Merci pour ton soutien !",
     "noHistory": "Aucun achat enregistré",
     "donateAgain": "Faire un nouveau don"
   },
@@ -533,10 +535,27 @@
     "activeDesc": "Tu as l'accès total au summum de l'application.",
     "price": "1,99€/mois",
     "locked": "Abonnement Pro exclusif",
-    "lockedDesc": "Passe au Pro pour débloquer ces fonctionnalités !"
+    "lockedDesc": "Passe au Pro pour débloquer ces fonctionnalités !",
+    "historyTitle": "Abonnement Pro",
+    "historyDesc": "Renouvellement automatique"
   },
   "store": {
-    "title": "Boutique"
+    "title": "Boutique",
+    "historyTitle": "Achat In-App",
+    "historyDesc": "Transaction OneUp",
+    "statusActive": "Actif",
+    "statusExpired": "Expiré",
+    "statusPaid": "Payé"
+  },
+  "paywall": {
+    "proRequired": "Mode Pro Requis",
+    "proRequiredDesc": "Accédez aux tableaux de bord de musculation et créez vos propres exercices personnalisés.",
+    "viewStore": "Voir la Boutique"
+  },
+  "webPayment": {
+    "oops": "Oups...",
+    "description": "Les paiements In-App ne sont pas disponibles sur la version Web.<br/><br/>Veuillez utiliser l'application Android pour accéder à la boutique et débloquer ces fonctionnalités !",
+    "gotIt": "J'ai compris"
   },
   "customExercises": {
     "title": "Exercices Personnalisés",

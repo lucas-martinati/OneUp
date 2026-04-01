@@ -340,13 +340,9 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                                             }} />
                                         );
                                     })}
-                                    {/* Red dot if nothing done and not future */}
+                                    {/* Red X if nothing done and not future */}
                                     {isMissed && (
-                                        <div style={{
-                                            width: dotSize, height: dotSize, borderRadius: '50%',
-                                            background: '#ef4444', flexShrink: 0,
-                                            boxShadow: '0 0 4px rgba(239,68,68,0.5)'
-                                        }} />
+                                        <X size={parseInt(dotSize) + 6} color="#ef4444" strokeWidth={3} style={{ flexShrink: 0, filter: 'drop-shadow(0 0 3px rgba(239,68,68,0.5))' }} />
                                     )}
                                 </div>
                             )}

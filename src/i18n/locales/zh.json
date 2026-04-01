@@ -512,6 +512,8 @@
     "badgeActive": "你的支持者徽章已在排行榜中激活。",
     "androidOnly": "购买仅在 Android 应用中可用。",
     "history": "购买历史",
+    "historyTitle": "支持 OneUp ❤️",
+    "historyDesc": "感谢你的支持！",
     "noHistory": "没有购买记录",
     "donateAgain": "再次捐赠"
   },
@@ -533,10 +535,27 @@
     "activeDesc": "你可以创建自定义计划。",
     "price": "€1.99/月",
     "locked": "需要 Pro 订阅",
-    "lockedDesc": "升级到 Pro 以创建你的计划！"
+    "lockedDesc": "升级到 Pro 以创建你的计划！",
+    "historyTitle": "Pro 订阅",
+    "historyDesc": "自动续订"
   },
   "store": {
-    "title": "商店"
+    "title": "商店",
+    "historyTitle": "应用内购买",
+    "historyDesc": "OneUp 交易",
+    "statusActive": "有效",
+    "statusExpired": "已过期",
+    "statusPaid": "已支付"
+  },
+  "paywall": {
+    "proRequired": "需要 Pro 模式",
+    "proRequiredDesc": "访问力量训练面板并创建你自己的自定义练习。",
+    "viewStore": "查看商店"
+  },
+  "webPayment": {
+    "oops": "哎呀...",
+    "description": "应用内购买在网页版上不可用。<br/><br/>请使用 Android 应用访问商店并解锁这些功能！",
+    "gotIt": "知道了"
   },
   "customExercises": {
     "title": "自定义练习",
