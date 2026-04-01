@@ -1,5 +1,5 @@
 import { Smartphone } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { Z_INDEX } from '../../utils/zIndex';
 
 export function WebPaymentModal({ onClose }) {
@@ -45,7 +45,7 @@ export function WebPaymentModal({ onClose }) {
                     lineHeight: '1.6', margin: '0 0 28px 0',
                     padding: '0 10px'
                 }}>
-                    {t('webPayment.description')}
+                    <Trans i18nKey="webPayment.description" />
                 </p>
 
                 <button onClick={onClose} className="hover-lift" style={{
