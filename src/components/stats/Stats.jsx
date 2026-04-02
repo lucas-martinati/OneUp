@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, Suspense, lazy, useMemo } from 'react';
-import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock, Share2, Clock, ChevronRight, Dumbbell } from 'lucide-react';
+import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock, Clock, ChevronRight, Dumbbell } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../../hooks/useComputedStats';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
@@ -7,21 +7,19 @@ import { BADGE_DEFINITIONS } from '../../config/badgeDefinitions';
 import ICON_MAP from '../../utils/iconMap';
 import { Z_INDEX } from '../../utils/zIndex';
 import { registerBackHandler } from '../../utils/backHandler';
-import { useShareCard } from '../../features/share/hooks/useShareCard';
 import { getSessionHistory, removeSession } from '../../features/share/services/sessionHistoryService';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
+import { SharePanel } from '../../features/share/components/SharePanel';
 
 // Lazy load Recharts components
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
 const ConsistencyPieChart = lazy(() => import('./ConsistencyPieChart'));
 const DailyRepsChart = lazy(() => import('./DailyRepsChart'));
-const ShareModal = lazy(() => import('../../features/share/components/ShareModal').then(m => ({ default: m.ShareModal })));
 const SessionDetailModal = lazy(() => import('../../features/share/components/SessionDetailModal').then(m => ({ default: m.SessionDetailModal })));
 
 export function Stats({ completions, exercisesList, initialCategory, isPro, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats: globalStats, onOpenStore }) {
     const { t, i18n } = useTranslation();
     const [chartsReady, setChartsReady] = useState(false);
-    const [showShare, setShowShare] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
     const [activeCategories, setActiveCategories] = useState(() => {
         if (initialCategory === 'global') return ['standard', 'weights', 'custom'];
@@ -110,13 +108,6 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
     const handleSessionNameChange = useCallback((sessionId, newName) => {
         setSessionHistory(prev => prev.map(s => s.id === sessionId ? { ...s, name: newName } : s));
     }, []);
-
-    const shareHook = useShareCard({
-        sessionData: { date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') },
-        stats: computedStats,
-        sessionHistory,
-        mode: 'global',
-    });
 
     const ChampionIcon = champion && ICON_MAP[champion.icon] ? ICON_MAP[champion.icon] : Dumbbell;
 
@@ -650,21 +641,13 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                 marginBottom: 'var(--spacing-md)',
             }}>
                 {/* Share button */}
-                <button
-                    onClick={() => setShowShare(true)}
-                    className="hover-lift"
-                    style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                        padding: '14px', borderRadius: 'var(--radius-lg)',
-                        background: 'linear-gradient(135deg, rgba(129,140,248,0.15), rgba(139,92,246,0.1))',
-                        border: '1px solid rgba(129,140,248,0.2)',
-                        color: '#818cf8', fontSize: '0.9rem', fontWeight: 700,
-                        cursor: 'pointer', width: '100%',
-                    }}
-                >
-                    <Share2 size={18} />
-                    {t('share.shareCard', 'Partager mes statistiques')}
-                </button>
+                <SharePanel
+                    sessionData={{ date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') }}
+                    stats={computedStats}
+                    isPro={isPro}
+                    variant="stats"
+                    mode="global"
+                />
 
                 {/* Session history */}
                 {sessionHistory.length > 0 && (
@@ -755,17 +738,6 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                     {t('stats.quoteSub')}
                 </p>
             </div>
-
-            {/* ── Share Modal (lazy) ───────────────────────────────────── */}
-            <Suspense fallback={null}>
-                {showShare && (
-                    <ShareModal
-                        shareHook={shareHook}
-                        onClose={() => setShowShare(false)}
-                        isPro={isPro}
-                    />
-                )}
-            </Suspense>
 
             {/* ── Session Detail Modal (lazy) ──────────────────────────── */}
             <Suspense fallback={null}>

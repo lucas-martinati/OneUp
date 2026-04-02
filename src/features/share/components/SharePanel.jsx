@@ -1,55 +1,72 @@
 import React, { useState, Suspense, lazy } from 'react';
 import { Share2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useShareCard } from '../hooks/useShareCard';
 import { getSessionHistory } from '../services/sessionHistoryService';
 
 const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
 
 /**
- * SharePanel — shared share button + modal for session sharing.
- * Used in SessionSummary (end of workout) and SessionDetailModal (history).
+ * SharePanel — shared share button + modal for session or global stats sharing.
+ * Used in SessionSummary, SessionDetailModal, and Stats.
  *
- * @param {Object} sessionData - { id, date, exercises, duration, name, type }
- * @param {Object} stats - computed stats for streak
- * @param {boolean} isPro - pro entitlement
- * @param {string} variant - 'large' (SessionSummary) | 'compact' (SessionDetailModal)
+ * @param {Object} props
+ * @param {Object} props.sessionData - { id, date, exercises, duration, name, type }
+ * @param {Object} props.stats - computed stats for streak
+ * @param {boolean} props.isPro - pro entitlement
+ * @param {string} props.variant - 'large' | 'compact' | 'stats'
+ * @param {string} props.mode - 'session' | 'global'
+ * @param {string} props.label - button label (for 'stats' variant)
  */
-export function SharePanel({ sessionData, stats = {}, isPro = false, variant = 'large' }) {
+export function SharePanel({ sessionData, stats = {}, isPro = false, variant = 'large', mode = 'session', label }) {
   const [showShare, setShowShare] = useState(false);
+  const { t } = useTranslation();
 
   const shareHook = useShareCard({
     sessionData,
     stats,
     sessionHistory: getSessionHistory(),
+    mode,
   });
 
   const isCompact = variant === 'compact';
+  const isStats = variant === 'stats';
+
+  const buttonStyle = isStats ? {
+    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+    padding: '14px', borderRadius: 'var(--radius-lg)',
+    background: 'linear-gradient(135deg, rgba(129,140,248,0.15), rgba(139,92,246,0.1))',
+    border: '1px solid rgba(129,140,248,0.2)',
+    color: '#818cf8', fontSize: '0.9rem', fontWeight: 700,
+    cursor: 'pointer', width: '100%',
+  } : isCompact ? {
+    padding: '12px', borderRadius: '12px',
+    background: 'linear-gradient(135deg, #818cf8, #6366f1)',
+    border: 'none', color: 'white', fontSize: '0.85rem', fontWeight: 700,
+    cursor: 'pointer', display: 'flex', alignItems: 'center',
+    justifyContent: 'center', gap: '8px', flex: 1,
+  } : {
+    padding: '14px 16px', borderRadius: 'var(--radius-lg)',
+    background: 'rgba(255,255,255,0.08)',
+    border: '1px solid rgba(255,255,255,0.15)',
+    color: 'white', fontSize: '1rem', fontWeight: 700,
+    cursor: 'pointer', display: 'flex',
+    alignItems: 'center', justifyContent: 'center',
+  };
+
+  const defaultLabel = isStats
+    ? t('share.shareCard', 'Partager mes statistiques')
+    : isCompact ? t('share.share', 'Partager') : undefined;
 
   return (
     <>
       <button
         onClick={() => setShowShare(true)}
         className="hover-lift"
-        style={{
-          padding: isCompact ? '12px' : '14px 16px',
-          borderRadius: isCompact ? '12px' : 'var(--radius-lg)',
-          background: isCompact
-            ? 'linear-gradient(135deg, #818cf8, #6366f1)'
-            : 'rgba(255,255,255,0.08)',
-          border: isCompact ? 'none' : '1px solid rgba(255,255,255,0.15)',
-          color: 'white',
-          fontSize: isCompact ? '0.85rem' : '1rem',
-          fontWeight: 700,
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: isCompact ? '8px' : undefined,
-          flex: isCompact ? 1 : undefined,
-        }}
+        style={buttonStyle}
       >
-        <Share2 size={isCompact ? 16 : 20} />
-        {isCompact && 'Partager'}
+        <Share2 size={isCompact ? 16 : isStats ? 18 : 20} />
+        {(label || defaultLabel)}
       </button>
 
       <Suspense fallback={null}>

@@ -167,16 +167,14 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
     : sessionHistory;
   const filteredStats = isGlobal ? (() => {
     let totalReps = 0;
-    const uniqueDays = new Set();
     let exerciseCount = 0;
     for (const s of filteredHistory) {
-      if (s.date) uniqueDays.add(s.date.slice(0, 10));
       for (const ex of (s.exercises || [])) {
         totalReps += (ex.reps || 0);
         exerciseCount++;
       }
     }
-    return { totalReps, totalDays: uniqueDays.size, exerciseCount };
+    return { totalReps, exerciseCount };
   })() : null;
 
   const totalReps = isGlobal
@@ -186,7 +184,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const streak = stats?.displayStreak || 0;
   const streakActive = stats?.streakActive || false;
   const exerciseCount = isGlobal ? (filteredStats?.exerciseCount || 0) : allExercises.length;
-  const totalDays = isGlobal ? (filteredStats?.totalDays || 0) : 0;
+  const totalDays = isGlobal ? (stats?.totalDays || 0) : 0;
   const maxStreak = stats?.maxStreak || 0;
   const dateStr = sessionData?.date
     ? formatDate(sessionData.date)
@@ -386,7 +384,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
         )}
 
         {/* Session history mini list */}
-        {options.showSessionHistory && filteredHistory.length > 0 && (
+        {options.showSessionHistory && sessionHistory.length > 0 && (
           <div style={{
             padding: '12px',
             borderRadius: '14px',
@@ -401,7 +399,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
             }}>
               {t('share.recentSessions', 'S\u00e9ances r\u00e9centes')}
             </div>
-            {filteredHistory.slice(0, 5).map((session, i) => (
+            {sessionHistory.slice(0, 5).map((session, i) => (
               <HistoryRow key={session.id || i} session={session} t={t} />
             ))}
           </div>
