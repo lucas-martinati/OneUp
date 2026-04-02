@@ -71,14 +71,23 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
   const captureCard = useCallback(async () => {
     if (!cardRef.current) throw new Error('Card ref not attached');
     setIsExporting(true);
+    const el = cardRef.current;
+    const prevWidth = el.style.width;
+    const prevMaxWidth = el.style.maxWidth;
     try {
-      const dataUrl = await captureElement(cardRef.current, {
+      // Force fixed size for consistent export
+      el.style.width = '360px';
+      el.style.maxWidth = '360px';
+      const dataUrl = await captureElement(el, {
         format: options.format,
         quality: 0.95,
         pixelRatio: 2,
       });
       return dataUrl;
     } finally {
+      // Restore original sizing
+      el.style.width = prevWidth;
+      el.style.maxWidth = prevMaxWidth;
       setIsExporting(false);
     }
   }, [options.format]);

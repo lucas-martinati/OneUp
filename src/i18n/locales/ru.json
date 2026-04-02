@@ -30,7 +30,8 @@
     "anonymous": "Аноним",
     "member": "Участник",
     "saved": "Сохранено",
-    "loading": "Загрузка..."
+    "loading": "Загрузка...",
+    "confirm": "Подтвердить"
   },
   "paywall": {
     "proRequired": "Требуется Pro режим",
@@ -650,5 +651,39 @@
     "planche": "Планка (с)",
     "dips": "Отжимания на брусьях",
     "mountain": "Альпинисты"
+  },
+  "share": {
+    "title": "Поделиться",
+    "duration": "Длительность",
+    "volume": "Объём",
+    "exercises": "Упражнения",
+    "exercisesCompleted": "Выполненные упражнения",
+    "streak": "Серия",
+    "streakDisplay": "Серия (streak)",
+    "showHistory": "История тренировок",
+    "recentSessions": "Последние тренировки",
+    "session": "Тренировка",
+    "metrics": "Показываемые метрики",
+    "download": "Скачать",
+    "share": "Поделиться",
+    "exporting": "Экспорт...",
+    "shareCard": "Поделиться статистикой",
+    "globalStats": "Глобальная статистика",
+    "totalReps": "Всего повторений",
+    "activeDays": "Активных дней",
+    "bestStreak": "Лучшая серия",
+    "sessionDetail": "Детали тренировки",
+    "reps": "Повторения",
+    "showWeights": "Разделить по категориям",
+    "bodyweight": "С весом тела",
+    "weights": "С отягощением",
+    "customEx": "Пользовательские",
+    "sessionNamePlaceholder": "Название тренировки (необязательно)",
+    "categoryFilter": "Категория",
+    "cat": {
+      "bodyweight": "С весом тела",
+      "weights": "С отягощением",
+      "custom": "Пользовательские"
+    }
   }
 }

@@ -30,7 +30,8 @@
     "anonymous": "匿名",
     "member": "一位成员",
     "saved": "已保存",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "confirm": "确认"
   },
   "paywall": {
     "proRequired": "需要 Pro 模式",
@@ -624,5 +625,39 @@
     "squat_weights": "负重深蹲",
     "deadlift": "硬拉",
     "barbell_row": "杠铃划船"
+  },
+  "share": {
+    "title": "分享",
+    "duration": "时长",
+    "volume": "总量",
+    "exercises": "练习",
+    "exercisesCompleted": "已完成的练习",
+    "streak": "连续天数",
+    "streakDisplay": "连续天数",
+    "showHistory": "训练历史",
+    "recentSessions": "最近的训练",
+    "session": "训练",
+    "metrics": "显示的指标",
+    "download": "下载",
+    "share": "分享",
+    "exporting": "导出中...",
+    "shareCard": "分享我的统计",
+    "globalStats": "全局统计",
+    "totalReps": "总次数",
+    "activeDays": "活跃天数",
+    "bestStreak": "最佳连续天数",
+    "sessionDetail": "训练详情",
+    "reps": "次数",
+    "showWeights": "按类别分开",
+    "bodyweight": "自重训练",
+    "weights": "器械训练",
+    "customEx": "自定义",
+    "sessionNamePlaceholder": "训练名称（可选）",
+    "categoryFilter": "类别",
+    "cat": {
+      "bodyweight": "自重训练",
+      "weights": "器械训练",
+      "custom": "自定义"
+    }
   }
 }

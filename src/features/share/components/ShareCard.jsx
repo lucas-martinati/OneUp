@@ -12,10 +12,10 @@ function formatDuration(seconds) {
   return `${m}min`;
 }
 
-function formatDate(dateStr) {
+function formatDate(dateStr, lang) {
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+    return d.toLocaleDateString(lang || undefined, { weekday: 'short', day: 'numeric', month: 'short' });
   } catch {
     return '';
   }
@@ -51,7 +51,7 @@ function SessionIcons({ exercises, size = 11 }) {
   );
 }
 
-function HistoryRow({ session, t }) {
+function HistoryRow({ session, t, lang }) {
   const hasName = session.name && session.name.trim().length > 0;
 
   return (
@@ -63,7 +63,7 @@ function HistoryRow({ session, t }) {
         fontSize: '0.55rem', color: 'rgba(255,255,255,0.4)', width: '52px', flexShrink: 0,
         fontWeight: 500,
       }}>
-        {formatDate(session.date)}
+        {formatDate(session.date, lang)}
       </span>
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
         {hasName ? (
@@ -132,7 +132,8 @@ function ExerciseList({ exercises, t }) {
  *   - 'global': global stats from Stats screen
  */
 export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options, mode = 'session' }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
 
   const WEIGHT_IDS = ['biceps_curl','hammer_curl','bench_press','overhead_press','squat_weights','deadlift','barbell_row'];
   const isGlobal = mode === 'global';
@@ -187,14 +188,15 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const totalDays = isGlobal ? (stats?.totalDays || 0) : 0;
   const maxStreak = stats?.maxStreak || 0;
   const dateStr = sessionData?.date
-    ? formatDate(sessionData.date)
-    : formatDate(new Date().toISOString());
+    ? formatDate(sessionData.date, lang)
+    : formatDate(new Date().toISOString(), lang);
 
   return (
     <div
       ref={cardRef}
       style={{
-        width: '360px',
+        width: '100%',
+        maxWidth: '360px',
         borderRadius: '20px',
         overflow: 'hidden',
         fontFamily: "'Outfit', -apple-system, BlinkMacSystemFont, sans-serif",
@@ -400,7 +402,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
               {t('share.recentSessions', 'S\u00e9ances r\u00e9centes')}
             </div>
             {sessionHistory.slice(0, 5).map((session, i) => (
-              <HistoryRow key={session.id || i} session={session} t={t} />
+              <HistoryRow key={session.id || i} session={session} t={t} lang={lang} />
             ))}
           </div>
         )}

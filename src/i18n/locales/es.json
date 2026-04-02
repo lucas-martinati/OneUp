@@ -22,6 +22,7 @@
     "close": "Cerrar",
     "global_classic": "Peso corporal",
     "cancel": "Cancelar",
+    "confirm": "Confirmar",
     "global": "Global",
     "poke": "te envió un toque!",
     "you": "tú",
@@ -639,5 +640,39 @@
     "planche": "Plancha (s)",
     "dips": "Fondos",
     "mountain": "Escaladores"
+  },
+  "share": {
+    "title": "Compartir",
+    "duration": "Duración",
+    "volume": "Volumen",
+    "exercises": "Ejercicios",
+    "exercisesCompleted": "Ejercicios completados",
+    "streak": "Racha",
+    "streakDisplay": "Racha (streak)",
+    "showHistory": "Historial de sesiones",
+    "recentSessions": "Sesiones recientes",
+    "session": "Sesión",
+    "metrics": "Métricas mostradas",
+    "download": "Descargar",
+    "share": "Compartir",
+    "exporting": "Exportando...",
+    "shareCard": "Compartir mis estadísticas",
+    "globalStats": "Estadísticas globales",
+    "totalReps": "Reps totales",
+    "activeDays": "Días activos",
+    "bestStreak": "Mejor racha",
+    "sessionDetail": "Detalle de la sesión",
+    "reps": "Reps",
+    "showWeights": "Separar por categoría",
+    "bodyweight": "Peso corporal",
+    "weights": "Mancuernas",
+    "customEx": "Personalizado",
+    "sessionNamePlaceholder": "Nombre de la sesión (opcional)",
+    "categoryFilter": "Categoría",
+    "cat": {
+      "bodyweight": "Peso corporal",
+      "weights": "Mancuernas",
+      "custom": "Personal"
+    }
   }
 }
