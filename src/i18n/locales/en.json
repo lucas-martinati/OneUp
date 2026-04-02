@@ -646,6 +646,12 @@
     "customEx": "Custom",
     "sessionNamePlaceholder": "Session name (optional)",
     "categoryFilter": "Category",
+    "theme": "Theme",
+    "theme.dark": "Dark",
+    "theme.ocean": "Ocean",
+    "theme.sunset": "Sunset",
+    "theme.forest": "Forest",
+    "theme.purple": "Purple",
     "cat": {
       "bodyweight": "Bodyweight",
       "weights": "Weights",

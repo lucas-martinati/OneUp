@@ -141,6 +141,16 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const allExercises = sessionData?.exercises || [];
   const sessionType = sessionData?.type || 'bodyweight';
 
+  const theme = options.theme || 'dark';
+  const THEMES = {
+    dark: { bg: 'linear-gradient(165deg, #0f0f1a 0%, #0a0a14 40%, #0d0d18 100%)', accent: '#818cf8', glow1: 'rgba(129,140,248,0.15)', glow2: 'rgba(139,92,246,0.1)', streakGlow: 'rgba(249,115,22,0.18)' },
+    ocean: { bg: 'linear-gradient(165deg, #0a1628 0%, #061018 40%, #081420 100%)', accent: '#06b6d4', glow1: 'rgba(6,182,212,0.15)', glow2: 'rgba(14,116,144,0.1)', streakGlow: 'rgba(34,211,238,0.18)' },
+    sunset: { bg: 'linear-gradient(165deg, #1a0a0a 0%, #0f0505 40%, #150808 100%)', accent: '#f97316', glow1: 'rgba(249,115,22,0.15)', glow2: 'rgba(220,38,38,0.1)', streakGlow: 'rgba(249,115,22,0.2)' },
+    forest: { bg: 'linear-gradient(165deg, #0a1a0f 0%, #050d07 40%, #081209 100%)', accent: '#22c55e', glow1: 'rgba(34,197,94,0.15)', glow2: 'rgba(20,83,45,0.1)', streakGlow: 'rgba(74,222,128,0.18)' },
+    purple: { bg: 'linear-gradient(165deg, #120a1a 0%, #0a0610 40%, #0f0814 100%)', accent: '#a855f7', glow1: 'rgba(168,85,247,0.15)', glow2: 'rgba(126,34,206,0.1)', streakGlow: 'rgba(192,132,252,0.18)' },
+  };
+  const currentTheme = THEMES[theme] || THEMES.dark;
+
   // Categorize exercises
   const isWeightEx = (ex) => WEIGHT_IDS.includes(ex.id);
   const isCustomEx = (ex) => ex.id?.startsWith('custom_') || (!WEIGHT_IDS.includes(ex.id) && sessionType === 'custom');
@@ -207,7 +217,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
       {/* Background gradient */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(165deg, #0f0f1a 0%, #0a0a14 40%, #0d0d18 100%)',
+        background: currentTheme.bg,
       }} />
 
       {/* Accent glow */}
@@ -215,14 +225,14 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
         position: 'absolute', top: '-40px', right: '-40px',
         width: '160px', height: '160px', borderRadius: '50%',
         background: options.showStreak && streak > 0
-          ? 'radial-gradient(circle, rgba(249,115,22,0.18) 0%, transparent 70%)'
-          : 'radial-gradient(circle, rgba(129,140,248,0.15) 0%, transparent 70%)',
+          ? 'rgba(249,115,22,0.18)'
+          : currentTheme.glow1,
         filter: 'blur(20px)',
       }} />
       <div style={{
         position: 'absolute', bottom: '-30px', left: '-30px',
         width: '120px', height: '120px', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)',
+        background: currentTheme.glow2,
         filter: 'blur(15px)',
       }} />
 
@@ -246,7 +256,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
             </div>
             <div style={{
               fontSize: '1.3rem', fontWeight: 800, marginTop: '4px',
-              background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
+              background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent})`,
               WebkitBackgroundClip: 'text', backgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}>
@@ -277,11 +287,11 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
           ) : (
             <div style={{
               width: '36px', height: '36px', borderRadius: '12px',
-              background: 'linear-gradient(135deg, rgba(129,140,248,0.2), rgba(139,92,246,0.15))',
-              border: '1px solid rgba(129,140,248,0.2)',
+              background: `linear-gradient(135deg, ${currentTheme.accent}33, ${currentTheme.accent}26)`,
+              border: `1px solid ${currentTheme.accent}33`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <Flame size={18} color="#818cf8" />
+              <Flame size={18} color={currentTheme.accent} />
             </div>
           )}
         </div>

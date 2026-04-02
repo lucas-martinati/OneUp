@@ -657,6 +657,12 @@
     "customEx": "Personnalisé",
     "sessionNamePlaceholder": "Nom de la séance (optionnel)",
     "categoryFilter": "Catégorie",
+    "theme": "Thème",
+    "theme.dark": "Sombre",
+    "theme.ocean": "Ocean",
+    "theme.sunset": "Couché",
+    "theme.forest": "Forêt",
+    "theme.purple": "Violet",
     "cat": {
       "bodyweight": "Poids du corps",
       "weights": "Musculation",

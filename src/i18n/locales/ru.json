@@ -680,6 +680,12 @@
     "customEx": "Пользовательские",
     "sessionNamePlaceholder": "Название тренировки (необязательно)",
     "categoryFilter": "Категория",
+    "theme": "Тема",
+    "theme.dark": "Тёмная",
+    "theme.ocean": "Океан",
+    "theme.sunset": "Закат",
+    "theme.forest": "Лес",
+    "theme.purple": "Фиолетовый",
     "cat": {
       "bodyweight": "С весом тела",
       "weights": "С отягощением",

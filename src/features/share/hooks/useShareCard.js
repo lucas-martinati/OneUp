@@ -10,6 +10,7 @@ const DEFAULT_OPTIONS = {
   showWeights: true,
   statsCategories: ['bodyweight', 'weights', 'custom'],
   format: 'png',
+  theme: 'dark',
 };
 
 const OPTIONS_STORAGE_KEY = 'oneup_share_options';

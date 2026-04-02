@@ -654,6 +654,12 @@
     "customEx": "自定义",
     "sessionNamePlaceholder": "训练名称（可选）",
     "categoryFilter": "类别",
+    "theme": "主题",
+    "theme.dark": "深色",
+    "theme.ocean": "海洋",
+    "theme.sunset": "日落",
+    "theme.forest": "森林",
+    "theme.purple": "紫色",
     "cat": {
       "bodyweight": "自重训练",
       "weights": "器械训练",
