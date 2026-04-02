@@ -1,12 +1,44 @@
-import React from 'react';
-import { Trophy, Check, Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal } from 'lucide-react';
+import React, { useState, useMemo, Suspense, lazy } from 'react';
+import { Trophy, Check, Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal, Share2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import ICON_MAP from '../../utils/iconMap';
 import { Z_INDEX } from '../../utils/zIndex';
+import { useShareCard } from '../../features/share/hooks/useShareCard';
+import { getSessionHistory } from '../../features/share/services/sessionHistoryService';
 
-export function SessionSummary({ queue, exerciseInfo, onClose }) {
+const ShareModal = lazy(() => import('../../features/share/components/ShareModal').then(m => ({ default: m.ShareModal })));
+
+export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, sessionHistory }) {
     const { t } = useTranslation();
+    const [showShare, setShowShare] = useState(false);
+
+    const exercises = useMemo(() => {
+        return queue.map(id => {
+            const ex = exerciseInfo.find(e => e.id === id);
+            return ex ? { id: ex.id, label: ex.label || t('exercises.' + ex.id), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type } : null;
+        }).filter(Boolean);
+    }, [queue, exerciseInfo, t]);
+
+    const history = useMemo(() => {
+        return sessionHistory || getSessionHistory();
+    }, [sessionHistory]);
+
+    const shareSessionData = useMemo(() => {
+        return sessionData || {
+            date: new Date().toISOString(),
+            exercises,
+            duration: 0,
+            name: t('workout.sessionDone'),
+            type: 'bodyweight',
+        };
+    }, [sessionData, exercises, t]);
+
+    const shareHook = useShareCard({
+        sessionData: shareSessionData,
+        stats: stats || {},
+        sessionHistory: history,
+    });
 
     return (
         <div className="fade-in" style={{
@@ -72,18 +104,48 @@ export function SessionSummary({ queue, exerciseInfo, onClose }) {
                 })}
             </div>
 
-            <button
-                onClick={onClose}
-                className="hover-lift"
-                style={{
-                    marginTop: '8px', padding: '14px 40px', borderRadius: 'var(--radius-lg)',
-                    background: 'linear-gradient(135deg, #818cf8, #6366f1)',
-                    border: 'none', color: 'white', fontSize: '1rem', fontWeight: '700',
-                    cursor: 'pointer'
-                }}
-            >
-                {t('common.close')}
-            </button>
+            {/* Action buttons */}
+            <div style={{
+                display: 'flex', gap: '10px', marginTop: '8px',
+                width: '100%', maxWidth: '300px',
+            }}>
+                <button
+                    onClick={onClose}
+                    className="hover-lift"
+                    style={{
+                        flex: 1, padding: '14px 20px', borderRadius: 'var(--radius-lg)',
+                        background: 'linear-gradient(135deg, #818cf8, #6366f1)',
+                        border: 'none', color: 'white', fontSize: '1rem', fontWeight: '700',
+                        cursor: 'pointer'
+                    }}
+                >
+                    {t('common.close')}
+                </button>
+                <button
+                    onClick={() => setShowShare(true)}
+                    className="hover-lift"
+                    style={{
+                        padding: '14px 16px', borderRadius: 'var(--radius-lg)',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        color: 'white', fontSize: '1rem', fontWeight: '700',
+                        cursor: 'pointer', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                    }}
+                >
+                    <Share2 size={20} />
+                </button>
+            </div>
+
+            {/* Share Modal */}
+            <Suspense fallback={null}>
+                {showShare && (
+                    <ShareModal
+                        shareHook={shareHook}
+                        onClose={() => setShowShare(false)}
+                    />
+                )}
+            </Suspense>
         </div>
     );
 }

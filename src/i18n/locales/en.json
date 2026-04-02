@@ -617,6 +617,28 @@
     "body4": "🚀 {{day}} reps to keep the flame! 🏆",
     "title": "💪 OneUp — Daily Challenge!"
   },
+  "share": {
+    "title": "Share",
+    "duration": "Duration",
+    "volume": "Volume",
+    "exercises": "Exercises",
+    "exercisesCompleted": "Exercises completed",
+    "streak": "Streak",
+    "streakDisplay": "Streak",
+    "showHistory": "Session history",
+    "recentSessions": "Recent sessions",
+    "session": "Session",
+    "metrics": "Displayed metrics",
+    "download": "Download",
+    "share": "Share",
+    "exporting": "Exporting...",
+    "shareCard": "Share my stats",
+    "globalStats": "Global stats",
+    "totalReps": "Total reps",
+    "activeDays": "Active days",
+    "bestStreak": "Best streak",
+    "sessionDetail": "Session details"
+  },
   "exercises": {
     "pushups": "Push-ups",
     "squats": "Squats",

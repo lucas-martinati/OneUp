@@ -628,6 +628,28 @@
     "body4": "🚀 {{day}} reps pour garder la flamme ! 🏆",
     "title": "💪 OneUp — Défi du jour !"
   },
+  "share": {
+    "title": "Partager",
+    "duration": "Durée",
+    "volume": "Volume",
+    "exercises": "Exercices",
+    "exercisesCompleted": "Exercices complétés",
+    "streak": "Série",
+    "streakDisplay": "Série (streak)",
+    "showHistory": "Historique des séances",
+    "recentSessions": "Séances récentes",
+    "session": "Séance",
+    "metrics": "Métriques affichées",
+    "download": "Télécharger",
+    "share": "Partager",
+    "exporting": "Export...",
+    "shareCard": "Partager mes statistiques",
+    "globalStats": "Statistiques globales",
+    "totalReps": "Reps totales",
+    "activeDays": "Jours actifs",
+    "bestStreak": "Meilleure série",
+    "sessionDetail": "Détail de la séance"
+  },
   "exercises": {
     "pushups": "Pompes",
     "squats": "Squats",

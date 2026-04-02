@@ -14,6 +14,7 @@ import { SessionSummary } from './SessionSummary';
 import { registerBackHandler } from '../../utils/backHandler';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import ICON_MAP from '../../utils/iconMap';
+import { addSession, getSessionHistory } from '../../features/share/services/sessionHistoryService';
 
 // ── Exercise grid item ──────────────────────────────────────────────────
 function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
@@ -97,6 +98,10 @@ export function WorkoutSession({
     const itemRefs = useRef({});
 
     // Back handler
+    const sessionStartTime = useRef(null);
+    const [sessionDuration, setSessionDuration] = useState(0);
+    const [savedSession, setSavedSession] = useState(null);
+
     useEffect(() => {
         const unreg = registerBackHandler(() => {
             if (showSaveRoutine) {
@@ -174,6 +179,7 @@ export function WorkoutSession({
     const startSession = () => {
         if (queue.length < 1) return;
         setCurrentIdx(0);
+        sessionStartTime.current = Date.now();
         setPhase('running');
     };
 
@@ -294,6 +300,25 @@ export function WorkoutSession({
                 return;
             }
         }
+        // Session complete — compute duration and save to history
+        const duration = sessionStartTime.current
+            ? Math.round((Date.now() - sessionStartTime.current) / 1000)
+            : 0;
+        setSessionDuration(duration);
+
+        const completedExercises = queue.map(id => {
+            const ex = exerciseInfo.find(e => e.id === id);
+            return ex ? { id: ex.id, label: ex.label || ex.id, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type } : null;
+        }).filter(Boolean);
+
+        const session = addSession({
+            date: new Date().toISOString(),
+            duration,
+            name: t('workout.sessionDone'),
+            type: activeSlide === 1 ? 'weights' : activeSlide === 2 ? 'custom' : 'bodyweight',
+            exercises: completedExercises,
+        });
+        setSavedSession(session);
         setPhase('done');
     };
 
@@ -749,7 +774,27 @@ export function WorkoutSession({
 
     // ── DONE PHASE ───────────────────────────────────────────────
     if (phase === 'done') {
-        return <SessionSummary queue={queue} exerciseInfo={exerciseInfo} onClose={onClose} />;
+        const completedExercises = queue.map(id => {
+            const ex = exerciseInfo.find(e => e.id === id);
+            return ex ? { id: ex.id, label: ex.label || t('exercises.' + ex.id), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type } : null;
+        }).filter(Boolean);
+
+        return (
+            <SessionSummary
+                queue={queue}
+                exerciseInfo={exerciseInfo}
+                onClose={onClose}
+                sessionData={savedSession || {
+                    date: new Date().toISOString(),
+                    exercises: completedExercises,
+                    duration: sessionDuration,
+                    name: t('workout.sessionDone'),
+                    type: activeSlide === 1 ? 'weights' : activeSlide === 2 ? 'custom' : 'bodyweight',
+                }}
+                stats={{}}
+                sessionHistory={getSessionHistory()}
+            />
+        );
     }
 
     return null;

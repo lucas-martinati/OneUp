@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
-import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef, Suspense, lazy, useMemo } from 'react';
+import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock, Share2, Clock, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../../hooks/useComputedStats';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
@@ -7,15 +7,21 @@ import { BADGE_DEFINITIONS } from '../../config/badgeDefinitions';
 import ICON_MAP from '../../utils/iconMap';
 import { Z_INDEX } from '../../utils/zIndex';
 import { registerBackHandler } from '../../utils/backHandler';
+import { useShareCard } from '../../features/share/hooks/useShareCard';
+import { getSessionHistory } from '../../features/share/services/sessionHistoryService';
 
 // Lazy load Recharts components
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
 const ConsistencyPieChart = lazy(() => import('./ConsistencyPieChart'));
 const DailyRepsChart = lazy(() => import('./DailyRepsChart'));
+const ShareModal = lazy(() => import('../../features/share/components/ShareModal').then(m => ({ default: m.ShareModal })));
+const SessionDetailModal = lazy(() => import('../../features/share/components/SessionDetailModal').then(m => ({ default: m.SessionDetailModal })));
 
 export function Stats({ completions, exercisesList, initialCategory, isPro, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats: globalStats, onOpenStore }) {
     const { t, i18n } = useTranslation();
     const [chartsReady, setChartsReady] = useState(false);
+    const [showShare, setShowShare] = useState(false);
+    const [selectedSession, setSelectedSession] = useState(null);
     const [activeCategories, setActiveCategories] = useState(() => {
         if (initialCategory === 'global') return ['standard', 'weights', 'custom'];
         return [initialCategory || 'standard'];
@@ -92,6 +98,15 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
     const maxMonthly = Math.max(...monthlyActivityTotal, 1);
     const monthNames = t('stats.monthAbbreviations', { returnObjects: true });
     const today = new Date();
+
+    const sessionHistory = useMemo(() => getSessionHistory(), []);
+
+    const shareHook = useShareCard({
+        sessionData: { date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') },
+        stats: computedStats,
+        sessionHistory,
+        mode: 'global',
+    });
 
     const ChampionIcon = champion && ICON_MAP[champion.icon] ? ICON_MAP[champion.icon] : Dumbbell;
 
@@ -619,6 +634,96 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                 </div>
             )}
 
+            {/* ── Share & Session History ──────────────────────────────── */}
+            <div style={{
+                display: 'flex', flexDirection: 'column', gap: '10px',
+                marginBottom: 'var(--spacing-md)',
+            }}>
+                {/* Share button */}
+                <button
+                    onClick={() => setShowShare(true)}
+                    className="hover-lift"
+                    style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                        padding: '14px', borderRadius: 'var(--radius-lg)',
+                        background: 'linear-gradient(135deg, rgba(129,140,248,0.15), rgba(139,92,246,0.1))',
+                        border: '1px solid rgba(129,140,248,0.2)',
+                        color: '#818cf8', fontSize: '0.9rem', fontWeight: 700,
+                        cursor: 'pointer', width: '100%',
+                    }}
+                >
+                    <Share2 size={18} />
+                    {t('share.shareCard', 'Partager mes statistiques')}
+                </button>
+
+                {/* Session history */}
+                {sessionHistory.length > 0 && (
+                    <div className="glass-premium" style={{
+                        padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                        background: 'var(--surface-section)',
+                    }}>
+                        <h3 style={{
+                            ...sectionTitleStyle,
+                            display: 'flex', alignItems: 'center', gap: '6px',
+                        }}>
+                            <Clock size={14} />
+                            {t('share.recentSessions', 'S\u00e9ances r\u00e9centes')}
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            {sessionHistory.slice(0, 10).map((session, i) => {
+                                const exCount = session.exercises?.length || 0;
+                                const dateObj = new Date(session.date);
+                                const dateLabel = dateObj.toLocaleDateString(i18n.language, {
+                                    day: 'numeric', month: 'short',
+                                });
+                                return (
+                                    <button
+                                        key={session.id || i}
+                                        onClick={() => setSelectedSession(session)}
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '10px',
+                                            padding: '10px 12px', borderRadius: '12px',
+                                            background: 'rgba(255,255,255,0.03)',
+                                            border: '1px solid rgba(255,255,255,0.05)',
+                                            cursor: 'pointer', width: '100%', textAlign: 'left',
+                                            transition: 'all 0.15s ease',
+                                        }}
+                                        onMouseEnter={e => {
+                                            e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                                            e.currentTarget.style.borderColor = 'rgba(129,140,248,0.2)';
+                                        }}
+                                        onMouseLeave={e => {
+                                            e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                                        }}
+                                    >
+                                        <span style={{
+                                            fontSize: '0.7rem', color: 'var(--text-secondary)',
+                                            width: '40px', flexShrink: 0, fontWeight: 500,
+                                        }}>
+                                            {dateLabel}
+                                        </span>
+                                        <span style={{
+                                            flex: 1, fontSize: '0.8rem', fontWeight: 600,
+                                            color: 'var(--text-primary)',
+                                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                        }}>
+                                            {session.name || t('share.session', 'S\u00e9ance')}
+                                        </span>
+                                        <span style={{
+                                            fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: 500,
+                                        }}>
+                                            {exCount} ex
+                                        </span>
+                                        <ChevronRight size={14} color="var(--text-secondary)" style={{ opacity: 0.4, flexShrink: 0 }} />
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+            </div>
+
             {/* ── Motivational footer ─────────────────────────────────── */}
             <div className="glass slide-up" style={{
                 marginTop: '4px', padding: 'var(--spacing-sm) var(--spacing-md)',
@@ -632,6 +737,26 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                     {t('stats.quoteSub')}
                 </p>
             </div>
+
+            {/* ── Share Modal (lazy) ───────────────────────────────────── */}
+            <Suspense fallback={null}>
+                {showShare && (
+                    <ShareModal
+                        shareHook={shareHook}
+                        onClose={() => setShowShare(false)}
+                    />
+                )}
+            </Suspense>
+
+            {/* ── Session Detail Modal (lazy) ──────────────────────────── */}
+            <Suspense fallback={null}>
+                {selectedSession && (
+                    <SessionDetailModal
+                        session={selectedSession}
+                        onClose={() => setSelectedSession(null)}
+                    />
+                )}
+            </Suspense>
             </div>
         </div>
     );
