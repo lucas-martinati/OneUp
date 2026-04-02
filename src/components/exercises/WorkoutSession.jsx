@@ -101,6 +101,7 @@ export function WorkoutSession({
     const sessionStartTime = useRef(null);
     const [sessionDuration, setSessionDuration] = useState(0);
     const [savedSession, setSavedSession] = useState(null);
+    const [sessionName, setSessionName] = useState('');
 
     useEffect(() => {
         const unreg = registerBackHandler(() => {
@@ -185,6 +186,7 @@ export function WorkoutSession({
 
     // Load a routine into the queue
     const loadRoutine = (routine) => {
+        const WEIGHT_IDS = ['biceps_curl','hammer_curl','bench_press','overhead_press','squat_weights','deadlift','barbell_row'];
         // Filter out exercises that don't exist anymore, aren't allowed, or are already completed
         const validIds = routine.exerciseIds.filter(id => {
             const ex = allowedExercises.find(e => e.id === id);
@@ -195,7 +197,28 @@ export function WorkoutSession({
             return !done;
         });
         setQueue(validIds);
+        setSessionName(routine.name);
         setShowRoutineList(false);
+
+        // If routine mixes exercise types, enable showAll so all are available
+        const hasWeights = routine.exerciseIds.some(id => WEIGHT_IDS.includes(id));
+        const hasBodyweight = routine.exerciseIds.some(id => !WEIGHT_IDS.includes(id) && !id.startsWith('custom_'));
+        const hasCustom = routine.exerciseIds.some(id => id.startsWith('custom_'));
+        const isMixed = (hasWeights && hasBodyweight) || hasCustom;
+        if (isMixed && canMixDashboards) {
+            setShowAll(true);
+        }
+
+        // Auto-activate showWeights in share options if routine mixes categories
+        if (isMixed) {
+            try {
+                const raw = localStorage.getItem('oneup_share_options');
+                const opts = raw ? JSON.parse(raw) : {};
+                if (!opts.showWeights) {
+                    localStorage.setItem('oneup_share_options', JSON.stringify({ ...opts, showWeights: true }));
+                }
+            } catch { /* ignore */ }
+        }
     };
 
     // Save current queue as routine (new or update)
@@ -308,13 +331,27 @@ export function WorkoutSession({
 
         const completedExercises = queue.map(id => {
             const ex = exerciseInfo.find(e => e.id === id);
-            return ex ? { id: ex.id, label: ex.label || ex.id, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type } : null;
+            if (!ex) return null;
+            const label = ex.label || t('exercises.' + ex.id);
+            return { id: ex.id, label, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type };
         }).filter(Boolean);
+
+        // Detect routine: if queue matches a saved routine (same exercises, same order)
+        let detectedName = sessionName;
+        if (!detectedName && routines?.length > 0) {
+            for (const routine of routines) {
+                if (routine.exerciseIds.length === queue.length &&
+                    routine.exerciseIds.every((id, i) => id === queue[i])) {
+                    detectedName = routine.name;
+                    break;
+                }
+            }
+        }
 
         const session = addSession({
             date: new Date().toISOString(),
             duration,
-            name: '',
+            name: detectedName,
             type: activeSlide === 1 ? 'weights' : activeSlide === 2 ? 'custom' : 'bodyweight',
             exercises: completedExercises,
         });
@@ -788,12 +825,13 @@ export function WorkoutSession({
                     date: new Date().toISOString(),
                     exercises: completedExercises,
                     duration: sessionDuration,
-                    name: '',
+                    name: sessionName,
                     type: activeSlide === 1 ? 'weights' : activeSlide === 2 ? 'custom' : 'bodyweight',
                 }}
                 stats={computedStats}
                 sessionHistory={getSessionHistory()}
                 isPro={isPro}
+                defaultSessionName={sessionName}
             />
         );
     }

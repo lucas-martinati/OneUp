@@ -640,9 +640,17 @@
     "bestStreak": "Best streak",
     "sessionDetail": "Session details",
     "reps": "Reps",
-    "showWeights": "Separate weights",
+    "showWeights": "Separate by category",
     "bodyweight": "Bodyweight",
-    "weights": "Weights"
+    "weights": "Weights",
+    "customEx": "Custom",
+    "sessionNamePlaceholder": "Session name (optional)",
+    "categoryFilter": "Category",
+    "cat": {
+      "bodyweight": "Bodyweight",
+      "weights": "Weights",
+      "custom": "Custom"
+    }
   },
   "exercises": {
     "pushups": "Push-ups",

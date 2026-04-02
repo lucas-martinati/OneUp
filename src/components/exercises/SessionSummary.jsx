@@ -1,11 +1,11 @@
 import React, { useState, useMemo, Suspense, lazy } from 'react';
-import { Trophy, Check, Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal, Share2, Clock } from 'lucide-react';
+import { Trophy, Check, Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal, Share2, Clock, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import ICON_MAP from '../../utils/iconMap';
 import { Z_INDEX } from '../../utils/zIndex';
 import { useShareCard } from '../../features/share/hooks/useShareCard';
-import { getSessionHistory } from '../../features/share/services/sessionHistoryService';
+import { getSessionHistory, updateSessionName } from '../../features/share/services/sessionHistoryService';
 
 const ShareModal = lazy(() => import('../../features/share/components/ShareModal').then(m => ({ default: m.ShareModal })));
 
@@ -16,14 +16,18 @@ function formatDuration(seconds) {
     return `${m}:${s}`;
 }
 
-export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, sessionHistory, isPro = false }) {
+export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, sessionHistory, isPro = false, defaultSessionName = '' }) {
     const { t } = useTranslation();
     const [showShare, setShowShare] = useState(false);
+    const [editingName, setEditingName] = useState(false);
+    const [sessionName, setSessionName] = useState(defaultSessionName);
 
     const exercises = useMemo(() => {
         return queue.map(id => {
             const ex = exerciseInfo.find(e => e.id === id);
-            return ex ? { id: ex.id, label: ex.label || t('exercises.' + ex.id), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type } : null;
+            if (!ex) return null;
+            const label = ex.label || t('exercises.' + ex.id);
+            return { id: ex.id, label, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type };
         }).filter(Boolean);
     }, [queue, exerciseInfo, t]);
 
@@ -32,14 +36,15 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
     }, [sessionHistory]);
 
     const shareSessionData = useMemo(() => {
-        return sessionData || {
+        const base = sessionData || {
             date: new Date().toISOString(),
             exercises,
             duration: 0,
-            name: '',
+            name: sessionName,
             type: 'bodyweight',
         };
-    }, [sessionData, exercises]);
+        return { ...base, name: sessionName };
+    }, [sessionData, exercises, sessionName]);
 
     const sessionDuration = shareSessionData?.duration || 0;
 
@@ -48,6 +53,13 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
         stats: stats || {},
         sessionHistory: history,
     });
+
+    const handleNameSave = () => {
+        setEditingName(false);
+        if (sessionData?.id) {
+            updateSessionName(sessionData.id, sessionName);
+        }
+    };
 
     return (
         <div className="fade-in" style={{
@@ -59,7 +71,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
             paddingBottom: 'env(safe-area-inset-bottom)'
         }}>
             <CSSConfetti
-                active={true}
+                active={!showShare}
                 colors={['#818cf8', '#fbbf24', '#10b981', '#ec4899', '#22d3ee']}
                 onDone={() => {}}
             />
@@ -102,6 +114,61 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                     </span>
                 </div>
             )}
+
+            {/* Editable session name */}
+            <div style={{
+                width: '100%', maxWidth: '300px',
+            }}>
+                {editingName ? (
+                    <div style={{
+                        display: 'flex', gap: '6px', alignItems: 'center',
+                    }}>
+                        <input
+                            autoFocus
+                            value={sessionName}
+                            onChange={e => setSessionName(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') handleNameSave(); }}
+                            placeholder={t('share.sessionNamePlaceholder', 'Nom de la séance (optionnel)')}
+                            style={{
+                                flex: 1, padding: '8px 12px', borderRadius: '10px',
+                                background: 'rgba(255,255,255,0.06)',
+                                border: '1px solid rgba(129,140,248,0.3)',
+                                color: 'white', fontSize: '0.85rem', fontWeight: 600,
+                                outline: 'none',
+                            }}
+                        />
+                        <button
+                            onClick={handleNameSave}
+                            style={{
+                                padding: '8px 14px', borderRadius: '10px',
+                                background: 'rgba(129,140,248,0.2)',
+                                border: 'none', color: '#818cf8',
+                                fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer',
+                            }}
+                        >
+                            OK
+                        </button>
+                    </div>
+                ) : (
+                    <button
+                        onClick={() => setEditingName(true)}
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            width: '100%', padding: '8px 12px', borderRadius: '10px',
+                            background: sessionName ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)',
+                            border: '1px dashed rgba(255,255,255,0.1)',
+                            cursor: 'pointer', color: sessionName ? 'var(--text-primary)' : 'var(--text-secondary)',
+                            fontSize: '0.85rem', fontWeight: 600,
+                            textAlign: 'left',
+                        }}
+                    >
+                        <Pencil size={14} style={{ opacity: 0.5, flexShrink: 0 }} />
+                        <span style={{ flex: 1 }}>
+                            {sessionName || t('share.sessionNamePlaceholder', 'Nom de la séance (optionnel)')}
+                        </span>
+                    </button>
+                )}
+            </div>
 
             {/* Recap */}
             <div style={{

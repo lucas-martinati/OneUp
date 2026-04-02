@@ -651,9 +651,17 @@
     "bestStreak": "Meilleure série",
     "sessionDetail": "Détail de la séance",
     "reps": "Reps",
-    "showWeights": "Séparer musculation",
+    "showWeights": "Séparer par catégorie",
     "bodyweight": "Poids du corps",
-    "weights": "Musculation"
+    "weights": "Musculation",
+    "customEx": "Personnalisé",
+    "sessionNamePlaceholder": "Nom de la séance (optionnel)",
+    "categoryFilter": "Catégorie",
+    "cat": {
+      "bodyweight": "Poids du corps",
+      "weights": "Musculation",
+      "custom": "Perso"
+    }
   },
   "exercises": {
     "pushups": "Pompes",

@@ -1,10 +1,10 @@
 import React, { useState, Suspense, lazy, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Clock, Zap, Dumbbell, Check, Share2, Trash2 } from 'lucide-react';
+import { X, Clock, Zap, Dumbbell, Check, Share2, Trash2, Pencil } from 'lucide-react';
 import ICON_MAP from '../../../utils/iconMap';
 import { Z_INDEX } from '../../../utils/zIndex';
 import { useShareCard } from '../hooks/useShareCard';
-import { getSessionHistory } from '../services/sessionHistoryService';
+import { getSessionHistory, updateSessionName } from '../services/sessionHistoryService';
 
 const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
 
@@ -28,22 +28,38 @@ function formatDateTime(dateStr) {
   }
 }
 
-export function SessionDetailModal({ session, onClose, onDelete, stats = {} }) {
+function resolveExerciseName(ex, t) {
+  if (ex.label && /[A-Z\u00C0-\u017F]/.test(ex.label)) return ex.label;
+  if (ex.id?.startsWith('custom_')) return ex.label || ex.id;
+  return t('exercises.' + ex.id, { defaultValue: ex.label || ex.id });
+}
+
+export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isPro = false, onNameChange }) {
   const { t } = useTranslation();
   const [showShare, setShowShare] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [name, setName] = useState(session?.name || '');
+  const hasName = name && name.trim().length > 0;
 
   if (!session) return null;
 
   const exercises = session.exercises || [];
   const totalReps = exercises.reduce((sum, ex) => sum + (ex.reps || 0), 0);
-  const hasName = session.name && session.name.trim().length > 0;
+
+  const sessionWithName = useMemo(() => ({ ...session, name }), [session, name]);
 
   const shareHook = useShareCard({
-    sessionData: session,
+    sessionData: sessionWithName,
     stats: stats,
     sessionHistory: getSessionHistory(),
   });
+
+  const handleNameSave = () => {
+    setEditingName(false);
+    updateSessionName(session.id, name);
+    onNameChange?.(session.id, name);
+  };
 
   const handleDelete = () => {
     onDelete?.(session.id);
@@ -101,19 +117,65 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {} }) {
           }}>
             {formatDateTime(session.date)}
           </div>
-          {hasName ? (
-            <div style={{
-              fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)',
-            }}>
-              {session.name}
+          {editingName ? (
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '6px' }}>
+              <input
+                autoFocus
+                value={name}
+                onChange={e => setName(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleNameSave(); }}
+                placeholder={t('share.sessionNamePlaceholder', 'Nom de la s\u00e9ance (optionnel)')}
+                style={{
+                  flex: 1, padding: '8px 12px', borderRadius: '10px',
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(129,140,248,0.3)',
+                  color: 'white', fontSize: '0.85rem', fontWeight: 600,
+                  outline: 'none',
+                }}
+              />
+              <button onClick={handleNameSave} style={{
+                padding: '8px 14px', borderRadius: '10px',
+                background: 'rgba(129,140,248,0.2)',
+                border: 'none', color: '#818cf8',
+                fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer',
+              }}>
+                OK
+              </button>
             </div>
+          ) : hasName ? (
+            <button
+              onClick={() => setEditingName(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: 0, width: '100%', textAlign: 'left',
+              }}
+            >
+              <span style={{
+                fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)',
+                flex: 1,
+              }}>
+                {name}
+              </span>
+              <Pencil size={14} style={{ opacity: 0.4, flexShrink: 0 }} />
+            </button>
           ) : exercises.length > 0 && (
-            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-              {exercises.map((ex, i) => {
-                const Icon = ICON_MAP[ex.icon] || Dumbbell;
-                return <Icon key={ex.id || i} size={16} color={ex.color || '#818cf8'} />;
-              })}
-            </div>
+            <button
+              onClick={() => setEditingName(true)}
+              style={{
+                display: 'flex', gap: '4px', alignItems: 'center',
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: 0, width: '100%',
+              }}
+            >
+              <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flex: 1 }}>
+                {exercises.map((ex, i) => {
+                  const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                  return <Icon key={ex.id || i} size={16} color={ex.color || '#818cf8'} />;
+                })}
+              </div>
+              <Pencil size={14} style={{ opacity: 0.3, flexShrink: 0 }} />
+            </button>
           )}
         </div>
 
@@ -200,7 +262,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {} }) {
                       fontSize: '0.85rem', fontWeight: 700,
                       color: ex.color || '#818cf8',
                     }}>
-                      {ex.label || ex.id}
+                      {resolveExerciseName(ex, t)}
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -280,6 +342,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {} }) {
           <ShareModal
             shareHook={shareHook}
             onClose={() => setShowShare(false)}
+            isPro={isPro}
           />
         )}
       </Suspense>

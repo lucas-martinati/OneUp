@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, Suspense, lazy, useMemo } from 'react';
-import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock, Share2, Clock, ChevronRight } from 'lucide-react';
+import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock, Share2, Clock, ChevronRight, Dumbbell } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../../hooks/useComputedStats';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
@@ -104,6 +104,10 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
     const handleDeleteSession = useCallback((sessionId) => {
         const updated = removeSession(sessionId);
         setSessionHistory(updated);
+    }, []);
+
+    const handleSessionNameChange = useCallback((sessionId, newName) => {
+        setSessionHistory(prev => prev.map(s => s.id === sessionId ? { ...s, name: newName } : s));
     }, []);
 
     const shareHook = useShareCard({
@@ -769,7 +773,9 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                         session={selectedSession}
                         onClose={() => setSelectedSession(null)}
                         onDelete={handleDeleteSession}
+                        onNameChange={handleSessionNameChange}
                         stats={computedStats}
+                        isPro={isPro}
                     />
                 )}
             </Suspense>

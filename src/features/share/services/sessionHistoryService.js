@@ -56,6 +56,16 @@ export function removeSession(sessionId) {
   return history;
 }
 
+export function updateSessionName(sessionId, name) {
+  const history = getSessionHistory();
+  const session = history.find(s => s.id === sessionId);
+  if (session) {
+    session.name = name;
+    saveSessionHistory(history);
+  }
+  return history;
+}
+
 export function clearHistory() {
   localStorage.removeItem(STORAGE_KEY);
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, Zap, Dumbbell, Flame, History, Image, Award, Target, Weight } from 'lucide-react';
+import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter } from 'lucide-react';
 
 function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
   return (
@@ -38,9 +38,21 @@ function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
   );
 }
 
-export function ShareOptions({ options, toggleOption, setOption, mode = 'session', isPro = false }) {
+const CATEGORIES = [
+  { key: 'bodyweight', color: '#34d399' },
+  { key: 'weights', color: '#f97316' },
+  { key: 'custom', color: '#8b5cf6' },
+];
+
+export function ShareOptions({ options, toggleOption, setOption, toggleCategory, mode = 'session', isPro = false, sessionData }) {
   const { t } = useTranslation();
   const isGlobal = mode === 'global';
+  const selectedCategories = options.statsCategories || ['bodyweight', 'weights', 'custom'];
+
+  const hasWeightExercises = !isGlobal && sessionData?.exercises?.some(ex => {
+    const weightIds = ['biceps_curl','hammer_curl','bench_press','overhead_press','squat_weights','deadlift','barbell_row'];
+    return weightIds.includes(ex.id);
+  });
 
   return (
     <div style={{
@@ -92,8 +104,8 @@ export function ShareOptions({ options, toggleOption, setOption, mode = 'session
         onToggle={() => toggleOption('showSessionHistory')}
       />
 
-      {/* Weights toggle (pro only, session mode only) */}
-      {!isGlobal && isPro && (
+      {/* Weights toggle (pro only, session mode, only if weight exercises exist) */}
+      {!isGlobal && isPro && hasWeightExercises && (
         <OptionRow
           icon={Weight}
           label={t('share.showWeights', 'S\u00e9parer musculation')}
@@ -103,37 +115,44 @@ export function ShareOptions({ options, toggleOption, setOption, mode = 'session
         />
       )}
 
-      <div style={{ height: '4px' }} />
-
-      {/* Format selector */}
-      <div style={{
-        display: 'flex', gap: '6px', padding: '0 4px',
-      }}>
-        <div style={{
-          fontSize: '0.65rem', fontWeight: 600,
-          color: 'var(--text-secondary)', lineHeight: '28px',
-        }}>
-          <Image size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-          Format:
-        </div>
-        {['png', 'jpeg'].map(fmt => (
-          <button
-            key={fmt}
-            onClick={() => setOption('format', fmt)}
-            style={{
-              padding: '4px 12px', borderRadius: '8px', border: 'none',
-              background: options.format === fmt
-                ? 'rgba(129,140,248,0.2)'
-                : 'rgba(255,255,255,0.06)',
-              color: options.format === fmt ? '#818cf8' : 'var(--text-secondary)',
-              fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer',
-              textTransform: 'uppercase',
-            }}
-          >
-            {fmt}
-          </button>
-        ))}
-      </div>
+      {/* Category filter for global stats (pro only, multi-select) */}
+      {isGlobal && isPro && (
+        <>
+          <div style={{ height: '4px' }} />
+          <div style={{
+            fontSize: '0.65rem', fontWeight: 700,
+            color: 'var(--text-secondary)',
+            textTransform: 'uppercase', letterSpacing: '1px',
+            padding: '0 4px',
+          }}>
+            <Filter size={11} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+            {t('share.categoryFilter', 'Cat\u00e9gorie')}
+          </div>
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            {CATEGORIES.map(cat => {
+              const isSelected = selectedCategories.includes(cat.key);
+              return (
+                <button
+                  key={cat.key}
+                  onClick={() => toggleCategory(cat.key)}
+                  style={{
+                    padding: '6px 12px', borderRadius: '8px',
+                    border: isSelected ? `1px solid ${cat.color}40` : '1px solid rgba(255,255,255,0.06)',
+                    background: isSelected
+                      ? `${cat.color}18`
+                      : 'rgba(255,255,255,0.03)',
+                    color: isSelected ? cat.color : 'var(--text-secondary)',
+                    fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {t(`share.cat.${cat.key}`, cat.key === 'bodyweight' ? 'Poids du corps' : cat.key === 'weights' ? 'Musculation' : 'Perso')}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }

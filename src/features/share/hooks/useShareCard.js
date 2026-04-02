@@ -8,6 +8,7 @@ const DEFAULT_OPTIONS = {
   showStreak: false,
   showSessionHistory: false,
   showWeights: true,
+  statsCategories: ['bodyweight', 'weights', 'custom'],
   format: 'png',
 };
 
@@ -53,6 +54,20 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
     });
   }, []);
 
+  const toggleCategory = useCallback((cat) => {
+    setOptions(prev => {
+      const cats = prev.statsCategories || DEFAULT_OPTIONS.statsCategories;
+      const next = cats.includes(cat)
+        ? cats.filter(c => c !== cat)
+        : [...cats, cat];
+      // Don't allow empty selection
+      if (next.length === 0) return prev;
+      const updated = { ...prev, statsCategories: next };
+      localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
   const captureCard = useCallback(async () => {
     if (!cardRef.current) throw new Error('Card ref not attached');
     setIsExporting(true);
@@ -92,6 +107,7 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
     options,
     setOption,
     toggleOption,
+    toggleCategory,
     exportCard,
     shareCard,
     isExporting,

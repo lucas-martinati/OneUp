@@ -9,7 +9,7 @@ import { canShareNatively } from '../services/shareService';
 export function ShareModal({ shareHook, onClose, isPro = false }) {
   const { t } = useTranslation();
   const {
-    cardRef, options, toggleOption, setOption,
+    cardRef, options, toggleOption, setOption, toggleCategory,
     exportCard, shareCard, isExporting,
     sessionData, stats, sessionHistory, mode,
   } = shareHook;
@@ -87,8 +87,10 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
           options={options}
           toggleOption={toggleOption}
           setOption={setOption}
+          toggleCategory={toggleCategory}
           mode={mode}
           isPro={isPro}
+          sessionData={sessionData}
         />
       </div>
 
