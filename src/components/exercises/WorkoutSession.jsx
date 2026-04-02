@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
     X, Play, Check, Trophy, Save, FolderOpen, Trash2, GripVertical, Pencil,
     Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
-    Flame, Square, MoveDown, MoveDiagonal
+    Flame, Square, MoveDown, MoveDiagonal, Shuffle
 } from 'lucide-react';
 import { EXERCISES, getDailyGoal } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
@@ -156,6 +156,18 @@ export function WorkoutSession({
         setQueue(prev =>
             prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
         );
+    };
+
+    // Shuffle queue (Fisher-Yates)
+    const shuffleQueue = () => {
+        setQueue(prev => {
+            const shuffled = [...prev];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        });
     };
 
     // Start session
@@ -444,10 +456,10 @@ export function WorkoutSession({
                         }}>
                             <div>
                                 <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                                    {t('workout.interDashboard', { defaultValue: 'Mixer les exercices' })}
+                                    {t('workout.interDashboard')}
                                 </div>
                                 <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                                    {t('workout.interDashboardDesc', { defaultValue: 'Mélanger les exercices de tous les tableaux de bord.' })}
+                                    {t('workout.interDashboardDesc')}
                                 </div>
                             </div>
                             <label className="toggle-switch">
@@ -475,6 +487,26 @@ export function WorkoutSession({
 
                     {/* ── Selected order (drag & drop) ── */}
                     {queue.length > 0 && (
+                        <>
+                            {queue.length >= 2 && (
+                                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                    <button
+                                        onClick={shuffleQueue}
+                                        className="hover-lift"
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '5px',
+                                            padding: '6px 12px', borderRadius: '20px',
+                                            background: 'rgba(139,92,246,0.12)',
+                                            border: '1px solid rgba(139,92,246,0.25)',
+                                            color: '#a78bfa', cursor: 'pointer',
+                                            fontSize: '0.7rem', fontWeight: '600'
+                                        }}
+                                    >
+                                        <Shuffle size={13} />
+                                        {t('workout.shuffle')}
+                                    </button>
+                                </div>
+                            )}
                         <div
                             ref={queueListRef}
                             style={{
@@ -540,6 +572,7 @@ export function WorkoutSession({
                             // (Because allExercises always contains all).
                             }
                         </div>
+                        </>
                     )}
 
                     {/* Exercise grid */}
@@ -549,10 +582,10 @@ export function WorkoutSession({
                                 const catExercises = exerciseInfo.filter(ex => ex.category === cat);
                                 if (catExercises.length === 0) return null;
                                 const catTitle = cat === 'bodyweight' 
-                                    ? t('common.global_classic', { defaultValue: 'Poids du corps' })
+                                    ? t('common.global_classic')
                                     : cat === 'weights' 
-                                        ? t('common.global_weights', { defaultValue: 'Musculation' })
-                                        : t('workout.custom', { defaultValue: 'Personnalisés' });
+                                        ? t('common.global_weights')
+                                        : t('workout.custom');
 
                                 return (
                                     <div key={cat} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

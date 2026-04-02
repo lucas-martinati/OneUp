@@ -428,7 +428,10 @@
     "sessionDone": "¡Sesión Completada!",
     "allCompleted": "Todos los ejercicios completados 💪",
     "close": "Cerrar",
-    "reps": "{{count}} repeticiones"
+    "reps": "{{count}} repeticiones",
+    "shuffle": "Barajar",
+    "interDashboard": "Mezclar ejercicios",
+    "interDashboardDesc": "Combinar ejercicios de todos los paneles."
   },
   "routines": {
     "title": "Mis Rutinas",

@@ -23,7 +23,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                         transition: 'all 0.2s', boxShadow: domain === 'classic' ? '0 4px 12px rgba(255,255,255,0.1)' : 'none'
                     }}
                 >
-                    <Trophy size={16} /> {t('common.global_classic', { defaultValue: 'Classique'})}
+                    <Trophy size={16} /> {t('common.global_classic')}
                 </button>
                 <button
                     onClick={() => { setDomain('weights'); setActiveTab('global_weights'); }}
@@ -38,7 +38,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                         transition: 'all 0.2s', boxShadow: domain === 'weights' ? '0 4px 12px rgba(139,92,246,0.2)' : 'none'
                     }}
                 >
-                    <Dumbbell size={16} /> {t('common.global_weights', { defaultValue: 'Musculation'})}
+                    <Dumbbell size={16} /> {t('common.global_weights')}
                 </button>
             </div>
 
