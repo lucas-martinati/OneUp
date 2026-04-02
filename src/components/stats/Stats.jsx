@@ -93,7 +93,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
         const ex = exercises?.find(e => e.id === d.exId);
         return {
             ...d,
-            subject: getExerciseLabel(ex)
+            subject: getExerciseLabel(ex, t)
         };
     });
     const maxMonthly = Math.max(...monthlyActivityTotal, 1);
@@ -348,7 +348,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                             }}>
                                 {ChampionIcon && <ChampionIcon size={16} color={champion.color} />}
                                 <span style={{ fontSize: '0.85rem', fontWeight: '700', color: champion.color }}>
-                                    {getExerciseLabel(exercises?.find(e => e.id === champion.id) || { id: champion.id })}
+                                    {getExerciseLabel(exercises?.find(e => e.id === champion.id) || { id: champion.id }, t)}
                                 </span>
                             </div>
                             <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)' }}>
@@ -390,7 +390,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                                                 background: ex.color
                                             }} />
                                             <span style={{ fontWeight: '600', color: ex.color }}>{reps}</span>
-                                            <span>{getExerciseLabel(ex)}</span>
+                                            <span>{getExerciseLabel(ex, t)}</span>
                                         </div>
                                     );
                                 })}
@@ -414,7 +414,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                                 width: '8px', height: '8px', borderRadius: '2px',
                                 background: ex.color
                             }} />
-                            <span>{getExerciseLabel(ex)}</span>
+                            <span>{getExerciseLabel(ex, t)}</span>
                         </div>
                     ))}
                 </div>
@@ -571,7 +571,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                                                 <span style={{
                                                     fontSize: '0.85rem', fontWeight: '700',
                                                     color: ex.color
-                                                    }}>{getExerciseLabel(ex)}</span>
+                                                    }}>{getExerciseLabel(ex, t)}</span>
                                                 <div style={{
                                                     display: 'flex', alignItems: 'center', gap: '6px'
                                                 }}>

@@ -166,7 +166,7 @@ export function RoutineManager({
                                                         <Icon size={12} color={ex.color} />
                                                         <span style={{
                                                             fontSize: '0.65rem', fontWeight: '600', color: ex.color
-                                                        }}>{getExerciseLabel(ex)}</span>
+                                                        }}>{getExerciseLabel(ex, t)}</span>
                                                     </div>
                                                 );
                                             })}
@@ -384,7 +384,7 @@ export function RoutineManager({
                                         <Icon size={14} color={ex.color} />
                                         <span style={{
                                             fontSize: '0.7rem', fontWeight: '600', color: ex.color
-                                        }}>{getExerciseLabel(ex)}</span>
+                                        }}>{getExerciseLabel(ex, t)}</span>
                                     </div>
                                 );
                             })}
@@ -434,7 +434,7 @@ export function RoutineManager({
                                     <Icon size={24} />
                                     <span style={{
                                         fontSize: '0.75rem', fontWeight: '600'
-                                    }}>{getExerciseLabel(ex)}</span>
+                                    }}>{getExerciseLabel(ex, t)}</span>
                                 </button>
                             );
                         })}

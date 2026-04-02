@@ -34,7 +34,6 @@ export async function savePurchase({ isSupporter, isPro }) {
   if (!auth?.currentUser || !database) return false;
 
   await set(ref(database, `users/${auth.currentUser.uid}/purchase`), { isSupporter: !!isSupporter, isPro: !!isPro });
-  logger.success('Purchase saved to cloud');
   return true;
 }
 

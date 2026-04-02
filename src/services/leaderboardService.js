@@ -30,7 +30,6 @@ export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps
     lastUpdated: serverTimestamp()
   });
 
-  logger.success('Leaderboard entry published');
   return true;
 }
 

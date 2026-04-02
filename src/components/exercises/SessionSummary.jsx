@@ -1,14 +1,12 @@
-import React, { useState, useMemo, Suspense, lazy } from 'react';
-import { Trophy, Check, Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal, Share2, Clock, Pencil } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Trophy, Check, Dumbbell, Clock, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import ICON_MAP from '../../utils/iconMap';
 import { Z_INDEX } from '../../utils/zIndex';
-import { useShareCard } from '../../features/share/hooks/useShareCard';
-import { getSessionHistory, updateSessionName } from '../../features/share/services/sessionHistoryService';
+import { updateSessionName } from '../../features/share/services/sessionHistoryService';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
-
-const ShareModal = lazy(() => import('../../features/share/components/ShareModal').then(m => ({ default: m.ShareModal })));
+import { SharePanel } from '../../features/share/components/SharePanel';
 
 function formatDuration(seconds) {
     if (!seconds || seconds <= 0) return '0:00';
@@ -17,24 +15,20 @@ function formatDuration(seconds) {
     return `${m}:${s}`;
 }
 
-export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, sessionHistory, isPro = false, defaultSessionName = '' }) {
+export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, isPro = false, defaultSessionName = '' }) {
     const { t } = useTranslation();
-    const [showShare, setShowShare] = useState(false);
     const [editingName, setEditingName] = useState(false);
     const [sessionName, setSessionName] = useState(defaultSessionName);
+    const [confettiDone, setConfettiDone] = useState(false);
 
     const exercises = useMemo(() => {
         return queue.map(id => {
             const ex = exerciseInfo.find(e => e.id === id);
             if (!ex) return null;
-            const label = getExerciseLabel(ex);
+            const label = getExerciseLabel(ex, t);
             return { id: ex.id, label, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type };
         }).filter(Boolean);
     }, [queue, exerciseInfo, t]);
-
-    const history = useMemo(() => {
-        return sessionHistory || getSessionHistory();
-    }, [sessionHistory]);
 
     const shareSessionData = useMemo(() => {
         const base = sessionData || {
@@ -48,12 +42,6 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
     }, [sessionData, exercises, sessionName]);
 
     const sessionDuration = shareSessionData?.duration || 0;
-
-    const shareHook = useShareCard({
-        sessionData: shareSessionData,
-        stats: stats || {},
-        sessionHistory: history,
-    });
 
     const handleNameSave = () => {
         setEditingName(false);
@@ -72,9 +60,9 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
             paddingBottom: 'env(safe-area-inset-bottom)'
         }}>
             <CSSConfetti
-                active={!showShare}
+                active={!confettiDone}
                 colors={['#818cf8', '#fbbf24', '#10b981', '#ec4899', '#22d3ee']}
-                onDone={() => {}}
+                onDone={() => setConfettiDone(true)}
             />
 
             <Trophy size={56} color="#fbbf24" />
@@ -103,33 +91,25 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                     border: '1px solid rgba(129,140,248,0.15)',
                 }}>
                     <Clock size={16} color="#818cf8" />
-                    <span style={{
-                        fontSize: '0.9rem', fontWeight: 700, color: '#818cf8',
-                    }}>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#818cf8' }}>
                         {formatDuration(sessionDuration)}
                     </span>
-                    <span style={{
-                        fontSize: '0.7rem', color: 'var(--text-secondary)',
-                    }}>
-                        {t('share.duration', 'Durée')}
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                        {t('share.duration', 'Dur\u00e9e')}
                     </span>
                 </div>
             )}
 
             {/* Editable session name */}
-            <div style={{
-                width: '100%', maxWidth: '300px',
-            }}>
+            <div style={{ width: '100%', maxWidth: '300px' }}>
                 {editingName ? (
-                    <div style={{
-                        display: 'flex', gap: '6px', alignItems: 'center',
-                    }}>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                         <input
                             autoFocus
                             value={sessionName}
                             onChange={e => setSessionName(e.target.value)}
                             onKeyDown={e => { if (e.key === 'Enter') handleNameSave(); }}
-                            placeholder={t('share.sessionNamePlaceholder', 'Nom de la séance (optionnel)')}
+                            placeholder={t('share.sessionNamePlaceholder', 'Nom de la s\u00e9ance (optionnel)')}
                             style={{
                                 flex: 1, padding: '8px 12px', borderRadius: '10px',
                                 background: 'rgba(255,255,255,0.06)',
@@ -138,15 +118,12 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                                 outline: 'none',
                             }}
                         />
-                        <button
-                            onClick={handleNameSave}
-                            style={{
-                                padding: '8px 14px', borderRadius: '10px',
-                                background: 'rgba(129,140,248,0.2)',
-                                border: 'none', color: '#818cf8',
-                                fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer',
-                            }}
-                        >
+                        <button onClick={handleNameSave} style={{
+                            padding: '8px 14px', borderRadius: '10px',
+                            background: 'rgba(129,140,248,0.2)',
+                            border: 'none', color: '#818cf8',
+                            fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer',
+                        }}>
                             OK
                         </button>
                     </div>
@@ -158,14 +135,14 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                             width: '100%', padding: '8px 12px', borderRadius: '10px',
                             background: sessionName ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)',
                             border: '1px dashed rgba(255,255,255,0.1)',
-                            cursor: 'pointer', color: sessionName ? 'var(--text-primary)' : 'var(--text-secondary)',
-                            fontSize: '0.85rem', fontWeight: 600,
-                            textAlign: 'left',
+                            cursor: 'pointer',
+                            color: sessionName ? 'var(--text-primary)' : 'var(--text-secondary)',
+                            fontSize: '0.85rem', fontWeight: 600, textAlign: 'left',
                         }}
                     >
                         <Pencil size={14} style={{ opacity: 0.5, flexShrink: 0 }} />
                         <span style={{ flex: 1 }}>
-                            {sessionName || t('share.sessionNamePlaceholder', 'Nom de la séance (optionnel)')}
+                            {sessionName || t('share.sessionNamePlaceholder', 'Nom de la s\u00e9ance (optionnel)')}
                         </span>
                     </button>
                 )}
@@ -189,10 +166,8 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                             <Icon size={16} color={ex.color} />
                             <span style={{
                                 flex: 1, fontSize: '0.8rem', fontWeight: '600', color: ex.color
-                            }}>{getExerciseLabel(ex)}</span>
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: '4px'
-                            }}>
+                            }}>{getExerciseLabel(ex, t)}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <Check size={14} color="#10b981" />
                                 <span style={{
                                     fontSize: '0.75rem', fontWeight: '700', color: '#10b981'
@@ -220,32 +195,13 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                 >
                     {t('common.close')}
                 </button>
-                <button
-                    onClick={() => setShowShare(true)}
-                    className="hover-lift"
-                    style={{
-                        padding: '14px 16px', borderRadius: 'var(--radius-lg)',
-                        background: 'rgba(255,255,255,0.08)',
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        color: 'white', fontSize: '1rem', fontWeight: '700',
-                        cursor: 'pointer', display: 'flex',
-                        alignItems: 'center', justifyContent: 'center',
-                    }}
-                >
-                    <Share2 size={20} />
-                </button>
+                <SharePanel
+                    sessionData={shareSessionData}
+                    stats={stats}
+                    isPro={isPro}
+                    variant="large"
+                />
             </div>
-
-            {/* Share Modal */}
-            <Suspense fallback={null}>
-                {showShare && (
-                    <ShareModal
-                        shareHook={shareHook}
-                        onClose={() => setShowShare(false)}
-                        isPro={isPro}
-                    />
-                )}
-            </Suspense>
         </div>
     );
 }

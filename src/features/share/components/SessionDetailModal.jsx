@@ -1,13 +1,11 @@
-import React, { useState, Suspense, lazy, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Clock, Zap, Dumbbell, Check, Share2, Trash2, Pencil } from 'lucide-react';
+import { X, Clock, Zap, Dumbbell, Check, Trash2, Pencil } from 'lucide-react';
 import ICON_MAP from '../../../utils/iconMap';
 import { Z_INDEX } from '../../../utils/zIndex';
-import { useShareCard } from '../hooks/useShareCard';
-import { getSessionHistory, updateSessionName } from '../services/sessionHistoryService';
+import { updateSessionName } from '../services/sessionHistoryService';
 import { getExerciseLabel } from '../../../utils/exerciseLabel';
-
-const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
+import { SharePanel } from './SharePanel';
 
 function formatDuration(seconds) {
   if (!seconds || seconds <= 0) return '0min';
@@ -31,7 +29,6 @@ function formatDateTime(dateStr) {
 
 export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isPro = false, onNameChange }) {
   const { t } = useTranslation();
-  const [showShare, setShowShare] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(session?.name || '');
@@ -43,12 +40,6 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   const totalReps = exercises.reduce((sum, ex) => sum + (ex.reps || 0), 0);
 
   const sessionWithName = useMemo(() => ({ ...session, name }), [session, name]);
-
-  const shareHook = useShareCard({
-    sessionData: sessionWithName,
-    stats: stats,
-    sessionHistory: getSessionHistory(),
-  });
 
   const handleNameSave = () => {
     setEditingName(false);
@@ -257,7 +248,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
                       fontSize: '0.85rem', fontWeight: 700,
                       color: ex.color || '#818cf8',
                     }}>
-                      {getExerciseLabel(ex)}
+                      {getExerciseLabel(ex, t)}
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -274,20 +265,12 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
 
         {/* Action buttons */}
         <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-          <button
-            onClick={() => setShowShare(true)}
-            className="hover-lift"
-            style={{
-              flex: 1, padding: '12px', borderRadius: '12px',
-              background: 'linear-gradient(135deg, #818cf8, #6366f1)',
-              border: 'none', color: 'white', fontSize: '0.85rem', fontWeight: 700,
-              cursor: 'pointer', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', gap: '8px',
-            }}
-          >
-            <Share2 size={16} />
-            {t('share.share', 'Partager')}
-          </button>
+          <SharePanel
+            sessionData={sessionWithName}
+            stats={stats}
+            isPro={isPro}
+            variant="compact"
+          />
           {confirmDelete ? (
             <div style={{ display: 'flex', gap: '6px' }}>
               <button
@@ -330,17 +313,6 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
           )}
         </div>
       </div>
-
-      {/* Share Modal */}
-      <Suspense fallback={null}>
-        {showShare && (
-          <ShareModal
-            shareHook={shareHook}
-            onClose={() => setShowShare(false)}
-            isPro={isPro}
-          />
-        )}
-      </Suspense>
     </div>
   );
 }

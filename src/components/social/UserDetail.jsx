@@ -59,7 +59,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                 <ExIcon size={16} color={ex.color} style={{ flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                        <span style={{ fontSize: '0.75rem', fontWeight: '600', color: ex.color }}>{getExerciseLabel(ex)}</span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: '600', color: ex.color }}>{getExerciseLabel(ex, t)}</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             {!loadingDetails && (stats.exerciseStreaks?.[ex.id] || 0) > 0 && (
                                 <div style={{

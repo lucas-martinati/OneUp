@@ -111,7 +111,7 @@ function ExerciseList({ exercises, t }) {
               flex: 1, fontSize: '0.7rem', fontWeight: 600,
               color: ex.color || '#818cf8',
             }}>
-              {getExerciseLabel(ex)}
+              {getExerciseLabel(ex, t)}
             </span>
             <span style={{
               fontSize: '0.65rem', fontWeight: 700, color: '#10b981',

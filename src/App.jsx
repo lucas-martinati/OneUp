@@ -125,7 +125,6 @@ function App() {
         isSupporter: isSupporterRef.current,
         isPro: isProRef.current,
       });
-      logger.debug('Leaderboard published');
     } catch (e) {
       logger.error('Leaderboard publish failed:', e);
     }
@@ -138,7 +137,6 @@ function App() {
     await cloudSync.savePurchase({ isSupporter: sup, isPro: pr });
     // Publish leaderboard WITHOUT purchase flags (they are preserved from server)
     await publishLeaderboardNow();
-    logger.info('Saved + published:', { isSupporter: sup, isPro: pr });
   }, [googleAuth, computedStats, completions, settings]);
 
   // Apply performance mode on document root

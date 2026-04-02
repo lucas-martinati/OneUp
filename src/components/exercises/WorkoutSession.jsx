@@ -66,7 +66,7 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
             )}
             <Icon size={24} />
             <span style={{ fontSize: '0.75rem', fontWeight: '600', textAlign: 'center' }}>
-                {getExerciseLabel(ex)}
+                {getExerciseLabel(ex, t)}
             </span>
             <span style={{ fontSize: '0.6rem', opacity: 0.6 }}>
                 {ex.done ? t('workout.completed') : (ex.type === 'timer' ? `${ex.goal - ex.count}s` : t('workout.remaining', { count: ex.goal - ex.count }))}
@@ -345,7 +345,7 @@ export function WorkoutSession({
         const completedExercises = queue.map(id => {
             const ex = exerciseInfo.find(e => e.id === id);
             if (!ex) return null;
-            const label = getExerciseLabel(ex);
+            const label = getExerciseLabel(ex, t);
             return { id: ex.id, label, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type };
         }).filter(Boolean);
 
@@ -627,7 +627,7 @@ export function WorkoutSession({
                                         <Icon size={14} color={ex.color} />
                                         <span style={{
                                             fontSize: '0.75rem', fontWeight: '600', color: ex.color, flex: 1
-                                        }}>{getExerciseLabel(ex)}</span>
+                                        }}>{getExerciseLabel(ex, t)}</span>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
                                             style={{
@@ -826,7 +826,7 @@ export function WorkoutSession({
     if (phase === 'done') {
         const completedExercises = queue.map(id => {
             const ex = exerciseInfo.find(e => e.id === id);
-            return ex ? { id: ex.id, label: getExerciseLabel(ex), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type } : null;
+            return ex ? { id: ex.id, label: getExerciseLabel(ex, t), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type } : null;
         }).filter(Boolean);
 
         return (
