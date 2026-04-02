@@ -15,6 +15,7 @@ import { registerBackHandler } from '../../utils/backHandler';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import ICON_MAP from '../../utils/iconMap';
 import { addSession, getSessionHistory } from '../../features/share/services/sessionHistoryService';
+import { getExerciseLabel, getExerciseCategory } from '../../utils/exerciseLabel';
 
 // ── Exercise grid item ──────────────────────────────────────────────────
 function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
@@ -65,7 +66,7 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
             )}
             <Icon size={24} />
             <span style={{ fontSize: '0.75rem', fontWeight: '600', textAlign: 'center' }}>
-                {ex.label || t('exercises.' + ex.id)}
+                {getExerciseLabel(ex)}
             </span>
             <span style={{ fontSize: '0.6rem', opacity: 0.6 }}>
                 {ex.done ? t('workout.completed') : (ex.type === 'timer' ? `${ex.goal - ex.count}s` : t('workout.remaining', { count: ex.goal - ex.count }))}
@@ -159,9 +160,21 @@ export function WorkoutSession({
 
     // Toggle in queue
     const toggleExercise = (id) => {
-        setQueue(prev =>
-            prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-        );
+        setQueue(prev => {
+            if (prev.includes(id)) return prev.filter(x => x !== id);
+
+            // Check pro access for non-bodyweight exercises
+            const cat = getExerciseCategory(id);
+            if (cat !== 'bodyweight' && !isPro) return prev;
+
+            // If exercise is from a different category, auto-enable showAll
+            const currentCat = activeSlide === 0 ? 'bodyweight' : activeSlide === 1 ? 'weights' : 'custom';
+            if (cat !== currentCat && canMixDashboards && !showAll) {
+                setShowAll(true);
+            }
+
+            return [...prev, id];
+        });
     };
 
     // Shuffle queue (Fisher-Yates)
@@ -332,7 +345,7 @@ export function WorkoutSession({
         const completedExercises = queue.map(id => {
             const ex = exerciseInfo.find(e => e.id === id);
             if (!ex) return null;
-            const label = ex.label || t('exercises.' + ex.id);
+            const label = getExerciseLabel(ex);
             return { id: ex.id, label, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type };
         }).filter(Boolean);
 
@@ -614,7 +627,7 @@ export function WorkoutSession({
                                         <Icon size={14} color={ex.color} />
                                         <span style={{
                                             fontSize: '0.75rem', fontWeight: '600', color: ex.color, flex: 1
-                                        }}>{ex.label || t('exercises.' + ex.id)}</span>
+                                        }}>{getExerciseLabel(ex)}</span>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
                                             style={{
@@ -813,7 +826,7 @@ export function WorkoutSession({
     if (phase === 'done') {
         const completedExercises = queue.map(id => {
             const ex = exerciseInfo.find(e => e.id === id);
-            return ex ? { id: ex.id, label: ex.label || t('exercises.' + ex.id), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type } : null;
+            return ex ? { id: ex.id, label: getExerciseLabel(ex), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type } : null;
         }).filter(Boolean);
 
         return (

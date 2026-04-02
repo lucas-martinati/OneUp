@@ -6,6 +6,7 @@ import ICON_MAP from '../../utils/iconMap';
 import { Z_INDEX } from '../../utils/zIndex';
 import { useShareCard } from '../../features/share/hooks/useShareCard';
 import { getSessionHistory, updateSessionName } from '../../features/share/services/sessionHistoryService';
+import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 const ShareModal = lazy(() => import('../../features/share/components/ShareModal').then(m => ({ default: m.ShareModal })));
 
@@ -26,7 +27,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
         return queue.map(id => {
             const ex = exerciseInfo.find(e => e.id === id);
             if (!ex) return null;
-            const label = ex.label || t('exercises.' + ex.id);
+            const label = getExerciseLabel(ex);
             return { id: ex.id, label, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type };
         }).filter(Boolean);
     }, [queue, exerciseInfo, t]);
@@ -188,7 +189,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                             <Icon size={16} color={ex.color} />
                             <span style={{
                                 flex: 1, fontSize: '0.8rem', fontWeight: '600', color: ex.color
-                            }}>{ex.label || t('exercises.' + ex.id)}</span>
+                            }}>{getExerciseLabel(ex)}</span>
                             <div style={{
                                 display: 'flex', alignItems: 'center', gap: '4px'
                             }}>

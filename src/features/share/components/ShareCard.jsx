@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dumbbell, Flame, Zap, Clock, Target, Award } from 'lucide-react';
 import ICON_MAP from '../../../utils/iconMap';
+import { getExerciseLabel } from '../../../utils/exerciseLabel';
 
 function formatDuration(seconds) {
   if (!seconds || seconds <= 0) return '0min';
@@ -18,15 +19,6 @@ function formatDate(dateStr) {
   } catch {
     return '';
   }
-}
-
-function resolveExerciseName(ex, t) {
-  // If label has uppercase or accented chars, it's a proper name
-  if (ex.label && /[A-Z\u00C0-\u017F]/.test(ex.label)) return ex.label;
-  // If id starts with custom_, just use the label as-is (no i18n)
-  if (ex.id?.startsWith('custom_')) return ex.label || ex.id;
-  // Try i18n lookup, fallback to label or id
-  return t('exercises.' + ex.id, { defaultValue: ex.label || ex.id });
 }
 
 function MetricCard({ icon: Icon, value, label, color }) {
@@ -119,7 +111,7 @@ function ExerciseList({ exercises, t }) {
               flex: 1, fontSize: '0.7rem', fontWeight: 600,
               color: ex.color || '#818cf8',
             }}>
-              {resolveExerciseName(ex, t)}
+              {getExerciseLabel(ex)}
             </span>
             <span style={{
               fontSize: '0.65rem', fontWeight: 700, color: '#10b981',

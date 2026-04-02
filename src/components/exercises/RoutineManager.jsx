@@ -9,6 +9,7 @@ import { EXERCISES } from '../../config/exercises';
 import { registerBackHandler } from '../../utils/backHandler';
 import ICON_MAP from '../../utils/iconMap';
 import { Z_INDEX } from '../../utils/zIndex';
+import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 export function RoutineManager({
     onClose, routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, onLaunchRoutine
@@ -165,7 +166,7 @@ export function RoutineManager({
                                                         <Icon size={12} color={ex.color} />
                                                         <span style={{
                                                             fontSize: '0.65rem', fontWeight: '600', color: ex.color
-                                                        }}>{t('exercises.' + ex.id)}</span>
+                                                        }}>{getExerciseLabel(ex)}</span>
                                                     </div>
                                                 );
                                             })}
@@ -383,7 +384,7 @@ export function RoutineManager({
                                         <Icon size={14} color={ex.color} />
                                         <span style={{
                                             fontSize: '0.7rem', fontWeight: '600', color: ex.color
-                                        }}>{t('exercises.' + ex.id)}</span>
+                                        }}>{getExerciseLabel(ex)}</span>
                                     </div>
                                 );
                             })}
@@ -433,7 +434,7 @@ export function RoutineManager({
                                     <Icon size={24} />
                                     <span style={{
                                         fontSize: '0.75rem', fontWeight: '600'
-                                    }}>{t('exercises.' + ex.id)}</span>
+                                    }}>{getExerciseLabel(ex)}</span>
                                 </button>
                             );
                         })}

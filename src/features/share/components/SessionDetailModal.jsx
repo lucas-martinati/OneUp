@@ -5,6 +5,7 @@ import ICON_MAP from '../../../utils/iconMap';
 import { Z_INDEX } from '../../../utils/zIndex';
 import { useShareCard } from '../hooks/useShareCard';
 import { getSessionHistory, updateSessionName } from '../services/sessionHistoryService';
+import { getExerciseLabel } from '../../../utils/exerciseLabel';
 
 const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
 
@@ -26,12 +27,6 @@ function formatDateTime(dateStr) {
   } catch {
     return '';
   }
-}
-
-function resolveExerciseName(ex, t) {
-  if (ex.label && /[A-Z\u00C0-\u017F]/.test(ex.label)) return ex.label;
-  if (ex.id?.startsWith('custom_')) return ex.label || ex.id;
-  return t('exercises.' + ex.id, { defaultValue: ex.label || ex.id });
 }
 
 export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isPro = false, onNameChange }) {
@@ -262,7 +257,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
                       fontSize: '0.85rem', fontWeight: 700,
                       color: ex.color || '#818cf8',
                     }}>
-                      {resolveExerciseName(ex, t)}
+                      {getExerciseLabel(ex)}
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

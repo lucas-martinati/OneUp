@@ -6,6 +6,7 @@ import { getLocalDateStr } from '../../utils/dateUtils';
 import { registerBackHandler } from '../../utils/backHandler';
 import { getDailyGoal } from '../../config/exercises';
 import ICON_MAP from '../../utils/iconMap';
+import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 export function Calendar({ startDate, completions, exercises, getDayNumber, onClose, settings }) { // Added settings prop
     const { t } = useTranslation();
@@ -383,7 +384,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                             width: '8px', height: '8px', borderRadius: '50%',
                             background: ex.color, boxShadow: `0 0 4px ${ex.color}`
                         }} />
-                        <span style={{ color: 'var(--text-secondary)' }}>{ex.label || t('exercises.' + ex.id)}</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>{getExerciseLabel(ex)}</span>
                     </div>
                 ))}
             </div>
@@ -559,7 +560,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                             </div>
                             <div style={{ flex: 1 }}>
                                 <div style={{ fontSize: '0.9rem', fontWeight: '600', color: exData.isCompleted ? ex.color : 'var(--text-primary)' }}>
-                                    {ex.label || t('exercises.' + ex.id)}
+                                    {getExerciseLabel(ex)}
                                 </div>
                                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                                     {t('calendar.repsCount', { done: exData.isCompleted ? goal : 0, goal })}

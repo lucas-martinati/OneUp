@@ -9,6 +9,7 @@ import { Z_INDEX } from '../../utils/zIndex';
 import { registerBackHandler } from '../../utils/backHandler';
 import { useShareCard } from '../../features/share/hooks/useShareCard';
 import { getSessionHistory, removeSession } from '../../features/share/services/sessionHistoryService';
+import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 // Lazy load Recharts components
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
@@ -92,7 +93,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
         const ex = exercises?.find(e => e.id === d.exId);
         return {
             ...d,
-            subject: ex?.label || t('exercises.' + d.exId)
+            subject: getExerciseLabel(ex)
         };
     });
     const maxMonthly = Math.max(...monthlyActivityTotal, 1);
@@ -347,7 +348,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                             }}>
                                 {ChampionIcon && <ChampionIcon size={16} color={champion.color} />}
                                 <span style={{ fontSize: '0.85rem', fontWeight: '700', color: champion.color }}>
-                                    {exercises?.find(e => e.id === champion.id)?.label || t('exercises.' + champion.id)}
+                                    {getExerciseLabel(exercises?.find(e => e.id === champion.id) || { id: champion.id })}
                                 </span>
                             </div>
                             <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)' }}>
@@ -389,7 +390,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                                                 background: ex.color
                                             }} />
                                             <span style={{ fontWeight: '600', color: ex.color }}>{reps}</span>
-                                            <span>{ex.label || t('exercises.' + ex.id)}</span>
+                                            <span>{getExerciseLabel(ex)}</span>
                                         </div>
                                     );
                                 })}
@@ -413,7 +414,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                                 width: '8px', height: '8px', borderRadius: '2px',
                                 background: ex.color
                             }} />
-                            <span>{ex.label || t('exercises.' + ex.id)}</span>
+                            <span>{getExerciseLabel(ex)}</span>
                         </div>
                     ))}
                 </div>
@@ -570,7 +571,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                                                 <span style={{
                                                     fontSize: '0.85rem', fontWeight: '700',
                                                     color: ex.color
-                                                    }}>{t('exercises.' + ex.id)}</span>
+                                                    }}>{getExerciseLabel(ex)}</span>
                                                 <div style={{
                                                     display: 'flex', alignItems: 'center', gap: '6px'
                                                 }}>
