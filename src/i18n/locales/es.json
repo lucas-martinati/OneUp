@@ -170,7 +170,7 @@
     "interDashboardDesc": "Combinar ejercicios de todos los paneles.",
     "chooseOrder": "Elige el orden de ejercicios",
     "shuffle": "Barajar",
-    "custom": "workout.custom",
+    "custom": "Personalizado",
     "launch_one": "Empezar ({{count}} ejercicio)",
     "launch_many": "Empezar ({{count}} ejercicios)",
     "launch_other": "Empezar ({{count}} ejercicios)",

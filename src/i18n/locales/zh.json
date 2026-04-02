@@ -158,7 +158,7 @@
     "interDashboardDesc": "合并所有仪表板的运动。",
     "chooseOrder": "选择运动顺序",
     "shuffle": "随机排序",
-    "custom": "workout.custom",
+    "custom": "\u81ea\u5b9a\u4e49",
     "launch_other": "开始 ({{count}} 项运动)",
     "remaining": "还剩 {{count}} 个",
     "launch": "开始 ({{count}} 项运动)",

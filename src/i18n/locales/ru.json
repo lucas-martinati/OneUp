@@ -176,7 +176,7 @@
     "interDashboardDesc": "Объединить упражнения со всех панелей.",
     "chooseOrder": "Выберите порядок упражнений",
     "shuffle": "Перемешать",
-    "custom": "workout.custom",
+    "custom": "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c\u0441\u043a\u0438\u0439",
     "launch_one": "Начать ({{count}} упражнение)",
     "launch_few": "Начать ({{count}} упражнения)",
     "launch_many": "Начать ({{count}} упражнений)",

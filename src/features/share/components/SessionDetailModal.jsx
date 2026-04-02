@@ -8,11 +8,12 @@ import { getExerciseLabel } from '../../../utils/exerciseLabel';
 import { SharePanel } from './SharePanel';
 
 function formatDuration(seconds) {
-  if (!seconds || seconds <= 0) return '0min';
+  if (!seconds || seconds <= 0) return '0:00';
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) return `${h}h${m > 0 ? String(m).padStart(2, '0') : ''}`;
-  return `${m}min`;
+  const s = (seconds % 60).toString().padStart(2, '0');
+  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${s}`;
+  return `${m}:${s}`;
 }
 
 function formatDateTime(dateStr, lang) {

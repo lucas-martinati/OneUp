@@ -164,7 +164,7 @@
     "interDashboardDesc": "Combine exercises from all dashboards.",
     "chooseOrder": "Choose exercise order",
     "shuffle": "Shuffle",
-    "custom": "workout.custom",
+    "custom": "Custom",
     "launch_one": "Start ({{count}} exercise)",
     "launch_other": "Start ({{count}} exercises)",
     "remaining": "{{count}} left",
