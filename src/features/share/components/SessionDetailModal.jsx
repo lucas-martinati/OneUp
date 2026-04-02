@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState, Suspense, lazy, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Clock, Zap, Dumbbell, Check } from 'lucide-react';
+import { X, Clock, Zap, Dumbbell, Check, Share2, Trash2 } from 'lucide-react';
 import ICON_MAP from '../../../utils/iconMap';
 import { Z_INDEX } from '../../../utils/zIndex';
+import { useShareCard } from '../hooks/useShareCard';
+import { getSessionHistory } from '../services/sessionHistoryService';
+
+const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
 
 function formatDuration(seconds) {
   if (!seconds || seconds <= 0) return '0min';
@@ -24,12 +28,27 @@ function formatDateTime(dateStr) {
   }
 }
 
-export function SessionDetailModal({ session, onClose }) {
+export function SessionDetailModal({ session, onClose, onDelete, stats = {} }) {
   const { t } = useTranslation();
+  const [showShare, setShowShare] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
   if (!session) return null;
 
   const exercises = session.exercises || [];
   const totalReps = exercises.reduce((sum, ex) => sum + (ex.reps || 0), 0);
+  const hasName = session.name && session.name.trim().length > 0;
+
+  const shareHook = useShareCard({
+    sessionData: session,
+    stats: stats,
+    sessionHistory: getSessionHistory(),
+  });
+
+  const handleDelete = () => {
+    onDelete?.(session.id);
+    onClose();
+  };
 
   return (
     <div className="fade-in" style={{
@@ -82,22 +101,28 @@ export function SessionDetailModal({ session, onClose }) {
           }}>
             {formatDateTime(session.date)}
           </div>
-          <div style={{
-            fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)',
-          }}>
-            {session.name || t('share.session', 'S\u00e9ance')}
-          </div>
+          {hasName ? (
+            <div style={{
+              fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)',
+            }}>
+              {session.name}
+            </div>
+          ) : exercises.length > 0 && (
+            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+              {exercises.map((ex, i) => {
+                const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                return <Icon key={ex.id || i} size={16} color={ex.color || '#818cf8'} />;
+              })}
+            </div>
+          )}
         </div>
 
         {/* Stats row */}
-        <div style={{
-          display: 'flex', gap: '8px',
-        }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
           <div style={{
             flex: 1, padding: '14px', borderRadius: '14px',
             background: 'rgba(129,140,248,0.08)',
-            border: '1px solid rgba(129,140,248,0.12)',
-            textAlign: 'center',
+            border: '1px solid rgba(129,140,248,0.12)', textAlign: 'center',
           }}>
             <Clock size={18} color="#818cf8" style={{ marginBottom: '4px' }} />
             <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#818cf8' }}>
@@ -113,8 +138,7 @@ export function SessionDetailModal({ session, onClose }) {
           <div style={{
             flex: 1, padding: '14px', borderRadius: '14px',
             background: 'rgba(251,191,36,0.08)',
-            border: '1px solid rgba(251,191,36,0.12)',
-            textAlign: 'center',
+            border: '1px solid rgba(251,191,36,0.12)', textAlign: 'center',
           }}>
             <Zap size={18} color="#fbbf24" style={{ marginBottom: '4px' }} />
             <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fbbf24' }}>
@@ -124,14 +148,13 @@ export function SessionDetailModal({ session, onClose }) {
               fontSize: '0.55rem', color: 'var(--text-secondary)',
               textTransform: 'uppercase', letterSpacing: '0.5px',
             }}>
-              {t('share.volume', 'Volume')}
+              {t('share.reps', 'Reps')}
             </div>
           </div>
           <div style={{
             flex: 1, padding: '14px', borderRadius: '14px',
             background: 'rgba(52,211,153,0.08)',
-            border: '1px solid rgba(52,211,153,0.12)',
-            textAlign: 'center',
+            border: '1px solid rgba(52,211,153,0.12)', textAlign: 'center',
           }}>
             <Dumbbell size={18} color="#34d399" style={{ marginBottom: '4px' }} />
             <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#34d399' }}>
@@ -148,14 +171,10 @@ export function SessionDetailModal({ session, onClose }) {
 
         {/* Exercise list */}
         {exercises.length > 0 && (
-          <div style={{
-            display: 'flex', flexDirection: 'column', gap: '6px',
-          }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div style={{
-              fontSize: '0.65rem', fontWeight: 700,
-              color: 'var(--text-secondary)',
-              textTransform: 'uppercase', letterSpacing: '1px',
-              padding: '0 4px',
+              fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-secondary)',
+              textTransform: 'uppercase', letterSpacing: '1px', padding: '0 4px',
             }}>
               {t('share.exercisesCompleted', 'Exercices compl\u00e9t\u00e9s')}
             </div>
@@ -184,13 +203,9 @@ export function SessionDetailModal({ session, onClose }) {
                       {ex.label || ex.id}
                     </div>
                   </div>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: '4px',
-                  }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <Check size={14} color="#10b981" />
-                    <span style={{
-                      fontSize: '0.8rem', fontWeight: 700, color: '#10b981',
-                    }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#10b981' }}>
                       {ex.type === 'timer' ? `${ex.reps}s` : `${ex.reps} ${t('common.reps', 'reps')}`}
                     </span>
                   </div>
@@ -199,7 +214,75 @@ export function SessionDetailModal({ session, onClose }) {
             })}
           </div>
         )}
+
+        {/* Action buttons */}
+        <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+          <button
+            onClick={() => setShowShare(true)}
+            className="hover-lift"
+            style={{
+              flex: 1, padding: '12px', borderRadius: '12px',
+              background: 'linear-gradient(135deg, #818cf8, #6366f1)',
+              border: 'none', color: 'white', fontSize: '0.85rem', fontWeight: 700,
+              cursor: 'pointer', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', gap: '8px',
+            }}
+          >
+            <Share2 size={16} />
+            {t('share.share', 'Partager')}
+          </button>
+          {confirmDelete ? (
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button
+                onClick={handleDelete}
+                style={{
+                  padding: '12px 16px', borderRadius: '12px',
+                  background: '#ef4444', border: 'none',
+                  color: 'white', fontSize: '0.8rem', fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                {t('common.confirm', 'Confirmer')}
+              </button>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                style={{
+                  padding: '12px 16px', borderRadius: '12px',
+                  background: 'rgba(255,255,255,0.06)', border: 'none',
+                  color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {t('common.cancel', 'Annuler')}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              style={{
+                padding: '12px 16px', borderRadius: '12px',
+                background: 'rgba(239,68,68,0.08)',
+                border: '1px solid rgba(239,68,68,0.15)',
+                color: '#ef4444', fontSize: '0.85rem', fontWeight: 600,
+                cursor: 'pointer', display: 'flex', alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Share Modal */}
+      <Suspense fallback={null}>
+        {showShare && (
+          <ShareModal
+            shareHook={shareHook}
+            onClose={() => setShowShare(false)}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

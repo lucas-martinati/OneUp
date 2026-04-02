@@ -8,7 +8,7 @@ import ICON_MAP from '../../utils/iconMap';
 import { Z_INDEX } from '../../utils/zIndex';
 import { registerBackHandler } from '../../utils/backHandler';
 import { useShareCard } from '../../features/share/hooks/useShareCard';
-import { getSessionHistory } from '../../features/share/services/sessionHistoryService';
+import { getSessionHistory, removeSession } from '../../features/share/services/sessionHistoryService';
 
 // Lazy load Recharts components
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
@@ -99,7 +99,12 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
     const monthNames = t('stats.monthAbbreviations', { returnObjects: true });
     const today = new Date();
 
-    const sessionHistory = useMemo(() => getSessionHistory(), []);
+    const [sessionHistory, setSessionHistory] = useState(() => getSessionHistory());
+
+    const handleDeleteSession = useCallback((sessionId) => {
+        const updated = removeSession(sessionId);
+        setSessionHistory(updated);
+    }, []);
 
     const shareHook = useShareCard({
         sessionData: { date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') },
@@ -671,7 +676,8 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                         </h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             {sessionHistory.slice(0, 10).map((session, i) => {
-                                const exCount = session.exercises?.length || 0;
+                                const exercises = session.exercises || [];
+                                const hasName = session.name && session.name.trim().length > 0;
                                 const dateObj = new Date(session.date);
                                 const dateLabel = dateObj.toLocaleDateString(i18n.language, {
                                     day: 'numeric', month: 'short',
@@ -703,18 +709,25 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                                         }}>
                                             {dateLabel}
                                         </span>
-                                        <span style={{
-                                            flex: 1, fontSize: '0.8rem', fontWeight: 600,
-                                            color: 'var(--text-primary)',
-                                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                                        }}>
-                                            {session.name || t('share.session', 'S\u00e9ance')}
-                                        </span>
-                                        <span style={{
-                                            fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: 500,
-                                        }}>
-                                            {exCount} ex
-                                        </span>
+                                        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                                            {hasName && (
+                                                <span style={{
+                                                    fontSize: '0.8rem', fontWeight: 600,
+                                                    color: 'var(--text-primary)',
+                                                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                                }}>
+                                                    {session.name}
+                                                </span>
+                                            )}
+                                            {exercises.length > 0 && (
+                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', alignItems: 'center' }}>
+                                                    {exercises.map((ex, j) => {
+                                                        const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
+                                                        return <ExIcon key={ex.id || j} size={13} color={ex.color || '#818cf8'} />;
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
                                         <ChevronRight size={14} color="var(--text-secondary)" style={{ opacity: 0.4, flexShrink: 0 }} />
                                     </button>
                                 );
@@ -744,6 +757,7 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                     <ShareModal
                         shareHook={shareHook}
                         onClose={() => setShowShare(false)}
+                        isPro={isPro}
                     />
                 )}
             </Suspense>
@@ -754,6 +768,8 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                     <SessionDetailModal
                         session={selectedSession}
                         onClose={() => setSelectedSession(null)}
+                        onDelete={handleDeleteSession}
+                        stats={computedStats}
                     />
                 )}
             </Suspense>

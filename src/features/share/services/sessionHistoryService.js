@@ -39,6 +39,7 @@ export function addSession({ date, duration, name, type, exercises }) {
       label: ex.label || ex.id,
       reps: ex.reps || ex.goal || 0,
       color: ex.color || '#818cf8',
+      icon: ex.icon || 'Dumbbell',
       type: ex.type || 'counter',
     })),
   };

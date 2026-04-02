@@ -7,6 +7,7 @@ const DEFAULT_OPTIONS = {
   showExercises: true,
   showStreak: false,
   showSessionHistory: false,
+  showWeights: true,
   format: 'png',
 };
 

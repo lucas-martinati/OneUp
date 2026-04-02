@@ -461,6 +461,7 @@ export function Dashboard({
                             isPro={isPro}
                             activeSlide={effectiveSlide}
                             customExercises={customExercises}
+                            computedStats={computedStats}
                         />
                     )}
                     {showClan && (

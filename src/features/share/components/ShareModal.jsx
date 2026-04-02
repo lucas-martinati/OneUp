@@ -6,7 +6,7 @@ import { ShareCard } from './ShareCard';
 import { ShareOptions } from './ShareOptions';
 import { canShareNatively } from '../services/shareService';
 
-export function ShareModal({ shareHook, onClose }) {
+export function ShareModal({ shareHook, onClose, isPro = false }) {
   const { t } = useTranslation();
   const {
     cardRef, options, toggleOption, setOption,
@@ -37,7 +37,7 @@ export function ShareModal({ shareHook, onClose }) {
       <div style={{
         width: '100%', maxWidth: '400px',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '16px 20px',
+        padding: '16px 20px 8px',
       }}>
         <h2 style={{
           margin: 0, fontSize: '1.3rem', fontWeight: 800,
@@ -59,12 +59,13 @@ export function ShareModal({ shareHook, onClose }) {
 
       {/* Card preview */}
       <div style={{
-        padding: '0 20px', width: '100%', maxWidth: '400px',
+        width: '100%', maxWidth: '400px',
+        padding: '0 20px',
         display: 'flex', justifyContent: 'center',
       }}>
         <div style={{
-          transform: 'scale(0.85)', transformOrigin: 'top center',
-          marginBottom: '-20px',
+          transform: 'scale(0.78)',
+          transformOrigin: 'top center',
         }}>
           <ShareCard
             cardRef={cardRef}
@@ -80,12 +81,14 @@ export function ShareModal({ shareHook, onClose }) {
       {/* Options */}
       <div style={{
         width: '100%', maxWidth: '400px',
-        padding: '12px 20px',
+        padding: '8px 20px',
       }}>
         <ShareOptions
           options={options}
           toggleOption={toggleOption}
           setOption={setOption}
+          mode={mode}
+          isPro={isPro}
         />
       </div>
 
@@ -110,7 +113,7 @@ export function ShareModal({ shareHook, onClose }) {
           }}
         >
           {isExporting ? <Loader2 size={18} className="spin" /> : <Download size={18} />}
-          {t('share.download', 'Télécharger')}
+          {t('share.download', 'T\u00e9l\u00e9charger')}
         </button>
         <button
           onClick={handleShare}
@@ -129,7 +132,7 @@ export function ShareModal({ shareHook, onClose }) {
           {isExporting ? <Loader2 size={18} className="spin" /> : <Share2 size={18} />}
           {canShareNatively()
             ? t('share.share', 'Partager')
-            : t('share.download', 'Télécharger')}
+            : t('share.download', 'T\u00e9l\u00e9charger')}
         </button>
       </div>
 

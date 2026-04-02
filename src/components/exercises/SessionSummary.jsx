@@ -1,5 +1,5 @@
 import React, { useState, useMemo, Suspense, lazy } from 'react';
-import { Trophy, Check, Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal, Share2 } from 'lucide-react';
+import { Trophy, Check, Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal, Share2, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import ICON_MAP from '../../utils/iconMap';
@@ -9,7 +9,14 @@ import { getSessionHistory } from '../../features/share/services/sessionHistoryS
 
 const ShareModal = lazy(() => import('../../features/share/components/ShareModal').then(m => ({ default: m.ShareModal })));
 
-export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, sessionHistory }) {
+function formatDuration(seconds) {
+    if (!seconds || seconds <= 0) return '0:00';
+    const m = Math.floor(seconds / 60);
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+}
+
+export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, sessionHistory, isPro = false }) {
     const { t } = useTranslation();
     const [showShare, setShowShare] = useState(false);
 
@@ -29,10 +36,12 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
             date: new Date().toISOString(),
             exercises,
             duration: 0,
-            name: t('workout.sessionDone'),
+            name: '',
             type: 'bodyweight',
         };
-    }, [sessionData, exercises, t]);
+    }, [sessionData, exercises]);
+
+    const sessionDuration = shareSessionData?.duration || 0;
 
     const shareHook = useShareCard({
         sessionData: shareSessionData,
@@ -71,6 +80,28 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
             }}>
                 {t('workout.allCompleted')}
             </div>
+
+            {/* Duration */}
+            {sessionDuration > 0 && (
+                <div style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    padding: '8px 16px', borderRadius: '12px',
+                    background: 'rgba(129,140,248,0.1)',
+                    border: '1px solid rgba(129,140,248,0.15)',
+                }}>
+                    <Clock size={16} color="#818cf8" />
+                    <span style={{
+                        fontSize: '0.9rem', fontWeight: 700, color: '#818cf8',
+                    }}>
+                        {formatDuration(sessionDuration)}
+                    </span>
+                    <span style={{
+                        fontSize: '0.7rem', color: 'var(--text-secondary)',
+                    }}>
+                        {t('share.duration', 'Durée')}
+                    </span>
+                </div>
+            )}
 
             {/* Recap */}
             <div style={{
@@ -143,6 +174,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                     <ShareModal
                         shareHook={shareHook}
                         onClose={() => setShowShare(false)}
+                        isPro={isPro}
                     />
                 )}
             </Suspense>

@@ -39,8 +39,20 @@ function MetricCard({ icon: Icon, value, label, color }) {
   );
 }
 
+function SessionIcons({ exercises, size = 11 }) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', alignItems: 'center' }}>
+      {exercises.map((ex, i) => {
+        const Icon = ICON_MAP[ex.icon] || Dumbbell;
+        return <Icon key={ex.id || i} size={size} color={ex.color || '#818cf8'} />;
+      })}
+    </div>
+  );
+}
+
 function HistoryRow({ session, t }) {
-  const exCount = session.exercises?.length || 0;
+  const hasName = session.name && session.name.trim().length > 0;
+
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: '8px',
@@ -52,22 +64,62 @@ function HistoryRow({ session, t }) {
       }}>
         {formatDate(session.date)}
       </span>
-      <span style={{
-        flex: 1, fontSize: '0.6rem', fontWeight: 600, color: 'rgba(255,255,255,0.8)',
-        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-      }}>
-        {session.name || t('share.session', 'S\u00e9ance')}
-      </span>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        {hasName ? (
+          <>
+            <span style={{
+              fontSize: '0.6rem', fontWeight: 600, color: 'rgba(255,255,255,0.8)',
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {session.name}
+            </span>
+            {session.exercises?.length > 0 && <SessionIcons exercises={session.exercises} />}
+          </>
+        ) : session.exercises?.length > 0 ? (
+          <SessionIcons exercises={session.exercises} size={13} />
+        ) : (
+          <span style={{
+            fontSize: '0.6rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)',
+          }}>
+            {t('share.session', 'S\u00e9ance')}
+          </span>
+        )}
+      </div>
       <span style={{
         fontSize: '0.55rem', color: 'rgba(255,255,255,0.5)', fontWeight: 500,
       }}>
         {formatDuration(session.duration)}
       </span>
-      <span style={{
-        fontSize: '0.55rem', color: 'rgba(129,140,248,0.8)', fontWeight: 600,
-      }}>
-        {exCount} ex
-      </span>
+    </div>
+  );
+}
+
+function ExerciseList({ exercises, t }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      {exercises.map((ex, i) => {
+        const Icon = ICON_MAP[ex.icon] || Dumbbell;
+        return (
+          <div key={ex.id || i} style={{
+            display: 'flex', alignItems: 'center', gap: '8px',
+            padding: '7px 10px', borderRadius: '10px',
+            background: `${ex.color || '#818cf8'}0a`,
+          }}>
+            <Icon size={13} color={ex.color || '#818cf8'} />
+            <span style={{
+              flex: 1, fontSize: '0.7rem', fontWeight: 600,
+              color: ex.color || '#818cf8',
+            }}>
+              {ex.label || ex.id}
+            </span>
+            <span style={{
+              fontSize: '0.65rem', fontWeight: 700, color: '#10b981',
+            }}>
+              {ex.type === 'timer' ? `${ex.reps}s` : `\u00d7${ex.reps}`}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -82,14 +134,19 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const { t } = useTranslation();
 
   const isGlobal = mode === 'global';
-  const exercises = sessionData?.exercises || [];
+  const allExercises = sessionData?.exercises || [];
+  const bodyweightExercises = allExercises.filter(ex => ex.type !== 'weights');
+  const weightExercises = allExercises.filter(ex => ex.type === 'weights');
+  const showWeightsSeparately = options.showWeights && weightExercises.length > 0;
+  const hasBothTypes = bodyweightExercises.length > 0 && weightExercises.length > 0;
+
   const totalReps = isGlobal
     ? (stats?.globalTotalReps || 0)
-    : exercises.reduce((sum, ex) => sum + (ex.reps || 0), 0);
+    : allExercises.reduce((sum, ex) => sum + (ex.reps || 0), 0);
   const duration = sessionData?.duration || 0;
   const streak = stats?.displayStreak || 0;
   const streakActive = stats?.streakActive || false;
-  const exerciseCount = isGlobal ? (stats?.totalExerciseCompletions || 0) : exercises.length;
+  const exerciseCount = isGlobal ? (stats?.totalExerciseCompletions || 0) : allExercises.length;
   const totalDays = stats?.totalDays || 0;
   const maxStreak = stats?.maxStreak || 0;
   const dateStr = sessionData?.date
@@ -157,7 +214,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
             </div>
           </div>
 
-          {/* Top-right icon: flame with streak or default icon */}
+          {/* Top-right: flame badge or default */}
           {options.showStreak && streak > 0 ? (
             <div style={{
               display: 'flex', alignItems: 'center', gap: '6px',
@@ -169,15 +226,10 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
                 ? '1px solid rgba(249,115,22,0.35)'
                 : '1px solid rgba(255,255,255,0.08)',
             }}>
-              <Flame
-                size={20}
-                color={streakActive ? '#f97316' : '#888'}
-                fill={streakActive ? '#f97316' : 'none'}
-              />
+              <Flame size={20} color={streakActive ? '#f97316' : '#888'} fill={streakActive ? '#f97316' : 'none'} />
               <span style={{
                 fontSize: '1.1rem', fontWeight: 800,
-                color: streakActive ? '#f97316' : '#888',
-                lineHeight: 1,
+                color: streakActive ? '#f97316' : '#888', lineHeight: 1,
               }}>
                 {streak}
               </span>
@@ -237,7 +289,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
                 <MetricCard icon={Clock} value={formatDuration(duration)} label={t('share.duration', 'Dur\u00e9e')} color="#818cf8" />
               )}
               {options.showVolume && (
-                <MetricCard icon={Zap} value={totalReps} label={t('share.volume', 'Volume')} color="#fbbf24" />
+                <MetricCard icon={Zap} value={totalReps} label={t('share.reps', 'Reps')} color="#fbbf24" />
               )}
               {options.showExercises && (
                 <MetricCard icon={Dumbbell} value={exerciseCount} label={t('share.exercises', 'Exercices')} color="#34d399" />
@@ -246,34 +298,42 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
           )}
         </div>
 
-        {/* Exercise list (session mode only) */}
-        {!isGlobal && exercises.length > 0 && (
-          <div style={{
-            display: 'flex', flexDirection: 'column', gap: '4px',
-          }}>
-            {exercises.map((ex, i) => {
-              const Icon = ICON_MAP[ex.icon] || Dumbbell;
-              return (
-                <div key={ex.id || i} style={{
-                  display: 'flex', alignItems: 'center', gap: '8px',
-                  padding: '7px 10px', borderRadius: '10px',
-                  background: `${ex.color || '#818cf8'}0a`,
-                }}>
-                  <Icon size={13} color={ex.color || '#818cf8'} />
-                  <span style={{
-                    flex: 1, fontSize: '0.7rem', fontWeight: 600,
-                    color: ex.color || '#818cf8',
+        {/* Exercise list (session mode) - separated by type */}
+        {!isGlobal && allExercises.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {bodyweightExercises.length > 0 && (
+              <div>
+                {hasBothTypes && (
+                  <div style={{
+                    fontSize: '0.55rem', fontWeight: 700,
+                    color: 'rgba(255,255,255,0.35)',
+                    textTransform: 'uppercase', letterSpacing: '1px',
+                    marginBottom: '4px',
                   }}>
-                    {ex.label || ex.id}
-                  </span>
-                  <span style={{
-                    fontSize: '0.65rem', fontWeight: 700, color: '#10b981',
+                    {t('share.bodyweight', 'Poids du corps')}
+                  </div>
+                )}
+                <ExerciseList exercises={bodyweightExercises} t={t} />
+              </div>
+            )}
+            {showWeightsSeparately && weightExercises.length > 0 && (
+              <div>
+                {hasBothTypes && (
+                  <div style={{
+                    fontSize: '0.55rem', fontWeight: 700,
+                    color: 'rgba(255,255,255,0.35)',
+                    textTransform: 'uppercase', letterSpacing: '1px',
+                    marginBottom: '4px',
                   }}>
-                    {ex.type === 'timer' ? `${ex.reps}s` : `\u00d7${ex.reps}`}
-                  </span>
-                </div>
-              );
-            })}
+                    {t('share.weights', 'Musculation')}
+                  </div>
+                )}
+                <ExerciseList exercises={weightExercises} t={t} />
+              </div>
+            )}
+            {!options.showWeights && weightExercises.length > 0 && bodyweightExercises.length === 0 && (
+              <ExerciseList exercises={allExercises} t={t} />
+            )}
           </div>
         )}
 

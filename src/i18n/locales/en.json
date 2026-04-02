@@ -30,7 +30,8 @@
     "anonymous": "Anonymous",
     "member": "A member",
     "saved": "Saved",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "confirm": "Confirm"
   },
   "paywall": {
     "proRequired": "Pro Mode Required",
@@ -637,7 +638,11 @@
     "totalReps": "Total reps",
     "activeDays": "Active days",
     "bestStreak": "Best streak",
-    "sessionDetail": "Session details"
+    "sessionDetail": "Session details",
+    "reps": "Reps",
+    "showWeights": "Separate weights",
+    "bodyweight": "Bodyweight",
+    "weights": "Weights"
   },
   "exercises": {
     "pushups": "Push-ups",

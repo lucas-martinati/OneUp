@@ -77,7 +77,7 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
 export function WorkoutSession({
     onClose, today, dayNumber, getExerciseCount, updateExerciseCount, completions, settings,
     routines = [], saveRoutine, deleteRoutine, updateRoutine, maxRoutines = 10,
-    isPro, activeSlide, customExercises = []
+    isPro, activeSlide, customExercises = [], computedStats = {}
 }) {
     const { t } = useTranslation();
     const [phase, setPhase] = useState('config'); // 'config' | 'running' | 'done'
@@ -314,7 +314,7 @@ export function WorkoutSession({
         const session = addSession({
             date: new Date().toISOString(),
             duration,
-            name: t('workout.sessionDone'),
+            name: '',
             type: activeSlide === 1 ? 'weights' : activeSlide === 2 ? 'custom' : 'bodyweight',
             exercises: completedExercises,
         });
@@ -788,11 +788,12 @@ export function WorkoutSession({
                     date: new Date().toISOString(),
                     exercises: completedExercises,
                     duration: sessionDuration,
-                    name: t('workout.sessionDone'),
+                    name: '',
                     type: activeSlide === 1 ? 'weights' : activeSlide === 2 ? 'custom' : 'bodyweight',
                 }}
-                stats={{}}
+                stats={computedStats}
                 sessionHistory={getSessionHistory()}
+                isPro={isPro}
             />
         );
     }

@@ -30,7 +30,8 @@
     "anonymous": "Anonyme",
     "member": "Un membre",
     "saved": "Sauvegardé",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "confirm": "Confirmer"
   },
   "paywall": {
     "proRequired": "Mode Pro Requis",
@@ -648,7 +649,11 @@
     "totalReps": "Reps totales",
     "activeDays": "Jours actifs",
     "bestStreak": "Meilleure série",
-    "sessionDetail": "Détail de la séance"
+    "sessionDetail": "Détail de la séance",
+    "reps": "Reps",
+    "showWeights": "Séparer musculation",
+    "bodyweight": "Poids du corps",
+    "weights": "Musculation"
   },
   "exercises": {
     "pushups": "Pompes",
