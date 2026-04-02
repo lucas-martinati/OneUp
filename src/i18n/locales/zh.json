@@ -40,7 +40,7 @@
   "counter": {
     "next": "下一个",
     "validated": "{{exercise}} 完成！",
-    "remaining_other": "counter.remaining",
+    "remaining_other": "还剩 {{count}} 个{{exercise}}",
     "reset": "重置",
     "completeAll": "全部完成",
     "tips": [
@@ -144,16 +144,16 @@
   "workout": {
     "sessionDone": "训练完成！",
     "allCompleted": "所有运动已完成 💪",
-    "reps_other": "workout.reps",
+    "reps_other": "{{count}} 次",
     "completed": "已完成 ✓",
-    "remaining_other": "workout.remaining",
+    "remaining_other": "还剩 {{count}} 个",
     "newSession": "新训练",
     "interDashboard": "混合运动",
     "interDashboardDesc": "合并所有仪表板的运动。",
     "chooseOrder": "选择运动顺序",
     "shuffle": "随机排序",
     "custom": "workout.custom",
-    "launch_other": "workout.launch",
+    "launch_other": "开始 ({{count}} 项运动)",
     "remaining": "还剩 {{count}} 个",
     "launch": "开始 ({{count}} 项运动)",
     "close": "关闭",
