@@ -14,13 +14,8 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
     sessionData, stats, sessionHistory, mode,
   } = shareHook;
 
-  const handleShare = async () => {
-    await shareCard();
-  };
-
-  const handleDownload = async () => {
-    await exportCard();
-  };
+  const handleShare = async () => { await shareCard(); };
+  const handleDownload = async () => { await exportCard(); };
 
   return (
     <div className="fade-in" style={{
@@ -30,6 +25,7 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
       display: 'flex', flexDirection: 'column',
       alignItems: 'center',
       overflowY: 'auto',
+      WebkitOverflowScrolling: 'touch',
       paddingTop: 'env(safe-area-inset-top)',
       paddingBottom: 'env(safe-area-inset-bottom)',
     }}>
@@ -57,16 +53,12 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
         </button>
       </div>
 
-      {/* Card preview */}
+      {/* Card preview - full width, scroll if too tall */}
       <div style={{
         width: '100%', maxWidth: '400px',
-        padding: '0 20px',
-        display: 'flex', justifyContent: 'center',
+        padding: '0 20px 12px',
       }}>
-        <div style={{
-          transform: 'scale(0.78)',
-          transformOrigin: 'top center',
-        }}>
+        <div ref={cardRef} style={{ width: '100%' }}>
           <ShareCard
             cardRef={cardRef}
             sessionData={sessionData}
@@ -138,7 +130,6 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
         </button>
       </div>
 
-      {/* Spinner animation */}
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .spin { animation: spin 1s linear infinite; }
