@@ -15,10 +15,10 @@ function formatDuration(seconds) {
   return `${m}min`;
 }
 
-function formatDateTime(dateStr) {
+function formatDateTime(dateStr, lang) {
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString(undefined, {
+    return d.toLocaleDateString(lang || undefined, {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
       hour: '2-digit', minute: '2-digit',
     });
@@ -28,7 +28,8 @@ function formatDateTime(dateStr) {
 }
 
 export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isPro = false, onNameChange }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(session?.name || '');
@@ -101,7 +102,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
             fontSize: '0.65rem', color: 'var(--text-secondary)',
             textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px',
           }}>
-            {formatDateTime(session.date)}
+            {formatDateTime(session.date, lang)}
           </div>
           {editingName ? (
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '6px' }}>
