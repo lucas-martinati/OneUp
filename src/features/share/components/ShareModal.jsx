@@ -10,6 +10,7 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
   const { t } = useTranslation();
   const {
     cardRef, options, toggleOption, setOption, toggleCategory,
+    setBackgroundImage, clearBackgroundImage,
     exportCard, shareCard, isExporting,
     sessionData, stats, sessionHistory, mode,
   } = shareHook;
@@ -81,6 +82,8 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
           toggleOption={toggleOption}
           setOption={setOption}
           toggleCategory={toggleCategory}
+          setBackgroundImage={setBackgroundImage}
+          clearBackgroundImage={clearBackgroundImage}
           mode={mode}
           isPro={isPro}
           sessionData={sessionData}

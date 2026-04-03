@@ -658,7 +658,14 @@
       "bodyweight": "Bodyweight",
       "weights": "Weights",
       "custom": "Custom"
-    }
+    },
+    "tagFriends": "Tag friends",
+    "tagFriendsHint": "Select friends to tag on the card",
+    "noFriends": "No friends to tag",
+    "friends": "friends",
+    "taggedUsers": "Tagged users",
+    "backgroundImage": "Background image",
+    "uploadImage": "Add an image"
   },
   "exercises": {
     "pushups": "Push-ups",

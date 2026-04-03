@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette } from 'lucide-react';
+import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X } from 'lucide-react';
 
+// eslint-disable-next-line no-unused-vars
 function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
   return (
     <button
@@ -44,10 +45,24 @@ const CATEGORIES = [
   { key: 'custom', color: '#8b5cf6' },
 ];
 
-export function ShareOptions({ options, toggleOption, setOption, toggleCategory, mode = 'session', isPro = false, sessionData }) {
+export function ShareOptions({ options, toggleOption, setOption, toggleCategory, setBackgroundImage, clearBackgroundImage, mode = 'session', isPro = false, sessionData }) {
   const { t } = useTranslation();
   const isGlobal = mode === 'global';
   const selectedCategories = options.statsCategories || ['bodyweight', 'weights', 'custom'];
+  const fileInputRef = useRef(null);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setBackgroundImage(event.target.result);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   const hasWeightExercises = !isGlobal && sessionData?.exercises?.some(ex => {
     const weightIds = ['biceps_curl','hammer_curl','bench_press','overhead_press','squat_weights','deadlift','barbell_row'];
@@ -198,6 +213,68 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
               );
             })}
           </div>
+        </>
+      )}
+
+      {/* Background image (pro only) */}
+      {isPro && (
+        <>
+          <div style={{ height: '4px' }} />
+          <div style={{
+            fontSize: '0.65rem', fontWeight: 700,
+            color: 'var(--text-secondary)',
+            textTransform: 'uppercase', letterSpacing: '1px',
+            padding: '0 4px',
+          }}>
+            <Image size={11} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+            {t('share.backgroundImage', 'Image de fond')}
+          </div>
+          
+          {options.backgroundImage ? (
+            <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden' }}>
+              <img 
+                src={options.backgroundImage} 
+                alt="Background" 
+                style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '12px' }}
+              />
+              <button
+                onClick={clearBackgroundImage}
+                style={{
+                  position: 'absolute', top: '4px', right: '4px',
+                  width: '24px', height: '24px', borderRadius: '50%',
+                  background: 'rgba(0,0,0,0.6)', border: 'none',
+                  color: 'white', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <X size={14} />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                width: '100%', padding: '16px', borderRadius: '12px',
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px dashed rgba(255,255,255,0.15)',
+                color: 'var(--text-secondary)',
+                fontSize: '0.75rem', fontWeight: 600,
+                cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: '6px',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Image size={20} style={{ opacity: 0.5 }} />
+              {t('share.uploadImage', 'Ajouter une image')}
+            </button>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            style={{ display: 'none' }}
+          />
         </>
       )}
     </div>

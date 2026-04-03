@@ -22,6 +22,7 @@ function formatDate(dateStr, lang) {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
 function MetricCard({ icon: Icon, value, label, color }) {
   return (
     <div style={{
@@ -214,11 +215,21 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
         position: 'relative',
       }}
     >
-      {/* Background gradient */}
+      {/* Background gradient or image */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: currentTheme.bg,
+        background: options.backgroundImage 
+          ? `center / cover no-repeat url(${options.backgroundImage})`
+          : currentTheme.bg,
       }} />
+      
+      {/* Overlay for readability when background image is present */}
+      {options.backgroundImage && (
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'rgba(10,10,18,0.75)',
+        }} />
+      )}
 
       {/* Accent glow */}
       <div style={{

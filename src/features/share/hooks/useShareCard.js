@@ -11,6 +11,8 @@ const DEFAULT_OPTIONS = {
   statsCategories: ['bodyweight', 'weights', 'custom'],
   format: 'png',
   theme: 'dark',
+  taggedUsers: [],
+  backgroundImage: null,
 };
 
 const OPTIONS_STORAGE_KEY = 'oneup_share_options';
@@ -69,6 +71,22 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
     });
   }, []);
 
+  const setBackgroundImage = useCallback((imageDataUrl) => {
+    setOptions(prev => {
+      const next = { ...prev, backgroundImage: imageDataUrl };
+      localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  const clearBackgroundImage = useCallback(() => {
+    setOptions(prev => {
+      const next = { ...prev, backgroundImage: null };
+      localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   const captureCard = useCallback(async () => {
     if (!cardRef.current) throw new Error('Card ref not attached');
     setIsExporting(true);
@@ -118,6 +136,8 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
     setOption,
     toggleOption,
     toggleCategory,
+    setBackgroundImage,
+    clearBackgroundImage,
     exportCard,
     shareCard,
     isExporting,

@@ -665,6 +665,13 @@
       "bodyweight": "自重训练",
       "weights": "器械训练",
       "custom": "自定义"
-    }
+    },
+    "tagFriends": "标记朋友",
+    "tagFriendsHint": "选择要标记在卡片上的朋友",
+    "noFriends": "没有可标记的朋友",
+    "friends": "朋友",
+    "taggedUsers": "已标记用户",
+    "backgroundImage": "背景图片",
+    "uploadImage": "添加图片"
   }
 }

@@ -680,6 +680,13 @@
       "bodyweight": "Peso corporal",
       "weights": "Mancuernas",
       "custom": "Personal"
-    }
+    },
+    "tagFriends": "Etiquetar amigos",
+    "tagFriendsHint": "Seleccionar amigos para etiquetar en la tarjeta",
+    "noFriends": "No hay amigos para etiquetar",
+    "friends": "amigos",
+    "taggedUsers": "Usuarios etiquetados",
+    "backgroundImage": "Imagen de fondo",
+    "uploadImage": "Añadir una imagen"
   }
 }

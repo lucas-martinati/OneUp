@@ -668,7 +668,14 @@
       "bodyweight": "Poids du corps",
       "weights": "Musculation",
       "custom": "Perso"
-    }
+    },
+    "tagFriends": "Taguer des amis",
+    "tagFriendsHint": "Sélectionner les amis à taguer sur la carte",
+    "noFriends": "Aucun ami à taguer",
+    "friends": "amis",
+    "taggedUsers": "Utilisateurs tagués",
+    "backgroundImage": "Image de fond",
+    "uploadImage": "Ajouter une image"
   },
   "exercises": {
     "pushups": "Pompes",
