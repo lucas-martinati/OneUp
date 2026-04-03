@@ -5,11 +5,12 @@ const SETTINGS_KEY = 'oneup_settings';
 const defaultSettings = {
   notificationsEnabled: false,
   soundsEnabled: true,
-  notificationTime: { hour: 9, minute: 0 }, // Default 9:00 AM
+  notificationTime: { hour: 9, minute: 0 },
   leaderboardEnabled: false,
   leaderboardPseudo: '',
   difficultyMultiplier: 1.0,
-  performanceMode: 'high' // 'low' | 'high'
+  performanceMode: 'high',
+  hasSharedFirstTime: false
 };
 
 export function useSettings() {

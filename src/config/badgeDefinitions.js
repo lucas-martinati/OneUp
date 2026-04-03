@@ -1,6 +1,6 @@
 import {
   Target, Flame, Zap, Calendar, TrendingUp, Trophy, Medal, Gem, Rocket,
-  Star, Award, Crown, Activity, Sun, Moon, Users, Ghost
+  Star, Award, Crown, Activity, Sun, Moon, Users, Ghost, Share2
 } from 'lucide-react';
 
 // Single source of truth for all 40 achievement badges.
@@ -39,8 +39,7 @@ export const BADGE_DEFINITIONS = [
   { id: 'perfect_five',         icon: Medal, color: '#a78bfa', category: 'perfection', test: s => s.perfectDays >= 5 },
   { id: 'perfect_fifty',        icon: Crown, color: '#fbbf24', category: 'perfection', test: s => s.perfectDays >= 50 },
   { id: 'perfect_hundred',      icon: Gem,   color: '#c084fc', category: 'perfection', test: s => s.perfectDays >= 100 },
-  { id: 'perfect_two_hundred',  icon: Gem,   color: '#c084fc', category: 'perfection', test: s => s.perfectDays >= 200 },
-
+  
   // ── Schedule ───────────────────────────────────────────────────────
   { id: 'weekday_warrior', icon: Sun,    color: '#f59e0b', category: 'quantite', test: s => s.weekdayWorkouts >= 25 },
   { id: 'weekend_warrior', icon: Moon,   color: '#6366f1', category: 'quantite', test: s => s.weekendWorkouts >= 25 },
@@ -56,6 +55,7 @@ export const BADGE_DEFINITIONS = [
   { id: 'evening_25',      icon: Moon,   color: '#4338ca', category: 'horaires',  test: s => s.eveningWorkouts >= 25 },
 
   // ── Secrets ────────────────────────────────────────────────────────
+  { id: 'first_share', icon: Share2,color: '#818cf8', category: 'secrets', secret: true, test: s => s.hasSharedFirstTime },
   { id: 'ghost',         icon: Ghost,  color: '#6b7280', category: 'secrets', secret: true, test: s => s.ghostWorkout },
   { id: 'perfectionist', icon: Star,   color: '#6b7280', category: 'secrets', secret: true, test: s => s.perfectStreak >= 30 },
   { id: 'beast',         icon: Rocket, color: '#6b7280', category: 'secrets', secret: true, test: s => s.totalRepsAll >= 100000 },

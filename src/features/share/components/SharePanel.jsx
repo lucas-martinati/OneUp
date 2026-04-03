@@ -3,6 +3,7 @@ import { Share2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useShareCard } from '../hooks/useShareCard';
 import { getSessionHistory } from '../services/sessionHistoryService';
+import { useSettings } from '../../../hooks/useSettings';
 
 const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
 
@@ -17,10 +18,21 @@ const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.Sha
  * @param {string} props.variant - 'large' | 'compact' | 'stats'
  * @param {string} props.mode - 'session' | 'global'
  * @param {string} props.label - button label (for 'stats' variant)
+ * @param {Function} props.updateSettings - settings updater for achievement tracking
  */
-export function SharePanel({ sessionData, stats = {}, isPro = false, variant = 'large', mode = 'session', label }) {
+export function SharePanel({ sessionData, stats = {}, isPro = false, variant = 'large', mode = 'session', label, updateSettings: propUpdateSettings }) {
   const [showShare, setShowShare] = useState(false);
   const { t } = useTranslation();
+  const { settings, updateSettings: contextUpdateSettings } = useSettings();
+  
+  const updateSettings = propUpdateSettings || contextUpdateSettings;
+
+  const handleShareClick = () => {
+    if (!settings?.hasSharedFirstTime) {
+      updateSettings({ hasSharedFirstTime: true });
+    }
+    setShowShare(true);
+  };
 
   const shareHook = useShareCard({
     sessionData,
@@ -61,7 +73,7 @@ export function SharePanel({ sessionData, stats = {}, isPro = false, variant = '
   return (
     <>
       <button
-        onClick={() => setShowShare(true)}
+        onClick={handleShareClick}
         className="hover-lift"
         style={buttonStyle}
       >
