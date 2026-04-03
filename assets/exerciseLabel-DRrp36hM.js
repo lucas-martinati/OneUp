@@ -1,0 +1,1 @@
+import{z as e,e as r,d as a}from"./index-luL5Gl0N.js";const i=new Set(r.map(t=>t.id)),s=new Set(a.map(t=>t.id));function u(t){return t?t.id?.startsWith("custom_")?t.label||t.id:t.label&&/[A-Z\u00C0-\u017F]/.test(t.label)?t.label:e.t("exercises."+t.id,{defaultValue:t.label||t.id}):""}function l(t){return i.has(t)?"weights":s.has(t)?"bodyweight":"custom"}export{l as a,u as g};
