@@ -310,8 +310,6 @@ export function ClanModal({ onClose }) {
             <Leaderboard 
                 clanData={clanData} 
                 onClose={onClose} 
-                cloudSync={cloudSync} 
-                cloudAuth={cloudAuth}
                 onLeaveClan={handleLeave}
             />
         </>

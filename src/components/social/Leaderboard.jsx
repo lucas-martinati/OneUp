@@ -13,7 +13,7 @@ import ICON_MAP from '../../utils/iconMap';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProgressContext } from '../../contexts/ProgressContext';
 
-export function Leaderboard({ onClose, activeSlide = 0 }) {
+export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan }) {
 
     // ── Context consumption ──
     const cloudAuth = useAuth();
