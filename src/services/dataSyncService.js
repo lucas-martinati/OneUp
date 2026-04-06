@@ -99,6 +99,8 @@ export function mergeData(localData, cloudData) {
     userStartDate: localData.userStartDate || cloudData.userStartDate,
     completions: mergedCompletions,
     isSetup: localData.isSetup || cloudData.isSetup,
+    hasShared: localData.hasShared || cloudData.hasShared || false,
+    manualBadges: { ...cloudData.manualBadges, ...localData.manualBadges },
     lastSyncedAt: new Date().toISOString()
   };
 }

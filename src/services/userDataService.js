@@ -111,3 +111,25 @@ export async function loadProgramCompletionsFromCloud(programId) {
   if (snapshot.exists()) return snapshot.val();
   return null;
 }
+
+// ── Manual badges (achievements) ─────────────────────────────────────────
+
+export async function saveManualBadgesToCloud(manualBadges) {
+  const auth = getAuthInstance();
+  const database = getDatabaseInstance();
+  if (!auth?.currentUser || !database) return false;
+
+  await set(ref(database, `users/${auth.currentUser.uid}/manualBadges`), manualBadges || {});
+  logger.success('Manual badges synced to cloud');
+  return true;
+}
+
+export async function loadManualBadgesFromCloud() {
+  const auth = getAuthInstance();
+  const database = getDatabaseInstance();
+  if (!auth?.currentUser || !database) return null;
+
+  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/manualBadges`));
+  if (snapshot.exists()) { logger.success('Manual badges loaded from cloud'); return snapshot.val(); }
+  return null;
+}

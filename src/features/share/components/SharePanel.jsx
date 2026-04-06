@@ -19,7 +19,7 @@ const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.Sha
  * @param {string} props.label - button label (for 'stats' variant)
  * @param {Function} props.onShare - callback when user shares/downloads
  */
-export function SharePanel({ sessionData, stats = {}, isPro = false, variant = 'large', mode = 'session', label, onShare }) {
+export function SharePanel({ sessionData, stats = {}, isPro = false, variant = 'large', mode = 'session', label, onShare, setHasShared, showAchievement, hasShared }) {
   const [showShare, setShowShare] = useState(false);
   const { t } = useTranslation();
 
@@ -77,6 +77,10 @@ export function SharePanel({ sessionData, stats = {}, isPro = false, variant = '
             onClose={() => setShowShare(false)}
             isPro={isPro}
             onShare={onShare}
+            mode={mode}
+            setHasShared={setHasShared}
+            showAchievement={showAchievement}
+            hasShared={hasShared}
           />
         )}
       </Suspense>

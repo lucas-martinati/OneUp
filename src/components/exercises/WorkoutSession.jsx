@@ -78,7 +78,8 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
 export function WorkoutSession({
     onClose, today, dayNumber, getExerciseCount, updateExerciseCount, completions, settings,
     routines = [], saveRoutine, deleteRoutine, updateRoutine, maxRoutines = 10,
-    isPro, activeSlide, customExercises = [], computedStats = {}
+    isPro, activeSlide, customExercises = [], computedStats = {}, onShare,
+    setHasShared, showAchievement, hasShared
 }) {
     const { t } = useTranslation();
     const [phase, setPhase] = useState('config'); // 'config' | 'running' | 'done'
@@ -845,6 +846,10 @@ export function WorkoutSession({
                 sessionHistory={getSessionHistory()}
                 isPro={isPro}
                 defaultSessionName={sessionName}
+                onShare={onShare}
+                setHasShared={setHasShared}
+                showAchievement={showAchievement}
+                hasShared={hasShared}
             />
         );
     }

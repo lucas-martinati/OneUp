@@ -28,7 +28,7 @@ function formatDateTime(dateStr, lang) {
   }
 }
 
-export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isPro = false, onNameChange }) {
+export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isPro = false, onNameChange, setHasShared, showAchievement }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -272,6 +272,9 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
             stats={stats}
             isPro={isPro}
             variant="compact"
+            setHasShared={setHasShared}
+            showAchievement={showAchievement}
+            hasShared={hasShared}
           />
           {confirmDelete ? (
             <div style={{ display: 'flex', gap: '6px' }}>

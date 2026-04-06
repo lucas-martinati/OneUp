@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Award, Lock } from 'lucide-react';
-import { BADGE_DEFINITIONS } from '../../config/badgeDefinitions';
+import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '../../config/badgeDefinitions';
 
 const CATEGORY_COLORS = {
     streak: '#f97316',
@@ -25,7 +25,7 @@ const CATEGORY_TITLES = {
 
 const BadgeItem = React.memo(({ badge }) => {
     const { t } = useTranslation();
-    const Icon = badge.icon;
+    const IconComponent = badge.icon;
     const displayTitle = badge.titleKey ? t(badge.titleKey) : (badge.secret ? t('achievements.badges.secret') : '???');
     const displayDesc = badge.descKey && badge.unlocked ? t(badge.descKey) : (badge.secret ? '🔒 ??????' : (badge.descKey ? t(badge.descKey) : ''));
     
@@ -48,7 +48,7 @@ const BadgeItem = React.memo(({ badge }) => {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 marginBottom: '12px'
             }}>
-                <Icon size={22} color={badge.unlocked ? badge.color : 'var(--text-secondary)'} />
+                <IconComponent size={22} color={badge.unlocked ? badge.color : 'var(--text-secondary)'} />
             </div>
             
             <div style={{
@@ -194,16 +194,19 @@ export function Achievements({ completions, exercises, onClose, settings, getDay
         ghostWorkout, perfectStreak, hasShared
     }), [totalDays, maxStreak, totalRepsAll, perfectDays, hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts, morningWorkouts, afternoonWorkouts, eveningWorkouts, ghostWorkout, perfectStreak, hasShared]);
 
-    const badges = useMemo(() => BADGE_DEFINITIONS.map(def => ({
-        id: def.id,
-        icon: def.icon,
-        color: def.color,
-        category: def.category,
-        secret: def.secret || false,
-        titleKey: def.secret && !def.test(statsSnapshot) ? null : `achievements.badges.${def.id}.title`,
-        descKey: def.secret && !def.test(statsSnapshot) ? null : `achievements.badges.${def.id}.desc`,
-        unlocked: def.test(statsSnapshot),
-    })), [statsSnapshot]);
+    const badges = useMemo(() => BADGE_DEFINITIONS.map(def => {
+        const IconComp = getBadgeIconFromDef(def);
+        return {
+            id: def.id,
+            icon: IconComp,
+            color: def.color,
+            category: def.category,
+            secret: def.secret || false,
+            titleKey: def.secret && !isBadgeUnlocked(def.id, statsSnapshot) ? null : `achievements.badges.${def.id}.title`,
+            descKey: def.secret && !isBadgeUnlocked(def.id, statsSnapshot) ? null : `achievements.badges.${def.id}.desc`,
+            unlocked: isBadgeUnlocked(def.id, statsSnapshot),
+        };
+    }), [statsSnapshot]);
 
     const unlockedCount = useMemo(() => badges.filter(b => b.unlocked).length, [badges]);
 

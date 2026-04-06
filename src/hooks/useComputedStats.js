@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { getLocalDateStr, isDayDoneFromCompletions, calculateStreak, calculateExerciseStreak, MAX_STREAK_WINDOW } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
-import { BADGE_DEFINITIONS } from '../config/badgeDefinitions';
+import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
 
 /**
  * Centralized computation hook.
@@ -14,20 +14,21 @@ import { BADGE_DEFINITIONS } from '../config/badgeDefinitions';
  * @param {Function} getDayNumber - (dateStr) => number
  * @param {Array} customExercises - User defined exercises
  * @param {boolean} hasShared - Whether user has shared at least once
+ * @param {Object} manualBadges - { [badgeId]: true|false } for manual badge overrides
  * @returns {Object} computedStats
  */
-export function useComputedStats(completions, settings, getDayNumber, customExercises = [], hasShared = false) {
+export function useComputedStats(completions, settings, getDayNumber, customExercises = [], hasShared = false, manualBadges = {}) {
     const allExercises = useMemo(() => [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises], [customExercises]);
     return useMemo(() => {
-        return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared);
-    }, [completions, settings?.difficultyMultiplier, getDayNumber, allExercises, hasShared]);
+        return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, manualBadges);
+    }, [completions, settings?.difficultyMultiplier, getDayNumber, allExercises, hasShared, JSON.stringify(manualBadges)]);
 }
 
 /**
  * Pure function that computes all stats in a single pass.
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
  */
-export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false) {
+export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, manualBadges = {}) {
     const difficultyMultiplier = settings?.difficultyMultiplier ?? 1.0;
     const todayStr = getLocalDateStr(new Date());
     const today = new Date(todayStr);
@@ -275,13 +276,16 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         ? exerciseStats.reduce((best, ex) => ex.totalReps > (best?.totalReps || 0) ? ex : best, exerciseStats[0])
         : null;
 
-    // ─── Badge count (from single source of truth) ─────────────────────
-    const badgeCount = BADGE_DEFINITIONS.filter(b => b.test({
+    // Stats snapshot for badge testing
+    const statsSnapshot = {
         totalDays, maxStreak, totalRepsAll: globalTotalReps, perfectDays,
         hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts,
         morningWorkouts, afternoonWorkouts, eveningWorkouts,
         ghostWorkout, perfectStreak: maxPerfectStreak, hasShared,
-    })).length;
+    };
+
+    // Badge count (supports manual overrides)
+    const badgeCount = BADGE_DEFINITIONS.filter(b => isBadgeUnlocked(b.id, statsSnapshot, manualBadges)).length;
 
     // ─── Return everything ───────────────────────────────────────────────
     return {
@@ -321,6 +325,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         ghostWorkout,
         perfectStreak: maxPerfectStreak,
         hasShared,
+        manualBadges,
         badgeCount,
         totalRepsAll: globalTotalReps,
         totalExerciseReps: exerciseReps,

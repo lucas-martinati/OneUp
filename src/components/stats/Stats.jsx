@@ -17,7 +17,7 @@ const ConsistencyPieChart = lazy(() => import('./ConsistencyPieChart'));
 const DailyRepsChart = lazy(() => import('./DailyRepsChart'));
 const SessionDetailModal = lazy(() => import('../../features/share/components/SessionDetailModal').then(m => ({ default: m.SessionDetailModal })));
 
-export function Stats({ completions, exercisesList, initialCategory, isPro, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats: globalStats, onOpenStore, onShare }) {
+export function Stats({ completions, exercisesList, initialCategory, isPro, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats: globalStats, onOpenStore, onShare, setHasShared, showAchievement, hasShared }) {
     const { t, i18n } = useTranslation();
     const [chartsReady, setChartsReady] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
@@ -648,6 +648,9 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                     variant="stats"
                     mode="global"
                     onShare={onShare}
+                    setHasShared={setHasShared}
+                    showAchievement={showAchievement}
+                    hasShared={hasShared}
                 />
 
                 {/* Session history */}
@@ -750,6 +753,9 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                         onNameChange={handleSessionNameChange}
                         stats={computedStats}
                         isPro={isPro}
+                        setHasShared={setHasShared}
+                        showAchievement={showAchievement}
+                        hasShared={hasShared}
                     />
                 )}
             </Suspense>

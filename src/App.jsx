@@ -15,9 +15,11 @@ import {
 } from './services/purchaseService';
 import { EXERCISES } from './config/exercises';
 import { WEIGHT_EXERCISES } from './config/weights';
+import { BADGE_DEFINITIONS, BADGE_ICONS, getBadgeIconFromDef } from './config/badgeDefinitions';
 import { createLogger } from './utils/logger';
 import { getLocalDateStr, isDayDoneFromCompletions } from './utils/dateUtils';
 import { loadCachedEntitlements, saveCachedEntitlements, clearCachedEntitlements, resolveEntitlements } from './utils/entitlements';
+import './utils/consoleAchievements';
 
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
 const Onboarding = lazy(() => import('./components/settings/Onboarding').then(module => ({ default: module.Onboarding })));
@@ -97,10 +99,10 @@ function App() {
     scheduleNotification, requestNotificationPermission,
     getExerciseCount, updateExerciseCount,
     saveToCloud, loadFromCloud, syncWithCloud, startCloudListener, deleteExerciseHistory,
-    setHasShared, hasShared
+    setHasShared, hasShared, manualBadges
   } = progress;
 
-  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesHook.customExercises, hasShared);
+  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesHook.customExercises, hasShared, manualBadges);
   const userDetailsCache = useUserDetailsCache(cloudSync);
 
   // ── Helper: publish leaderboard with current state ────────────────────
@@ -486,6 +488,7 @@ function App() {
           onPurchasePro={handlePurchasePro}
           onRestorePurchases={handleRestorePurchases}
           setHasShared={setHasShared}
+          hasShared={hasShared}
         />
       )}
     </Suspense>

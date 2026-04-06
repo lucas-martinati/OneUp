@@ -7,12 +7,12 @@ import {
     Target, TrendingUp, Star, Activity, Play, Square, MoveDown, MoveDiagonal, Shield,
     Sparkles, Lock, ShoppingBag
 } from 'lucide-react';
-import { AchievementToast } from './feedback/AchievementToast';
 import { CSSConfetti } from './feedback/CSSConfetti';
 import { NotificationManager } from './social/NotificationManager';
 import { DashboardHeader } from './dashboard/DashboardHeader';
 import { DashboardSlide } from './dashboard/DashboardSlide';
 import { DashboardActions } from './dashboard/DashboardActions';
+import { useAchievementToast } from '../hooks/useAchievementToast.jsx';
 import { ProPaywall } from './dashboard/ProPaywall';
 import { useHardwareBack } from '../hooks/useHardwareBack';
 import { useModalManager } from '../hooks/useModalManager';
@@ -46,7 +46,7 @@ export function Dashboard({
     routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
     isSupporter, isPro,
     onPurchaseSupporter, onPurchasePro, onRestorePurchases,
-    customExercisesHook, setHasShared
+    customExercisesHook, setHasShared, hasShared
 }) {
     const { t } = useTranslation();
     const [today, setToday] = useState(getLocalDateStr(new Date()));
@@ -74,7 +74,6 @@ export function Dashboard({
     const showSession = modals.session;
     const showClan = modals.clan;
     const showCustomExercisesModal = modals.customExercises;
-    const [newAchievement, setNewAchievement] = useState(null);
     const [activeSlide, setActiveSlide] = useState(0); // 0: Classic, 1: Weights, 2: Custom
     
     // Custom exercises integration
@@ -107,19 +106,33 @@ export function Dashboard({
         setSoundSettingsGetter(() => settings);
     }, [settings]);
 
-    // Achievement detection — compare badge count changes
-    const prevBadgeCountRef = useRef(computedStats.badgeCount);
-    useEffect(() => {
-        const prevCount = prevBadgeCountRef.current;
-        const newCount = computedStats.badgeCount;
-
-        if (newCount > prevCount) {
-            // A new badge was unlocked — show a generic achievement toast
-            setNewAchievement({ id: 'new_badge', title: t('dashboard.newAchievement'), color: '#fbbf24', icon: Award });
+    // Achievement toast - utilise le hook useAchievementToast
+    const { showAchievement, AchievementToast: AchievementToastComponent } = useAchievementToast(
+        () => {
+            setShowStats(true);
+            setTimeout(() => setShowAchievements(true), 100);
         }
+    );
+    const handleViewAchievement = useCallback(() => {
+        setShowCounter(false);
+        setShowStats(true);
+        setTimeout(() => {
+            setShowAchievements(true);
+        }, 100);
+    }, []);
 
-        prevBadgeCountRef.current = newCount;
-    }, [computedStats.badgeCount]);
+    // Handler pour le partage - affiche la notification + valide le badge
+    const handleShareWithAchievement = useCallback(() => {
+        console.log('[Dashboard] handleShareWithAchievement called');
+        setHasShared();
+        showAchievement('first_share');
+    }, [setHasShared, showAchievement]);
+
+    const handleShareSuccess = useCallback(() => {
+        console.log('[Dashboard] handleShareSuccess - granting share achievement');
+        setHasShared();
+        showAchievement('first_share');
+    }, [setHasShared, showAchievement]);
 
     const dayNumber = useMemo(() => getDayNumber(today), [getDayNumber, today]);
 
@@ -186,14 +199,6 @@ export function Dashboard({
         if (scheduleNotification) scheduleNotification(newSettings);
     }, [updateSettings, scheduleNotification]);
 
-    const handleViewAchievement = useCallback(() => {
-        setShowCounter(false);
-        setShowStats(true);
-        setTimeout(() => {
-            setShowAchievements(true);
-        }, 100);
-    }, []);
-
     // Lock body scroll when any modal is open (critical for iOS Safari)
     useEffect(() => {
         if (anyModalOpen) {
@@ -221,13 +226,7 @@ export function Dashboard({
                 onDone={() => setShowDayConfetti(false)}
                 reducedParticles={settings?.performanceMode === 'low'}
             />
-            {newAchievement && (
-                <AchievementToast
-                    achievement={newAchievement}
-                    onClose={() => setNewAchievement(null)}
-                    onView={handleViewAchievement}
-                />
-            )}
+            {AchievementToastComponent}
             <div className="fade-in" style={{
                 display: 'flex', flexDirection: 'column', height: '100%',
                 gap: 'clamp(4px, 1vh, 10px)', paddingBottom: 'clamp(2px, 0.5vh, 8px)'
@@ -373,7 +372,7 @@ export function Dashboard({
                             isPro={isPro}
                             onClose={() => setShowStats(false)}
                             onOpenAchievements={() => { setShowAchievements(true); }}
-                            highlightedBadgeId={newAchievement?.id}
+                            highlightedBadgeId={null}
                             settings={settings}
                             getDayNumber={getDayNumber}
                             computedStats={computedStats}
@@ -381,7 +380,10 @@ export function Dashboard({
                                 setShowSettings(true);
                                 setOpenStoreDirectly(true);
                             }}
-                            onShare={setHasShared}
+                            onShare={handleShareWithAchievement}
+                            setHasShared={setHasShared}
+                            showAchievement={showAchievement}
+                            hasShared={hasShared}
                         />
                     )}
                     {showSettings && (
@@ -438,10 +440,10 @@ export function Dashboard({
                         <Achievements
                             completions={completions}
                             exercises={EXERCISES}
-                            onClose={() => { setShowAchievements(false); setNewAchievement(null); }}
+                            onClose={() => { setShowAchievements(false); }}
                             settings={settings}
                             getDayNumber={getDayNumber}
-                            highlightedBadgeId={newAchievement?.id}
+                            highlightedBadgeId={null}
                             computedStats={computedStats}
                         />
                     )}
@@ -463,6 +465,10 @@ export function Dashboard({
                             activeSlide={effectiveSlide}
                             customExercises={customExercises}
                             computedStats={computedStats}
+                            onShare={handleShareWithAchievement}
+                            setHasShared={setHasShared}
+                            showAchievement={showAchievement}
+                            hasShared={hasShared}
                         />
                     )}
                     {showClan && (

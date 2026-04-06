@@ -6,7 +6,7 @@ import { ShareCard } from './ShareCard';
 import { ShareOptions } from './ShareOptions';
 import { canShareNatively } from '../services/shareService';
 
-export function ShareModal({ shareHook, onClose, isPro = false, onShare }) {
+export function ShareModal({ shareHook, onClose, isPro = false, onShare, setHasShared, showAchievement, hasShared }) {
   const { t } = useTranslation();
   const {
     cardRef, options, toggleOption, setOption, toggleCategory,
@@ -15,13 +15,24 @@ export function ShareModal({ shareHook, onClose, isPro = false, onShare }) {
     sessionData, stats, sessionHistory, mode,
   } = shareHook;
 
+  const handleShareSuccess = () => {
+    if (setHasShared && showAchievement && hasShared) {
+      return;
+    } else if (setHasShared && showAchievement && !hasShared) {
+      setHasShared();
+      showAchievement('first_share');
+    } else {
+      onShare?.();
+    }
+  };
+
   const handleShare = async () => { 
     await shareCard(); 
-    onShare?.();
+    handleShareSuccess();
   };
   const handleDownload = async () => { 
     await exportCard(); 
-    onShare?.();
+    handleShareSuccess();
   };
 
   return (

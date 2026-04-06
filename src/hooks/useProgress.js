@@ -3,6 +3,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { cloudSync } from '../services/cloudSync';
 import { getLocalDateStr } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
+import { saveManualBadgesToCloud, loadManualBadgesFromCloud } from '../services/userDataService';
 import i18n from '../i18n';
 
 const STORAGE_KEY = 'pushup_challenge_data';
@@ -73,6 +74,8 @@ function validateProgressData(data) {
         : data.startDate || `${new Date().getFullYear()}-01-01`,
     completions,
     isSetup: typeof data.isSetup === 'boolean' ? data.isSetup : false,
+    hasShared: typeof data.hasShared === 'boolean' ? data.hasShared : false,
+    manualBadges: typeof data.manualBadges === 'object' && data.manualBadges !== null ? data.manualBadges : {},
   };
 }
 
@@ -111,21 +114,41 @@ export function useProgress() {
         userStartDate: fixedStartDate,
         completions: {},
         isSetup: false,
-        hasShared: false,
+        hasShared: parsed?.hasShared ?? false,
+        manualBadges: parsed?.manualBadges ?? {},
       };
     }
 
     // Legacy support
     if (parsed.isSetup === undefined) {
-      return { ...parsed, isSetup: true, userStartDate: parsed.startDate, lastCompletionChange: Date.now() };
+      return { ...parsed, isSetup: true, userStartDate: parsed.startDate, lastCompletionChange: Date.now(), manualBadges: parsed.manualBadges ?? {} };
     }
 
-    return { ...parsed, lastCompletionChange: Date.now(), hasShared: parsed.hasShared ?? false };
+    return { ...parsed, lastCompletionChange: Date.now(), hasShared: parsed.hasShared ?? false, manualBadges: parsed.manualBadges ?? {} };
   });
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
+
+  // Sync manual badges to cloud when they change
+  useEffect(() => {
+    if (state.manualBadges && Object.keys(state.manualBadges).length > 0) {
+      saveManualBadgesToCloud(state.manualBadges).catch(() => {});
+    }
+  }, [state.manualBadges]);
+
+  // Load manual badges from cloud on init (for logged-in users)
+  useEffect(() => {
+    loadManualBadgesFromCloud().then(cloudBadges => {
+      if (cloudBadges && Object.keys(cloudBadges).length > 0) {
+        setState(prev => ({
+          ...prev,
+          manualBadges: { ...prev.manualBadges, ...cloudBadges }
+        }));
+      }
+    }).catch(() => {});
+  }, []);
 
   // ─── Challenge Setup ──────────────────────────────────────────────────────
 
@@ -379,6 +402,8 @@ export function useProgress() {
             userStartDate: validated.userStartDate,
             completions: validated.completions || {},
             isSetup: validated.isSetup,
+            hasShared: validated.hasShared ?? false,
+            manualBadges: validated.manualBadges ?? {},
           };
         });
         return { success: true, data: cloudData };
@@ -473,6 +498,7 @@ export function useProgress() {
     startDate: state.startDate,
     completions: state.completions,
     hasShared: state.hasShared,
+    manualBadges: state.manualBadges,
     startChallenge,
     toggleCompletion,
     getDayNumber,
@@ -492,5 +518,14 @@ export function useProgress() {
     syncWithCloud,
     startCloudListener,
     setHasShared,
+    setManualBadge: (badgeId, value) => {
+      setState(prev => ({ ...prev, manualBadges: { ...prev.manualBadges, [badgeId]: value } }));
+    },
+    validateBadge: (badgeId) => {
+      setState(prev => ({ ...prev, manualBadges: { ...prev.manualBadges, [badgeId]: true } }));
+    },
+    invalidateBadge: (badgeId) => {
+      setState(prev => ({ ...prev, manualBadges: { ...prev.manualBadges, [badgeId]: false } }));
+    },
   };
 }
