@@ -309,18 +309,10 @@ export function Dashboard() {
                     )}
                     {showStats && (
                         <Stats
-                            completions={completions}
-                            exercisesList={exercisesByCategory}
                             initialCategory={effectiveSlide === 0 ? 'standard' : effectiveSlide === 1 ? 'weights' : 'custom'}
-                            isPro={isPro}
                             onClose={() => setShowStats(false)}
                             onOpenAchievements={() => { setShowAchievements(true); }}
-                            highlightedBadgeId={null}
-                            settings={settings}
-                            getDayNumber={getDayNumber}
-                            computedStats={computedStats}
                             onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
-
                         />
                     )}
                     {showSettings && (
@@ -373,20 +365,7 @@ export function Dashboard() {
                             onClose={() => { setShowSession(false); resumeCloudSync?.(); }}
                             today={today}
                             dayNumber={dayNumber}
-                            getExerciseCount={getExerciseCount}
-                            updateExerciseCount={updateExerciseCount}
-                            completions={completions}
-                            settings={settings}
-                            routines={routines}
-                            saveRoutine={saveRoutine}
-                            deleteRoutine={deleteRoutine}
-                            updateRoutine={updateRoutine}
-                            maxRoutines={maxRoutines}
-                            isPro={isPro}
                             activeSlide={effectiveSlide}
-                            customExercises={customExercises}
-                            computedStats={computedStats}
-
                         />
                     )}
                     {showClan && (
