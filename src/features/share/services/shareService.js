@@ -13,6 +13,7 @@ export async function captureElement(element, { format = 'png', quality = 0.92, 
   if (!element) throw new Error('No element to capture');
 
   const captureFn = format === 'jpeg' ? toJpeg : toPng;
+  
   const dataUrl = await captureFn(element, {
     quality,
     pixelRatio,
@@ -21,6 +22,7 @@ export async function captureElement(element, { format = 'png', quality = 0.92, 
     style: {
       transform: 'none',
     },
+    skipFonts: true,
   });
 
   return dataUrl;
