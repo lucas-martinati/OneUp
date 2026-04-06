@@ -6,7 +6,7 @@ import { ShareCard } from './ShareCard';
 import { ShareOptions } from './ShareOptions';
 import { canShareNatively } from '../services/shareService';
 
-export function ShareModal({ shareHook, onClose, isPro = false }) {
+export function ShareModal({ shareHook, onClose, isPro = false, onShare }) {
   const { t } = useTranslation();
   const {
     cardRef, options, toggleOption, setOption, toggleCategory,
@@ -15,8 +15,14 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
     sessionData, stats, sessionHistory, mode,
   } = shareHook;
 
-  const handleShare = async () => { await shareCard(); };
-  const handleDownload = async () => { await exportCard(); };
+  const handleShare = async () => { 
+    await shareCard(); 
+    onShare?.();
+  };
+  const handleDownload = async () => { 
+    await exportCard(); 
+    onShare?.();
+  };
 
   return (
     <div className="fade-in" style={{

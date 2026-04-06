@@ -13,20 +13,21 @@ import { BADGE_DEFINITIONS } from '../config/badgeDefinitions';
  * @param {Object} settings - { difficultyMultiplier, ... }
  * @param {Function} getDayNumber - (dateStr) => number
  * @param {Array} customExercises - User defined exercises
+ * @param {boolean} hasShared - Whether user has shared at least once
  * @returns {Object} computedStats
  */
-export function useComputedStats(completions, settings, getDayNumber, customExercises = []) {
+export function useComputedStats(completions, settings, getDayNumber, customExercises = [], hasShared = false) {
     const allExercises = useMemo(() => [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises], [customExercises]);
     return useMemo(() => {
-        return computeAllStats(completions, settings, getDayNumber, allExercises);
-    }, [completions, settings?.difficultyMultiplier, getDayNumber, allExercises]);
+        return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared);
+    }, [completions, settings?.difficultyMultiplier, getDayNumber, allExercises, hasShared]);
 }
 
 /**
  * Pure function that computes all stats in a single pass.
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
  */
-export function computeAllStats(completions, settings, getDayNumber, allExercises) {
+export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false) {
     const difficultyMultiplier = settings?.difficultyMultiplier ?? 1.0;
     const todayStr = getLocalDateStr(new Date());
     const today = new Date(todayStr);
@@ -279,7 +280,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         totalDays, maxStreak, totalRepsAll: globalTotalReps, perfectDays,
         hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts,
         morningWorkouts, afternoonWorkouts, eveningWorkouts,
-        ghostWorkout, perfectStreak: maxPerfectStreak,
+        ghostWorkout, perfectStreak: maxPerfectStreak, hasShared,
     })).length;
 
     // ─── Return everything ───────────────────────────────────────────────
@@ -319,6 +320,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         hasCompletedAllExercisesOnce,
         ghostWorkout,
         perfectStreak: maxPerfectStreak,
+        hasShared,
         badgeCount,
         totalRepsAll: globalTotalReps,
         totalExerciseReps: exerciseReps,

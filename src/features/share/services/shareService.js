@@ -69,6 +69,30 @@ export async function shareImage(dataUrl, { title = 'OneUp', text = '' } = {}) {
 }
 
 export async function downloadImage(dataUrl, filename = 'oneup-session.png') {
+  if (isNative()) {
+    try {
+      const { Filesystem, Directory } = await import('@capacitor/filesystem');
+      const base64Data = dataUrl.split(',')[1];
+      const fileName = filename || `oneup-session-${Date.now()}.png`;
+      
+      const result = await Filesystem.writeFile({
+        path: fileName,
+        data: base64Data,
+        directory: Directory.Cache,
+      });
+      
+      const { Share } = await import('@capacitor/share');
+      await Share.share({
+        url: result.uri,
+        title: 'OneUp',
+      });
+      
+      return { success: true, method: 'native-share' };
+    } catch (err) {
+      console.error('Native download failed:', err);
+    }
+  }
+  
   const link = document.createElement('a');
   link.download = filename;
   link.href = dataUrl;

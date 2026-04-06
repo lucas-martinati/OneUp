@@ -3,14 +3,25 @@ import { useTranslation } from 'react-i18next';
 import { Award, Lock } from 'lucide-react';
 import { BADGE_DEFINITIONS } from '../../config/badgeDefinitions';
 
-const CATEGORIES = [
-    { id: 'streak', titleKey: 'achievements.categories.streak', color: '#f97316' },
-    { id: 'quantite', titleKey: 'achievements.categories.quantity', color: '#22c55e' },
-    { id: 'volume', titleKey: 'achievements.categories.volume', color: '#ef4444' },
-    { id: 'perfection', titleKey: 'achievements.categories.perfection', color: '#22d3d1' },
-    { id: 'horaires', titleKey: 'achievements.categories.horaires', color: '#fb923c' },
-    { id: 'secrets', titleKey: 'achievements.categories.secrets', color: '#6b7280' }
-];
+const CATEGORY_COLORS = {
+    streak: '#f97316',
+    quantite: '#22c55e',
+    volume: '#ef4444',
+    perfection: '#22d3d1',
+    horaires: '#fb923c',
+    secrets: '#6b7280',
+    social: '#3b82f6',
+};
+
+const CATEGORY_TITLES = {
+    streak: 'achievements.categories.streak',
+    quantite: 'achievements.categories.quantity',
+    volume: 'achievements.categories.volume',
+    perfection: 'achievements.categories.perfection',
+    horaires: 'achievements.categories.horaires',
+    secrets: 'achievements.categories.secrets',
+    social: 'achievements.categories.social',
+};
 
 const BadgeItem = React.memo(({ badge }) => {
     const { t } = useTranslation();
@@ -172,7 +183,7 @@ export function Achievements({ completions, exercises, onClose, settings, getDay
         totalDays, maxStreak, totalRepsAll, perfectDays,
         hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts,
         morningWorkouts, afternoonWorkouts, eveningWorkouts,
-        ghostWorkout, perfectStreak
+        ghostWorkout, perfectStreak, hasShared
     } = computedStats;
 
     // Memoize the badge list from the single source of truth
@@ -180,8 +191,8 @@ export function Achievements({ completions, exercises, onClose, settings, getDay
         totalDays, maxStreak, totalRepsAll, perfectDays,
         hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts,
         morningWorkouts, afternoonWorkouts, eveningWorkouts,
-        ghostWorkout, perfectStreak
-    }), [totalDays, maxStreak, totalRepsAll, perfectDays, hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts, morningWorkouts, afternoonWorkouts, eveningWorkouts, ghostWorkout, perfectStreak]);
+        ghostWorkout, perfectStreak, hasShared
+    }), [totalDays, maxStreak, totalRepsAll, perfectDays, hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts, morningWorkouts, afternoonWorkouts, eveningWorkouts, ghostWorkout, perfectStreak, hasShared]);
 
     const badges = useMemo(() => BADGE_DEFINITIONS.map(def => ({
         id: def.id,
@@ -195,6 +206,15 @@ export function Achievements({ completions, exercises, onClose, settings, getDay
     })), [statsSnapshot]);
 
     const unlockedCount = useMemo(() => badges.filter(b => b.unlocked).length, [badges]);
+
+    const categories = useMemo(() => {
+        const catIds = [...new Set(badges.map(b => b.category))];
+        return catIds.map(id => ({
+            id,
+            titleKey: CATEGORY_TITLES[id] || `achievements.categories.${id}`,
+            color: CATEGORY_COLORS[id] || '#888',
+        }));
+    }, [badges]);
 
     return (
         <>
@@ -276,7 +296,7 @@ export function Achievements({ completions, exercises, onClose, settings, getDay
                     </div>
 
                     {/* Categories Listing */}
-                    {CATEGORIES.map(cat => {
+                    {categories.map(cat => {
                         const catBadges = badges.filter(b => b.category === cat.id);
                         if (catBadges.length === 0) return null;
                         

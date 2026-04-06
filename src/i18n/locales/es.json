@@ -289,10 +289,6 @@
         "title": "Perfeccionista",
         "desc": "100 días perfectos"
       },
-      "perfect_two_hundred": {
-        "title": "¡No Humano!",
-        "desc": "200 días perfectos"
-      },
       "all_exercises": {
         "title": "Todoterreno",
         "desc": "Haz cada ejercicio al menos una vez"
@@ -345,6 +341,10 @@
         "title": "Luna",
         "desc": "25 entrenamientos por la noche"
       },
+      "first_share": {
+        "title": "Mariposa Social",
+        "desc": "Comparte tus estadísticas por primera vez"
+      },
       "ghost": {
         "title": "Fantasma",
         "desc": "Entrena entre las 3am y las 4am"
@@ -366,7 +366,8 @@
       "volume": "Volumen",
       "perfection": "Perfección",
       "horaires": "Hora del Día",
-      "secrets": "Secretos"
+      "secrets": "Secretos",
+      "social": "Social"
     }
   },
   "achievementToast": {

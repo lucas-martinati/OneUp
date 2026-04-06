@@ -289,10 +289,6 @@
         "title": "Perfectionniste",
         "desc": "100 jours parfaits"
       },
-      "perfect_two_hundred": {
-        "title": "Pas Humain!",
-        "desc": "200 jours parfaits"
-      },
       "all_exercises": {
         "title": "Polyvalent",
         "desc": "Faire tous les exercices au moins une fois"
@@ -345,6 +341,10 @@
         "title": "Lune",
         "desc": "25 entraînements le soir"
       },
+      "first_share": {
+        "title": "Réseau Social",
+        "desc": "Partagez vos statistiques pour la première fois"
+      },
       "ghost": {
         "title": "Fantôme",
         "desc": "Entraînement entre 3h et 4h"
@@ -366,7 +366,8 @@
       "volume": "Volume",
       "perfection": "Perfection",
       "horaires": "Horaires",
-      "secrets": "Secrets"
+      "secrets": "Secrets",
+      "social": "Social"
     }
   },
   "achievementToast": {

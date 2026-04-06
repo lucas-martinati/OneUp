@@ -111,6 +111,7 @@ export function useProgress() {
         userStartDate: fixedStartDate,
         completions: {},
         isSetup: false,
+        hasShared: false,
       };
     }
 
@@ -119,7 +120,7 @@ export function useProgress() {
       return { ...parsed, isSetup: true, userStartDate: parsed.startDate, lastCompletionChange: Date.now() };
     }
 
-    return { ...parsed, lastCompletionChange: Date.now() };
+    return { ...parsed, lastCompletionChange: Date.now(), hasShared: parsed.hasShared ?? false };
   });
 
   useEffect(() => {
@@ -464,9 +465,14 @@ export function useProgress() {
 
   // ─── Return ───────────────────────────────────────────────────────────────
 
+  const setHasShared = useCallback(() => {
+    setState(prev => ({ ...prev, hasShared: true }));
+  }, []);
+
   return {
     startDate: state.startDate,
     completions: state.completions,
+    hasShared: state.hasShared,
     startChallenge,
     toggleCompletion,
     getDayNumber,
@@ -485,5 +491,6 @@ export function useProgress() {
     loadFromCloud,
     syncWithCloud,
     startCloudListener,
+    setHasShared,
   };
 }

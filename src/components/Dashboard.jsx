@@ -46,7 +46,7 @@ export function Dashboard({
     routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
     isSupporter, isPro,
     onPurchaseSupporter, onPurchasePro, onRestorePurchases,
-    customExercisesHook
+    customExercisesHook, setHasShared
 }) {
     const { t } = useTranslation();
     const [today, setToday] = useState(getLocalDateStr(new Date()));
@@ -381,6 +381,7 @@ export function Dashboard({
                                 setShowSettings(true);
                                 setOpenStoreDirectly(true);
                             }}
+                            onShare={setHasShared}
                         />
                     )}
                     {showSettings && (

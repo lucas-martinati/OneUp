@@ -282,10 +282,6 @@
         "title": "Perfectionist",
         "desc": "100 perfect days"
       },
-      "perfect_two_hundred": {
-        "title": "Not Human!",
-        "desc": "200 perfect days"
-      },
       "all_exercises": {
         "title": "All-Rounder",
         "desc": "Do every exercise at least once"
@@ -338,6 +334,10 @@
         "title": "Moon",
         "desc": "25 evening workouts"
       },
+      "first_share": {
+        "title": "Social Butterfly",
+        "desc": "Share your stats for the first time"
+      },
       "ghost": {
         "title": "Ghost",
         "desc": "Workout between 3am and 4am"
@@ -359,7 +359,8 @@
       "volume": "Volume",
       "perfection": "Perfection",
       "horaires": "Time of Day",
-      "secrets": "Secrets"
+      "secrets": "Secrets",
+      "social": "Social"
     }
   },
   "achievementToast": {

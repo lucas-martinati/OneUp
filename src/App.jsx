@@ -96,10 +96,11 @@ function App() {
     getDayNumber, getTotalReps, isDayDone, isSetup, userStartDate,
     scheduleNotification, requestNotificationPermission,
     getExerciseCount, updateExerciseCount,
-    saveToCloud, loadFromCloud, syncWithCloud, startCloudListener, deleteExerciseHistory
+    saveToCloud, loadFromCloud, syncWithCloud, startCloudListener, deleteExerciseHistory,
+    setHasShared, hasShared
   } = progress;
 
-  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesHook.customExercises);
+  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesHook.customExercises, hasShared);
   const userDetailsCache = useUserDetailsCache(cloudSync);
 
   // ── Helper: publish leaderboard with current state ────────────────────
@@ -484,6 +485,7 @@ function App() {
           onPurchaseSupporter={handlePurchaseSupporter}
           onPurchasePro={handlePurchasePro}
           onRestorePurchases={handleRestorePurchases}
+          setHasShared={setHasShared}
         />
       )}
     </Suspense>
