@@ -499,6 +499,7 @@ export function useProgress() {
     completions: state.completions,
     hasShared: state.hasShared,
     manualBadges: state.manualBadges,
+    lastCompletionChange: state.lastCompletionChange,
     startChallenge,
     toggleCompletion,
     getDayNumber,

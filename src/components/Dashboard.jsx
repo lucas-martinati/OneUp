@@ -1,12 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo, Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
-import { App as CapacitorApp } from '@capacitor/app';
-import {
-    Trophy, Calendar as CalendarIcon, PieChart, Flame, Settings as SettingsIcon,
-    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Users, Check, Award,
-    Target, TrendingUp, Star, Activity, Play, Square, MoveDown, MoveDiagonal, Shield,
-    Sparkles, Lock, ShoppingBag
-} from 'lucide-react';
 import { CSSConfetti } from './feedback/CSSConfetti';
 import { NotificationManager } from './social/NotificationManager';
 import { DashboardHeader } from './dashboard/DashboardHeader';
@@ -17,6 +10,12 @@ import { ProPaywall } from './dashboard/ProPaywall';
 import { useHardwareBack } from '../hooks/useHardwareBack';
 import { useModalManager } from '../hooks/useModalManager';
 
+// Contexts
+import { useAuth } from '../contexts/AuthContext';
+import { useProgressContext } from '../contexts/ProgressContext';
+import { useSubscription } from '../contexts/SubscriptionContext';
+import { useExercises } from '../contexts/ExercisesContext';
+
 const Calendar = lazy(() => import('./stats/Calendar').then(m => ({ default: m.Calendar })));
 const Stats = lazy(() => import('./stats/Stats').then(m => ({ default: m.Stats })));
 const Settings = lazy(() => import('./settings/Settings').then(m => ({ default: m.Settings })));
@@ -25,7 +24,6 @@ const Leaderboard = lazy(() => import('./social/Leaderboard').then(m => ({ defau
 const Achievements = lazy(() => import('./feedback/Achievements').then(m => ({ default: m.Achievements })));
 const Timer = lazy(() => import('./exercises/Timer').then(m => ({ default: m.Timer })));
 const WorkoutSession = lazy(() => import('./exercises/WorkoutSession').then(m => ({ default: m.WorkoutSession })));
-const Onboarding = lazy(() => import('./settings/Onboarding').then(module => ({ default: module.Onboarding })));
 const ClanModal = lazy(() => import('./social/ClanModal').then(m => ({ default: m.ClanModal })));
 const CustomExercisesModal = lazy(() => import('./exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
 
@@ -33,29 +31,34 @@ import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';
 import { EXERCISES, EXERCISES_MAP, getDailyGoal } from '../config/exercises';
 import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
-import { runBackHandler } from '../utils/backHandler';
 import { canAccessFeature, FEATURES } from '../utils/entitlements';
-import ICON_MAP from '../utils/iconMap';
 import { formatTime } from '../utils/dateUtils';
 
-export function Dashboard({
-    getDayNumber, toggleCompletion, completions, startDate, userStartDate,
-    scheduleNotification, cloudAuth, cloudSync, settings, updateSettings,
-    conflictData, onResolveConflict, getExerciseCount, updateExerciseCount, getTotalReps,
-    getExerciseDone, pauseCloudSync, resumeCloudSync, computedStats,
-    routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
-    isSupporter, isPro,
-    onPurchaseSupporter, onPurchasePro, onRestorePurchases,
-    customExercisesHook, setHasShared, hasShared
-}) {
+export function Dashboard() {
     const { t } = useTranslation();
+
+    // ── Consume contexts (replaces ~35 props) ────────────────────────
+    const auth = useAuth();
+    const {
+        getDayNumber, toggleCompletion, completions, startDate, userStartDate,
+        scheduleNotification, settings, updateSettings,
+        conflictData, onResolveConflict, getExerciseCount, updateExerciseCount,
+        getTotalReps, getExerciseDone, pauseCloudSync, resumeCloudSync,
+        computedStats, cloudSyncAPI, setHasShared, hasShared,
+    } = useProgressContext();
+    const { isSupporter, isPro, purchaseSupporter, purchasePro, restorePurchases } = useSubscription();
+    const {
+        classicExercises, weightExercises, customExercises, customExercisesMap,
+        routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
+        customExercisesHook, exercisesByCategory,
+    } = useExercises();
+
     const [today, setToday] = useState(getLocalDateStr(new Date()));
 
     const { modals, openModal, closeModal, anyModalOpen, activeModals } = useModalManager(
         { calendar: false, stats: false, settings: false, counter: false, leaderboard: false, achievements: false, session: false, clan: false, customExercises: false },
-        ['counter', 'session', 'clan'] // shouldResumeSync modals
+        ['counter', 'session', 'clan']
     );
-    // Aliases for child components expecting setShowX boolean setters
     const setShowCalendar = (v) => v ? openModal('calendar') : closeModal('calendar');
     const setShowStats = (v) => v ? openModal('stats') : closeModal('stats');
     const setShowSettings = (v) => v ? openModal('settings') : closeModal('settings');
@@ -74,15 +77,7 @@ export function Dashboard({
     const showSession = modals.session;
     const showClan = modals.clan;
     const showCustomExercisesModal = modals.customExercises;
-    const [activeSlide, setActiveSlide] = useState(0); // 0: Classic, 1: Weights, 2: Custom
-    
-    // Custom exercises integration
-    const customExercises = customExercisesHook?.customExercises || [];
-    const customExercisesMap = useMemo(() => {
-        const map = {};
-        customExercises.forEach(ex => { map[ex.id] = ex; });
-        return map;
-    }, [customExercises]);
+    const [activeSlide, setActiveSlide] = useState(0);
 
     const [classicSelected, setClassicSelected] = useState('pushups');
     const [weightsSelected, setWeightsSelected] = useState('biceps_curl');
@@ -93,7 +88,6 @@ export function Dashboard({
     const [showDayConfetti, setShowDayConfetti] = useState(false);
     const [openStoreDirectly, setOpenStoreDirectly] = useState(false);
 
-    // Dynamic global selection for Header badge styling
     const effectiveSlide = isPro ? activeSlide : 0;
     const globalSelectedId = effectiveSlide === 0 ? classicSelected : effectiveSlide === 1 ? weightsSelected : customSelected;
     const selectedExercise = useMemo(() => {
@@ -106,30 +100,14 @@ export function Dashboard({
         setSoundSettingsGetter(() => settings);
     }, [settings]);
 
-    // Achievement toast - utilise le hook useAchievementToast
     const { showAchievement, AchievementToast: AchievementToastComponent } = useAchievementToast(
         () => {
             setShowStats(true);
             setTimeout(() => setShowAchievements(true), 100);
         }
     );
-    const handleViewAchievement = useCallback(() => {
-        setShowCounter(false);
-        setShowStats(true);
-        setTimeout(() => {
-            setShowAchievements(true);
-        }, 100);
-    }, []);
 
-    // Handler pour le partage - affiche la notification + valide le badge
     const handleShareWithAchievement = useCallback(() => {
-        console.log('[Dashboard] handleShareWithAchievement called');
-        setHasShared();
-        showAchievement('first_share');
-    }, [setHasShared, showAchievement]);
-
-    const handleShareSuccess = useCallback(() => {
-        console.log('[Dashboard] handleShareSuccess - granting share achievement');
         setHasShared();
         showAchievement('first_share');
     }, [setHasShared, showAchievement]);
@@ -140,17 +118,12 @@ export function Dashboard({
     const isExerciseDone = completions[today]?.[selectedExerciseId]?.isCompleted || false;
     const currentCount = getExerciseCount(today, selectedExerciseId);
     const dailyGoal = getDailyGoal(selectedExercise, dayNumber, settings?.difficultyMultiplier) || 1;
-
     const totalReps = computedStats.exerciseReps[globalSelectedId] || 0;
 
     const effectiveStart = userStartDate || startDate;
     const isFuture = today < effectiveStart;
 
-    // Pre-computed streaks from computedStats
     const statsSelectedEx = computedStats.exerciseStats?.find(e => e.id === globalSelectedId);
-    const exerciseStreak = statsSelectedEx ? statsSelectedEx.streak : 0;
-
-    // Duolingo-style streak from computedStats
     const displayStreak = computedStats.displayStreak;
     const streakActive = computedStats.streakActive;
 
@@ -160,7 +133,6 @@ export function Dashboard({
         else setCustomSelected(id);
     };
 
-    // Day change detection
     useEffect(() => {
         const handleDayChange = () => {
             const now = new Date();
@@ -168,23 +140,16 @@ export function Dashboard({
             if (currentDateStr !== today) {
                 const previousDayNumber = getDayNumber(today);
                 const newDayNumber = getDayNumber(currentDateStr);
-
                 if (newDayNumber > previousDayNumber) {
                     setPrevDayNumber(previousDayNumber);
                     setIsCounterTransitioning(true);
                     setShowDayConfetti(true);
-
-                    setTimeout(() => {
-                        setIsCounterTransitioning(false);
-                        setPrevDayNumber(null);
-                    }, 800);
+                    setTimeout(() => { setIsCounterTransitioning(false); setPrevDayNumber(null); }, 800);
                 }
-
                 setToday(currentDateStr);
                 if (scheduleNotification) scheduleNotification(settings);
             }
         };
-
         handleDayChange();
         const interval = setInterval(handleDayChange, 10000);
         return () => clearInterval(interval);
@@ -192,14 +157,11 @@ export function Dashboard({
 
     useHardwareBack(activeModals, resumeCloudSync);
 
-
-
     const handleSaveSettings = useCallback((newSettings) => {
         updateSettings(newSettings);
         if (scheduleNotification) scheduleNotification(newSettings);
     }, [updateSettings, scheduleNotification]);
 
-    // Lock body scroll when any modal is open (critical for iOS Safari)
     useEffect(() => {
         if (anyModalOpen) {
             document.body.style.overflow = 'hidden';
@@ -231,7 +193,6 @@ export function Dashboard({
                 display: 'flex', flexDirection: 'column', height: '100%',
                 gap: 'clamp(4px, 1vh, 10px)', paddingBottom: 'clamp(2px, 0.5vh, 8px)'
             }}>
-                {/* ── Header ── */}
                 <DashboardHeader
                     setShowSettings={setShowSettings}
                     setShowStats={setShowStats}
@@ -244,12 +205,8 @@ export function Dashboard({
                     totalReps={totalReps}
                 />
 
-                {/* ── Main ── */}
-                <main style={{
-                    flex: 1, display: 'flex', flexDirection: 'column',
-                    minHeight: 0, position: 'relative'
-                }}>
-                    <div 
+                <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, position: 'relative' }}>
+                    <div
                         onScroll={(e) => {
                             const slideHeight = e.target.clientHeight;
                             if (slideHeight === 0) return;
@@ -340,15 +297,13 @@ export function Dashboard({
                     </div>
                 </main>
 
-                {/* Bottom Actions Row */}
-                <DashboardActions 
-                    setShowCalendar={setShowCalendar} 
-                    setShowSession={setShowSession} 
-                    pauseCloudSync={pauseCloudSync} 
-                    selectedExercise={selectedExercise} 
+                <DashboardActions
+                    setShowCalendar={setShowCalendar}
+                    setShowSession={setShowSession}
+                    pauseCloudSync={pauseCloudSync}
+                    selectedExercise={selectedExercise}
                 />
 
-                {/* Modals */}
                 <Suspense fallback={null}>
                     {showCalendar && (
                         <Calendar
@@ -363,11 +318,7 @@ export function Dashboard({
                     {showStats && (
                         <Stats
                             completions={completions}
-                            exercisesList={{
-                                standard: EXERCISES,
-                                weights: WEIGHT_EXERCISES,
-                                custom: customExercises
-                            }}
+                            exercisesList={exercisesByCategory}
                             initialCategory={effectiveSlide === 0 ? 'standard' : effectiveSlide === 1 ? 'weights' : 'custom'}
                             isPro={isPro}
                             onClose={() => setShowStats(false)}
@@ -376,10 +327,7 @@ export function Dashboard({
                             settings={settings}
                             getDayNumber={getDayNumber}
                             computedStats={computedStats}
-                            onOpenStore={() => {
-                                setShowSettings(true);
-                                setOpenStoreDirectly(true);
-                            }}
+                            onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
                             onShare={handleShareWithAchievement}
                             setHasShared={setHasShared}
                             showAchievement={showAchievement}
@@ -390,20 +338,17 @@ export function Dashboard({
                         <Settings
                             defaultShowStore={openStoreDirectly}
                             settings={settings}
-                            onClose={() => {
-                                setShowSettings(false);
-                                setOpenStoreDirectly(false);
-                            }}
+                            onClose={() => { setShowSettings(false); setOpenStoreDirectly(false); }}
                             onSave={handleSaveSettings}
-                            cloudAuth={cloudAuth}
-                            cloudSync={cloudSync}
+                            cloudAuth={auth}
+                            cloudSync={cloudSyncAPI}
                             conflictData={conflictData}
                             onResolveConflict={onResolveConflict}
                             isSupporter={isSupporter}
                             isPro={isPro}
-                            onPurchaseSupporter={onPurchaseSupporter}
-                            onPurchasePro={onPurchasePro}
-                            onRestorePurchases={onRestorePurchases}
+                            onPurchaseSupporter={purchaseSupporter}
+                            onPurchasePro={purchasePro}
+                            onRestorePurchases={restorePurchases}
                         />
                     )}
                     {showCounter && selectedExercise?.type !== 'timer' && (
@@ -431,8 +376,8 @@ export function Dashboard({
                     {showLeaderboard && (
                         <Leaderboard
                             onClose={() => setShowLeaderboard(false)}
-                            cloudSync={cloudSync}
-                            cloudAuth={cloudAuth}
+                            cloudSync={cloudSyncAPI}
+                            cloudAuth={auth}
                             activeSlide={effectiveSlide}
                         />
                     )}
@@ -474,10 +419,10 @@ export function Dashboard({
                     {showClan && (
                         <ClanModal
                             onClose={() => { setShowClan(false); resumeCloudSync?.(); }}
-                            cloudAuth={cloudAuth}
+                            cloudAuth={auth}
                             settings={settings}
                             updateSettings={updateSettings}
-                                                    />
+                        />
                     )}
                     {showCustomExercisesModal && (
                         <CustomExercisesModal
@@ -491,5 +436,3 @@ export function Dashboard({
         </>
     );
 }
-
-
