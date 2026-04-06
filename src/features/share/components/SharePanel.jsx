@@ -3,6 +3,7 @@ import { Share2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useShareCard } from '../hooks/useShareCard';
 import { getSessionHistory } from '../services/sessionHistoryService';
+import { useSubscription } from '../../../contexts/SubscriptionContext';
 
 const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
 
@@ -10,18 +11,12 @@ const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.Sha
  * SharePanel — shared share button + modal for session or global stats sharing.
  * Used in SessionSummary, SessionDetailModal, and Stats.
  *
- * @param {Object} props
- * @param {Object} props.sessionData - { id, date, exercises, duration, name, type }
- * @param {Object} props.stats - computed stats for streak
- * @param {boolean} props.isPro - pro entitlement
- * @param {string} props.variant - 'large' | 'compact' | 'stats'
- * @param {string} props.mode - 'session' | 'global'
- * @param {string} props.label - button label (for 'stats' variant)
- * @param {Function} props.onShare - callback when user shares/downloads
+ * Now consumes isPro from SubscriptionContext directly.
  */
-export function SharePanel({ sessionData, stats = {}, isPro = false, variant = 'large', mode = 'session', label, onShare, setHasShared, showAchievement, hasShared }) {
+export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 'session', label }) {
   const [showShare, setShowShare] = useState(false);
   const { t } = useTranslation();
+  const { isPro } = useSubscription();
 
   const shareHook = useShareCard({
     sessionData,
@@ -76,11 +71,7 @@ export function SharePanel({ sessionData, stats = {}, isPro = false, variant = '
             shareHook={shareHook}
             onClose={() => setShowShare(false)}
             isPro={isPro}
-            onShare={onShare}
             mode={mode}
-            setHasShared={setHasShared}
-            showAchievement={showAchievement}
-            hasShared={hasShared}
           />
         )}
       </Suspense>

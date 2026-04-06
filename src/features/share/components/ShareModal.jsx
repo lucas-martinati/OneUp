@@ -5,9 +5,11 @@ import { Z_INDEX } from '../../../utils/zIndex';
 import { ShareCard } from './ShareCard';
 import { ShareOptions } from './ShareOptions';
 import { canShareNatively } from '../services/shareService';
+import { useProgressContext } from '../../../contexts/ProgressContext';
 
-export function ShareModal({ shareHook, onClose, isPro = false, onShare, setHasShared, showAchievement, hasShared }) {
+export function ShareModal({ shareHook, onClose, isPro = false }) {
   const { t } = useTranslation();
+  const { hasShared, setHasShared } = useProgressContext();
   const {
     cardRef, options, toggleOption, setOption, toggleCategory,
     setBackgroundImage, clearBackgroundImage,
@@ -16,13 +18,8 @@ export function ShareModal({ shareHook, onClose, isPro = false, onShare, setHasS
   } = shareHook;
 
   const handleShareSuccess = () => {
-    if (setHasShared && showAchievement && hasShared) {
-      return;
-    } else if (setHasShared && showAchievement && !hasShared) {
+    if (!hasShared) {
       setHasShared();
-      showAchievement('first_share');
-    } else {
-      onShare?.();
     }
   };
 
@@ -71,7 +68,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, onShare, setHasS
         </button>
       </div>
 
-      {/* Card preview - full width, scroll if too tall */}
+      {/* Card preview */}
       <div style={{
         width: '100%', maxWidth: '400px',
         padding: '0 20px 12px',
@@ -128,7 +125,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, onShare, setHasS
           }}
         >
           {isExporting ? <Loader2 size={18} className="spin" /> : <Download size={18} />}
-          {t('share.download', 'T\u00e9l\u00e9charger')}
+          {t('share.download', 'Télécharger')}
         </button>
         <button
           onClick={handleShare}
@@ -147,7 +144,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, onShare, setHasS
           {isExporting ? <Loader2 size={18} className="spin" /> : <Share2 size={18} />}
           {canShareNatively()
             ? t('share.share', 'Partager')
-            : t('share.download', 'T\u00e9l\u00e9charger')}
+            : t('share.download', 'Télécharger')}
         </button>
       </div>
 

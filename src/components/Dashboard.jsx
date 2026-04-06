@@ -11,7 +11,6 @@ import { useHardwareBack } from '../hooks/useHardwareBack';
 import { useModalManager } from '../hooks/useModalManager';
 
 // Contexts
-import { useAuth } from '../contexts/AuthContext';
 import { useProgressContext } from '../contexts/ProgressContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { useExercises } from '../contexts/ExercisesContext';
@@ -38,19 +37,18 @@ export function Dashboard() {
     const { t } = useTranslation();
 
     // ── Consume contexts (replaces ~35 props) ────────────────────────
-    const auth = useAuth();
+
     const {
-        getDayNumber, toggleCompletion, completions, startDate, userStartDate,
+        getDayNumber, completions, startDate, userStartDate,
         scheduleNotification, settings, updateSettings,
-        conflictData, onResolveConflict, getExerciseCount, updateExerciseCount,
-        getTotalReps, getExerciseDone, pauseCloudSync, resumeCloudSync,
-        computedStats, cloudSyncAPI, setHasShared, hasShared,
+        getExerciseCount, updateExerciseCount,
+        pauseCloudSync, resumeCloudSync,
+        computedStats,
     } = useProgressContext();
-    const { isSupporter, isPro, purchaseSupporter, purchasePro, restorePurchases } = useSubscription();
+    const { isPro } = useSubscription();
     const {
-        classicExercises, weightExercises, customExercises, customExercisesMap,
-        routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
-        customExercisesHook, exercisesByCategory,
+        customExercises, customExercisesMap,
+        customExercisesHook,
     } = useExercises();
 
     const [today, setToday] = useState(getLocalDateStr(new Date()));
@@ -107,10 +105,7 @@ export function Dashboard() {
         }
     );
 
-    const handleShareWithAchievement = useCallback(() => {
-        setHasShared();
-        showAchievement('first_share');
-    }, [setHasShared, showAchievement]);
+
 
     const dayNumber = useMemo(() => getDayNumber(today), [getDayNumber, today]);
 
@@ -157,10 +152,7 @@ export function Dashboard() {
 
     useHardwareBack(activeModals, resumeCloudSync);
 
-    const handleSaveSettings = useCallback((newSettings) => {
-        updateSettings(newSettings);
-        if (scheduleNotification) scheduleNotification(newSettings);
-    }, [updateSettings, scheduleNotification]);
+
 
     useEffect(() => {
         if (anyModalOpen) {
@@ -328,27 +320,13 @@ export function Dashboard() {
                             getDayNumber={getDayNumber}
                             computedStats={computedStats}
                             onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
-                            onShare={handleShareWithAchievement}
-                            setHasShared={setHasShared}
-                            showAchievement={showAchievement}
-                            hasShared={hasShared}
+
                         />
                     )}
                     {showSettings && (
                         <Settings
                             defaultShowStore={openStoreDirectly}
-                            settings={settings}
                             onClose={() => { setShowSettings(false); setOpenStoreDirectly(false); }}
-                            onSave={handleSaveSettings}
-                            cloudAuth={auth}
-                            cloudSync={cloudSyncAPI}
-                            conflictData={conflictData}
-                            onResolveConflict={onResolveConflict}
-                            isSupporter={isSupporter}
-                            isPro={isPro}
-                            onPurchaseSupporter={purchaseSupporter}
-                            onPurchasePro={purchasePro}
-                            onRestorePurchases={restorePurchases}
                         />
                     )}
                     {showCounter && selectedExercise?.type !== 'timer' && (
@@ -376,8 +354,6 @@ export function Dashboard() {
                     {showLeaderboard && (
                         <Leaderboard
                             onClose={() => setShowLeaderboard(false)}
-                            cloudSync={cloudSyncAPI}
-                            cloudAuth={auth}
                             activeSlide={effectiveSlide}
                         />
                     )}
@@ -410,18 +386,12 @@ export function Dashboard() {
                             activeSlide={effectiveSlide}
                             customExercises={customExercises}
                             computedStats={computedStats}
-                            onShare={handleShareWithAchievement}
-                            setHasShared={setHasShared}
-                            showAchievement={showAchievement}
-                            hasShared={hasShared}
+
                         />
                     )}
                     {showClan && (
                         <ClanModal
                             onClose={() => { setShowClan(false); resumeCloudSync?.(); }}
-                            cloudAuth={auth}
-                            settings={settings}
-                            updateSettings={updateSettings}
                         />
                     )}
                     {showCustomExercisesModal && (

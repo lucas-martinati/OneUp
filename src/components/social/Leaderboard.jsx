@@ -10,8 +10,14 @@ import { LeaderboardRow } from './LeaderboardRow';
 import { Z_INDEX } from '../../utils/zIndex';
 import { UserDetail } from './UserDetail';
 import ICON_MAP from '../../utils/iconMap';
+import { useAuth } from '../../contexts/AuthContext';
+import { useProgressContext } from '../../contexts/ProgressContext';
 
-export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveClan, activeSlide = 0 }) {
+export function Leaderboard({ onClose, activeSlide = 0 }) {
+
+    // ── Context consumption ──
+    const cloudAuth = useAuth();
+    const { cloudSyncAPI: cloudSync } = useProgressContext();
     const { t } = useTranslation();
 
     const [domain, setDomain] = useState(activeSlide === 1 ? 'weights' : 'classic');

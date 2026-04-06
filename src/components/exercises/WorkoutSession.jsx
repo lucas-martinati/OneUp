@@ -16,6 +16,9 @@ import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import ICON_MAP from '../../utils/iconMap';
 import { addSession, getSessionHistory } from '../../features/share/services/sessionHistoryService';
 import { getExerciseLabel, getExerciseCategory } from '../../utils/exerciseLabel';
+import { useProgressContext } from '../../contexts/ProgressContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useExercises } from '../../contexts/ExercisesContext';
 
 // ── Exercise grid item ──────────────────────────────────────────────────
 function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
@@ -76,11 +79,13 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
 }
 
 export function WorkoutSession({
-    onClose, today, dayNumber, getExerciseCount, updateExerciseCount, completions, settings,
-    routines = [], saveRoutine, deleteRoutine, updateRoutine, maxRoutines = 10,
-    isPro, activeSlide, customExercises = [], computedStats = {}, onShare,
-    setHasShared, showAchievement, hasShared
+    onClose, today, dayNumber, activeSlide
 }) {
+
+    // ── Context consumption (replaces 12 props) ──
+    const { getExerciseCount, updateExerciseCount, completions, settings, computedStats } = useProgressContext();
+    const { isPro } = useSubscription();
+    const { routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, customExercises } = useExercises();
     const { t } = useTranslation();
     const [phase, setPhase] = useState('config'); // 'config' | 'running' | 'done'
     const [queue, setQueue] = useState([]); // ordered list of exercise IDs
@@ -846,10 +851,7 @@ export function WorkoutSession({
                 sessionHistory={getSessionHistory()}
                 isPro={isPro}
                 defaultSessionName={sessionName}
-                onShare={onShare}
-                setHasShared={setHasShared}
-                showAchievement={showAchievement}
-                hasShared={hasShared}
+
             />
         );
     }

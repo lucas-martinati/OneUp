@@ -10,6 +10,9 @@ import { registerBackHandler } from '../../utils/backHandler';
 import { getSessionHistory, removeSession } from '../../features/share/services/sessionHistoryService';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 import { SharePanel } from '../../features/share/components/SharePanel';
+import { useProgressContext } from '../../contexts/ProgressContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useExercises } from '../../contexts/ExercisesContext';
 
 // Lazy load Recharts components
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
@@ -17,7 +20,13 @@ const ConsistencyPieChart = lazy(() => import('./ConsistencyPieChart'));
 const DailyRepsChart = lazy(() => import('./DailyRepsChart'));
 const SessionDetailModal = lazy(() => import('../../features/share/components/SessionDetailModal').then(m => ({ default: m.SessionDetailModal })));
 
-export function Stats({ completions, exercisesList, initialCategory, isPro, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats: globalStats, onOpenStore, onShare, setHasShared, showAchievement, hasShared }) {
+export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStore }) {
+
+    // ── Context consumption (replaces 8 props) ──
+    const { completions, settings, getDayNumber, computedStats: globalStats } = useProgressContext();
+    const { isPro } = useSubscription();
+    const { exercisesByCategory: exercisesList } = useExercises();
+    const highlightedBadgeId = null;
     const { t, i18n } = useTranslation();
     const [chartsReady, setChartsReady] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
@@ -644,13 +653,8 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                 <SharePanel
                     sessionData={{ date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') }}
                     stats={computedStats}
-                    isPro={isPro}
                     variant="stats"
                     mode="global"
-                    onShare={onShare}
-                    setHasShared={setHasShared}
-                    showAchievement={showAchievement}
-                    hasShared={hasShared}
                 />
 
                 {/* Session history */}
@@ -753,9 +757,6 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
                         onNameChange={handleSessionNameChange}
                         stats={computedStats}
                         isPro={isPro}
-                        setHasShared={setHasShared}
-                        showAchievement={showAchievement}
-                        hasShared={hasShared}
                     />
                 )}
             </Suspense>

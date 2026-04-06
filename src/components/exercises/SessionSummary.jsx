@@ -15,7 +15,7 @@ function formatDuration(seconds) {
     return `${m}:${s}`;
 }
 
-export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, isPro = false, defaultSessionName = '', onShare, setHasShared, showAchievement, hasShared }) {
+export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, isPro = false, defaultSessionName = '' }) {
     const { t } = useTranslation();
     const [editingName, setEditingName] = useState(false);
     const [sessionName, setSessionName] = useState(defaultSessionName);
@@ -198,12 +198,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                 <SharePanel
                     sessionData={shareSessionData}
                     stats={stats}
-                    isPro={isPro}
                     variant="large"
-                    onShare={onShare}
-                    setHasShared={setHasShared}
-                    showAchievement={showAchievement}
-                    hasShared={hasShared}
                 />
             </div>
         </div>

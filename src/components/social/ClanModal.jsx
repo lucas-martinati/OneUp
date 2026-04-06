@@ -6,8 +6,14 @@ import { Leaderboard } from './Leaderboard';
 import { registerBackHandler } from '../../utils/backHandler';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import { Z_INDEX } from '../../utils/zIndex';
+import { useAuth } from '../../contexts/AuthContext';
+import { useProgressContext } from '../../contexts/ProgressContext';
 
-export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
+export function ClanModal({ onClose }) {
+
+    // ── Context consumption ──
+    const cloudAuth = useAuth();
+    const { settings, updateSettings } = useProgressContext();
     const { t } = useTranslation();
     const [userClans, setUserClans] = useState([]);
     const [clanData, setClanData] = useState(null);
