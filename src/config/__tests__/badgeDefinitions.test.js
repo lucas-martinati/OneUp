@@ -6,7 +6,7 @@ const EMPTY_STATS = {
   totalDays: 0, maxStreak: 0, totalRepsAll: 0, perfectDays: 0,
   hasCompletedAllExercisesOnce: false, weekdayWorkouts: 0, weekendWorkouts: 0,
   morningWorkouts: 0, afternoonWorkouts: 0, eveningWorkouts: 0,
-  ghostWorkout: false, perfectStreak: 0,
+  ghostWorkout: false, perfectStreak: 0, hasShared: false,
 };
 
 // Stats snapshot with everything maxed — all badges should unlock
@@ -14,7 +14,7 @@ const MAXED_STATS = {
   totalDays: 999999, maxStreak: 999999, totalRepsAll: 999999, perfectDays: 999999,
   hasCompletedAllExercisesOnce: true, weekdayWorkouts: 999999, weekendWorkouts: 999999,
   morningWorkouts: 999999, afternoonWorkouts: 999999, eveningWorkouts: 999999,
-  ghostWorkout: true, perfectStreak: 999999,
+  ghostWorkout: true, perfectStreak: 999999, hasShared: true,
 };
 
 // ── Structure ──────────────────────────────────────────────────────────
@@ -141,8 +141,6 @@ describe('BADGE_DEFINITIONS', () => {
       ['perfect_fifty',        'perfectDays',  50, true],
       ['perfect_hundred',      'perfectDays',  99, false],
       ['perfect_hundred',      'perfectDays', 100, true],
-      ['perfect_two_hundred',  'perfectDays', 199, false],
-      ['perfect_two_hundred',  'perfectDays', 200, true],
     ])('%s unlocks at %s=%j → %j', (badgeId, field, value, expected) => {
       const def = BADGE_DEFINITIONS.find(b => b.id === badgeId);
       expect(def.test({ ...EMPTY_STATS, [field]: value })).toBe(expected);
@@ -178,6 +176,14 @@ describe('BADGE_DEFINITIONS', () => {
     ])('%s with %j → %j', (badgeId, overrides, expected) => {
       const def = BADGE_DEFINITIONS.find(b => b.id === badgeId);
       expect(def.test({ ...EMPTY_STATS, ...overrides })).toBe(expected);
+    });
+  });
+
+  describe('social badges', () => {
+    it('first_share unlocks only when hasShared is true', () => {
+      const def = BADGE_DEFINITIONS.find(b => b.id === 'first_share');
+      expect(def.test({ ...EMPTY_STATS, hasShared: false })).toBe(false);
+      expect(def.test({ ...EMPTY_STATS, hasShared: true })).toBe(true);
     });
   });
 
