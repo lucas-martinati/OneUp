@@ -158,10 +158,9 @@ export function useAchievementToast(onViewAchievement, onValidateBadge) {
         onViewAchievement?.();
     }, [hideAchievement, onViewAchievement]);
 
-    // Écoute les événements pour les tests console (désactivé en production)
+    // Écoute les événements globaux pour afficher des achievements
+    // Permet aux composants enfants (ex: ShareModal) de trigger un toast sans prop drilling
     useEffect(() => {
-        if (!import.meta.env.DEV) return;
-
         const handleShowAchievement = (e) => {
             const { badgeId } = e.detail || {};
             if (badgeId) {

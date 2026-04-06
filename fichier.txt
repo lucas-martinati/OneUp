@@ -1,0 +1,572 @@
+    commit 5b76ef8b1f2eb6553bf6357da0bc70b258d19d08
+    Author: Lucas_M54 <lucasm54800@gmail.com>
+    Date:   Mon Apr 6 20:23:24 2026 +0200
+
+        refactor: migrate component prop drilling to global contexts and consolidate share success logic
+
+    diff --git a/package-lock.json b/package-lock.json
+    index e2726ac..2824ffa 100644
+    --- a/package-lock.json
+    +++ b/package-lock.json
+    @@ -12,6 +12,7 @@
+            "@capacitor/app": "^8.0.1",
+            "@capacitor/cli": "^8.2.0",
+            "@capacitor/core": "^8.2.0",
+    +        "@capacitor/filesystem": "^8.1.2",
+            "@capacitor/local-notifications": "^8.0.0",
+            "@capacitor/preferences": "^8.0.0",
+            "@capacitor/share": "^8.0.1",
+    @@ -2214,6 +2215,18 @@
+            "tslib": "^2.1.0"
+        }
+        },
+    +    "node_modules/@capacitor/filesystem": {
+    +      "version": "8.1.2",
+    +      "resolved": "https://registry.npmjs.org/@capacitor/filesystem/-/filesystem-8.1.2.tgz",
+    +      "integrity": "sha512-doaaMfGoFR2hWU6aV6u83I+5ZsGyJVq+Gz4r9lMpJzUKMm1eMu0hLnFdV1aXZlU9FlK/RndFrVD8oRZfNOqWgQ==",
+    +      "license": "MIT",
+    +      "dependencies": {
+    +        "@capacitor/synapse": "^1.0.4"
+    +      },
+    +      "peerDependencies": {
+    +        "@capacitor/core": ">=8.0.0"
+    +      }
+    +    },
+        "node_modules/@capacitor/local-notifications": {
+        "version": "8.0.1",
+        "resolved": "https://registry.npmjs.org/@capacitor/local-notifications/-/local-notifications-8.0.1.tgz",
+    @@ -2241,6 +2254,12 @@
+            "@capacitor/core": ">=8.0.0"
+        }
+        },
+    +    "node_modules/@capacitor/synapse": {
+    +      "version": "1.0.4",
+    +      "resolved": "https://registry.npmjs.org/@capacitor/synapse/-/synapse-1.0.4.tgz",
+    +      "integrity": "sha512-/C1FUo8/OkKuAT4nCIu/34ny9siNHr9qtFezu4kxm6GY1wNFxrCFWjfYx5C1tUhVGz3fxBABegupkpjXvjCHrw==",
+    +      "license": "ISC"
+    +    },
+        "node_modules/@codetrix-studio/capacitor-google-auth": {
+        "version": "3.4.0-rc.4",
+        "resolved": "https://registry.npmjs.org/@codetrix-studio/capacitor-google-auth/-/capacitor-google-auth-3.4.0-rc.4.tgz",
+    diff --git a/package.json b/package.json
+    index 36376cf..d1da0b9 100644
+    --- a/package.json
+    +++ b/package.json
+    @@ -23,6 +23,7 @@
+        "@capacitor/app": "^8.0.1",
+        "@capacitor/cli": "^8.2.0",
+        "@capacitor/core": "^8.2.0",
+    +    "@capacitor/filesystem": "^8.1.2",
+        "@capacitor/local-notifications": "^8.0.0",
+        "@capacitor/preferences": "^8.0.0",
+        "@capacitor/share": "^8.0.1",
+    diff --git a/src/components/Dashboard.jsx b/src/components/Dashboard.jsx
+    index d923bd8..7466279 100644
+    --- a/src/components/Dashboard.jsx
+    +++ b/src/components/Dashboard.jsx
+    @@ -11,7 +11,6 @@ import { useHardwareBack } from '../hooks/useHardwareBack';
+    import { useModalManager } from '../hooks/useModalManager';
+    
+    // Contexts
+    -import { useAuth } from '../contexts/AuthContext';
+    import { useProgressContext } from '../contexts/ProgressContext';
+    import { useSubscription } from '../contexts/SubscriptionContext';
+    import { useExercises } from '../contexts/ExercisesContext';
+    @@ -38,19 +37,18 @@ export function Dashboard() {
+        const { t } = useTranslation();
+    
+        // ── Consume contexts (replaces ~35 props) ────────────────────────
+    -    const auth = useAuth();
+    +
+        const {
+    -        getDayNumber, toggleCompletion, completions, startDate, userStartDate,
+    +        getDayNumber, completions, startDate, userStartDate,
+            scheduleNotification, settings, updateSettings,
+    -        conflictData, onResolveConflict, getExerciseCount, updateExerciseCount,
+    -        getTotalReps, getExerciseDone, pauseCloudSync, resumeCloudSync,
+    -        computedStats, cloudSyncAPI, setHasShared, hasShared,
+    +        getExerciseCount, updateExerciseCount,
+    +        pauseCloudSync, resumeCloudSync,
+    +        computedStats,
+        } = useProgressContext();
+    -    const { isSupporter, isPro, purchaseSupporter, purchasePro, restorePurchases } = useSubscription();
+    +    const { isPro } = useSubscription();
+        const {
+    -        classicExercises, weightExercises, customExercises, customExercisesMap,
+    -        routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
+    -        customExercisesHook, exercisesByCategory,
+    +        customExercises, customExercisesMap,
+    +        customExercisesHook,
+        } = useExercises();
+    
+        const [today, setToday] = useState(getLocalDateStr(new Date()));
+    @@ -107,10 +105,7 @@ export function Dashboard() {
+            }
+        );
+    
+    -    const handleShareWithAchievement = useCallback(() => {
+    -        setHasShared();
+    -        showAchievement('first_share');
+    -    }, [setHasShared, showAchievement]);
+    +
+    
+        const dayNumber = useMemo(() => getDayNumber(today), [getDayNumber, today]);
+    
+    @@ -157,10 +152,7 @@ export function Dashboard() {
+    
+        useHardwareBack(activeModals, resumeCloudSync);
+    
+    -    const handleSaveSettings = useCallback((newSettings) => {
+    -        updateSettings(newSettings);
+    -        if (scheduleNotification) scheduleNotification(newSettings);
+    -    }, [updateSettings, scheduleNotification]);
+    +
+    
+        useEffect(() => {
+            if (anyModalOpen) {
+    @@ -328,27 +320,13 @@ export function Dashboard() {
+                                getDayNumber={getDayNumber}
+                                computedStats={computedStats}
+                                onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
+    -                            onShare={handleShareWithAchievement}
+    -                            setHasShared={setHasShared}
+    -                            showAchievement={showAchievement}
+    -                            hasShared={hasShared}
+    +
+                            />
+                        )}
+                        {showSettings && (
+                            <Settings
+                                defaultShowStore={openStoreDirectly}
+    -                            settings={settings}
+                                onClose={() => { setShowSettings(false); setOpenStoreDirectly(false); }}
+    -                            onSave={handleSaveSettings}
+    -                            cloudAuth={auth}
+    -                            cloudSync={cloudSyncAPI}
+    -                            conflictData={conflictData}
+    -                            onResolveConflict={onResolveConflict}
+    -                            isSupporter={isSupporter}
+    -                            isPro={isPro}
+    -                            onPurchaseSupporter={purchaseSupporter}
+    -                            onPurchasePro={purchasePro}
+    -                            onRestorePurchases={restorePurchases}
+                            />
+                        )}
+                        {showCounter && selectedExercise?.type !== 'timer' && (
+    @@ -376,8 +354,6 @@ export function Dashboard() {
+                        {showLeaderboard && (
+                            <Leaderboard
+                                onClose={() => setShowLeaderboard(false)}
+    -                            cloudSync={cloudSyncAPI}
+    -                            cloudAuth={auth}
+                                activeSlide={effectiveSlide}
+                            />
+                        )}
+    @@ -410,18 +386,12 @@ export function Dashboard() {
+                                activeSlide={effectiveSlide}
+                                customExercises={customExercises}
+                                computedStats={computedStats}
+    -                            onShare={handleShareWithAchievement}
+    -                            setHasShared={setHasShared}
+    -                            showAchievement={showAchievement}
+    -                            hasShared={hasShared}
+    +
+                            />
+                        )}
+                        {showClan && (
+                            <ClanModal
+                                onClose={() => { setShowClan(false); resumeCloudSync?.(); }}
+    -                            cloudAuth={auth}
+    -                            settings={settings}
+    -                            updateSettings={updateSettings}
+                            />
+                        )}
+                        {showCustomExercisesModal && (
+    diff --git a/src/components/exercises/SessionSummary.jsx b/src/components/exercises/SessionSummary.jsx
+    index 220c8b3..f992066 100644
+    --- a/src/components/exercises/SessionSummary.jsx
+    +++ b/src/components/exercises/SessionSummary.jsx
+    @@ -15,7 +15,7 @@ function formatDuration(seconds) {
+        return `${m}:${s}`;
+    }
+    
+    -export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, isPro = false, defaultSessionName = '', onShare, setHasShared, showAchievement, hasShared }) {
+    +export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, isPro = false, defaultSessionName = '' }) {
+        const { t } = useTranslation();
+        const [editingName, setEditingName] = useState(false);
+        const [sessionName, setSessionName] = useState(defaultSessionName);
+    @@ -198,12 +198,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
+                    <SharePanel
+                        sessionData={shareSessionData}
+                        stats={stats}
+    -                    isPro={isPro}
+                        variant="large"
+    -                    onShare={onShare}
+    -                    setHasShared={setHasShared}
+    -                    showAchievement={showAchievement}
+    -                    hasShared={hasShared}
+                    />
+                </div>
+            </div>
+    diff --git a/src/components/exercises/WorkoutSession.jsx b/src/components/exercises/WorkoutSession.jsx
+    index 88c7387..f4b0665 100644
+    --- a/src/components/exercises/WorkoutSession.jsx
+    +++ b/src/components/exercises/WorkoutSession.jsx
+    @@ -16,6 +16,9 @@ import { canAccessFeature, FEATURES } from '../../utils/entitlements';
+    import ICON_MAP from '../../utils/iconMap';
+    import { addSession, getSessionHistory } from '../../features/share/services/sessionHistoryService';
+    import { getExerciseLabel, getExerciseCategory } from '../../utils/exerciseLabel';
+    +import { useProgressContext } from '../../contexts/ProgressContext';
+    +import { useSubscription } from '../../contexts/SubscriptionContext';
+    +import { useExercises } from '../../contexts/ExercisesContext';
+    
+    // ── Exercise grid item ──────────────────────────────────────────────────
+    function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
+    @@ -76,11 +79,13 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
+    }
+    
+    export function WorkoutSession({
+    -    onClose, today, dayNumber, getExerciseCount, updateExerciseCount, completions, settings,
+    -    routines = [], saveRoutine, deleteRoutine, updateRoutine, maxRoutines = 10,
+    -    isPro, activeSlide, customExercises = [], computedStats = {}, onShare,
+    -    setHasShared, showAchievement, hasShared
+    +    onClose, today, dayNumber, activeSlide
+    }) {
+    +
+    +    // ── Context consumption (replaces 12 props) ──
+    +    const { getExerciseCount, updateExerciseCount, completions, settings, computedStats } = useProgressContext();
+    +    const { isPro } = useSubscription();
+    +    const { routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, customExercises } = useExercises();
+        const { t } = useTranslation();
+        const [phase, setPhase] = useState('config'); // 'config' | 'running' | 'done'
+        const [queue, setQueue] = useState([]); // ordered list of exercise IDs
+    @@ -846,10 +851,7 @@ export function WorkoutSession({
+                    sessionHistory={getSessionHistory()}
+                    isPro={isPro}
+                    defaultSessionName={sessionName}
+    -                onShare={onShare}
+    -                setHasShared={setHasShared}
+    -                showAchievement={showAchievement}
+    -                hasShared={hasShared}
+    +
+                />
+            );
+        }
+    diff --git a/src/components/settings/Settings.jsx b/src/components/settings/Settings.jsx
+    index 79cd06a..1358ee2 100644
+    --- a/src/components/settings/Settings.jsx
+    +++ b/src/components/settings/Settings.jsx
+    @@ -8,8 +8,21 @@ import { getPurchaseHistory } from '../../services/purchaseService';
+    import { ToggleSwitch } from '../ui/ToggleSwitch';
+    import { SettingRow } from '../ui/SettingRow';
+    import { StoreCard } from '../store/StoreCard';
+    +import { useAuth } from '../../contexts/AuthContext';
+    +import { useProgressContext } from '../../contexts/ProgressContext';
+    +import { useSubscription } from '../../contexts/SubscriptionContext';
+    
+    -export function Settings({ defaultShowStore = false, settings, onClose, onSave, cloudAuth, cloudSync, conflictData, onResolveConflict, isSupporter, isPro, onPurchaseSupporter, onPurchasePro, onRestorePurchases }) {
+    +export function Settings({ defaultShowStore = false, onClose }) {
+    +
+    +    // ── Context consumption (replaces 11 props) ──
+    +    const cloudAuth = useAuth();
+    +    const { settings, updateSettings, computedStats, cloudSyncAPI: cloudSync, conflictData, onResolveConflict, scheduleNotification } = useProgressContext();
+    +    const { isSupporter, isPro, purchaseSupporter: onPurchaseSupporter, purchasePro: onPurchasePro, restorePurchases: onRestorePurchases } = useSubscription();
+    +
+    +    const onSave = (newSettings) => {
+    +        updateSettings(newSettings);
+    +        if (scheduleNotification) scheduleNotification(newSettings);
+    +    };
+        const { t, i18n } = useTranslation();
+        const [showStore, setShowStore] = useState(defaultShowStore);
+        const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
+    diff --git a/src/components/social/ClanModal.jsx b/src/components/social/ClanModal.jsx
+    index e6cc8b3..4982e5d 100644
+    --- a/src/components/social/ClanModal.jsx
+    +++ b/src/components/social/ClanModal.jsx
+    @@ -6,8 +6,14 @@ import { Leaderboard } from './Leaderboard';
+    import { registerBackHandler } from '../../utils/backHandler';
+    import { CSSConfetti } from '../feedback/CSSConfetti';
+    import { Z_INDEX } from '../../utils/zIndex';
+    +import { useAuth } from '../../contexts/AuthContext';
+    +import { useProgressContext } from '../../contexts/ProgressContext';
+    
+    -export function ClanModal({ onClose, cloudAuth, settings, updateSettings }) {
+    +export function ClanModal({ onClose }) {
+    +
+    +    // ── Context consumption ──
+    +    const cloudAuth = useAuth();
+    +    const { settings, updateSettings } = useProgressContext();
+        const { t } = useTranslation();
+        const [userClans, setUserClans] = useState([]);
+        const [clanData, setClanData] = useState(null);
+    diff --git a/src/components/social/Leaderboard.jsx b/src/components/social/Leaderboard.jsx
+    index ad1ae81..6e96f44 100644
+    --- a/src/components/social/Leaderboard.jsx
+    +++ b/src/components/social/Leaderboard.jsx
+    @@ -10,8 +10,14 @@ import { LeaderboardRow } from './LeaderboardRow';
+    import { Z_INDEX } from '../../utils/zIndex';
+    import { UserDetail } from './UserDetail';
+    import ICON_MAP from '../../utils/iconMap';
+    +import { useAuth } from '../../contexts/AuthContext';
+    +import { useProgressContext } from '../../contexts/ProgressContext';
+    
+    -export function Leaderboard({ onClose, cloudSync, cloudAuth, clanData, onLeaveClan, activeSlide = 0 }) {
+    +export function Leaderboard({ onClose, activeSlide = 0 }) {
+    +
+    +    // ── Context consumption ──
+    +    const cloudAuth = useAuth();
+    +    const { cloudSyncAPI: cloudSync } = useProgressContext();
+        const { t } = useTranslation();
+    
+        const [domain, setDomain] = useState(activeSlide === 1 ? 'weights' : 'classic');
+    diff --git a/src/components/stats/Stats.jsx b/src/components/stats/Stats.jsx
+    index 69364cb..15e8a76 100644
+    --- a/src/components/stats/Stats.jsx
+    +++ b/src/components/stats/Stats.jsx
+    @@ -10,6 +10,9 @@ import { registerBackHandler } from '../../utils/backHandler';
+    import { getSessionHistory, removeSession } from '../../features/share/services/sessionHistoryService';
+    import { getExerciseLabel } from '../../utils/exerciseLabel';
+    import { SharePanel } from '../../features/share/components/SharePanel';
+    +import { useProgressContext } from '../../contexts/ProgressContext';
+    +import { useSubscription } from '../../contexts/SubscriptionContext';
+    +import { useExercises } from '../../contexts/ExercisesContext';
+    
+    // Lazy load Recharts components
+    const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
+    @@ -17,7 +20,13 @@ const ConsistencyPieChart = lazy(() => import('./ConsistencyPieChart'));
+    const DailyRepsChart = lazy(() => import('./DailyRepsChart'));
+    const SessionDetailModal = lazy(() => import('../../features/share/components/SessionDetailModal').then(m => ({ default: m.SessionDetailModal })));
+    
+    -export function Stats({ completions, exercisesList, initialCategory, isPro, onClose, onOpenAchievements, highlightedBadgeId, settings, getDayNumber, computedStats: globalStats, onOpenStore, onShare, setHasShared, showAchievement, hasShared }) {
+    +export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStore }) {
+    +
+    +    // ── Context consumption (replaces 8 props) ──
+    +    const { completions, settings, getDayNumber, computedStats: globalStats } = useProgressContext();
+    +    const { isPro } = useSubscription();
+    +    const { exercisesByCategory: exercisesList } = useExercises();
+    +    const highlightedBadgeId = null;
+        const { t, i18n } = useTranslation();
+        const [chartsReady, setChartsReady] = useState(false);
+        const [selectedSession, setSelectedSession] = useState(null);
+    @@ -644,13 +653,8 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
+                    <SharePanel
+                        sessionData={{ date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') }}
+                        stats={computedStats}
+    -                    isPro={isPro}
+                        variant="stats"
+                        mode="global"
+    -                    onShare={onShare}
+    -                    setHasShared={setHasShared}
+    -                    showAchievement={showAchievement}
+    -                    hasShared={hasShared}
+                    />
+    
+                    {/* Session history */}
+    @@ -753,9 +757,6 @@ export function Stats({ completions, exercisesList, initialCategory, isPro, onCl
+                            onNameChange={handleSessionNameChange}
+                            stats={computedStats}
+                            isPro={isPro}
+    -                        setHasShared={setHasShared}
+    -                        showAchievement={showAchievement}
+    -                        hasShared={hasShared}
+                        />
+                    )}
+                </Suspense>
+    diff --git a/src/features/share/components/SessionDetailModal.jsx b/src/features/share/components/SessionDetailModal.jsx
+    index 8aa8f98..b5d9c06 100644
+    --- a/src/features/share/components/SessionDetailModal.jsx
+    +++ b/src/features/share/components/SessionDetailModal.jsx
+    @@ -28,7 +28,7 @@ function formatDateTime(dateStr, lang) {
+    }
+    }
+    
+    -export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isPro = false, onNameChange, setHasShared, showAchievement, hasShared }) {
+    +export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isPro = false, onNameChange }) {
+    const { t, i18n } = useTranslation();
+    const lang = i18n.language;
+    const [confirmDelete, setConfirmDelete] = useState(false);
+    @@ -272,9 +272,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
+                stats={stats}
+                isPro={isPro}
+                variant="compact"
+    -            setHasShared={setHasShared}
+    -            showAchievement={showAchievement}
+    -            hasShared={hasShared}
+    +
+            />
+            {confirmDelete ? (
+                <div style={{ display: 'flex', gap: '6px' }}>
+    diff --git a/src/features/share/components/ShareModal.jsx b/src/features/share/components/ShareModal.jsx
+    index 5aece10..4a9bfcb 100644
+    --- a/src/features/share/components/ShareModal.jsx
+    +++ b/src/features/share/components/ShareModal.jsx
+    @@ -5,9 +5,11 @@ import { Z_INDEX } from '../../../utils/zIndex';
+    import { ShareCard } from './ShareCard';
+    import { ShareOptions } from './ShareOptions';
+    import { canShareNatively } from '../services/shareService';
+    +import { useProgressContext } from '../../../contexts/ProgressContext';
+    
+    -export function ShareModal({ shareHook, onClose, isPro = false, onShare, setHasShared, showAchievement, hasShared }) {
+    +export function ShareModal({ shareHook, onClose, isPro = false }) {
+    const { t } = useTranslation();
+    +  const { hasShared, setHasShared } = useProgressContext();
+    const {
+        cardRef, options, toggleOption, setOption, toggleCategory,
+        setBackgroundImage, clearBackgroundImage,
+    @@ -16,13 +18,8 @@ export function ShareModal({ shareHook, onClose, isPro = false, onShare, setHasS
+    } = shareHook;
+    
+    const handleShareSuccess = () => {
+    -    if (setHasShared && showAchievement && hasShared) {
+    -      return;
+    -    } else if (setHasShared && showAchievement && !hasShared) {
+    +    if (!hasShared) {
+        setHasShared();
+    -      showAchievement('first_share');
+    -    } else {
+    -      onShare?.();
+        }
+    };
+    
+    @@ -71,7 +68,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, onShare, setHasS
+            </button>
+        </div>
+    
+    -      {/* Card preview - full width, scroll if too tall */}
+    +      {/* Card preview */}
+        <div style={{
+            width: '100%', maxWidth: '400px',
+            padding: '0 20px 12px',
+    @@ -128,7 +125,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, onShare, setHasS
+            }}
+            >
+            {isExporting ? <Loader2 size={18} className="spin" /> : <Download size={18} />}
+    -          {t('share.download', 'T\u00e9l\u00e9charger')}
+    +          {t('share.download', 'Télécharger')}
+            </button>
+            <button
+            onClick={handleShare}
+    @@ -147,7 +144,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, onShare, setHasS
+            {isExporting ? <Loader2 size={18} className="spin" /> : <Share2 size={18} />}
+            {canShareNatively()
+                ? t('share.share', 'Partager')
+    -            : t('share.download', 'T\u00e9l\u00e9charger')}
+    +            : t('share.download', 'Télécharger')}
+            </button>
+        </div>
+    
+    diff --git a/src/features/share/components/SharePanel.jsx b/src/features/share/components/SharePanel.jsx
+    index 2ec8bf6..fb29eb8 100644
+    --- a/src/features/share/components/SharePanel.jsx
+    +++ b/src/features/share/components/SharePanel.jsx
+    @@ -3,6 +3,7 @@ import { Share2 } from 'lucide-react';
+    import { useTranslation } from 'react-i18next';
+    import { useShareCard } from '../hooks/useShareCard';
+    import { getSessionHistory } from '../services/sessionHistoryService';
+    +import { useSubscription } from '../../../contexts/SubscriptionContext';
+    
+    const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
+    
+    @@ -10,18 +11,12 @@ const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.Sha
+    * SharePanel — shared share button + modal for session or global stats sharing.
+    * Used in SessionSummary, SessionDetailModal, and Stats.
+    *
+    - * @param {Object} props
+    - * @param {Object} props.sessionData - { id, date, exercises, duration, name, type }
+    - * @param {Object} props.stats - computed stats for streak
+    - * @param {boolean} props.isPro - pro entitlement
+    - * @param {string} props.variant - 'large' | 'compact' | 'stats'
+    - * @param {string} props.mode - 'session' | 'global'
+    - * @param {string} props.label - button label (for 'stats' variant)
+    - * @param {Function} props.onShare - callback when user shares/downloads
+    + * Now consumes isPro from SubscriptionContext directly.
+    */
+    -export function SharePanel({ sessionData, stats = {}, isPro = false, variant = 'large', mode = 'session', label, onShare, setHasShared, showAchievement, hasShared }) {
+    +export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 'session', label }) {
+    const [showShare, setShowShare] = useState(false);
+    const { t } = useTranslation();
+    +  const { isPro } = useSubscription();
+    
+    const shareHook = useShareCard({
+        sessionData,
+    @@ -76,11 +71,7 @@ export function SharePanel({ sessionData, stats = {}, isPro = false, variant = '
+                shareHook={shareHook}
+                onClose={() => setShowShare(false)}
+                isPro={isPro}
+    -            onShare={onShare}
+                mode={mode}
+    -            setHasShared={setHasShared}
+    -            showAchievement={showAchievement}
+    -            hasShared={hasShared}
+            />
+            )}
+        </Suspense>
+    diff --git a/src/hooks/useAchievementContext.jsx b/src/hooks/useAchievementContext.jsx
+    deleted file mode 100644
+    index 565c289..0000000
+    --- a/src/hooks/useAchievementContext.jsx
+    +++ /dev/null
+    @@ -1,26 +0,0 @@
+    -import React, { createContext, useContext, useCallback } from 'react';
+    -
+    -const AchievementContext = createContext(null);
+    -
+    -export function AchievementProvider({ children, setHasShared, showAchievement }) {
+    -    const grantAchievement = useCallback((badgeId) => {
+    -        if (badgeId === 'first_share') {
+    -            setHasShared();
+    -        }
+    -        showAchievement(badgeId);
+    -    }, [setHasShared, showAchievement]);
+    -
+    -    return (
+    -        <AchievementContext.Provider value={{ grantAchievement }}>
+    -            {children}
+    -        </AchievementContext.Provider>
+    -    );
+    -}
+    -
+    -export function useGrantAchievement() {
+    -    const context = useContext(AchievementContext);
+    -    if (!context) {
+    -        throw new Error('useGrantAchievement must be used within an AchievementProvider');
+    -    }
+    -    return context.grantAchievement;
+    -}
+    \ No newline at end of file
+    diff --git a/src/hooks/useShareSuccess.js b/src/hooks/useShareSuccess.js
+    new file mode 100644
+    index 0000000..9f1f477
+    --- /dev/null
+    +++ b/src/hooks/useShareSuccess.js
+    @@ -0,0 +1,30 @@
+    +import { useCallback } from 'react';
+    +import { useProgressContext } from '../contexts/ProgressContext';
+    +import { useAchievementToast } from './useAchievementToast';
+    +
+    +/**
+    + * Hook that centralizes the share success logic.
+    + * Replaces the prop drilling of setHasShared, showAchievement, hasShared
+    + * across Dashboard → Stats → SessionDetailModal → ShareModal.
+    + *
+    + * Usage:
+    + *   const { hasShared, handleShareSuccess, AchievementToast } = useShareSuccess(onToastClick);
+    + */
+    +export function useShareSuccess(onToastClick) {
+    +  const { hasShared, setHasShared } = useProgressContext();
+    +  const { showAchievement, AchievementToast } = useAchievementToast(onToastClick);
+    +
+    +  const handleShareSuccess = useCallback(() => {
+    +    if (!hasShared) {
+    +      setHasShared();
+    +      showAchievement('first_share');
+    +    }
+    +  }, [hasShared, setHasShared, showAchievement]);
+    +
+    +  return {
+    +    hasShared,
+    +    handleShareSuccess,
+    +    showAchievement,
+    +    AchievementToast,
+    +  };
+    +}

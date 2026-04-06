@@ -20,6 +20,8 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
   const handleShareSuccess = () => {
     if (!hasShared) {
       setHasShared();
+      // Trigger achievement toast via global event (listened by Dashboard's useAchievementToast)
+      window.dispatchEvent(new CustomEvent('show-achievement', { detail: { badgeId: 'first_share' } }));
     }
   };
 
