@@ -280,7 +280,6 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts,
         morningWorkouts, afternoonWorkouts, eveningWorkouts,
         ghostWorkout, perfectStreak: maxPerfectStreak,
-        hasSharedFirstTime: settings?.hasSharedFirstTime || false,
     })).length;
 
     // ─── Return everything ───────────────────────────────────────────────
