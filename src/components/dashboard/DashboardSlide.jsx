@@ -7,7 +7,7 @@ import { formatTime } from '../../utils/dateUtils';
 
 export const DashboardSlide = React.memo(({
     isFuture, effectiveStart, dayNumber, today, settings, getExerciseCount, completions, computedStats,
-    isCounterTransitioning, prevDayNumber, numberKey, pauseCloudSync, setShowCounter,
+    isCounterTransitioning, prevDayNumber, pauseCloudSync, setShowCounter,
     activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, onManageCustom
 }) => {
     const { t, i18n } = useTranslation();
@@ -79,7 +79,7 @@ export const DashboardSlide = React.memo(({
                                 </div>
                             )}
                             <div
-                                key={isCounterTransitioning ? `new-${dayNumber}` : numberKey}
+                                key={dayNumber}
                                 className="rainbow-gradient"
                                 style={{
                                     fontSize: 'clamp(3rem, 8.5vh, 6.5rem)', fontWeight: '800', lineHeight: 1,
