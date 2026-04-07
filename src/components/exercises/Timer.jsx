@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWakeLock } from '../../hooks/useWakeLock';

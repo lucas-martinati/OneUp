@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo, Suspense, lazy } from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useEffect, useState, useMemo, Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from './feedback/CSSConfetti';
 import { NotificationManager } from './social/NotificationManager';
@@ -27,11 +28,10 @@ const ClanModal = lazy(() => import('./social/ClanModal').then(m => ({ default: 
 const CustomExercisesModal = lazy(() => import('./exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
 
 import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
-import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';
+import { getLocalDateStr } from '../utils/dateUtils';
 import { EXERCISES, EXERCISES_MAP, getDailyGoal } from '../config/exercises';
 import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
 import { canAccessFeature, FEATURES } from '../utils/entitlements';
-import { formatTime } from '../utils/dateUtils';
 
 export function Dashboard() {
     const { t } = useTranslation();

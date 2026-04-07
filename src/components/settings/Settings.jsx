@@ -16,7 +16,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
 
     // ── Context consumption (replaces 11 props) ──
     const cloudAuth = useAuth();
-    const { settings, updateSettings, computedStats, cloudSyncAPI: cloudSync, conflictData, onResolveConflict, scheduleNotification } = useProgressContext();
+    const { settings, updateSettings, cloudSyncAPI: cloudSync, conflictData, onResolveConflict, scheduleNotification } = useProgressContext();
     const { isSupporter, isPro, purchaseSupporter: onPurchaseSupporter, purchasePro: onPurchasePro, restorePurchases: onRestorePurchases } = useSubscription();
 
     const onSave = (newSettings) => {

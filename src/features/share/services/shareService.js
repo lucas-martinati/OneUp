@@ -36,9 +36,21 @@ export async function dataUrlToBlob(dataUrl) {
 export async function shareImage(dataUrl, { title = 'OneUp', text = '' } = {}) {
   if (isNative()) {
     try {
+      // Save image to filesystem first, then share with URL
+      const { Filesystem, Directory } = await import('@capacitor/filesystem');
+      const base64Data = dataUrl.split(',')[1];
+      const fileName = `oneup-share-${Date.now()}.png`;
+      
+      const result = await Filesystem.writeFile({
+        path: fileName,
+        data: base64Data,
+        directory: Directory.Cache,
+      });
+
       await CapacitorShare.share({
         title,
         text,
+        url: result.uri,
         dialogTitle: title,
       });
       return { success: true, method: 'capacitor' };
@@ -50,6 +62,7 @@ export async function shareImage(dataUrl, { title = 'OneUp', text = '' } = {}) {
     }
   }
 
+  // Web Share API - always sends both image and text
   if (navigator.share && navigator.canShare) {
     try {
       const blob = await dataUrlToBlob(dataUrl);
