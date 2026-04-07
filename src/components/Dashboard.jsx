@@ -79,6 +79,7 @@ export function Dashboard() {
     const [classicSelected, setClassicSelected] = useState('pushups');
     const [weightsSelected, setWeightsSelected] = useState('biceps_curl');
     const [customSelected, setCustomSelected] = useState(customExercises[0]?.id || 'custom_placeholder');
+    const [numberKey, setNumberKey] = useState(0);
     const [isCounterTransitioning, setIsCounterTransitioning] = useState(false);
     const [prevDayNumber, setPrevDayNumber] = useState(null);
     const [showDayConfetti, setShowDayConfetti] = useState(false);
@@ -124,6 +125,7 @@ export function Dashboard() {
         if (effectiveSlide === 0) setClassicSelected(id);
         else if (effectiveSlide === 1) setWeightsSelected(id);
         else setCustomSelected(id);
+        setNumberKey(k => k + 1);
     };
 
     useEffect(() => {
