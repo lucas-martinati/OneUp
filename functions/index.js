@@ -17,6 +17,26 @@ exports.onRevenueCatWebhook = onRequest(async (req, res) => {
     return;
   }
 
+  // Verify RevenueCat webhook signature
+  // RevenueCat signs requests with X-Signature header using shared secret
+  const signature = req.headers['x-signature'] || req.headers['authorization'];
+  const expectedSecret = process.env.REVENUECAT_WEBHOOK_SECRET;
+  
+  if (!expectedSecret) {
+    console.error("CRITICAL: REVENUECAT_WEBHOOK_SECRET not configured");
+    res.status(500).send("Server Configuration Error");
+    return;
+  }
+
+  // Simple signature verification: compare the Authorization header
+  // Format: "RevenueCat <secret>" or raw secret depending on setup
+  const authValue = signature?.replace(/^RevenueCat\s+/i, '') || '';
+  if (authValue !== expectedSecret) {
+    console.log(`[RevenueCat Webhook] Invalid signature rejected. Expected secret present: ${!!expectedSecret}`);
+    res.status(401).send("Unauthorized: Invalid signature");
+    return;
+  }
+
   try {
     const event = req.body?.event;
     if (!event) {
