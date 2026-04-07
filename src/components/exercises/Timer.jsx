@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/refs */
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWakeLock } from '../../hooks/useWakeLock';
@@ -20,12 +19,14 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
 
     const prevCompletedRef = useRef(isCompleted);
     const hasCelebratedRef = useRef(false);
-
-    // Timer logic - using refs to track values
     const countRef = useRef(currentCount);
     const completedRef = useRef(isCompleted);
-    countRef.current = currentCount;
-    completedRef.current = isCompleted;
+
+    // Sync refs when props change
+    useEffect(() => {
+        countRef.current = currentCount;
+        completedRef.current = isCompleted;
+    }, [currentCount, isCompleted]);
     
     useEffect(() => {
         if (!isRunning || isCompleted) return;
