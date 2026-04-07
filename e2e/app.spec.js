@@ -14,8 +14,7 @@ test.describe('App Initialization', () => {
     });
 
     await page.goto('/');
-
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle');
 
     const criticalErrors = errors.filter(e => 
       !e.includes('Failed to load resource') && 
@@ -41,14 +40,14 @@ test.describe('App Initialization', () => {
     });
 
     await page.goto('/');
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
 
     expect(pageErrors).toHaveLength(0);
   });
 
   test('app renders main UI elements', async ({ page }) => {
     await page.goto('/');
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle');
 
     const body = await page.locator('body');
     const hasContent = await body.evaluate(el => el.innerText.length > 0);

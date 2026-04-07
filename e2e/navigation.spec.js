@@ -3,7 +3,8 @@ import { test, expect } from '@playwright/test';
 test.describe('Navigation & Interactions', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('#root')).toBeVisible();
   });
 
   test('can interact with exercise selector', async ({ page }) => {
@@ -11,7 +12,7 @@ test.describe('Navigation & Interactions', () => {
     
     if (await slideIndicator.isVisible().catch(() => false)) {
       await slideIndicator.click();
-      await page.waitForTimeout(300);
+      await expect(page.locator('body')).toBeVisible();
     }
     expect(true).toBe(true);
   });
@@ -28,7 +29,7 @@ test.describe('Navigation & Interactions', () => {
     
     if (await main.isVisible().catch(() => false)) {
       await main.evaluate(el => el.scrollTo(0, 100));
-      await page.waitForTimeout(300);
+      await expect(main).toBeVisible();
     }
     expect(true).toBe(true);
   });

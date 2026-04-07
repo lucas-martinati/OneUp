@@ -3,7 +3,8 @@ import { test, expect } from '@playwright/test';
 test.describe('Main Pages Loading', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('#root')).toBeVisible();
   });
 
   test('Dashboard page loads', async ({ page }) => {
@@ -18,7 +19,7 @@ test.describe('Main Pages Loading', () => {
     const settingsButton = page.locator('button').filter({ hasText: /settings|paramètres/i }).first();
     if (await settingsButton.isVisible().catch(() => false)) {
       await settingsButton.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle');
       
       const settingsModal = page.locator('[class*="modal"], [role="dialog"]').first();
       if (await settingsModal.isVisible().catch(() => false)) {
@@ -30,14 +31,12 @@ test.describe('Main Pages Loading', () => {
 
   test('Counter modal opens', async ({ page }) => {
     const counterButtons = page.locator('button').all();
-    let counterFound = false;
     
     for (const button of await counterButtons) {
       const text = await button.textContent();
       if (text && text.toLowerCase().includes('start')) {
         await button.click();
-        await page.waitForTimeout(500);
-        counterFound = true;
+        await page.waitForLoadState('networkidle');
         break;
       }
     }
