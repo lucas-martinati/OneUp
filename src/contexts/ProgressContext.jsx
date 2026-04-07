@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 import { useProgress } from '../hooks/useProgress';
 import { useSettings } from '../hooks/useSettings';
@@ -78,9 +79,11 @@ export function ProgressProvider({ children }) {
   // ── Reset sync state when user signs out ───────────────────────────
   useEffect(() => {
     if (!auth.isSignedIn) {
-      setConflictCheckDone(false);
-      setIsInitialSyncDone(false);
-      setConflictData(null);
+      queueMicrotask(() => {
+        setConflictCheckDone(false);
+        setIsInitialSyncDone(false);
+        setConflictData(null);
+      });
     }
   }, [auth.isSignedIn, auth.user?.uid]);
 
@@ -92,6 +95,7 @@ export function ProgressProvider({ children }) {
         scheduleNotification(settings);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSetup, settings.notificationsEnabled]);
 
   useEffect(() => {
@@ -106,6 +110,7 @@ export function ProgressProvider({ children }) {
       }, tomorrow.getTime() - now.getTime());
       return () => clearTimeout(midnightTimer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSetup, settings.notificationsEnabled, settings.notificationTime, completions]);
 
   // ── Auto-save to cloud on completion change ─────────────────────────
@@ -139,6 +144,7 @@ export function ProgressProvider({ children }) {
       };
       loadSettings();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth.isSignedIn, auth.loading]);
 
   // ── Cloud auto-save for settings ────────────────────────────────────
@@ -179,7 +185,7 @@ export function ProgressProvider({ children }) {
       };
       detectConflict();
     } else if (auth.isSignedIn && !auth.loading && !isSetup && !conflictCheckDone) {
-      setConflictCheckDone(true);
+      queueMicrotask(() => setConflictCheckDone(true));
     }
   }, [auth.isSignedIn, auth.loading, isSetup, conflictCheckDone, completions]);
 
@@ -192,6 +198,7 @@ export function ProgressProvider({ children }) {
       };
       initialSync();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conflictCheckDone, auth.isSignedIn, auth.loading, isSetup, isInitialSyncDone]);
 
   // ── Real-time cloud listener ────────────────────────────────────────
@@ -207,6 +214,7 @@ export function ProgressProvider({ children }) {
     if (!auth.isSignedIn || auth.loading || !isSetup || !isInitialSyncDone) return;
     const timer = setTimeout(() => publishLeaderboardNow(), 2000);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     completions, settings.leaderboardEnabled, settings.leaderboardPseudo, settings.difficultyMultiplier,
     auth.isSignedIn, auth.loading, isSetup, isInitialSyncDone, computedStats

@@ -104,12 +104,13 @@ export function CSSConfetti({
 
     useEffect(() => {
         if (!active) {
-            setParticles(null);
+            queueMicrotask(() => setParticles(null));
             return;
         }
 
         injectStyles();
-        setParticles(generateParticles(colors, particleCount));
+        const generated = generateParticles(colors, particleCount);
+        queueMicrotask(() => setParticles(generated));
 
         // Nettoyage après la durée maximale d'une particule
         const maxTimer = BASE_DURATION_MS + 800 + 150;
@@ -119,7 +120,7 @@ export function CSSConfetti({
         }, maxTimer);
 
         return () => clearTimeout(timer);
-    }, [active, colors, onDone]);
+    }, [active, colors, onDone, particleCount]);
 
     if (!particles) return null;
 

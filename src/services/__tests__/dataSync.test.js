@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 // Mock firebase/database — we only need ref/set/get/onValue/serverTimestamp to be callable
 vi.mock('firebase/database', () => ({
@@ -17,7 +17,7 @@ vi.mock('../firebase', () => ({
 }));
 
 // Now we can import directly — the mocked Firebase won't blow up
-import { mergeData, sanitizeForCloud, saveToCloud, loadFromCloud } from '../dataSyncService';
+import { mergeData, sanitizeForCloud } from '../dataSyncService';
 
 // ── mergeData ───────────────────────────────────────────────────────────
 

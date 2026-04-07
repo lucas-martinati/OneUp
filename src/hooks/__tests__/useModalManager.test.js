@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useModalManager } from '../useModalManager';
 
@@ -60,7 +60,6 @@ describe('useModalManager', () => {
 
   it('activeModals includes shouldResumeSync for sync modals', () => {
     const { result } = renderHook(() => useModalManager({ counter: true, stats: true }, ['counter']));
-    const counterModal = result.current.activeModals.find(m => m.isOpen);
     // counter is in syncModals, stats is not
     const syncModals = result.current.activeModals;
     // Verify the structure

@@ -21,8 +21,12 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
     const hasCelebratedRef = useRef(false);
     const countRef = useRef(currentCount);
     const completedRef = useRef(isCompleted);
-    countRef.current = currentCount;
-    completedRef.current = isCompleted;
+
+    // Sync refs in an effect instead of during render
+    useEffect(() => {
+        countRef.current = currentCount;
+        completedRef.current = isCompleted;
+    }, [currentCount, isCompleted]);
     
     useEffect(() => {
         if (!isRunning || isCompleted) return;
@@ -37,15 +41,17 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
         }, 1000);
         
         return () => clearInterval(interval);
-    }, [isRunning, isCompleted, dailyGoal]);
+    }, [isRunning, isCompleted, dailyGoal, onUpdateCount]);
 
     // Celebration
     useEffect(() => {
         const wasCompleted = prevCompletedRef.current;
         if (isCompleted && !wasCompleted && !hasCelebratedRef.current) {
             hasCelebratedRef.current = true;
-            setShowConfetti(true);
-            sounds.success();
+            queueMicrotask(() => {
+                setShowConfetti(true);
+                sounds.success();
+            });
 
             // Auto-advance to next exercise in session mode
             if (onNext) {
@@ -56,7 +62,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
             hasCelebratedRef.current = false;
         }
         prevCompletedRef.current = isCompleted;
-    }, [isCompleted]);
+    }, [isCompleted, onNext]);
 
     const handleReset = () => {
         setIsRunning(false);

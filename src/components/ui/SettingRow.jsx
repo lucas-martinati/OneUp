@@ -1,4 +1,5 @@
-export function SettingRow({ icon: Icon, title, description, color, children, isLast }) {
+// eslint-disable-next-line no-unused-vars
+export function SettingRow({ icon: IconComponent, title, description, color, children, isLast }) {
     return (
         <div style={{
             padding: '12px 0',
@@ -15,7 +16,7 @@ export function SettingRow({ icon: Icon, title, description, color, children, is
                     borderRadius: '12px',
                     border: `1px solid ${color}30`
                 }}>
-                    <Icon size={20} color={color} />
+                    <IconComponent size={20} color={color} />
                 </div>
                 <div>
                     <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)' }}>{title}</div>

@@ -1,11 +1,12 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useMemo, useCallback } from 'react';
-import { useAuth } from './AuthContext';
 import { useRoutines } from '../hooks/useRoutines';
 import { useCustomExercises } from '../hooks/useCustomExercises';
 import { EXERCISES, EXERCISES_MAP } from '../config/exercises';
 import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
 
 const ExercisesContext = createContext(null);
+const EMPTY_ARRAY = [];
 
 /**
  * Centralizes all exercise lists and routines.
@@ -13,12 +14,11 @@ const ExercisesContext = createContext(null);
  * pattern found in 5+ files.
  */
 export function ExercisesProvider({ children, onDeleteExerciseHistory, onSaveToCloud }) {
-  const auth = useAuth();
   const routinesHook = useRoutines();
   const customExercisesHook = useCustomExercises();
 
   const { routines, saveRoutine, deleteRoutine, updateRoutine, setRoutinesFromCloud, maxRoutines } = routinesHook;
-  const customExercises = customExercisesHook.customExercises || [];
+  const customExercises = customExercisesHook.customExercises || EMPTY_ARRAY;
 
   // Centralized exercise maps — computed once, available everywhere
   const customExercisesMap = useMemo(() => {
@@ -72,7 +72,7 @@ export function ExercisesProvider({ children, onDeleteExerciseHistory, onSaveToC
         }
       }
     });
-  }, [customExercisesHook.deleteCustomExercise, onDeleteExerciseHistory, onSaveToCloud, routines, deleteRoutine, updateRoutine]);
+  }, [customExercisesHook, onDeleteExerciseHistory, onSaveToCloud, routines, deleteRoutine, updateRoutine]);
 
   const wrappedCustomExercisesHook = useMemo(() => ({
     ...customExercisesHook,

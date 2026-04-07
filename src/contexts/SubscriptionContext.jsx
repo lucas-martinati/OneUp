@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 import { cloudSync } from '../services/cloudSync';
@@ -37,9 +38,11 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
   // Reset when user signs out
   useEffect(() => {
     if (!auth.isSignedIn) {
-      setIsSupporter(false);
-      setIsPro(false);
-      clearCachedEntitlements();
+      queueMicrotask(() => {
+        setIsSupporter(false);
+        setIsPro(false);
+        clearCachedEntitlements();
+      });
     }
   }, [auth.isSignedIn, auth.user?.uid]);
 

@@ -36,12 +36,11 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   const [name, setName] = useState(session?.name || '');
   const hasName = name && name.trim().length > 0;
 
-  if (!session) return null;
-
-  const exercises = session.exercises || [];
+  const exercises = session?.exercises || [];
   const totalReps = exercises.reduce((sum, ex) => sum + (ex.reps || 0), 0);
-
   const sessionWithName = useMemo(() => ({ ...session, name }), [session, name]);
+
+  if (!session) return null;
 
   const handleNameSave = () => {
     setEditingName(false);

@@ -1,7 +1,8 @@
 export function StoreCard({
     isActive,
     title,
-    icon: Icon,
+    // eslint-disable-next-line no-unused-vars
+    icon: IconComponent,
     colorMain, // e.g. '#8b5cf6'
     colorRGB, // e.g. '139,92,246'
     colorGradientStart, // e.g. '#8b5cf6'
@@ -55,7 +56,7 @@ export function StoreCard({
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: `0 4px 16px rgba(${colorRGB},0.3)`, flexShrink: 0
                     }}>
-                        <Icon size={24} color="white" fill={allowMultiplePurchases ? "white" : "none"} />
+                        <IconComponent size={24} color="white" fill={allowMultiplePurchases ? "white" : "none"} />
                     </div>
                     <div>
                         <div style={{ fontWeight: '800', fontSize: '1rem', color: colorMain }}>
@@ -77,7 +78,7 @@ export function StoreCard({
                             border: `1px solid rgba(${colorRGB},0.12)`,
                             textAlign: 'center', marginBottom: '12px'
                         }}>
-                            <Icon size={32} color={colorMain} style={{ marginBottom: '8px', opacity: 0.8 }} />
+                            <IconComponent size={32} color={colorMain} style={{ marginBottom: '8px', opacity: 0.8 }} />
                             <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
                                 {idleDescription}
                             </div>
@@ -113,7 +114,7 @@ export function StoreCard({
                             marginBottom: '8px'
                         }}
                     >
-                        <Icon size={20} fill={allowMultiplePurchases ? "white" : "none"} />
+                        <IconComponent size={20} fill={allowMultiplePurchases ? "white" : "none"} />
                         {buyButtonText}
                     </button>
                 </div>

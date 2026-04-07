@@ -11,7 +11,7 @@ import { runBackHandler } from '../utils/backHandler';
  */
 export function useHardwareBack(modals, onResumeSync) {
     useEffect(() => {
-        const handleBackButton = ({ canGoBack }) => {
+        const handleBackButton = () => {
             // Priority 1: Any imperative non-hook back handlers (popups, etc)
             if (runBackHandler()) return;
             

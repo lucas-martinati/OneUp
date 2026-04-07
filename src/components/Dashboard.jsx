@@ -116,7 +116,6 @@ export function Dashboard() {
     const effectiveStart = userStartDate || startDate;
     const isFuture = today < effectiveStart;
 
-    const statsSelectedEx = computedStats.exerciseStats?.find(e => e.id === globalSelectedId);
     const displayStreak = computedStats.displayStreak;
     const streakActive = computedStats.streakActive;
 

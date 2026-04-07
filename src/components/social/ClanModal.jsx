@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Users, LogIn, Plus, X, Check, Shield } from 'lucide-react';
 import { cloudSync } from '../../services/cloudSync';
@@ -24,9 +24,17 @@ export function ClanModal({ onClose }) {
     const [error, setError] = useState('');
     const [showConfetti, setShowConfetti] = useState(false);
 
+    // Sync pseudo input when user/settings change — use ref to skip initial render
+    const pseudoInitRef = useRef(false);
     useEffect(() => {
         if (cloudAuth?.user) {
-            setPseudoInput(settings?.leaderboardPseudo || cloudAuth.user.displayName || '');
+            const newPseudo = settings?.leaderboardPseudo || cloudAuth.user.displayName || '';
+            if (!pseudoInitRef.current) {
+                pseudoInitRef.current = true;
+                queueMicrotask(() => setPseudoInput(newPseudo));
+            } else {
+                queueMicrotask(() => setPseudoInput(newPseudo));
+            }
         }
     }, [cloudAuth?.user, settings?.leaderboardPseudo]);
 

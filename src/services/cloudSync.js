@@ -1,4 +1,3 @@
-import { createLogger } from '../utils/logger';
 import { initializeFirebase } from './firebase';
 import {
   setupAuthListener, signInWithGoogle, signInWithGoogleWeb,
@@ -26,7 +25,7 @@ import {
   saveProgramCompletionsToCloud, loadProgramCompletionsFromCloud
 } from './userDataService';
 
-const logger = createLogger('CloudSync');
+
 
 class CloudSyncService {
   constructor() {

@@ -58,7 +58,7 @@ export function useCustomPrograms() {
         name: programData.name.trim(),
         description: programData.description?.trim() || '',
         exerciseIds: [...programData.exerciseIds],
-        dailyGoals: { ...programData.dailyGoals } || {},
+        dailyGoals: programData.dailyGoals ? { ...programData.dailyGoals } : {},
         duration: programData.duration || 30,
         startDate: programData.startDate || null,
         status: 'draft',
@@ -148,7 +148,6 @@ export function useCustomPrograms() {
 
     const sortedDates = Object.keys(programCompletions).sort().reverse();
     let streak = 0;
-    const today = getLocalDateStr(new Date());
 
     for (let i = 0; i < sortedDates.length; i++) {
       const dateStr = sortedDates[i];

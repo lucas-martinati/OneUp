@@ -6,9 +6,7 @@ import { Avatar } from '../ui/Avatar';
 import { Z_INDEX } from '../../utils/zIndex';
 
 export function NotificationManager() {
-    // eslint-disable-next-line no-unused-vars
-    const [notifications, setNotifications] = useState([]);
-    // eslint-disable-next-line no-unused-vars
+    const [notifications, setNotifications] = useState([]); // eslint-disable-line no-unused-vars
     const [activeToasts, setActiveToasts] = useState([]);
 
     useEffect(() => {

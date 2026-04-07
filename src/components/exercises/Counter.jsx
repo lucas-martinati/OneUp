@@ -30,8 +30,11 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
 
         if (isCompleted && !wasCompleted && !hasCelebratedRef.current) {
             hasCelebratedRef.current = true;
-            setShowConfetti(true);
-            sounds.success();
+            // Use queueMicrotask to avoid synchronous setState in effect
+            queueMicrotask(() => {
+                setShowConfetti(true);
+                sounds.success();
+            });
 
             // Auto-advance to next exercise in session mode
             if (onNext) {
@@ -44,7 +47,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
         }
 
         prevCompletedRef.current = isCompleted;
-    }, [isCompleted]);
+    }, [isCompleted, onNext]);
 
     const handleIncrement = (amount) => {
         setIsAnimating(true);

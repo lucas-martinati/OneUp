@@ -21,9 +21,10 @@ export function useGoogleAuth() {
 
   const isNative = Capacitor.isNativePlatform();
 
-  // Web sign-in handler using GIS (only for web)
-  const webSignInHandler = !isNative ? useGoogleLogin({
+  // Web sign-in handler using GIS (always call the hook to satisfy rules-of-hooks)
+  const webSignInHandler = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
+      if (isNative) return; // No-op on native
       try {
         logger.info('GIS sign-in successful, retrieving user info...');
 
@@ -49,6 +50,7 @@ export function useGoogleAuth() {
       }
     },
     onError: (error) => {
+      if (isNative) return; // No-op on native
       logger.error('GIS login failed:', error);
       setAuthState(prev => ({
         ...prev,
@@ -58,7 +60,7 @@ export function useGoogleAuth() {
       }));
     },
     scope: 'profile email'
-  }) : null;
+  });
 
   // Initialize Capacitor Google Auth for native platforms
   useEffect(() => {

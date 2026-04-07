@@ -15,14 +15,16 @@ import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
  * @param {Array} customExercises - User defined exercises
  * @param {boolean} hasShared - Whether user has shared at least once
  * @param {Object} manualBadges - { [badgeId]: true|false } for manual badge overrides
- * @returns {Object} computedStats
  */
-export function useComputedStats(completions, settings, getDayNumber, customExercises = [], hasShared = false, manualBadges = {}) {
+const EMPTY_ARRAY = [];
+
+export function useComputedStats(completions, settings, getDayNumber, customExercises = EMPTY_ARRAY, hasShared = false, manualBadges = {}) {
     const allExercises = useMemo(() => [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises], [customExercises]);
     const difficultyMultiplier = settings?.difficultyMultiplier ?? 1;
     const badgesKey = manualBadges ? Object.keys(manualBadges).sort().join(',') : '';
     return useMemo(() => {
         return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, manualBadges);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [completions, difficultyMultiplier, getDayNumber, allExercises, hasShared, badgesKey]);
 }
 

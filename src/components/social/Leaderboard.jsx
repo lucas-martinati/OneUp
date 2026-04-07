@@ -79,6 +79,7 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
 
     useEffect(() => {
         loadData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const sorted = useMemo(() => {
