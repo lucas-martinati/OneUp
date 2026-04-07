@@ -21,12 +21,8 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
     const hasCelebratedRef = useRef(false);
     const countRef = useRef(currentCount);
     const completedRef = useRef(isCompleted);
-
-    // Sync refs when props change
-    useEffect(() => {
-        countRef.current = currentCount;
-        completedRef.current = isCompleted;
-    }, [currentCount, isCompleted]);
+    countRef.current = currentCount;
+    completedRef.current = isCompleted;
     
     useEffect(() => {
         if (!isRunning || isCompleted) return;
