@@ -119,16 +119,17 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
 
   const shareCard = useCallback(async () => {
     const dataUrl = await captureCard();
-    const exerciseCount = sessionData?.exercises?.length || 0;
-    const text = `OneUp - ${exerciseCount} exercice${exerciseCount > 1 ? 's' : ''} complété${exerciseCount > 1 ? 's' : ''} ! 💪`;
-    const result = await shareImage(dataUrl, { title: 'OneUp', text });
+    const shareText = mode === 'global' 
+      ? `Découvrez mes statistiques et ma régularité sur OneUp ! 🔥`
+      : `Je viens de terminer une énorme séance sur OneUp ! 💪 Toujours plus haut, toujours plus fort.`;
+    const result = await shareImage(dataUrl, { title: 'OneUp', text: shareText });
 
     if (!result.success && !result.canceled) {
       await downloadImage(dataUrl, `oneup-session-${Date.now()}.png`);
       return { success: true, method: 'download-fallback' };
     }
     return result;
-  }, [captureCard, sessionData]);
+  }, [captureCard, mode]);
 
   return {
     cardRef,

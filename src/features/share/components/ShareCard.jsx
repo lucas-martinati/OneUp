@@ -181,11 +181,21 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const filteredStats = isGlobal ? (() => {
     let totalReps = 0;
     let exerciseCount = 0;
-    for (const s of filteredHistory) {
-      for (const ex of (s.exercises || [])) {
-        totalReps += (ex.reps || 0);
-        exerciseCount++;
+    if (stats && stats.exerciseStats) {
+      for (const ex of stats.exerciseStats) {
+        if (ex.totalReps > 0) {
+          let cat = 'bodyweight';
+          if (isWeightEx(ex)) cat = 'weights';
+          else if (isCustomEx(ex)) cat = 'custom';
+          
+          if (selectedCats.includes(cat)) {
+            totalReps += ex.totalReps;
+            exerciseCount++;
+          }
+        }
       }
+    } else if (stats?.globalTotalReps) {
+      totalReps = stats.globalTotalReps;
     }
     return { totalReps, exerciseCount };
   })() : null;
