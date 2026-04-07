@@ -411,7 +411,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
 
     useEffect(() => {
         history.pushState({ sheetOpen: true }, '');
-        const handlePopState = (e) => {
+        const handlePopState = () => {
             onClose();
         };
         window.addEventListener('popstate', handlePopState);

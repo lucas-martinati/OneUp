@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo, Suspense, lazy } from 'react';
+import React, { useEffect, useState, useMemo, Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from './feedback/CSSConfetti';
 import { NotificationManager } from './social/NotificationManager';
@@ -26,12 +26,11 @@ const WorkoutSession = lazy(() => import('./exercises/WorkoutSession').then(m =>
 const ClanModal = lazy(() => import('./social/ClanModal').then(m => ({ default: m.ClanModal })));
 const CustomExercisesModal = lazy(() => import('./exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
 
-import { sounds, setSoundSettingsGetter } from '../utils/soundManager';
-import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';
+import { setSoundSettingsGetter } from '../utils/soundManager';
+import { getLocalDateStr } from '../utils/dateUtils';
 import { EXERCISES, EXERCISES_MAP, getDailyGoal } from '../config/exercises';
 import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
 import { canAccessFeature, FEATURES } from '../utils/entitlements';
-import { formatTime } from '../utils/dateUtils';
 
 export function Dashboard() {
     const { t } = useTranslation();
@@ -40,7 +39,7 @@ export function Dashboard() {
 
     const {
         getDayNumber, completions, startDate, userStartDate,
-        scheduleNotification, settings, updateSettings,
+        scheduleNotification, settings,
         getExerciseCount, updateExerciseCount,
         pauseCloudSync, resumeCloudSync,
         computedStats,
@@ -80,7 +79,6 @@ export function Dashboard() {
     const [classicSelected, setClassicSelected] = useState('pushups');
     const [weightsSelected, setWeightsSelected] = useState('biceps_curl');
     const [customSelected, setCustomSelected] = useState(customExercises[0]?.id || 'custom_placeholder');
-    const [numberKey, setNumberKey] = useState(0);
     const [isCounterTransitioning, setIsCounterTransitioning] = useState(false);
     const [prevDayNumber, setPrevDayNumber] = useState(null);
     const [showDayConfetti, setShowDayConfetti] = useState(false);
@@ -98,7 +96,7 @@ export function Dashboard() {
         setSoundSettingsGetter(() => settings);
     }, [settings]);
 
-    const { showAchievement, AchievementToast: AchievementToastComponent } = useAchievementToast(
+    const { AchievementToast: AchievementToastComponent } = useAchievementToast(
         () => {
             setShowStats(true);
             setTimeout(() => setShowAchievements(true), 100);
@@ -225,7 +223,7 @@ export function Dashboard() {
                             <DashboardSlide
                                 isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
                                 getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
-                                isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber} numberKey={numberKey}
+                                isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
                                 pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                                 activeExerciseId={classicSelected} onSelectExercise={handleSelectExercise}
                                 exercisesList={EXERCISES} exercisesMap={EXERCISES_MAP}
@@ -238,7 +236,7 @@ export function Dashboard() {
                                     title={t('common.global_weights')}
                                     isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
                                     getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
-                                    isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber} numberKey={numberKey}
+                                    isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
                                     pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                                     activeExerciseId={weightsSelected} onSelectExercise={handleSelectExercise}
                                     exercisesList={WEIGHT_EXERCISES} exercisesMap={WEIGHT_EXERCISES_MAP}
@@ -257,7 +255,7 @@ export function Dashboard() {
                                     title={t('common.global_custom')}
                                     isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
                                     getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
-                                    isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber} numberKey={numberKey}
+                                    isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
                                     pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                                     activeExerciseId={customExercisesMap[customSelected] ? customSelected : (customExercises[0]?.id || null)} onSelectExercise={handleSelectExercise}
                                     exercisesList={customExercises} exercisesMap={customExercisesMap}

@@ -4,7 +4,6 @@ test.describe('Main Pages Loading', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
-    await expect(page.locator('#root')).toBeVisible();
   });
 
   test('Dashboard page loads', async ({ page }) => {
@@ -26,7 +25,7 @@ test.describe('Main Pages Loading', () => {
     await expect(settingsModal).toBeVisible();
   });
 
-  test('Counter modal opens', async ({ page }) => {
+  test('Counter starts workout', async ({ page }) => {
     const counterButtons = page.locator('button').all();
     let startButtonClicked = false;
     

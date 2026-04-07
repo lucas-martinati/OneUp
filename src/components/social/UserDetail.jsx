@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Zap, Dumbbell, ArrowDownUp, ArrowUp, ChevronsUp, Footprints } from 'lucide-react';

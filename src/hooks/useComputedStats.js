@@ -19,9 +19,11 @@ import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
  */
 export function useComputedStats(completions, settings, getDayNumber, customExercises = [], hasShared = false, manualBadges = {}) {
     const allExercises = useMemo(() => [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises], [customExercises]);
+    const difficultyMultiplier = settings?.difficultyMultiplier ?? 1;
+    const badgesKey = manualBadges ? Object.keys(manualBadges).sort().join(',') : '';
     return useMemo(() => {
         return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, manualBadges);
-    }, [completions, settings?.difficultyMultiplier, getDayNumber, allExercises, hasShared, JSON.stringify(manualBadges)]);
+    }, [completions, difficultyMultiplier, getDayNumber, allExercises, hasShared, badgesKey]);
 }
 
 /**

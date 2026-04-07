@@ -60,4 +60,6 @@ upload_certificate.pem
 
 AGENTS.md
 .opencode
+
+# Test results
 test-results/

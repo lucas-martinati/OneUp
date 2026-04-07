@@ -81,7 +81,7 @@ const BadgeItem = React.memo(({ badge }) => {
     );
 });
 
-export function Achievements({ completions, exercises, onClose, settings, getDayNumber, computedStats }) {
+export function Achievements({ /* completions, exercises, settings, getDayNumber, */ onClose, computedStats }) {
     const { t } = useTranslation();
     const [isVisible, setIsVisible] = useState(false);
     const [isClosing, setIsClosing] = useState(false);

@@ -15,7 +15,7 @@ function formatDuration(seconds) {
     return `${m}:${s}`;
 }
 
-export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, isPro = false, defaultSessionName = '' }) {
+export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, defaultSessionName = '' }) {
     const { t } = useTranslation();
     const [editingName, setEditingName] = useState(false);
     const [sessionName, setSessionName] = useState(defaultSessionName);

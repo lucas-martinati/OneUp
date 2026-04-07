@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     X, Plus, Play, Trash2, Edit3, Check, Save,
@@ -21,6 +21,12 @@ export function RoutineManager({
     const [selectedExercises, setSelectedExercises] = useState([]);
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
+    const resetForm = useCallback(() => {
+        setName('');
+        setSelectedExercises([]);
+        setEditId(null);
+    }, []);
+
     // Back handler
     useEffect(() => {
         const unreg = registerBackHandler(() => {
@@ -33,13 +39,7 @@ export function RoutineManager({
             return true;
         });
         return unreg;
-    }, [mode, onClose]);
-
-    const resetForm = () => {
-        setName('');
-        setSelectedExercises([]);
-        setEditId(null);
-    };
+    }, [mode, onClose, resetForm]);
 
     const handleCreate = () => {
         if (routines.length >= maxRoutines) return;

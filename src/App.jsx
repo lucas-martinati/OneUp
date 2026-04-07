@@ -6,14 +6,14 @@ import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import { ExercisesProvider, useExercises } from './contexts/ExercisesContext';
 import { useCloudAutoSave } from './hooks/useCloudAutoSave';
 import { cloudSync } from './services/cloudSync';
-import { installDebugCommands } from './utils/debugCommands';
-import './utils/consoleAchievements';
+// Only install debug utilities in development builds
+if (import.meta.env.DEV) {
+  import('./utils/debugCommands').then(({ installDebugCommands }) => installDebugCommands());
+  import('./utils/consoleAchievements');
+}
 
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
 const Onboarding = lazy(() => import('./components/settings/Onboarding').then(module => ({ default: module.Onboarding })));
-
-// Install debug commands once
-installDebugCommands();
 
 /**
  * Inner app component — has access to all contexts.
@@ -55,11 +55,11 @@ function AppContent() {
           if (cloudRoutines && Array.isArray(cloudRoutines)) setRoutinesFromCloud(cloudRoutines);
           const cloudExercises = await cloudSync.loadCustomExercisesFromCloud();
           if (cloudExercises && Array.isArray(cloudExercises)) customExercisesHook.setCustomExercisesFromCloud(cloudExercises);
-        } catch (error) { /* silent */ }
+        } catch { /* silent */ }
       };
       loadData();
     }
-  }, [auth.isSignedIn, auth.loading]);
+  }, [auth.isSignedIn, auth.loading, setRoutinesFromCloud, customExercisesHook]);
 
   return (
     <Suspense fallback={

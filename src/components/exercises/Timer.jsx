@@ -19,8 +19,6 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
 
     const prevCompletedRef = useRef(isCompleted);
     const hasCelebratedRef = useRef(false);
-
-    // Timer logic - using refs to track values
     const countRef = useRef(currentCount);
     const completedRef = useRef(isCompleted);
     countRef.current = currentCount;
