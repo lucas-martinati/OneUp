@@ -22,11 +22,9 @@ test.describe('Main Pages Loading', () => {
       await page.waitForLoadState('networkidle');
       
       const settingsModal = page.locator('[class*="modal"], [role="dialog"]').first();
-      if (await settingsModal.isVisible().catch(() => false)) {
-        expect(true).toBe(true);
-      }
+      await expect(settingsModal).toBeVisible();
     }
-    expect(true).toBe(true);
+    await expect(page.locator('body')).toBeVisible();
   });
 
   test('Counter modal opens', async ({ page }) => {
@@ -40,6 +38,6 @@ test.describe('Main Pages Loading', () => {
         break;
       }
     }
-    expect(true).toBe(true);
+    await expect(page.locator('body')).toBeVisible();
   });
 });
