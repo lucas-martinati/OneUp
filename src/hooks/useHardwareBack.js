@@ -11,7 +11,8 @@ import { runBackHandler } from '../utils/backHandler';
  */
 export function useHardwareBack(modals, onResumeSync) {
     useEffect(() => {
-        const handleBackButton = () => {
+        // eslint-disable-next-line no-unused-vars
+        const handleBackButton = ({ canGoBack }) => {
             // Priority 1: Any imperative non-hook back handlers (popups, etc)
             if (runBackHandler()) return;
             

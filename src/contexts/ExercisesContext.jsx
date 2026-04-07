@@ -18,7 +18,8 @@ export function ExercisesProvider({ children, onDeleteExerciseHistory, onSaveToC
   const customExercisesHook = useCustomExercises();
 
   const { routines, saveRoutine, deleteRoutine, updateRoutine, setRoutinesFromCloud, maxRoutines } = routinesHook;
-  const customExercises = customExercisesHook.customExercises || EMPTY_ARRAY;
+  const { customExercises: _customExercises, deleteCustomExercise: rawDeleteCustomExercise } = customExercisesHook;
+  const customExercises = _customExercises || EMPTY_ARRAY;
 
   // Centralized exercise maps — computed once, available everywhere
   const customExercisesMap = useMemo(() => {
@@ -51,7 +52,7 @@ export function ExercisesProvider({ children, onDeleteExerciseHistory, onSaveToC
 
   // Wrapped deleteCustomExercise that also cleans up completions and routines
   const handleDeleteCustomExercise = useCallback(async (id) => {
-    customExercisesHook.deleteCustomExercise(id);
+    rawDeleteCustomExercise(id);
 
     // Erase from completion history
     if (onDeleteExerciseHistory) {
@@ -72,7 +73,7 @@ export function ExercisesProvider({ children, onDeleteExerciseHistory, onSaveToC
         }
       }
     });
-  }, [customExercisesHook, onDeleteExerciseHistory, onSaveToCloud, routines, deleteRoutine, updateRoutine]);
+  }, [rawDeleteCustomExercise, onDeleteExerciseHistory, onSaveToCloud, routines, deleteRoutine, updateRoutine]);
 
   const wrappedCustomExercisesHook = useMemo(() => ({
     ...customExercisesHook,

@@ -25,8 +25,6 @@ import {
   saveProgramCompletionsToCloud, loadProgramCompletionsFromCloud
 } from './userDataService';
 
-
-
 class CloudSyncService {
   constructor() {
     this.listeners = new Set();
