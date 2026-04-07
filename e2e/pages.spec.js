@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Main Pages Loading', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle');
   });
 
   test('Dashboard page loads', async ({ page }) => {
@@ -15,20 +15,20 @@ test.describe('Main Pages Loading', () => {
   });
 
   test('Settings modal opens', async ({ page }) => {
-    const settingsButton = page.locator('button').filter({ hasText: /settings|paramètres/i }).first();
-    if (await settingsButton.isVisible().catch(() => false)) {
+    const settingsButton = page.locator('button').filter({ hasText: /paramètres|settings/i }).first();
+    
+    const isVisible = await settingsButton.isVisible().catch(() => false);
+    if (isVisible) {
       await settingsButton.click();
       await page.waitForTimeout(500);
       
       const settingsModal = page.locator('[class*="modal"], [role="dialog"]').first();
-      if (await settingsModal.isVisible().catch(() => false)) {
-        expect(true).toBe(true);
-      }
+      const modalVisible = await settingsModal.isVisible().catch(() => false);
+      expect(modalVisible).toBe(true);
     }
-    expect(true).toBe(true);
   });
 
-  test('Counter modal opens', async ({ page }) => {
+  test('Counter starts workout', async ({ page }) => {
     const counterButtons = page.locator('button').all();
     let counterFound = false;
     
@@ -41,6 +41,6 @@ test.describe('Main Pages Loading', () => {
         break;
       }
     }
-    expect(true).toBe(true);
+    expect(counterFound).toBe(true);
   });
 });
