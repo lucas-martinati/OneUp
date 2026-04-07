@@ -48,7 +48,7 @@ function AppContent() {
 
   // Sync routines + custom exercises from cloud on sign-in
   useEffect(() => {
-    if (auth.isSignedIn && !auth.loading) {
+    if (auth.isSignedIn && !auth.loading && auth.user?.uid) {
       const loadData = async () => {
         try {
           const cloudRoutines = await cloudSync.loadRoutinesFromCloud();
@@ -59,7 +59,8 @@ function AppContent() {
       };
       loadData();
     }
-  }, [auth.isSignedIn, auth.loading, setRoutinesFromCloud, customExercisesHook]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.isSignedIn, auth.loading, auth.user?.uid]);
 
   return (
     <Suspense fallback={

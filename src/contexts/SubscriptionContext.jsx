@@ -48,7 +48,7 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
 
   // Initialize purchases and check ALL tier statuses on sign-in
   useEffect(() => {
-    if (auth.isSignedIn && !auth.loading) {
+    if (auth.isSignedIn && !auth.loading && auth.user?.uid) {
       const initAndCheck = async () => {
         try {
           await initPurchases(cloudSync.getCurrentUserId());
@@ -85,7 +85,8 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
       };
       initAndCheck();
     }
-  }, [auth.isSignedIn, auth.loading, saveAndPublish]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.isSignedIn, auth.loading, auth.user?.uid]);
 
   const handlePurchaseSupporter = useCallback(async () => {
     const result = await purchaseSupporter();
