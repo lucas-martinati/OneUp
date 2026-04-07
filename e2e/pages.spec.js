@@ -17,27 +17,31 @@ test.describe('Main Pages Loading', () => {
 
   test('Settings modal opens', async ({ page }) => {
     const settingsButton = page.locator('button').filter({ hasText: /settings|paramètres/i }).first();
-    if (await settingsButton.isVisible().catch(() => false)) {
-      await settingsButton.click();
-      await page.waitForLoadState('networkidle');
-      
-      const settingsModal = page.locator('[class*="modal"], [role="dialog"]').first();
-      await expect(settingsModal).toBeVisible();
-    }
-    await expect(page.locator('body')).toBeVisible();
+    const isVisible = await settingsButton.isVisible().catch(() => false);
+    test.skip(!isVisible, 'Settings button not visible in current UI state.');
+    await settingsButton.click();
+    await page.waitForLoadState('networkidle');
+    
+    const settingsModal = page.locator('[class*="modal"], [role="dialog"]').first();
+    await expect(settingsModal).toBeVisible();
   });
 
   test('Counter modal opens', async ({ page }) => {
     const counterButtons = page.locator('button').all();
+    let startButtonClicked = false;
     
     for (const button of await counterButtons) {
       const text = await button.textContent();
       if (text && text.toLowerCase().includes('start')) {
         await button.click();
         await page.waitForLoadState('networkidle');
+        startButtonClicked = true;
         break;
       }
     }
-    await expect(page.locator('body')).toBeVisible();
+
+    test.skip(!startButtonClicked, 'Start button not visible in current UI state.');
+    const counterModal = page.locator('[class*="modal"], [role="dialog"]').first();
+    await expect(counterModal).toBeVisible();
   });
 });

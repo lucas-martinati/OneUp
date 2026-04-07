@@ -9,12 +9,10 @@ test.describe('Navigation & Interactions', () => {
 
   test('can interact with exercise selector', async ({ page }) => {
     const slideIndicator = page.locator('div').filter({ hasText: /^[0-9]$/ }).first();
-    
-    if (await slideIndicator.isVisible().catch(() => false)) {
-      await slideIndicator.click();
-      await expect(page.locator('body')).toBeVisible();
-    }
-    expect(true).toBe(true);
+    const isVisible = await slideIndicator.isVisible().catch(() => false);
+    test.skip(!isVisible, 'Slide indicator not visible in current UI state.');
+    await slideIndicator.click();
+    await expect(slideIndicator).toBeVisible();
   });
 
   test('has working buttons on dashboard', async ({ page }) => {
@@ -26,11 +24,9 @@ test.describe('Navigation & Interactions', () => {
 
   test('scroll works on dashboard', async ({ page }) => {
     const main = page.locator('main').first();
-    
-    if (await main.isVisible().catch(() => false)) {
-      await main.evaluate(el => el.scrollTo(0, 100));
-      await expect(main).toBeVisible();
-    }
-    expect(true).toBe(true);
+    const isVisible = await main.isVisible().catch(() => false);
+    test.skip(!isVisible, 'Main container not visible in current UI state.');
+    await main.evaluate(el => el.scrollTo(0, 100));
+    await expect.poll(async () => main.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
   });
 });
