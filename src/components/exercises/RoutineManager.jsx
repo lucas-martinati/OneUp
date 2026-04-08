@@ -1,13 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    X, Plus, Play, Trash2, Edit3, Check, Save,
-    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
-    Flame, Square, MoveDown, MoveDiagonal, FolderOpen
-} from 'lucide-react';
+import { X, Plus, Play, Trash2, Edit3, Check, Save, FolderOpen } from 'lucide-react';
 import { EXERCISES } from '../../config/exercises';
 import { registerBackHandler } from '../../utils/backHandler';
-import ICON_MAP from '../../utils/iconMap';
+import { getIcon } from '../../utils/icons';
 import { Z_INDEX } from '../../utils/zIndex';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
@@ -151,7 +147,7 @@ export function RoutineManager({
                                             {routine.exerciseIds.map((exId, i) => {
                                                 const ex = EXERCISES.find(e => e.id === exId);
                                                 if (!ex) return null;
-                                                const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                                                const Icon = getIcon(ex.icon);
                                                 return (
                                                     <div key={exId} style={{
                                                         display: 'flex', alignItems: 'center', gap: '3px',
@@ -370,7 +366,7 @@ export function RoutineManager({
                             {selectedExercises.map((id, i) => {
                                 const ex = EXERCISES.find(e => e.id === id);
                                 if (!ex) return null;
-                                const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                                const Icon = getIcon(ex.icon);
                                 return (
                                     <div key={id} style={{
                                         display: 'flex', alignItems: 'center', gap: '4px',
@@ -397,7 +393,7 @@ export function RoutineManager({
                         gap: '8px'
                     }}>
                         {EXERCISES.map(ex => {
-                            const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                            const Icon = getIcon(ex.icon);
                             const selected = selectedExercises.includes(ex.id);
                             const orderNum = selected ? selectedExercises.indexOf(ex.id) + 1 : null;
                             return (

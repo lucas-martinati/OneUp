@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
-import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr } from '../../utils/dateUtils';
 import { registerBackHandler } from '../../utils/backHandler';
 import { getDailyGoal } from '../../config/exercises';
-import ICON_MAP from '../../utils/iconMap';
+import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 export function Calendar({ startDate, completions, exercises, getDayNumber, onClose, settings }) {
@@ -555,7 +554,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
 
             <div data-scroll-content style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">
                 {exercises && exercises.map(ex => {
-                    const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
+                    const ExIcon = getIcon(ex.icon);
                     const goal = getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
                     const exData = dayCompletions[ex.id] || { isCompleted: false };
                     return (

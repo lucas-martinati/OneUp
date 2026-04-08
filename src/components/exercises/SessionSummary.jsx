@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Trophy, Check, Dumbbell, Clock, Pencil } from 'lucide-react';
+import { Trophy, Check, Clock, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
-import ICON_MAP from '../../utils/iconMap';
+import { getIcon } from '../../utils/icons';
 import { Z_INDEX } from '../../utils/zIndex';
 import { updateSessionName } from '../../features/share/services/sessionHistoryService';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
@@ -156,7 +156,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                 {queue.map(id => {
                     const ex = exerciseInfo.find(e => e.id === id);
                     if (!ex) return null;
-                    const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                    const Icon = getIcon(ex.icon);
                     return (
                         <div key={id} style={{
                             display: 'flex', alignItems: 'center', gap: '10px',

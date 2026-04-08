@@ -1,8 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal, Check, Settings as SettingsIcon } from 'lucide-react';
+import { getIcon, UI_ICONS } from '../../utils/icons';
 import { getDailyGoal } from '../../config/exercises';
-import ICON_MAP from '../../utils/iconMap';
 import { formatTime } from '../../utils/dateUtils';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
@@ -195,7 +194,7 @@ export const DashboardSlide = React.memo(({
                                             animation: 'spin 2s linear infinite',
                                             pointerEvents: 'none'
                                         }} />
-                                        <Check size={26} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
+                                        <UI_ICONS.Check size={26} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
                                         <span style={{
                                             fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)',
                                             color: 'white',
@@ -212,7 +211,7 @@ export const DashboardSlide = React.memo(({
                                     </>
                                 ) : (
                                     <>
-                                        {(() => { const I = ICON_MAP[safeSelectedExercise.icon] || Dumbbell; return <I size={22} color={safeSelectedExercise.color} />; })()}
+                                        {(() => { const I = getIcon(safeSelectedExercise.icon); return <I size={22} color={safeSelectedExercise.color} />; })()}
                                         <span style={{ fontSize: 'clamp(0.45rem, 1.2vh, 0.65rem)', color: safeSelectedExercise.color, fontWeight: '700' }}>
                                             {safeSelectedExercise.type === 'timer'
                                                 ? `${formatTime(currentCount)}/${formatTime(dailyGoal)}`
@@ -262,7 +261,7 @@ const ExerciseButton = React.memo(({
     ex, isActive, dayNumber, today, settings,
     getExerciseCount, completions, computedStats, onSelect
 }) => {
-    const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
+    const ExIcon = getIcon(ex.icon);
     const statsEx = computedStats.exerciseStats?.find(e => e.id === ex.id);
     const exStreak = statsEx ? statsEx.streak : 0;
     const exCount = getExerciseCount(today, ex.id);

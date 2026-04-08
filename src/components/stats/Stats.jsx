@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
-import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock, Clock, ChevronRight, Dumbbell } from 'lucide-react';
+import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock, Clock, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../../hooks/useComputedStats';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { BADGE_DEFINITIONS } from '../../config/badgeDefinitions';
-import ICON_MAP from '../../utils/iconMap';
+import { getIcon } from '../../utils/icons';
 import { Z_INDEX } from '../../utils/zIndex';
 import { registerBackHandler } from '../../utils/backHandler';
 import { getSessionHistory, removeSession } from '../../features/share/services/sessionHistoryService';
@@ -119,7 +119,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         setSessionHistory(prev => prev.map(s => s.id === sessionId ? { ...s, name: newName } : s));
     }, []);
 
-    const ChampionIcon = champion && ICON_MAP[champion.icon] ? ICON_MAP[champion.icon] : Dumbbell;
+    const ChampionIcon = champion ? getIcon(champion.icon) : null;
 
     const formatDate = (dateStr) => {
         if (!dateStr) return '—';
@@ -545,7 +545,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                     <h3 style={sectionTitleStyle}>{t('stats.byExercise')}</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {exerciseStats.map(ex => {
-                            const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
+                            const ExIcon = getIcon(ex.icon);
                             return (
                                 <div key={ex.id} style={{
                                     padding: '10px 12px', borderRadius: 'var(--radius-md)',
@@ -720,7 +720,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                             {exercises.length > 0 && (
                                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', alignItems: 'center' }}>
                                                     {exercises.map((ex, j) => {
-                                                        const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
+                                                        const ExIcon = getIcon(ex.icon);
                                                         return <ExIcon key={ex.id || j} size={13} color={getExerciseColor(ex)} />;
                                                     })}
                                                 </div>

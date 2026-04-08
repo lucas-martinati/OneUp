@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Clock, Zap, Dumbbell, Check, Trash2, Pencil } from 'lucide-react';
-import ICON_MAP from '../../../utils/iconMap';
+import { X, Clock, Check, Trash2, Pencil } from 'lucide-react';
+import { getIcon } from '../../../utils/icons';
 import { Z_INDEX } from '../../../utils/zIndex';
 import { updateSessionName } from '../services/sessionHistoryService';
 import { getExerciseLabel, getExerciseColor } from '../../../utils/exerciseLabel';
@@ -158,7 +158,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
             >
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flex: 1 }}>
                 {exercises.map((ex, i) => {
-                  const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                  const Icon = getIcon(ex.icon);
                   return <Icon key={ex.id || i} size={16} color={getExerciseColor(ex)} />;
                 })}
               </div>
@@ -229,7 +229,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
               {t('share.exercisesCompleted', 'Exercices compl\u00e9t\u00e9s')}
             </div>
             {exercises.map((ex, i) => {
-              const Icon = ICON_MAP[ex.icon] || Dumbbell;
+              const Icon = getIcon(ex.icon);
               return (
                 <div key={ex.id || i} style={{
                   display: 'flex', alignItems: 'center', gap: '10px',

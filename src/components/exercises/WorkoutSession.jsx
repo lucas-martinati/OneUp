@@ -1,10 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    X, Play, Check, Trophy, Save, FolderOpen, Trash2, GripVertical, Pencil,
-    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
-    Flame, Square, MoveDown, MoveDiagonal, Shuffle
-} from 'lucide-react';
+import { X, Play, Check, Trophy, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle } from 'lucide-react';
 import { EXERCISES, getDailyGoal } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { Counter } from './Counter';
@@ -13,7 +9,7 @@ import { Timer } from './Timer';
 import { SessionSummary } from './SessionSummary';
 import { registerBackHandler } from '../../utils/backHandler';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
-import ICON_MAP from '../../utils/iconMap';
+import { getIcon } from '../../utils/icons';
 import { addSession, getSessionHistory } from '../../features/share/services/sessionHistoryService';
 import { getExerciseLabel, getExerciseCategory, isCustomExercise } from '../../utils/exerciseLabel';
 import { useProgressContext } from '../../contexts/ProgressContext';
@@ -22,7 +18,7 @@ import { useExercises } from '../../contexts/ExercisesContext';
 
 // ── Exercise grid item ──────────────────────────────────────────────────
 function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
-    const Icon = ICON_MAP[ex.icon] || Dumbbell;
+    const Icon = getIcon(ex.icon);
     return (
         <button
             onClick={() => !ex.done && onToggle(ex.id)}
@@ -466,7 +462,7 @@ export function WorkoutSession({
                                                 {routine.exerciseIds.map(exId => {
                                                     const ex = allExercises.find(e => e.id === exId);
                                                     if (!ex) return null;
-                                                    const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                                                    const Icon = getIcon(ex.icon);
                                                     return <Icon key={exId} size={12} color={ex.color} />;
                                                 })}
                                             </div>
@@ -600,7 +596,7 @@ export function WorkoutSession({
                             {queue.map((id, i) => {
                                 const ex = allExercises.find(e => e.id === id);
                                 if (!ex) return null;
-                                const Icon = ICON_MAP[ex.icon] || Dumbbell;
+                                const Icon = getIcon(ex.icon);
                                 const isDragging = dragIdx === i;
                                 const isDragOver = dragOverIdx === i;
                                 return (

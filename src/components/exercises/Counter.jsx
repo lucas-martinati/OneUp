@@ -2,14 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWakeLock } from '../../hooks/useWakeLock';
 import { CSSConfetti } from '../feedback/CSSConfetti';
-import {
-    X, Check, CheckCheck, RotateCcw, Plus, Minus, ChevronRight,
-    Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
-    Flame, Square, MoveDown, MoveDiagonal
-} from 'lucide-react';
+import { X, Check, CheckCheck, RotateCcw, Plus, Minus, ChevronRight } from 'lucide-react';
 import { sounds } from '../../utils/soundManager';
 import { Z_INDEX } from '../../utils/zIndex';
-import ICON_MAP from '../../utils/iconMap';
+import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 
@@ -90,7 +86,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     // Exercise-specific styling
     const activeColor = exerciseConfig?.color || '#818cf8';
     const [gradStart, gradEnd] = exerciseConfig?.gradient || ['#667eea', '#818cf8'];
-    const ExIcon = ICON_MAP[exerciseConfig?.icon] || Dumbbell;
+    const ExIcon = getIcon(exerciseConfig?.icon);
         const exerciseLabel = getExerciseLabel(exerciseConfig);
 
     // Unique SVG gradient id per exercise to avoid conflicts

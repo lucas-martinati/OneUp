@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { Calendar, ArrowRight, Zap, Target, Dumbbell, ArrowDownUp, ArrowUp, ChevronsUp, Footprints, Flame, Square, MoveDown, MoveDiagonal } from 'lucide-react';
+import { Calendar, ArrowRight, Zap, Target, Dumbbell } from 'lucide-react';
 import { getLocalDateStr } from '../../utils/dateUtils';
 import { EXERCISES } from '../../config/exercises';
-import ICON_MAP from '../../utils/iconMap';
+import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 export function Onboarding({ onStart }) {
@@ -304,7 +304,7 @@ export function Onboarding({ onStart }) {
                                 overflowY: 'auto'
                             }}>
                                 {EXERCISES.map(ex => {
-                                    const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
+                                    const ExIcon = getIcon(ex.icon);
                                     const isSelected = selectedExercises.includes(ex.id);
                                     return (
                                         <button

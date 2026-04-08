@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { X, Trophy, Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, LogOut, Activity } from 'lucide-react';
+import { X, Trophy, LogOut, Activity } from 'lucide-react';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { getLocalDateStr } from '../../utils/dateUtils';
@@ -9,7 +9,7 @@ import { LeaderboardTabs } from './LeaderboardTabs';
 import { LeaderboardRow } from './LeaderboardRow';
 import { Z_INDEX } from '../../utils/zIndex';
 import { UserDetail } from './UserDetail';
-import ICON_MAP from '../../utils/iconMap';
+import { getIcon } from '../../utils/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProgressContext } from '../../contexts/ProgressContext';
 
@@ -34,14 +34,14 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
         if (domain === 'weights') { 
             return [
                 combinedTab,
-                { id: 'global_weights', customLabel: `${t('common.global')} ${t('common.global_weights')}`, color: '#8b5cf6', icon: Dumbbell },
-                ...WEIGHT_EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
+                { id: 'global_weights', customLabel: `${t('common.global')} ${t('common.global_weights')}`, color: '#8b5cf6', icon: getIcon('Dumbbell') },
+                ...WEIGHT_EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: getIcon(ex.icon) }))
             ];
         }
         return [
             combinedTab,
             { id: 'global_classic', customLabel: `${t('common.global')} ${t('common.global_classic')}`, color: '#fbbf24', icon: Trophy },
-            ...EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: ICON_MAP[ex.icon] || Dumbbell }))
+            ...EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: getIcon(ex.icon) }))
         ];
     }, [domain, t]);
 

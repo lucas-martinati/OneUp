@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Flame, Zap, Clock, Target, Award } from 'lucide-react';
-import ICON_MAP from '../../../utils/iconMap';
+import { Clock, Target, Award } from 'lucide-react';
+import { getIcon, EXERCISE_ICONS, UI_ICONS, SOCIAL_ICONS, SHARE_ICONS } from '../../../utils/icons';
 import { getExerciseLabel, getExerciseColor, isCustomExercise } from '../../../utils/exerciseLabel';
 import { sumExerciseReps } from '../../../utils/stats';
 import { CATEGORIES } from '../../../config/categories';
@@ -41,7 +41,7 @@ function SessionIcons({ exercises, size = 11 }) {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', alignItems: 'center' }}>
       {exercises.map((ex, i) => {
-        const Icon = ICON_MAP[ex.icon] || Dumbbell;
+        const Icon = getIcon(ex.icon);
         return <Icon key={ex.id || i} size={size} color={getExerciseColor(ex)} />;
       })}
     </div>
@@ -96,7 +96,7 @@ function ExerciseList({ exercises, t }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
       {exercises.map((ex, i) => {
-        const Icon = ICON_MAP[ex.icon] || Dumbbell;
+        const Icon = getIcon(ex.icon);
         return (
           <div key={ex.id || i} style={{
             display: 'flex', alignItems: 'center', gap: '8px',
@@ -387,22 +387,22 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
             <>
               {options.showVolume && (
                 <>
-                  <MetricCard icon={Zap} value={totalReps.toLocaleString()} label={t('stats.totalReps', 'Total reps')} color="#fbbf24" />
-                  <MetricCard icon={Target} value={totalDays} label={t('leaderboard.activeDays', 'Active days')} color="#34d399" />
-                  <MetricCard icon={Award} value={`${maxStreak}j`} label={t('stats.bestStreak', 'Best streak')} color="#8b5cf6" />
+                  <MetricCard icon={EXERCISE_ICONS.Zap} value={totalReps.toLocaleString()} label={t('stats.totalReps', 'Total reps')} color="#fbbf24" />
+                  <MetricCard icon={SHARE_ICONS.Target} value={totalDays} label={t('leaderboard.activeDays', 'Active days')} color="#34d399" />
+                  <MetricCard icon={SOCIAL_ICONS.Award} value={`${maxStreak}j`} label={t('stats.bestStreak', 'Best streak')} color="#8b5cf6" />
                 </>
               )}
             </>
           ) : (
             <>
               {options.showDuration && (
-                <MetricCard icon={Clock} value={formatDuration(duration)} label={t('share.duration', 'Dur\u00e9e')} color="#818cf8" />
+                <MetricCard icon={SHARE_ICONS.Clock} value={formatDuration(duration)} label={t('share.duration', 'Dur\u00e9e')} color="#818cf8" />
               )}
               {options.showVolume && (
-                <MetricCard icon={Zap} value={totalReps} label={t('customExercises.typeReps', 'Reps')} color="#fbbf24" />
+                <MetricCard icon={EXERCISE_ICONS.Zap} value={totalReps} label={t('customExercises.typeReps', 'Reps')} color="#fbbf24" />
               )}
               {options.showExercises && (
-                <MetricCard icon={Dumbbell} value={exerciseCount} label={t('share.exercises', 'Exercices')} color="#34d399" />
+                <MetricCard icon={EXERCISE_ICONS.Dumbbell} value={exerciseCount} label={t('share.exercises', 'Exercices')} color="#34d399" />
               )}
             </>
           )}
