@@ -10,6 +10,7 @@ import {
 import { sounds } from '../../utils/soundManager';
 import { Z_INDEX } from '../../utils/zIndex';
 import ICON_MAP from '../../utils/iconMap';
+import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 
 
@@ -90,8 +91,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     const activeColor = exerciseConfig?.color || '#818cf8';
     const [gradStart, gradEnd] = exerciseConfig?.gradient || ['#667eea', '#818cf8'];
     const ExIcon = ICON_MAP[exerciseConfig?.icon] || Dumbbell;
-    const isCustom = exerciseConfig?.id?.startsWith('custom_');
-    const exerciseLabel = isCustom ? (exerciseConfig.label || exerciseConfig.name) : (t('exercises.' + exerciseConfig?.id) || t('common.exercise'));
+        const exerciseLabel = getExerciseLabel(exerciseConfig);
 
     // Unique SVG gradient id per exercise to avoid conflicts
     const gradientId = `counterGrad-${exerciseConfig?.id || 'default'}`;

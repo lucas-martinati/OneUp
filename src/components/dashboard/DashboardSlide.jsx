@@ -4,6 +4,7 @@ import { Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints, Flame, Squ
 import { getDailyGoal } from '../../config/exercises';
 import ICON_MAP from '../../utils/iconMap';
 import { formatTime } from '../../utils/dateUtils';
+import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 export const DashboardSlide = React.memo(({
     isFuture, effectiveStart, dayNumber, today, settings, getExerciseCount, completions, computedStats,
@@ -261,8 +262,6 @@ const ExerciseButton = React.memo(({
     ex, isActive, dayNumber, today, settings,
     getExerciseCount, completions, computedStats, onSelect
 }) => {
-    const { t } = useTranslation();
-
     const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
     const statsEx = computedStats.exerciseStats?.find(e => e.id === ex.id);
     const exStreak = statsEx ? statsEx.streak : 0;
@@ -327,7 +326,7 @@ const ExerciseButton = React.memo(({
                 textAlign: 'center', lineHeight: '1.1',
                 transition: 'color 0.2s ease'
             }}>
-                {ex.id.startsWith('custom_') ? (ex.label || ex.name) : t('exercises.' + ex.id)}
+                {getExerciseLabel(ex)}
             </span>
             <span style={{
                 fontSize: 'clamp(0.65rem, 1.5vh, 0.85rem)', fontWeight: '700',

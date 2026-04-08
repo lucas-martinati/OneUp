@@ -4,6 +4,7 @@ import { Calendar, ArrowRight, Zap, Target, Dumbbell, ArrowDownUp, ArrowUp, Chev
 import { getLocalDateStr } from '../../utils/dateUtils';
 import { EXERCISES } from '../../config/exercises';
 import ICON_MAP from '../../utils/iconMap';
+import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 export function Onboarding({ onStart }) {
     const { t } = useTranslation();
@@ -343,7 +344,7 @@ export function Onboarding({ onStart }) {
                                                 fontWeight: '600',
                                                 fontSize: 'clamp(0.75rem, 2vw, 0.9rem)'
                                             }}>
-                                                {t('exercises.' + ex.id)}
+                                                {getExerciseLabel(ex)}
                                             </span>
                                         </button>
                                     );
