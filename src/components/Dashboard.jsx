@@ -127,8 +127,7 @@ export function Dashboard() {
 
     useEffect(() => {
         const handleDayChange = () => {
-            const now = new Date();
-            const currentDateStr = getLocalDateStr(now);
+            const currentDateStr = getLocalDateStr(new Date());
             if (currentDateStr !== today) {
                 const previousDayNumber = getDayNumber(today);
                 const newDayNumber = getDayNumber(currentDateStr);

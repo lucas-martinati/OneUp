@@ -15,7 +15,7 @@ import { registerBackHandler } from '../../utils/backHandler';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import ICON_MAP from '../../utils/iconMap';
 import { addSession, getSessionHistory } from '../../features/share/services/sessionHistoryService';
-import { getExerciseLabel, getExerciseCategory } from '../../utils/exerciseLabel';
+import { getExerciseLabel, getExerciseCategory, isCustomExercise } from '../../utils/exerciseLabel';
 import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
@@ -221,8 +221,8 @@ export function WorkoutSession({
 
         // If routine mixes exercise types, enable showAll so all are available
         const hasWeights = routine.exerciseIds.some(id => WEIGHT_IDS.includes(id));
-        const hasBodyweight = routine.exerciseIds.some(id => !WEIGHT_IDS.includes(id) && !id.startsWith('custom_'));
-        const hasCustom = routine.exerciseIds.some(id => id.startsWith('custom_'));
+        const hasBodyweight = routine.exerciseIds.some(id => !WEIGHT_IDS.includes(id) && !isCustomExercise(id));
+        const hasCustom = routine.exerciseIds.some(id => isCustomExercise(id));
         const isMixed = (hasWeights && hasBodyweight) || hasCustom;
         if (isMixed && canMixDashboards) {
             setShowAll(true);

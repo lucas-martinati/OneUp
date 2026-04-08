@@ -2,16 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dumbbell, Flame, Zap, Clock, Target, Award } from 'lucide-react';
 import ICON_MAP from '../../../utils/iconMap';
-import { getExerciseLabel } from '../../../utils/exerciseLabel';
-
-function formatDuration(seconds) {
-  if (!seconds || seconds <= 0) return '0:00';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = (seconds % 60).toString().padStart(2, '0');
-  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${s}`;
-  return `${m}:${s}`;
-}
+import { getExerciseLabel, getExerciseColor, isCustomExercise } from '../../../utils/exerciseLabel';
+import { sumExerciseReps } from '../../../utils/stats';
+import { formatDuration } from '../../../utils/dateUtils';
 
 function formatDate(dateStr, lang) {
   try {
@@ -47,7 +40,7 @@ function SessionIcons({ exercises, size = 11 }) {
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', alignItems: 'center' }}>
       {exercises.map((ex, i) => {
         const Icon = ICON_MAP[ex.icon] || Dumbbell;
-        return <Icon key={ex.id || i} size={size} color={ex.color || '#818cf8'} />;
+        return <Icon key={ex.id || i} size={size} color={getExerciseColor(ex)} />;
       })}
     </div>
   );
@@ -106,12 +99,12 @@ function ExerciseList({ exercises, t }) {
           <div key={ex.id || i} style={{
             display: 'flex', alignItems: 'center', gap: '8px',
             padding: '7px 10px', borderRadius: '10px',
-            background: `${ex.color || '#818cf8'}0a`,
+            background: `${getExerciseColor(ex)}0a`,
           }}>
-            <Icon size={13} color={ex.color || '#818cf8'} />
+            <Icon size={13} color={getExerciseColor(ex)} />
             <span style={{
               flex: 1, fontSize: '0.7rem', fontWeight: 600,
-              color: ex.color || '#818cf8',
+              color: getExerciseColor(ex),
             }}>
               {getExerciseLabel(ex, t)}
             </span>
@@ -154,7 +147,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
 
   // Categorize exercises
   const isWeightEx = (ex) => WEIGHT_IDS.includes(ex.id);
-  const isCustomEx = (ex) => ex.id?.startsWith('custom_') || (!WEIGHT_IDS.includes(ex.id) && sessionType === 'custom');
+  const isCustomEx = (ex) => isCustomExercise(ex.id) || (!WEIGHT_IDS.includes(ex.id) && sessionType === 'custom');
   const hasWeightEx = allExercises.some(isWeightEx);
   const hasCustomEx = allExercises.some(isCustomEx);
   const showCategoriesSeparately = options.showWeights && (hasWeightEx || hasCustomEx);
@@ -223,7 +216,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
 
   const totalReps = isGlobal
     ? (filteredStats?.totalReps || 0)
-    : allExercises.reduce((sum, ex) => sum + (ex.reps || 0), 0);
+    : sumExerciseReps(allExercises);
   const duration = sessionData?.duration || 0;
   const streak = stats?.displayStreak || 0;
   const streakActive = stats?.streakActive || false;

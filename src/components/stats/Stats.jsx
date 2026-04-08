@@ -9,7 +9,7 @@ import ICON_MAP from '../../utils/iconMap';
 import { Z_INDEX } from '../../utils/zIndex';
 import { registerBackHandler } from '../../utils/backHandler';
 import { getSessionHistory, removeSession } from '../../features/share/services/sessionHistoryService';
-import { getExerciseLabel } from '../../utils/exerciseLabel';
+import { getExerciseLabel, getExerciseColor } from '../../utils/exerciseLabel';
 import { SharePanel } from '../../features/share/components/SharePanel';
 import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
@@ -721,7 +721,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', alignItems: 'center' }}>
                                                     {exercises.map((ex, j) => {
                                                         const ExIcon = ICON_MAP[ex.icon] || Dumbbell;
-                                                        return <ExIcon key={ex.id || j} size={13} color={ex.color || '#818cf8'} />;
+                                                        return <ExIcon key={ex.id || j} size={13} color={getExerciseColor(ex)} />;
                                                     })}
                                                 </div>
                                             )}

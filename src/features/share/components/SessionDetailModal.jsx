@@ -4,7 +4,8 @@ import { X, Clock, Zap, Dumbbell, Check, Trash2, Pencil } from 'lucide-react';
 import ICON_MAP from '../../../utils/iconMap';
 import { Z_INDEX } from '../../../utils/zIndex';
 import { updateSessionName } from '../services/sessionHistoryService';
-import { getExerciseLabel } from '../../../utils/exerciseLabel';
+import { getExerciseLabel, getExerciseColor } from '../../../utils/exerciseLabel';
+import { sumExerciseReps } from '../../../utils/stats';
 import { SharePanel } from './SharePanel';
 
 function formatDuration(seconds) {
@@ -37,7 +38,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   const hasName = name && name.trim().length > 0;
 
   const exercises = session?.exercises || [];
-  const totalReps = exercises.reduce((sum, ex) => sum + (ex.reps || 0), 0);
+  const totalReps = sumExerciseReps(exercises);
   const sessionWithName = useMemo(() => ({ ...session, name }), [session, name]);
 
   if (!session) return null;
@@ -158,7 +159,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flex: 1 }}>
                 {exercises.map((ex, i) => {
                   const Icon = ICON_MAP[ex.icon] || Dumbbell;
-                  return <Icon key={ex.id || i} size={16} color={ex.color || '#818cf8'} />;
+                  return <Icon key={ex.id || i} size={16} color={getExerciseColor(ex)} />;
                 })}
               </div>
               <Pencil size={14} style={{ opacity: 0.3, flexShrink: 0 }} />
@@ -233,21 +234,21 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
                 <div key={ex.id || i} style={{
                   display: 'flex', alignItems: 'center', gap: '10px',
                   padding: '12px 14px', borderRadius: '12px',
-                  background: `${ex.color || '#818cf8'}0a`,
-                  border: `1px solid ${ex.color || '#818cf8'}15`,
+                  background: `${getExerciseColor(ex)}0a`,
+                  border: `1px solid ${getExerciseColor(ex)}15`,
                 }}>
                   <div style={{
                     width: '32px', height: '32px', borderRadius: '10px',
-                    background: `${ex.color || '#818cf8'}15`,
+                    background: `${getExerciseColor(ex)}15`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}>
-                    <Icon size={16} color={ex.color || '#818cf8'} />
+                    <Icon size={16} color={getExerciseColor(ex)} />
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{
                       fontSize: '0.85rem', fontWeight: 700,
-                      color: ex.color || '#818cf8',
+                      color: getExerciseColor(ex),
                     }}>
                       {getExerciseLabel(ex, t)}
                     </div>

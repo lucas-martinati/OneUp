@@ -7,6 +7,10 @@ const MAX_SESSIONS = 10;
  * Each session: { id, date, duration, name, type, exercises: [{ id, label, reps, color }] }
  */
 
+function getDefaultExerciseColor() {
+  return '#818cf8';
+}
+
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
@@ -38,7 +42,7 @@ export function addSession({ date, duration, name, type, exercises }) {
       id: ex.id,
       label: ex.label || ex.id,
       reps: ex.reps || ex.goal || 0,
-      color: ex.color || '#818cf8',
+      color: ex.color || getDefaultExerciseColor(),
       icon: ex.icon || 'Dumbbell',
       type: ex.type || 'counter',
     })),
