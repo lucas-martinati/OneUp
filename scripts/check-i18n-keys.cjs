@@ -44,55 +44,99 @@ function flattenKeys(obj, prefix = '') {
 
 /**
  * Vérifie qu'une clé extraite du code ressemble à une vraie clé i18n.
- * Une clé valide doit :
- *  - contenir au moins un point (structure imbriquée)
- *  - ne pas être un chemin de fichier ou d'import
- *  - ne pas contenir d'espaces ou de virgules
  */
 function isLikelyI18nKey(key) {
-  if (!key || key.length < 3)                        return false;
-  if (!key.includes('.'))                             return false; // doit être imbriquée
-  if (key.startsWith('.') || key.startsWith('/'))    return false;
-  if (key.startsWith('./') || key.startsWith('../')) return false;
-  if (key.includes(' ') || key.includes(','))        return false;
-  if (key.includes('@'))                              return false; // packages npm
-  // Chemins de fichiers (ex: components/Foo/Bar)
-  if (/\/(components|hooks|services|utils|pages|contexts)/.test(key)) return false;
+  if (!key || key.length < 3)                                           return false;
+  if (!key.includes('.'))                                               return false;
+  if (key.startsWith('.') || key.endsWith('.'))                        return false;
+  if (key.startsWith('/') || key.startsWith('./') ||
+      key.startsWith('../'))                                            return false;
+  if (key.includes(' ') || key.includes(','))                          return false;
+  if (key.includes('@'))                                                return false;
+
+  // Chemins de fichiers
+  if (/\/(components|hooks|services|utils|pages|contexts)/.test(key))  return false;
+
+  // Extensions de fichiers
+  if (/\.(png|jpg|svg|gif|webp|ico|json|cjs|ts|tsx|js|jsx)$/.test(key)) return false;
+
+  // Valeurs CSS : commence par un chiffre ou signe négatif + chiffre
+  if (/^-?\d/.test(key))                                               return false;
+
+  // Unités CSS dans la valeur
+  if (/\d+(rem|em|px|s|ms|%)/.test(key))                              return false;
+
+  // Fonctions CSS
+  if (/^(scale|translate|rotate|skew|matrix)\(/.test(key))            return false;
+
+  // Caractères non autorisés (seuls a-z, A-Z, 0-9, point, underscore acceptés)
+  if (/[^a-zA-Z0-9._]/.test(key))                                     return false;
+
+  // Chaque segment doit commencer par une lettre et ne pas être vide
+  if (key.split('.').some(seg => seg.length === 0 || /^\d/.test(seg))) return false;
+
   return true;
 }
 
 /**
  * Extrait les clés i18n utilisées dans le contenu d'un fichier source.
  *
- * Gère deux cas :
- *  1. Clé statique   : t('some.key')  → clé complète
- *  2. Clé dynamique  : t(`some.${var}.name`) → préfixe 'some' (la partie avant la première interpolation)
+ * Cas 1 — Clé statique dans t()       : t('some.key')
+ * Cas 2 — Clé dynamique dans t()      : t(`some.${var}.end`) → préfixe 'some'
+ * Cas 3 — String literal hors t()     : 'some.key' dans un objet/variable
+ * Cas 4 — Template literal hors t()   : `some.${var}` → préfixe 'some'
+ * Cas 5 — Concaténation hors t()      : 'exercises.' + ex.id → préfixe 'exercises'
  */
 function extractI18nUsage(content) {
-  const staticKeys  = new Set();
-  const prefixes    = new Set();
-
-  // Capture t('...'), t("..."), t(`...`) — avec ou sans namespace (ex: t('ns:key'))
-  const regex = /\bt\((?:'([^']+)'|"([^"]+)"|`([^`]+)`)/g;
+  const staticKeys = new Set();
+  const prefixes   = new Set();
   let match;
 
-  while ((match = regex.exec(content)) !== null) {
+  // ── Cas 1 & 2 : appels t('...') ──────────────────────────────────────────
+  const tCallRegex = /\bt\((?:'([^']+)'|"([^"]+)"|`([^`]+)`)/g;
+  while ((match = tCallRegex.exec(content)) !== null) {
     const raw = match[1] ?? match[2] ?? match[3];
     if (!raw) continue;
 
     const isTemplate = match[3] !== undefined;
 
     if (isTemplate && raw.includes('${')) {
-      // Clé dynamique : extraire le préfixe stable (avant le premier ${...})
-      const stablePart = raw.split('${')[0].replace(/\.$/, '');
-      if (stablePart.includes('.')) {
+      // Cas 2 : préfixe stable avant la première interpolation
+      const stablePart = raw.split('${')[0].replace(/\.$/, '').trim();
+      if (stablePart.includes('.') && isLikelyI18nKey(stablePart + '.x')) {
         prefixes.add(stablePart);
       }
     } else {
-      // Clé statique (ou template sans interpolation)
-      // Supprimer le namespace éventuel (ex: 'common:key' → 'key')
+      // Cas 1 : clé statique (supprimer namespace éventuel ex: 'ns:key')
       const key = raw.includes(':') ? raw.split(':').slice(1).join(':') : raw;
       if (isLikelyI18nKey(key)) staticKeys.add(key);
+    }
+  }
+
+  // ── Cas 3 : string literals hors t() ─────────────────────────────────────
+  const literalRegex = /(?:'([^'\n]+)'|"([^"\n]+)")/g;
+  while ((match = literalRegex.exec(content)) !== null) {
+    const raw = match[1] ?? match[2];
+    if (!raw) continue;
+    const key = raw.includes(':') ? raw.split(':').slice(1).join(':') : raw;
+    if (isLikelyI18nKey(key)) staticKeys.add(key);
+  }
+
+  // ── Cas 4 : template literals sans appel t() ─────────────────────────────
+  const templateRegex = /`([^`]*)\$\{[^}]+\}[^`]*`/g;
+  while ((match = templateRegex.exec(content)) !== null) {
+    const stablePart = match[1].replace(/\.$/, '').trim();
+    if (stablePart.includes('.') && isLikelyI18nKey(stablePart + '.x')) {
+      prefixes.add(stablePart);
+    }
+  }
+
+  // ── Cas 5 : concaténation  'prefix.' + variable ───────────────────────────
+  const concatRegex = /['"`]([a-zA-Z][a-zA-Z0-9._]*)\.['"`]\s*\+/g;
+  while ((match = concatRegex.exec(content)) !== null) {
+    const prefix = match[1];
+    if (isLikelyI18nKey(prefix + '.x')) {
+      prefixes.add(prefix);
     }
   }
 
@@ -102,8 +146,8 @@ function extractI18nUsage(content) {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 // 1. Charger toutes les clés définies dans en.json
-const enJson  = JSON.parse(fs.readFileSync(path.join(LOCALES_DIR, 'en.json'), 'utf-8'));
-const allKeys = flattenKeys(enJson);
+const enJson     = JSON.parse(fs.readFileSync(path.join(LOCALES_DIR, 'en.json'), 'utf-8'));
+const allKeys    = flattenKeys(enJson);
 const allKeysSet = new Set(allKeys);
 
 console.log(`Total keys in en.json: ${allKeys.length}\n`);
@@ -115,14 +159,14 @@ const usedPrefixes   = new Set();
 walkDir(SRC_DIR, (filepath) => {
   const content = fs.readFileSync(filepath, 'utf-8');
   const { staticKeys, prefixes } = extractI18nUsage(content);
-  staticKeys.forEach(k  => usedStaticKeys.add(k));
-  prefixes.forEach(p    => usedPrefixes.add(p));
+  staticKeys.forEach(k => usedStaticKeys.add(k));
+  prefixes.forEach(p   => usedPrefixes.add(p));
 });
 
 console.log(`Static keys found in code : ${usedStaticKeys.size}`);
 console.log(`Dynamic prefixes found    : ${usedPrefixes.size}\n`);
 
-// 3. Clés dynamiques
+// 3. Afficher les clés dynamiques
 if (usedPrefixes.size > 0) {
   console.log('=== DYNAMIC KEYS (accessed via variable patterns) ===\n');
   for (const prefix of [...usedPrefixes].sort()) {
@@ -137,18 +181,60 @@ if (usedPrefixes.size > 0) {
   console.log('');
 }
 
-// 4. Clés inutilisées (ni statique ni couverte par un préfixe dynamique)
-const unusedKeys = allKeys.filter(key => {
-  if (usedStaticKeys.has(key)) return false;
-  if ([...usedPrefixes].some(p => key.startsWith(p + '.'))) return false;
-  return true;
-});
+// 4. Clés inutilisées
+//
+// Une clé est considérée utilisée si :
+//   a) elle est dans usedStaticKeys (clé exacte)
+//   b) elle est couverte par un préfixe dynamique
+//   c) sa base sans suffixe pluriel (_one/_other/…) est dans usedStaticKeys
+//      ex: 'workout.reps_one' est couverte si 'workout.reps' est utilisée
+//
+const PLURAL_SUFFIXES = ['_one', '_other', '_zero', '_two', '_few', '_many'];
+
+// Base des clés statiques utilisées (pour couvrir les variantes plurielles)
+const usedPluralBases = new Set(
+  [...usedStaticKeys].map(k => {
+    for (const s of PLURAL_SUFFIXES) {
+      if (k.endsWith(s)) return k.slice(0, -s.length);
+    }
+    return k;
+  })
+);
+
+function isKeyUsed(key) {
+  // a) clé exacte
+  if (usedStaticKeys.has(key)) return true;
+
+  // b) couverte par un préfixe dynamique
+  if ([...usedPrefixes].some(p => key.startsWith(p + '.'))) return true;
+
+  // c) variante plurielle dont la base est utilisée
+  for (const suffix of PLURAL_SUFFIXES) {
+    if (key.endsWith(suffix)) {
+      const base = key.slice(0, -suffix.length);
+      if (usedPluralBases.has(base) || usedStaticKeys.has(base)) return true;
+    }
+  }
+
+  return false;
+}
+
+const unusedKeys = allKeys.filter(key => !isKeyUsed(key));
 
 console.log(`=== UNUSED KEYS (${unusedKeys.length}) ===\n`);
 unusedKeys.forEach(k => console.log(`  - ${k}`));
 
-// 5. Clés utilisées mais absentes de en.json
-const missingKeys = [...usedStaticKeys].filter(k => !allKeysSet.has(k));
+// 5. Clés utilisées dans le code mais absentes de en.json
+//    (ignorer les "bases" de clés plurielles qui existent sous forme _one/_other)
+const missingKeys = [...usedStaticKeys].filter(k => {
+  if (allKeysSet.has(k)) return false;
+
+  // La clé est la base d'une paire plurielle existante → pas vraiment manquante
+  const hasPluralVariant = PLURAL_SUFFIXES.some(s => allKeysSet.has(`${k}${s}`));
+  if (hasPluralVariant) return false;
+
+  return true;
+});
 
 if (missingKeys.length > 0) {
   console.log(`\n=== MISSING KEYS — used in code but not in en.json (${missingKeys.length}) ===\n`);
