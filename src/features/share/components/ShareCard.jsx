@@ -175,9 +175,6 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const selectedCats = isGlobal
     ? (options.statsCategories || ['bodyweight', 'weights', 'custom'])
     : null;
-  const filteredHistory = isGlobal
-    ? (sessionHistory || []).filter(s => selectedCats.includes(s.type || 'bodyweight'))
-    : sessionHistory;
   const filteredStats = isGlobal ? (() => {
     let totalReps = 0;
     let exerciseCount = 0;
