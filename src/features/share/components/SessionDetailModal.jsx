@@ -198,7 +198,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
               fontSize: '0.55rem', color: 'var(--text-secondary)',
               textTransform: 'uppercase', letterSpacing: '0.5px',
             }}>
-              {t('share.reps', 'Reps')}
+              {t('customExercises.typeReps')}
             </div>
           </div>
           <div style={{

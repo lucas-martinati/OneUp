@@ -85,28 +85,28 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
 
       <OptionRow
         icon={isGlobal ? Award : Clock}
-        label={isGlobal ? t('share.bestStreak', 'Meilleure s\u00e9rie') : t('share.duration', 'Dur\u00e9e')}
+        label={isGlobal ? t('stats.bestStreak', 'Best streak') : t('share.duration', 'Dur\u00e9e')}
         color="#818cf8"
         checked={options.showDuration}
         onToggle={() => toggleOption('showDuration')}
       />
       <OptionRow
         icon={Zap}
-        label={isGlobal ? t('share.totalReps', 'Reps totales') : t('share.reps', 'Reps')}
+        label={isGlobal ? t('stats.totalReps', 'Total reps') : t('customExercises.typeReps', 'Reps')}
         color="#fbbf24"
         checked={options.showVolume}
         onToggle={() => toggleOption('showVolume')}
       />
       <OptionRow
         icon={isGlobal ? Target : Dumbbell}
-        label={isGlobal ? t('share.activeDays', 'Jours actifs') : t('share.exercisesCompleted', 'Exercices compl\u00e9t\u00e9s')}
+        label={isGlobal ? t('leaderboard.activeDays', 'Active days') : t('share.exercisesCompleted', 'Exercices compl\u00e9t\u00e9s')}
         color="#34d399"
         checked={options.showExercises}
         onToggle={() => toggleOption('showExercises')}
       />
       <OptionRow
         icon={Flame}
-        label={t('share.streakDisplay', 'S\u00e9rie (streak)')}
+        label={t('achievements.categories.streak', 'Streak')}
         color="#ef4444"
         checked={options.showStreak}
         onToggle={() => toggleOption('showStreak')}

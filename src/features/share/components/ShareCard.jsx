@@ -77,7 +77,7 @@ function HistoryRow({ session, t, lang }) {
           <span style={{
             fontSize: '0.6rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)',
           }}>
-            {t('share.session', 'S\u00e9ance')}
+            {t('dashboard.session', 'S\u00e9ance')}
           </span>
         )}
       </div>
@@ -158,9 +158,9 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const weightExercises = allExercises.filter(isWeightEx);
   const customExercises = allExercises.filter(isCustomEx);
   const categories = [
-    bodyweightExercises.length > 0 && { key: 'bodyweight', exercises: bodyweightExercises, label: t('share.bodyweight', 'Poids du corps'), color: '#34d399' },
-    weightExercises.length > 0 && { key: 'weights', exercises: weightExercises, label: t('share.weights', 'Musculation'), color: '#f97316' },
-    customExercises.length > 0 && { key: 'custom', exercises: customExercises, label: t('share.customEx', 'Perso'), color: '#8b5cf6' },
+    bodyweightExercises.length > 0 && { key: 'bodyweight', exercises: bodyweightExercises, label: t('common.global_classic', 'Bodyweight'), color: '#34d399' },
+    weightExercises.length > 0 && { key: 'weights', exercises: weightExercises, label: t('common.global_weights', 'Weights'), color: '#f97316' },
+    customExercises.length > 0 && { key: 'custom', exercises: customExercises, label: t('common.global_custom', 'Custom'), color: '#8b5cf6' },
   ].filter(Boolean);
   const showSections = showCategoriesSeparately && categories.length > 1;
 
@@ -384,13 +384,11 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
           {isGlobal ? (
             <>
               {options.showVolume && (
-                <MetricCard icon={Zap} value={totalReps.toLocaleString()} label={t('share.totalReps', 'Reps totales')} color="#fbbf24" />
-              )}
-              {options.showExercises && (
-                <MetricCard icon={Target} value={totalDays} label={t('share.activeDays', 'Jours actifs')} color="#34d399" />
-              )}
-              {options.showDuration && maxStreak > 0 && (
-                <MetricCard icon={Award} value={`${maxStreak}j`} label={t('share.bestStreak', 'Meilleure s\u00e9rie')} color="#8b5cf6" />
+                <>
+                  <MetricCard icon={Zap} value={totalReps.toLocaleString()} label={t('stats.totalReps', 'Total reps')} color="#fbbf24" />
+                  <MetricCard icon={Target} value={totalDays} label={t('leaderboard.activeDays', 'Active days')} color="#34d399" />
+                  <MetricCard icon={Award} value={`${maxStreak}j`} label={t('stats.bestStreak', 'Best streak')} color="#8b5cf6" />
+                </>
               )}
             </>
           ) : (
@@ -399,7 +397,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
                 <MetricCard icon={Clock} value={formatDuration(duration)} label={t('share.duration', 'Dur\u00e9e')} color="#818cf8" />
               )}
               {options.showVolume && (
-                <MetricCard icon={Zap} value={totalReps} label={t('share.reps', 'Reps')} color="#fbbf24" />
+                <MetricCard icon={Zap} value={totalReps} label={t('customExercises.typeReps', 'Reps')} color="#fbbf24" />
               )}
               {options.showExercises && (
                 <MetricCard icon={Dumbbell} value={exerciseCount} label={t('share.exercises', 'Exercices')} color="#34d399" />
