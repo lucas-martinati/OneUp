@@ -129,7 +129,9 @@
       "exerciseChoice": "Free exercise choice",
       "dailyProgression": "Tailored daily progression",
       "dedicatedPanel": "Dedicated panel with full tracking",
-      "shareThemes": "Exclusive share themes"
+      "shareThemes": "Exclusive share themes",
+      "specialExercises": "Weight Training & Dumbbells",
+      "proStats": "Expert stats & charts"
     },
     "buyButton": "Go Pro",
     "price": "€1.99/month",
@@ -654,7 +656,6 @@
     "theme.sunset": "Sunset",
     "theme.forest": "Forest",
     "theme.purple": "Purple",
-    "proThemes": "Pro",
     "cat": {
       "bodyweight": "Bodyweight",
       "weights": "Weights",
