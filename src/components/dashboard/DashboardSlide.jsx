@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Settings } from 'lucide-react';
 import { getIcon, UI_ICONS } from '../../utils/icons';
 import { getDailyGoal } from '../../config/exercises';
 import { formatTime } from '../../utils/dateUtils';
@@ -47,7 +48,7 @@ export const DashboardSlide = React.memo(({
                     </div>
                     {onManageCustom && (
                         <button onClick={onManageCustom} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', opacity: 0.6, padding: '4px' }}>
-                            <SettingsIcon size={14} />
+                            <Settings size={14} />
                         </button>
                     )}
                 </div>
