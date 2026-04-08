@@ -155,19 +155,31 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
 
             <ClanInviteCard clanData={clanData} />
 
+            {/* Domain filter - stays fixed */}
             <LeaderboardTabs 
                 domain={domain}
                 setDomain={setDomain}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 VISIBLE_TABS={VISIBLE_TABS}
+                showDomainFilter={true}
+                showExerciseTabs={false}
             />
 
-            {/* Content */}
+            {/* Content - exercise tabs + users list scroll together */}
             <div style={{
                 flex: 1, overflowY: 'auto', padding: '0 var(--spacing-md) var(--spacing-md)',
                 display: 'flex', flexDirection: 'column', gap: '6px'
             }}>
+                <LeaderboardTabs 
+                    domain={domain}
+                    setDomain={setDomain}
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    VISIBLE_TABS={VISIBLE_TABS}
+                    showDomainFilter={false}
+                    showExerciseTabs={true}
+                />
                 {loading ? (
                     <div style={{
                         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',

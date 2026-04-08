@@ -2,50 +2,49 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy, Dumbbell, Activity } from 'lucide-react';
 
-export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VISIBLE_TABS }) {
+export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VISIBLE_TABS, showDomainFilter = true, showExerciseTabs = true }) {
     const { t } = useTranslation();
 
     return (
         <>
             {/* ── Domain Filter ── */}
+            {showDomainFilter && (
             <div style={{
-                display: 'flex', gap: '8px', padding: 'var(--spacing-md) var(--spacing-md) 0'
+                display: 'flex', gap: '8px', padding: '12px var(--spacing-md) 0'
             }}>
                 <button
                     onClick={() => { setDomain('classic'); setActiveTab('global_classic'); }}
-                    className="hover-lift"
                     style={{
                         flex: 1, padding: '10px', borderRadius: 'var(--radius-md)',
                         background: domain === 'classic' ? '#ffffff' : 'rgba(255,255,255,0.05)',
                         color: domain === 'classic' ? '#000000' : 'var(--text-secondary)',
                         border: 'none', fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                        transition: 'all 0.2s', boxShadow: domain === 'classic' ? '0 4px 12px rgba(255,255,255,0.1)' : 'none'
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
                     }}
                 >
                     <Trophy size={16} /> {t('common.global_classic')}
                 </button>
                 <button
                     onClick={() => { setDomain('weights'); setActiveTab('global_weights'); }}
-                    className="hover-lift"
                     style={{
                         flex: 1, padding: '10px', borderRadius: 'var(--radius-md)',
                         background: domain === 'weights' ? 'linear-gradient(135deg, #8b5cf6, #6366f1)' : 'rgba(255,255,255,0.05)',
                         color: domain === 'weights' ? '#ffffff' : 'var(--text-secondary)',
                         border: domain === 'weights' ? '1px solid rgba(139,92,246,0.4)' : '1px solid transparent',
                         fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                        transition: 'all 0.2s', boxShadow: domain === 'weights' ? '0 4px 12px rgba(139,92,246,0.2)' : 'none'
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
                     }}
                 >
                     <Dumbbell size={16} /> {t('common.global_weights')}
                 </button>
             </div>
+            )}
 
             {/* ── Tabs (wrapping) ───────────────────────────────── */}
+            {showExerciseTabs && (
             <div style={{
                 display: 'flex', flexWrap: 'wrap', gap: '6px',
-                padding: 'var(--spacing-md)'
+                padding: showDomainFilter ? 'var(--spacing-md)' : 'var(--spacing-md) 0'
             }}>
                 {VISIBLE_TABS.map(tab => {
                     const isActive = tab.id === activeTab || (!VISIBLE_TABS.find(t => t.id === activeTab) && tab.id === VISIBLE_TABS[0].id);
@@ -80,6 +79,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                     );
                 })}
             </div>
+            )}
         </>
     );
 }
