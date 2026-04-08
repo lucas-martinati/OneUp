@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { X, Play, Check, Trophy, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle } from 'lucide-react';
 import { EXERCISES, getDailyGoal } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
+import { CATEGORIES } from '../../config/categories';
 import { Counter } from './Counter';
 import { Z_INDEX } from '../../utils/zIndex';
 import { Timer } from './Timer';
@@ -201,31 +202,52 @@ export function WorkoutSession({
 
     // Load a routine into the queue
     const loadRoutine = (routine) => {
-        const WEIGHT_IDS = ['biceps_curl','hammer_curl','bench_press','overhead_press','squat_weights','deadlift','barbell_row'];
-        // Filter out exercises that don't exist anymore, aren't allowed, or are already completed
-        const validIds = routine.exerciseIds.filter(id => {
-            const ex = allowedExercises.find(e => e.id === id);
-            if (!ex) return false;
+        const weightIds = WEIGHT_EXERCISES.map(e => e.id);
+        
+        // Get current category based on activeSlide
+        const currentCat = activeSlide === 0 ? CATEGORIES.BODYWEIGHT : activeSlide === 1 ? CATEGORIES.WEIGHTS : CATEGORIES.CUSTOM;
+        
+        // Filter exercises: keep only accessible ones (bodyweight always, weights/custom only if Pro)
+        const routineExercises = routine.exerciseIds
+            .map(id => allExercises.find(e => e.id === id))
+            .filter(ex => {
+                if (!ex) return false;
+                const isWeight = weightIds.includes(ex.id);
+                const isCustom = isCustomExercise(ex.id);
+                // Remove weights and custom if not Pro
+                if (!isPro && (isWeight || isCustom)) return false;
+                return true;
+            });
+        
+        // Filter out completed exercises
+        const validExercises = routineExercises.filter(ex => {
             const goal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
             const count = getExerciseCount(today, ex.id);
             const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
             return !done;
         });
+        
+        const validIds = validExercises.map(ex => ex.id);
         setQueue(validIds);
         setSessionName(routine.name);
         setShowRoutineList(false);
 
-        // If routine mixes exercise types, enable showAll so all are available
-        const hasWeights = routine.exerciseIds.some(id => WEIGHT_IDS.includes(id));
-        const hasBodyweight = routine.exerciseIds.some(id => !WEIGHT_IDS.includes(id) && !isCustomExercise(id));
-        const hasCustom = routine.exerciseIds.some(id => isCustomExercise(id));
-        const isMixed = (hasWeights && hasBodyweight) || hasCustom;
-        if (isMixed && canMixDashboards) {
+        // Get unique categories from valid exercises
+        const categoriesInRoutine = new Set(validExercises.map(ex => {
+            if (weightIds.includes(ex.id)) return CATEGORIES.WEIGHTS;
+            if (isCustomExercise(ex.id)) return CATEGORIES.CUSTOM;
+            return CATEGORIES.BODYWEIGHT;
+        }));
+        
+        // If routine has exercises from a different category than current, enable showAll
+        const isDifferentCategory = [...categoriesInRoutine].some(cat => cat !== currentCat);
+        
+        if (isDifferentCategory && canMixDashboards) {
             setShowAll(true);
         }
 
         // Auto-activate showWeights in share options if routine mixes categories
-        if (isMixed) {
+        if (categoriesInRoutine.size > 1) {
             try {
                 const raw = localStorage.getItem('oneup_share_options');
                 const opts = raw ? JSON.parse(raw) : {};
