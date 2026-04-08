@@ -12,17 +12,35 @@ const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.Sha
  * Used in SessionSummary, SessionDetailModal, and Stats.
  *
  * Now consumes isPro from SubscriptionContext directly.
+ * 
+ * @param {Object} params
+ * @param {Object} params.sessionData - { date, exercises, duration, name, type }
+ * @param {Object} params.stats - computed stats from useComputedStats
+ * @param {string} params.variant - 'large' | 'compact' | 'stats'
+ * @param {string} params.mode - 'session' | 'global'
+ * @param {Array} params.activeCategories - ['standard', 'weights', 'custom'] from Stats filters
  */
-export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 'session', label }) {
+export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 'session', label, activeCategories = ['standard', 'weights', 'custom'] }) {
   const [showShare, setShowShare] = useState(false);
   const { t } = useTranslation();
   const { isPro } = useSubscription();
+
+  // Map Stats categories to SharePanel categories for initial state
+  const categoryMap = {
+    standard: 'bodyweight',
+    weights: 'weights',
+    custom: 'custom',
+  };
+  const initialCategories = activeCategories
+    .map(cat => categoryMap[cat])
+    .filter(Boolean);
 
   const shareHook = useShareCard({
     sessionData,
     stats,
     sessionHistory: getSessionHistory(),
     mode,
+    initialCategories: initialCategories.length > 0 ? initialCategories : ['bodyweight', 'weights', 'custom'],
   });
 
   const isCompact = variant === 'compact';

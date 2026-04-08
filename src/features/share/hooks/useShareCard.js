@@ -34,11 +34,22 @@ function loadSavedOptions() {
  * @param {Object} params.stats - computed stats from useComputedStats (for streak, etc.)
  * @param {Array} params.sessionHistory - last 10 sessions from sessionHistoryService
  * @param {string} params.mode - 'session' | 'global'
+ * @param {Array} params.initialCategories - initial categories to select ['bodyweight', 'weights', 'custom']
  * @returns {Object} { cardRef, options, setOption, toggleOption, exportCard, shareCard, isExporting, mode }
  */
-export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mode = 'session' } = {}) {
+export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mode = 'session', initialCategories } = {}) {
   const cardRef = useRef(null);
-  const [options, setOptions] = useState(loadSavedOptions);
+  
+  // Apply initial categories only once on mount (when modal opens)
+  const getInitialOptions = () => {
+    const saved = loadSavedOptions();
+    if (initialCategories && initialCategories.length > 0) {
+      return { ...saved, statsCategories: initialCategories };
+    }
+    return saved;
+  };
+  
+  const [options, setOptions] = useState(getInitialOptions);
   const [isExporting, setIsExporting] = useState(false);
 
   const setOption = useCallback((key, value) => {

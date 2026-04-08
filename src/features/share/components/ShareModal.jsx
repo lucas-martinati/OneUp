@@ -77,7 +77,7 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
       }}>
         <div ref={cardRef} style={{ width: '100%' }}>
           <ShareCard
-            key={options.theme}
+            key={`${options.theme}-${options.statsCategories?.join(',') || ''}`}
             cardRef={cardRef}
             sessionData={sessionData}
             stats={stats}

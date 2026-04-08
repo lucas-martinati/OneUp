@@ -653,9 +653,10 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 {/* Share button */}
                 <SharePanel
                     sessionData={{ date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') }}
-                    stats={computedStats}
+                    stats={globalStats}
                     variant="stats"
                     mode="global"
+                    activeCategories={activeCategories}
                 />
 
                 {/* Session history */}

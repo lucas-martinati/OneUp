@@ -178,21 +178,45 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const filteredStats = isGlobal ? (() => {
     let totalReps = 0;
     let exerciseCount = 0;
-    if (stats && stats.exerciseStats) {
+    
+    if (stats && stats.exerciseStats && stats.exerciseStats.length > 0) {
+      const countedIds = new Set();
+      
       for (const ex of stats.exerciseStats) {
-        if (ex.totalReps > 0) {
+        if (ex.totalReps > 0 && ex.id) {
           let cat = 'bodyweight';
           if (isWeightEx(ex)) cat = 'weights';
           else if (isCustomEx(ex)) cat = 'custom';
           
           if (selectedCats.includes(cat)) {
             totalReps += ex.totalReps;
-            exerciseCount++;
+            if (!countedIds.has(ex.id)) {
+              countedIds.add(ex.id);
+              exerciseCount++;
+            }
           }
         }
       }
     } else if (stats?.globalTotalReps) {
       totalReps = stats.globalTotalReps;
+      const countedIds = new Set();
+      if (stats.exerciseStats) {
+        for (const ex of stats.exerciseStats) {
+          if (ex.totalReps > 0 && ex.id) {
+            let cat = 'bodyweight';
+            if (isWeightEx(ex)) cat = 'weights';
+            else if (isCustomEx(ex)) cat = 'custom';
+            
+            if (selectedCats.includes(cat) && !countedIds.has(ex.id)) {
+              countedIds.add(ex.id);
+              exerciseCount++;
+            }
+          }
+        }
+      }
+      if (exerciseCount === 0) {
+        exerciseCount = stats.exerciseStats?.filter(ex => ex.totalReps > 0).length || 0;
+      }
     }
     return { totalReps, exerciseCount };
   })() : null;
