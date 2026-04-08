@@ -83,12 +83,13 @@ function validateProgressData(data) {
 function makeAllDone(selectedExercises = null) {
   const entry = {};
   const now = new Date().toISOString();
+  const validateTime = Date.now();
   const exercisesToComplete = selectedExercises 
     ? EXERCISES.filter(ex => selectedExercises.includes(ex.id))
     : EXERCISES;
   
   for (const ex of exercisesToComplete) {
-    entry[ex.id] = { isCompleted: true, timestamp: now, timeOfDay: null };
+    entry[ex.id] = { isCompleted: true, timestamp: now, timeOfDay: null, validatedAt: validateTime };
   }
   return entry;
 }

@@ -117,13 +117,15 @@ export function useCustomPrograms() {
     setCompletions((prev) => {
       const programCompletions = prev[programId] || {};
       const dayCompletions = programCompletions[dateStr] || {};
+      const newValue = !dayCompletions[exerciseId];
       return {
         ...prev,
         [programId]: {
           ...programCompletions,
           [dateStr]: {
             ...dayCompletions,
-            [exerciseId]: !dayCompletions[exerciseId],
+            [exerciseId]: newValue,
+            validatedAt: newValue ? Date.now() : dayCompletions.validatedAt,
           },
         },
       };
@@ -140,6 +142,16 @@ export function useCustomPrograms() {
 
   const isProgramExerciseDone = useCallback((programId, dateStr, exerciseId) => {
     return completions[programId]?.[dateStr]?.[exerciseId] || false;
+  }, [completions]);
+
+  const getDayValidationTime = useCallback((programId, dateStr) => {
+    const dayData = completions[programId]?.[dateStr];
+    if (!dayData) return null;
+    const times = Object.entries(dayData)
+      .filter(([key, val]) => key !== 'validatedAt' && typeof val === 'object' && val?.validatedAt)
+      .map(([, val]) => val.validatedAt);
+    if (times.length === 0) return null;
+    return Math.min(...times);
   }, [completions]);
 
   const getProgramStreak = useCallback((programId) => {
@@ -217,6 +229,7 @@ export function useCustomPrograms() {
     toggleProgramExerciseCompletion,
     getProgramDayNumber,
     isProgramExerciseDone,
+    getDayValidationTime,
     getProgramStreak,
     getProgramStats,
     setProgramsFromCloud,

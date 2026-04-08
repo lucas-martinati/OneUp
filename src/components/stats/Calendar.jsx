@@ -8,7 +8,7 @@ import { getDailyGoal } from '../../config/exercises';
 import ICON_MAP from '../../utils/iconMap';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
-export function Calendar({ startDate, completions, exercises, getDayNumber, onClose, settings }) { // Added settings prop
+export function Calendar({ startDate, completions, exercises, getDayNumber, onClose, settings, programId, getDayValidationTime }) {
     const { t } = useTranslation();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
@@ -366,8 +366,10 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                         getDayNumber={getDayNumber}
                         onClose={handleCloseDetail}
                         isClosing={isClosing}
-                        settings={settings} // Pass settings to DayDetail
+                        settings={settings}
                         t={t}
+                        programId={programId}
+                        getDayValidationTime={getDayValidationTime}
                     />
                 </>
             )}
@@ -394,7 +396,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
 }
 
 /** Day detail bottom sheet */
-function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, settings, t }) { // Added settings prop
+function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, settings, t, programId, getDayValidationTime }) {
     const dayNum = getDayNumber(dateString);
     const dayCompletions = completions[dateString] || {};
     const [dragY, setDragY] = useState(0);
@@ -525,6 +527,20 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                         {dateString}
                     </div>
                     <div style={{ fontSize: '1.2rem', fontWeight: '700' }}>{t('calendar.day', { num: dayNum })}</div>
+                    {(() => {
+                        const timestamps = Object.values(dayCompletions)
+                            .filter(ex => ex?.timestamp)
+                            .map(ex => new Date(ex.timestamp).getTime());
+                        if (timestamps.length > 0) {
+                            const earliest = new Date(Math.min(...timestamps));
+                            return (
+                                <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                    {earliest.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                            );
+                        }
+                        return null;
+                    })()}
                 </div>
                 <div style={{
                     fontSize: '1.4rem', fontWeight: '800',
