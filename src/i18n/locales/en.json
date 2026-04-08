@@ -3,7 +3,6 @@
     "initializing": "Initializing..."
   },
   "dashboard": {
-    "newAchievement": "New Achievement!",
     "calendar": "Calendar",
     "session": "Session",
     "noExercisesConfigured": "You haven't configured any exercises here yet.",
@@ -11,14 +10,11 @@
     "day": "Day",
     "doneAt": "Done at {{time}}",
     "waiting": "⏳ Waiting",
-    "challengeStarts": "Your challenge starts on",
-    "routines": "Routines",
-    "date": "{{date}}"
+    "challengeStarts": "Your challenge starts on"
   },
   "common": {
     "global_weights": "Weights",
     "global_custom": "Custom",
-    "exercise": "Exercise",
     "close": "Close",
     "global_classic": "Bodyweight",
     "cancel": "Cancel",
@@ -29,8 +25,6 @@
     "reps": "reps",
     "anonymous": "Anonymous",
     "member": "A member",
-    "saved": "Saved",
-    "loading": "Loading...",
     "confirm": "Confirm"
   },
   "paywall": {
@@ -125,13 +119,7 @@
       "customExercises": "100% Custom Exercises",
       "weightDashboard": "Weight Training Dashboard",
       "exclusiveLeaderboards": "Exclusive Leaderboards",
-      "customPrograms": "100% custom programs",
-      "exerciseChoice": "Free exercise choice",
-      "dailyProgression": "Tailored daily progression",
-      "dedicatedPanel": "Dedicated panel with full tracking",
-      "shareThemes": "Exclusive share themes",
-      "specialExercises": "Weight Training & Dumbbells",
-      "proStats": "Expert stats & charts"
+      "shareThemes": "Exclusive share themes"
     },
     "buyButton": "Go Pro",
     "price": "€1.99/month",
@@ -149,10 +137,7 @@
     "namePlaceholder": "E.g. Full Body, Push Day...",
     "selectExercises": "Select exercises (in order)",
     "save": "Save",
-    "load": "Load",
-    "delete": "Delete",
-    "launch": "Launch",
-    "nameRequired": "A name is required"
+    "load": "Load"
   },
   "workout": {
     "sessionDone": "Session Complete!",
@@ -172,7 +157,6 @@
     "launch_other": "Start ({{count}} exercises)",
     "remaining": "{{count}} left",
     "launch": "Start ({{count}} exercise{{plural}})",
-    "close": "Close",
     "reps": "{{count}} reps"
   },
   "timer": {
@@ -474,10 +458,8 @@
     "buyButton": "Support OneUp",
     "restore": "Restore my purchases",
     "history": "Purchase history",
-    "androidOnly": "Purchase is only available in the Android app.",
     "historyTitle": "OneUp Support ❤️",
-    "historyDesc": "Thank you for your support!",
-    "noHistory": "No purchases recorded"
+    "historyDesc": "Thank you for your support!"
   },
   "leaderboard": {
     "inviteCode": "Invite Code",
@@ -527,8 +509,7 @@
     "joinError": "Error joining clan",
     "missingId": "Missing clan ID",
     "leaveError": "Error leaving clan",
-    "yourClans": "Your Clans ({{count}})",
-    "cancel": "Cancel"
+    "yourClans": "Your Clans ({{count}})"
   },
   "calendar": {
     "months": [
@@ -625,10 +606,8 @@
   "share": {
     "title": "Share",
     "duration": "Duration",
-    "volume": "Volume",
     "exercises": "Exercises",
     "exercisesCompleted": "Exercises completed",
-    "streak": "Streak",
     "streakDisplay": "Streak",
     "showHistory": "Session history",
     "recentSessions": "Recent sessions",
@@ -636,7 +615,6 @@
     "metrics": "Displayed metrics",
     "download": "Download",
     "share": "Share",
-    "exporting": "Exporting...",
     "shareCard": "Share my stats",
     "globalStats": "Global stats",
     "totalReps": "Total reps",
@@ -661,11 +639,6 @@
       "weights": "Weights",
       "custom": "Custom"
     },
-    "tagFriends": "Tag friends",
-    "tagFriendsHint": "Select friends to tag on the card",
-    "noFriends": "No friends to tag",
-    "friends": "friends",
-    "taggedUsers": "Tagged users",
     "backgroundImage": "Background image",
     "uploadImage": "Add an image"
   },

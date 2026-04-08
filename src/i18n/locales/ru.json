@@ -3,7 +3,6 @@
     "initializing": "Инициализация..."
   },
   "dashboard": {
-    "newAchievement": "Новое достижение!",
     "calendar": "Календарь",
     "session": "Тренировка",
     "noExercisesConfigured": "Вы еще не настроили упражнения здесь.",
@@ -11,14 +10,11 @@
     "day": "День",
     "doneAt": "Выполнено в {{time}}",
     "waiting": "⏳ Ожидание",
-    "challengeStarts": "Ваш челлендж начинается",
-    "routines": "Программы",
-    "date": "{{date}}"
+    "challengeStarts": "Ваш челлендж начинается"
   },
   "common": {
     "global_weights": "Отягощения",
     "global_custom": "Свои",
-    "exercise": "Упражнение",
     "close": "Закрыть",
     "global_classic": "С весом тела",
     "cancel": "Отмена",
@@ -29,8 +25,6 @@
     "reps": "повт.",
     "anonymous": "Аноним",
     "member": "Участник",
-    "saved": "Сохранено",
-    "loading": "Загрузка...",
     "confirm": "Подтвердить"
   },
   "paywall": {
@@ -125,12 +119,6 @@
       "customExercises": "100% Пользовательские упражнения",
       "weightDashboard": "Панель силовых тренировок",
       "exclusiveLeaderboards": "Эксклюзивные таблицы лидеров",
-      "customPrograms": "100% персональные программы",
-      "exerciseChoice": "Свободный выбор упражнений",
-      "dailyProgression": "Индивидуальная ежедневная прогрессия",
-      "dedicatedPanel": "Выделенная панель с полным отслеживанием",
-      "specialExercises": "Силовые тренировки и гантели",
-      "proStats": "Экспертная статистика и графики",
       "shareThemes": "Эксклюзивные темы для публикации"
     },
     "buyButton": "Стать Pro",
@@ -149,10 +137,7 @@
     "namePlaceholder": "Напр.: Всё тело, День жима...",
     "selectExercises": "Выбери упражнения (по порядку)",
     "save": "Сохранить",
-    "load": "Загрузить",
-    "delete": "Удалить",
-    "launch": "Запустить",
-    "nameRequired": "Требуется название"
+    "load": "Загрузить"
   },
   "workout": {
     "sessionDone": "Тренировка завершена!",
@@ -172,7 +157,6 @@
     "launch_other": "Начать ({{count}} упражнений)",
     "remaining": "Осталось {{count}}",
     "launch": "Начать ({{count}} упражнени{{plural}})",
-    "close": "Закрыть",
     "reps": "{{count}} повторений"
   },
   "timer": {
@@ -474,10 +458,8 @@
     "buyButton": "Поддержать OneUp",
     "restore": "Восстановить покупки",
     "history": "История покупок",
-    "androidOnly": "Покупка доступна только в приложении Android.",
     "historyTitle": "Поддержка OneUp ❤️",
-    "historyDesc": "Спасибо за поддержку!",
-    "noHistory": "Нет записанных покупок"
+    "historyDesc": "Спасибо за поддержку!"
   },
   "leaderboard": {
     "inviteCode": "Код приглашения",
@@ -527,8 +509,7 @@
     "joinError": "Ошибка при входе в клан",
     "missingId": "Отсутствует ID клана",
     "leaveError": "Ошибка при выходе из клана",
-    "yourClans": "Ваши кланы ({{count}})",
-    "cancel": "Отмена"
+    "yourClans": "Ваши кланы ({{count}})"
   },
   "calendar": {
     "months": [
@@ -644,10 +625,8 @@
   "share": {
     "title": "Поделиться",
     "duration": "Длительность",
-    "volume": "Объём",
     "exercises": "Упражнения",
     "exercisesCompleted": "Выполненные упражнения",
-    "streak": "Серия",
     "streakDisplay": "Серия (streak)",
     "showHistory": "История тренировок",
     "recentSessions": "Последние тренировки",
@@ -655,7 +634,6 @@
     "metrics": "Показываемые метрики",
     "download": "Скачать",
     "share": "Поделиться",
-    "exporting": "Экспорт...",
     "shareCard": "Поделиться статистикой",
     "globalStats": "Глобальная статистика",
     "totalReps": "Всего повторений",
@@ -680,11 +658,6 @@
       "weights": "С отягощением",
       "custom": "Пользовательские"
     },
-    "tagFriends": "Отметить друзей",
-    "tagFriendsHint": "Выбрать друзей для отметки на карточке",
-    "noFriends": "Нет друзей для отметки",
-    "friends": "друзей",
-    "taggedUsers": "Отмеченные пользователи",
     "backgroundImage": "Фоновое изображение",
     "uploadImage": "Добавить изображение"
   }

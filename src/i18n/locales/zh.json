@@ -3,7 +3,6 @@
     "initializing": "正在初始化..."
   },
   "dashboard": {
-    "newAchievement": "新成就！",
     "calendar": "日历",
     "session": "训练",
     "noExercisesConfigured": "您尚未在此处配置任何练习。",
@@ -11,14 +10,11 @@
     "day": "天",
     "doneAt": "完成于 {{time}}",
     "waiting": "⏳ 等待中",
-    "challengeStarts": "你的挑战开始于",
-    "routines": "日常",
-    "date": "{{date}}"
+    "challengeStarts": "你的挑战开始于"
   },
   "common": {
     "global_weights": "负重",
     "global_custom": "自定义",
-    "exercise": "运动",
     "close": "关闭",
     "global_classic": "自重",
     "cancel": "取消",
@@ -29,8 +25,6 @@
     "reps": "次",
     "anonymous": "匿名",
     "member": "一位成员",
-    "saved": "已保存",
-    "loading": "加载中...",
     "confirm": "确认"
   },
   "paywall": {
@@ -125,12 +119,6 @@
       "customExercises": "100%自定义练习",
       "weightDashboard": "力量训练面板",
       "exclusiveLeaderboards": "专属排行榜",
-      "customPrograms": "100% 自定义计划",
-      "exerciseChoice": "自由选择运动",
-      "dailyProgression": "多运动混合训练",
-      "dedicatedPanel": "专用面板和完整追踪",
-      "specialExercises": "负重和哑铃模式",
-      "proStats": "专家统计和图表",
       "shareThemes": "专属分享主题"
     },
     "buyButton": "升级 Pro",
@@ -149,10 +137,7 @@
     "namePlaceholder": "例: 全身, 推日...",
     "selectExercises": "选择练习（按顺序）",
     "save": "保存",
-    "load": "加载",
-    "delete": "删除",
-    "launch": "启动",
-    "nameRequired": "需要一个名称"
+    "load": "加载"
   },
   "workout": {
     "sessionDone": "训练完成！",
@@ -172,7 +157,6 @@
     "launch_other": "开始 ({{count}} 项运动)",
     "remaining": "还剩 {{count}} 个",
     "launch": "开始 ({{count}} 项运动)",
-    "close": "关闭",
     "reps": "{{count}} 次"
   },
   "timer": {
@@ -474,10 +458,8 @@
     "buyButton": "支持 OneUp",
     "restore": "恢复购买",
     "history": "购买历史",
-    "androidOnly": "购买仅在 Android 应用中可用。",
     "historyTitle": "支持 OneUp ❤️",
-    "historyDesc": "感谢你的支持！",
-    "noHistory": "没有购买记录"
+    "historyDesc": "感谢你的支持！"
   },
   "leaderboard": {
     "inviteCode": "邀请码",
@@ -527,8 +509,7 @@
     "joinError": "加入公会时出错",
     "missingId": "缺少公会ID",
     "leaveError": "离开公会时出错",
-    "yourClans": "你的部落 ({{count}})",
-    "cancel": "取消"
+    "yourClans": "你的部落 ({{count}})"
   },
   "calendar": {
     "months": [
@@ -644,10 +625,8 @@
   "share": {
     "title": "分享",
     "duration": "时长",
-    "volume": "总量",
     "exercises": "练习",
     "exercisesCompleted": "已完成的练习",
-    "streak": "连续天数",
     "streakDisplay": "连续天数",
     "showHistory": "训练历史",
     "recentSessions": "最近的训练",
@@ -655,7 +634,6 @@
     "metrics": "显示的指标",
     "download": "下载",
     "share": "分享",
-    "exporting": "导出中...",
     "shareCard": "分享我的统计",
     "globalStats": "全局统计",
     "totalReps": "总次数",
@@ -680,11 +658,6 @@
       "weights": "器械训练",
       "custom": "自定义"
     },
-    "tagFriends": "标记朋友",
-    "tagFriendsHint": "选择要标记在卡片上的朋友",
-    "noFriends": "没有可标记的朋友",
-    "friends": "朋友",
-    "taggedUsers": "已标记用户",
     "backgroundImage": "背景图片",
     "uploadImage": "添加图片"
   }

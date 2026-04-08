@@ -3,7 +3,6 @@
     "initializing": "Inicializando..."
   },
   "dashboard": {
-    "newAchievement": "¡Nuevo logro!",
     "calendar": "Calendario",
     "session": "Sesión",
     "noExercisesConfigured": "Aún no has configurado ejercicios aquí.",
@@ -11,14 +10,11 @@
     "day": "Día",
     "doneAt": "Hecho a las {{time}}",
     "waiting": "⏳ Esperando",
-    "challengeStarts": "Tu desafío comienza el",
-    "routines": "Rutinas",
-    "date": "{{date}}"
+    "challengeStarts": "Tu desafío comienza el"
   },
   "common": {
     "global_weights": "Pesas",
     "global_custom": "Personalizados",
-    "exercise": "Ejercicio",
     "close": "Cerrar",
     "global_classic": "Peso corporal",
     "cancel": "Cancelar",
@@ -29,9 +25,7 @@
     "daysAbbr": "d",
     "reps": "reps",
     "anonymous": "Anónimo",
-    "member": "Un miembro",
-    "saved": "Guardado",
-    "loading": "Cargando..."
+    "member": "Un miembro"
   },
   "paywall": {
     "proRequired": "Modo Pro Requerido",
@@ -125,12 +119,6 @@
       "customExercises": "Ejercicios 100% Personalizados",
       "weightDashboard": "Panel de Pesas",
       "exclusiveLeaderboards": "Clasificaciones Exclusivas",
-      "customPrograms": "Programas 100% personalizados",
-      "exerciseChoice": "Elección libre de ejercicios",
-      "dailyProgression": "Progresión diaria a medida",
-      "dedicatedPanel": "Panel dedicado con seguimiento completo",
-      "specialExercises": "Entrenamiento con Pesas y Mancuernas",
-      "proStats": "Estadísticas y gráficos expertos",
       "shareThemes": "Temas de compartido exclusivos"
     },
     "buyButton": "Hazte Pro",
@@ -149,10 +137,7 @@
     "namePlaceholder": "Ej: Cuerpo Completo, Día de Empujar...",
     "selectExercises": "Selecciona los ejercicios (en orden)",
     "save": "Guardar",
-    "load": "Cargar",
-    "delete": "Eliminar",
-    "launch": "Lanzar",
-    "nameRequired": "Se requiere un nombre"
+    "load": "Cargar"
   },
   "workout": {
     "sessionDone": "¡Sesión Completada!",
@@ -172,7 +157,6 @@
     "launch_other": "Empezar ({{count}} ejercicios)",
     "remaining": "{{count}} restantes",
     "launch": "Empezar ({{count}} ejercicio{{plural}})",
-    "close": "Cerrar",
     "reps": "{{count}} repeticiones"
   },
   "timer": {
@@ -474,10 +458,8 @@
     "buyButton": "Apoyar OneUp",
     "restore": "Restaurar mis compras",
     "history": "Historial de compras",
-    "androidOnly": "La compra solo está disponible en la aplicación Android.",
     "historyTitle": "Apoyo a OneUp ❤️",
-    "historyDesc": "¡Gracias por tu apoyo!",
-    "noHistory": "Sin compras registradas"
+    "historyDesc": "¡Gracias por tu apoyo!"
   },
   "leaderboard": {
     "inviteCode": "Código de Invitación",
@@ -527,8 +509,7 @@
     "joinError": "Error al unirse al clan",
     "missingId": "ID de clan faltante",
     "leaveError": "Error al salir del clan",
-    "yourClans": "Tus Clanes ({{count}})",
-    "cancel": "Cancelar"
+    "yourClans": "Tus Clanes ({{count}})"
   },
   "calendar": {
     "months": [
@@ -644,10 +625,8 @@
   "share": {
     "title": "Compartir",
     "duration": "Duración",
-    "volume": "Volumen",
     "exercises": "Ejercicios",
     "exercisesCompleted": "Ejercicios completados",
-    "streak": "Racha",
     "streakDisplay": "Racha (streak)",
     "showHistory": "Historial de sesiones",
     "recentSessions": "Sesiones recientes",
@@ -655,7 +634,6 @@
     "metrics": "Métricas mostradas",
     "download": "Descargar",
     "share": "Compartir",
-    "exporting": "Exportando...",
     "shareCard": "Compartir mis estadísticas",
     "globalStats": "Estadísticas globales",
     "totalReps": "Reps totales",
@@ -680,11 +658,6 @@
       "weights": "Mancuernas",
       "custom": "Personal"
     },
-    "tagFriends": "Etiquetar amigos",
-    "tagFriendsHint": "Seleccionar amigos para etiquetar en la tarjeta",
-    "noFriends": "No hay amigos para etiquetar",
-    "friends": "amigos",
-    "taggedUsers": "Usuarios etiquetados",
     "backgroundImage": "Imagen de fondo",
     "uploadImage": "Añadir una imagen"
   }
