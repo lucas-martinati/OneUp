@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useShareCard } from '../hooks/useShareCard';
 import { getSessionHistory } from '../services/sessionHistoryService';
 import { useSubscription } from '../../../contexts/SubscriptionContext';
+import { CATEGORIES } from '../../../config/categories';
 
 const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
 
@@ -27,20 +28,20 @@ export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 
 
   // Map Stats categories to SharePanel categories for initial state
   const categoryMap = {
-    standard: 'bodyweight',
-    weights: 'weights',
-    custom: 'custom',
+      standard: CATEGORIES.BODYWEIGHT,
+      weights: CATEGORIES.WEIGHTS,
+      custom: CATEGORIES.CUSTOM,
   };
   const initialCategories = activeCategories
-    .map(cat => categoryMap[cat])
-    .filter(Boolean);
+      .map(cat => categoryMap[cat])
+      .filter(Boolean);
 
   const shareHook = useShareCard({
-    sessionData,
-    stats,
-    sessionHistory: getSessionHistory(),
-    mode,
-    initialCategories: initialCategories.length > 0 ? initialCategories : ['bodyweight', 'weights', 'custom'],
+      sessionData,
+      stats,
+      sessionHistory: getSessionHistory(),
+      mode,
+      initialCategories: initialCategories.length > 0 ? initialCategories : [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM],
   });
 
   const isCompact = variant === 'compact';

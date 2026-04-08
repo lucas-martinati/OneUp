@@ -8,7 +8,7 @@ import { getDailyGoal } from '../../config/exercises';
 import ICON_MAP from '../../utils/iconMap';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
-export function Calendar({ startDate, completions, exercises, getDayNumber, onClose, settings, programId, getDayValidationTime }) {
+export function Calendar({ startDate, completions, exercises, getDayNumber, onClose, settings }) {
     const { t } = useTranslation();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
@@ -368,8 +368,6 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                         isClosing={isClosing}
                         settings={settings}
                         t={t}
-                        programId={programId}
-                        getDayValidationTime={getDayValidationTime}
                     />
                 </>
             )}
@@ -396,7 +394,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
 }
 
 /** Day detail bottom sheet */
-function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, settings, t, programId, getDayValidationTime }) {
+function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, settings, t }) {
     const dayNum = getDayNumber(dateString);
     const dayCompletions = completions[dateString] || {};
     const [dragY, setDragY] = useState(0);

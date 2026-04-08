@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { captureElement, shareImage, downloadImage } from '../services/shareService';
+import { CATEGORIES } from '../../../config/categories';
 
 const DEFAULT_OPTIONS = {
   showDuration: true,
@@ -8,7 +9,7 @@ const DEFAULT_OPTIONS = {
   showStreak: false,
   showSessionHistory: false,
   showWeights: true,
-  statsCategories: ['bodyweight', 'weights', 'custom'],
+  statsCategories: [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM],
   format: 'png',
   theme: 'dark',
   taggedUsers: [],

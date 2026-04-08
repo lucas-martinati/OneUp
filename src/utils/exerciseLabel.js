@@ -1,6 +1,7 @@
 import i18n from '../i18n';
 import { EXERCISES } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
+import { CATEGORIES } from '../config/categories';
 
 const WEIGHT_ID_SET = new Set(WEIGHT_EXERCISES.map(e => e.id));
 const BW_ID_SET = new Set(EXERCISES.map(e => e.id));
@@ -37,9 +38,9 @@ export function getExerciseColor(ex, fallback = DEFAULT_EXERCISE_COLOR) {
  * Returns 'bodyweight' | 'weights' | 'custom'
  */
 export function getExerciseCategory(id) {
-  if (WEIGHT_ID_SET.has(id)) return 'weights';
-  if (BW_ID_SET.has(id)) return 'bodyweight';
-  return 'custom';
+  if (WEIGHT_ID_SET.has(id)) return CATEGORIES.WEIGHTS;
+  if (BW_ID_SET.has(id)) return CATEGORIES.BODYWEIGHT;
+  return CATEGORIES.CUSTOM;
 }
 
 /**

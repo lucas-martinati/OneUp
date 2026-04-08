@@ -39,16 +39,18 @@ function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
   );
 }
 
-const CATEGORIES = [
-  { key: 'bodyweight', color: '#34d399' },
-  { key: 'weights', color: '#f97316' },
-  { key: 'custom', color: '#8b5cf6' },
+import { CATEGORIES } from '../../../config/categories';
+
+const CATEGORIES_CONFIG = [
+  { key: CATEGORIES.BODYWEIGHT, color: '#34d399' },
+  { key: CATEGORIES.WEIGHTS, color: '#f97316' },
+  { key: CATEGORIES.CUSTOM, color: '#8b5cf6' },
 ];
 
 export function ShareOptions({ options, toggleOption, setOption, toggleCategory, setBackgroundImage, clearBackgroundImage, mode = 'session', isPro = false, sessionData }) {
   const { t } = useTranslation();
   const isGlobal = mode === 'global';
-  const selectedCategories = options.statsCategories || ['bodyweight', 'weights', 'custom'];
+  const selectedCategories = options.statsCategories || [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM];
   const fileInputRef = useRef(null);
 
   const handleImageUpload = (e) => {
@@ -144,7 +146,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
             {t('share.categoryFilter', 'Cat\u00e9gorie')}
           </div>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {CATEGORIES.map(cat => {
+            {CATEGORIES_CONFIG.map(cat => {
               const isSelected = selectedCategories.includes(cat.key);
               return (
                 <button
@@ -161,7 +163,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  {t(`share.cat.${cat.key}`, cat.key === 'bodyweight' ? 'Poids du corps' : cat.key === 'weights' ? 'Musculation' : 'Perso')}
+                  {t(`share.cat.${cat.key}`)}
                 </button>
               );
             })}

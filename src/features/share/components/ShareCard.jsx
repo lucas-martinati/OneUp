@@ -4,6 +4,8 @@ import { Dumbbell, Flame, Zap, Clock, Target, Award } from 'lucide-react';
 import ICON_MAP from '../../../utils/iconMap';
 import { getExerciseLabel, getExerciseColor, isCustomExercise } from '../../../utils/exerciseLabel';
 import { sumExerciseReps } from '../../../utils/stats';
+import { CATEGORIES } from '../../../config/categories';
+import { WEIGHT_EXERCISES } from '../../../config/weights';
 import { formatDuration } from '../../../utils/dateUtils';
 
 function formatDate(dateStr, lang) {
@@ -130,10 +132,10 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
 
-  const WEIGHT_IDS = ['biceps_curl','hammer_curl','bench_press','overhead_press','squat_weights','deadlift','barbell_row'];
+  const weightIds = WEIGHT_EXERCISES.map(e => e.id);
   const isGlobal = mode === 'global';
   const allExercises = sessionData?.exercises || [];
-  const sessionType = sessionData?.type || 'bodyweight';
+  const sessionType = sessionData?.type || CATEGORIES.BODYWEIGHT;
 
   const theme = options.theme || 'dark';
   const THEMES = {
@@ -146,8 +148,8 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const currentTheme = THEMES[theme] || THEMES.dark;
 
   // Categorize exercises
-  const isWeightEx = (ex) => WEIGHT_IDS.includes(ex.id);
-  const isCustomEx = (ex) => isCustomExercise(ex.id) || (!WEIGHT_IDS.includes(ex.id) && sessionType === 'custom');
+  const isWeightEx = (ex) => weightIds.includes(ex.id);
+  const isCustomEx = (ex) => isCustomExercise(ex.id) || (!weightIds.includes(ex.id) && sessionType === CATEGORIES.CUSTOM);
   const hasWeightEx = allExercises.some(isWeightEx);
   const hasCustomEx = allExercises.some(isCustomEx);
   const showCategoriesSeparately = options.showWeights && (hasWeightEx || hasCustomEx);
@@ -158,15 +160,15 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const weightExercises = allExercises.filter(isWeightEx);
   const customExercises = allExercises.filter(isCustomEx);
   const categories = [
-    bodyweightExercises.length > 0 && { key: 'bodyweight', exercises: bodyweightExercises, label: t('common.global_classic', 'Bodyweight'), color: '#34d399' },
-    weightExercises.length > 0 && { key: 'weights', exercises: weightExercises, label: t('common.global_weights', 'Weights'), color: '#f97316' },
-    customExercises.length > 0 && { key: 'custom', exercises: customExercises, label: t('common.global_custom', 'Custom'), color: '#8b5cf6' },
+    bodyweightExercises.length > 0 && { key: CATEGORIES.BODYWEIGHT, exercises: bodyweightExercises, label: t('common.global_classic'), color: '#34d399' },
+    weightExercises.length > 0 && { key: CATEGORIES.WEIGHTS, exercises: weightExercises, label: t('common.global_weights'), color: '#f97316' },
+    customExercises.length > 0 && { key: CATEGORIES.CUSTOM, exercises: customExercises, label: t('common.global_custom'), color: '#8b5cf6' },
   ].filter(Boolean);
   const showSections = showCategoriesSeparately && categories.length > 1;
 
   // For global mode, filter sessions by selected categories and recompute stats
   const selectedCats = isGlobal
-    ? (options.statsCategories || ['bodyweight', 'weights', 'custom'])
+    ? (options.statsCategories || Object.values(CATEGORIES))
     : null;
   const filteredStats = isGlobal ? (() => {
     let totalReps = 0;
@@ -177,9 +179,9 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
       
       for (const ex of stats.exerciseStats) {
         if (ex.totalReps > 0 && ex.id) {
-          let cat = 'bodyweight';
-          if (isWeightEx(ex)) cat = 'weights';
-          else if (isCustomEx(ex)) cat = 'custom';
+          let cat = CATEGORIES.BODYWEIGHT;
+          if (isWeightEx(ex)) cat = CATEGORIES.WEIGHTS;
+          else if (isCustomEx(ex)) cat = CATEGORIES.CUSTOM;
           
           if (selectedCats.includes(cat)) {
             totalReps += ex.totalReps;
@@ -196,9 +198,9 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
       if (stats.exerciseStats) {
         for (const ex of stats.exerciseStats) {
           if (ex.totalReps > 0 && ex.id) {
-            let cat = 'bodyweight';
-            if (isWeightEx(ex)) cat = 'weights';
-            else if (isCustomEx(ex)) cat = 'custom';
+            let cat = CATEGORIES.BODYWEIGHT;
+            if (isWeightEx(ex)) cat = CATEGORIES.WEIGHTS;
+            else if (isCustomEx(ex)) cat = CATEGORIES.CUSTOM;
             
             if (selectedCats.includes(cat) && !countedIds.has(ex.id)) {
               countedIds.add(ex.id);
@@ -342,7 +344,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
               {t('share.globalStats', 'Statistiques globales')}
             </div>
             {(() => {
-              const cats = options.statsCategories || ['bodyweight','weights','custom'];
+              const cats = options.statsCategories || Object.values(CATEGORIES);
               const allSelected = cats.length === 3;
               if (allSelected) return null;
               const catColors = { bodyweight: '#34d399', weights: '#f97316', custom: '#8b5cf6' };
