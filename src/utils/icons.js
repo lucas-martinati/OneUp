@@ -1,3 +1,4 @@
+import React from 'react';
 // Centralized icon system - single source of truth for all icons
 // Avoids importing lucide-react everywhere, easy to modify in one place
 
@@ -124,3 +125,12 @@ export function getExerciseIcon(exercise) {
 
 // Default export for convenience
 export default getIcon;
+
+// ============ DYNAMIC ICON COMPONENT ============
+/**
+ * A stable component for rendering icons dynamically by name.
+ */
+export const DynamicIcon = ({ icon, fallback = 'Dumbbell', ...props }) => {
+  const IconComponent = getIcon(icon, fallback);
+  return React.createElement(IconComponent, props);
+};

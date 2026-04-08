@@ -10,7 +10,7 @@ import { Timer } from './Timer';
 import { SessionSummary } from './SessionSummary';
 import { registerBackHandler } from '../../utils/backHandler';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
-import { getIcon } from '../../utils/icons';
+import { DynamicIcon } from '../../utils/icons';
 import { addSession, getSessionHistory } from '../../features/share/services/sessionHistoryService';
 import { getExerciseLabel, getExerciseCategory, isCustomExercise } from '../../utils/exerciseLabel';
 import { useProgressContext } from '../../contexts/ProgressContext';
@@ -19,7 +19,6 @@ import { useExercises } from '../../contexts/ExercisesContext';
 
 // ── Exercise grid item ──────────────────────────────────────────────────
 function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
-    const Icon = getIcon(ex.icon);
     return (
         <button
             onClick={() => !ex.done && onToggle(ex.id)}
@@ -64,7 +63,7 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
                     {orderNum}
                 </div>
             )}
-            <Icon size={24} />
+            <DynamicIcon icon={ex.icon} size={24} />
             <span style={{ fontSize: '0.75rem', fontWeight: '600', textAlign: 'center' }}>
                 {getExerciseLabel(ex, t)}
             </span>
@@ -484,8 +483,7 @@ export function WorkoutSession({
                                                 {routine.exerciseIds.map(exId => {
                                                     const ex = allExercises.find(e => e.id === exId);
                                                     if (!ex) return null;
-                                                    const Icon = getIcon(ex.icon);
-                                                    return <Icon key={exId} size={12} color={ex.color} />;
+                                                    return <DynamicIcon key={exId} icon={ex.icon} size={12} color={ex.color} />;
                                                 })}
                                             </div>
                                         </div>
@@ -618,7 +616,6 @@ export function WorkoutSession({
                             {queue.map((id, i) => {
                                 const ex = allExercises.find(e => e.id === id);
                                 if (!ex) return null;
-                                const Icon = getIcon(ex.icon);
                                 const isDragging = dragIdx === i;
                                 const isDragOver = dragOverIdx === i;
                                 return (
@@ -648,7 +645,7 @@ export function WorkoutSession({
                                             fontSize: '0.65rem', fontWeight: '800', color: ex.color,
                                             width: '16px', textAlign: 'center', flexShrink: 0
                                         }}>{i + 1}</span>
-                                        <Icon size={14} color={ex.color} />
+                                        <DynamicIcon icon={ex.icon} size={14} color={ex.color} />
                                         <span style={{
                                             fontSize: '0.75rem', fontWeight: '600', color: ex.color, flex: 1
                                         }}>{getExerciseLabel(ex, t)}</span>

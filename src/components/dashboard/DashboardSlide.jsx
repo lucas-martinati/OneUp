@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from 'lucide-react';
-import { getIcon, UI_ICONS } from '../../utils/icons';
+import { UI_ICONS, DynamicIcon } from '../../utils/icons';
 import { getDailyGoal } from '../../config/exercises';
 import { formatTime } from '../../utils/dateUtils';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
@@ -212,7 +212,7 @@ export const DashboardSlide = React.memo(({
                                     </>
                                 ) : (
                                     <>
-                                        {(() => { const I = getIcon(safeSelectedExercise.icon); return <I size={22} color={safeSelectedExercise.color} />; })()}
+                                        <DynamicIcon icon={safeSelectedExercise.icon} size={22} color={safeSelectedExercise.color} />
                                         <span style={{ fontSize: 'clamp(0.45rem, 1.2vh, 0.65rem)', color: safeSelectedExercise.color, fontWeight: '700' }}>
                                             {safeSelectedExercise.type === 'timer'
                                                 ? `${formatTime(currentCount)}/${formatTime(dailyGoal)}`
@@ -262,7 +262,6 @@ const ExerciseButton = React.memo(({
     ex, isActive, dayNumber, today, settings,
     getExerciseCount, completions, computedStats, onSelect
 }) => {
-    const ExIcon = getIcon(ex.icon);
     const statsEx = computedStats.exerciseStats?.find(e => e.id === ex.id);
     const exStreak = statsEx ? statsEx.streak : 0;
     const exCount = getExerciseCount(today, ex.id);
@@ -315,7 +314,8 @@ const ExerciseButton = React.memo(({
                     <span style={{ fontSize: '9px', color: 'white', fontWeight: '700', lineHeight: 1 }}>✓</span>
                 </div>
             )}
-            <ExIcon
+            <DynamicIcon
+                icon={ex.icon}
                 size={20}
                 color={exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)'}
                 style={{ transition: 'color 0.2s ease' }}

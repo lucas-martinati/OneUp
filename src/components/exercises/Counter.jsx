@@ -5,7 +5,7 @@ import { CSSConfetti } from '../feedback/CSSConfetti';
 import { X, Check, CheckCheck, RotateCcw, Plus, Minus, ChevronRight } from 'lucide-react';
 import { sounds } from '../../utils/soundManager';
 import { Z_INDEX } from '../../utils/zIndex';
-import { getIcon } from '../../utils/icons';
+import { DynamicIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 
@@ -86,7 +86,6 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     // Exercise-specific styling
     const activeColor = exerciseConfig?.color || '#818cf8';
     const [gradStart, gradEnd] = exerciseConfig?.gradient || ['#667eea', '#818cf8'];
-    const ExIcon = getIcon(exerciseConfig?.icon);
         const exerciseLabel = getExerciseLabel(exerciseConfig);
 
     // Unique SVG gradient id per exercise to avoid conflicts
@@ -160,7 +159,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                         border: `1.5px solid ${activeColor}55`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
-                        <ExIcon size={20} color={activeColor} />
+                        <DynamicIcon icon={exerciseConfig?.icon} size={20} color={activeColor} />
                     </div>
                     <h2 style={{ fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', fontWeight: '700', color: activeColor, margin: 0 }}>
                         {exerciseLabel}

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../../hooks/useComputedStats';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { BADGE_DEFINITIONS } from '../../config/badgeDefinitions';
-import { getIcon } from '../../utils/icons';
+import { DynamicIcon } from '../../utils/icons';
 import { Z_INDEX } from '../../utils/zIndex';
 import { registerBackHandler } from '../../utils/backHandler';
 import { getSessionHistory, removeSession } from '../../features/share/services/sessionHistoryService';
@@ -119,7 +119,6 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         setSessionHistory(prev => prev.map(s => s.id === sessionId ? { ...s, name: newName } : s));
     }, []);
 
-    const ChampionIcon = champion ? getIcon(champion.icon) : null;
 
     const formatDate = (dateStr) => {
         if (!dateStr) return '—';
@@ -347,7 +346,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 gap: '6px', marginBottom: '2px'
                             }}>
-                                {ChampionIcon && <ChampionIcon size={16} color={champion.color} />}
+                                {champion && <DynamicIcon icon={champion.icon} size={16} color={champion.color} />}
                                 <span style={{ fontSize: '0.85rem', fontWeight: '700', color: champion.color }}>
                                     {getExerciseLabel(exercises?.find(e => e.id === champion.id) || { id: champion.id }, t)}
                                 </span>
@@ -545,7 +544,6 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                     <h3 style={sectionTitleStyle}>{t('stats.byExercise')}</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {exerciseStats.map(ex => {
-                            const ExIcon = getIcon(ex.icon);
                             return (
                                 <div key={ex.id} style={{
                                     padding: '10px 12px', borderRadius: 'var(--radius-md)',
@@ -562,7 +560,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                             background: `${ex.color}20`, display: 'flex',
                                             alignItems: 'center', justifyContent: 'center', flexShrink: 0
                                         }}>
-                                            <ExIcon size={16} color={ex.color} />
+                                            <DynamicIcon icon={ex.icon} size={16} color={ex.color} />
                                         </div>
                                         <div style={{ flex: 1 }}>
                                             <div style={{
@@ -720,8 +718,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                             {exercises.length > 0 && (
                                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', alignItems: 'center' }}>
                                                     {exercises.map((ex, j) => {
-                                                        const ExIcon = getIcon(ex.icon);
-                                                        return <ExIcon key={ex.id || j} size={13} color={getExerciseColor(ex)} />;
+                                                        return <DynamicIcon key={ex.id || j} icon={ex.icon} size={13} color={getExerciseColor(ex)} />;
                                                     })}
                                                 </div>
                                             )}
