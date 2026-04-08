@@ -103,7 +103,7 @@ function extractI18nUsage(content) {
     if (isTemplate && raw.includes('${')) {
       // Cas 2 : préfixe stable avant la première interpolation
       const stablePart = raw.split('${')[0].replace(/\.$/, '').trim();
-      if (stablePart.includes('.') && isLikelyI18nKey(stablePart + '.x')) {
+      if (stablePart.length > 0 && isLikelyI18nKey(stablePart + '.x')) {
         prefixes.add(stablePart);
       }
     } else {
@@ -126,7 +126,7 @@ function extractI18nUsage(content) {
   const templateRegex = /`([^`]*)\$\{[^}]+\}[^`]*`/g;
   while ((match = templateRegex.exec(content)) !== null) {
     const stablePart = match[1].replace(/\.$/, '').trim();
-    if (stablePart.includes('.') && isLikelyI18nKey(stablePart + '.x')) {
+    if (stablePart.length > 0 && isLikelyI18nKey(stablePart + '.x')) {
       prefixes.add(stablePart);
     }
   }
