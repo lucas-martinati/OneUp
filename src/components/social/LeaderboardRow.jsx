@@ -29,9 +29,7 @@ export function LeaderboardRow({
         3: '1px solid rgba(205,127,50,0.3)'
     };
 
-    const isPerfect = entry.isPerfectToday;
-    const isTopThree = rank <= 3;
-    
+    const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
     const bg = rankBgColors[rank] || (isPerfect
         ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(212, 175, 55, 0.08))'
         : isMe

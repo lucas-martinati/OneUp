@@ -14,7 +14,8 @@ import { getExerciseLabel } from '../../utils/exerciseLabel';
 export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
     const { t } = useTranslation();
     const rankColors = { 1: '#fbbf24', 2: '#c0c0c0', 3: '#cd7f32' };
-    const rankColor = rankColors[rank] || '#818cf8';
+    const todayStr = getLocalDateStr(new Date());
+    const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
 
     const [details, setDetails] = useState(null);
     const [loadingDetails, setLoadingDetails] = useState(true);
@@ -103,7 +104,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                 style={{
                     width: '100%', maxWidth: '400px',
                     borderRadius: 'var(--radius-xl)', padding: 'var(--spacing-lg)',
-                    boxShadow: entry.isPerfectToday 
+                    boxShadow: isPerfect 
                         ? '0 0 30px rgba(255, 215, 0, 0.25), 0 20px 60px rgba(0,0,0,0.5)' 
                         : '0 20px 60px rgba(0,0,0,0.5)',
                     maxHeight: '90vh', display: 'flex', flexDirection: 'column',
@@ -118,16 +119,29 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                     position: 'relative', overflow: 'hidden'
                 }}
             >
-                {entry.isPerfectToday && (
+                {isPerfect && (
                     <>
-                        <Star className="sparkle-icon" size={14} fill="#FFD700" style={{ top: '5%', left: '10%', animationDelay: '0s' }} />
-                        <Star className="sparkle-icon" size={10} fill="#FFD700" style={{ top: '15%', right: '15%', animationDelay: '1s' }} />
-                        <Star className="sparkle-icon" size={12} fill="#FFD700" style={{ bottom: '20%', left: '15%', animationDelay: '2s' }} />
-                        <Star className="sparkle-icon" size={9} fill="#FFD700" style={{ bottom: '10%', right: '10%', animationDelay: '3s' }} />
-                        <Star className="sparkle-icon" size={11} fill="#FFD700" style={{ top: '40%', left: '5%', animationDelay: '1.5s' }} />
-                        <Star className="sparkle-icon" size={8} fill="#FFD700" style={{ top: '50%', right: '5%', animationDelay: '2.5s' }} />
-                        <Star className="sparkle-icon" size={13} fill="#FFD700" style={{ top: '10%', left: '50%', animationDelay: '0.5s' }} />
-                        <Star className="sparkle-icon" size={7} fill="#FFD700" style={{ bottom: '30%', right: '40%', animationDelay: '3.5s' }} />
+                        {[
+                            { top: '5%', left: '10%', size: 14, delay: '0s' },
+                            { top: '15%', right: '15%', size: 10, delay: '1s' },
+                            { bottom: '20%', left: '15%', size: 12, delay: '2s' },
+                            { bottom: '10%', right: '10%', size: 9, delay: '3s' },
+                            { top: '40%', left: '5%', size: 11, delay: '1.5s' },
+                            { top: '50%', right: '5%', size: 8, delay: '2.5s' },
+                            { top: '10%', left: '50%', size: 13, delay: '0.5s' },
+                            { bottom: '30%', right: '40%', size: 7, delay: '3.5s' },
+                        ].map((s, idx) => (
+                            <Star 
+                                key={idx}
+                                className="sparkle-icon" 
+                                size={s.size} 
+                                fill="#FFD700" 
+                                style={{ 
+                                    top: s.top, left: s.left, right: s.right, bottom: s.bottom, 
+                                    animationDelay: s.delay 
+                                }} 
+                            />
+                        ))}
                     </>
                 )}
                 <button
