@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { HeartHandshake, X } from '../../utils/icons';
-import { cloudSync } from '../../services/cloudSync';
 import { sounds } from '../../utils/soundManager';
+import { useProgressContext } from '../../contexts/ProgressContext';
 import { Avatar } from '../ui/Avatar';
 import { Z_INDEX } from '../../utils/zIndex';
 
 export function NotificationManager() {
+    const { cloudSyncAPI: cloudSync } = useProgressContext();
     const [notifications, setNotifications] = useState([]); // eslint-disable-line no-unused-vars
     const [activeToasts, setActiveToasts] = useState([]);
 

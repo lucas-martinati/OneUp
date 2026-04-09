@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Users, LogIn, Plus, X, Check, Shield } from '../../utils/icons';
-import { cloudSync } from '../../services/cloudSync';
 import { Leaderboard } from './Leaderboard';
 import { registerBackHandler } from '../../utils/backHandler';
 import { CSSConfetti } from '../feedback/CSSConfetti';
@@ -13,7 +12,7 @@ export function ClanModal({ onClose }) {
 
     // ── Context consumption ──
     const cloudAuth = useAuth();
-    const { settings, updateSettings } = useProgressContext();
+    const { settings, updateSettings, cloudSyncAPI: cloudSync } = useProgressContext();
     const { t } = useTranslation();
     const [userClans, setUserClans] = useState([]);
     const [clanData, setClanData] = useState(null);

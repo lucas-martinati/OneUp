@@ -242,6 +242,17 @@ export function ProgressProvider({ children }) {
     loadUserDetails: (uid) => userDetailsCache.loadUserDetails(uid),
     getCurrentUserId: () => cloudSync.getCurrentUserId(),
     deleteAccount: () => cloudSync.deleteAccount(),
+    // Clan methods
+    createClan: (name) => cloudSync.createClan(name),
+    joinClan: (code) => cloudSync.joinClan(code),
+    leaveClan: (id) => cloudSync.leaveClan(id),
+    getUserClans: () => cloudSync.getUserClans(),
+    getClanDetails: (id) => cloudSync.getClanDetails(id),
+    sendClanNotification: (uid, type, msg) => cloudSync.sendClanNotification(uid, type, msg),
+    listenToNotifications: (cb) => cloudSync.listenToNotifications(cb),
+    deleteNotification: (id) => cloudSync.deleteNotification(id),
+    subscribe: (cb) => cloudSync.subscribe(cb),
+    checkSignInStatus: () => cloudSync.checkSignInStatus(),
   }), [auth.signIn, auth.signOut, saveToCloud, loadFromCloud, syncWithCloud, userDetailsCache]);
 
   const value = useMemo(() => ({
