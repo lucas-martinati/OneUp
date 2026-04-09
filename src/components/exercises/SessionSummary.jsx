@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Trophy, Check, Clock, Pencil } from 'lucide-react';
+import { Trophy, Check, Clock, Pencil } from '../../utils/icons';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import { getIcon } from '../../utils/icons';

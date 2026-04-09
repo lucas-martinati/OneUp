@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { X, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, CheckCircle2 } from '../../utils/icons';
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr } from '../../utils/dateUtils';
 import { registerBackHandler } from '../../utils/backHandler';

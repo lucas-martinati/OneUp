@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWakeLock } from '../../hooks/useWakeLock';
 import { CSSConfetti } from '../feedback/CSSConfetti';
-import { X, Check, CheckCheck, RotateCcw, Plus, Minus, ChevronRight } from 'lucide-react';
+import { X, Check, CheckCheck, RotateCcw, Plus, Minus, ChevronRight } from '../../utils/icons';
 import { sounds } from '../../utils/soundManager';
 import { Z_INDEX } from '../../utils/zIndex';
 import { DynamicIcon } from '../../utils/icons';

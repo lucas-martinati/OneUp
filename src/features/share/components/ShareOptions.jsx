@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X } from 'lucide-react';
+import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X } from '../../../utils/icons';
 
 // eslint-disable-next-line no-unused-vars
 function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {

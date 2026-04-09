@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Share2, Download, X, Loader2 } from 'lucide-react';
+import { Share2, Download, X, Loader2 } from '../../../utils/icons';
 import { Z_INDEX } from '../../../utils/zIndex';
 import { ShareCard } from './ShareCard';
 import { ShareOptions } from './ShareOptions';

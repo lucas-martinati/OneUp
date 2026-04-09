@@ -1,4 +1,4 @@
-import { Smartphone } from 'lucide-react';
+import { Smartphone } from '../../utils/icons';
 import { useTranslation, Trans } from 'react-i18next';
 import { Z_INDEX } from '../../utils/zIndex';
 

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Clock, Check, Trash2, Pencil } from 'lucide-react';
+import { X, Clock, Check, Trash2, Pencil, Dumbbell, Zap } from '../../../utils/icons';
 import { getIcon } from '../../../utils/icons';
 import { Z_INDEX } from '../../../utils/zIndex';
 import { updateSessionName } from '../services/sessionHistoryService';

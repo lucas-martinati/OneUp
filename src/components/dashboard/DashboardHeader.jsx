@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, PieChart, Users, Shield, Flame, Trophy } from 'lucide-react';
+import { SettingsIcon, PieChart, Users, Shield, Flame, Trophy } from '../../utils/icons';
 
 export const DashboardHeader = React.memo(({
     setShowSettings, setShowStats, setShowLeaderboard, setShowClan, pauseCloudSync,

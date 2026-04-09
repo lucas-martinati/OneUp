@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Calendar as CalendarIcon, Play } from 'lucide-react';
+import { Calendar as CalendarIcon, Play } from '../../utils/icons';
 
 export const DashboardActions = React.memo(({
     setShowCalendar, setShowSession, pauseCloudSync, selectedExercise

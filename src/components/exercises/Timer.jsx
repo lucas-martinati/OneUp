@@ -5,7 +5,7 @@ import { CSSConfetti } from '../feedback/CSSConfetti';
 import {
     X, Check, CheckCheck, RotateCcw, Play, Pause,
     Square, ChevronRight
-} from 'lucide-react';
+} from '../../utils/icons';
 import { sounds } from '../../utils/soundManager';
 import { formatTime } from '../../utils/dateUtils';
 import { Z_INDEX } from '../../utils/zIndex';

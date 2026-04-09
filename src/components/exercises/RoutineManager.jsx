@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Plus, Play, Trash2, Edit3, Check, Save, FolderOpen } from 'lucide-react';
+import { X, Plus, Play, Trash2, Edit3, Check, Save, FolderOpen } from '../../utils/icons';
 import { EXERCISES } from '../../config/exercises';
 import { registerBackHandler } from '../../utils/backHandler';
 import { getIcon } from '../../utils/icons';

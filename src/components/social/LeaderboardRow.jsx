@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Shield, HeartHandshake, Check } from 'lucide-react';
+import { ChevronRight, Shield, HeartHandshake, Check } from '../../utils/icons';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '../ui/Avatar';
 import { getTierBadgeConfigs } from '../../utils/entitlements';

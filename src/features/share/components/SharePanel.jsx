@@ -1,5 +1,5 @@
 import React, { useState, Suspense, lazy } from 'react';
-import { Share2 } from 'lucide-react';
+import { Share2 } from '../../../utils/icons';
 import { useTranslation } from 'react-i18next';
 import { useShareCard } from '../hooks/useShareCard';
 import { getSessionHistory } from '../services/sessionHistoryService';

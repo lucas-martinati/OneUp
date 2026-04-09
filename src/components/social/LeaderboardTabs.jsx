@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Dumbbell, Activity } from 'lucide-react';
+import { Trophy, Dumbbell, Activity } from '../../utils/icons';
 
 export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VISIBLE_TABS, showDomainFilter = true, showExerciseTabs = true }) {
     const { t } = useTranslation();

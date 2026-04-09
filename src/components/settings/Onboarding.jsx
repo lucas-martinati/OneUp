@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { Calendar, ArrowRight, Zap, Target, Dumbbell } from 'lucide-react';
+import { Calendar, ArrowRight, Zap, Target, Dumbbell, getIcon } from '../../utils/icons';
+import { getExerciseLabel } from '../../utils/exerciseLabel';
 import { getLocalDateStr } from '../../utils/dateUtils';
 import { EXERCISES } from '../../config/exercises';
-import { getIcon } from '../../utils/icons';
-import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 export function Onboarding({ onStart }) {
     const { t } = useTranslation();

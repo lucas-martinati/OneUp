@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
-import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock, Clock, ChevronRight } from 'lucide-react';
+import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock, Clock, ChevronRight } from '../../utils/icons';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../../hooks/useComputedStats';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';

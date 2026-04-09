@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { X, Trophy, LogOut, Activity } from 'lucide-react';
+import { X, Trophy, LogOut, Activity } from '../../utils/icons';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { getLocalDateStr } from '../../utils/dateUtils';

@@ -1,7 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, Target, Award, Flame } from 'lucide-react';
-import { getIcon, EXERCISE_ICONS, UI_ICONS, SOCIAL_ICONS, SHARE_ICONS } from '../../../utils/icons';
+import { 
+  getIcon, EXERCISE_ICONS, UI_ICONS, SOCIAL_ICONS, SHARE_ICONS,
+  Clock, Target, Award, Flame 
+} from '../../../utils/icons';
 import { getExerciseLabel, getExerciseColor, isCustomExercise } from '../../../utils/exerciseLabel';
 import { sumExerciseReps } from '../../../utils/stats';
 import { CATEGORIES } from '../../../config/categories';

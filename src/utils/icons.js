@@ -1,81 +1,100 @@
 import React from 'react';
-// Centralized icon system - single source of truth for all icons
-// Avoids importing lucide-react everywhere, easy to modify in one place
-
 import {
-  // Exercise icons (from config/exercises.js & config/weights.js)
+  // Exercise icons
   Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
-  Flame, Activity, MoveDown, MoveDiagonal,
+  Flame, Activity, MoveDown, MoveDiagonal, Square,
   // UI icons
-  X, Check, CheckCheck, ChevronLeft, ChevronRight, ChevronRight as ChevronNext,
-  Plus, Minus, Play, RotateCcw, Save, Trash2, Edit3, Edit2 as Pencil,
-  FolderOpen, GripVertical, Shuffle,
+  X, Check, CheckCheck, CheckCircle2, ChevronLeft, ChevronRight, Plus, Minus, 
+  Play, Pause, RotateCcw, Save, Trash2, Edit3, Edit2,
+  FolderOpen, GripVertical, Shuffle, ArrowLeft, ArrowRight,
   // Social & gamification
-  Trophy, Medal, Award, Star, Crown, Flame as FireStreak,
-  Users, LogIn, UserPlus, Shield, HeartHandshake,
-  LogOut, Hash,
+  Trophy, Medal, Award, Star, Crown,
+  Users, User, LogIn, UserPlus, Shield, HeartHandshake,
+  LogOut, Hash, Swords,
   // Navigation & settings
-  Settings as SettingsIcon, Bell, Volume2, Clock, Lock, Unlock,
-  Globe, Gauge, ShoppingBag, ArrowLeft, ArrowRight,
+  Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
+  Globe, Gauge, ShoppingBag, PieChart,
   // Sharing & media
-  Share2, Download, Image, Palette, Target, Clock as TimerIcon,
+  Share2, Download, Image, Palette, Target,
   History, Weight, Filter, Loader2, Smartphone,
   // Cloud & sync
   Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
   // Misc
-  RefreshCw, Heart, Sparkles, Link, Calendar, TrendingUp,
+  RefreshCw, Heart, Sparkles, Link, Calendar, TrendingUp, BarChart3,
+  Gem, Ghost, Moon, Rocket, Sun,
 } from 'lucide-react';
 
-// ============ EXERCISES ============
+// ============ INDIVIDUAL EXPORTS ============
+export {
+  Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
+  Flame, Activity, MoveDown, MoveDiagonal, Square,
+  X, Check, CheckCheck, CheckCircle2, ChevronLeft, ChevronRight, Plus, Minus,
+  Play, Pause, RotateCcw, Save, Trash2, Edit3, Edit2,
+  FolderOpen, GripVertical, Shuffle, ArrowLeft, ArrowRight,
+  Trophy, Medal, Award, Star, Crown,
+  Users, User, LogIn, UserPlus, Shield, HeartHandshake,
+  LogOut, Hash, Swords,
+  Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
+  Globe, Gauge, ShoppingBag, PieChart,
+  Share2, Download, Image, Palette, Target,
+  History, Weight, Filter, Loader2, Smartphone,
+  Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
+  RefreshCw, Heart, Sparkles, Link, Calendar, TrendingUp, BarChart3,
+  Gem, Ghost, Moon, Rocket, Sun
+};
+
+// ============ ALIASES ============
+export { 
+  Edit2 as Pencil,
+  Clock as TimerIcon,
+  Flame as FireStreak,
+  ChevronRight as ChevronNext,
+  Settings as SettingsIcon
+};
+
+// ============ GROUPED OBJECTS (Compatibility) ============
 export const EXERCISE_ICONS = {
   Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
-  Flame, Square: Activity, MoveDown, MoveDiagonal,
+  Flame, Square, MoveDown, MoveDiagonal,
 };
 
-// ============ UI ============
 export const UI_ICONS = {
-  X, Check, CheckCheck, ChevronLeft, ChevronRight, ChevronNext,
-  Plus, Minus, Play, Pause: Play, RotateCcw, Save, Trash2, Edit3, Pencil,
-  FolderOpen, GripVertical, Shuffle,
+  X, Check, CheckCheck, ChevronLeft, ChevronRight, ChevronNext: ChevronRight,
+  Plus, Minus, Play, Pause, RotateCcw, Save, Trash2, Edit3, Pencil: Edit2,
+  FolderOpen, GripVertical, Shuffle, ArrowLeft, ArrowRight
 };
 
-// ============ SOCIAL & GAMIFICATION ============
 export const SOCIAL_ICONS = {
-  Trophy, Medal, Award, Star, Crown, FireStreak,
-  Users, LogIn, UserPlus, Shield, HeartHandshake,
-  LogOut, Activity, Hash,
+  Trophy, Medal, Award, Star, Crown, FireStreak: Flame,
+  Users, User, LogIn, UserPlus, Shield, HeartHandshake,
+  LogOut, Activity, Hash, Swords,
 };
 
-// ============ NAVIGATION & SETTINGS ============
 export const NAV_ICONS = {
-  Settings: SettingsIcon, Bell, Volume2, Clock, Lock, Unlock,
-  Globe, Gauge, ShoppingBag, ArrowLeft, ArrowRight,
+  Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
+  Globe, Gauge, ShoppingBag, PieChart,
 };
 
-// ============ SHARING & MEDIA ============
 export const SHARE_ICONS = {
-  Share2, Download, Image, Palette, Target, TimerIcon,
+  Share2, Download, Image, Palette, Target, TimerIcon: Clock,
   History, Weight, Filter, Loader2, Smartphone,
 };
 
-// ============ CLOUD & SYNC ============
 export const CLOUD_ICONS = {
   Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
 };
 
-// ============ MISC ============
 export const MISC_ICONS = {
-  RefreshCw, Heart, Sparkles, Link, Calendar, TrendingUp,
+  RefreshCw, Heart, Sparkles, Link, Calendar, TrendingUp, BarChart3,
 };
 
-// ============ CATEGORIES (re-exports for convenience) ============
 export const CATEGORY_ICONS = {
   BODYWEIGHT: Dumbbell,
   WEIGHTS: ArrowUp,
   CUSTOM: Star,
 };
 
-// ============ ALL ICONS MERGED ============
+// ============ MERGED MAP ============
 export const ICON_MAP = {
   ...EXERCISE_ICONS,
   ...UI_ICONS,
@@ -84,14 +103,14 @@ export const ICON_MAP = {
   ...SHARE_ICONS,
   ...CLOUD_ICONS,
   ...MISC_ICONS,
+  Settings2,
 };
 
-// ============ GET ICON FUNCTION ============
+// ============ UTILITIES ============
 /**
  * Get icon component by name
- * @param {string} name - Icon name (e.g., 'Dumbbell', 'Trophy', 'X')
- * @param {string} [fallback='Dumbbell'] - Fallback icon name if not found
- * @returns {React.Component} lucide-react icon component
+ * @param {string} name - Icon name
+ * @param {string} [fallback='Dumbbell'] - Fallback icon name
  */
 export function getIcon(name, fallback = 'Dumbbell') {
   if (!name) return ICON_MAP[fallback] || Dumbbell;
@@ -100,8 +119,6 @@ export function getIcon(name, fallback = 'Dumbbell') {
 
 /**
  * Get icon by category type
- * @param {string} category - 'bodyweight' | 'weights' | 'custom'
- * @returns {React.Component}
  */
 export function getCategoryIcon(category) {
   const map = {
@@ -114,8 +131,6 @@ export function getCategoryIcon(category) {
 
 /**
  * Get icon from exercise object
- * @param {Object|string} exercise - Exercise object with icon property or icon name string
- * @returns {React.Component}
  */
 export function getExerciseIcon(exercise) {
   if (!exercise) return Dumbbell;
@@ -123,10 +138,8 @@ export function getExerciseIcon(exercise) {
   return getIcon(exercise.icon, 'Dumbbell');
 }
 
-// Default export for convenience
 export default getIcon;
 
-// ============ DYNAMIC ICON COMPONENT ============
 /**
  * A stable component for rendering icons dynamically by name.
  */

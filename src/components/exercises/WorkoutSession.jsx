@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Play, Check, Trophy, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle } from 'lucide-react';
+import { X, Play, Check, Trophy, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle } from '../../utils/icons';
 import { EXERCISES, getDailyGoal } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { CATEGORIES } from '../../config/categories';

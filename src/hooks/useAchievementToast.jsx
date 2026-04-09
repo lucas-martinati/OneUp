@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight } from '../utils/icons';
 import { BADGE_DEFINITIONS, BADGE_ICONS, getBadgeIconFromDef } from '../config/badgeDefinitions';
 import { Z_INDEX } from '../utils/zIndex';
 

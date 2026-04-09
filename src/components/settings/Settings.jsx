@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Z_INDEX } from '../../utils/zIndex';
-import { X, Bell, Volume2, Clock, Check, Users, Settings as SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Sparkles, Star, Smartphone } from 'lucide-react';
+import { X, Bell, Volume2, Clock, Check, Users, SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Sparkles, Star, Smartphone } from '../../utils/icons';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
 import { getPurchaseHistory } from '../../services/purchaseService';

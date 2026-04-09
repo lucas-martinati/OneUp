@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Sparkles, Plus, X, Check, Trash2, Play, Pause, ChevronRight,
   Lock, Calendar, Flame, BarChart3, Edit3, ArrowLeft
-} from 'lucide-react';
+} from '../../utils/icons';
 import { EXERCISES, EXERCISES_MAP } from '../../config/exercises';
 import { getLocalDateStr } from '../../utils/dateUtils';
 import { registerBackHandler } from '../../utils/backHandler';

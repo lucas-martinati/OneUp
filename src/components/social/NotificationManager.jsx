@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { HeartHandshake, X } from 'lucide-react';
+import { HeartHandshake, X } from '../../utils/icons';
 import { cloudSync } from '../../services/cloudSync';
 import { sounds } from '../../utils/soundManager';
 import { Avatar } from '../ui/Avatar';

@@ -1,7 +1,7 @@
 import {
   Target, Flame, Zap, Calendar, TrendingUp, Trophy, Medal, Gem, Rocket,
   Star, Award, Crown, Activity, Sun, Moon, Users, Ghost, Share2
-} from 'lucide-react';
+} from '../utils/icons';
 
 export const BADGE_ICONS = {
   Target, Flame, Zap, Calendar, TrendingUp, Trophy, Medal, Gem, Rocket,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Award, Lock } from 'lucide-react';
+import { Award, Lock } from '../../utils/icons';
 import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '../../config/badgeDefinitions';
 
 const CATEGORY_COLORS = {

@@ -1,4 +1,4 @@
-import { Heart, Crown } from 'lucide-react';
+import { Heart, Crown } from './icons';
 
 const LS_SUPPORTER = 'oneup_supporter';
 const LS_PRO = 'oneup_pro';
