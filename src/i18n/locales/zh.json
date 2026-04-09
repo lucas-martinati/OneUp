@@ -13,10 +13,10 @@
     "challengeStarts": "你的挑战开始于"
   },
   "common": {
-    "global_weights": "负重",
-    "global_custom": "自定义",
+    "weights": "负重",
+    "custom": "自定义",
     "close": "关闭",
-    "global_classic": "自重",
+    "bodyweight": "自重",
     "cancel": "取消",
     "global": "全球",
     "poke": "给你发了一个戳！",

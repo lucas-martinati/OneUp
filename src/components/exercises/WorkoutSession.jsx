@@ -678,9 +678,9 @@ export function WorkoutSession({
                                 const catExercises = exerciseInfo.filter(ex => ex.category === cat);
                                 if (catExercises.length === 0) return null;
                                 const catTitle = cat === 'bodyweight' 
-                                    ? t('common.global_classic')
+                                    ? t('common.bodyweight')
                                     : cat === 'weights' 
-                                        ? t('common.global_weights')
+                                        ? t('common.weights')
                                         : t('workout.custom');
 
                                 return (

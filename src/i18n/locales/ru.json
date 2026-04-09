@@ -13,10 +13,10 @@
     "challengeStarts": "Ваш челлендж начинается"
   },
   "common": {
-    "global_weights": "Отягощения",
-    "global_custom": "Свои",
+    "weights": "Отягощения",
+    "custom": "Свои",
     "close": "Закрыть",
-    "global_classic": "С весом тела",
+    "bodyweight": "С весом тела",
     "cancel": "Отмена",
     "global": "Глобально",
     "poke": "отправил(а) вам тычок!",

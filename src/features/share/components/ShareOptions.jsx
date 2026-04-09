@@ -163,7 +163,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  {t(`share.cat.${cat.key}`)}
+                  {t(`common.${cat.key}`)}
                 </button>
               );
             })}

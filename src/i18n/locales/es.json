@@ -13,10 +13,10 @@
     "challengeStarts": "Tu desafío comienza el"
   },
   "common": {
-    "global_weights": "Pesas",
-    "global_custom": "Personalizados",
+    "weights": "Pesas",
+    "custom": "Personalizados",
     "close": "Cerrar",
-    "global_classic": "Peso corporal",
+    "bodyweight": "Peso corporal",
     "cancel": "Cancelar",
     "confirm": "Confirmar",
     "global": "Global",

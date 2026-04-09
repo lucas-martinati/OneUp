@@ -13,10 +13,10 @@
     "challengeStarts": "Ton défi commence le"
   },
   "common": {
-    "global_weights": "Musculation",
-    "global_custom": "Personnalisés",
+    "weights": "Musculation",
+    "custom": "Personnalisés",
     "close": "Fermer",
-    "global_classic": "Poids du corps",
+    "bodyweight": "Poids du corps",
     "cancel": "Annuler",
     "global": "Global",
     "poke": "t'a envoyé un poke !",

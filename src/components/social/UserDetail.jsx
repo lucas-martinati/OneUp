@@ -175,7 +175,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
 
                         <StatCard 
                             icon={<Trophy size={16} color="#fbbf24" />} 
-                            label={t('common.global_classic')}
+                            label={t('common.bodyweight')}
                             value={entry.totalReps.toLocaleString()} 
                             color="#fbbf24" 
                         />
@@ -183,7 +183,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                         {canAccessFeature(FEATURES.WEIGHTS, entry) && entry.weightsTotalReps > 0 && (
                             <StatCard 
                                 icon={<Dumbbell size={16} color="#8b5cf6" />} 
-                                label={t('common.global_weights')} 
+                                label={t('common.weights')} 
                                 value={entry.weightsTotalReps.toLocaleString()} 
                                 color="#8b5cf6" 
                             />
@@ -198,14 +198,14 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0, paddingBottom: '16px' }}>
                         <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '4px', letterSpacing: '1px' }}>
-                            {t('common.global_classic')}
+                            {t('common.bodyweight')}
                         </div>
                         {EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
                         
                         {canAccessFeature(FEATURES.WEIGHTS, entry) && (
                             <>
                                 <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '16px', letterSpacing: '1px' }}>
-                                    {t('common.global_weights')}
+                                    {t('common.weights')}
                                 </div>
                                 {WEIGHT_EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
                             </>

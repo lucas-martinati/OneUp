@@ -189,9 +189,9 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         display: 'flex', flexWrap: 'wrap', gap: '8px'
                     }}>
                         {[
-                            { id: 'standard', label: t('common.global_classic'), locked: false },
-                            { id: 'weights', label: t('common.global_weights'), locked: !canAccessFeature(FEATURES.WEIGHTS, { isPro }) },
-                            { id: 'custom', label: t('common.global_custom'), locked: !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) }
+                            { id: 'standard', label: t('common.bodyweight'), locked: false },
+                            { id: 'weights', label: t('common.weights'), locked: !canAccessFeature(FEATURES.WEIGHTS, { isPro }) },
+                            { id: 'custom', label: t('common.custom'), locked: !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) }
                         ].map(cat => (
                             <label key={cat.id} style={{
                                 display: 'flex', alignItems: 'center', gap: '6px',

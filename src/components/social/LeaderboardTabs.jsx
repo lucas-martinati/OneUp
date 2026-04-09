@@ -15,19 +15,19 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                 marginBottom: '4px'
             }}>
                 <button
-                    onClick={() => { setDomain('classic'); setActiveTab('global_classic'); }}
+                    onClick={() => { setDomain('bodyweight'); setActiveTab('bodyweight'); }}
                     style={{
                         flex: 1, padding: '10px', borderRadius: 'var(--radius-md)',
-                        background: domain === 'classic' ? '#ffffff' : 'rgba(255,255,255,0.05)',
-                        color: domain === 'classic' ? '#000000' : 'var(--text-secondary)',
+                        background: domain === 'bodyweight' ? '#ffffff' : 'rgba(255,255,255,0.05)',
+                        color: domain === 'bodyweight' ? '#000000' : 'var(--text-secondary)',
                         border: 'none', fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
                     }}
                 >
-                    <Trophy size={16} /> {t('common.global_classic')}
+                    <Trophy size={16} /> {t('common.bodyweight')}
                 </button>
                 <button
-                    onClick={() => { setDomain('weights'); setActiveTab('global_weights'); }}
+                    onClick={() => { setDomain('weights'); setActiveTab('weights'); }}
                     style={{
                         flex: 1, padding: '10px', borderRadius: 'var(--radius-md)',
                         background: domain === 'weights' ? 'linear-gradient(135deg, #8b5cf6, #6366f1)' : 'rgba(255,255,255,0.05)',
@@ -37,7 +37,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
                     }}
                 >
-                    <Dumbbell size={16} /> {t('common.global_weights')}
+                    <Dumbbell size={16} /> {t('common.weights')}
                 </button>
             </div>
             )}

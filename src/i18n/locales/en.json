@@ -13,10 +13,10 @@
     "challengeStarts": "Your challenge starts on"
   },
   "common": {
-    "global_weights": "Weights",
-    "global_custom": "Custom",
+    "weights": "Weights",
+    "custom": "Custom",
     "close": "Close",
-    "global_classic": "Bodyweight",
+    "bodyweight": "Bodyweight",
     "cancel": "Cancel",
     "global": "Global",
     "poke": "sent you a poke!",

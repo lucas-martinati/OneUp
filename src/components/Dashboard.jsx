@@ -231,7 +231,7 @@ export function Dashboard() {
                         <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                             {canAccessFeature(FEATURES.WEIGHTS, { isPro }) ? (
                                 <DashboardSlide
-                                    title={t('common.global_weights')}
+                                    title={t('common.weights')}
                                     isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
                                     getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
                                     isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
@@ -241,7 +241,7 @@ export function Dashboard() {
                                 />
                             ) : (
                                 <ProPaywall
-                                    title={t('common.global_weights')}
+                                    title={t('common.weights')}
                                     onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
                                 />
                             )}
@@ -250,7 +250,7 @@ export function Dashboard() {
                         <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                             {canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) ? (
                                 <DashboardSlide
-                                    title={t('common.global_custom')}
+                                    title={t('common.custom')}
                                     isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
                                     getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
                                     isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
@@ -261,7 +261,7 @@ export function Dashboard() {
                                 />
                             ) : (
                                 <ProPaywall
-                                    title={t('common.global_custom')}
+                                    title={t('common.custom')}
                                     onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
                                 />
                             )}

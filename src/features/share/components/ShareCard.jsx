@@ -162,9 +162,9 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const weightExercises = allExercises.filter(isWeightEx);
   const customExercises = allExercises.filter(isCustomEx);
   const categories = [
-    bodyweightExercises.length > 0 && { key: CATEGORIES.BODYWEIGHT, exercises: bodyweightExercises, label: t('common.global_classic'), color: '#34d399' },
-    weightExercises.length > 0 && { key: CATEGORIES.WEIGHTS, exercises: weightExercises, label: t('common.global_weights'), color: '#f97316' },
-    customExercises.length > 0 && { key: CATEGORIES.CUSTOM, exercises: customExercises, label: t('common.global_custom'), color: '#8b5cf6' },
+    bodyweightExercises.length > 0 && { key: CATEGORIES.BODYWEIGHT, exercises: bodyweightExercises, label: t('common.bodyweight'), color: '#34d399' },
+    weightExercises.length > 0 && { key: CATEGORIES.WEIGHTS, exercises: weightExercises, label: t('common.weights'), color: '#f97316' },
+    customExercises.length > 0 && { key: CATEGORIES.CUSTOM, exercises: customExercises, label: t('common.custom'), color: '#8b5cf6' },
   ].filter(Boolean);
   const showSections = showCategoriesSeparately && categories.length > 1;
 
@@ -362,7 +362,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
                       background: `${catColors[cat] || '#818cf8'}15`,
                       textTransform: 'uppercase', letterSpacing: '0.5px',
                     }}>
-                      {t(`share.cat.${cat}`, cat)}
+                      {t(`common.${cat}`, cat)}
                     </span>
                   ))}
                 </div>

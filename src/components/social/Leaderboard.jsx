@@ -20,7 +20,7 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
     const { cloudSyncAPI: cloudSync } = useProgressContext();
     const { t } = useTranslation();
 
-    const [domain, setDomain] = useState(activeSlide === 1 ? 'weights' : 'classic');
+    const [domain, setDomain] = useState(activeSlide === 1 ? 'weights' : 'bodyweight');
 
     const VISIBLE_TABS = useMemo(() => {
         const combinedTab = { 
@@ -34,20 +34,20 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
         if (domain === 'weights') { 
             return [
                 combinedTab,
-                { id: 'global_weights', customLabel: `${t('common.global')} ${t('common.global_weights')}`, color: '#8b5cf6', icon: getIcon('Dumbbell') },
+                { id: 'weights', customLabel: `${t('common.global')} ${t('common.weights')}`, color: '#8b5cf6', icon: getIcon('Dumbbell') },
                 ...WEIGHT_EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: getIcon(ex.icon) }))
             ];
         }
         return [
             combinedTab,
-            { id: 'global_classic', customLabel: `${t('common.global')} ${t('common.global_classic')}`, color: '#fbbf24', icon: Trophy },
+            { id: 'bodyweight', customLabel: `${t('common.global')} ${t('common.bodyweight')}`, color: '#fbbf24', icon: Trophy },
             ...EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: getIcon(ex.icon) }))
         ];
     }, [domain, t]);
 
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState(activeSlide === 1 ? 'global_weights' : 'global_classic');
+    const [activeTab, setActiveTab] = useState(activeSlide === 1 ? 'weights' : 'bodyweight');
     const [selectedUser, setSelectedUser] = useState(null);
     const [nudgedMember, setNudgedMember] = useState(null);
     const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
@@ -86,8 +86,8 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
         const filteredEntries = domain === 'weights' ? entries.filter(e => e.isPro) : entries;
         return [...filteredEntries].sort((a, b) => {
             if (activeTab === 'global_combined') return ((b.totalReps || 0) + (b.weightsTotalReps || 0)) - ((a.totalReps || 0) + (a.weightsTotalReps || 0));
-            if (activeTab === 'global_classic') return (b.totalReps || 0) - (a.totalReps || 0);
-            if (activeTab === 'global_weights') return (b.weightsTotalReps || 0) - (a.weightsTotalReps || 0);
+            if (activeTab === 'bodyweight') return (b.totalReps || 0) - (a.totalReps || 0);
+            if (activeTab === 'weights') return (b.weightsTotalReps || 0) - (a.weightsTotalReps || 0);
             return (b.exerciseReps?.[activeTab] || 0) - (a.exerciseReps?.[activeTab] || 0);
         });
     }, [entries, activeTab, domain]);
@@ -102,8 +102,8 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
 
     const getReps = (entry) => {
         if (activeTab === 'global_combined') return (entry.totalReps || 0) + (entry.weightsTotalReps || 0);
-        if (activeTab === 'global_classic') return entry.totalReps || 0;
-        if (activeTab === 'global_weights') return entry.weightsTotalReps || 0;
+        if (activeTab === 'bodyweight') return entry.totalReps || 0;
+        if (activeTab === 'weights') return entry.weightsTotalReps || 0;
         return entry.exerciseReps?.[activeTab] || 0;
     };
 
