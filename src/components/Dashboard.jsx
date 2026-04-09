@@ -298,6 +298,7 @@ export function Dashboard() {
                             startDate={startDate}
                             completions={completions}
                             exercises={effectiveSlide === 0 ? EXERCISES : effectiveSlide === 1 ? WEIGHT_EXERCISES : customExercises}
+                            isCustom={effectiveSlide === 2}
                             getDayNumber={getDayNumber}
                             onClose={() => setShowCalendar(false)}
                             settings={settings}

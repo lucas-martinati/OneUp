@@ -35,6 +35,12 @@ export const DashboardSlide = React.memo(({
     const isExerciseDone = completions[today]?.[safeSelectedExercise.id]?.isCompleted || currentCount >= dailyGoal;
     const progress = Math.min((dayNumber / 365) * 100, 100);
 
+    const isDayPerfect = !onManageCustom && exercisesList.length > 0 && exercisesList.every(ex => {
+        const count = getExerciseCount(today, ex.id);
+        const goal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
+        return completions[today]?.[ex.id]?.isCompleted || count >= goal;
+    });
+
     return (
         <div style={{
             display: 'flex', flexDirection: 'column',
@@ -43,7 +49,12 @@ export const DashboardSlide = React.memo(({
         }}>
             {title && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8 }}>
+                    <div style={{
+                        fontSize: '0.8rem', fontWeight: '800', 
+                        color: isDayPerfect ? '#ffdf00' : 'var(--text-secondary)', 
+                        textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8,
+                        textShadow: isDayPerfect ? '0 0 10px rgba(255,223,0,0.5)' : 'none'
+                    }}>
                         {title}
                     </div>
                     {onManageCustom && (
@@ -58,9 +69,11 @@ export const DashboardSlide = React.memo(({
                     {/* Day & Goal Hero Section */}
                     <div style={{ textAlign: 'center', position: 'relative' }}>
                         <div style={{
-                            fontSize: 'clamp(0.75rem, 1.6vh, 1rem)', color: 'var(--text-secondary)',
+                            fontSize: 'clamp(0.75rem, 1.6vh, 1rem)', 
+                            color: isDayPerfect ? '#ffdf00' : 'var(--text-secondary)',
                             textTransform: 'uppercase', letterSpacing: '4px',
-                            marginBottom: '2px', fontWeight: '700'
+                            marginBottom: '2px', fontWeight: '700',
+                            textShadow: isDayPerfect ? '0 0 8px rgba(255,223,0,0.4)' : 'none'
                         }}>
                             {t('dashboard.day')}
                         </div>
@@ -69,24 +82,27 @@ export const DashboardSlide = React.memo(({
                         <div style={{
                             position: 'relative', height: 'clamp(3.2rem, 9vh, 7rem)', overflow: 'hidden',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            marginBottom: 'clamp(2px, 0.5vh, 6px)'
+                            marginBottom: 'clamp(2px, 0.5vh, 6px)',
+                            filter: isDayPerfect ? 'drop-shadow(0 0 15px rgba(251,191,36,0.2))' : 'none'
                         }}>
                             {isCounterTransitioning && prevDayNumber && (
-                                <div className="rainbow-gradient" style={{
+                                <div className={isDayPerfect ? 'gold-text' : 'rainbow-gradient'} style={{
                                     position: 'absolute', fontSize: 'clamp(3rem, 8.5vh, 6.5rem)', fontWeight: '800', lineHeight: 1,
-                                    animation: 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards'
+                                    animation: isDayPerfect 
+                                        ? 'gradientShift 4s ease infinite, counterSlideDown 1s ease-out forwards'
+                                        : 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards'
                                 }}>
                                     {prevDayNumber}
                                 </div>
                             )}
                             <div
                                 key={dayNumber}
-                                className="rainbow-gradient"
+                                className={isDayPerfect ? 'gold-text' : 'rainbow-gradient'}
                                 style={{
                                     fontSize: 'clamp(3rem, 8.5vh, 6.5rem)', fontWeight: '800', lineHeight: 1,
                                     animation: isCounterTransitioning
-                                        ? 'rainbowFlow 6s ease infinite, counterSlideUp 1s ease-out'
-                                        : 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out'
+                                        ? (isDayPerfect ? 'gradientShift 4s ease infinite, counterSlideUp 1s ease-out' : 'rainbowFlow 6s ease infinite, counterSlideUp 1s ease-out')
+                                        : (isDayPerfect ? 'gradientShift 4s ease infinite, numberRoll 0.5s ease-out' : 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out')
                                 }}
                             >
                                 {dayNumber}

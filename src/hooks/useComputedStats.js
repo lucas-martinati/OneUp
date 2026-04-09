@@ -93,9 +93,15 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         totalDays++;
         if (!firstActiveDate) firstActiveDate = dateStr;
 
-        // Perfect day check (only considering standard EXERCISES for simplicity/retro-compatibility)
-        const allDone = EXERCISES.every(ex => day[ex.id]?.isCompleted);
-        if (allDone) perfectDays++;
+        // Perfect day check (category-aware, non-custom)
+        const hasStandard = EXERCISES.every(ex => allExercises.some(e => e.id === ex.id));
+        const hasWeights = WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => allExercises.some(e => e.id === ex.id));
+        
+        const standardDone = hasStandard && EXERCISES.every(ex => day[ex.id]?.isCompleted);
+        const weightsDone = hasWeights && WEIGHT_EXERCISES.every(ex => day[ex.id]?.isCompleted);
+        const isPerfect = standardDone || weightsDone;
+        
+        if (isPerfect) perfectDays++;
 
         // Day of week
         const dateObj = new Date(dateStr);
@@ -202,12 +208,19 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
 
     // Perfect streak (consecutive perfect days)
     let perfectStreak = 0, maxPerfectStreak = 0;
+    const hasStandard = EXERCISES.every(ex => allExercises.some(exe => exe.id === ex.id));
+    const hasWeights = WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => allExercises.some(exe => exe.id === ex.id));
+
     for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const d = new Date(today);
         d.setDate(d.getDate() - i);
         const dateStr = d.toISOString().split('T')[0];
         const dayCompletions = completions[dateStr];
-        const isPerfect = EXERCISES.every(ex => dayCompletions?.[ex.id]?.isCompleted);
+        
+        const isStandardPerfect = hasStandard && EXERCISES.every(ex => dayCompletions?.[ex.id]?.isCompleted);
+        const isWeightsPerfect = hasWeights && WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => dayCompletions?.[ex.id]?.isCompleted);
+        
+        const isPerfect = isStandardPerfect || isWeightsPerfect;
         if (isPerfect) {
             perfectStreak++;
             if (perfectStreak > maxPerfectStreak) maxPerfectStreak = perfectStreak;

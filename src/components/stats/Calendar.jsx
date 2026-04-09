@@ -7,7 +7,7 @@ import { getDailyGoal } from '../../config/exercises';
 import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
-export function Calendar({ startDate, completions, exercises, getDayNumber, onClose, settings }) {
+export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, settings }) {
     const { t } = useTranslation();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
@@ -267,8 +267,9 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                     const isToday = dateString === todayStr;
 
                     const dayCompletions = completions[dateString] || {};
-                    const isAnyDone = Object.values(dayCompletions).some(ex => ex?.isCompleted);
-                    const isMissed = !isAnyDone && !isFuture && !isBeforeStart;
+                    const isPerfect = !isCustom && exercises.length > 0 && exercises.every(ex => dayCompletions[ex.id]?.isCompleted);
+                    const isAnyDone = !isPerfect && Object.values(dayCompletions).some(ex => ex?.isCompleted);
+                    const isMissed = !isPerfect && !isAnyDone && !isFuture && !isBeforeStart;
                     const completedCount = exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length;
                     const totalCount = completedCount + (isMissed ? 1 : 0);
                     const dotSize = totalCount > 12 ? '4px' : totalCount > 8 ? '5px' : totalCount > 4 ? '6px' : '7px';
@@ -277,6 +278,7 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                     let bgColor = 'var(--surface-subtle)';
                     if (isToday) bgColor = 'rgba(139, 92, 246, 0.1)';
                     if (isAnyDone) bgColor = 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.15))';
+                    if (isPerfect) bgColor = 'var(--gradient-gold-trans)';
                     if (isMissed) bgColor = 'linear-gradient(135deg, rgba(239,68,68,0.1), rgba(220,38,38,0.1))';
 
                     const isSelected = selectedDay === dateString;
@@ -299,17 +301,23 @@ export function Calendar({ startDate, completions, exercises, getDayNumber, onCl
                                 opacity: isFuture || isBeforeStart ? 0.25 : 1,
                                 border: isSelected
                                     ? '2px solid var(--border-strong)'
-                                    : isToday
-                                        ? '2px solid rgba(139,92,246,0.5)'
-                                        : '2px solid transparent',
+                                    : isPerfect
+                                        ? '2px solid rgba(255, 223, 0, 0.6)'
+                                        : isToday
+                                            ? '2px solid rgba(139,92,246,0.5)'
+                                            : '2px solid transparent',
+                                boxShadow: isPerfect ? 'var(--glow-gold)' : 'none',
+                                backdropFilter: isPerfect ? 'brightness(1.2) saturate(1.2)' : 'none',
+                                WebkitBackdropFilter: isPerfect ? 'brightness(1.2) saturate(1.2)' : 'none',
                                 transition: 'all 0.2s ease',
                                 cursor: !isFuture && !isBeforeStart ? 'pointer' : 'default'
                             }}
                         >
                             <span style={{
-                                fontSize: '0.85rem', fontWeight: isToday ? '700' : '600',
-                                color: isToday ? '#8b5cf6' : 'var(--text-primary)',
-                                marginBottom: '2px'
+                                fontSize: '0.85rem', fontWeight: (isToday || isPerfect) ? '700' : '600',
+                                color: isPerfect ? '#fbbf24' : isToday ? '#8b5cf6' : 'var(--text-primary)',
+                                marginBottom: '2px',
+                                textShadow: isPerfect ? '0 0 8px rgba(255, 215, 0, 0.4)' : 'none'
                             }}>
                                 {date.getDate()}
                             </span>
