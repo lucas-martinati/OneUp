@@ -1,0 +1,129 @@
+diff --git a/src/features/share/components/ShareCard.jsx b/src/features/share/components/ShareCard.jsx
+index 7adf571..7e2bc55 100644
+--- a/src/features/share/components/ShareCard.jsx
++++ b/src/features/share/components/ShareCard.jsx
+@@ -34,7 +34,9 @@ function MetricCard({ icon: Icon, value, label, color, isVisible = true }) {
+       transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+     }}>
+       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: 'max-content' }}>
+-        <Icon size={18} color={color} strokeWidth={2.5} />
++        <div style={{ color: color, transition: 'color 0.5s ease' }}>
++          <Icon size={18} color="currentColor" strokeWidth={2.5} />
++        </div>
+         <span style={{
+           fontSize: '1.2rem', fontWeight: 800, color: '#ffffff',
+           lineHeight: 1, letterSpacing: '-0.02em',
+@@ -252,21 +254,33 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
+         position: 'relative',
+       }}
+     >
+-      {/* Background gradient or image */}
++      {/* Background gradients for smooth transition */}
++      {Object.entries(THEMES).map(([key, themeObj]) => (
++        <div key={key} style={{
++          position: 'absolute', inset: 0,
++          background: themeObj.bg,
++          opacity: (!options.backgroundImage && theme === key) ? 1 : 0,
++          transition: 'opacity 0.5s ease',
++        }} />
++      ))}
++      
+       <div style={{
+         position: 'absolute', inset: 0,
+         background: options.backgroundImage 
+           ? `center / cover no-repeat url(${options.backgroundImage})`
+-          : currentTheme.bg,
++          : 'transparent',
++        opacity: options.backgroundImage ? 1 : 0,
++        transition: 'opacity 0.5s ease',
+       }} />
+       
+       {/* Overlay for readability when background image is present */}
+-      {options.backgroundImage && (
+-        <div style={{
+-          position: 'absolute', inset: 0,
+-          background: 'rgba(10,10,18,0.75)',
+-        }} />
+-      )}
++      <div style={{
++        position: 'absolute', inset: 0,
++        background: 'rgba(10,10,18,0.75)',
++        opacity: options.backgroundImage ? 1 : 0,
++        transition: 'opacity 0.5s ease',
++        pointerEvents: 'none',
++      }} />
+ 
+       {/* Accent glow */}
+       <div style={{
+@@ -276,12 +290,14 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
+           ? 'rgba(249,115,22,0.18)'
+           : currentTheme.glow1,
+         filter: 'blur(20px)',
++        transition: 'background 0.5s ease',
+       }} />
+       <div style={{
+         position: 'absolute', bottom: '-30px', left: '-30px',
+         width: '120px', height: '120px', borderRadius: '50%',
+         background: currentTheme.glow2,
+         filter: 'blur(15px)',
++        transition: 'background 0.5s ease',
+       }} />
+ 
+       {/* Content */}
+@@ -304,9 +320,8 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
+             </div>
+             <div style={{
+               fontSize: '1.3rem', fontWeight: 800, marginTop: '4px',
+-              background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent})`,
+-              WebkitBackgroundClip: 'text', backgroundClip: 'text',
+-              WebkitTextFillColor: 'transparent',
++              color: currentTheme.accent,
++              transition: 'color 0.5s ease',
+             }}>
+               OneUp
+             </div>
+@@ -340,15 +355,15 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
+             <div style={{
+               position: 'absolute', right: 0,
+               width: '36px', height: '36px', borderRadius: '12px',
+-              background: `linear-gradient(135deg, ${currentTheme.accent}33, ${currentTheme.accent}26)`,
++              backgroundColor: `${currentTheme.accent}26`,
+               border: `1px solid ${currentTheme.accent}33`,
+               display: 'flex', alignItems: 'center', justifyContent: 'center',
+               opacity: !(options.showStreak && streak > 0) ? 1 : 0,
+               transform: !(options.showStreak && streak > 0) ? 'scale(1)' : 'scale(0.8)',
+               pointerEvents: !(options.showStreak && streak > 0) ? 'auto' : 'none',
+-              transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
++              transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.5s ease, border-color 0.5s ease',
+             }}>
+-              <Flame size={18} color={currentTheme.accent} />
++              <Flame size={18} color={currentTheme.accent} style={{ transition: 'color 0.5s ease' }} />
+             </div>
+           </div>
+         </div>
+@@ -407,11 +422,11 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
+             <>
+               <MetricCard isVisible={options.showVolume} icon={EXERCISE_ICONS.Zap} value={totalReps.toLocaleString()} label={t('stats.totalReps', 'Total reps')} color="#fbbf24" />
+               <MetricCard isVisible={options.showExercises} icon={SHARE_ICONS.Target} value={totalDays} label={t('leaderboard.activeDays', 'Active days')} color="#34d399" />
+-              <MetricCard isVisible={options.showDuration} icon={SOCIAL_ICONS.Award} value={`${maxStreak}j`} label={t('common.bestStreak', 'Best streak')} color="#818cf8" />
++              <MetricCard isVisible={options.showDuration} icon={SOCIAL_ICONS.Award} value={`${maxStreak}j`} label={t('common.bestStreak', 'Best streak')} color={currentTheme.accent} />
+             </>
+           ) : (
+             <>
+-              <MetricCard isVisible={options.showDuration} icon={Clock} value={formatDuration(duration)} label={t('share.duration', 'Dur\u00e9e')} color="#818cf8" />
++              <MetricCard isVisible={options.showDuration} icon={Clock} value={formatDuration(duration)} label={t('share.duration', 'Dur\u00e9e')} color={currentTheme.accent} />
+               <MetricCard isVisible={options.showVolume} icon={EXERCISE_ICONS.Zap} value={totalReps} label={t('customExercises.typeReps', 'Reps')} color="#fbbf24" />
+               <MetricCard isVisible={options.showExercises} icon={EXERCISE_ICONS.Dumbbell} value={exerciseCount} label={t('share.exercises', 'Exercices')} color="#34d399" />
+             </>
+diff --git a/src/features/share/components/ShareModal.jsx b/src/features/share/components/ShareModal.jsx
+index d72def3..28589ea 100644
+--- a/src/features/share/components/ShareModal.jsx
++++ b/src/features/share/components/ShareModal.jsx
+@@ -77,7 +77,6 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
+       }}>
+         <div ref={cardRef} style={{ width: '100%' }}>
+           <ShareCard
+-            key={`${options.theme}-${options.statsCategories?.join(',') || ''}`}
+             cardRef={cardRef}
+             sessionData={sessionData}
+             stats={stats}
