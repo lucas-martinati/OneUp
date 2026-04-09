@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Settings } from '../../utils/icons';
+import { Settings, Star } from '../../utils/icons';
 import { UI_ICONS, DynamicIcon } from '../../utils/icons';
 import { getDailyGoal } from '../../config/exercises';
 import { formatTime } from '../../utils/dateUtils';
@@ -42,11 +42,37 @@ export const DashboardSlide = React.memo(({
     });
 
     return (
-        <div style={{
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'space-evenly', gap: 'clamp(4px, 0.8vh, 12px)',
-            height: '100%', width: '100%', paddingTop: title ? '12px' : '0'
-        }}>
+        <div 
+            className={isDayPerfect ? 'dashboard-gold-bg' : ''}
+            style={{
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'space-evenly', gap: 'clamp(4px, 0.8vh, 12px)',
+                height: '100%', width: '100%', paddingTop: title ? '12px' : '0',
+                transition: 'all 0.6s ease-in-out',
+                position: 'relative', overflow: 'hidden'
+            }}
+        >
+            {isDayPerfect && (
+                <>
+                    {[
+                        { top: '10%', left: '15%', size: 12, delay: '0s' },
+                        { top: '20%', right: '10%', size: 8, delay: '1s' },
+                        { bottom: '15%', left: '10%', size: 10, delay: '2s' },
+                        { bottom: '25%', right: '15%', size: 7, delay: '3.5s' }
+                    ].map((s, idx) => (
+                        <Star 
+                            key={idx}
+                            className="sparkle-icon"
+                            size={s.size}
+                            fill="#FFD700"
+                            style={{
+                                top: s.top, left: s.left, right: s.right, bottom: s.bottom,
+                                animationDelay: s.delay, opacity: 0.4
+                            }}
+                        />
+                    ))}
+                </>
+            )}
             {title && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{

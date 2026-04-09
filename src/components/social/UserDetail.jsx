@@ -16,6 +16,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
     const rankColors = { 1: '#fbbf24', 2: '#c0c0c0', 3: '#cd7f32' };
     const todayStr = getLocalDateStr(new Date());
     const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
+    const rankColor = rankColors[rank] || '#818cf8';
 
     const [details, setDetails] = useState(null);
     const [loadingDetails, setLoadingDetails] = useState(true);
