@@ -20,21 +20,30 @@ function formatDate(dateStr, lang) {
 }
 
 // eslint-disable-next-line no-unused-vars
-function MetricCard({ icon: Icon, value, label, color }) {
+function MetricCard({ icon: Icon, value, label, color, isVisible = true }) {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      gap: '4px', flex: 1, minWidth: 0,
+      gap: '4px', minWidth: 0,
+      flex: isVisible ? 1 : 0,
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'scale(1) translateY(0)' : 'scale(0.8) translateY(10px)',
+      width: isVisible ? 'auto' : 0,
+      pointerEvents: isVisible ? 'auto' : 'none',
+      overflow: 'hidden',
+      transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
     }}>
-      <Icon size={18} color={color} strokeWidth={2.5} />
-      <span style={{
-        fontSize: '1.2rem', fontWeight: 800, color: '#ffffff',
-        lineHeight: 1, letterSpacing: '-0.02em',
-      }}>{value}</span>
-      <span style={{
-        fontSize: '0.6rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)',
-        textTransform: 'uppercase', letterSpacing: '0.5px',
-      }}>{label}</span>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: 'max-content' }}>
+        <Icon size={18} color={color} strokeWidth={2.5} />
+        <span style={{
+          fontSize: '1.2rem', fontWeight: 800, color: '#ffffff',
+          lineHeight: 1, letterSpacing: '-0.02em',
+        }}>{value}</span>
+        <span style={{
+          fontSize: '0.6rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)',
+          textTransform: 'uppercase', letterSpacing: '0.5px',
+        }}>{label}</span>
+      </div>
     </div>
   );
 }
@@ -304,8 +313,9 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
           </div>
 
           {/* Top-right: flame badge or default */}
-          {options.showStreak && streak > 0 ? (
+          <div style={{ position: 'relative', height: '36px', minWidth: '80px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
             <div style={{
+              position: 'absolute', right: 0,
               display: 'flex', alignItems: 'center', gap: '6px',
               padding: '6px 14px', borderRadius: '14px',
               background: streakActive
@@ -314,7 +324,10 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
               border: streakActive
                 ? '1px solid rgba(249,115,22,0.35)'
                 : '1px solid rgba(255,255,255,0.08)',
-              transition: 'all 0.3s ease',
+              opacity: options.showStreak && streak > 0 ? 1 : 0,
+              transform: options.showStreak && streak > 0 ? 'scale(1)' : 'scale(0.8)',
+              pointerEvents: options.showStreak && streak > 0 ? 'auto' : 'none',
+              transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
             }}>
               <Flame size={20} color={streakActive ? '#f97316' : '#888'} fill={streakActive ? '#f97316' : 'none'} />
               <span style={{
@@ -324,17 +337,20 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
                 {streak}
               </span>
             </div>
-          ) : (
             <div style={{
+              position: 'absolute', right: 0,
               width: '36px', height: '36px', borderRadius: '12px',
               background: `linear-gradient(135deg, ${currentTheme.accent}33, ${currentTheme.accent}26)`,
               border: `1px solid ${currentTheme.accent}33`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'all 0.3s ease',
+              opacity: !(options.showStreak && streak > 0) ? 1 : 0,
+              transform: !(options.showStreak && streak > 0) ? 'scale(1)' : 'scale(0.8)',
+              pointerEvents: !(options.showStreak && streak > 0) ? 'auto' : 'none',
+              transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
             }}>
               <Flame size={18} color={currentTheme.accent} />
             </div>
-          )}
+          </div>
         </div>
 
         {/* Session title or global label */}
@@ -389,27 +405,15 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
         }}>
           {isGlobal ? (
             <>
-              {options.showVolume && (
-                <MetricCard icon={EXERCISE_ICONS.Zap} value={totalReps.toLocaleString()} label={t('stats.totalReps', 'Total reps')} color="#fbbf24" />
-              )}
-              {options.showExercises && (
-                <MetricCard icon={SHARE_ICONS.Target} value={totalDays} label={t('leaderboard.activeDays', 'Active days')} color="#34d399" />
-              )}
-              {options.showDuration && (
-                <MetricCard icon={SOCIAL_ICONS.Award} value={`${maxStreak}j`} label={t('common.bestStreak', 'Best streak')} color="#818cf8" />
-              )}
+              <MetricCard isVisible={options.showVolume} icon={EXERCISE_ICONS.Zap} value={totalReps.toLocaleString()} label={t('stats.totalReps', 'Total reps')} color="#fbbf24" />
+              <MetricCard isVisible={options.showExercises} icon={SHARE_ICONS.Target} value={totalDays} label={t('leaderboard.activeDays', 'Active days')} color="#34d399" />
+              <MetricCard isVisible={options.showDuration} icon={SOCIAL_ICONS.Award} value={`${maxStreak}j`} label={t('common.bestStreak', 'Best streak')} color="#818cf8" />
             </>
           ) : (
             <>
-              {options.showDuration && (
-                <MetricCard icon={Clock} value={formatDuration(duration)} label={t('share.duration', 'Dur\u00e9e')} color="#818cf8" />
-              )}
-              {options.showVolume && (
-                <MetricCard icon={EXERCISE_ICONS.Zap} value={totalReps} label={t('customExercises.typeReps', 'Reps')} color="#fbbf24" />
-              )}
-              {options.showExercises && (
-                <MetricCard icon={EXERCISE_ICONS.Dumbbell} value={exerciseCount} label={t('share.exercises', 'Exercices')} color="#34d399" />
-              )}
+              <MetricCard isVisible={options.showDuration} icon={Clock} value={formatDuration(duration)} label={t('share.duration', 'Dur\u00e9e')} color="#818cf8" />
+              <MetricCard isVisible={options.showVolume} icon={EXERCISE_ICONS.Zap} value={totalReps} label={t('customExercises.typeReps', 'Reps')} color="#fbbf24" />
+              <MetricCard isVisible={options.showExercises} icon={EXERCISE_ICONS.Dumbbell} value={exerciseCount} label={t('share.exercises', 'Exercices')} color="#34d399" />
             </>
           )}
         </div>
@@ -438,26 +442,28 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
         )}
 
         {/* Session history mini list */}
-        {options.showSessionHistory && sessionHistory.length > 0 && (
+        <div style={{
+          padding: options.showSessionHistory && sessionHistory.length > 0 ? '12px' : '0 12px',
+          borderRadius: '14px',
+          background: 'rgba(255,255,255,0.03)',
+          border: options.showSessionHistory && sessionHistory.length > 0 ? '1px solid rgba(255,255,255,0.05)' : '0px solid rgba(255,255,255,0)',
+          maxHeight: options.showSessionHistory && sessionHistory.length > 0 ? '400px' : '0px',
+          opacity: options.showSessionHistory && sessionHistory.length > 0 ? 1 : 0,
+          overflow: 'hidden',
+          transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        }}>
           <div style={{
-            padding: '12px',
-            borderRadius: '14px',
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.05)',
+            fontSize: '0.55rem', fontWeight: 700,
+            color: 'rgba(255,255,255,0.4)',
+            textTransform: 'uppercase', letterSpacing: '1px',
+            marginBottom: '8px',
           }}>
-            <div style={{
-              fontSize: '0.55rem', fontWeight: 700,
-              color: 'rgba(255,255,255,0.4)',
-              textTransform: 'uppercase', letterSpacing: '1px',
-              marginBottom: '8px',
-            }}>
-              {t('share.recentSessions', 'S\u00e9ances r\u00e9centes')}
-            </div>
-            {sessionHistory.slice(0, 5).map((session, i) => (
-              <HistoryRow key={session.id || i} session={session} t={t} lang={lang} />
-            ))}
+            {t('share.recentSessions', 'S\u00e9ances r\u00e9centes')}
           </div>
-        )}
+          {sessionHistory.slice(0, 5).map((session, i) => (
+            <HistoryRow key={session.id || i} session={session} t={t} lang={lang} />
+          ))}
+        </div>
 
         {/* Footer */}
         <div style={{

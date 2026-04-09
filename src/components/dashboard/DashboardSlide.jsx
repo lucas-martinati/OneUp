@@ -227,16 +227,6 @@ export const DashboardSlide = React.memo(({
                                             background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
                                             pointerEvents: 'none'
                                         }} />
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: '-50%',
-                                            left: '-50%',
-                                            width: '200%',
-                                            height: '200%',
-                                            background: `conic-gradient(from 0deg, transparent, ${safeSelectedExercise.color}44, transparent, ${safeSelectedExercise.color}44, transparent)`,
-                                            animation: 'spin 2s linear infinite',
-                                            pointerEvents: 'none'
-                                        }} />
                                         <UI_ICONS.Check size={26} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
                                         <span style={{
                                             fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)',
