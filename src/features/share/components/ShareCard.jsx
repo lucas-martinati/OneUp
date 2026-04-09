@@ -398,7 +398,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
           ) : (
             <>
               {options.showDuration && (
-                <MetricCard icon={SHARE_ICONS.Clock} value={formatDuration(duration)} label={t('share.duration', 'Dur\u00e9e')} color="#818cf8" />
+                <MetricCard icon={Clock} value={formatDuration(duration)} label={t('share.duration', 'Dur\u00e9e')} color="#818cf8" />
               )}
               {options.showVolume && (
                 <MetricCard icon={EXERCISE_ICONS.Zap} value={totalReps} label={t('customExercises.typeReps', 'Reps')} color="#fbbf24" />
