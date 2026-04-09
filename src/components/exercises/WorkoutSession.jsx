@@ -560,7 +560,18 @@ export function WorkoutSession({
                                 </div>
                             </div>
                             <label className="toggle-switch">
-                                <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
+                                <input 
+                                    type="checkbox" 
+                                    checked={showAll} 
+                                    onChange={(e) => {
+                                        const checked = e.target.checked;
+                                        setShowAll(checked);
+                                        if (!checked) {
+                                            const localIds = new Set(localExercises.map(ex => ex.id));
+                                            setQueue(prev => prev.filter(id => localIds.has(id)));
+                                        }
+                                    }} 
+                                />
                                 <span className="slider"></span>
                             </label>
                             <style>{`
