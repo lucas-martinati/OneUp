@@ -141,6 +141,7 @@ export async function getClanDetails(clanId) {
       lastActiveDay: lbData.lastActiveDay || null, difficultyMultiplier: lbData.difficultyMultiplier || 1,
       lastUpdated: lbData.lastUpdated || null,
       isSupporter: !!lbData.isSupporter, isPro: !!lbData.isPro,
+      isPerfectToday: !!lbData.isPerfectToday,
       isCurrentUser: memberUid === uid
     };
   });

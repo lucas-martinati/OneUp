@@ -231,21 +231,68 @@ button:active {
   }
 }
 
-/* Number animations */
-@keyframes numberRoll {
-  0% {
-    transform: translateY(-20%) scale(0.8);
-    opacity: 0;
-  }
+/* Leaderboard & Perfect Day Effects */
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 0.8; transform: scale(1) rotate(180deg); }
+}
 
-  60% {
-    transform: translateY(5%) scale(1.05);
-  }
+@keyframes goldShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
 
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
+@keyframes topRankPulse1 {
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.1); border-color: rgba(255, 215, 0, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.4); border-color: rgba(255, 215, 0, 0.7); }
+}
+
+@keyframes topRankPulse2 {
+  0%, 100% { box-shadow: 0 0 8px rgba(192, 192, 192, 0.1); border-color: rgba(192, 192, 192, 0.2); }
+  50% { box-shadow: 0 0 18px rgba(192, 192, 192, 0.3); border-color: rgba(192, 192, 192, 0.5); }
+}
+
+@keyframes topRankPulse3 {
+  0%, 100% { box-shadow: 0 0 8px rgba(205, 127, 50, 0.1); border-color: rgba(205, 127, 50, 0.2); }
+  50% { box-shadow: 0 0 15px rgba(205, 127, 50, 0.3); border-color: rgba(205, 127, 50, 0.5); }
+}
+
+.top-rank-1 { animation: topRankPulse1 3s infinite ease-in-out; border-width: 1.5px !important; }
+.top-rank-2 { animation: topRankPulse2 4s infinite ease-in-out; }
+.top-rank-3 { animation: topRankPulse3 4s infinite ease-in-out; }
+
+.perfect-day-row {
+  position: relative;
+  overflow: hidden;
+}
+
+.perfect-day-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg, 
+    transparent, 
+    rgba(255, 215, 0, 0.03), 
+    rgba(255, 215, 0, 0.05), 
+    rgba(255, 215, 0, 0.03), 
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: goldShimmer 10s infinite linear;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sparkle-icon {
+  position: absolute;
+  color: #FFD700;
+  animation: sparkle 5s infinite ease-in-out;
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Midnight counter transition animations */

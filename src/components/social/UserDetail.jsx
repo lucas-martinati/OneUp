@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Zap } from '../../utils/icons';
+import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Zap, Star } from '../../utils/icons';
 import { Avatar } from '../ui/Avatar';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
@@ -103,10 +103,33 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                 style={{
                     width: '100%', maxWidth: '400px',
                     borderRadius: 'var(--radius-xl)', padding: 'var(--spacing-lg)',
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-                    maxHeight: '90vh', display: 'flex', flexDirection: 'column'
+                    boxShadow: entry.isPerfectToday 
+                        ? '0 0 30px rgba(255, 215, 0, 0.25), 0 20px 60px rgba(0,0,0,0.5)' 
+                        : '0 20px 60px rgba(0,0,0,0.5)',
+                    maxHeight: '90vh', display: 'flex', flexDirection: 'column',
+                    background: rank === 1 
+                        ? 'linear-gradient(135deg, rgba(30, 25, 10, 0.8), rgba(20, 15, 5, 0.5))' 
+                        : rank === 2 
+                            ? 'linear-gradient(135deg, rgba(25, 25, 25, 0.8), rgba(15, 15, 15, 0.5))'
+                            : rank === 3
+                                ? 'linear-gradient(135deg, rgba(30, 20, 15, 0.8), rgba(20, 10, 5, 0.5))'
+                                : undefined,
+                    border: rank <= 3 ? `1px solid ${rankColor}40` : undefined,
+                    position: 'relative', overflow: 'hidden'
                 }}
             >
+                {entry.isPerfectToday && (
+                    <>
+                        <Star className="sparkle-icon" size={14} fill="#FFD700" style={{ top: '5%', left: '10%', animationDelay: '0s' }} />
+                        <Star className="sparkle-icon" size={10} fill="#FFD700" style={{ top: '15%', right: '15%', animationDelay: '1s' }} />
+                        <Star className="sparkle-icon" size={12} fill="#FFD700" style={{ bottom: '20%', left: '15%', animationDelay: '2s' }} />
+                        <Star className="sparkle-icon" size={9} fill="#FFD700" style={{ bottom: '10%', right: '10%', animationDelay: '3s' }} />
+                        <Star className="sparkle-icon" size={11} fill="#FFD700" style={{ top: '40%', left: '5%', animationDelay: '1.5s' }} />
+                        <Star className="sparkle-icon" size={8} fill="#FFD700" style={{ top: '50%', right: '5%', animationDelay: '2.5s' }} />
+                        <Star className="sparkle-icon" size={13} fill="#FFD700" style={{ top: '10%', left: '50%', animationDelay: '0.5s' }} />
+                        <Star className="sparkle-icon" size={7} fill="#FFD700" style={{ bottom: '30%', right: '40%', animationDelay: '3.5s' }} />
+                    </>
+                )}
                 <button
                     onClick={onClose}
                     className="hover-lift"

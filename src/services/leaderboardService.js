@@ -5,7 +5,7 @@ import i18n from '../i18n';
 
 const logger = createLogger('Leaderboard');
 
-export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter, isPro }) {
+export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter, isPro, isPerfectToday }) {
   const auth = getAuthInstance();
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
@@ -27,6 +27,7 @@ export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps
     isPublic: isPublic !== false,
     isSupporter: isSupporter !== undefined ? isSupporter : (existingData.isSupporter || false),
     isPro: isPro !== undefined ? isPro : (existingData.isPro || false),
+    isPerfectToday: !!isPerfectToday,
     lastUpdated: serverTimestamp()
   });
 
@@ -65,7 +66,8 @@ export async function loadLeaderboard() {
       difficultyMultiplier: entry.difficultyMultiplier || 1,
       lastUpdated: entry.lastUpdated || null,
       isSupporter: !!entry.isSupporter,
-      isPro: !!entry.isPro
+      isPro: !!entry.isPro,
+      isPerfectToday: !!entry.isPerfectToday
     }));
 
   entries.sort((a, b) => b.totalReps - a.totalReps);

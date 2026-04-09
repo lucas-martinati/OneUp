@@ -40,6 +40,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     // ─── Accumulators ────────────────────────────────────────────────────
     let totalDays = 0;
     let perfectDays = 0;
+    let isPerfectToday = false;
     let totalExerciseCompletions = 0;
     let weekdayWorkouts = 0;
     let weekendWorkouts = 0;
@@ -102,6 +103,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         const isPerfect = standardDone || weightsDone;
         
         if (isPerfect) perfectDays++;
+        if (dateStr === todayStr && isPerfect) isPerfectToday = true;
 
         // Day of week
         const dateObj = new Date(dateStr);
@@ -319,6 +321,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         totalExerciseCompletions,
         successRate,
         firstActiveDate,
+        isPerfectToday,
 
         // Per-exercise
         exerciseReps,        // { exId: totalReps }

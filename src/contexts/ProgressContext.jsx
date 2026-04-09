@@ -64,6 +64,7 @@ export function ProgressProvider({ children }) {
         achievements: computedStats.badgeCount,
         isPublic: !!settings.leaderboardEnabled,
         lastActiveDay,
+        isPerfectToday: computedStats.isPerfectToday,
         difficultyMultiplier: settings?.difficultyMultiplier,
       });
     } catch (e) {

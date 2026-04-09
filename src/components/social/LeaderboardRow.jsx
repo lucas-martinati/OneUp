@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Shield, HeartHandshake, Check } from '../../utils/icons';
+import { ChevronRight, Shield, HeartHandshake, Check, Star } from '../../utils/icons';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '../ui/Avatar';
 import { getTierBadgeConfigs } from '../../utils/entitlements';
@@ -24,30 +24,47 @@ export function LeaderboardRow({
         3: 'linear-gradient(135deg, rgba(205,127,50,0.2), rgba(205,127,50,0.08))'
     };
     const rankBorderColors = {
-        1: '1px solid rgba(255,215,0,0.35)',
+        1: '1px solid rgba(255,215,0,0.4)',
         2: '1px solid rgba(192,192,192,0.3)',
         3: '1px solid rgba(205,127,50,0.3)'
     };
 
-    const bg = rankBgColors[rank] || (isMe
-        ? 'linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06))'
-        : 'rgba(255,255,255,0.03)');
-    const border = rankBorderColors[rank] || (isMe
-        ? '1px solid rgba(251,191,36,0.25)'
-        : '1px solid rgba(255,255,255,0.05)');
+    const isPerfect = entry.isPerfectToday;
+    const isTopThree = rank <= 3;
+    
+    const bg = rankBgColors[rank] || (isPerfect
+        ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(212, 175, 55, 0.08))'
+        : isMe
+            ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(245, 158, 11, 0.06))'
+            : 'rgba(255, 255, 255, 0.03)');
+    const border = rankBorderColors[rank] || (isPerfect
+        ? '1px solid rgba(255, 215, 0, 0.2)'
+        : isMe
+            ? '1px solid rgba(251, 191, 36, 0.25)'
+            : '1px solid rgba(255, 255, 255, 0.05)');
 
     return (
         <div
             onClick={() => onSelect(entry)}
-            className="hover-lift"
+            className={`hover-lift ${isPerfect ? 'perfect-day-row' : ''} ${rank === 1 ? 'top-rank-1' : (rank === 2 ? 'top-rank-2' : (rank === 3 ? 'top-rank-3' : ''))}`}
             style={{
                 display: 'flex', alignItems: 'center', gap: '10px',
                 padding: '10px 12px', borderRadius: 'var(--radius-md)',
                 background: bg,
                 border: border,
-                cursor: 'pointer', transition: 'all 0.2s ease'
+                boxShadow: isPerfect ? '0 0 10px rgba(255, 215, 0, 0.08)' : 'none',
+                cursor: 'pointer', transition: 'all 0.2s ease',
+                position: 'relative', overflow: 'hidden'
             }}
         >
+            {isPerfect && (
+                <>
+                    <Star className="sparkle-icon" size={10} fill="#FFD700" style={{ top: '10%', left: '15%', animationDelay: '0s' }} />
+                    <Star className="sparkle-icon" size={8} fill="#FFD700" style={{ top: '60%', left: '40%', animationDelay: '1.2s' }} />
+                    <Star className="sparkle-icon" size={12} fill="#FFD700" style={{ top: '25%', right: '20%', animationDelay: '2.5s' }} />
+                    <Star className="sparkle-icon" size={7} fill="#FFD700" style={{ bottom: '15%', right: '10%', animationDelay: '3.8s' }} />
+                </>
+            )}
             {/* Rank */}
             <span style={{
                 width: '28px', textAlign: 'center',
@@ -90,6 +107,14 @@ export function LeaderboardRow({
                             </span>
                         );
                     })}
+                    {isPerfect && (
+                        <Star 
+                            size={12} 
+                            color="#fbbf24" 
+                            fill="#fbbf24" 
+                            style={{ filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.5))' }} 
+                        />
+                    )}
                     {entry.lastActiveDay === todayStr && <Shield size={12} color="#10b981" />}
                 </div>
             </div>

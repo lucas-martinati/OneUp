@@ -17,7 +17,7 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
 
     // ── Context consumption ──
     const cloudAuth = useAuth();
-    const { cloudSyncAPI: cloudSync } = useProgressContext();
+    const { cloudSyncAPI: cloudSync, computedStats } = useProgressContext();
     const { t } = useTranslation();
 
     const [domain, setDomain] = useState(activeSlide === 1 ? 'weights' : 'bodyweight');
@@ -211,7 +211,7 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
                         {sorted.map((entry, i) => (
                             <LeaderboardRow 
                                 key={entry.uid}
-                                entry={entry}
+                                entry={entry.uid === currentUid ? { ...entry, isPerfectToday: computedStats.isPerfectToday } : entry}
                                 rank={getRank(i)}
                                 isMe={entry.uid === currentUid}
                                 reps={getReps(entry)}
