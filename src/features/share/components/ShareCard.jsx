@@ -314,6 +314,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
               border: streakActive
                 ? '1px solid rgba(249,115,22,0.35)'
                 : '1px solid rgba(255,255,255,0.08)',
+              transition: 'all 0.3s ease',
             }}>
               <Flame size={20} color={streakActive ? '#f97316' : '#888'} fill={streakActive ? '#f97316' : 'none'} />
               <span style={{
@@ -329,6 +330,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
               background: `linear-gradient(135deg, ${currentTheme.accent}33, ${currentTheme.accent}26)`,
               border: `1px solid ${currentTheme.accent}33`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'all 0.3s ease',
             }}>
               <Flame size={18} color={currentTheme.accent} />
             </div>
@@ -388,11 +390,13 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
           {isGlobal ? (
             <>
               {options.showVolume && (
-                <>
-                  <MetricCard icon={EXERCISE_ICONS.Zap} value={totalReps.toLocaleString()} label={t('stats.totalReps', 'Total reps')} color="#fbbf24" />
-                  <MetricCard icon={SHARE_ICONS.Target} value={totalDays} label={t('leaderboard.activeDays', 'Active days')} color="#34d399" />
-                  <MetricCard icon={SOCIAL_ICONS.Award} value={`${maxStreak}j`} label={t('common.bestStreak', 'Best streak')} color="#8b5cf6" />
-                </>
+                <MetricCard icon={EXERCISE_ICONS.Zap} value={totalReps.toLocaleString()} label={t('stats.totalReps', 'Total reps')} color="#fbbf24" />
+              )}
+              {options.showExercises && (
+                <MetricCard icon={SHARE_ICONS.Target} value={totalDays} label={t('leaderboard.activeDays', 'Active days')} color="#34d399" />
+              )}
+              {options.showDuration && (
+                <MetricCard icon={SOCIAL_ICONS.Award} value={`${maxStreak}j`} label={t('common.bestStreak', 'Best streak')} color="#818cf8" />
               )}
             </>
           ) : (

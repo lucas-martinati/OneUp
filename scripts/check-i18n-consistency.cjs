@@ -126,6 +126,7 @@ if (interLangDuplicates.length > 0) {
   console.log('  ✓ No inter-language duplicates found.\n');
 }
 
+/**
 // 5. Clés avec des valeurs identiques (Doublons locaux)
 console.log('=== 5. LOCAL DUPLICATE VALUES (Per language, excluding inter-language duplicates) ===\n');
 let noDuplicates = true;
@@ -155,3 +156,4 @@ for (const lang of LANGUAGES) {
   }
 }
 if (noDuplicates) console.log('  ✓ No local duplicate values found.\n');
+*/
