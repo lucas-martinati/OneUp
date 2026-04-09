@@ -42,7 +42,7 @@ export function ClanModal({ onClose }) {
             setIsLoading(false);
         };
         fetchClans();
-    }, [cloudAuth?.isSignedIn]);
+    }, [cloudAuth?.isSignedIn, cloudSync]);
 
     // Back handler
     useEffect(() => {

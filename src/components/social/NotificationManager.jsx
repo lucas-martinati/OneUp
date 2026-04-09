@@ -71,7 +71,7 @@ export function NotificationManager() {
             if (unsubscribe) unsubscribe();
             authUnsub();
         };
-    }, []);
+    }, [cloudSync]);
 
     const dismissToast = (id) => {
         cloudSync.deleteNotification(id);
