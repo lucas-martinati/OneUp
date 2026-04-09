@@ -391,7 +391,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
                 <>
                   <MetricCard icon={EXERCISE_ICONS.Zap} value={totalReps.toLocaleString()} label={t('stats.totalReps', 'Total reps')} color="#fbbf24" />
                   <MetricCard icon={SHARE_ICONS.Target} value={totalDays} label={t('leaderboard.activeDays', 'Active days')} color="#34d399" />
-                  <MetricCard icon={SOCIAL_ICONS.Award} value={`${maxStreak}j`} label={t('stats.bestStreak', 'Best streak')} color="#8b5cf6" />
+                  <MetricCard icon={SOCIAL_ICONS.Award} value={`${maxStreak}j`} label={t('common.bestStreak', 'Best streak')} color="#8b5cf6" />
                 </>
               )}
             </>

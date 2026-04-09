@@ -58,7 +58,7 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
           WebkitBackgroundClip: 'text', backgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
         }}>
-          {t('share.title', 'Partager')}
+          {t('common.share', 'Partager')}
         </h2>
         <button onClick={onClose} style={{
           background: 'rgba(255,255,255,0.1)', border: 'none',
@@ -145,7 +145,7 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
         >
           {isExporting ? <Loader2 size={18} className="spin" /> : <Share2 size={18} />}
           {canShareNatively()
-            ? t('share.share', 'Partager')
+            ? t('common.share', 'Partager')
             : t('share.download', 'Télécharger')}
         </button>
       </div>

@@ -190,7 +190,7 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
                             borderTopColor: '#fbbf24', borderRadius: '50%',
                             animation: 'spin 0.8s linear infinite'
                         }} />
-                        <span style={{ fontSize: '0.85rem' }}>{t('leaderboard.loading')}</span>
+                        <span style={{ fontSize: '0.85rem' }}>{t('common.loading')}</span>
                     </div>
                 ) : sorted.length === 0 ? (
                     <div style={{

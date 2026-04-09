@@ -286,7 +286,7 @@ export async function getPurchaseHistory() {
 
     const getProductDetails = (identifier) => {
       if (identifier?.includes('supporter')) return { titleKey: 'supporter.historyTitle', descKey: 'supporter.historyDesc' };
-      if (identifier?.includes('pro')) return { titleKey: 'pro.historyTitle', descKey: 'pro.historyDesc' };
+      if (identifier?.includes('pro')) return { titleKey: 'pro.title', descKey: 'pro.historyDesc' };
       return { titleKey: 'store.historyTitle', descKey: 'store.historyDesc' };
     };
 

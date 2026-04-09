@@ -458,7 +458,7 @@ export function RoutineManager({
                     }}
                 >
                     <Save size={20} />
-                    {t('routines.save')}
+                    {t('common.save')}
                 </button>
             </div>
         </div>

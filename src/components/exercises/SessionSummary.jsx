@@ -171,7 +171,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                                 <Check size={14} color="#10b981" />
                                 <span style={{
                                     fontSize: '0.75rem', fontWeight: '700', color: '#10b981'
-                                }}>{ex.type === 'timer' ? `${ex.goal}s` : t('workout.reps', { count: ex.goal })}</span>
+                                }}>{ex.type === 'timer' ? `${ex.goal}s` : t('common.repsCount', { count: ex.goal })}</span>
                             </div>
                         </div>
                     );

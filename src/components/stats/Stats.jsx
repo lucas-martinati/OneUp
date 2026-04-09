@@ -280,7 +280,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 }}>
                     <Award size={24} color="#fbbf24" style={{ marginBottom: '6px' }} />
                     <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fbbf24', lineHeight: 1 }}>{maxStreak}</div>
-                    <div style={statLabelStyle}>{t('stats.bestStreak')}</div>
+                    <div style={statLabelStyle}>{t('common.bestStreak')}</div>
                 </div>
                 <div className="glass-premium scale-in" style={{
                     ...statCardStyle('rgba(16,185,129,0.15)', 'rgba(5,150,105,0.15)'),
@@ -323,7 +323,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                     <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#ec4899', lineHeight: 1 }}>
                         {perfectDays}
                     </div>
-                    <div style={statLabelStyle}>{t('stats.perfectDays')}</div>
+                    <div style={statLabelStyle}>{t('common.perfectDays')}</div>
                 </div>
             </div>
 

@@ -128,7 +128,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                             minHeight: 'var(--touch-min)'
                         }}
                     >
-                        {t('counter.next')} <ChevronRight size={16} />
+                        {t('common.next')} <ChevronRight size={16} />
                     </button>
                 )}
                 <button
@@ -260,7 +260,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                     </div>
                 ) : (
                     <div style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
-                        {t('counter.remaining', { count: remaining, exercise: exerciseLabel.toLowerCase() })}
+                        {t('common.remaining', { count: remaining })}
                     </div>
                 )}
 

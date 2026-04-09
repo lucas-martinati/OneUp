@@ -68,7 +68,7 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
                 {getExerciseLabel(ex, t)}
             </span>
             <span style={{ fontSize: '0.6rem', opacity: 0.6 }}>
-                {ex.done ? t('workout.completed') : (ex.type === 'timer' ? `${ex.goal - ex.count}s` : t('workout.remaining', { count: ex.goal - ex.count }))}
+                {ex.done ? t('common.completed') : (ex.type === 'timer' ? `${ex.goal - ex.count}s` : t('common.remaining', { count: ex.goal - ex.count }))}
             </span>
         </button>
     );

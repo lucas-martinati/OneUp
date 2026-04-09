@@ -127,7 +127,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                             minHeight: 'var(--touch-min)'
                         }}
                     >
-                        {t('timer.next')} <ChevronRight size={16} />
+                        {t('common.next')} <ChevronRight size={16} />
                     </button>
                 )}
                 <button

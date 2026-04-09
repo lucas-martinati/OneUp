@@ -87,7 +87,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
 
       <OptionRow
         icon={isGlobal ? Award : Clock}
-        label={isGlobal ? t('stats.bestStreak', 'Best streak') : t('share.duration', 'Dur\u00e9e')}
+        label={isGlobal ? t('common.bestStreak', 'Best streak') : t('share.duration', 'Dur\u00e9e')}
         color="#818cf8"
         checked={options.showDuration}
         onToggle={() => toggleOption('showDuration')}

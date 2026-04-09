@@ -145,7 +145,7 @@ export function ClanModal({ onClose }) {
                 position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.92)',
                 zIndex: Z_INDEX.TOAST, display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>
-                <div style={{ color: 'var(--text-secondary)' }}>{t('clan.loading')}</div>
+                <div style={{ color: 'var(--text-secondary)' }}>{t('common.loading')}</div>
             </div>
         );
     }
@@ -256,7 +256,7 @@ export function ClanModal({ onClose }) {
                                         type="text"
                                         value={pseudoInput}
                                         onChange={(e) => setPseudoInput(e.target.value)}
-                                        placeholder={t('clan.yourPseudo')}
+                                        placeholder={t('common.yourPseudo')}
                                         maxLength={20}
                                         style={{
                                             width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)',
@@ -291,7 +291,7 @@ export function ClanModal({ onClose }) {
                                 fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                                 opacity: isLoading ? 0.7 : 1
                             }}>
-                                {isLoading ? t('clan.loadingBtn') : view === 'create' ? t('clan.createButton') : t('clan.join')}
+                                {isLoading ? t('common.loading') : view === 'create' ? t('clan.createButton') : t('clan.join')}
                             </button>
                             <button onClick={() => setView('menu')} style={{
                                 width: '100%', padding: '12px', background: 'transparent', border: 'none',

@@ -285,13 +285,13 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                 flex: 1, padding: '14px', borderRadius: 'var(--radius-md)',
                 background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
                 color: 'var(--text-primary)', fontSize: '1rem', fontWeight: '600'
-              }}>{t('customExercises.cancel')}</button>
+              }}>{t('common.cancel')}</button>
               
               <button onClick={handleCreate} style={{
                 flex: 1, padding: '14px', borderRadius: 'var(--radius-md)',
                 background: '#8b5cf6', border: 'none',
                 color: 'white', fontSize: '1rem', fontWeight: '700'
-              }}>{t('customExercises.save')}</button>
+              }}>{t('common.save')}</button>
             </div>
           </div>
         )}
@@ -339,7 +339,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                   color: 'white', fontWeight: '700'
                 }}
               >
-                {t('customExercises.cancel')}
+                {t('common.cancel')}
               </button>
               <button 
                 onClick={() => {
@@ -352,7 +352,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                   background: '#ef4444', border: 'none', color: 'white', fontWeight: '700'
                 }}
               >
-                {t('customExercises.delete')}
+                {t('common.delete')}
               </button>
             </div>
           </div>

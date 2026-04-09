@@ -461,7 +461,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
 
                 <SettingRow
                     icon={Users}
-                    title={t('settings.leaderboard')}
+                    title={t('leaderboard.title')}
                     description={t('settings.leaderboardDesc')}
                     color="#fbbf24"
                     isLast={!settings.leaderboardEnabled}
@@ -492,7 +492,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                 const newSettings = { ...settings, leaderboardPseudo: e.target.value.slice(0, 20) };
                                 onSave(newSettings);
                             }}
-                            placeholder={cloudAuth?.user?.displayName || t('settings.yourPseudo')}
+                            placeholder={cloudAuth?.user?.displayName || t('common.yourPseudo')}
                             maxLength={20}
                             style={{
                                 width: '100%', padding: '12px 16px',
@@ -554,7 +554,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                 overflow: 'hidden',
                 flexShrink: 0
             }}>
-                <h3 style={{ ...sectionTitleStyle, color: isMultiplierUnlocked ? '#ef4444' : 'var(--text-secondary)' }}>{t('settings.difficulty')}</h3>
+                <h3 style={{ ...sectionTitleStyle, color: isMultiplierUnlocked ? '#ef4444' : 'var(--text-secondary)' }}>{t('common.difficulty')}</h3>
 
                 <div style={{ marginBottom: '16px' }}>
                     <div style={{

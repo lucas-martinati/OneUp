@@ -239,7 +239,7 @@ export function CloudSyncPanel({
       {authState.loading ? (
         <div className="cloud-sync-loading">
           <Cloud className="pulse-animation" />
-          <span>{t('cloud.loading')}</span>
+          <span>{t('common.loading')}</span>
         </div>
       ) : authState.isSignedIn ? (
         <div className="cloud-sync-content">
@@ -309,7 +309,7 @@ export function CloudSyncPanel({
                       <Trash2 />
                     </div>
                   </div>
-                  <h3>{t('cloud.deleteTitle')}</h3>
+                  <h3>{t('cloud.deleteAccount')}</h3>
                   <p>
                     <Trans i18nKey="cloud.deleteWarning">
                       Cette action est <strong>irréversible</strong>. Toutes vos données seront
@@ -349,7 +349,7 @@ export function CloudSyncPanel({
                       ) : (
                         <>
                           <Trash2 size={16} />
-                          {t('cloud.deleteConfirm')}
+                          {t('common.delete')}
                         </>
                       )}
                     </button>

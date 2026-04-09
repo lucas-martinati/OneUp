@@ -71,7 +71,7 @@ export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 
 
   const defaultLabel = isStats
     ? t('share.shareCard', 'Partager mes statistiques')
-    : isCompact ? t('share.share', 'Partager') : undefined;
+    : isCompact ? t('common.share', 'Partager') : undefined;
 
   return (
     <>

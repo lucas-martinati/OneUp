@@ -434,7 +434,7 @@ export function CustomProgramPanel({
               fontSize: '1rem', fontWeight: '700', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
             }}>
-              <Check size={20} /> {t('customProgram.save')}
+              <Check size={20} /> {t('common.save')}
             </button>
 
             {/* Delete button (edit mode only) */}
@@ -449,7 +449,7 @@ export function CustomProgramPanel({
                 color: '#ef4444', fontSize: '0.9rem', fontWeight: '700', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}>
-                <Trash2 size={18} /> {t('customProgram.delete')}
+                <Trash2 size={18} /> {t('common.delete')}
               </button>
             )}
           </div>
