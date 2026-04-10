@@ -11,7 +11,7 @@ import styles from './DashboardNavBar.module.css';
  * thumb reach, with the Session action as the elevated central button.
  */
 export const DashboardNavBar = React.memo(({
-    selectedExercise, activeCategoryColor, isDay100
+    selectedExercise, activeCategoryColor
 }) => {
     const { t } = useTranslation();
     const openModal = useUIStore(s => s.openModal);
@@ -35,7 +35,7 @@ export const DashboardNavBar = React.memo(({
     );
 
     return (
-        <nav className={`${styles.navBar} ${isDay100 ? 'day100-actions' : ''}`}>
+        <nav className={`${styles.navBar} dashboard-nav-bar`}>
             {navItem('calendar', CalendarIcon, t('dashboard.calendar'))}
             {navItem('stats', PieChart, t('stats.title'))}
 

@@ -16,7 +16,7 @@ import { useUIStore } from '../../../store/useUIStore';
 const selectedExercise = { color: '#8b5cf6', gradient: ['#7c3aed', '#8b5cf6'] };
 
 const renderNavBar = (props = {}) => render(
-  <DashboardNavBar selectedExercise={selectedExercise} activeCategoryColor={null} isDay100={false} {...props} />
+  <DashboardNavBar selectedExercise={selectedExercise} activeCategoryColor={null} {...props} />
 );
 
 beforeEach(() => {
@@ -64,7 +64,7 @@ describe('DashboardNavBar', () => {
 
     useUIStore.setState({ sessionInProgress: true });
     rerender(
-      <DashboardNavBar selectedExercise={selectedExercise} activeCategoryColor={null} isDay100={false} />
+      <DashboardNavBar selectedExercise={selectedExercise} activeCategoryColor={null} />
     );
     expect(container.querySelector('[class*="sessionDot"]')).not.toBe(null);
   });

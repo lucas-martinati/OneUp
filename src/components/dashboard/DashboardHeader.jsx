@@ -5,7 +5,7 @@ import { Card, IconButton } from '../ui';
 
 export const DashboardHeader = React.memo(({
     isAdmin,
-    streakActive, displayStreak, selectedExercise, totalReps, isDay100
+    streakActive, displayStreak, selectedExercise, totalReps
 }) => {
     const openModal = useUIStore(s => s.openModal);
 
@@ -74,7 +74,7 @@ export const DashboardHeader = React.memo(({
 
     return (
         <Card as="header" ref={headerRef} variant="glass" padding="none"
-            className={isDay100 ? 'day100-header' : ''}
+            className="dashboard-header"
             style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 padding: 'clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 20px)',
@@ -90,10 +90,9 @@ export const DashboardHeader = React.memo(({
                     />
                 )}
                 {showText && (
-                    <span style={{ 
-                        fontWeight: '800', fontSize: 'clamp(1.1rem, 2.5vh, 1.5rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0,
-                        ...(isDay100 ? { fontFamily: "'Courier New', monospace", color: '#ef4444', textShadow: '0 0 8px rgba(239,68,68,0.5)' } : {})
-                    }}>{isDay100 ? 'HACKED' : 'OneUp'}</span>
+                    <span className="app-logo-text" style={{ 
+                        fontWeight: '800', fontSize: 'clamp(1.1rem, 2.5vh, 1.5rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0
+                    }}>OneUp</span>
                 )}
             </div>
 

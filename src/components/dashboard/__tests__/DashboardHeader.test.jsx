@@ -20,7 +20,6 @@ const baseProps = {
   displayStreak: 7,
   selectedExercise,
   totalReps: 1234,
-  isDay100: false,
 };
 
 beforeEach(() => {
@@ -51,11 +50,6 @@ describe('DashboardHeader', () => {
     const { getByRole } = render(<DashboardHeader {...baseProps} isAdmin={true} />);
     fireEvent.click(getByRole('button', { name: 'Admin Panel' }));
     expect(useUIStore.getState().modals.admin).toBe(true);
-  });
-
-  it('renders the HACKED title on day 100', () => {
-    const { getByText } = render(<DashboardHeader {...baseProps} isDay100={true} />);
-    expect(getByText('HACKED')).toBeTruthy();
   });
 
   it('renders the OneUp title normally', () => {

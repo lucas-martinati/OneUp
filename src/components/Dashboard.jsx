@@ -8,7 +8,7 @@ import { DashboardHeader } from './dashboard/DashboardHeader';
 import { DashboardNavBar } from './dashboard/DashboardNavBar';
 import { SessionBubble } from './dashboard/SessionBubble';
 import { CategoryNav } from './dashboard/CategoryNav';
-import { Day100Overlay, Day100HackModal, Day100UnhackAnimation, useDay100Logic } from '../features/events/Day100Event';
+import { Day100EventManager } from '../features/events/Day100Event';
 import { useAchievementToast } from '../hooks/useAchievementToast';
 import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../config/categories';
 import { useBackHandler } from '../hooks/useBackHandler';
@@ -195,23 +195,6 @@ export function Dashboard() {
 
     const effectiveStart = userStartDate || startDate;
     const isFuture = today < effectiveStart;
-    const isDay100 = dayNumber === 100;
-
-    // ── Day 100 hack event flow ──
-    const isDayPerfectStandard = useMemo(() => {
-        if (!isDay100) return false;
-        return EXERCISES.length > 0 && EXERCISES.every(ex => {
-            const count = getExerciseCount(today, ex.id);
-            const exDiff = getConfig(ex.id, today).difficulty;
-            const goal = getDailyGoal(ex, dayNumber, exDiff);
-            return completions[today]?.[ex.id]?.isCompleted || count >= goal;
-        });
-    }, [isDay100, today, completions, dayNumber, getExerciseCount, getConfig]);
-
-    const {
-        hackActive, showDay100Modal, showUnhackAnim, day100Unhacked,
-        handleDay100ModalDismiss, handleUnhackComplete
-    } = useDay100Logic(dayNumber, isDayPerfectStandard);
 
     useBackHandler(closeTopModal, anyModalOpen);
 
@@ -244,11 +227,15 @@ export function Dashboard() {
                 reducedParticles={settings?.performanceMode === 'low'}
             />
             {AchievementToastComponent}
-            {showDay100Modal && <Day100HackModal onDismiss={handleDay100ModalDismiss} />}
-            {showUnhackAnim && <Day100UnhackAnimation onComplete={handleUnhackComplete} />}
-            {hackActive && <Day100Overlay />}
+            <Day100EventManager
+                dayNumber={dayNumber}
+                today={today}
+                getExerciseCount={getExerciseCount}
+                getConfig={getConfig}
+                completions={completions}
+            />
 
-            <div className={`flex-col full-height fade-in gap-responsive ${hackActive ? 'day100-global day100-flicker' : ''} ${day100Unhacked ? 'day100-unhacking' : ''}`} style={{
+            <div className="flex-col full-height fade-in gap-responsive" style={{
                 paddingBottom: 'clamp(1px, 0.3vh, 6px)'
             }}>
                 <DashboardHeader
@@ -257,7 +244,6 @@ export function Dashboard() {
                     displayStreak={computedStats.displayStreak}
                     selectedExercise={selectedExercise}
                     totalReps={totalReps}
-                    isDay100={hackActive}
                 />
 
                 {sessionInProgress && !anyModalOpen && (
@@ -283,7 +269,6 @@ export function Dashboard() {
                             isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
                             isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
                             classicSelected={classicSelected} weightsSelected={weightsSelected} customSelected={customSelected} userCatSelected={userCatSelected} handleSelectExercise={handleSelectExercise}
-                            hackActive={hackActive}
                             customCategories={customCategories}
                         />
                     </div>
@@ -300,7 +285,6 @@ export function Dashboard() {
                 <DashboardNavBar
                     selectedExercise={selectedExercise}
                     activeCategoryColor={fullCategoryColors[fullCategoryOrder[effectiveSlide]]}
-                    isDay100={hackActive}
                 />
 
                 <DashboardModals

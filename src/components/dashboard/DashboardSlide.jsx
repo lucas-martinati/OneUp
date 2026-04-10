@@ -14,7 +14,7 @@ import styles from './DashboardSlide.module.css';
 export const DashboardSlide = React.memo(({
     isFuture, effectiveStart, dayNumber, today, getExerciseCount, completions, computedStats,
     isCounterTransitioning, prevDayNumber, pauseCloudSync, setShowCounter,
-    activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, categoryColor, onManageCustom, onManageCategories, isDay100, getConfig
+    activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, categoryColor, onManageCustom, onManageCategories, getConfig
 }) => {
     const { t, i18n } = useTranslation();
     const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
@@ -51,7 +51,7 @@ export const DashboardSlide = React.memo(({
 
     return (
         <div
-            className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative hide-scrollbar gap-responsive ${isDay100 ? 'dashboard-glitch-bg' : (isDayPerfect ? styles.goldBg : '')}`}
+            className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative hide-scrollbar gap-responsive dashboard-slide-bg ${isDayPerfect ? styles.goldBg : ''}`}
             style={{
                 paddingTop: title ? 'var(--dashboard-slide-padding-top, clamp(6px, 1vh, 12px))' : '0',
                 transition: 'all 0.6s ease-in-out',
@@ -120,44 +120,39 @@ export const DashboardSlide = React.memo(({
                         <div style={{
                             fontSize: 'var(--day-label-size, clamp(0.75rem, 1.6vh, 1rem))',
                             lineHeight: 1.2,
-                            color: isDay100 ? '#ef4444' : (isDayPerfect ? '#ffdf00' : 'var(--text-secondary)'),
+                            color: isDayPerfect ? '#ffdf00' : 'var(--text-secondary)',
                             textTransform: 'uppercase', letterSpacing: '4px',
                             marginBottom: '2px', fontWeight: '700',
-                            textShadow: isDay100 ? '0 0 10px rgba(239, 68, 68, 0.8)' : (isDayPerfect ? '0 0 8px rgba(255,223,0,0.4)' : 'none'),
-                            fontFamily: isDay100 ? 'monospace' : 'inherit'
-                        }} className={isDay100 ? 'hacked-title' : ''}>
-                            {isDay100 ? 'SYSTEM_OVERRIDE' : t('dashboard.day')}
+                            textShadow: isDayPerfect ? '0 0 8px rgba(255,223,0,0.4)' : 'none',
+                        }} className="day-label">
+                            <span className="day-label-text">{t('dashboard.day')}</span>
                         </div>
 
                         {/* Big animated day number */}
-                        <div className="flex-center pos-relative overflow-hidden" style={{
+                        <div className="flex-center pos-relative overflow-hidden day-number-container" style={{
                             height: 'var(--day-num-height, clamp(2.4rem, 8vh, 6.5rem))',
                             marginBottom: 'clamp(2px, 0.4vh, 6px)',
-                            filter: isDay100 ? 'drop-shadow(0 0 15px rgba(239,68,68,0.4))' : (isDayPerfect ? 'drop-shadow(0 0 15px rgba(251,191,36,0.2))' : 'none')
+                            filter: isDayPerfect ? 'drop-shadow(0 0 15px rgba(251,191,36,0.2))' : 'none'
                         }}>
                             {isCounterTransitioning && prevDayNumber && (
-                                <div className={isDay100 ? 'glitch-text' : (isDayPerfect ? 'gold-text' : 'rainbow-gradient')} style={{
+                                <div className={`day-number-anim ${isDayPerfect ? 'gold-text' : 'rainbow-gradient'}`} style={{
                                     position: 'absolute', fontSize: 'var(--day-num-font-size, clamp(2.2rem, 7.5vh, 6rem))', fontWeight: '800', lineHeight: 1,
-                                    animation: isDay100
-                                        ? 'textGlitch 0.6s infinite, counterSlideDown 1s ease-out forwards'
-                                        : (isDayPerfect
+                                    animation: isDayPerfect
                                             ? 'gradientShift 4s ease infinite, counterSlideDown 1s ease-out forwards'
-                                            : 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards')
+                                            : 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards'
                                 }}>
                                     {prevDayNumber}
                                 </div>
                             )}
                             <div
                                 key={dayNumber}
-                                className={isDay100 ? 'glitch-text' : (isDayPerfect ? 'gold-text' : 'rainbow-gradient')}
-                                data-text={isDay100 ? dayNumber : undefined}
+                                className={`day-number ${isDayPerfect ? 'gold-text' : 'rainbow-gradient'}`}
+                                data-text={dayNumber}
                                 style={{
                                     fontSize: 'var(--day-num-font-size, clamp(2.2rem, 7.5vh, 6rem))', fontWeight: '800', lineHeight: 1,
-                                    animation: isDay100
-                                        ? (isCounterTransitioning ? 'textGlitch 0.6s infinite, counterSlideUp 1s ease-out' : 'textGlitch 0.6s infinite')
-                                        : (isCounterTransitioning
+                                    animation: isCounterTransitioning
                                             ? (isDayPerfect ? 'gradientShift 4s ease infinite, counterSlideUp 1s ease-out' : 'rainbowFlow 6s ease infinite, counterSlideUp 1s ease-out')
-                                            : (isDayPerfect ? 'gradientShift 4s ease infinite, numberRoll 0.5s ease-out' : 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out'))
+                                            : (isDayPerfect ? 'gradientShift 4s ease infinite, numberRoll 0.5s ease-out' : 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out')
                                 }}
                             >
                                 {dayNumber}
@@ -181,7 +176,6 @@ export const DashboardSlide = React.memo(({
                                 completions={completions}
                                 computedStats={computedStats}
                                 onSelect={onSelectExercise}
-                                isDay100={isDay100}
                                 getConfig={getConfig}
                             />
                         ))}
@@ -201,7 +195,7 @@ export const DashboardSlide = React.memo(({
                                 transition: 'background 0.6s ease'
                             }} />
                             {/* Year progress ring */}
-                            <svg viewBox="0 0 100 100" className={isDay100 ? 'day100-ring' : ''} style={{
+                            <svg viewBox="0 0 100 100" className="progress-ring-svg" style={{
                                 position: 'absolute', top: '50%', left: '50%',
                                 transform: 'translate(-50%, -50%)',
                                 width: '100%', height: '100%',
@@ -231,7 +225,7 @@ export const DashboardSlide = React.memo(({
                             <button
                                 aria-label={`${getExerciseLabel(safeSelectedExercise)} counter`}
                                 onClick={() => { pauseCloudSync?.(); setShowCounter(true); }}
-                                className={`ripple ${isDay100 ? 'hacked-button' : ''}`}
+                                className="ripple counter-button"
                                 style={{
                                     width: '100%', height: '100%', borderRadius: '50%',
                                     background: isExerciseDone
@@ -335,7 +329,7 @@ export const DashboardSlide = React.memo(({
 
 const ExerciseButton = React.memo(({
     ex, isActive, dayNumber, today,
-    getExerciseCount, completions, computedStats, onSelect, isDay100, getConfig
+    getExerciseCount, completions, computedStats, onSelect, getConfig
 }) => {
     const statsEx = computedStats.exerciseStats?.find(e => e.id === ex.id);
     const exStreak = statsEx ? statsEx.streak : 0;
@@ -349,7 +343,7 @@ const ExerciseButton = React.memo(({
     return (
         <button
             onClick={() => onSelect(ex.id)}
-            className={`hover-lift ${isDay100 ? 'day100-exercise-btn' : ''}`}
+            className="hover-lift exercise-button"
             style={{
                 flex: '1 1 calc(33.333% - 8px)',
                 minWidth: 'clamp(60px, 18vw, 100px)',

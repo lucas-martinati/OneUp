@@ -24,7 +24,6 @@ export function DashboardSlideRenderer({
     isFuture, effectiveStart, dayNumber, today,
     isCounterTransitioning, prevDayNumber,
     classicSelected, weightsSelected, customSelected, userCatSelected, handleSelectExercise,
-    hackActive,
     customCategories
 }) {
     const { t } = useTranslation();
@@ -69,7 +68,6 @@ export function DashboardSlideRenderer({
                         pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                         activeExerciseId={classicSelected} onSelectExercise={handleSelectExercise}
                         exercisesList={EXERCISES} exercisesMap={EXERCISES_MAP}
-                        isDay100={hackActive}
                         getConfig={getConfig}
                     />
                 </div>
@@ -89,7 +87,6 @@ export function DashboardSlideRenderer({
                             pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                             activeExerciseId={weightsSelected} onSelectExercise={handleSelectExercise}
                             exercisesList={WEIGHT_EXERCISES} exercisesMap={WEIGHT_EXERCISES_MAP}
-                            isDay100={hackActive}
                             getConfig={getConfig}
                         />
                     ) : (
@@ -121,7 +118,6 @@ export function DashboardSlideRenderer({
                             exercisesList={defaultCustomExercises} exercisesMap={customExercisesMap}
                             onManageCustom={() => { openCustomExercises(null); pauseCloudSync?.(); }}
                             onManageCategories={() => { openModal('categoryManager'); }}
-                            isDay100={hackActive}
                             getConfig={getConfig}
                         />
                     ) : (
@@ -154,7 +150,6 @@ export function DashboardSlideRenderer({
                             activeExerciseId={selId} onSelectExercise={handleSelectExercise}
                             exercisesList={catExercises} exercisesMap={catExMap}
                             onManageCustom={() => { openCustomExercises(catKey); pauseCloudSync?.(); }}
-                            isDay100={hackActive}
                             getConfig={getConfig}
                         />
                     ) : (

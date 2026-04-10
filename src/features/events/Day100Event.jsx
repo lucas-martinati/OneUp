@@ -7,7 +7,8 @@
  * ajouter ou retirer cet événement de l'app se fait en un seul import,
  * sans dépendances dispersées dans le projet.
  */
-import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
+import { EXERCISES, getDailyGoal } from '../../config/exercises';
 
 // ============================================================================
 // 1. STYLES CSS (Injectés uniquement pour cet événement)
@@ -22,8 +23,8 @@ const Day100Styles = () => (
           content: '';
           position: fixed;
           inset: 0;
-          background: radial-gradient(ellipse at 30% 20%, rgba(239, 68, 68, 0.06) 0%, transparent 60%),
-                      radial-gradient(ellipse at 70% 80%, rgba(14, 165, 233, 0.04) 0%, transparent 60%);
+          background: radial-gradient(ellipse at 30% 20%, rgba(239, 68, 68, 0.12) 0%, transparent 70%),
+                      radial-gradient(ellipse at 70% 80%, rgba(239, 68, 68, 0.08) 0%, transparent 60%);
           pointer-events: none;
           z-index: 0;
           animation: bgPulseHack 4s ease-in-out infinite alternate;
@@ -119,22 +120,24 @@ const Day100Styles = () => (
         }
 
         /* ── Glitch background for slides ── */
-        .dashboard-glitch-bg {
-          background: radial-gradient(circle at center, rgba(239, 68, 68, 0.06) 0%, transparent 70%);
-          position: relative;
+        .day100-global .dashboard-slide-bg {
+          background: radial-gradient(circle at center, rgba(239, 68, 68, 0.06) 0%, transparent 70%) !important;
         }
 
         /* ── Main glitch text (the "100" number) ── */
-        .glitch-text {
-          color: #ef4444;
-          text-shadow: 3px 3px #0ea5e9, -3px -3px #10b981;
-          animation: textGlitch 0.5s steps(2) infinite;
+        .day100-global .day-number,
+        .day100-global .day-number-anim {
+          color: #ef4444 !important;
+          text-shadow: 3px 3px #0ea5e9, -3px -3px #10b981 !important;
+          animation: textGlitch 0.5s steps(2) infinite !important;
           position: relative;
-          font-family: 'Courier New', monospace;
-          letter-spacing: 4px;
+          font-family: 'Courier New', monospace !important;
+          letter-spacing: 4px !important;
         }
-        .glitch-text::before,
-        .glitch-text::after {
+        .day100-global .day-number::before,
+        .day100-global .day-number::after,
+        .day100-global .day-number-anim::before,
+        .day100-global .day-number-anim::after {
           content: attr(data-text);
           position: absolute;
           top: 0;
@@ -145,13 +148,15 @@ const Day100Styles = () => (
           font-weight: inherit;
           line-height: inherit;
         }
-        .glitch-text::before {
+        .day100-global .day-number::before,
+        .day100-global .day-number-anim::before {
           color: #0ea5e9;
           animation: glitchClip1 2s steps(3) infinite;
           clip-path: inset(0 0 60% 0);
           transform: translate(-4px, -2px);
         }
-        .glitch-text::after {
+        .day100-global .day-number::after,
+        .day100-global .day-number-anim::after {
           color: #10b981;
           animation: glitchClip2 2.5s steps(3) infinite 0.3s;
           clip-path: inset(40% 0 0 0);
@@ -182,14 +187,32 @@ const Day100Styles = () => (
           100% { clip-path: inset(60% 0 0 0); transform: translate(4px, 2px); }
         }
 
-        /* ── "SYSTEM_OVERRIDE" title ── */
-        .hacked-title {
+        /* ── Text overrides via CSS (Plug & Play) ── */
+        .day100-global .app-logo-text {
+          font-family: 'Courier New', monospace !important;
           color: #ef4444 !important;
-          font-family: 'Courier New', monospace;
-          text-transform: uppercase;
+          text-shadow: 0 0 8px rgba(239, 68, 68, 0.5) !important;
+          font-size: 0 !important;
+        }
+        .day100-global .app-logo-text::after {
+          content: 'HACKED';
+          font-size: clamp(1.1rem, 2.5vh, 1.5rem);
+        }
+
+        .day100-global .day-label {
+          color: #ef4444 !important;
+          font-family: 'Courier New', monospace !important;
+          text-transform: uppercase !important;
           letter-spacing: 6px !important;
           text-shadow: 0 0 12px rgba(239, 68, 68, 0.9), 0 0 40px rgba(239, 68, 68, 0.3) !important;
-          animation: blinkHack 2s steps(8) infinite;
+          animation: blinkHack 2s steps(8) infinite !important;
+        }
+        .day100-global .day-label-text {
+          font-size: 0 !important;
+        }
+        .day100-global .day-label-text::after {
+          content: 'SYSTEM_OVERRIDE';
+          font-size: var(--day-label-size, clamp(0.75rem, 1.6vh, 1rem));
         }
 
         @keyframes blinkHack {
@@ -205,27 +228,39 @@ const Day100Styles = () => (
         }
 
         /* ── Central button hacked style ── */
-        .hacked-button {
-          border: 2.5px solid #ef4444 !important;
-          box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), 0 0 60px rgba(239, 68, 68, 0.15), inset 0 0 15px rgba(239, 68, 68, 0.25) !important;
+        .day100-global .counter-button {
+          border: 3px solid #ef4444 !important;
+          background: repeating-radial-gradient(circle, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.1) 4px, transparent 4px, transparent 8px) !important;
+          box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), inset 0 0 25px rgba(239, 68, 68, 0.4) !important;
           animation: buttonGlitch 3s infinite !important;
         }
 
+        .day100-global .counter-button span {
+          color: #ef4444 !important;
+          font-family: 'Courier New', monospace !important;
+          text-shadow: 0 0 8px rgba(239, 68, 68, 0.8) !important;
+        }
+
+        .day100-global .counter-button svg {
+          color: #ef4444 !important;
+          filter: drop-shadow(0 0 5px #ef4444) !important;
+        }
+
         @keyframes buttonGlitch {
-          0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), 0 0 60px rgba(239, 68, 68, 0.15), inset 0 0 15px rgba(239, 68, 68, 0.25); transform: scale(1); }
+          0%, 100% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), inset 0 0 25px rgba(239, 68, 68, 0.4); transform: scale(1); }
           88% { transform: scale(1) translate(0); }
-          90% { transform: scale(1.03) translate(3px, -2px); box-shadow: 0 0 35px rgba(239, 68, 68, 0.8), 0 0 80px rgba(239, 68, 68, 0.25); }
-          92% { transform: scale(0.97) translate(-4px, 3px); box-shadow: 0 0 10px rgba(14, 165, 233, 0.5); }
-          94% { transform: scale(1.02) translate(2px, 2px); box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
-          96% { transform: scale(1) translate(-1px, -1px); box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+          90% { transform: scale(1.05) translate(4px, -3px); box-shadow: 0 0 50px rgba(239, 68, 68, 0.9), inset 0 0 40px rgba(239, 68, 68, 0.6); }
+          92% { transform: scale(0.95) translate(-5px, 4px); box-shadow: 0 0 15px rgba(14, 165, 233, 0.7); }
+          94% { transform: scale(1.02) translate(3px, 3px); box-shadow: 0 0 35px rgba(239, 68, 68, 0.8); }
+          96% { transform: scale(1) translate(-2px, -2px); box-shadow: 0 0 30px rgba(239, 68, 68, 0.6); }
         }
 
         /* ── Hacked header style ── */
-        .day100-header {
+        .day100-global .dashboard-header {
           border-color: rgba(239, 68, 68, 0.3) !important;
           background: rgba(239, 68, 68, 0.04) !important;
           box-shadow: 0 0 15px rgba(239, 68, 68, 0.1), inset 0 0 30px rgba(239, 68, 68, 0.03) !important;
-          animation: headerFlicker 4s infinite;
+          animation: headerFlicker 4s infinite !important;
         }
 
         @keyframes headerFlicker {
@@ -238,30 +273,124 @@ const Day100Styles = () => (
           78% { border-color: rgba(239, 68, 68, 0.3); }
         }
 
-        /* ── Hacked exercise buttons ── */
-        .day100-exercise-btn {
-          border-color: rgba(239, 68, 68, 0.4) !important;
-          background: rgba(239, 68, 68, 0.06) !important;
+        /* ── Hacked exercise buttons (Premium Glitch Style) ── */
+        .day100-global .exercise-button {
+          border: 1px solid rgba(239, 68, 68, 0.5) !important;
+          background: repeating-linear-gradient(0deg, rgba(239, 68, 68, 0.03), rgba(239, 68, 68, 0.03) 2px, rgba(0, 0, 0, 0.3) 2px, rgba(0, 0, 0, 0.3) 4px) !important;
+          box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.15), 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+          position: relative;
+          overflow: hidden;
+          animation: exBtnCorrupt 6s steps(5) infinite !important;
+          border-radius: 4px !important; /* more geometric/terminal look */
+        }
+        
+        .day100-global .exercise-button:hover {
+          background: rgba(239, 68, 68, 0.15) !important;
+          box-shadow: inset 0 0 20px rgba(239, 68, 68, 0.4), 0 0 15px rgba(239, 68, 68, 0.5) !important;
+          border-color: #ef4444 !important;
+        }
+
+        /* Glitch overlay on hover */
+        .day100-global .exercise-button::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: rgba(14, 165, 233, 0.1);
+          opacity: 0;
+          pointer-events: none;
+        }
+        .day100-global .exercise-button:hover::after {
+          animation: tileGlitchAnim 0.3s steps(2) infinite;
+        }
+
+        @keyframes tileGlitchAnim {
+          0% { transform: translate(2px, -2px); opacity: 0.5; }
+          50% { transform: translate(-2px, 2px); opacity: 0.8; }
+          100% { transform: translate(0, 0); opacity: 0; }
+        }
+
+        /* Override all texts inside to red and monospace */
+        .day100-global .exercise-button span {
+          color: #ef4444 !important;
           font-family: 'Courier New', monospace !important;
+          text-shadow: 0 0 5px rgba(239, 68, 68, 0.5) !important;
+          letter-spacing: 1px !important;
         }
-        .day100-exercise-btn > * {
-          animation: exBtnCorrupt 4s steps(5) infinite;
+        
+        /* The count text slightly brighter */
+        .day100-global .exercise-button span:last-of-type {
+          color: #fca5a5 !important;
+          font-weight: 800 !important;
         }
+
+        /* Override icon chip background and svg color */
+        .day100-global .exercise-button > div:not(:last-child):not([class*="streak"]) {
+          background: rgba(239, 68, 68, 0.1) !important;
+          border: 1px dashed rgba(239, 68, 68, 0.4) !important;
+          border-radius: 4px !important;
+        }
+        
+        /* Ensure SVGs inherit the red corrupted color */
+        .day100-global .exercise-button svg {
+          color: #ef4444 !important;
+          stroke: #ef4444 !important;
+          filter: drop-shadow(0 0 2px #ef4444) !important;
+        }
+
+        /* Progress bar override */
+        .day100-global .exercise-button > div:last-child {
+          background: rgba(0, 0, 0, 0.5) !important;
+          height: 4px !important;
+        }
+        .day100-global .exercise-button > div:last-child > div {
+          background: #ef4444 !important;
+          box-shadow: 0 0 8px #ef4444, 0 0 15px #ef4444 !important;
+        }
+        
         @keyframes exBtnCorrupt {
-          0%, 90%, 100% { filter: none; }
-          92% { filter: hue-rotate(90deg) brightness(1.5); }
-          94% { filter: hue-rotate(-90deg) contrast(1.3); }
-          96% { filter: invert(1); }
-          98% { filter: hue-rotate(180deg); }
+          0%, 92%, 100% { filter: none; transform: none; }
+          94% { filter: hue-rotate(90deg) brightness(1.5); transform: skewX(2deg); }
+          96% { filter: hue-rotate(-90deg) contrast(1.5); transform: skewX(-2deg); }
+          98% { filter: invert(1); transform: none; }
         }
 
         /* ── Hacked bottom actions bar ── */
-        .day100-actions button {
-          border: 1px solid rgba(239, 68, 68, 0.3) !important;
-          background: rgba(239, 68, 68, 0.08) !important;
+        .day100-global .dashboard-nav-bar button {
+          border: 1px solid rgba(239, 68, 68, 0.4) !important;
+          background: rgba(239, 68, 68, 0.1) !important;
           font-family: 'Courier New', monospace !important;
           color: #ef4444 !important;
-          text-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+          text-shadow: 0 0 6px rgba(239, 68, 68, 0.4) !important;
+          box-shadow: inset 0 0 8px rgba(239, 68, 68, 0.2) !important;
+          transition: all 0.2s ease !important;
+        }
+        
+        .day100-global .dashboard-nav-bar button:hover {
+          background: rgba(239, 68, 68, 0.25) !important;
+          box-shadow: 0 0 15px rgba(239, 68, 68, 0.5), inset 0 0 12px rgba(239, 68, 68, 0.4) !important;
+          border-color: #ef4444 !important;
+        }
+        
+        .day100-global .dashboard-nav-bar span {
+          color: #ef4444 !important;
+        }
+        .day100-global .dashboard-nav-bar svg {
+          stroke: #ef4444 !important;
+          filter: drop-shadow(0 0 3px #ef4444) !important;
+        }
+        
+        /* ── Glitch Ring ── */
+        .day100-global .progress-ring-svg {
+          filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6)) !important;
+        }
+        .day100-global .progress-ring-svg circle {
+          stroke: #ef4444 !important;
+          animation: ringPulse 2s infinite !important;
+        }
+        
+        @keyframes ringPulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
         }
 
         /* ── Floating hacked messages ── */
@@ -388,7 +517,7 @@ const Day100Styles = () => (
 // ============================================================================
 // 2. HOOK LOGIQUE PRINCIPAL
 // ============================================================================
-export function useDay100Logic(dayNumber, isDayPerfectStandard) {
+function useDay100Logic(dayNumber, isDayPerfectStandard) {
     const isDay100 = dayNumber === 100;
     
     const [day100ModalShown, setDay100ModalShown] = useState(
@@ -504,7 +633,7 @@ const FLOATING_MSGS = Array.from({ length: 6 }, (_, i) => ({
     animDuration: `${5 + seeded(i, 10) * 4}s`,
 }));
 
-export const Day100Overlay = memo(() => {
+const Day100Overlay = memo(() => {
     return (
         <>
             <Day100Styles />
@@ -582,7 +711,7 @@ const TERMINAL_LINES = [
     { text: '> Le système sera restauré.', delay: 7200, color: '#0ea5e9' },
 ];
 
-export function Day100HackModal({ onDismiss }) {
+function Day100HackModal({ onDismiss }) {
     const [visibleLines, setVisibleLines] = useState(0);
     const [showButton, setShowButton] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
@@ -731,7 +860,7 @@ const PARTICLES = Array.from({ length: 60 }, (_, i) => ({
     shape: Math.floor(seeded(i, 7) * 3),
 }));
 
-export function Day100UnhackAnimation({ onComplete }) {
+function Day100UnhackAnimation({ onComplete }) {
     const [phase, setPhase] = useState('blackout');
     const [progressPct, setProgressPct] = useState(0);
 
@@ -885,5 +1014,58 @@ export function Day100UnhackAnimation({ onComplete }) {
                 </div>
             )}
         </div>
+    );
+}
+
+// ============================================================================
+// 6. MANAGER D'ÉVÉNEMENT (PLUG & PLAY)
+// ============================================================================
+export function Day100EventManager({ dayNumber, today, getExerciseCount, getConfig, completions }) {
+    const isDay100 = dayNumber === 100;
+
+    const isDayPerfectStandard = useMemo(() => {
+        if (!isDay100) return false;
+        return EXERCISES.length > 0 && EXERCISES.every(ex => {
+            const count = getExerciseCount(today, ex.id);
+            const exDiff = getConfig(ex.id, today).difficulty;
+            const goal = getDailyGoal(ex, dayNumber, exDiff);
+            return completions[today]?.[ex.id]?.isCompleted || count >= goal;
+        });
+    }, [isDay100, today, completions, dayNumber, getExerciseCount, getConfig]);
+
+    const {
+        hackActive, showDay100Modal, showUnhackAnim, day100Unhacked,
+        handleDay100ModalDismiss, handleUnhackComplete
+    } = useDay100Logic(dayNumber, isDayPerfectStandard);
+
+    useEffect(() => {
+        const root = document.getElementById('root');
+        if (!root) return;
+        
+        if (hackActive) {
+            root.classList.add('day100-global', 'day100-flicker');
+        } else {
+            root.classList.remove('day100-global', 'day100-flicker');
+        }
+        
+        if (day100Unhacked) {
+            root.classList.add('day100-unhacking');
+        } else {
+            root.classList.remove('day100-unhacking');
+        }
+
+        return () => {
+            root.classList.remove('day100-global', 'day100-flicker', 'day100-unhacking');
+        };
+    }, [hackActive, day100Unhacked]);
+
+    if (!isDay100) return null;
+
+    return (
+        <>
+            {showDay100Modal && <Day100HackModal onDismiss={handleDay100ModalDismiss} />}
+            {showUnhackAnim && <Day100UnhackAnimation onComplete={handleUnhackComplete} />}
+            {hackActive && <Day100Overlay />}
+        </>
     );
 }
