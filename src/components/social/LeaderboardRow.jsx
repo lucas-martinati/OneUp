@@ -48,6 +48,7 @@ export function LeaderboardRow({
             style={{
                 display: 'flex', alignItems: 'center', gap: '10px',
                 padding: '10px 12px', borderRadius: 'var(--radius-md)',
+                flexShrink: 0,
                 background: bg,
                 border: border,
                 boxShadow: isPerfect ? '0 0 10px rgba(255, 215, 0, 0.08)' : 'none',
