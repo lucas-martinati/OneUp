@@ -3,7 +3,7 @@ import { SettingsIcon, PieChart, Users, Shield, Flame, Trophy } from '../../util
 
 export const DashboardHeader = React.memo(({
     setShowSettings, setShowStats, setShowLeaderboard, setShowClan, pauseCloudSync,
-    streakActive, displayStreak, selectedExercise, totalReps
+    streakActive, displayStreak, selectedExercise, totalReps, isDay100
 }) => {
     const iconBtnStyle = {
         background: 'var(--surface-hover)', width: 'var(--touch-min)', height: 'var(--touch-min)',
@@ -12,7 +12,7 @@ export const DashboardHeader = React.memo(({
     };
 
     return (
-        <header className="glass" style={{
+        <header className={`glass ${isDay100 ? 'day100-header' : ''}`} style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             padding: 'clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 20px)', borderRadius: 'var(--radius-lg)',
             boxShadow: 'var(--shadow-md)', minWidth: 0,
@@ -25,7 +25,10 @@ export const DashboardHeader = React.memo(({
                     className="bounce-on-hover hide-logo-mobile"
                     style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', objectFit: 'cover', cursor: 'pointer', transition: 'transform 0.3s ease' }}
                 />
-                <span className="hide-text-mobile" style={{ fontWeight: '600', fontSize: 'clamp(0.8rem, 1.8vh, 1.1rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>OneUp</span>
+                <span className="hide-text-mobile" style={{ 
+                    fontWeight: '600', fontSize: 'clamp(0.8rem, 1.8vh, 1.1rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    ...(isDay100 ? { fontFamily: "'Courier New', monospace", color: '#ef4444', textShadow: '0 0 8px rgba(239,68,68,0.5)' } : {})
+                }}>{isDay100 ? 'HACKED' : 'OneUp'}</span>
             </div>
 
             <div style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 1, minWidth: 0, justifyContent: 'flex-end' }}>

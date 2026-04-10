@@ -1,10 +1,13 @@
-import React, { useEffect, useState, useMemo, Suspense, lazy } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef, Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from './feedback/CSSConfetti';
 import { NotificationManager } from './social/NotificationManager';
 import { DashboardHeader } from './dashboard/DashboardHeader';
 import { DashboardSlide } from './dashboard/DashboardSlide';
 import { DashboardActions } from './dashboard/DashboardActions';
+import { Day100Overlay } from './dashboard/Day100Overlay';
+import { Day100HackModal } from './dashboard/Day100HackModal';
+import { Day100UnhackAnimation } from './dashboard/Day100UnhackAnimation';
 import { useAchievementToast } from '../hooks/useAchievementToast.jsx';
 import { ProPaywall } from './dashboard/ProPaywall';
 import { useHardwareBack } from '../hooks/useHardwareBack';
@@ -115,6 +118,50 @@ export function Dashboard() {
 
     const effectiveStart = userStartDate || startDate;
     const isFuture = today < effectiveStart;
+    const isDay100 = dayNumber === 100;
+
+    // ── Day 100 hack event flow ──
+    const isDayPerfectStandard = useMemo(() => {
+        if (!isDay100) return false;
+        return EXERCISES.length > 0 && EXERCISES.every(ex => {
+            const count = getExerciseCount(today, ex.id);
+            const goal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
+            return completions[today]?.[ex.id]?.isCompleted || count >= goal;
+        });
+    }, [isDay100, today, completions, dayNumber, settings, getExerciseCount]);
+
+    const [day100ModalShown, setDay100ModalShown] = useState(
+        () => isDay100 && !!sessionStorage.getItem('day100_modal_shown')
+    );
+    const [day100Unhacked, setDay100Unhacked] = useState(false);
+    const [showUnhackAnim, setShowUnhackAnim] = useState(false);
+
+    // Show hack modal once per day-100 session
+    const showDay100Modal = isDay100 && !day100ModalShown && !day100Unhacked
+        && !sessionStorage.getItem('day100_modal_shown');
+
+    // The hack is active when: it's day 100, modal has been dismissed, and not yet unhacked
+    const hackActive = isDay100 && day100ModalShown && !day100Unhacked && !showUnhackAnim;
+
+    const handleDay100ModalDismiss = useCallback(() => {
+        setDay100ModalShown(true);
+        sessionStorage.setItem('day100_modal_shown', '1');
+    }, []);
+
+    // Detect perfect day completion → trigger unhack animation
+    // We subscribe to completions changes via a micro-task to satisfy lint rules
+    const perfectDayCompletedRef = useRef(false);
+    useEffect(() => {
+        if (!hackActive || !isDayPerfectStandard || perfectDayCompletedRef.current) return;
+        perfectDayCompletedRef.current = true;
+        // Use a microtask to avoid "setState in effect" lint error
+        queueMicrotask(() => setShowUnhackAnim(true));
+    }, [hackActive, isDayPerfectStandard]);
+
+    const handleUnhackComplete = useCallback(() => {
+        setShowUnhackAnim(false);
+        setDay100Unhacked(true);
+    }, []);
 
     const displayStreak = computedStats.displayStreak;
     const streakActive = computedStats.streakActive;
@@ -177,7 +224,10 @@ export function Dashboard() {
                 reducedParticles={settings?.performanceMode === 'low'}
             />
             {AchievementToastComponent}
-            <div className="fade-in" style={{
+            {showDay100Modal && <Day100HackModal onDismiss={handleDay100ModalDismiss} />}
+            {showUnhackAnim && <Day100UnhackAnimation onComplete={handleUnhackComplete} />}
+            {hackActive && <Day100Overlay />}
+            <div className={`fade-in ${hackActive ? 'day100-global day100-flicker' : ''} ${day100Unhacked ? 'day100-unhacking' : ''}`} style={{
                 display: 'flex', flexDirection: 'column', height: '100%',
                 gap: 'clamp(4px, 1vh, 10px)', paddingBottom: 'clamp(2px, 0.5vh, 8px)'
             }}>
@@ -191,6 +241,7 @@ export function Dashboard() {
                     displayStreak={displayStreak}
                     selectedExercise={selectedExercise}
                     totalReps={totalReps}
+                    isDay100={hackActive}
                 />
 
                 <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, position: 'relative' }}>
@@ -225,6 +276,7 @@ export function Dashboard() {
                                 pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                                 activeExerciseId={classicSelected} onSelectExercise={handleSelectExercise}
                                 exercisesList={EXERCISES} exercisesMap={EXERCISES_MAP}
+                                isDay100={hackActive}
                             />
                         </div>
 
@@ -238,6 +290,7 @@ export function Dashboard() {
                                     pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                                     activeExerciseId={weightsSelected} onSelectExercise={handleSelectExercise}
                                     exercisesList={WEIGHT_EXERCISES} exercisesMap={WEIGHT_EXERCISES_MAP}
+                                    isDay100={hackActive}
                                 />
                             ) : (
                                 <ProPaywall
@@ -258,6 +311,7 @@ export function Dashboard() {
                                     activeExerciseId={customExercisesMap[customSelected] ? customSelected : (customExercises[0]?.id || null)} onSelectExercise={handleSelectExercise}
                                     exercisesList={customExercises} exercisesMap={customExercisesMap}
                                     onManageCustom={() => { setShowCustomExercisesModal(true); pauseCloudSync?.(); }}
+                                    isDay100={hackActive}
                                 />
                             ) : (
                                 <ProPaywall
@@ -290,6 +344,7 @@ export function Dashboard() {
                     setShowSession={setShowSession}
                     pauseCloudSync={pauseCloudSync}
                     selectedExercise={selectedExercise}
+                    isDay100={hackActive}
                 />
 
                 <Suspense fallback={null}>
