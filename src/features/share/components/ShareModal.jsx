@@ -4,6 +4,7 @@ import { Share2, Download, X, Loader2 } from '../../../utils/icons';
 import { Z_INDEX } from '../../../utils/zIndex';
 import { ShareCard } from './ShareCard';
 import { ShareOptions } from './ShareOptions';
+import { CropModal } from './CropModal';
 import { canShareNatively } from '../services/shareService';
 import { useProgressContext } from '../../../contexts/ProgressContext';
 
@@ -13,6 +14,7 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
   const {
     cardRef, options, toggleOption, setOption, toggleCategory,
     setBackgroundImage, clearBackgroundImage,
+    originalImage, cropData, isCropModalOpen, openCropModal, closeCropModal, applyCrop,
     exportCard, shareCard, isExporting,
     sessionData, stats, sessionHistory, mode,
   } = shareHook;
@@ -99,11 +101,25 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
           toggleCategory={toggleCategory}
           setBackgroundImage={setBackgroundImage}
           clearBackgroundImage={clearBackgroundImage}
+          originalImage={originalImage}
+          cropData={cropData}
+          openCropModal={openCropModal}
           mode={mode}
           isPro={isPro}
           sessionData={sessionData}
         />
       </div>
+
+      {/* Crop Modal */}
+      {isCropModalOpen && originalImage && (
+        <CropModal
+          imageSrc={originalImage}
+          initialCrop={cropData?.crop}
+          initialZoom={cropData?.zoom}
+          onSave={applyCrop}
+          onClose={closeCropModal}
+        />
+      )}
 
       {/* Action buttons */}
       <div style={{

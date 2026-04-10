@@ -47,7 +47,7 @@ const CATEGORIES_CONFIG = [
   { key: CATEGORIES.CUSTOM, color: '#8b5cf6' },
 ];
 
-export function ShareOptions({ options, toggleOption, setOption, toggleCategory, setBackgroundImage, clearBackgroundImage, mode = 'session', isPro = false, sessionData }) {
+export function ShareOptions({ options, toggleOption, setOption, toggleCategory, setBackgroundImage, clearBackgroundImage, originalImage, cropData, openCropModal, mode = 'session', isPro = false, sessionData }) {
   const { t } = useTranslation();
   const isGlobal = mode === 'global';
   const selectedCategories = options.statsCategories || [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM];
@@ -60,7 +60,30 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
     
     const reader = new FileReader();
     reader.onload = (event) => {
-      setBackgroundImage(event.target.result);
+      const img = new window.Image();
+      img.onload = () => {
+        // Resize to reduce memory usage during export and avoid crashes
+        const MAX_DIMENSION = 1080;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+           const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+           width = width * ratio;
+           height = height * ratio;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert back to base64 with moderate quality to optimize storage
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        openCropModal(dataUrl);
+      };
+      img.src = event.target.result;
     };
     reader.readAsDataURL(file);
     e.target.value = '';
@@ -233,25 +256,50 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
           </div>
           
           {options.backgroundImage ? (
-            <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden' }}>
-              <img 
-                src={options.backgroundImage} 
-                alt="Background" 
-                style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '12px' }}
-              />
-              <button
-                onClick={clearBackgroundImage}
-                style={{
-                  position: 'absolute', top: '4px', right: '4px',
-                  width: '24px', height: '24px', borderRadius: '50%',
-                  background: 'rgba(0,0,0,0.6)', border: 'none',
-                  color: 'white', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >
-                <X size={14} />
-              </button>
-            </div>
+            <>
+              <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden' }}>
+                <img 
+                  src={options.backgroundImage} 
+                  alt="Background" 
+                  style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '12px' }}
+                />
+                <button
+                  onClick={() => {
+                    clearBackgroundImage();
+                    setOption('bgSize', undefined);
+                    setOption('bgPosX', undefined);
+                    setOption('bgPosY', undefined);
+                  }}
+                  style={{
+                    position: 'absolute', top: '4px', right: '4px',
+                    width: '24px', height: '24px', borderRadius: '50%',
+                    background: 'rgba(0,0,0,0.6)', border: 'none',
+                    color: 'white', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+
+              {originalImage && (
+                <button
+                  onClick={() => openCropModal()}
+                  style={{
+                    width: '100%', padding: '12px', borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.75rem', fontWeight: 600,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', gap: '8px',
+                    marginTop: '8px', transition: 'all 0.15s ease',
+                  }}
+                >
+                  {t('share.recropImage', 'Recadrer l\'image')}
+                </button>
+              )}
+            </>
           ) : (
             <button
               onClick={() => fileInputRef.current?.click()}

@@ -52,6 +52,28 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
   
   const [options, setOptions] = useState(getInitialOptions);
   const [isExporting, setIsExporting] = useState(false);
+  const [originalImage, setOriginalImage] = useState(null);
+  const [cropData, setCropData] = useState(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+
+  const openCropModal = useCallback((imgBase64) => {
+    if (imgBase64) setOriginalImage(imgBase64);
+    setIsCropModalOpen(true);
+  }, []);
+
+  const closeCropModal = useCallback(() => {
+    setIsCropModalOpen(false);
+  }, []);
+
+  const applyCrop = useCallback((croppedBase64, crop, zoom) => {
+    setOptions(prev => {
+      const next = { ...prev, backgroundImage: croppedBase64 };
+      localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+    setCropData({ crop, zoom });
+    setIsCropModalOpen(false);
+  }, []);
 
   const setOption = useCallback((key, value) => {
     setOptions(prev => {
@@ -97,6 +119,8 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
       localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(next));
       return next;
     });
+    setOriginalImage(null);
+    setCropData(null);
   }, []);
 
   const captureCard = useCallback(async () => {
@@ -151,6 +175,12 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
     toggleCategory,
     setBackgroundImage,
     clearBackgroundImage,
+    originalImage,
+    cropData,
+    isCropModalOpen,
+    openCropModal,
+    closeCropModal,
+    applyCrop,
     exportCard,
     shareCard,
     isExporting,

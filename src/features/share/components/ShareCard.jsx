@@ -266,9 +266,11 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
       
       <div style={{
         position: 'absolute', inset: 0,
-        background: options.backgroundImage 
-          ? `center / cover no-repeat url(${options.backgroundImage})`
-          : 'transparent',
+        backgroundColor: 'transparent',
+        backgroundImage: options.backgroundImage ? `url(${options.backgroundImage})` : 'none',
+        backgroundPosition: `${options.bgPosX ?? 50}% ${options.bgPosY ?? 50}%`,
+        backgroundSize: options.bgSize && options.bgSize !== 100 ? `${options.bgSize}%` : 'cover',
+        backgroundRepeat: 'no-repeat',
         opacity: options.backgroundImage ? 1 : 0,
         transition: 'opacity 0.5s ease',
       }} />
