@@ -87,7 +87,10 @@ exports.onRevenueCatWebhook = onRequest(async (req, res) => {
     if (entitlement_ids && entitlement_ids.length > 0) {
       entitlement_ids.forEach((entId) => {
         const key = entId.toLowerCase();
-        if (key === "pro") updatePayload.isPro = isActive;
+        if (key === "pro") {
+          updatePayload.isPro = isActive;
+          if (isActive) updatePayload.hadPro = true; // Permanently remember they had Pro
+        }
         if (key === "supporter") updatePayload.isSupporter = isActive;
       });
     } else {
