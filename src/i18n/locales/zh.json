@@ -122,7 +122,9 @@
     "buyButton": "升级 Pro",
     "price": "€1.99/月",
     "historyDesc": "自动续订",
-    "promotionalDesc": "OneUp 团队赠送"
+    "promotionalDesc": "OneUp 团队赠送",
+    "lifetimeDesc": "永久访问",
+    "oneTimeDesc": "一次性支付"
   },
   "routines": {
     "title": "我的日常训练",

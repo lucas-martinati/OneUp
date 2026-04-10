@@ -122,7 +122,9 @@
     "buyButton": "Hazte Pro",
     "price": "6,99€/mes",
     "historyDesc": "Renovación automática",
-    "promotionalDesc": "Regalo del equipo OneUp"
+    "promotionalDesc": "Regalo del equipo OneUp",
+    "lifetimeDesc": "Acceso Permanente",
+    "oneTimeDesc": "Pago único"
   },
   "routines": {
     "title": "Mis Rutinas",

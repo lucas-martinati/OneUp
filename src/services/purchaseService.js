@@ -293,12 +293,25 @@ export async function getPurchaseHistory() {
     // 1. Active & Expired Entitlements
     if (customerInfo?.entitlements?.all) {
       for (const [key, ent] of Object.entries(customerInfo.entitlements.all)) {
-        const details = getProductDetails(ent.productIdentifier);
         const rawId = ent.productIdentifier || key;
+        const details = getProductDetails(rawId);
         
-        // Use a special description for gifted/promotional access
-        const isPromotional = ent.periodType === 'PROMOTIONAL';
-        const descKey = isPromotional && rawId.includes('pro') ? 'pro.promotionalDesc' : details.descKey;
+        // Refined detection for history display
+        const isPromotional = ent.periodType === 'PROMOTIONAL' || rawId.toLowerCase().includes('promo');
+        const isLifetime = rawId.toLowerCase().includes('lifetime');
+        const isOneTime = ent.willRenew === false;
+
+        let descKey = details.descKey; // Default: 'pro.historyDesc' (Auto-renewal)
+        
+        if (rawId.includes('pro')) {
+          if (isPromotional) {
+            descKey = 'pro.promotionalDesc';
+          } else if (isLifetime) {
+            descKey = 'pro.lifetimeDesc';
+          } else if (isOneTime) {
+            descKey = 'pro.oneTimeDesc';
+          }
+        }
         
         history.push({
           id: rawId.replace(/^\$/, ''),
