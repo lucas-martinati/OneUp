@@ -483,6 +483,8 @@ export function useProgress() {
           userStartDate: merged.userStartDate || prev.userStartDate,
           completions: merged.completions || prev.completions,
           isSetup: merged.isSetup ?? prev.isSetup,
+          hasShared: merged.hasShared ?? prev.hasShared,
+          manualBadges: merged.manualBadges || prev.manualBadges,
           lastCompletionChange: Date.now(),
         };
       });

@@ -34,7 +34,7 @@ function MetricCard({ icon: Icon, value, label, color, isVisible = true }) {
       overflow: 'hidden',
       transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
     }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: 'max-content' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
         <div style={{ color: color, transition: 'color 0.5s ease' }}>
           <Icon size={18} color="currentColor" strokeWidth={2.5} />
         </div>
@@ -44,7 +44,8 @@ function MetricCard({ icon: Icon, value, label, color, isVisible = true }) {
         }}>{value}</span>
         <span style={{
           fontSize: '0.6rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)',
-          textTransform: 'uppercase', letterSpacing: '0.5px',
+          textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'center',
+          whiteSpace: 'nowrap'
         }}>{label}</span>
       </div>
     </div>
@@ -306,7 +307,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
       ref={cardRef}
       style={{
         width: '100%',
-        maxWidth: '360px',
+        maxWidth: '420px',
         borderRadius: '20px',
         overflow: 'hidden',
         fontFamily: "'Outfit', -apple-system, BlinkMacSystemFont, sans-serif",
@@ -431,8 +432,8 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
 
         {/* Session title or global label */}
         {isGlobal ? (
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%' }}>
-            <div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{
                 fontSize: '0.75rem', fontWeight: 700,
                 color: activeThemeKey === 'gold' ? '#fbbf24' : 'rgba(255,255,255,0.6)',
@@ -447,7 +448,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
                 const catColors = { bodyweight: '#34d399', weights: '#f97316', custom: '#8b5cf6' };
                 return (
                   <div style={{
-                    display: 'flex', gap: '6px', marginTop: '4px', flexWrap: 'wrap',
+                    display: 'flex', flexWrap: 'wrap', marginTop: '6px',
                   }}>
                     {cats.map(cat => (
                       <span key={cat} style={{
@@ -456,6 +457,8 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
                         padding: '2px 6px', borderRadius: '4px',
                         background: `${catColors[cat] || '#818cf8'}15`,
                         textTransform: 'uppercase', letterSpacing: '0.5px',
+                        marginRight: '6px', marginBottom: '4px', display: 'inline-block',
+                        whiteSpace: 'nowrap'
                       }}>
                         {t(`common.${cat}`, cat)}
                       </span>
@@ -472,9 +475,9 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
                 boxShadow: '0 0 10px rgba(251,191,36,0.15)',
                 color: '#fbbf24', fontSize: '0.55rem', fontWeight: 800,
                 textTransform: 'uppercase', letterSpacing: '1px',
-                display: 'flex', alignItems: 'center', gap: '4px'
+                display: 'flex', alignItems: 'center', marginLeft: 'auto', height: 'fit-content'
               }}>
-                <Award size={10} color="#fbbf24" fill="#fbbf24" />
+                <Award size={10} color="#fbbf24" fill="#fbbf24" style={{ marginRight: '4px' }} />
                 {t('common.perfectDays', 'Perfect Day')}
               </div>
             )}
