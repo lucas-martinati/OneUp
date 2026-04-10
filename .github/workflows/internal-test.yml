@@ -121,12 +121,13 @@ jobs:
 
       # ── Prepare release notes ──────────────────────────────────
       - name: Write release notes
+        env:
+          NOTES_FR: ${{ github.event.inputs.release_notes_fr }}
+          NOTES_EN: ${{ github.event.inputs.release_notes_en }}
         run: |
           mkdir -p distribution/whatsnew
-          FR_NOTES="${{ github.event.inputs.release_notes_fr }}"
-          EN_NOTES="${{ github.event.inputs.release_notes_en }}"
-          echo "${FR_NOTES:-Test interne}" > distribution/whatsnew/whatsnew-fr-FR
-          echo "${EN_NOTES:-Internal test}" > distribution/whatsnew/whatsnew-en-US
+          echo "${NOTES_FR:-Test interne}" > distribution/whatsnew/whatsnew-fr-FR
+          echo "${NOTES_EN:-Internal test}" > distribution/whatsnew/whatsnew-en-US
 
       # ── Deploy to Internal Testing ─────────────────────────────
       - name: Upload to Google Play (Internal Testing)

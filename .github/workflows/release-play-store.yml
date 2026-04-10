@@ -143,13 +143,16 @@ jobs:
       # ── Prepare release notes (if provided) ────────────────────
       - name: Write release notes
         if: ${{ github.event.inputs.release_notes_fr != '' || github.event.inputs.release_notes_en != '' }}
+        env:
+          NOTES_FR: ${{ github.event.inputs.release_notes_fr }}
+          NOTES_EN: ${{ github.event.inputs.release_notes_en }}
         run: |
           mkdir -p distribution/whatsnew
-          if [[ -n "${{ github.event.inputs.release_notes_fr }}" ]]; then
-            echo "${{ github.event.inputs.release_notes_fr }}" > distribution/whatsnew/whatsnew-fr-FR
+          if [[ -n "$NOTES_FR" ]]; then
+            echo "$NOTES_FR" > distribution/whatsnew/whatsnew-fr-FR
           fi
-          if [[ -n "${{ github.event.inputs.release_notes_en }}" ]]; then
-            echo "${{ github.event.inputs.release_notes_en }}" > distribution/whatsnew/whatsnew-en-US
+          if [[ -n "$NOTES_EN" ]]; then
+            echo "$NOTES_EN" > distribution/whatsnew/whatsnew-en-US
           fi
 
       # ── Deploy to Play Store ──────────────────────────────────
