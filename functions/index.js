@@ -53,7 +53,8 @@ exports.onRevenueCatWebhook = onRequest(async (req, res) => {
       "UNCANCELLATION",  // User resumed before expiration
       "TRANSFER",        // Subscription moved to another UI
       "EXPIRATION",
-      "CANCELLATION"     // Sandbox refunds or immediate billing error cancellations
+      "CANCELLATION",    // Sandbox refunds or immediate billing error cancellations
+      "NON_RENEWING_PURCHASE" // Action trigger when API 'Promotional' is used
     ];
 
     if (!actionableEvents.includes(type)) {
@@ -68,7 +69,7 @@ exports.onRevenueCatWebhook = onRequest(async (req, res) => {
 
     // Determine target boolean status:
     let isActive = false;
-    if (["INITIAL_PURCHASE", "RENEWAL", "UNCANCELLATION", "TRANSFER"].includes(type)) {
+    if (["INITIAL_PURCHASE", "RENEWAL", "UNCANCELLATION", "TRANSFER", "NON_RENEWING_PURCHASE"].includes(type)) {
       isActive = true;
     } else if (["EXPIRATION", "CANCELLATION"].includes(type)) {
       // For cancellations, sometimes they are immediate (like test refunds or billing errors).
