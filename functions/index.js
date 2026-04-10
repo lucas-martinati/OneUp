@@ -10,7 +10,7 @@ const db = admin.database();
  * Listens for RevenueCat subscription events and updates Firebase Realtime Database.
  * Endpoint URL: https://<REGION>-<PROJECT_ID>.cloudfunctions.net/onRevenueCatWebhook
  */
-exports.onRevenueCatWebhook = onRequest(async (req, res) => {
+exports.onRevenueCatWebhook = onRequest({ secrets: ["REVENUECAT_WEBHOOK_SECRET"] }, async (req, res) => {
   // Reject non-POST requests immediately
   if (req.method !== "POST") {
     res.status(405).send("Method Not Allowed");
