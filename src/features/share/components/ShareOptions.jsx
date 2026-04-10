@@ -106,33 +106,33 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
         textTransform: 'uppercase', letterSpacing: '1px',
         padding: '0 4px',
       }}>
-        {t('share.metrics', 'M\u00e9triques affich\u00e9es')}
+        {t('share.metrics')}
       </div>
 
       <OptionRow
         icon={isGlobal ? Award : Clock}
-        label={isGlobal ? t('common.bestStreak', 'Best streak') : t('share.duration', 'Dur\u00e9e')}
+        label={isGlobal ? t('common.bestStreak') : t('share.duration')}
         color="#818cf8"
         checked={options.showDuration}
         onToggle={() => toggleOption('showDuration')}
       />
       <OptionRow
         icon={Zap}
-        label={isGlobal ? t('stats.totalReps', 'Total reps') : t('customExercises.typeReps', 'Reps')}
+        label={isGlobal ? t('stats.totalReps') : t('customExercises.typeReps')}
         color="#fbbf24"
         checked={options.showVolume}
         onToggle={() => toggleOption('showVolume')}
       />
       <OptionRow
         icon={isGlobal ? Target : Dumbbell}
-        label={isGlobal ? t('leaderboard.activeDays', 'Active days') : t('share.exercisesCompleted', 'Exercices compl\u00e9t\u00e9s')}
+        label={isGlobal ? t('leaderboard.activeDays') : t('share.exercisesCompleted')}
         color="#34d399"
         checked={options.showExercises}
         onToggle={() => toggleOption('showExercises')}
       />
       <OptionRow
         icon={Flame}
-        label={t('achievements.categories.streak', 'Streak')}
+        label={t('achievements.categories.streak')}
         color="#ef4444"
         checked={options.showStreak}
         onToggle={() => toggleOption('showStreak')}
@@ -168,7 +168,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       )}
       <OptionRow
         icon={History}
-        label={t('share.showHistory', 'Historique des s\u00e9ances')}
+        label={t('share.showHistory')}
         color="#8b5cf6"
         checked={options.showSessionHistory}
         onToggle={() => toggleOption('showSessionHistory')}
@@ -178,7 +178,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       {!isGlobal && isPro && hasWeightExercises && (
         <OptionRow
           icon={Weight}
-          label={t('share.showWeights', 'S\u00e9parer musculation')}
+          label={t('share.showWeights')}
           color="#f97316"
           checked={options.showWeights}
           onToggle={() => toggleOption('showWeights')}
@@ -196,7 +196,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
             padding: '0 4px',
           }}>
             <Filter size={11} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            {t('share.categoryFilter', 'Cat\u00e9gorie')}
+            {t('share.categoryFilter')}
           </div>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
             {CATEGORIES_CONFIG.map(cat => {
@@ -235,7 +235,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
             padding: '0 4px',
           }}>
             <Palette size={11} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            {t('share.theme', 'Th\u00e8me')}
+            {t('share.theme')}
           </div>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
             {[
@@ -282,7 +282,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
             padding: '0 4px',
           }}>
             <Image size={11} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            {t('share.backgroundImage', 'Image de fond')}
+            {t('share.backgroundImage')}
           </div>
           
           {options.backgroundImage ? (

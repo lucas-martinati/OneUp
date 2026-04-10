@@ -95,7 +95,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                         {formatDuration(sessionDuration)}
                     </span>
                     <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                        {t('share.duration', 'Dur\u00e9e')}
+                        {t('share.duration')}
                     </span>
                 </div>
             )}
@@ -109,7 +109,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                             value={sessionName}
                             onChange={e => setSessionName(e.target.value)}
                             onKeyDown={e => { if (e.key === 'Enter') handleNameSave(); }}
-                            placeholder={t('share.sessionNamePlaceholder', 'Nom de la s\u00e9ance (optionnel)')}
+                            placeholder={t('share.sessionNamePlaceholder')}
                             style={{
                                 flex: 1, padding: '8px 12px', borderRadius: '10px',
                                 background: 'rgba(255,255,255,0.06)',
@@ -142,7 +142,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                     >
                         <Pencil size={14} style={{ opacity: 0.5, flexShrink: 0 }} />
                         <span style={{ flex: 1 }}>
-                            {sessionName || t('share.sessionNamePlaceholder', 'Nom de la s\u00e9ance (optionnel)')}
+                            {sessionName || t('share.sessionNamePlaceholder')}
                         </span>
                     </button>
                 )}

@@ -670,7 +670,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                             display: 'flex', alignItems: 'center', gap: '6px',
                         }}>
                             <Clock size={14} />
-                            {t('share.recentSessions', 'S\u00e9ances r\u00e9centes')}
+                            {t('share.recentSessions')}
                         </h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             {sessionHistory.slice(0, 10).map((session, i) => {

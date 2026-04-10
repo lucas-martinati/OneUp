@@ -94,7 +94,7 @@ function HistoryRow({ session, t, lang }) {
           <span style={{
             fontSize: '0.6rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)',
           }}>
-            {t('dashboard.session', 'S\u00e9ance')}
+            {t('dashboard.session')}
           </span>
         )}
       </div>
@@ -439,7 +439,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
                 color: activeThemeKey === 'gold' ? '#fbbf24' : 'rgba(255,255,255,0.6)',
                 textTransform: 'uppercase', letterSpacing: '1px',
               }}>
-                {t('share.globalStats', 'Statistiques globales')}
+                {t('share.globalStats')}
               </div>
               {(() => {
                 const cats = options.statsCategories || Object.values(CATEGORIES);
@@ -478,7 +478,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
                 display: 'flex', alignItems: 'center', marginLeft: 'auto', height: 'fit-content'
               }}>
                 <Award size={10} color="#fbbf24" fill="#fbbf24" style={{ marginRight: '4px' }} />
-                {t('common.perfectDays', 'Perfect Day')}
+                {t('common.perfectDays')}
               </div>
             )}
           </div>
@@ -500,15 +500,15 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
         }}>
           {isGlobal ? (
             <>
-              <MetricCard isVisible={options.showVolume} icon={EXERCISE_ICONS.Zap} value={totalReps.toLocaleString()} label={t('stats.totalReps', 'Total reps')} color="#fbbf24" />
-              <MetricCard isVisible={options.showExercises} icon={SHARE_ICONS.Target} value={totalDays} label={t('leaderboard.activeDays', 'Active days')} color="#34d399" />
-              <MetricCard isVisible={options.showDuration} icon={SOCIAL_ICONS.Award} value={`${maxStreak}j`} label={t('common.bestStreak', 'Best streak')} color={currentTheme.accent} />
+              <MetricCard isVisible={options.showVolume} icon={EXERCISE_ICONS.Zap} value={totalReps.toLocaleString()} label={t('stats.totalReps')} color="#fbbf24" />
+              <MetricCard isVisible={options.showExercises} icon={SHARE_ICONS.Target} value={totalDays} label={t('leaderboard.activeDays')} color="#34d399" />
+              <MetricCard isVisible={options.showDuration} icon={SOCIAL_ICONS.Award} value={`${maxStreak}j`} label={t('common.bestStreak')} color={currentTheme.accent} />
             </>
           ) : (
             <>
-              <MetricCard isVisible={options.showDuration} icon={Clock} value={formatDuration(duration)} label={t('share.duration', 'Dur\u00e9e')} color={currentTheme.accent} />
-              <MetricCard isVisible={options.showVolume} icon={EXERCISE_ICONS.Zap} value={totalReps} label={t('customExercises.typeReps', 'Reps')} color="#fbbf24" />
-              <MetricCard isVisible={options.showExercises} icon={EXERCISE_ICONS.Dumbbell} value={exerciseCount} label={t('share.exercises', 'Exercices')} color="#34d399" />
+              <MetricCard isVisible={options.showDuration} icon={Clock} value={formatDuration(duration)} label={t('share.duration')} color={currentTheme.accent} />
+              <MetricCard isVisible={options.showVolume} icon={EXERCISE_ICONS.Zap} value={totalReps} label={t('customExercises.typeReps')} color="#fbbf24" />
+              <MetricCard isVisible={options.showExercises} icon={EXERCISE_ICONS.Dumbbell} value={exerciseCount} label={t('share.exercises')} color="#34d399" />
             </>
           )}
         </div>
@@ -580,7 +580,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
                         display: 'flex', alignItems: 'center', gap: '4px'
                       }}>
                         <Award size={10} color="#fbbf24" fill="#fbbf24" />
-                        {t('common.perfectDays', 'Perfect Day')}
+                        {t('common.perfectDays')}
                       </div>
                     )}
                   </div>
@@ -610,7 +610,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
             textTransform: 'uppercase', letterSpacing: '1px',
             marginBottom: '8px',
           }}>
-            {t('share.recentSessions', 'S\u00e9ances r\u00e9centes')}
+            {t('share.recentSessions')}
           </div>
           {sessionHistory.slice(0, 5).map((session, i) => (
             <HistoryRow key={session.id || i} session={session} t={t} lang={lang} />

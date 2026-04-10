@@ -76,7 +76,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
           WebkitBackgroundClip: 'text', backgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
         }}>
-          {t('share.sessionDetail', 'D\u00e9tail de la s\u00e9ance')}
+          {t('share.sessionDetail')}
         </h2>
         <button onClick={onClose} style={{
           background: 'rgba(255,255,255,0.1)', border: 'none',
@@ -112,7 +112,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
                 value={name}
                 onChange={e => setName(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') handleNameSave(); }}
-                placeholder={t('share.sessionNamePlaceholder', 'Nom de la s\u00e9ance (optionnel)')}
+                placeholder={t('share.sessionNamePlaceholder')}
                 style={{
                   flex: 1, padding: '8px 12px', borderRadius: '10px',
                   background: 'rgba(255,255,255,0.06)',
@@ -182,7 +182,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
               fontSize: '0.55rem', color: 'var(--text-secondary)',
               textTransform: 'uppercase', letterSpacing: '0.5px',
             }}>
-              {t('share.duration', 'Dur\u00e9e')}
+              {t('share.duration')}
             </div>
           </div>
           <div style={{
@@ -214,7 +214,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
               fontSize: '0.55rem', color: 'var(--text-secondary)',
               textTransform: 'uppercase', letterSpacing: '0.5px',
             }}>
-              {t('share.exercises', 'Exercices')}
+              {t('share.exercises')}
             </div>
           </div>
         </div>
@@ -226,7 +226,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
               fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-secondary)',
               textTransform: 'uppercase', letterSpacing: '1px', padding: '0 4px',
             }}>
-              {t('share.exercisesCompleted', 'Exercices compl\u00e9t\u00e9s')}
+              {t('share.exercisesCompleted')}
             </div>
             {exercises.map((ex, i) => {
               const Icon = getIcon(ex.icon);
@@ -256,7 +256,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <Check size={14} color="#10b981" />
                     <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#10b981' }}>
-                      {ex.type === 'timer' ? `${ex.reps}s` : `${ex.reps} ${t('common.reps', 'reps')}`}
+                      {ex.type === 'timer' ? `${ex.reps}s` : `${ex.reps} ${t('common.reps')}`}
                     </span>
                   </div>
                 </div>
@@ -285,7 +285,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
                   cursor: 'pointer',
                 }}
               >
-                {t('common.confirm', 'Confirmer')}
+                {t('common.confirm')}
               </button>
               <button
                 onClick={() => setConfirmDelete(false)}
@@ -296,7 +296,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
                   cursor: 'pointer',
                 }}
               >
-                {t('common.cancel', 'Annuler')}
+                {t('common.cancel')}
               </button>
             </div>
           ) : (

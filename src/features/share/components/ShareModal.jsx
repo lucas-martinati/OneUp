@@ -60,7 +60,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
           WebkitBackgroundClip: 'text', backgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
         }}>
-          {t('common.share', 'Partager')}
+          {t('common.share')}
         </h2>
         <button onClick={onClose} style={{
           background: 'rgba(255,255,255,0.1)', border: 'none',
@@ -145,7 +145,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
           }}
         >
           {isExporting ? <Loader2 size={18} className="spin" /> : <Download size={18} />}
-          {t('share.download', 'Télécharger')}
+          {t('share.download')}
         </button>
         <button
           onClick={handleShare}
@@ -163,8 +163,8 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
         >
           {isExporting ? <Loader2 size={18} className="spin" /> : <Share2 size={18} />}
           {canShareNatively()
-            ? t('common.share', 'Partager')
-            : t('share.download', 'Télécharger')}
+            ? t('common.share')
+            : t('share.download')}
         </button>
       </div>
 
