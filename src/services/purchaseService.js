@@ -295,10 +295,15 @@ export async function getPurchaseHistory() {
       for (const [key, ent] of Object.entries(customerInfo.entitlements.all)) {
         const details = getProductDetails(ent.productIdentifier);
         const rawId = ent.productIdentifier || key;
+        
+        // Use a special description for gifted/promotional access
+        const isPromotional = ent.periodType === 'PROMOTIONAL';
+        const descKey = isPromotional && rawId.includes('pro') ? 'pro.promotionalDesc' : details.descKey;
+        
         history.push({
           id: rawId.replace(/^\$/, ''),
           titleKey: details.titleKey,
-          descKey: details.descKey,
+          descKey: descKey,
           date: ent.latestPurchaseDate || ent.originalPurchaseDate,
           priceKey: ent.isActive ? 'store.statusActive' : 'store.statusExpired',
           isActive: ent.isActive

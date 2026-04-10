@@ -121,7 +121,8 @@
     },
     "buyButton": "Go Pro",
     "price": "€1.99/month",
-    "historyDesc": "Auto-renewal"
+    "historyDesc": "Auto-renewal",
+    "promotionalDesc": "Gifted by OneUp Team"
   },
   "routines": {
     "title": "My Routines",

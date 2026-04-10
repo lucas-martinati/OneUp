@@ -121,7 +121,8 @@
     },
     "buyButton": "Devenir Pro",
     "price": "1,99€/mois",
-    "historyDesc": "Renouvellement automatique"
+    "historyDesc": "Renouvellement automatique",
+    "promotionalDesc": "Offert par l'équipe OneUp"
   },
   "routines": {
     "title": "Mes Routines",

@@ -121,7 +121,8 @@
     },
     "buyButton": "Стать Pro",
     "price": "6,99€/мес",
-    "historyDesc": "Автопродление"
+    "historyDesc": "Автопродление",
+    "promotionalDesc": "Подарок от команды OneUp"
   },
   "routines": {
     "title": "Мои программы",
