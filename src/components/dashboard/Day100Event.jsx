@@ -386,8 +386,19 @@ export function useDay100Logic(dayNumber, isDayPerfectStandard) {
     const [day100ModalShown, setDay100ModalShown] = useState(
         () => isDay100 && !!sessionStorage.getItem('day100_modal_shown')
     );
-    const [day100Unhacked, setDay100Unhacked] = useState(false);
+    const [day100Unhacked, setDay100Unhacked] = useState(
+        () => isDay100 && !!localStorage.getItem('day100_unhacked')
+    );
     const [showUnhackAnim, setShowUnhackAnim] = useState(false);
+
+    // If stats load and indicate perfect day BEFORE the modal is dismissed,
+    // it implies it was completed in a previous session. Mark it unhacked silently.
+    useEffect(() => {
+        if (isDay100 && isDayPerfectStandard && !day100Unhacked && !day100ModalShown) {
+            setDay100Unhacked(true);
+            localStorage.setItem('day100_unhacked', '1');
+        }
+    }, [isDay100, isDayPerfectStandard, day100ModalShown, day100Unhacked]);
 
     // The modal should be shown if it's day 100, we haven't unhacked, and it hasn't been shown in this session
     // We already evaluated sessionStorage in useState, so day100ModalShown accurately tracks it for this session.
@@ -417,6 +428,7 @@ export function useDay100Logic(dayNumber, isDayPerfectStandard) {
     const handleUnhackComplete = useCallback(() => {
         setShowUnhackAnim(false);
         setDay100Unhacked(true);
+        localStorage.setItem('day100_unhacked', '1');
     }, []);
 
     return {
