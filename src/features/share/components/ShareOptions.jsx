@@ -47,7 +47,7 @@ const CATEGORIES_CONFIG = [
   { key: CATEGORIES.CUSTOM, color: '#8b5cf6' },
 ];
 
-export function ShareOptions({ options, toggleOption, setOption, toggleCategory, setBackgroundImage, clearBackgroundImage, originalImage, cropData, openCropModal, mode = 'session', isPro = false, sessionData }) {
+export function ShareOptions({ options, toggleOption, setOption, toggleCategory, clearBackgroundImage, originalImage, openCropModal, mode = 'session', isPro = false, sessionData }) {
   const { t } = useTranslation();
   const isGlobal = mode === 'global';
   const selectedCategories = options.statsCategories || [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM];

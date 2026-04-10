@@ -62,7 +62,7 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 
   const saveOptionsToStorage = useCallback((opts) => {
-    const { backgroundImage, ...safeOpts } = opts;
+    const { backgroundImage: _bg, ...safeOpts } = opts;
     localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(safeOpts));
   }, []);
 

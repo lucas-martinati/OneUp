@@ -395,8 +395,10 @@ export function useDay100Logic(dayNumber, isDayPerfectStandard) {
     // it implies it was completed in a previous session. Mark it unhacked silently.
     useEffect(() => {
         if (isDay100 && isDayPerfectStandard && !day100Unhacked && !day100ModalShown) {
-            setDay100Unhacked(true);
-            localStorage.setItem('day100_unhacked', '1');
+            setTimeout(() => {
+                setDay100Unhacked(true);
+                localStorage.setItem('day100_unhacked', '1');
+            }, 0);
         }
     }, [isDay100, isDayPerfectStandard, day100ModalShown, day100Unhacked]);
 
