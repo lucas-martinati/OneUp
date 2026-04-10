@@ -286,12 +286,28 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
           </div>
           
           {options.backgroundImage ? (
-            <>
-              <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden' }}>
-                <img 
-                  src={options.backgroundImage} 
-                  alt="Background" 
-                  style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '12px' }}
+            <div style={{
+              display: 'flex', alignItems: 'stretch', gap: '8px',
+              borderRadius: '14px',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              padding: '8px',
+              transition: 'all 0.2s ease',
+            }}>
+              {/* Thumbnail with remove overlay */}
+              <div style={{
+                position: 'relative',
+                width: '72px', minHeight: '72px',
+                borderRadius: '10px', overflow: 'hidden',
+                flexShrink: 0,
+              }}>
+                <img
+                  src={options.backgroundImage}
+                  alt="Background"
+                  style={{
+                    width: '100%', height: '100%',
+                    objectFit: 'cover', display: 'block',
+                  }}
                 />
                 <button
                   onClick={() => {
@@ -302,34 +318,55 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                   }}
                   style={{
                     position: 'absolute', top: '4px', right: '4px',
-                    width: '24px', height: '24px', borderRadius: '50%',
-                    background: 'rgba(0,0,0,0.6)', border: 'none',
+                    width: '22px', height: '22px', borderRadius: '50%',
+                    background: 'rgba(0,0,0,0.65)',
+                    backdropFilter: 'blur(4px)',
+                    border: '1px solid rgba(255,255,255,0.1)',
                     color: 'white', cursor: 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.15s ease',
                   }}
                 >
-                  <X size={14} />
+                  <X size={12} />
                 </button>
               </div>
 
-              {originalImage && (
-                <button
-                  onClick={() => openCropModal()}
-                  style={{
-                    width: '100%', padding: '12px', borderRadius: '12px',
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: 'var(--text-primary)',
-                    fontSize: '0.75rem', fontWeight: 600,
-                    cursor: 'pointer', display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', gap: '8px',
-                    marginTop: '8px', transition: 'all 0.15s ease',
-                  }}
-                >
-                  {t('share.recropImage', 'Recadrer l\'image')}
-                </button>
-              )}
-            </>
+              {/* Actions column */}
+              <div style={{
+                flex: 1, display: 'flex', flexDirection: 'column',
+                justifyContent: 'center', gap: '6px',
+                padding: '2px 4px',
+              }}>
+                <span style={{
+                  fontSize: '0.7rem', fontWeight: 600,
+                  color: 'rgba(255,255,255,0.6)',
+                  lineHeight: 1.3,
+                }}>
+                  {t('share.imageSelected', 'Image sélectionnée')}
+                </span>
+
+                {originalImage && (
+                  <button
+                    onClick={() => openCropModal()}
+                    style={{
+                      padding: '8px 14px', borderRadius: '10px',
+                      background: 'rgba(129,140,248,0.1)',
+                      border: '1px solid rgba(129,140,248,0.2)',
+                      color: '#818cf8',
+                      fontSize: '0.7rem', fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', gap: '6px',
+                      transition: 'all 0.15s ease',
+                      width: '100%',
+                    }}
+                  >
+                    <Image size={13} />
+                    {t('share.recropImage', 'Recadrer')}
+                  </button>
+                )}
+              </div>
+            </div>
           ) : (
             <div style={{ display: 'flex', gap: '8px' }}>
               <button

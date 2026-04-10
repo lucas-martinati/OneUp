@@ -81,29 +81,70 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
   return (
     <div className="fade-in" style={{
       position: 'fixed', inset: 0,
-      background: 'rgba(5,5,5,0.99)', zIndex: Z_INDEX.MODAL + 100,
+      background: '#0a0a0f',
+      zIndex: Z_INDEX.MODAL + 100,
       display: 'flex', flexDirection: 'column',
     }}>
+      {/* Header — frosted glass nav bar */}
       <div style={{
-        padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: '14px 16px',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        background: 'rgba(15, 15, 25, 0.85)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        position: 'relative', zIndex: 2,
       }}>
-        <button onClick={onClose} style={{
-          background: 'none', border: 'none', color: 'white', cursor: 'pointer',
-        }}>
-          <X size={24} />
+        <button
+          onClick={onClose}
+          style={{
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            color: 'rgba(255,255,255,0.7)',
+            cursor: 'pointer',
+            width: '38px', height: '38px',
+            borderRadius: '12px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          <X size={20} />
         </button>
-        <span style={{ color: 'white', fontWeight: 600, fontSize: '1rem' }}>
+
+        <span style={{
+          color: 'white', fontWeight: 700, fontSize: '0.95rem',
+          letterSpacing: '-0.01em',
+          position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+        }}>
           {t('share.cropImage', 'Cadrage de l\'image')}
         </span>
-        <button onClick={handleSave} style={{
-          background: 'none', border: 'none', color: '#818cf8', cursor: 'pointer',
-          fontWeight: 700, fontSize: '1rem',
-        }}>
-          <Check size={24} />
+
+        <button
+          onClick={handleSave}
+          style={{
+            background: 'linear-gradient(135deg, #818cf8, #6366f1)',
+            border: 'none',
+            color: 'white',
+            cursor: 'pointer',
+            width: '38px', height: '38px',
+            borderRadius: '12px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.2s ease',
+            boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
+          }}
+        >
+          <Check size={20} />
         </button>
       </div>
-      
-      <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
+
+      {/* Crop area */}
+      <div style={{
+        position: 'relative', flex: 1, overflow: 'hidden',
+        margin: '12px',
+        borderRadius: '20px',
+        border: '1px solid rgba(255,255,255,0.06)',
+        boxShadow: 'inset 0 0 60px rgba(0,0,0,0.4)',
+      }}>
         <Cropper
           image={imageSrc}
           crop={crop}
@@ -113,25 +154,28 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
           onCropChange={setCrop}
           onCropComplete={onCropComplete}
           onZoomChange={setZoom}
+          zoomSpeed={0.4}
+          minZoom={1}
+          maxZoom={3}
+          cropShape="rect"
+          showGrid={false}
+          style={{
+            containerStyle: {
+              borderRadius: '20px',
+              background: '#0a0a0f',
+            },
+            cropAreaStyle: {
+              border: '2px solid rgba(129,140,248,0.5)',
+              borderRadius: '16px',
+              boxShadow: '0 0 0 9999px rgba(5,5,10,0.7), 0 0 30px rgba(129,140,248,0.15)',
+            },
+            mediaStyle: {
+              borderRadius: '0',
+            },
+          }}
         />
       </div>
 
-      <div style={{
-        padding: '24px', display: 'flex', alignItems: 'center', gap: '16px',
-        background: 'linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0))'
-      }}>
-        <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', width: '40px' }}>Zoom</span>
-        <input
-          type="range"
-          value={zoom}
-          min={1}
-          max={3}
-          step={0.1}
-          aria-labelledby="Zoom"
-          onChange={(e) => setZoom(Number(e.target.value))}
-          style={{ flex: 1, accentColor: '#818cf8' }}
-        />
-      </div>
     </div>
   );
 }
