@@ -30,19 +30,21 @@ beforeEach(() => {
 
 describe('loadCachedEntitlements', () => {
   it('returns false when nothing cached', () => {
-    expect(loadCachedEntitlements()).toEqual({ isSupporter: false, isPro: false });
+    expect(loadCachedEntitlements()).toEqual({ isSupporter: false, isPro: false, hadPro: false });
   });
 
   it('reads true flags from localStorage', () => {
     localStorage.setItem('oneup_supporter', 'true');
     localStorage.setItem('oneup_pro', 'true');
-    expect(loadCachedEntitlements()).toEqual({ isSupporter: true, isPro: true });
+    localStorage.setItem('oneup_had_pro', 'true');
+    expect(loadCachedEntitlements()).toEqual({ isSupporter: true, isPro: true, hadPro: true });
   });
 
   it('returns false for non-"true" values', () => {
     localStorage.setItem('oneup_supporter', 'false');
     localStorage.setItem('oneup_pro', '1');
-    expect(loadCachedEntitlements()).toEqual({ isSupporter: false, isPro: false });
+    localStorage.setItem('oneup_had_pro', 'false');
+    expect(loadCachedEntitlements()).toEqual({ isSupporter: false, isPro: false, hadPro: false });
   });
 });
 
@@ -126,10 +128,10 @@ describe('resolveEntitlements', () => {
 
   it('returns all false when both sources are false', () => {
     const result = resolveEntitlements(
-      { isSupporter: false, isPro: false },
-      { isSupporter: false, isPro: false },
+      { isSupporter: false, isPro: false, hadPro: false },
+      { isSupporter: false, isPro: false, hadPro: false },
     );
-    expect(result).toEqual({ isSupporter: false, isPro: false, hasAnyEntitlement: false });
+    expect(result).toEqual({ isSupporter: false, isPro: false, hadPro: false, hasAnyEntitlement: false });
   });
 
   it('hasAnyEntitlement is true when either tier is active', () => {
