@@ -2,6 +2,7 @@ import { Heart, Crown } from './icons';
 
 const LS_SUPPORTER = 'oneup_supporter';
 const LS_PRO = 'oneup_pro';
+const LS_HAD_PRO = 'oneup_had_pro';
 
 // ── Feature → required tier map ─────────────────────────────────────────
 
@@ -27,17 +28,22 @@ export function loadCachedEntitlements() {
   return {
     isSupporter: localStorage.getItem(LS_SUPPORTER) === 'true',
     isPro: localStorage.getItem(LS_PRO) === 'true',
+    hadPro: localStorage.getItem(LS_HAD_PRO) === 'true',
   };
 }
 
-export function saveCachedEntitlements({ isSupporter, isPro }) {
+export function saveCachedEntitlements({ isSupporter, isPro, hadPro }) {
   localStorage.setItem(LS_SUPPORTER, isSupporter ? 'true' : 'false');
   localStorage.setItem(LS_PRO, isPro ? 'true' : 'false');
+  if (hadPro !== undefined) {
+    localStorage.setItem(LS_HAD_PRO, hadPro ? 'true' : 'false');
+  }
 }
 
 export function clearCachedEntitlements() {
   localStorage.removeItem(LS_SUPPORTER);
   localStorage.removeItem(LS_PRO);
+  // Specifically do not clear LS_HAD_PRO, as it's a permanent unlock if it was ever true
 }
 
 // ── Access checks ───────────────────────────────────────────────────────
@@ -55,7 +61,8 @@ export function canAccessFeature(feature, { isPro } = {}) {
 export function resolveEntitlements(primary, fallback) {
   const sup = primary.isSupporter || fallback.isSupporter || false;
   const pro = primary.isPro || fallback.isPro || false;
-  return { isSupporter: sup, isPro: pro, hasAnyEntitlement: sup || pro };
+  const hadPro = pro || primary.hadPro || fallback.hadPro || false;
+  return { isSupporter: sup, isPro: pro, hadPro, hasAnyEntitlement: sup || hadPro };
 }
 
 // ── Badge config for tier display ───────────────────────────────────────

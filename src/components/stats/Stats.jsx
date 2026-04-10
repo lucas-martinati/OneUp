@@ -25,7 +25,9 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
     // ── Context consumption (replaces 8 props) ──
     const { completions, settings, getDayNumber, computedStats: globalStats } = useProgressContext();
-    const { isPro } = useSubscription();
+    const { isPro, hadPro } = useSubscription();
+    // For stats viewing, previously having pro is enough
+    const hasProAccess = isPro || hadPro;
     const { exercisesByCategory: exercisesList } = useExercises();
     const highlightedBadgeId = null;
     const { t, i18n } = useTranslation();
@@ -78,9 +80,9 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
     }, [activeCategories, exercisesList]);
 
     const computedStats = React.useMemo(() => {
-        if (canAccessFeature(FEATURES.MERGED_STATS, { isPro }) && activeCategories.length === 3) return globalStats;
+        if (canAccessFeature(FEATURES.MERGED_STATS, { isPro: hasProAccess }) && activeCategories.length === 3) return globalStats;
         return computeAllStats(completions, settings, getDayNumber, exercises);
-    }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, isPro]);
+    }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess]);
 
     // All values come from computedStats
     const {
@@ -190,8 +192,8 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                     }}>
                         {[
                             { id: 'standard', label: t('common.bodyweight'), locked: false },
-                            { id: 'weights', label: t('common.weights'), locked: !canAccessFeature(FEATURES.WEIGHTS, { isPro }) },
-                            { id: 'custom', label: t('common.custom'), locked: !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) }
+                            { id: 'weights', label: t('common.weights'), locked: !canAccessFeature(FEATURES.WEIGHTS, { isPro: hasProAccess }) },
+                            { id: 'custom', label: t('common.custom'), locked: !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro: hasProAccess }) }
                         ].map(cat => (
                             <label key={cat.id} style={{
                                 display: 'flex', alignItems: 'center', gap: '6px',
@@ -755,7 +757,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         onDelete={handleDeleteSession}
                         onNameChange={handleSessionNameChange}
                         stats={computedStats}
-                        isPro={isPro}
+                        isPro={hasProAccess}
                     />
                 )}
             </Suspense>

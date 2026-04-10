@@ -28,12 +28,15 @@ export async function loadSettingsFromCloud() {
 
 // ── Purchase ────────────────────────────────────────────────────────────
 
-export async function savePurchase({ isSupporter, isPro }) {
+export async function savePurchase({ isSupporter, isPro, hadPro }) {
   const auth = getAuthInstance();
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  await set(ref(database, `users/${auth.currentUser.uid}/purchase`), { isSupporter: !!isSupporter, isPro: !!isPro });
+  const payload = { isSupporter: !!isSupporter, isPro: !!isPro };
+  if (hadPro !== undefined) payload.hadPro = !!hadPro;
+
+  await set(ref(database, `users/${auth.currentUser.uid}/purchase`), payload);
   return true;
 }
 

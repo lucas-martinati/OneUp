@@ -25,7 +25,8 @@ const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.Sha
 export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 'session', label, activeCategories = ['standard', 'weights', 'custom'] }) {
   const [showShare, setShowShare] = useState(false);
   const { t } = useTranslation();
-  const { isPro } = useSubscription();
+  const { isPro, hadPro } = useSubscription();
+  const hasProAccess = isPro || hadPro;
   const { completions, getDayNumber, settings } = useProgressContext();
 
   // Map Stats categories to SharePanel categories for initial state
@@ -91,7 +92,7 @@ export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 
           <ShareModal
             shareHook={shareHook}
             onClose={() => setShowShare(false)}
-            isPro={isPro}
+            isPro={hasProAccess}
             mode={mode}
             completions={completions}
             getDayNumber={getDayNumber}

@@ -23,15 +23,23 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
 
   const [isSupporter, setIsSupporter] = useState(() => loadCachedEntitlements().isSupporter);
   const [isPro, setIsPro] = useState(() => loadCachedEntitlements().isPro);
+  const [hadPro, setHadPro] = useState(() => loadCachedEntitlements().hadPro);
 
   const isSupporterRef = useRef(isSupporter);
   const isProRef = useRef(isPro);
+  const hadProRef = useRef(hadPro);
   useEffect(() => { isSupporterRef.current = isSupporter; }, [isSupporter]);
   useEffect(() => { isProRef.current = isPro; }, [isPro]);
+  useEffect(() => { hadProRef.current = hadPro; }, [hadPro]);
 
-  const saveAndPublish = useCallback(async ({ isSupporter: sup, isPro: pr }) => {
-    saveCachedEntitlements({ isSupporter: sup, isPro: pr });
-    await cloudSync.savePurchase({ isSupporter: sup, isPro: pr });
+  const saveAndPublish = useCallback(async ({ isSupporter: sup, isPro: pr, hadPro: hp }) => {
+    // If pr is true, hp must be true
+    const finalHadPro = pr || hp;
+    if (finalHadPro && !hadProRef.current) {
+      setHadPro(true);
+    }
+    saveCachedEntitlements({ isSupporter: sup, isPro: pr, hadPro: finalHadPro });
+    await cloudSync.savePurchase({ isSupporter: sup, isPro: pr, hadPro: finalHadPro });
     if (publishLeaderboardNow) await publishLeaderboardNow();
   }, [publishLeaderboardNow]);
 
@@ -41,6 +49,8 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
       queueMicrotask(() => {
         setIsSupporter(false);
         setIsPro(false);
+        // keep hadPro in state as it might be loaded next session, but typically auth reset means clearing it
+        setHadPro(false);
         clearCachedEntitlements();
       });
     }
@@ -53,28 +63,30 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
         try {
           await initPurchases(cloudSync.getCurrentUserId());
 
-          let rcEntitlements = { isSupporter: false, isPro: false };
+          let rcEntitlements = { isSupporter: false, isPro: false, hadPro: false };
           try {
             rcEntitlements = {
               isSupporter: await checkSupporterStatus(),
               isPro: await checkProStatus(),
+              hadPro: false, // RevenueCat doesn't persistently track hadPro unless we query past receipts, we rely on FB for hadPro
             };
           } catch (rcErr) {
             logger.warn('RevenueCat check failed:', rcErr);
           }
 
-          let fbEntitlements = { isSupporter: false, isPro: false };
+          let fbEntitlements = { isSupporter: false, isPro: false, hadPro: false };
           if (!rcEntitlements.isSupporter && !rcEntitlements.isPro) {
             const cloudPurchase = await cloudSync.loadPurchase();
             if (cloudPurchase) {
-              fbEntitlements = { isSupporter: !!cloudPurchase.isSupporter, isPro: !!cloudPurchase.isPro };
-              if (fbEntitlements.isSupporter || fbEntitlements.isPro) logger.info('Loaded purchase from Firebase');
+              fbEntitlements = { isSupporter: !!cloudPurchase.isSupporter, isPro: !!cloudPurchase.isPro, hadPro: !!cloudPurchase.hadPro };
+              if (fbEntitlements.isSupporter || fbEntitlements.isPro || fbEntitlements.hadPro) logger.info('Loaded purchase from Firebase');
             }
           }
 
           const resolved = resolveEntitlements(rcEntitlements, fbEntitlements);
           setIsSupporter(resolved.isSupporter);
           setIsPro(resolved.isPro);
+          setHadPro(resolved.hadPro);
 
           if (resolved.hasAnyEntitlement) {
             await saveAndPublish(resolved);
@@ -92,7 +104,7 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
     const result = await purchaseSupporter();
     if (result.success || result.isSupporter || result.isActive) {
       setIsSupporter(true);
-      await saveAndPublish({ isSupporter: true, isPro: isProRef.current });
+      await saveAndPublish({ isSupporter: true, isPro: isProRef.current, hadPro: hadProRef.current });
     }
     return result;
   }, [saveAndPublish]);
@@ -101,7 +113,8 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
     const result = await purchasePro();
     if (result.success || result.isActive) {
       setIsPro(true);
-      await saveAndPublish({ isSupporter: isSupporterRef.current, isPro: true });
+      setHadPro(true);
+      await saveAndPublish({ isSupporter: isSupporterRef.current, isPro: true, hadPro: true });
     }
     return result;
   }, [saveAndPublish]);
@@ -110,7 +123,7 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
     const result = await restorePurchases();
     let resolved = resolveEntitlements(
       { isSupporter: result.supporter || result.isSupporter || false, isPro: result.pro || false },
-      { isSupporter: false, isPro: false }
+      { isSupporter: false, isPro: false, hadPro: false }
     );
 
     if (!resolved.hasAnyEntitlement) {
@@ -119,12 +132,14 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
         resolved = resolveEntitlements(resolved, {
           isSupporter: !!cloudPurchase.isSupporter,
           isPro: !!cloudPurchase.isPro,
+          hadPro: !!cloudPurchase.hadPro,
         });
       }
     }
 
     setIsSupporter(resolved.isSupporter);
     setIsPro(resolved.isPro);
+    setHadPro(resolved.hadPro);
 
     if (resolved.hasAnyEntitlement) {
       await saveAndPublish(resolved);
@@ -134,12 +149,14 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
   const value = useMemo(() => ({
     isSupporter: auth.isSignedIn ? isSupporter : false,
     isPro: auth.isSignedIn ? isPro : false,
+    hadPro: auth.isSignedIn ? hadPro : false,
     rawIsSupporter: isSupporter,
     rawIsPro: isPro,
+    rawHadPro: hadPro,
     purchaseSupporter: handlePurchaseSupporter,
     purchasePro: handlePurchasePro,
     restorePurchases: handleRestorePurchases,
-  }), [auth.isSignedIn, isSupporter, isPro, handlePurchaseSupporter, handlePurchasePro, handleRestorePurchases]);
+  }), [auth.isSignedIn, isSupporter, isPro, hadPro, handlePurchaseSupporter, handlePurchasePro, handleRestorePurchases]);
 
   return (
     <SubscriptionContext.Provider value={value}>
