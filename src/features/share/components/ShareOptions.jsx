@@ -52,6 +52,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
   const isGlobal = mode === 'global';
   const selectedCategories = options.statsCategories || [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM];
   const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
 
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
@@ -136,6 +137,35 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
         checked={options.showStreak}
         onToggle={() => toggleOption('showStreak')}
       />
+
+      {isGlobal && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <OptionRow
+            icon={Dumbbell}
+            label={t('share.showDailyExercises', 'Routine par jour')}
+            color="#ec4899"
+            checked={options.showDailyExercises}
+            onToggle={() => toggleOption('showDailyExercises')}
+          />
+          {options.showDailyExercises && (
+            <input
+              type="date"
+              value={options.globalDate || new Date().toISOString().split('T')[0]}
+              onChange={(e) => setOption('globalDate', e.target.value)}
+              style={{
+                marginLeft: '36px',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: 'white',
+                fontSize: '0.8rem',
+                colorScheme: 'dark'
+              }}
+            />
+          )}
+        </div>
+      )}
       <OptionRow
         icon={History}
         label={t('share.showHistory', 'Historique des s\u00e9ances')}
@@ -301,27 +331,57 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
               )}
             </>
           ) : (
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              style={{
-                width: '100%', padding: '16px', borderRadius: '12px',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px dashed rgba(255,255,255,0.15)',
-                color: 'var(--text-secondary)',
-                fontSize: '0.75rem', fontWeight: 600,
-                cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: '6px',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <Image size={20} style={{ opacity: 0.5 }} />
-              {t('share.uploadImage', 'Ajouter une image')}
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => cameraInputRef.current?.click()}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: '12px',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px dashed rgba(255,255,255,0.15)',
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.7rem', fontWeight: 600,
+                  cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', gap: '6px',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}>
+                  <span style={{ fontSize: '14px' }}>📸</span>
+                </div>
+                {t('share.takePhoto', 'Prendre une photo')}
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: '12px',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px dashed rgba(255,255,255,0.15)',
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.7rem', fontWeight: 600,
+                  cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', gap: '6px',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}>
+                  <Image size={14} style={{ opacity: 0.8 }} />
+                </div>
+                {t('share.uploadGallery', 'Galerie')}
+              </button>
+            </div>
           )}
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*"
+            onChange={handleImageUpload}
+            style={{ display: 'none' }}
+          />
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
             onChange={handleImageUpload}
             style={{ display: 'none' }}
           />

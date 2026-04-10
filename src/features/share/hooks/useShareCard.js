@@ -21,7 +21,11 @@ const OPTIONS_STORAGE_KEY = 'oneup_share_options';
 function loadSavedOptions() {
   try {
     const saved = localStorage.getItem(OPTIONS_STORAGE_KEY);
-    if (saved) return { ...DEFAULT_OPTIONS, ...JSON.parse(saved) };
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      delete parsed.backgroundImage; // Prevent large background images from clogging storage
+      return { ...DEFAULT_OPTIONS, ...parsed };
+    }
   } catch { /* ignore */ }
   return { ...DEFAULT_OPTIONS };
 }
@@ -44,6 +48,7 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
   // Apply initial categories only once on mount (when modal opens)
   const getInitialOptions = () => {
     const saved = loadSavedOptions();
+    saved.globalDate = new Date().toISOString().split('T')[0]; // Always reset date to today
     if (initialCategories && initialCategories.length > 0) {
       return { ...saved, statsCategories: initialCategories };
     }
@@ -55,6 +60,11 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
   const [originalImage, setOriginalImage] = useState(null);
   const [cropData, setCropData] = useState(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+
+  const saveOptionsToStorage = useCallback((opts) => {
+    const { backgroundImage, ...safeOpts } = opts;
+    localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(safeOpts));
+  }, []);
 
   const openCropModal = useCallback((imgBase64) => {
     if (imgBase64) setOriginalImage(imgBase64);
@@ -68,28 +78,28 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
   const applyCrop = useCallback((croppedBase64, crop, zoom) => {
     setOptions(prev => {
       const next = { ...prev, backgroundImage: croppedBase64 };
-      localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(next));
+      saveOptionsToStorage(next);
       return next;
     });
     setCropData({ crop, zoom });
     setIsCropModalOpen(false);
-  }, []);
+  }, [saveOptionsToStorage]);
 
   const setOption = useCallback((key, value) => {
     setOptions(prev => {
       const next = { ...prev, [key]: value };
-      localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(next));
+      saveOptionsToStorage(next);
       return next;
     });
-  }, []);
+  }, [saveOptionsToStorage]);
 
   const toggleOption = useCallback((key) => {
     setOptions(prev => {
       const next = { ...prev, [key]: !prev[key] };
-      localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(next));
+      saveOptionsToStorage(next);
       return next;
     });
-  }, []);
+  }, [saveOptionsToStorage]);
 
   const toggleCategory = useCallback((cat) => {
     setOptions(prev => {
@@ -100,28 +110,28 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
       // Don't allow empty selection
       if (next.length === 0) return prev;
       const updated = { ...prev, statsCategories: next };
-      localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(updated));
+      saveOptionsToStorage(updated);
       return updated;
     });
-  }, []);
+  }, [saveOptionsToStorage]);
 
   const setBackgroundImage = useCallback((imageDataUrl) => {
     setOptions(prev => {
       const next = { ...prev, backgroundImage: imageDataUrl };
-      localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(next));
+      saveOptionsToStorage(next);
       return next;
     });
-  }, []);
+  }, [saveOptionsToStorage]);
 
   const clearBackgroundImage = useCallback(() => {
     setOptions(prev => {
       const next = { ...prev, backgroundImage: null };
-      localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(next));
+      saveOptionsToStorage(next);
       return next;
     });
     setOriginalImage(null);
     setCropData(null);
-  }, []);
+  }, [saveOptionsToStorage]);
 
   const captureCard = useCallback(async () => {
     if (!cardRef.current) throw new Error('Card ref not attached');

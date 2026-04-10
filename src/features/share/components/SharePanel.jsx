@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useShareCard } from '../hooks/useShareCard';
 import { getSessionHistory } from '../services/sessionHistoryService';
 import { useSubscription } from '../../../contexts/SubscriptionContext';
+import { useProgressContext } from '../../../contexts/ProgressContext';
 import { CATEGORIES } from '../../../config/categories';
 
 const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
@@ -25,6 +26,7 @@ export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 
   const [showShare, setShowShare] = useState(false);
   const { t } = useTranslation();
   const { isPro } = useSubscription();
+  const { completions, getDayNumber, settings } = useProgressContext();
 
   // Map Stats categories to SharePanel categories for initial state
   const categoryMap = {
@@ -91,6 +93,9 @@ export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 
             onClose={() => setShowShare(false)}
             isPro={isPro}
             mode={mode}
+            completions={completions}
+            getDayNumber={getDayNumber}
+            settings={settings}
           />
         )}
       </Suspense>

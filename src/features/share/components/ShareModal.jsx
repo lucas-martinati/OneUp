@@ -8,7 +8,7 @@ import { CropModal } from './CropModal';
 import { canShareNatively } from '../services/shareService';
 import { useProgressContext } from '../../../contexts/ProgressContext';
 
-export function ShareModal({ shareHook, onClose, isPro = false }) {
+export function ShareModal({ shareHook, onClose, isPro = false, completions = {}, getDayNumber, settings }) {
   const { t } = useTranslation();
   const { hasShared, setHasShared } = useProgressContext();
   const {
@@ -83,6 +83,9 @@ export function ShareModal({ shareHook, onClose, isPro = false }) {
             sessionData={sessionData}
             stats={stats}
             sessionHistory={sessionHistory}
+            completions={completions}
+            getDayNumber={getDayNumber}
+            settings={settings}
             options={options}
             mode={mode}
           />

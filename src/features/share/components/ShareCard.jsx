@@ -7,6 +7,7 @@ import {
 import { getExerciseLabel, getExerciseColor, isCustomExercise } from '../../../utils/exerciseLabel';
 import { sumExerciseReps } from '../../../utils/stats';
 import { CATEGORIES } from '../../../config/categories';
+import { EXERCISES, getDailyGoal } from '../../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../../config/weights';
 import { formatDuration } from '../../../utils/dateUtils';
 
@@ -141,7 +142,7 @@ function ExerciseList({ exercises, t }) {
  *   - 'session': current workout session data
  *   - 'global': global stats from Stats screen
  */
-export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options, mode = 'session' }) {
+export function ShareCard({ cardRef, sessionData, stats, sessionHistory, completions, getDayNumber, settings, options, mode = 'session' }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
 
@@ -150,15 +151,51 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   const allExercises = sessionData?.exercises || [];
   const sessionType = sessionData?.type || CATEGORIES.BODYWEIGHT;
 
-  const theme = options.theme || 'dark';
   const THEMES = {
     dark: { bg: 'linear-gradient(165deg, #0f0f1a 0%, #0a0a14 40%, #0d0d18 100%)', accent: '#818cf8', glow1: 'rgba(129,140,248,0.15)', glow2: 'rgba(139,92,246,0.1)', streakGlow: 'rgba(249,115,22,0.18)' },
     ocean: { bg: 'linear-gradient(165deg, #0a1628 0%, #061018 40%, #081420 100%)', accent: '#06b6d4', glow1: 'rgba(6,182,212,0.15)', glow2: 'rgba(14,116,144,0.1)', streakGlow: 'rgba(34,211,238,0.18)' },
     sunset: { bg: 'linear-gradient(165deg, #1a0a0a 0%, #0f0505 40%, #150808 100%)', accent: '#f97316', glow1: 'rgba(249,115,22,0.15)', glow2: 'rgba(220,38,38,0.1)', streakGlow: 'rgba(249,115,22,0.2)' },
     forest: { bg: 'linear-gradient(165deg, #0a1a0f 0%, #050d07 40%, #081209 100%)', accent: '#22c55e', glow1: 'rgba(34,197,94,0.15)', glow2: 'rgba(20,83,45,0.1)', streakGlow: 'rgba(74,222,128,0.18)' },
     purple: { bg: 'linear-gradient(165deg, #120a1a 0%, #0a0610 40%, #0f0814 100%)', accent: '#a855f7', glow1: 'rgba(168,85,247,0.15)', glow2: 'rgba(126,34,206,0.1)', streakGlow: 'rgba(192,132,252,0.18)' },
+    gold: { bg: 'linear-gradient(165deg, #1a1305 0%, #171104 40%, #1f1b0a 100%)', accent: '#fbbf24', glow1: 'rgba(251,191,36,0.15)', glow2: 'rgba(245,158,11,0.1)', streakGlow: 'rgba(251,191,36,0.18)' },
   };
-  const currentTheme = THEMES[theme] || THEMES.dark;
+
+  let activeThemeKey = options.theme || 'dark';
+  let dailyExercises = [];
+  let dailyStandardDone = false;
+  let dailyWeightsDone = false;
+  
+  const displayMultiplier = settings?.difficultyMultiplier ?? 1;
+
+  if (isGlobal && options.showDailyExercises && completions) {
+    const targetDate = options.globalDate || new Date().toISOString().split('T')[0];
+    const dayNum = getDayNumber ? getDayNumber(targetDate) : 1;
+    const dayData = completions[targetDate];
+    if (dayData) {
+      const allKnownExercises = stats?.exerciseStats || [];
+      for (const [exId, exStats] of Object.entries(dayData)) {
+        if (exStats?.isCompleted) {
+          const knownEx = allKnownExercises.find(e => e.id === exId);
+          if (knownEx) {
+             dailyExercises.push({
+               ...knownEx,
+               reps: exStats.count || getDailyGoal(knownEx, dayNum, displayMultiplier) || knownEx.reps || 0
+             });
+          }
+        }
+      }
+
+      dailyStandardDone = EXERCISES.every(ex => dayData[ex.id]?.isCompleted);
+      dailyWeightsDone = WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => dayData[ex.id]?.isCompleted);
+      const isDailyExercisesPerfect = dailyStandardDone || dailyWeightsDone;
+
+      if (isDailyExercisesPerfect) {
+        activeThemeKey = 'gold';
+      }
+    }
+  }
+
+  const currentTheme = THEMES[activeThemeKey] || THEMES.dark;
 
   // Categorize exercises
   const isWeightEx = (ex) => weightIds.includes(ex.id);
@@ -179,10 +216,32 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
   ].filter(Boolean);
   const showSections = showCategoriesSeparately && categories.length > 1;
 
-  // For global mode, filter sessions by selected categories and recompute stats
   const selectedCats = isGlobal
     ? (options.statsCategories || Object.values(CATEGORIES))
-    : null;
+    : Object.values(CATEGORIES);
+
+  const filteredDailyExercises = isGlobal ? dailyExercises.filter(ex => {
+    if (isCustomEx(ex)) return selectedCats.includes(CATEGORIES.CUSTOM);
+    if (isWeightEx(ex)) return selectedCats.includes(CATEGORIES.WEIGHTS);
+    return selectedCats.includes(CATEGORIES.BODYWEIGHT);
+  }) : dailyExercises;
+
+  // Categorize daily exercises (for global mode)
+  const hasDailyWeightEx = filteredDailyExercises.some(isWeightEx);
+  const hasDailyCustomEx = filteredDailyExercises.some(isCustomEx);
+  const shouldSeparateDaily = hasDailyWeightEx || hasDailyCustomEx;
+
+  const dailyBodyweight = shouldSeparateDaily ? filteredDailyExercises.filter(ex => !isWeightEx(ex) && !isCustomEx(ex)) : filteredDailyExercises;
+  const dailyWeight = shouldSeparateDaily ? filteredDailyExercises.filter(isWeightEx) : [];
+  const dailyCustom = shouldSeparateDaily ? filteredDailyExercises.filter(isCustomEx) : [];
+  const dailyCategories = [
+    dailyBodyweight.length > 0 && { key: CATEGORIES.BODYWEIGHT, exercises: dailyBodyweight, label: t('common.bodyweight'), color: '#34d399', isPerfect: dailyStandardDone },
+    dailyWeight.length > 0 && { key: CATEGORIES.WEIGHTS, exercises: dailyWeight, label: t('common.weights'), color: '#f97316', isPerfect: dailyWeightsDone },
+    dailyCustom.length > 0 && { key: CATEGORIES.CUSTOM, exercises: dailyCustom, label: t('common.custom'), color: '#8b5cf6', isPerfect: false },
+  ].filter(Boolean);
+  const showDailySections = shouldSeparateDaily && dailyCategories.length > 1;
+
+  // For global mode, recompute stats for top section
   const filteredStats = isGlobal ? (() => {
     let totalReps = 0;
     let exerciseCount = 0;
@@ -259,7 +318,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
         <div key={key} style={{
           position: 'absolute', inset: 0,
           background: themeObj.bg,
-          opacity: (!options.backgroundImage && theme === key) ? 1 : 0,
+          opacity: (!options.backgroundImage && activeThemeKey === key) ? 1 : 0,
           transition: 'opacity 0.5s ease',
         }} />
       ))}
@@ -372,37 +431,53 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
 
         {/* Session title or global label */}
         {isGlobal ? (
-          <div>
-            <div style={{
-              fontSize: '0.75rem', fontWeight: 600,
-              color: 'rgba(255,255,255,0.5)',
-              textTransform: 'uppercase', letterSpacing: '1px',
-            }}>
-              {t('share.globalStats', 'Statistiques globales')}
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%' }}>
+            <div>
+              <div style={{
+                fontSize: '0.75rem', fontWeight: 700,
+                color: activeThemeKey === 'gold' ? '#fbbf24' : 'rgba(255,255,255,0.6)',
+                textTransform: 'uppercase', letterSpacing: '1px',
+              }}>
+                {t('share.globalStats', 'Statistiques globales')}
+              </div>
+              {(() => {
+                const cats = options.statsCategories || Object.values(CATEGORIES);
+                const allSelected = cats.length === 3;
+                if (allSelected) return null;
+                const catColors = { bodyweight: '#34d399', weights: '#f97316', custom: '#8b5cf6' };
+                return (
+                  <div style={{
+                    display: 'flex', gap: '6px', marginTop: '4px', flexWrap: 'wrap',
+                  }}>
+                    {cats.map(cat => (
+                      <span key={cat} style={{
+                        fontSize: '0.5rem', fontWeight: 700,
+                        color: catColors[cat] || '#818cf8',
+                        padding: '2px 6px', borderRadius: '4px',
+                        background: `${catColors[cat] || '#818cf8'}15`,
+                        textTransform: 'uppercase', letterSpacing: '0.5px',
+                      }}>
+                        {t(`common.${cat}`, cat)}
+                      </span>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
-            {(() => {
-              const cats = options.statsCategories || Object.values(CATEGORIES);
-              const allSelected = cats.length === 3;
-              if (allSelected) return null;
-              const catColors = { bodyweight: '#34d399', weights: '#f97316', custom: '#8b5cf6' };
-              return (
-                <div style={{
-                  display: 'flex', gap: '6px', marginTop: '4px', flexWrap: 'wrap',
-                }}>
-                  {cats.map(cat => (
-                    <span key={cat} style={{
-                      fontSize: '0.5rem', fontWeight: 700,
-                      color: catColors[cat] || '#818cf8',
-                      padding: '2px 6px', borderRadius: '4px',
-                      background: `${catColors[cat] || '#818cf8'}15`,
-                      textTransform: 'uppercase', letterSpacing: '0.5px',
-                    }}>
-                      {t(`common.${cat}`, cat)}
-                    </span>
-                  ))}
-                </div>
-              );
-            })()}
+            {!showDailySections && activeThemeKey === 'gold' && (
+              <div style={{
+                padding: '3px 8px', borderRadius: '6px',
+                background: 'linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.05))',
+                border: '1px solid rgba(251,191,36,0.4)',
+                boxShadow: '0 0 10px rgba(251,191,36,0.15)',
+                color: '#fbbf24', fontSize: '0.55rem', fontWeight: 800,
+                textTransform: 'uppercase', letterSpacing: '1px',
+                display: 'flex', alignItems: 'center', gap: '4px'
+              }}>
+                <Award size={10} color="#fbbf24" fill="#fbbf24" />
+                {t('common.perfectDays', 'Perfect Day')}
+              </div>
+            )}
           </div>
         ) : sessionData?.name ? (
           <div style={{
@@ -454,6 +529,63 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, options
               ))
             ) : (
               <ExerciseList exercises={allExercises} t={t} />
+            )}
+          </div>
+        )}
+
+        {/* Global Daily Exercises (global mode) */}
+        {isGlobal && (
+          <div style={{ 
+            display: 'flex', flexDirection: 'column', 
+            gap: options.showDailyExercises && filteredDailyExercises.length > 0 ? '10px' : '0px',
+            maxHeight: options.showDailyExercises && filteredDailyExercises.length > 0 ? '1000px' : '0px',
+            opacity: options.showDailyExercises && filteredDailyExercises.length > 0 ? 1 : 0,
+            overflow: 'hidden',
+            transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            paddingTop: options.showDailyExercises && filteredDailyExercises.length > 0 ? '4px' : '0px',
+          }}>
+            <div style={{
+              fontSize: '0.55rem', fontWeight: 700,
+              color: currentTheme.accent, opacity: 0.7,
+              textTransform: 'uppercase', letterSpacing: '1px',
+              marginBottom: '4px',
+            }}>
+              {formatDate(options.globalDate || new Date().toISOString().split('T')[0], lang)}
+            </div>
+            {showDailySections ? (
+              dailyCategories.map(cat => (
+                <div key={cat.key} style={{ transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+                    marginBottom: '4px',
+                  }}>
+                    <div style={{
+                      fontSize: '0.55rem', fontWeight: 700,
+                      color: cat.color, opacity: 0.7,
+                      textTransform: 'uppercase', letterSpacing: '1px',
+                    }}>
+                      {cat.label}
+                    </div>
+                    {cat.isPerfect && (
+                      <div style={{
+                        padding: '3px 8px', borderRadius: '6px',
+                        background: 'linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.05))',
+                        border: '1px solid rgba(251,191,36,0.4)',
+                        boxShadow: '0 0 10px rgba(251,191,36,0.15)',
+                        color: '#fbbf24', fontSize: '0.55rem', fontWeight: 800,
+                        textTransform: 'uppercase', letterSpacing: '1px',
+                        display: 'flex', alignItems: 'center', gap: '4px'
+                      }}>
+                        <Award size={10} color="#fbbf24" fill="#fbbf24" />
+                        {t('common.perfectDays', 'Perfect Day')}
+                      </div>
+                    )}
+                  </div>
+                  <ExerciseList exercises={cat.exercises} t={t} />
+                </div>
+              ))
+            ) : (
+              <ExerciseList exercises={filteredDailyExercises} t={t} />
             )}
           </div>
         )}
