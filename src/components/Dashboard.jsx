@@ -1,13 +1,11 @@
-import React, { useEffect, useState, useMemo, useCallback, useRef, Suspense, lazy } from 'react';
+import React, { useEffect, useState, useMemo, Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from './feedback/CSSConfetti';
 import { NotificationManager } from './social/NotificationManager';
 import { DashboardHeader } from './dashboard/DashboardHeader';
 import { DashboardSlide } from './dashboard/DashboardSlide';
 import { DashboardActions } from './dashboard/DashboardActions';
-import { Day100Overlay } from './dashboard/Day100Overlay';
-import { Day100HackModal } from './dashboard/Day100HackModal';
-import { Day100UnhackAnimation } from './dashboard/Day100UnhackAnimation';
+import { Day100Overlay, Day100HackModal, Day100UnhackAnimation, useDay100Logic } from './dashboard/Day100Event';
 import { useAchievementToast } from '../hooks/useAchievementToast.jsx';
 import { ProPaywall } from './dashboard/ProPaywall';
 import { useHardwareBack } from '../hooks/useHardwareBack';
@@ -130,38 +128,14 @@ export function Dashboard() {
         });
     }, [isDay100, today, completions, dayNumber, settings, getExerciseCount]);
 
-    const [day100ModalShown, setDay100ModalShown] = useState(
-        () => isDay100 && !!sessionStorage.getItem('day100_modal_shown')
-    );
-    const [day100Unhacked, setDay100Unhacked] = useState(false);
-    const [showUnhackAnim, setShowUnhackAnim] = useState(false);
-
-    // Show hack modal once per day-100 session
-    const showDay100Modal = isDay100 && !day100ModalShown && !day100Unhacked
-        && !sessionStorage.getItem('day100_modal_shown');
-
-    // The hack is active when: it's day 100, modal has been dismissed, and not yet unhacked
-    const hackActive = isDay100 && day100ModalShown && !day100Unhacked && !showUnhackAnim;
-
-    const handleDay100ModalDismiss = useCallback(() => {
-        setDay100ModalShown(true);
-        sessionStorage.setItem('day100_modal_shown', '1');
-    }, []);
-
-    // Detect perfect day completion → trigger unhack animation
-    // We subscribe to completions changes via a micro-task to satisfy lint rules
-    const perfectDayCompletedRef = useRef(false);
-    useEffect(() => {
-        if (!hackActive || !isDayPerfectStandard || perfectDayCompletedRef.current) return;
-        perfectDayCompletedRef.current = true;
-        // Use a microtask to avoid "setState in effect" lint error
-        queueMicrotask(() => setShowUnhackAnim(true));
-    }, [hackActive, isDayPerfectStandard]);
-
-    const handleUnhackComplete = useCallback(() => {
-        setShowUnhackAnim(false);
-        setDay100Unhacked(true);
-    }, []);
+    const {
+        hackActive,
+        showDay100Modal,
+        showUnhackAnim,
+        day100Unhacked,
+        handleDay100ModalDismiss,
+        handleUnhackComplete
+    } = useDay100Logic(dayNumber, isDayPerfectStandard);
 
     const displayStreak = computedStats.displayStreak;
     const streakActive = computedStats.streakActive;
