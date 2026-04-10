@@ -616,6 +616,11 @@
     "theme.forest": "Bosque",
     "theme.purple": "Púrpura",
     "backgroundImage": "Imagen de fondo",
-    "uploadImage": "Añadir una imagen"
+    "cropImage": "Recortar imagen",
+    "showDailyExercises": "Rutina diaria",
+    "imageSelected": "Imagen seleccionada",
+    "recropImage": "Volver a recortar",
+    "takePhoto": "Tomar foto",
+    "uploadGallery": "Galería"
   }
 }

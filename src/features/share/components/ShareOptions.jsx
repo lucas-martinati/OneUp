@@ -142,7 +142,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <OptionRow
             icon={Dumbbell}
-            label={t('share.showDailyExercises', 'Routine par jour')}
+            label={t('share.showDailyExercises')}
             color="#ec4899"
             checked={options.showDailyExercises}
             onToggle={() => toggleOption('showDailyExercises')}
@@ -342,7 +342,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                   color: 'rgba(255,255,255,0.6)',
                   lineHeight: 1.3,
                 }}>
-                  {t('share.imageSelected', 'Image sélectionnée')}
+                  {t('share.imageSelected')}
                 </span>
 
                 {originalImage && (
@@ -362,7 +362,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                     }}
                   >
                     <Image size={13} />
-                    {t('share.recropImage', 'Recadrer')}
+                    {t('share.recropImage')}
                   </button>
                 )}
               </div>
@@ -385,7 +385,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}>
                   <span style={{ fontSize: '14px' }}>📸</span>
                 </div>
-                {t('share.takePhoto', 'Prendre une photo')}
+                {t('share.takePhoto')}
               </button>
               <button
                 onClick={() => fileInputRef.current?.click()}
@@ -403,7 +403,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}>
                   <Image size={14} style={{ opacity: 0.8 }} />
                 </div>
-                {t('share.uploadGallery', 'Galerie')}
+                {t('share.uploadGallery')}
               </button>
             </div>
           )}

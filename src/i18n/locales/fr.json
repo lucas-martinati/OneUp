@@ -597,7 +597,12 @@
     "theme.forest": "Forêt",
     "theme.purple": "Violet",
     "backgroundImage": "Image de fond",
-    "uploadImage": "Ajouter une image"
+    "cropImage": "Cadrage de l'image",
+    "showDailyExercises": "Routine par jour",
+    "imageSelected": "Image sélectionnée",
+    "recropImage": "Recadrer",
+    "takePhoto": "Prendre une photo",
+    "uploadGallery": "Galerie"
   },
   "exercises": {
     "pushups": "Pompes",

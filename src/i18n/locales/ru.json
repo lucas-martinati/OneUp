@@ -616,6 +616,11 @@
     "theme.forest": "Лес",
     "theme.purple": "Фиолетовый",
     "backgroundImage": "Фоновое изображение",
-    "uploadImage": "Добавить изображение"
+    "cropImage": "Обрезать изображение",
+    "showDailyExercises": "Ежедневная рутина",
+    "imageSelected": "Изображение выбрано",
+    "recropImage": "Обрезать заново",
+    "takePhoto": "Сделать фото",
+    "uploadGallery": "Галерея"
   }
 }

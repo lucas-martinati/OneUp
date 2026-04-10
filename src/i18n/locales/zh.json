@@ -616,6 +616,11 @@
     "theme.forest": "森林",
     "theme.purple": "紫色",
     "backgroundImage": "背景图片",
-    "uploadImage": "添加图片"
+    "cropImage": "裁剪图片",
+    "showDailyExercises": "每日例行运动",
+    "imageSelected": "图片已选择",
+    "recropImage": "重新裁剪",
+    "takePhoto": "拍摄照片",
+    "uploadGallery": "相册"
   }
 }

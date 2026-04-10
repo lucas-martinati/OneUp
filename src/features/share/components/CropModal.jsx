@@ -116,7 +116,7 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
           letterSpacing: '-0.01em',
           position: 'absolute', left: '50%', transform: 'translateX(-50%)',
         }}>
-          {t('share.cropImage', 'Cadrage de l\'image')}
+          {t('share.cropImage')}
         </span>
 
         <button
