@@ -1,7 +1,6 @@
 export function StoreCard({
     isActive,
     title,
-    // eslint-disable-next-line no-unused-vars
     icon: IconComponent,
     colorMain, // e.g. '#8b5cf6'
     colorRGB, // e.g. '139,92,246'

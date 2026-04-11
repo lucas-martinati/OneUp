@@ -20,7 +20,6 @@ function formatDate(dateStr, lang) {
   }
 }
 
-// eslint-disable-next-line no-unused-vars
 function MetricCard({ icon: Icon, value, label, color, isVisible = true }) {
   return (
     <div style={{

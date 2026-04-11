@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 export function SettingRow({ icon: IconComponent, title, description, color, children, isLast }) {
     return (
         <div style={{
