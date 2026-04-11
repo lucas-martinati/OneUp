@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  X, Plus, Settings, Trash2, 
+  X, Plus, Settings2, Trash2, 
   Dumbbell, Activity, Flame, Heart, Zap, Star, Target, Trophy, Swords
 } from '../../utils/icons';
 import { Z_INDEX } from '../../utils/zIndex';
