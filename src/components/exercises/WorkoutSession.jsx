@@ -16,6 +16,7 @@ import { getExerciseLabel, getExerciseCategory, isCustomExercise } from '../../u
 import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
+import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
 
 // ── Exercise grid item ──────────────────────────────────────────────────
 function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
@@ -81,7 +82,7 @@ export function WorkoutSession({
     // ── Context consumption (replaces 12 props) ──
     const { getExerciseCount, updateExerciseCount, completions, settings, computedStats } = useProgressContext();
     const { isPro } = useSubscription();
-    const { routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, customExercises } = useExercises();
+    const { routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, customExercises, getWeight, setWeight } = useExercises();
     const { t } = useTranslation();
     const [phase, setPhase] = useState('config'); // 'config' | 'running' | 'done'
     const [queue, setQueue] = useState([]); // ordered list of exercise IDs
@@ -660,6 +661,17 @@ export function WorkoutSession({
                                         <span style={{
                                             fontSize: '0.75rem', fontWeight: '600', color: ex.color, flex: 1
                                         }}>{getExerciseLabel(ex, t)}</span>
+                                        {WEIGHT_EXERCISES_MAP[id] && (
+                                            <span style={{
+                                                fontSize: '0.65rem', fontWeight: '600',
+                                                color: 'var(--text-secondary)',
+                                                background: `${ex.color}12`,
+                                                padding: '2px 8px', borderRadius: '10px',
+                                                border: `1px solid ${ex.color}20`
+                                            }}>
+                                                {getWeight(id)} {t('weight.kg')}
+                                            </span>
+                                        )}
                                         <button
                                             onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
                                             style={{

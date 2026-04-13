@@ -622,5 +622,14 @@
     "recropImage": "重新裁剪",
     "takePhoto": "拍摄照片",
     "uploadGallery": "相册"
+  },
+  "weight": {
+    "title": "负重演变",
+    "subtitle": "跟踪您的负重进度",
+    "kg": "kg",
+    "selectExercise": "选择运动",
+    "noData": "尚无数据",
+    "noDataHint": "在训练期间设置负重以查看进度",
+    "lastUsed": "上次使用"
   }
 }

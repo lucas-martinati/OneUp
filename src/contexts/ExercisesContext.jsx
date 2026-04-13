@@ -2,6 +2,7 @@
 import { createContext, useContext, useMemo, useCallback } from 'react';
 import { useRoutines } from '../hooks/useRoutines';
 import { useCustomExercises } from '../hooks/useCustomExercises';
+import { useExerciseWeights } from '../hooks/useExerciseWeights';
 import { EXERCISES, EXERCISES_MAP } from '../config/exercises';
 import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
 
@@ -16,7 +17,7 @@ const EMPTY_ARRAY = [];
 export function ExercisesProvider({ children, onDeleteExerciseHistory, onSaveToCloud }) {
   const routinesHook = useRoutines();
   const customExercisesHook = useCustomExercises();
-
+  const exerciseWeightsHook = useExerciseWeights();
   const { routines, saveRoutine, deleteRoutine, updateRoutine, setRoutinesFromCloud, maxRoutines } = routinesHook;
   const { customExercises: _customExercises, deleteCustomExercise: rawDeleteCustomExercise } = customExercisesHook;
   const customExercises = _customExercises || EMPTY_ARRAY;
@@ -102,10 +103,15 @@ export function ExercisesProvider({ children, onDeleteExerciseHistory, onSaveToC
     updateRoutine,
     setRoutinesFromCloud,
     maxRoutines,
+    // Exercise weights
+    exerciseWeights: exerciseWeightsHook.weights,
+    getWeight: exerciseWeightsHook.getWeight,
+    setWeight: exerciseWeightsHook.setWeight,
   }), [
     customExercises, customExercisesMap, wrappedCustomExercisesHook,
     allExercises, allExercisesMap, getExerciseById, exercisesByCategory,
     routines, saveRoutine, deleteRoutine, updateRoutine, setRoutinesFromCloud, maxRoutines,
+    exerciseWeightsHook.weights, exerciseWeightsHook.getWeight, exerciseWeightsHook.setWeight,
   ]);
 
   return (

@@ -5,10 +5,15 @@ import i18n from '../i18n';
 
 const logger = createLogger('Leaderboard');
 
-export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps, exerciseReps, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter, isPro, isPerfectToday }) {
+export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps, exerciseReps, exerciseWeights, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter, isPro, isPerfectToday }) {
   const auth = getAuthInstance();
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
+
+  let finalWeights = exerciseWeights;
+  if (!finalWeights) {
+    try { finalWeights = JSON.parse(localStorage.getItem('oneup_exercise_weights') || '{}'); } catch {}
+  }
 
   const uid = auth.currentUser.uid;
   const lbRef = ref(database, `leaderboard/${uid}`);
@@ -21,6 +26,7 @@ export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps
     totalReps: totalReps || 0,
     weightsTotalReps: weightsTotalReps || 0,
     exerciseReps: exerciseReps || {},
+    exerciseWeights: finalWeights || {},
     achievements: achievements || 0,
     lastActiveDay,
     difficultyMultiplier: difficultyMultiplier || 1,
@@ -61,6 +67,7 @@ export async function loadLeaderboard() {
       totalReps: entry.totalReps || 0,
       weightsTotalReps: entry.weightsTotalReps || 0,
       exerciseReps: entry.exerciseReps || {},
+      exerciseWeights: entry.exerciseWeights || {},
       achievements: entry.achievements || 0,
       lastActiveDay: entry.lastActiveDay || null,
       difficultyMultiplier: entry.difficultyMultiplier || 1,

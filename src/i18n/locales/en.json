@@ -622,5 +622,14 @@
     "squat_weights": "Weighted Squat",
     "deadlift": "Deadlift",
     "barbell_row": "Barbell Row"
+  },
+  "weight": {
+    "title": "Weight Evolution",
+    "subtitle": "Track your load progression",
+    "kg": "kg",
+    "selectExercise": "Select exercise",
+    "noData": "No weight data yet",
+    "noDataHint": "Set your weights during a session to see progression",
+    "lastUsed": "Last used"
   }
 }

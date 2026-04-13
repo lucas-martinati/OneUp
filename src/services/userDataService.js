@@ -136,3 +136,26 @@ export async function loadManualBadgesFromCloud() {
   if (snapshot.exists()) { logger.success('Manual badges loaded from cloud'); return snapshot.val(); }
   return null;
 }
+
+// ── Exercise weights (current weight per exercise) ──────────────────────
+
+export async function saveExerciseWeightsToCloud(weights) {
+  const auth = getAuthInstance();
+  const database = getDatabaseInstance();
+  if (!auth?.currentUser || !database) return false;
+
+  await set(ref(database, `users/${auth.currentUser.uid}/exerciseWeights`), weights || {});
+  logger.success('Exercise weights synced to cloud');
+  return true;
+}
+
+export async function loadExerciseWeightsFromCloud() {
+  const auth = getAuthInstance();
+  const database = getDatabaseInstance();
+  if (!auth?.currentUser || !database) return null;
+
+  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/exerciseWeights`));
+  if (snapshot.exists()) { logger.success('Exercise weights loaded from cloud'); return snapshot.val(); }
+  return null;
+}
+

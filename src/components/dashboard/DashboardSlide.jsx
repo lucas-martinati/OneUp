@@ -5,6 +5,8 @@ import { UI_ICONS, DynamicIcon } from '../../utils/icons';
 import { getDailyGoal } from '../../config/exercises';
 import { formatTime } from '../../utils/dateUtils';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
+import { useExercises } from '../../contexts/ExercisesContext';
+import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
 
 export const DashboardSlide = React.memo(({
     isFuture, effectiveStart, dayNumber, today, settings, getExerciseCount, completions, computedStats,
@@ -12,6 +14,7 @@ export const DashboardSlide = React.memo(({
     activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, onManageCustom, isDay100
 }) => {
     const { t, i18n } = useTranslation();
+    const { getWeight } = useExercises();
     const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
     
     if (!safeSelectedExercise) {
@@ -303,6 +306,7 @@ const ExerciseButton = React.memo(({
     ex, isActive, dayNumber, today, settings,
     getExerciseCount, completions, computedStats, onSelect, isDay100
 }) => {
+    const { getWeight } = useExercises();
     const statsEx = computedStats.exerciseStats?.find(e => e.id === ex.id);
     const exStreak = statsEx ? statsEx.streak : 0;
     const exCount = getExerciseCount(today, ex.id);
@@ -382,16 +386,28 @@ const ExerciseButton = React.memo(({
                                                 : (exDone ? exGoal : `${exCount}/${exGoal}`)
                                             }
             </span>
-            {exStreak > 0 && (
-                <span style={{
-                    fontSize: 'clamp(0.5rem, 1.1vh, 0.65rem)',
-                    color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
-                    opacity: exDone ? 1 : 0.6,
-                    filter: exDone ? 'none' : 'grayscale(100%)'
-                }}>
-                    🔥{exStreak}
-                </span>
-            )}
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '-2px' }}>
+                {WEIGHT_EXERCISES_MAP[ex.id] && (
+                    <span style={{
+                        fontSize: 'clamp(0.5rem, 1.1vh, 0.65rem)',
+                        color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
+                        opacity: exDone ? 1 : 0.8,
+                        filter: exDone ? 'none' : 'grayscale(50%)'
+                    }}>
+                        🏋️{getWeight(ex.id)}kg
+                    </span>
+                )}
+                {exStreak > 0 && (
+                    <span style={{
+                        fontSize: 'clamp(0.5rem, 1.1vh, 0.65rem)',
+                        color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
+                        opacity: exDone ? 1 : 0.6,
+                        filter: exDone ? 'none' : 'grayscale(100%)'
+                    }}>
+                        🔥{exStreak}
+                    </span>
+                )}
+            </div>
         </button>
     );
 });

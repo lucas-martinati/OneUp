@@ -15,6 +15,7 @@ export const WEIGHT_EXERCISES = [
     gradient: ["#f59e0b", "#d97706"], // orange/amber
     icon: "Dumbbell",
     multiplier: 0.5,
+    defaultWeight: 10,
   },
   {
     id: "hammer_curl",
@@ -22,6 +23,7 @@ export const WEIGHT_EXERCISES = [
     gradient: ["#ea580c", "#c2410c"], // dark orange
     icon: "Dumbbell",
     multiplier: 0.5,
+    defaultWeight: 10,
   },
   {
     id: "bench_press",
@@ -29,6 +31,7 @@ export const WEIGHT_EXERCISES = [
     gradient: ["#3b82f6", "#2563eb"], // blue
     icon: "ArrowUp",
     multiplier: 0.5,
+    defaultWeight: 15,
   },
   {
     id: "overhead_press",
@@ -36,6 +39,7 @@ export const WEIGHT_EXERCISES = [
     gradient: ["#10b981", "#059669"], // emerald
     icon: "ArrowUp",
     multiplier: 0.4,
+    defaultWeight: 15,
   },
   {
     id: "squat_weights",
@@ -43,6 +47,7 @@ export const WEIGHT_EXERCISES = [
     gradient: ["#8b5cf6", "#7c3aed"], // violet
     icon: "ArrowDownUp",
     multiplier: 0.5,
+    defaultWeight: 10,
   },
   {
     id: "deadlift",
@@ -50,6 +55,7 @@ export const WEIGHT_EXERCISES = [
     gradient: ["#ef4444", "#dc2626"], // red
     icon: "Dumbbell",
     multiplier: 0.4,
+    defaultWeight: 25,
   },
   {
     id: "barbell_row",
@@ -57,6 +63,7 @@ export const WEIGHT_EXERCISES = [
     gradient: ["#06b6d4", "#0891b2"], // cyan
     icon: "MoveDiagonal",
     multiplier: 0.5,
+    defaultWeight: 15,
   }
 ];
 

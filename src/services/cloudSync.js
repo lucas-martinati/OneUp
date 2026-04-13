@@ -22,8 +22,12 @@ import {
   savePurchase, loadPurchase,
   saveRoutinesToCloud, loadRoutinesFromCloud,
   saveCustomExercisesToCloud, loadCustomExercisesFromCloud,
-  saveProgramCompletionsToCloud, loadProgramCompletionsFromCloud
+  saveProgramCompletionsToCloud, loadProgramCompletionsFromCloud,
+  saveExerciseWeightsToCloud, loadExerciseWeightsFromCloud
 } from './userDataService';
+import {
+  saveWeightEntry, loadWeightHistory, loadAllWeightHistories, loadLatestWeights
+} from './weightHistoryService';
 
 class CloudSyncService {
   constructor() {
@@ -77,6 +81,16 @@ class CloudSyncService {
   // Program completions
   saveProgramCompletionsToCloud(id, c) { return saveProgramCompletionsToCloud(id, c); }
   loadProgramCompletionsFromCloud(id) { return loadProgramCompletionsFromCloud(id); }
+
+  // Exercise weights
+  saveExerciseWeightsToCloud(w) { return saveExerciseWeightsToCloud(w); }
+  loadExerciseWeightsFromCloud() { return loadExerciseWeightsFromCloud(); }
+
+  // Weight history
+  saveWeightEntry(exId, date, weight) { return saveWeightEntry(exId, date, weight); }
+  loadWeightHistory(exId) { return loadWeightHistory(exId); }
+  loadAllWeightHistories() { return loadAllWeightHistories(); }
+  loadLatestWeights(uid) { return loadLatestWeights(uid); }
 
   // Clan
   createClan(name) { return createClan(name); }

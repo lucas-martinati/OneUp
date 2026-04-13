@@ -54,6 +54,8 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
         const maxReps = Math.max(...allList.map(e => entry.exerciseReps?.[e.id] || 0), 1);
         const barWidth = (reps / maxReps) * 100;
         const exDays = loadingDetails ? null : (stats.exerciseDays?.[ex.id] || 0);
+        const weight = entry.exerciseWeights?.[ex.id] || ex.defaultWeight;
+        const isWeightEx = !!WEIGHT_EXERCISES.find(e => e.id === ex.id);
         return (
             <div key={ex.id} style={{
                 display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px',
@@ -76,6 +78,15 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                             )}
                             {exDays !== null && (
                                 <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', opacity: 0.7 }}>{exDays}{t('common.daysAbbr')}</span>
+                            )}
+                            {isWeightEx && (
+                                <span style={{ 
+                                    fontSize: '0.65rem', fontWeight: '600', color: 'var(--text-secondary)',
+                                    background: `${ex.color}12`, padding: '2px 6px', borderRadius: '8px',
+                                    border: `1px solid ${ex.color}20`
+                                }}>
+                                    {weight} {t('weight.kg')}
+                                </span>
                             )}
                             <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-primary)' }}>{reps.toLocaleString()}</span>
                         </div>

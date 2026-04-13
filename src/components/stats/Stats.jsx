@@ -19,6 +19,7 @@ import { useExercises } from '../../contexts/ExercisesContext';
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
 const ConsistencyPieChart = lazy(() => import('./ConsistencyPieChart'));
 const DailyRepsChart = lazy(() => import('./DailyRepsChart'));
+const WeightEvolutionChart = lazy(() => import('./WeightEvolutionChart'));
 const SessionDetailModal = lazy(() => import('../../features/share/components/SessionDetailModal').then(m => ({ default: m.SessionDetailModal })));
 
 export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStore }) {
@@ -28,7 +29,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
     const { isPro, hadPro } = useSubscription();
     // For stats viewing, previously having pro is enough
     const hasProAccess = isPro || hadPro;
-    const { exercisesByCategory: exercisesList } = useExercises();
+    const { exercisesByCategory: exercisesList, getWeight } = useExercises();
     const highlightedBadgeId = null;
     const { t, i18n } = useTranslation();
     const [chartsReady, setChartsReady] = useState(false);
@@ -520,6 +521,13 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         title={t('stats.dailyReps')}
                         t={t}
                     />
+                    {activeCategories.includes('weights') && hasProAccess && (
+                        <WeightEvolutionChart
+                            title={t('weight.title')}
+                            t={t}
+                            getWeight={getWeight}
+                        />
+                    )}
                     <RadarChartPanel 
                         radarData={translatedRadarData} 
                         globalTotalReps={globalTotalReps}
