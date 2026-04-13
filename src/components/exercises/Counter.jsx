@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWakeLock } from '../../hooks/useWakeLock';
 import { CSSConfetti } from '../feedback/CSSConfetti';
@@ -20,6 +20,10 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     const [completeFlash, setCompleteFlash] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
 
+    // Use state to track previous completion state to avoid react-compiler ref mutation errors
+    const [wasCompleted, setWasCompleted] = useState(isCompleted);
+    const [hasCelebrated, setHasCelebrated] = useState(false);
+
     // Weight exercise support
     const isWeightExercise = !!WEIGHT_EXERCISES_MAP[exerciseConfig?.id];
     const currentWeight = isWeightExercise ? getWeight(exerciseConfig.id) : null;
@@ -28,19 +32,19 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     // Reset localWeightStr carefully
     useEffect(() => {
         if (currentWeight !== null) {
-            setLocalWeightStr(currentWeight.toString());
+            queueMicrotask(() => setLocalWeightStr(currentWeight.toString()));
         }
     }, [exerciseConfig?.id, currentWeight]);
 
-    // Reset interaction state on exercise switch
-    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
     useEffect(() => {
-        setIsAnimating(false);
-        setCompleteFlash(false);
-        setShowConfetti(false);
-        prevCompletedRef.current = isCompleted;
-        hasCelebratedRef.current = false;
-    }, [exerciseConfig?.id]);
+        queueMicrotask(() => {
+            setIsAnimating(false);
+            setCompleteFlash(false);
+            setShowConfetti(false);
+            setHasCelebrated(false);
+            setWasCompleted(isCompleted);
+        });
+    }, [exerciseConfig?.id, isCompleted]);
 
     const handleValidateWeight = () => {
         const val = parseFloat(localWeightStr.replace(',', '.'));
@@ -51,19 +55,13 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
         }
     };
 
-    // Use ref to track previous completion state (survives re-renders)
-    const prevCompletedRef = useRef(isCompleted);
-    const hasCelebratedRef = useRef(false);
 
     // Track threshold crossing for celebration
     useEffect(() => {
-        const wasCompleted = prevCompletedRef.current;
-
-        if (isCompleted && !wasCompleted && !hasCelebratedRef.current) {
-            // eslint-disable-next-line
-            hasCelebratedRef.current = true;
-            // Use queueMicrotask to avoid synchronous setState in effect
+        if (isCompleted && !wasCompleted && !hasCelebrated) {
+            // Use queueMicrotask to avoid synchronous setState cascades
             queueMicrotask(() => {
+                setHasCelebrated(true);
                 setShowConfetti(true);
                 sounds.success();
             });
@@ -75,12 +73,13 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
         }
 
         if (!isCompleted && wasCompleted) {
-            hasCelebratedRef.current = false;
+            queueMicrotask(() => setHasCelebrated(false));
         }
 
-        // eslint-disable-next-line
-        prevCompletedRef.current = isCompleted;
-    }, [isCompleted, onNext]);
+        if (isCompleted !== wasCompleted) {
+            queueMicrotask(() => setWasCompleted(isCompleted));
+        }
+    }, [isCompleted, wasCompleted, hasCelebrated, onNext]);
 
     const handleIncrement = (amount) => {
         setIsAnimating(true);

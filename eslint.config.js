@@ -39,6 +39,13 @@ export default defineConfig([
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
+  // Exceptions for React Fast Refresh (Contexts, paired hooks, and bundled portable components)
+  {
+    files: ['**/contexts/**/*.{js,jsx}', '**/hooks/**/*.{js,jsx}', '**/components/dashboard/Day100Event.jsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
   // Node.js files (Cloud Functions, build scripts)
   {
     files: ['functions/**/*.js', 'scripts/**/*.js'],

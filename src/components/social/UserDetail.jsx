@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Zap, Star } from '../../utils/icons';
@@ -6,7 +5,7 @@ import { Avatar } from '../ui/Avatar';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { registerBackHandler } from '../../utils/backHandler';
-import { getLocalDateStr, isDayDoneFromCompletions, calculateStreak, calculateExerciseStreak, calculateMaxStreak } from '../../utils/dateUtils';
+import { getLocalDateStr, calculateStreak, calculateExerciseStreak, calculateMaxStreak } from '../../utils/dateUtils';
 import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
@@ -47,7 +46,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
 
     const stats = computeStats(details);
 
-    const renderExerciseRow = (ex, index) => {
+    const renderExerciseRow = (ex) => {
         const ExIcon = getIcon(ex.icon);
         const reps = entry.exerciseReps?.[ex.id] || 0;
         const allList = [...EXERCISES, ...WEIGHT_EXERCISES];

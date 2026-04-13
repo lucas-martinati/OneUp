@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { X, Trophy, LogOut, Activity } from '../../utils/icons';
 import { EXERCISES } from '../../config/exercises';
@@ -62,8 +62,9 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
         setTimeout(() => setNudgedMember(null), 2000);
     };
 
-    const loadData = async () => {
-        setLoading(true);
+    const loadData = useCallback(async () => {
+        // Only set loading if not already loading, defer to microtask to avoid cascades
+        queueMicrotask(() => setLoading(prev => (prev ? prev : true)));
         try {
             if (clanData) {
                 setEntries(clanData.members);
@@ -75,12 +76,14 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
             console.error('Failed to load leaderboard', e);
         }
         setLoading(false);
-    };
+    }, [clanData, cloudSync]);
 
     useEffect(() => {
-        loadData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        const timer = setTimeout(() => {
+            loadData();
+        }, 0);
+        return () => clearTimeout(timer);
+    }, [loadData]);
 
     const sorted = useMemo(() => {
         const filteredEntries = domain === 'weights' ? entries.filter(e => e.isPro) : entries;

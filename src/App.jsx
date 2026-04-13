@@ -47,6 +47,7 @@ function AppContent() {
   );
 
   // Sync routines + custom exercises from cloud on sign-in
+  const { setCustomExercisesFromCloud } = customExercisesHook;
   useEffect(() => {
     if (auth.isSignedIn && !auth.loading && auth.user?.uid) {
       const loadData = async () => {
@@ -54,13 +55,12 @@ function AppContent() {
           const cloudRoutines = await cloudSync.loadRoutinesFromCloud();
           if (cloudRoutines && Array.isArray(cloudRoutines)) setRoutinesFromCloud(cloudRoutines);
           const cloudExercises = await cloudSync.loadCustomExercisesFromCloud();
-          if (cloudExercises && Array.isArray(cloudExercises)) customExercisesHook.setCustomExercisesFromCloud(cloudExercises);
+          if (cloudExercises && Array.isArray(cloudExercises)) setCustomExercisesFromCloud(cloudExercises);
         } catch { /* silent */ }
       };
       loadData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth.isSignedIn, auth.loading, auth.user?.uid]);
+  }, [auth.isSignedIn, auth.loading, auth.user?.uid, setCustomExercisesFromCloud, setRoutinesFromCloud]);
 
   return (
     <Suspense fallback={

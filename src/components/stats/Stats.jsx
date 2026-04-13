@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
 import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock, Clock, ChevronRight } from '../../utils/icons';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +29,6 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
     // For stats viewing, previously having pro is enough
     const hasProAccess = isPro || hadPro;
     const { exercisesByCategory: exercisesList, getWeight } = useExercises();
-    const highlightedBadgeId = null;
     const { t, i18n } = useTranslation();
     const [chartsReady, setChartsReady] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
@@ -91,9 +89,9 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         perfectDays, totalExerciseCompletions, globalTotalReps,
         exerciseStats, radarData, champion,
         monthlyActivityByExercise, monthlyActivityTotal,
-        pieData, trackedCount, badgeCount,
+        pieData, trackedCount,
         bestDayDate, bestDayReps, bestDayExReps,
-        firstActiveDate, dailyRepsData
+        dailyRepsData
     } = computedStats;
 
     const activeData = pieData.filter(d => d.value > 0).map(d => ({

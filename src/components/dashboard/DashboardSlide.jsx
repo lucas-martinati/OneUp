@@ -14,7 +14,6 @@ export const DashboardSlide = React.memo(({
     activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, onManageCustom, isDay100
 }) => {
     const { t, i18n } = useTranslation();
-    const { getWeight } = useExercises();
     const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
     
     if (!safeSelectedExercise) {

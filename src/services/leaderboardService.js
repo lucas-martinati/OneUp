@@ -12,7 +12,7 @@ export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps
 
   let finalWeights = exerciseWeights;
   if (!finalWeights) {
-    try { finalWeights = JSON.parse(localStorage.getItem('oneup_exercise_weights') || '{}'); } catch {}
+    try { finalWeights = JSON.parse(localStorage.getItem('oneup_exercise_weights') || '{}'); } catch (e) { logger.debug('Skip parsing err', e); }
   }
 
   const uid = auth.currentUser.uid;

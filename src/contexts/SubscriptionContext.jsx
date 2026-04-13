@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 import { cloudSync } from '../services/cloudSync';
@@ -97,6 +96,9 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
       };
       initAndCheck();
     }
+    // Intentionally omitted from deps: this effect is an auth-triggered initializer.
+    // initPurchases, cloudSync, resolveEntitlements are stable references (module-level
+    // singletons or useState setters). Adding them would cause spurious re-inits.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth.isSignedIn, auth.loading, auth.user?.uid]);
 

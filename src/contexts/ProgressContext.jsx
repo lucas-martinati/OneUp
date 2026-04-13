@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 import { useProgress } from '../hooks/useProgress';
@@ -96,8 +95,7 @@ export function ProgressProvider({ children }) {
         scheduleNotification(settings);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSetup, settings.notificationsEnabled]);
+  }, [isSetup, settings.notificationsEnabled, requestNotificationPermission, scheduleNotification, settings]);
 
   useEffect(() => {
     if (isSetup && settings.notificationsEnabled) {
@@ -111,8 +109,7 @@ export function ProgressProvider({ children }) {
       }, tomorrow.getTime() - now.getTime());
       return () => clearTimeout(midnightTimer);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSetup, settings.notificationsEnabled, settings.notificationTime, completions]);
+  }, [isSetup, settings.notificationsEnabled, settings.notificationTime, completions, scheduleNotification, settings]);
 
   // ── Auto-save to cloud on completion change ─────────────────────────
   useEffect(() => {
@@ -145,8 +142,7 @@ export function ProgressProvider({ children }) {
       };
       loadSettings();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth.isSignedIn, auth.loading]);
+  }, [auth.isSignedIn, auth.loading, updateSettings]);
 
   // ── Cloud auto-save for settings ────────────────────────────────────
   useCloudAutoSave(auth.isSignedIn && !auth.loading && isSetup, settings, cloudSync.saveSettingsToCloud, { delay: 2000 });
@@ -199,8 +195,7 @@ export function ProgressProvider({ children }) {
       };
       initialSync();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conflictCheckDone, auth.isSignedIn, auth.loading, isSetup, isInitialSyncDone]);
+  }, [conflictCheckDone, auth.isSignedIn, auth.loading, isSetup, isInitialSyncDone, syncWithCloud]);
 
   // ── Real-time cloud listener ────────────────────────────────────────
   useEffect(() => {
@@ -215,10 +210,9 @@ export function ProgressProvider({ children }) {
     if (!auth.isSignedIn || auth.loading || !isSetup || !isInitialSyncDone) return;
     const timer = setTimeout(() => publishLeaderboardNow(), 2000);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     completions, settings.leaderboardEnabled, settings.leaderboardPseudo, settings.difficultyMultiplier,
-    auth.isSignedIn, auth.loading, isSetup, isInitialSyncDone, computedStats
+    auth.isSignedIn, auth.loading, isSetup, isInitialSyncDone, computedStats, publishLeaderboardNow
   ]);
 
   // ── Conflict resolution ─────────────────────────────────────────────

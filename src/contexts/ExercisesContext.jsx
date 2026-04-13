@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useMemo, useCallback } from 'react';
 import { useRoutines } from '../hooks/useRoutines';
 import { useCustomExercises } from '../hooks/useCustomExercises';

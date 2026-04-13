@@ -7,7 +7,7 @@ import { Z_INDEX } from '../../utils/zIndex';
 
 export function NotificationManager() {
     const { cloudSyncAPI: cloudSync } = useProgressContext();
-    const [notifications, setNotifications] = useState([]); // eslint-disable-line no-unused-vars
+    const [, setNotifications] = useState([]);
     const [activeToasts, setActiveToasts] = useState([]);
 
     useEffect(() => {

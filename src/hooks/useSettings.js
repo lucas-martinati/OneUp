@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const SETTINGS_KEY = 'oneup_settings';
 
@@ -29,9 +29,9 @@ export function useSettings() {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   }, [settings]);
 
-  const updateSettings = (newSettings) => {
+  const updateSettings = useCallback((newSettings) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
-  };
+  }, []);
 
   return {
     settings,

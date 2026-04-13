@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWakeLock } from '../../hooks/useWakeLock';
 import { CSSConfetti } from '../feedback/CSSConfetti';
@@ -18,49 +18,39 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
     const [completeFlash, setCompleteFlash] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
 
-    const prevCompletedRef = useRef(isCompleted);
-    const hasCelebratedRef = useRef(false);
-    const countRef = useRef(currentCount);
-    const completedRef = useRef(isCompleted);
+    const [wasCompleted, setWasCompleted] = useState(isCompleted);
+    const [hasCelebrated, setHasCelebrated] = useState(false);
 
-    // Reset interaction state on exercise switch
-    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
     useEffect(() => {
-        setIsRunning(false);
-        setCompleteFlash(false);
-        setShowConfetti(false);
-        prevCompletedRef.current = isCompleted;
-        hasCelebratedRef.current = false;
-    }, [exerciseConfig?.id]);
+        queueMicrotask(() => {
+            setIsRunning(false);
+            setCompleteFlash(false);
+            setShowConfetti(false);
+            setHasCelebrated(false);
+            setWasCompleted(isCompleted);
+        });
+    }, [exerciseConfig?.id, isCompleted]);
 
-    // Sync refs in an effect instead of during render
-    useEffect(() => {
-        countRef.current = currentCount;
-        completedRef.current = isCompleted;
-    }, [currentCount, isCompleted]);
-    
     useEffect(() => {
         if (!isRunning || isCompleted) return;
         
+        let lastCount = currentCount;
         const interval = setInterval(() => {
-            if (completedRef.current) return;
-            const newCount = countRef.current + 1;
-            onUpdateCount(newCount);
-            if (newCount >= dailyGoal) {
+            lastCount += 1;
+            onUpdateCount(lastCount);
+            if (lastCount >= dailyGoal) {
                 setIsRunning(false);
             }
         }, 1000);
         
         return () => clearInterval(interval);
-    }, [isRunning, isCompleted, dailyGoal, onUpdateCount]);
+    }, [isRunning, isCompleted, currentCount, dailyGoal, onUpdateCount]);
 
     // Celebration
     useEffect(() => {
-        const wasCompleted = prevCompletedRef.current;
-        if (isCompleted && !wasCompleted && !hasCelebratedRef.current) {
-            // eslint-disable-next-line
-            hasCelebratedRef.current = true;
+        if (isCompleted && !wasCompleted && !hasCelebrated) {
             queueMicrotask(() => {
+                setHasCelebrated(true);
                 setShowConfetti(true);
                 sounds.success();
             });
@@ -71,11 +61,12 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
             }
         }
         if (!isCompleted && wasCompleted) {
-            hasCelebratedRef.current = false;
+            queueMicrotask(() => setHasCelebrated(false));
         }
-        // eslint-disable-next-line
-        prevCompletedRef.current = isCompleted;
-    }, [isCompleted, onNext]);
+        if (isCompleted !== wasCompleted) {
+            queueMicrotask(() => setWasCompleted(isCompleted));
+        }
+    }, [isCompleted, wasCompleted, hasCelebrated, onNext]);
 
     const handleReset = () => {
         setIsRunning(false);

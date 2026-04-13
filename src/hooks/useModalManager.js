@@ -1,8 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 
 export function useModalManager(initialModals = {}, syncModals = []) {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const keys = useMemo(() => Object.keys(initialModals), []);
+    const [keys] = useState(() => Object.keys(initialModals));
 
     const [modals, setModals] = useState(() => ({ ...initialModals }));
 

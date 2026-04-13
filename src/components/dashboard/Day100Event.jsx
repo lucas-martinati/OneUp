@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 
 // ============================================================================
