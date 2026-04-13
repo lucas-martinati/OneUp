@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useCallback } from 'react';
+import { useAuth } from './AuthContext';
 import { useRoutines } from '../hooks/useRoutines';
 import { useCustomExercises } from '../hooks/useCustomExercises';
 import { useExerciseWeights } from '../hooks/useExerciseWeights';
@@ -14,9 +15,11 @@ const EMPTY_ARRAY = [];
  * pattern found in 5+ files.
  */
 export function ExercisesProvider({ children, onDeleteExerciseHistory, onSaveToCloud }) {
-  const routinesHook = useRoutines();
-  const customExercisesHook = useCustomExercises();
-  const exerciseWeightsHook = useExerciseWeights();
+  const auth = useAuth();
+  const userId = auth.user?.uid;
+  const routinesHook = useRoutines(userId);
+  const customExercisesHook = useCustomExercises(userId);
+  const exerciseWeightsHook = useExerciseWeights(userId);
   const { routines, saveRoutine, deleteRoutine, updateRoutine, setRoutinesFromCloud, maxRoutines } = routinesHook;
   const { customExercises: _customExercises, deleteCustomExercise: rawDeleteCustomExercise } = customExercisesHook;
   const customExercises = _customExercises || EMPTY_ARRAY;

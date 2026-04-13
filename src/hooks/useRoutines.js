@@ -1,27 +1,52 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
-const STORAGE_KEY = 'oneup_routines';
+const STORAGE_KEY_BASE = 'oneup_routines';
 const MAX_ROUTINES = 10;
+
+function getStorageKey(userId) {
+  return userId ? `${STORAGE_KEY_BASE}_${userId}` : STORAGE_KEY_BASE;
+}
+
+function loadRoutinesFromStorage(storageKey) {
+  try {
+    const saved = localStorage.getItem(storageKey);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+}
 
 /**
  * Hook for managing workout routines (CRUD + localStorage persistence).
  * 
  * Each routine: { id, name, exerciseIds[], createdAt }
  */
-export function useRoutines() {
-  const [routines, setRoutines] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
+export function useRoutines(userId) {
+  const storageKey = getStorageKey(userId);
+
+  const [routines, setRoutines] = useState(() => loadRoutinesFromStorage(storageKey));
+
+  // Reload when userId changes (account switch)
+  const prevKeyRef = useRef(storageKey);
+  useEffect(() => {
+    if (prevKeyRef.current !== storageKey) {
+      prevKeyRef.current = storageKey;
+      if (userId) {
+        if (!localStorage.getItem(storageKey)) {
+          const legacyData = localStorage.getItem(STORAGE_KEY_BASE);
+          if (legacyData) localStorage.setItem(storageKey, legacyData);
+        }
+        setRoutines(loadRoutinesFromStorage(storageKey));
+      } else {
+        setRoutines([]);
+      }
     }
-  });
+  }, [storageKey, userId]);
 
   // Persist to localStorage on change
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(routines));
-  }, [routines]);
+    localStorage.setItem(storageKey, JSON.stringify(routines));
+  }, [routines, storageKey]);
 
   const saveRoutine = useCallback((name, exerciseIds) => {
     if (!name?.trim() || !exerciseIds?.length) return false;

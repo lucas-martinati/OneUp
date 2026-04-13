@@ -1,30 +1,56 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { WEIGHT_EXERCISES_MAP } from '../config/weights';
 import { cloudSync } from '../services/cloudSync';
 
-const STORAGE_KEY = 'oneup_exercise_weights';
+const STORAGE_KEY_BASE = 'oneup_exercise_weights';
+
+function getStorageKey(userId) {
+  return userId ? `${STORAGE_KEY_BASE}_${userId}` : STORAGE_KEY_BASE;
+}
+
+function loadFromStorage(storageKey) {
+  try {
+    const saved = localStorage.getItem(storageKey);
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+}
 
 /**
  * Hook to manage exercise weights (kg) per exercise.
  * - Persists locally in localStorage and syncs to Firebase.
  * - Falls back to the exercise's defaultWeight from config when no user value exists.
  */
-export function useExerciseWeights() {
-  const [weights, setWeights] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : {};
-    } catch {
-      return {};
-    }
-  });
+export function useExerciseWeights(userId) {
+  const storageKey = getStorageKey(userId);
+
+  const [weights, setWeights] = useState(() => loadFromStorage(storageKey));
 
   const [cloudLoaded, setCloudLoaded] = useState(false);
 
+  // Reload when userId changes (account switch)
+  const prevKeyRef = useRef(storageKey);
+  useEffect(() => {
+    if (prevKeyRef.current !== storageKey) {
+      prevKeyRef.current = storageKey;
+      setCloudLoaded(false);
+      if (userId) {
+        if (!localStorage.getItem(storageKey)) {
+          const legacyData = localStorage.getItem(STORAGE_KEY_BASE);
+          if (legacyData) localStorage.setItem(storageKey, legacyData);
+        }
+        setWeights(loadFromStorage(storageKey));
+      } else {
+        setWeights({});
+      }
+    }
+  }, [storageKey, userId]);
+
   // Persist to localStorage on change
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(weights));
-  }, [weights]);
+    localStorage.setItem(storageKey, JSON.stringify(weights));
+  }, [weights, storageKey]);
 
   // Load from cloud on init
   useEffect(() => {
@@ -36,7 +62,7 @@ export function useExerciseWeights() {
         setCloudLoaded(true);
       })
       .catch(() => { setCloudLoaded(true); });
-  }, []);
+  }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps -- reload from cloud on account switch
 
   // Save to cloud when weights change (debounced, after initial cloud load)
   useEffect(() => {

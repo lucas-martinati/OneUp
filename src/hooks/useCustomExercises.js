@@ -1,26 +1,51 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
-const STORAGE_KEY = 'oneup_custom_exercises';
+const STORAGE_KEY_BASE = 'oneup_custom_exercises';
 const MAX_CUSTOM_EXERCISES = 10;
+
+function getStorageKey(userId) {
+  return userId ? `${STORAGE_KEY_BASE}_${userId}` : STORAGE_KEY_BASE;
+}
+
+function loadFromStorage(storageKey) {
+  try {
+    const saved = localStorage.getItem(storageKey);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+}
 
 /**
  * Hook for managing personal custom exercises (Pro feature).
  * Each exercise: { id, label, icon, color, gradient, multiplier }
  */
-export function useCustomExercises() {
-  const [customExercises, setCustomExercises] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
+export function useCustomExercises(userId) {
+  const storageKey = getStorageKey(userId);
+
+  const [customExercises, setCustomExercises] = useState(() => loadFromStorage(storageKey));
+
+  // Reload when userId changes (account switch)
+  const prevKeyRef = useRef(storageKey);
+  useEffect(() => {
+    if (prevKeyRef.current !== storageKey) {
+      prevKeyRef.current = storageKey;
+      if (userId) {
+        if (!localStorage.getItem(storageKey)) {
+          const legacyData = localStorage.getItem(STORAGE_KEY_BASE);
+          if (legacyData) localStorage.setItem(storageKey, legacyData);
+        }
+        setCustomExercises(loadFromStorage(storageKey));
+      } else {
+        setCustomExercises([]);
+      }
     }
-  });
+  }, [storageKey, userId]);
 
   // Persist to localStorage
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(customExercises));
-  }, [customExercises]);
+    localStorage.setItem(storageKey, JSON.stringify(customExercises));
+  }, [customExercises, storageKey]);
 
   const saveCustomExercise = useCallback((exerciseData) => {
     if (!exerciseData?.label?.trim()) return null;

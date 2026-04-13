@@ -20,8 +20,8 @@ const ProgressContext = createContext(null);
  */
 export function ProgressProvider({ children }) {
   const auth = useAuth();
-  const progress = useProgress();
-  const { settings, updateSettings } = useSettings();
+  const progress = useProgress(auth.user?.uid);
+  const { settings, updateSettings } = useSettings(auth.user?.uid);
 
   const [conflictData, setConflictData] = useState(null);
   const [conflictCheckDone, setConflictCheckDone] = useState(false);

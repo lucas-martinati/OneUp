@@ -6,8 +6,26 @@ import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { saveManualBadgesToCloud, loadManualBadgesFromCloud } from '../services/userDataService';
 import i18n from '../i18n';
 
-const STORAGE_KEY = 'pushup_challenge_data';
+const STORAGE_KEY_BASE = 'pushup_challenge_data';
 const NOTIFICATION_ID = 1;
+
+/** Get the UID-scoped localStorage key (falls back to legacy key for anonymous users) */
+function getStorageKey(userId) {
+  return userId ? `${STORAGE_KEY_BASE}_${userId}` : STORAGE_KEY_BASE;
+}
+
+/** Default empty state for signed-out or new users */
+function getDefaultState() {
+  const currentYear = new Date().getFullYear();
+  return {
+    startDate: `${currentYear}-01-01`,
+    userStartDate: `${currentYear}-01-01`,
+    completions: {},
+    isSetup: false,
+    hasShared: false,
+    manualBadges: {},
+  };
+}
 
 /**
  * Migrate legacy flat completions entry to the new per-exercise structure.
@@ -85,6 +103,34 @@ function validateProgressData(data) {
   };
 }
 
+/** Load and validate state from a localStorage key */
+function loadStateFromStorage(storageKey) {
+  const saved = localStorage.getItem(storageKey);
+  let parsed = null;
+  try {
+    parsed = saved ? validateProgressData(JSON.parse(saved)) : null;
+  } catch {
+    parsed = null;
+  }
+
+  const currentYear = new Date().getFullYear();
+  const fixedStartDate = `${currentYear}-01-01`;
+
+  if (!parsed || parsed.startDate !== fixedStartDate) {
+    return {
+      ...getDefaultState(),
+      hasShared: parsed?.hasShared ?? false,
+      manualBadges: parsed?.manualBadges ?? {},
+    };
+  }
+
+  if (parsed.isSetup === undefined) {
+    return { ...parsed, isSetup: true, userStartDate: parsed.startDate, lastCompletionChange: Date.now(), manualBadges: parsed.manualBadges ?? {} };
+  }
+
+  return { ...parsed, lastCompletionChange: Date.now(), hasShared: parsed.hasShared ?? false, manualBadges: parsed.manualBadges ?? {} };
+}
+
 /** Build a "day done" object for all exercises (used in backfill) */
 function makeAllDone(selectedExercises = null) {
   const entry = {};
@@ -100,43 +146,36 @@ function makeAllDone(selectedExercises = null) {
   return entry;
 }
 
-export function useProgress() {
+export function useProgress(userId) {
+  const storageKey = getStorageKey(userId);
 
-  const [state, setState] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    let parsed = null;
+  const [state, setState] = useState(() => loadStateFromStorage(storageKey));
 
-    try {
-      parsed = saved ? validateProgressData(JSON.parse(saved)) : null;
-    } catch {
-      parsed = null;
-    }
-
-    const currentYear = new Date().getFullYear();
-    const fixedStartDate = `${currentYear}-01-01`;
-
-    if (!parsed || parsed.startDate !== fixedStartDate) {
-      return {
-        startDate: fixedStartDate,
-        userStartDate: fixedStartDate,
-        completions: {},
-        isSetup: false,
-        hasShared: parsed?.hasShared ?? false,
-        manualBadges: parsed?.manualBadges ?? {},
-      };
-    }
-
-    // Legacy support
-    if (parsed.isSetup === undefined) {
-      return { ...parsed, isSetup: true, userStartDate: parsed.startDate, lastCompletionChange: Date.now(), manualBadges: parsed.manualBadges ?? {} };
-    }
-
-    return { ...parsed, lastCompletionChange: Date.now(), hasShared: parsed.hasShared ?? false, manualBadges: parsed.manualBadges ?? {} };
-  });
-
+  // ── Reload state when userId changes (account switch) ──────────────
+  const prevKeyRef = useRef(storageKey);
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state]);
+    if (prevKeyRef.current !== storageKey) {
+      prevKeyRef.current = storageKey;
+      if (userId) {
+        // Migrate legacy data if UID-scoped key doesn't exist yet
+        if (!localStorage.getItem(storageKey)) {
+          const legacyData = localStorage.getItem(STORAGE_KEY_BASE);
+          if (legacyData) {
+            localStorage.setItem(storageKey, legacyData);
+          }
+        }
+        setState(loadStateFromStorage(storageKey));
+      } else {
+        // Signed out — reset to empty defaults
+        setState(getDefaultState());
+      }
+    }
+  }, [storageKey, userId]);
+
+  // ── Save to UID-scoped localStorage ────────────────────────────────
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(state));
+  }, [state, storageKey]);
 
   // Sync manual badges to cloud when they change
   useEffect(() => {
@@ -274,7 +313,15 @@ export function useProgress() {
       };
       newCompletions[dateStr] = day;
 
-      return { ...prev, completions: newCompletions, lastCompletionChange: Date.now() };
+      // Only trigger cloud save when completion status or weight actually changes
+      const completionChanged = wasDone !== isNowDone;
+      const weightChanged = weight !== null && weight !== (current.weight ?? null);
+      const needsCloudSync = completionChanged || weightChanged;
+      return {
+        ...prev,
+        completions: newCompletions,
+        ...(needsCloudSync ? { lastCompletionChange: Date.now() } : {}),
+      };
     });
   };
 
@@ -386,11 +433,18 @@ export function useProgress() {
 
   // Guard: skip incoming cloud updates triggered by our own writes
   const isLocalWriteRef = useRef(false);
+  // Ref to always have the latest state without re-creating callbacks
+  const stateRef = useRef(state);
+  useEffect(() => { stateRef.current = state; }, [state]);
+  // Guard against concurrent saves
+  const isSavingRef = useRef(false);
 
   const saveToCloud = useCallback(async () => {
+    if (isSavingRef.current) return { success: false, error: 'Save in progress' };
+    isSavingRef.current = true;
     try {
       isLocalWriteRef.current = true;
-      await cloudSync.saveToCloud(state);
+      await cloudSync.saveToCloud(stateRef.current);
       // Reset after a shorter delay to avoid missing legitimate incoming changes
       setTimeout(() => { isLocalWriteRef.current = false; }, 800);
       return { success: true };
@@ -398,8 +452,10 @@ export function useProgress() {
       isLocalWriteRef.current = false;
       console.error('Failed to save to cloud:', error);
       return { success: false, error: error.message };
+    } finally {
+      isSavingRef.current = false;
     }
-  }, [state]);
+  }, []);
 
   const loadFromCloud = useCallback(async () => {
     try {
@@ -428,7 +484,7 @@ export function useProgress() {
   const syncWithCloud = useCallback(async () => {
     try {
       isLocalWriteRef.current = true;
-      const mergedData = await cloudSync.syncData(state);
+      const mergedData = await cloudSync.syncData(stateRef.current);
       setState(validateProgressData(mergedData) || mergedData);
       // Reset after a shorter delay
       setTimeout(() => { isLocalWriteRef.current = false; }, 800);
@@ -438,7 +494,7 @@ export function useProgress() {
       console.error('Failed to sync with cloud:', error);
       return { success: false, error: error.message };
     }
-  }, [state]);
+  }, []);
 
   /**
    * Start listening to real-time cloud changes (Firebase onValue).
@@ -464,7 +520,6 @@ export function useProgress() {
       if (!changed) return prev;
 
       const newState = { ...prev, completions: nextCompletions, lastCompletionChange: Date.now() };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
       newStateToSync = newState;
       return newState;
     });

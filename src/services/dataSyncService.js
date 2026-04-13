@@ -86,6 +86,12 @@ export function mergeData(localData, cloudData) {
             merged[exId] = { ...localEx, ...cloudEx };
           }
         });
+        // Ensure local-only exercises (added offline) are preserved on shared days
+        Object.keys(localDay).forEach(exId => {
+          if (!merged[exId]) {
+            merged[exId] = localDay[exId];
+          }
+        });
         mergedCompletions[dateStr] = merged;
       }
     });
