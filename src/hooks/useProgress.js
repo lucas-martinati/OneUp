@@ -16,10 +16,15 @@ const NOTIFICATION_ID = 1;
  * New: completions[dateStr][exerciseId] = { isCompleted, timestamp, timeOfDay }
  */
 function migrateLegacyEntry(entry) {
-  const exerciseIds = EXERCISES.map(e => e.id);
-  const hasExerciseKey = exerciseIds.some(id => id in entry);
+  // Detect new per-exercise format by checking if ANY value is a nested object
+  // with exercise-like properties. This handles bodyweight, weighted, AND custom exercises
+  // without needing to hardcode exercise IDs.
+  const hasExerciseEntry = Object.values(entry).some(
+    val => val && typeof val === 'object' && !Array.isArray(val) &&
+      ('isCompleted' in val || 'done' in val || 'count' in val)
+  );
 
-  if (!hasExerciseKey) {
+  if (!hasExerciseEntry) {
     // Legacy flat entry — migrate pushupCount into pushups exercise
     const migrated = {};
     if (entry.done !== undefined || entry.pushupCount !== undefined || entry.isCompleted !== undefined) {
