@@ -11,7 +11,7 @@
     "build": "vite build",
     "build:bundle": "npm run build && npx cap copy android && cd android && ./gradlew bundleRelease",
     "build:apk": "npm run build && npx cap copy android && cd android && ./gradlew assembleRelease",
-    "lint": "eslint .",
+    "lint": "eslint . && node scripts/check-i18n-keys.cjs && node scripts/check-i18n-consistency.cjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "preview": "vite preview",

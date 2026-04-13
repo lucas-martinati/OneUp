@@ -166,21 +166,6 @@ walkDir(SRC_DIR, (filepath) => {
 console.log(`Static keys found in code : ${usedStaticKeys.size}`);
 console.log(`Dynamic prefixes found    : ${usedPrefixes.size}\n`);
 
-// 3. Afficher les clés dynamiques
-if (usedPrefixes.size > 0) {
-  console.log('=== DYNAMIC KEYS (accessed via variable patterns) ===\n');
-  for (const prefix of [...usedPrefixes].sort()) {
-    const matching = allKeys.filter(k => k.startsWith(prefix + '.'));
-    if (matching.length > 0) {
-      console.log(`  ${prefix}.* → ${matching.length} key(s)`);
-      matching.forEach(k => console.log(`    ✓ ${k}`));
-    } else {
-      console.log(`  ${prefix}.* → ⚠ no matching keys in en.json`);
-    }
-  }
-  console.log('');
-}
-
 // 4. Clés inutilisées
 //
 // Une clé est considérée utilisée si :
@@ -236,9 +221,23 @@ const missingKeys = [...usedStaticKeys].filter(k => {
   return true;
 });
 
+let hasErrors = false;
+
 if (missingKeys.length > 0) {
+  hasErrors = true;
   console.log(`\n=== MISSING KEYS — used in code but not in en.json (${missingKeys.length}) ===\n`);
   missingKeys.forEach(k => console.log(`  ! ${k}`));
 } else {
   console.log('\n✓ All static keys are defined in en.json.');
+}
+
+if (unusedKeys.length > 0) {
+  hasErrors = true;
+}
+
+if (hasErrors) {
+  console.error('\n❌ i18n checks failed. Please fix missing or unused keys.');
+  process.exit(1);
+} else {
+  console.log('\n✅ i18n checks passed. No missing or unused keys.');
 }

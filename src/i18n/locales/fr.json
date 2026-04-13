@@ -625,11 +625,8 @@
   },
   "weight": {
     "title": "Évolution du poids",
-    "subtitle": "Suivez votre progression de charge",
     "kg": "kg",
-    "selectExercise": "Sélectionner un exercice",
     "noData": "Aucune donnée de poids",
-    "noDataHint": "Renseignez vos poids pendant une session pour voir l'évolution",
-    "lastUsed": "Dernier utilisé"
+    "noDataHint": "Renseignez vos poids pendant une session pour voir l'évolution"
   }
 }

@@ -122,38 +122,16 @@ if (interLangDuplicates.length > 0) {
     });
     console.log('');
   }
+}
+
+let hasConsistencyErrors = false;
+if (!allComplete) hasConsistencyErrors = true;
+if (!noExtras) hasConsistencyErrors = true;
+if (interLangDuplicates.length > 0) hasConsistencyErrors = true;
+
+if (hasConsistencyErrors) {
+  console.error('\n❌ i18n consistency checks failed. Please fix the issues above.');
+  process.exit(1);
 } else {
-  console.log('  ✓ No inter-language duplicates found.\n');
+  console.log('\n✅ i18n consistency checks passed.');
 }
-
-/**
-// 5. Clés avec des valeurs identiques (Doublons locaux)
-console.log('=== 5. LOCAL DUPLICATE VALUES (Per language, excluding inter-language duplicates) ===\n');
-let noDuplicates = true;
-for (const lang of LANGUAGES) {
-  const flatObj = locales[lang];
-  
-  const valueMap = new Map();
-  for (const [key, value] of Object.entries(flatObj)) {
-    // OPTIMISATION : On ignore les clés déjà remontées dans l'étape 4
-    if (interLangDuplicateKeysToIgnore.has(key)) continue;
-
-    if (!valueMap.has(value)) {
-      valueMap.set(value, []);
-    }
-    valueMap.get(value).push(key);
-  }
-
-  const duplicates = [...valueMap.entries()].filter(([val, keys]) => keys.length > 1);
-
-  if (duplicates.length > 0) {
-    noDuplicates = false;
-    console.log(`  ${lang} (${duplicates.length} duplicated values):`);
-    for (const [value, keys] of duplicates) {
-      console.log(`    Value : "${value}"`);
-      console.log(`    Keys  : ${keys.join(', ')}\n`);
-    }
-  }
-}
-if (noDuplicates) console.log('  ✓ No local duplicate values found.\n');
-*/
