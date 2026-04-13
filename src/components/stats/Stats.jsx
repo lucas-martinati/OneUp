@@ -526,6 +526,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                             title={t('weight.title')}
                             t={t}
                             getWeight={getWeight}
+                            completions={completions}
                         />
                     )}
                     <RadarChartPanel 

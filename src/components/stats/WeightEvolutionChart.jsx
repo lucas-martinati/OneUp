@@ -1,27 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { WEIGHT_EXERCISES } from '../../config/weights';
-import { cloudSync } from '../../services/cloudSync';
 import { DynamicIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
-export default function WeightEvolutionChart({ title, t, getWeight }) {
+export default function WeightEvolutionChart({ title, t, getWeight, completions }) {
     const defaultId = WEIGHT_EXERCISES[0]?.id;
     const [selectedExIds, setSelectedExIds] = useState(defaultId ? [defaultId] : []);
-    const [historyData, setHistoryData] = useState({});
-    const [loading, setLoading] = useState(true);
-
-    // Load all weight histories on mount
-    useEffect(() => {
-        let cancelled = false;
-        cloudSync.loadAllWeightHistories()
-            .then(data => {
-                if (!cancelled && data) setHistoryData(data);
-            })
-            .catch(() => {})
-            .finally(() => { if (!cancelled) setLoading(false); });
-        return () => { cancelled = true; };
-    }, []);
 
     const toggleExercise = (id) => {
         setSelectedExIds(prev => {
@@ -31,26 +16,29 @@ export default function WeightEvolutionChart({ title, t, getWeight }) {
     };
 
     const chartData = useMemo(() => {
+        if (!completions) return [];
         const allDates = new Set();
-        selectedExIds.forEach(id => {
-            const exHistory = historyData[id];
-            if (exHistory && typeof exHistory === 'object') {
-                Object.keys(exHistory).forEach(date => allDates.add(date));
-            }
+        
+        // Find all dates where ANY selected weight exercise was completed with a weight
+        Object.entries(completions).forEach(([date, dayData]) => {
+            if (!dayData || typeof dayData !== 'object') return;
+            const hasDataForSelected = selectedExIds.some(id => dayData[id] && dayData[id].weight !== undefined && dayData[id].weight !== null && dayData[id].isCompleted);
+            if (hasDataForSelected) allDates.add(date);
         });
 
         const sortedDates = Array.from(allDates).sort((a, b) => a.localeCompare(b));
 
         return sortedDates.map(date => {
             const point = { date, label: date.slice(5).replace('-', '/') };
+            const dayData = completions[date] || {};
             selectedExIds.forEach(id => {
-                if (historyData[id] && historyData[id][date]) {
-                    point[id] = Number(historyData[id][date]) || 0;
+                if (dayData[id] && dayData[id].weight !== undefined && dayData[id].weight !== null && dayData[id].isCompleted) {
+                    point[id] = Number(dayData[id].weight) || 0;
                 }
             });
             return point;
         });
-    }, [historyData, selectedExIds]);
+    }, [completions, selectedExIds]);
 
     const maxWeight = useMemo(() => {
         let max = 1;
@@ -135,15 +123,7 @@ export default function WeightEvolutionChart({ title, t, getWeight }) {
             )}
 
             {/* Chart or empty state */}
-            {loading ? (
-                <div style={{
-                    height: '180px', display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', color: 'var(--text-secondary)',
-                    fontSize: '0.8rem'
-                }}>
-                    {t('common.loading')}
-                </div>
-            ) : chartData.length < 2 ? (
+            {chartData.length < 2 ? (
                 <div style={{
                     height: '180px', display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',

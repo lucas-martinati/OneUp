@@ -40,6 +40,7 @@ function migrateLegacyEntry(entry) {
         isCompleted: val.isCompleted !== undefined ? val.isCompleted : (val.done || false),
         timestamp: val.timestamp || null,
         timeOfDay: val.timeOfDay || null,
+        ...(val.weight !== undefined ? { weight: val.weight } : {})
       };
     }
   }
@@ -233,7 +234,7 @@ export function useProgress() {
    * Saves isCompleted boolean + timestamp. Count is kept locally for the counter UI
    * but NOT synced to Firebase (only isCompleted is synced).
    */
-  const updateExerciseCount = (dateStr, exerciseId, newCount, dailyGoal) => {
+  const updateExerciseCount = (dateStr, exerciseId, newCount, dailyGoal, weight = null) => {
     setState(prev => {
       const newCompletions = { ...prev.completions };
       const day = { ...(newCompletions[dateStr] || {}) };
@@ -259,7 +260,13 @@ export function useProgress() {
         timeOfDay = null;
       }
 
-      day[exerciseId] = { count: finalCount, isCompleted: isNowDone, timestamp, timeOfDay };
+      day[exerciseId] = { 
+        count: finalCount, 
+        isCompleted: isNowDone, 
+        timestamp, 
+        timeOfDay,
+        ...((weight !== null && weight !== undefined) ? { weight } : {}) 
+      };
       newCompletions[dateStr] = day;
 
       if (wasDone !== isNowDone) {

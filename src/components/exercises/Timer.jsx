@@ -23,6 +23,16 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
     const countRef = useRef(currentCount);
     const completedRef = useRef(isCompleted);
 
+    // Reset interaction state on exercise switch
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
+    useEffect(() => {
+        setIsRunning(false);
+        setCompleteFlash(false);
+        setShowConfetti(false);
+        prevCompletedRef.current = isCompleted;
+        hasCelebratedRef.current = false;
+    }, [exerciseConfig?.id]);
+
     // Sync refs in an effect instead of during render
     useEffect(() => {
         countRef.current = currentCount;
@@ -48,6 +58,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
     useEffect(() => {
         const wasCompleted = prevCompletedRef.current;
         if (isCompleted && !wasCompleted && !hasCelebratedRef.current) {
+            // eslint-disable-next-line
             hasCelebratedRef.current = true;
             queueMicrotask(() => {
                 setShowConfetti(true);
@@ -62,6 +73,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
         if (!isCompleted && wasCompleted) {
             hasCelebratedRef.current = false;
         }
+        // eslint-disable-next-line
         prevCompletedRef.current = isCompleted;
     }, [isCompleted, onNext]);
 

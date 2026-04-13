@@ -82,7 +82,7 @@ export function WorkoutSession({
     // ── Context consumption (replaces 12 props) ──
     const { getExerciseCount, updateExerciseCount, completions, settings, computedStats } = useProgressContext();
     const { isPro } = useSubscription();
-    const { routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, customExercises, getWeight, setWeight } = useExercises();
+    const { routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, customExercises, getWeight } = useExercises();
     const { t } = useTranslation();
     const [phase, setPhase] = useState('config'); // 'config' | 'running' | 'done'
     const [queue, setQueue] = useState([]); // ordered list of exercise IDs
@@ -858,7 +858,10 @@ export function WorkoutSession({
                 onClose={onClose}
                 dailyGoal={currentGoal}
                 currentCount={currentCount}
-                onUpdateCount={(newCount) => updateExerciseCount(today, currentExId, newCount, currentGoal)}
+                onUpdateCount={(newCount) => {
+                    const weight = getWeight ? getWeight(currentExId) : null;
+                    updateExerciseCount(today, currentExId, newCount, currentGoal, weight);
+                }}
                 isCompleted={currentDone}
                 dayNumber={dayNumber}
                 onNext={advanceToNext}

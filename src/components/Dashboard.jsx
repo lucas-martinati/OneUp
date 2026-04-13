@@ -48,7 +48,7 @@ export function Dashboard() {
     const { isPro } = useSubscription();
     const {
         customExercises, customExercisesMap,
-        customExercisesHook,
+        customExercisesHook, getWeight
     } = useExercises();
 
     const [today, setToday] = useState(getLocalDateStr(new Date()));
@@ -353,7 +353,10 @@ export function Dashboard() {
                             onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
                             dailyGoal={dailyGoal}
                             currentCount={currentCount}
-                            onUpdateCount={(newCount) => updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal)}
+                            onUpdateCount={(newCount) => {
+                                const weight = getWeight ? getWeight(selectedExerciseId) : null;
+                                updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight);
+                            }}
                             isCompleted={isExerciseDone}
                             dayNumber={dayNumber}
                         />
@@ -364,7 +367,10 @@ export function Dashboard() {
                             onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
                             dailyGoal={dailyGoal}
                             currentCount={currentCount}
-                            onUpdateCount={(newCount) => updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal)}
+                            onUpdateCount={(newCount) => {
+                                const weight = getWeight ? getWeight(selectedExerciseId) : null;
+                                updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight);
+                            }}
                             isCompleted={isExerciseDone}
                             dayNumber={dayNumber}
                         />

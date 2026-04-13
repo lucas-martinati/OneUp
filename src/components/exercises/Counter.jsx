@@ -25,12 +25,22 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     const currentWeight = isWeightExercise ? getWeight(exerciseConfig.id) : null;
     
     const [localWeightStr, setLocalWeightStr] = useState('');
+    // Reset localWeightStr carefully
     useEffect(() => {
-        if (currentWeight !== null && localWeightStr === '') {
+        if (currentWeight !== null) {
             setLocalWeightStr(currentWeight.toString());
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentWeight]);
+    }, [exerciseConfig?.id, currentWeight]);
+
+    // Reset interaction state on exercise switch
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
+    useEffect(() => {
+        setIsAnimating(false);
+        setCompleteFlash(false);
+        setShowConfetti(false);
+        prevCompletedRef.current = isCompleted;
+        hasCelebratedRef.current = false;
+    }, [exerciseConfig?.id]);
 
     const handleValidateWeight = () => {
         const val = parseFloat(localWeightStr.replace(',', '.'));
@@ -50,6 +60,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
         const wasCompleted = prevCompletedRef.current;
 
         if (isCompleted && !wasCompleted && !hasCelebratedRef.current) {
+            // eslint-disable-next-line
             hasCelebratedRef.current = true;
             // Use queueMicrotask to avoid synchronous setState in effect
             queueMicrotask(() => {
@@ -67,6 +78,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
             hasCelebratedRef.current = false;
         }
 
+        // eslint-disable-next-line
         prevCompletedRef.current = isCompleted;
     }, [isCompleted, onNext]);
 

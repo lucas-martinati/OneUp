@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { WEIGHT_EXERCISES_MAP } from '../config/weights';
 import { cloudSync } from '../services/cloudSync';
-import { getLocalDateStr } from '../utils/dateUtils';
 
 const STORAGE_KEY = 'oneup_exercise_weights';
 
@@ -60,16 +59,9 @@ export function useExerciseWeights() {
     return config?.defaultWeight ?? null;
   }, [weights]);
 
-  /**
-   * Set the weight for a specific exercise and persist to weight history.
-   */
   const setWeight = useCallback((exerciseId, kg) => {
     const value = Math.max(0, Number(kg) || 0);
     setWeights(prev => ({ ...prev, [exerciseId]: value }));
-
-    // Record in weight history for the chart
-    const todayStr = getLocalDateStr(new Date());
-    cloudSync.saveWeightEntry(exerciseId, todayStr, value).catch(() => {});
   }, []);
 
   return { weights, getWeight, setWeight };

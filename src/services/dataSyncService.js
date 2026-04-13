@@ -20,6 +20,7 @@ export function sanitizeForCloud(data) {
         isCompleted: ex.isCompleted || false,
         timestamp: ex.timestamp || null,
         timeOfDay: ex.timeOfDay || null,
+        ...(ex.weight !== undefined ? { weight: ex.weight } : {})
       };
     });
     sanitizedCompletions[dateStr] = sanitizedDay;
