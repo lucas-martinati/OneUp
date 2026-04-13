@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { useLocalStorageScoped } from './useLocalStorageScoped';
 import { cloudSync } from '../services/cloudSync';
 import { getLocalDateStr } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
@@ -8,11 +9,6 @@ import i18n from '../i18n';
 
 const STORAGE_KEY_BASE = 'pushup_challenge_data';
 const NOTIFICATION_ID = 1;
-
-/** Get the UID-scoped localStorage key (falls back to legacy key for anonymous users) */
-function getStorageKey(userId) {
-  return userId ? `${STORAGE_KEY_BASE}_${userId}` : STORAGE_KEY_BASE;
-}
 
 /** Default empty state for signed-out or new users */
 function getDefaultState() {
@@ -103,32 +99,27 @@ function validateProgressData(data) {
   };
 }
 
-/** Load and validate state from a localStorage key */
-function loadStateFromStorage(storageKey) {
-  const saved = localStorage.getItem(storageKey);
-  let parsed = null;
-  try {
-    parsed = saved ? validateProgressData(JSON.parse(saved)) : null;
-  } catch {
-    parsed = null;
-  }
+/** Custom parser for progress data — handles year validation and legacy migration */
+function parseProgressData(parsed) {
+  const validated = validateProgressData(parsed);
+  if (!validated) return null;
 
   const currentYear = new Date().getFullYear();
   const fixedStartDate = `${currentYear}-01-01`;
 
-  if (!parsed || parsed.startDate !== fixedStartDate) {
+  if (validated.startDate !== fixedStartDate) {
     return {
       ...getDefaultState(),
-      hasShared: parsed?.hasShared ?? false,
-      manualBadges: parsed?.manualBadges ?? {},
+      hasShared: validated.hasShared ?? false,
+      manualBadges: validated.manualBadges ?? {},
     };
   }
 
-  if (parsed.isSetup === undefined) {
-    return { ...parsed, isSetup: true, userStartDate: parsed.startDate, lastCompletionChange: Date.now(), manualBadges: parsed.manualBadges ?? {} };
+  if (validated.isSetup === undefined) {
+    return { ...validated, isSetup: true, userStartDate: validated.startDate, lastCompletionChange: Date.now(), manualBadges: validated.manualBadges ?? {} };
   }
 
-  return { ...parsed, lastCompletionChange: Date.now(), hasShared: parsed.hasShared ?? false, manualBadges: parsed.manualBadges ?? {} };
+  return { ...validated, lastCompletionChange: Date.now(), hasShared: validated.hasShared ?? false, manualBadges: validated.manualBadges ?? {} };
 }
 
 /** Build a "day done" object for all exercises (used in backfill) */
@@ -147,35 +138,9 @@ function makeAllDone(selectedExercises = null) {
 }
 
 export function useProgress(userId) {
-  const storageKey = getStorageKey(userId);
-
-  const [state, setState] = useState(() => loadStateFromStorage(storageKey));
-
-  // ── Reload state when userId changes (account switch) ──────────────
-  const prevKeyRef = useRef(storageKey);
-  useEffect(() => {
-    if (prevKeyRef.current !== storageKey) {
-      prevKeyRef.current = storageKey;
-      if (userId) {
-        // Migrate legacy data if UID-scoped key doesn't exist yet
-        if (!localStorage.getItem(storageKey)) {
-          const legacyData = localStorage.getItem(STORAGE_KEY_BASE);
-          if (legacyData) {
-            localStorage.setItem(storageKey, legacyData);
-          }
-        }
-        setState(loadStateFromStorage(storageKey));
-      } else {
-        // Signed out — reset to empty defaults
-        setState(getDefaultState());
-      }
-    }
-  }, [storageKey, userId]);
-
-  // ── Save to UID-scoped localStorage ────────────────────────────────
-  useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(state));
-  }, [state, storageKey]);
+  const [state, setState] = useLocalStorageScoped(
+    STORAGE_KEY_BASE, userId, getDefaultState(), parseProgressData
+  );
 
   // Sync manual badges to cloud when they change
   useEffect(() => {
