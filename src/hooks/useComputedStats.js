@@ -34,6 +34,29 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     const todayStr = getLocalDateStr(new Date());
     const today = new Date(todayStr);
 
+    const isDayDoneLocal = (dateStr) => {
+        const day = completions[dateStr];
+        if (!day) return false;
+        return Object.entries(day).some(([exId, exData]) => 
+            exData?.isCompleted && allExercises.some(e => e.id === exId)
+        );
+    };
+
+    const calculateLocalStreak = (dateStr) => {
+        let streak = 0;
+        const checkDate = new Date(dateStr);
+        for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
+            const d = new Date(checkDate);
+            d.setDate(d.getDate() - i);
+            if (isDayDoneLocal(getLocalDateStr(d))) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+        return streak;
+    };
+
     // ─── Accumulators ────────────────────────────────────────────────────
     let totalDays = 0;
     let perfectDays = 0;
@@ -87,7 +110,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         const day = completions[dateStr];
         if (!day || typeof day !== 'object') continue;
 
-        const anyDone = isDayDoneFromCompletions(completions, dateStr);
+        const anyDone = isDayDoneLocal(dateStr);
         if (!anyDone) continue;
 
         totalDays++;
@@ -198,7 +221,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const d = new Date(today);
         d.setDate(d.getDate() - i);
-        if (isDayDoneFromCompletions(completions, getLocalDateStr(d))) {
+        if (isDayDoneLocal(getLocalDateStr(d))) {
             tempStreak++;
             if (tempStreak > maxStreak) maxStreak = tempStreak;
         } else {
@@ -206,10 +229,10 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         }
     }
 
-    const currentStreak = calculateStreak(completions, todayStr);
+    const currentStreak = calculateLocalStreak(todayStr);
     const yesterdayDate = new Date(today);
     yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-    const yesterdayStreak = calculateStreak(completions, getLocalDateStr(yesterdayDate));
+    const yesterdayStreak = calculateLocalStreak(getLocalDateStr(yesterdayDate));
 
     // Perfect streak (consecutive perfect days)
     let perfectStreak = 0, maxPerfectStreak = 0;
@@ -264,7 +287,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     const globalTotalReps = Object.values(exerciseReps).reduce((sum, r) => sum + r, 0);
     const successRate = totalDays > 0 ? Math.round((totalDays / MAX_STREAK_WINDOW) * 100) : 0;
     const hasCompletedAllExercisesOnce = EXERCISES.every(ex => completedExIds.has(ex.id));
-    const todayDone = isDayDoneFromCompletions(completions, todayStr);
+    const todayDone = isDayDoneLocal(todayStr);
     const displayStreak = todayDone ? currentStreak : yesterdayStreak;
     const streakActive = todayDone;
 

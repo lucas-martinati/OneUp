@@ -214,7 +214,7 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
                         {sorted.map((entry, i) => (
                             <LeaderboardRow 
                                 key={entry.uid}
-                                entry={entry.uid === currentUid ? { ...entry, isPerfectToday: computedStats.isPerfectToday } : entry}
+                                entry={entry.uid === currentUid ? { ...entry, isPerfectToday: computedStats.isPerfectToday, lastActiveDay: computedStats.todayDone ? todayStr : entry.lastActiveDay } : entry}
                                 rank={getRank(i)}
                                 isMe={entry.uid === currentUid}
                                 reps={getReps(entry)}
