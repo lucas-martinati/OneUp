@@ -269,10 +269,7 @@ export function useProgress() {
       };
       newCompletions[dateStr] = day;
 
-      if (wasDone !== isNowDone) {
-        return { ...prev, completions: newCompletions, lastCompletionChange: Date.now() };
-      }
-      return { ...prev, completions: newCompletions };
+      return { ...prev, completions: newCompletions, lastCompletionChange: Date.now() };
     });
   };
 

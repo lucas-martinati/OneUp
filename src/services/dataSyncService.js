@@ -4,7 +4,7 @@ import { getAuthInstance, getDatabaseInstance } from './firebase';
 
 const logger = createLogger('DataSync');
 
-let syncInProgress = false;
+
 
 export function sanitizeForCloud(data) {
   if (!data || !data.completions) return data;
@@ -32,20 +32,16 @@ export async function saveToCloud(data) {
   const auth = getAuthInstance();
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) throw new Error('User not signed in or Firebase not initialized');
-  if (syncInProgress) { logger.debug('Sync already in progress, skipping...'); return; }
-
-  syncInProgress = true;
+  const userId = auth.currentUser.uid;
+  const cleanData = sanitizeForCloud(data);
+  
   try {
-    const userId = auth.currentUser.uid;
-    const cleanData = sanitizeForCloud(data);
     await set(ref(database, `users/${userId}/progress`), { ...cleanData, lastSyncedAt: serverTimestamp() });
     logger.success('Data saved to cloud successfully');
     return true;
   } catch (error) {
     logger.error('Error saving to cloud:', error);
     throw error;
-  } finally {
-    syncInProgress = false;
   }
 }
 

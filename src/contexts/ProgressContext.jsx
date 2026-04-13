@@ -188,12 +188,22 @@ export function ProgressProvider({ children }) {
 
   // ── Full sync on startup once conflict check is resolved ────────────
   useEffect(() => {
-    if (auth.isSignedIn && !auth.loading && conflictCheckDone && isSetup && !isInitialSyncDone) {
-      const initialSync = async () => {
-        try { await syncWithCloud(); setIsInitialSyncDone(true); }
-        catch (error) { logger.error('Initial sync failed:', error); setIsInitialSyncDone(true); }
-      };
-      initialSync();
+    if (auth.isSignedIn && !auth.loading && conflictCheckDone && !isInitialSyncDone) {
+      if (isSetup) {
+        const initialSync = async () => {
+          try {
+            await syncWithCloud();
+            queueMicrotask(() => setIsInitialSyncDone(true));
+          } catch (error) {
+            logger.error('Initial sync failed:', error);
+            queueMicrotask(() => setIsInitialSyncDone(true));
+          }
+        };
+        initialSync();
+      } else {
+        // No setup yet, but conflict check completed (empty cloud)
+        queueMicrotask(() => setIsInitialSyncDone(true));
+      }
     }
   }, [conflictCheckDone, auth.isSignedIn, auth.loading, isSetup, isInitialSyncDone, syncWithCloud]);
 
