@@ -63,8 +63,8 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
     };
 
     const loadData = useCallback(async () => {
-        // Only set loading if not already loading, defer to microtask to avoid cascades
-        queueMicrotask(() => setLoading(prev => (prev ? prev : true)));
+        // Only set loading if not already loading
+        setLoading(prev => (prev ? prev : true));
         try {
             if (clanData) {
                 setEntries(clanData.members);
