@@ -370,7 +370,8 @@ export function WorkoutSession({
             const ex = exerciseInfo.find(e => e.id === id);
             if (!ex) return null;
             const label = getExerciseLabel(ex, t);
-            return { id: ex.id, label, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type };
+            const w = getWeight ? getWeight(id) : null;
+            return { id: ex.id, label, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type, weight: w };
         }).filter(Boolean);
 
         // Detect routine: if queue matches a saved routine (same exercises, same order)
@@ -873,7 +874,8 @@ export function WorkoutSession({
     if (phase === 'done') {
         const completedExercises = queue.map(id => {
             const ex = exerciseInfo.find(e => e.id === id);
-            return ex ? { id: ex.id, label: getExerciseLabel(ex, t), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type } : null;
+            const w = getWeight ? getWeight(id) : null;
+            return ex ? { id: ex.id, label: getExerciseLabel(ex, t), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type, weight: w } : null;
         }).filter(Boolean);
 
         return (

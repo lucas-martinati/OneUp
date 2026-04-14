@@ -128,6 +128,7 @@ function ExerciseList({ exercises, t }) {
               fontSize: '0.65rem', fontWeight: 700, color: '#10b981',
             }}>
               {ex.type === 'timer' ? `${ex.reps}s` : `\u00d7${ex.reps}`}
+              {ex.weight ? ` • ${ex.weight} ${t('weight.kg', 'kg')}` : ''}
             </span>
           </div>
         );
@@ -179,7 +180,8 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
           if (knownEx) {
              dailyExercises.push({
                ...knownEx,
-               reps: exStats.count || getDailyGoal(knownEx, dayNum, displayMultiplier) || knownEx.reps || 0
+               reps: exStats.count || getDailyGoal(knownEx, dayNum, displayMultiplier) || knownEx.reps || 0,
+               weight: exStats.weight
              });
           }
         }

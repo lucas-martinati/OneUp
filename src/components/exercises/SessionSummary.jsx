@@ -153,12 +153,11 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                 width: '100%', maxWidth: '300px',
                 display: 'flex', flexDirection: 'column', gap: '6px'
             }}>
-                {queue.map(id => {
-                    const ex = exerciseInfo.find(e => e.id === id);
+                {shareSessionData.exercises.map((ex, i) => {
                     if (!ex) return null;
                     const Icon = getIcon(ex.icon);
                     return (
-                        <div key={id} style={{
+                        <div key={ex.id || i} style={{
                             display: 'flex', alignItems: 'center', gap: '10px',
                             padding: '10px 12px', borderRadius: 'var(--radius-md)',
                             background: `${ex.color}08`
@@ -166,12 +165,15 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                             <Icon size={16} color={ex.color} />
                             <span style={{
                                 flex: 1, fontSize: '0.8rem', fontWeight: '600', color: ex.color
-                            }}>{getExerciseLabel(ex, t)}</span>
+                            }}>{ex.label}</span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <Check size={14} color="#10b981" />
                                 <span style={{
                                     fontSize: '0.75rem', fontWeight: '700', color: '#10b981'
-                                }}>{ex.type === 'timer' ? `${ex.goal}s` : t('common.repsCount', { count: ex.goal })}</span>
+                                }}>
+                                    {ex.type === 'timer' ? `${ex.reps || ex.goal}s` : t('common.repsCount', { count: ex.reps || ex.goal })}
+                                    {ex.weight ? ` • ${ex.weight} ${t('weight.kg', 'kg')}` : ''}
+                                </span>
                             </div>
                         </div>
                     );

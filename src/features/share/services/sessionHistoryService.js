@@ -45,6 +45,7 @@ export function addSession({ date, duration, name, type, exercises }) {
       color: ex.color || getDefaultExerciseColor(),
       icon: ex.icon || 'Dumbbell',
       type: ex.type || 'counter',
+      ...(ex.weight ? { weight: ex.weight } : {})
     })),
   };
 

@@ -257,6 +257,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
                     <Check size={14} color="#10b981" />
                     <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#10b981' }}>
                       {ex.type === 'timer' ? `${ex.reps}s` : `${ex.reps} ${t('common.reps')}`}
+                      {ex.weight ? ` • ${ex.weight} ${t('weight.kg', 'kg')}` : ''}
                     </span>
                   </div>
                 </div>
