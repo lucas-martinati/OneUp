@@ -27,6 +27,7 @@ export function ProgressProvider({ children }) {
   const [conflictCheckDone, setConflictCheckDone] = useState(false);
   const [isInitialSyncDone, setIsInitialSyncDone] = useState(false);
   const [isSyncPaused, setIsSyncPaused] = useState(false);
+  const [syncError, setSyncError] = useState(null);
 
   const {
     startDate, completions, startChallenge, toggleCompletion,
@@ -115,12 +116,31 @@ export function ProgressProvider({ children }) {
   useEffect(() => {
     if (auth.isSignedIn && !auth.loading && !conflictData && conflictCheckDone && isInitialSyncDone) {
       const doSave = async () => {
-        try { await saveToCloud(); } catch (error) { logger.error('Auto-save failed:', error); }
+        try { 
+          await saveToCloud(); 
+          setSyncError(null);
+        } catch (error) { 
+          logger.error('Auto-save failed:', error); 
+          setSyncError(error.message);
+        }
       };
       const timer = setTimeout(doSave, 1000);
       return () => clearTimeout(timer);
     }
   }, [lastCompletionChange, auth.isSignedIn, auth.loading, conflictData, conflictCheckDone, isInitialSyncDone, saveToCloud]);
+
+  // ── Online recovery listener ────────────────────────────────────────
+  useEffect(() => {
+    const handleOnline = () => {
+      logger.info('Device back online. Attempting synchronization...');
+      if (auth.isSignedIn && !auth.loading && isInitialSyncDone) {
+        syncWithCloud().catch(err => logger.error('Online recovery sync failed:', err));
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [auth.isSignedIn, auth.loading, isInitialSyncDone, syncWithCloud]);
 
   // ── Sync settings with cloud on sign-in ─────────────────────────────
   useEffect(() => {
@@ -148,39 +168,49 @@ export function ProgressProvider({ children }) {
   useCloudAutoSave(auth.isSignedIn && !auth.loading && isSetup, settings, cloudSync.saveSettingsToCloud, { delay: 2000 });
 
   // ── Conflict detection ──────────────────────────────────────────────
+  // Only flag a real conflict when cloud and local share days with
+  // genuinely different isCompleted values.  Days that exist only on one
+  // side are simple additions — they will be combined by the merge step.
   useEffect(() => {
     if (auth.isSignedIn && !auth.loading && isSetup && !conflictCheckDone) {
+      let cancelled = false;
       const detectConflict = async () => {
         try {
           const cloudData = await cloudSync.loadFromCloud();
+          if (cancelled) return;
           if (cloudData && cloudData.completions) {
             const cloudKeys = Object.keys(cloudData.completions);
-            const localKeys = Object.keys(completions);
-            const hasConflict = cloudKeys.length > 0 && (
-              cloudKeys.some(key => !completions[key]) ||
-              localKeys.some(key => !cloudData.completions[key]) ||
-              cloudKeys.some(key => {
-                const cloudDay = cloudData.completions[key];
-                const localDay = completions[key];
-                if (!cloudDay || !localDay) return true;
-                const allExIds = new Set([...Object.keys(cloudDay), ...Object.keys(localDay)]);
-                for (const exId of allExIds) {
-                  if ((cloudDay[exId]?.isCompleted || false) !== (localDay[exId]?.isCompleted || false)) return true;
-                }
-                return false;
-              })
-            );
-            if (hasConflict) setConflictData(cloudData);
-            else setConflictCheckDone(true);
+            // Only inspect days that exist on BOTH sides
+            const sharedKeys = cloudKeys.filter(key => completions[key]);
+            const hasRealConflict = sharedKeys.some(key => {
+              const cloudDay = cloudData.completions[key];
+              const localDay = completions[key];
+              if (!cloudDay || !localDay) return false;
+              const allExIds = new Set([...Object.keys(cloudDay), ...Object.keys(localDay)]);
+              for (const exId of allExIds) {
+                const cloudDone = cloudDay[exId]?.isCompleted || false;
+                const localDone = localDay[exId]?.isCompleted || false;
+                if (cloudDone !== localDone) return true;
+              }
+              return false;
+            });
+
+            if (hasRealConflict) {
+              setConflictData(cloudData);
+            } else {
+              // No real conflict — skip modal
+              setConflictCheckDone(true);
+            }
           } else {
             setConflictCheckDone(true);
           }
         } catch (error) {
           logger.error('Conflict detection failed:', error);
-          setConflictCheckDone(true);
+          if (!cancelled) setConflictCheckDone(true);
         }
       };
       detectConflict();
+      return () => { cancelled = true; };
     } else if (auth.isSignedIn && !auth.loading && !isSetup && !conflictCheckDone) {
       queueMicrotask(() => setConflictCheckDone(true));
     }
@@ -229,11 +259,11 @@ export function ProgressProvider({ children }) {
   const handleResolveConflict = useCallback(async (action) => {
     try {
       if (action === 'restore') await loadFromCloud();
-      else if (action === 'upload') await saveToCloud();
+      else if (action === 'upload') await syncWithCloud(); // merge instead of overwrite
       setConflictData(null);
       setConflictCheckDone(true);
     } catch (error) { logger.error('Conflict resolution failed:', error); }
-  }, [loadFromCloud, saveToCloud]);
+  }, [loadFromCloud, syncWithCloud]);
 
   // Pause / resume sync
   const pauseCloudSync = useCallback(() => setIsSyncPaused(true), []);
@@ -279,6 +309,7 @@ export function ProgressProvider({ children }) {
     cloudSyncAPI, conflictData, onResolveConflict: handleResolveConflict,
     pauseCloudSync, resumeCloudSync,
     publishLeaderboardNow,
+    syncError,
   }), [
     startDate, completions, isSetup, userStartDate, hasShared, manualBadges,
     startChallenge, toggleCompletion, getDayNumber, getTotalReps, isDayDone,
@@ -287,6 +318,7 @@ export function ProgressProvider({ children }) {
     settings, updateSettings, computedStats, setCustomExercisesForStats,
     cloudSyncAPI, conflictData, handleResolveConflict,
     pauseCloudSync, resumeCloudSync, publishLeaderboardNow,
+    syncError,
   ]);
 
   return (

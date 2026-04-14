@@ -70,6 +70,8 @@ export function mergeData(localData, cloudData) {
   if (!cloudData) return localData;
   if (!localData) return cloudData;
 
+  logger.info(`Merging data: local has ${Object.keys(localData.completions).length} days, cloud has ${cloudData.completions ? Object.keys(cloudData.completions).length : 0} days`);
+
   const mergedCompletions = { ...localData.completions };
   if (cloudData.completions) {
     Object.keys(cloudData.completions).forEach(dateStr => {
@@ -82,7 +84,13 @@ export function mergeData(localData, cloudData) {
         Object.keys(cloudDay).forEach(exId => {
           const cloudEx = cloudDay[exId];
           const localEx = merged[exId];
-          if (!localEx || (cloudEx?.timestamp && localEx?.timestamp && new Date(cloudEx.timestamp) > new Date(localEx.timestamp)) || (cloudEx?.timestamp && !localEx?.timestamp)) {
+          
+          // Use cloud version if it has a strictly newer timestamp,
+          // or if local doesn't have a timestamp yet (fresh entry)
+          const cloudIsNewer = (cloudEx?.timestamp && localEx?.timestamp && new Date(cloudEx.timestamp) > new Date(localEx.timestamp));
+          const localHasNoTimestamp = (cloudEx?.timestamp && !localEx?.timestamp);
+
+          if (!localEx || cloudIsNewer || localHasNoTimestamp) {
             merged[exId] = { ...localEx, ...cloudEx };
           }
         });
@@ -97,7 +105,7 @@ export function mergeData(localData, cloudData) {
     });
   }
 
-  return {
+  const result = {
     startDate: localData.startDate || cloudData.startDate,
     userStartDate: localData.userStartDate || cloudData.userStartDate,
     completions: mergedCompletions,
@@ -106,9 +114,13 @@ export function mergeData(localData, cloudData) {
     manualBadges: { ...cloudData.manualBadges, ...localData.manualBadges },
     lastSyncedAt: new Date().toISOString()
   };
+
+  logger.debug(`Merge complete. Final completion days: ${Object.keys(result.completions).length}`);
+  return result;
 }
 
 export async function syncData(localData) {
+  logger.info('Starting full data synchronization...');
   const cloudData = await loadFromCloud();
   const mergedData = mergeData(localData, cloudData);
   await saveToCloud(mergedData);
