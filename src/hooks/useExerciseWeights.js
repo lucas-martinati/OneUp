@@ -13,11 +13,17 @@ const STORAGE_KEY = 'oneup_exercise_weights';
 export function useExerciseWeights(userId) {
   const [weights, setWeights] = useLocalStorageScoped(STORAGE_KEY, userId, {});
   const [cloudLoaded, setCloudLoaded] = useState(false);
+  const [prevUserId, setPrevUserId] = useState(userId);
+
+  // Reset when user changes to avoid cascading renders inside useEffect
+  if (userId !== prevUserId) {
+    setPrevUserId(userId);
+    setCloudLoaded(false);
+  }
 
   // Load from cloud on init (with cancellation to prevent stale writes on account switch)
   useEffect(() => {
     let cancelled = false;
-    setCloudLoaded(false);
 
     cloudSync.loadExerciseWeightsFromCloud()
       .then(cloudWeights => {

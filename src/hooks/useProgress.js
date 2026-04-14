@@ -159,7 +159,7 @@ export function useProgress(userId) {
         }));
       }
     }).catch(() => {});
-  }, []);
+  }, [setState]);
 
   // ─── Challenge Setup ──────────────────────────────────────────────────────
 
@@ -444,7 +444,7 @@ export function useProgress(userId) {
       console.error('Failed to load from cloud:', error);
       return { success: false, error: error.message };
     }
-  }, []);
+  }, [setState]);
 
   const syncWithCloud = useCallback(async () => {
     try {
@@ -459,7 +459,7 @@ export function useProgress(userId) {
       console.error('Failed to sync with cloud:', error);
       return { success: false, error: error.message };
     }
-  }, []);
+  }, [setState]);
 
   /**
    * Start listening to real-time cloud changes (Firebase onValue).
@@ -489,7 +489,7 @@ export function useProgress(userId) {
       return newState;
     });
     return newStateToSync;
-  }, []);
+  }, [setState]);
 
   const startCloudListener = useCallback(() => {
     return cloudSync.listenToCloudChanges((cloudData) => {
@@ -518,13 +518,13 @@ export function useProgress(userId) {
         };
       });
     });
-  }, []);
+  }, [setState]);
 
   // ─── Return ───────────────────────────────────────────────────────────────
 
   const setHasShared = useCallback(() => {
     setState(prev => ({ ...prev, hasShared: true }));
-  }, []);
+  }, [setState]);
 
   return {
     startDate: state.startDate,

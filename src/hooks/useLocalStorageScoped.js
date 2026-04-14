@@ -31,8 +31,11 @@ export function useLocalStorageScoped(baseKey, userId, defaultValue, parse) {
   // Keep stable refs for config values that shouldn't trigger re-runs
   const defaultValueRef = useRef(defaultValue);
   const parseRef = useRef(parse);
-  defaultValueRef.current = defaultValue;
-  parseRef.current = parse;
+
+  useEffect(() => {
+    defaultValueRef.current = defaultValue;
+    parseRef.current = parse;
+  }, [defaultValue, parse]);
 
   const [value, setValue] = useState(() => loadFromStorage(storageKey, defaultValue, parse));
 

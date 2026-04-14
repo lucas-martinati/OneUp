@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getLocalDateStr, isDayDoneFromCompletions, calculateStreak, calculateExerciseStreak, MAX_STREAK_WINDOW } from '../utils/dateUtils';
+import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
