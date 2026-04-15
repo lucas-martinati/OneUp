@@ -43,7 +43,7 @@ export function CloudSyncPanel({
             {conflictData.isAnonymousMerge ? (
               <button
                 className="btn-conflict btn-merge"
-                onClick={() => handleResolve('merge_anonymous')}
+                onClick={() => handleResolve('upload')}
                 disabled={resolving}
               >
                 <Upload />
