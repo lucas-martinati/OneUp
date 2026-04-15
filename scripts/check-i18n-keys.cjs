@@ -166,6 +166,23 @@ walkDir(SRC_DIR, (filepath) => {
 console.log(`Static keys found in code : ${usedStaticKeys.size}`);
 console.log(`Dynamic prefixes found    : ${usedPrefixes.size}\n`);
 
+// ─── 3. Special Case: Badge Definitions ──────────────────────────────────────
+const badgeDefPath = path.join(SRC_DIR, 'config/badgeDefinitions.js');
+if (fs.existsSync(badgeDefPath)) {
+  const content = fs.readFileSync(badgeDefPath, 'utf-8');
+  // Simple regex to extract IDs: { id: 'some_id', ... }
+  const idRegex = /id:\s*['"]([^'"]+)['"]/g;
+  let match;
+  let badgeCount = 0;
+  while ((match = idRegex.exec(content)) !== null) {
+    const id = match[1];
+    usedStaticKeys.add(`achievements.badges.${id}.title`);
+    usedStaticKeys.add(`achievements.badges.${id}.desc`);
+    badgeCount++;
+  }
+  console.log(`Added ${badgeCount * 2} keys from ${badgeCount} badge definitions.\n`);
+}
+
 // 4. Clés inutilisées
 //
 // Une clé est considérée utilisée si :
