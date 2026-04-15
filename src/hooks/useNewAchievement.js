@@ -12,6 +12,14 @@ import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '../conf
 export function useNewAchievement(computedStats, t) {
     const prevUnlockedIdsRef = useRef(null);
     const [newAchievement, setNewAchievement] = useState(null);
+    const [isReady, setIsReady] = useState(false);
+
+    // Initial timeout to prevent flashes of achievements on page load
+    // due to asynchronous context hydration (e.g., custom exercises or cloud sync).
+    useEffect(() => {
+        const timer = setTimeout(() => setIsReady(true), 2500);
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         // Collect current stats needed for badge testing
@@ -41,8 +49,8 @@ export function useNewAchievement(computedStats, t) {
             }
         }
 
-        // Skip detection on first run, just initialize the ref
-        if (prevUnlockedIdsRef.current === null) {
+        // Skip detection on first run or during hydration phase, just initialize the ref
+        if (!isReady || prevUnlockedIdsRef.current === null) {
             prevUnlockedIdsRef.current = currentUnlockedIds;
             return;
         }
@@ -72,7 +80,7 @@ export function useNewAchievement(computedStats, t) {
         computedStats.perfectDays, computedStats.hasCompletedAllExercisesOnce, computedStats.weekdayWorkouts,
         computedStats.weekendWorkouts, computedStats.morningWorkouts, computedStats.afternoonWorkouts,
         computedStats.eveningWorkouts, computedStats.ghostWorkout, computedStats.perfectStreak,
-        computedStats.hasShared, computedStats.manualBadges, t
+        computedStats.hasShared, computedStats.manualBadges, t, isReady
     ]);
 
     // Callback pour fermer le toast
