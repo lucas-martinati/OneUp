@@ -40,7 +40,6 @@ export const BADGE_DEFINITIONS = [
   { id: 'rep_500',   icon: 'Activity', color: '#ef4444', category: 'volume', test: s => s.totalRepsAll >= 500 },
   { id: 'rep_1000',  icon: 'Zap',      color: '#facc15', category: 'volume', test: s => s.totalRepsAll >= 1000 },
   { id: 'rep_5000',  icon: 'Flame',    color: '#f97316', category: 'volume', test: s => s.totalRepsAll >= 5000 },
-  { id: 'achiever',  icon: 'Award',    color: '#f97316', category: 'quantite', test: s => s.totalRepsAll >= 500 },
   { id: 'rep_10000', icon: 'Trophy',   color: '#eab308', category: 'volume', test: s => s.totalRepsAll >= 10000 },
   { id: 'rep_50000', icon: 'Rocket',   color: '#ec4899', category: 'volume', test: s => s.totalRepsAll >= 50000 },
 
