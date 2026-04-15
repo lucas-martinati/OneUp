@@ -17,6 +17,7 @@ export function CloudSyncPanel({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmUpload, setConfirmUpload] = useState(false);
+  const [confirmRestore, setConfirmRestore] = useState(false);
 
   const handleResolve = async (action) => {
     setResolving(true);
@@ -74,14 +75,22 @@ export function CloudSyncPanel({
               </button>
             )}
             <button
-              className="btn-conflict btn-restore"
-              onClick={() => handleResolve('restore')}
+              className={`btn-conflict btn-restore ${confirmRestore ? 'confirming' : ''}`}
+              onClick={() => {
+                if (!confirmRestore) {
+                  setConfirmRestore(true);
+                  setTimeout(() => setConfirmRestore(false), 3000);
+                } else {
+                  handleResolve('restore');
+                }
+              }}
               disabled={resolving}
+              style={confirmRestore ? { background: 'linear-gradient(135deg, #3b82f6, #2563eb)' } : {}}
             >
-              <Cloud />
+              {confirmRestore ? <AlertTriangle /> : <Cloud />}
               <div>
-                <strong>{t('cloud.restore')}</strong>
-                <span>{t('cloud.restoreDesc')}</span>
+                <strong>{confirmRestore ? t('cloud.areYouSure') : t('cloud.restore')}</strong>
+                <span>{confirmRestore ? t('cloud.cannotBeUndone') : t('cloud.restoreDesc')}</span>
               </div>
             </button>
           </div>
@@ -172,7 +181,8 @@ export function CloudSyncPanel({
             transition: all 0.3s ease;
             text-align: left;
           }
-          .btn-conflict svg {
+
+          .btn-conflict svg {
             width: 28px;
             height: 28px;
             flex-shrink: 0;
@@ -195,35 +205,39 @@ export function CloudSyncPanel({
           }
 
           .btn-restore {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: white;
+          }
+
+          .btn-restore.confirming {
+             background: linear-gradient(135deg, #eb2525ff, #d81d1dff) !important;
           }
 
           .btn-restore:hover:not(:disabled) {
             transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5);
+            box-shadow: 0 12px 32px rgba(59, 130, 246, 0.5);
           }
 
           .btn-merge {
-            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            background: linear-gradient(135deg, #10b981, #059669);
             color: white;
             border: 2px solid rgba(255, 255, 255, 0.1);
           }
 
           .btn-merge:hover:not(:disabled) {
             transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(124, 58, 237, 0.4);
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.4);
             border-color: rgba(255, 255, 255, 0.3);
           }
 
           .btn-upload {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
             color: white;
           }
 
           .btn-upload:hover:not(:disabled) {
             transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(59, 130, 246, 0.5);
+            box-shadow: 0 12px 32px rgba(124, 58, 237, 0.5);
           }
 
           .btn-conflict:active:not(:disabled) {
