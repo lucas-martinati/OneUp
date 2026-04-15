@@ -10,6 +10,7 @@ import { useAchievementToast } from '../hooks/useAchievementToast.jsx';
 import { ProPaywall } from './dashboard/ProPaywall';
 import { useHardwareBack } from '../hooks/useHardwareBack';
 import { useModalManager } from '../hooks/useModalManager';
+import { useNewAchievement } from '../hooks/useNewAchievement';
 
 // Contexts
 import { useProgressContext } from '../contexts/ProgressContext';
@@ -97,12 +98,22 @@ export function Dashboard() {
         setSoundSettingsGetter(() => settings);
     }, [settings]);
 
-    const { AchievementToast: AchievementToastComponent } = useAchievementToast(
+    const { showAchievement, AchievementToast: AchievementToastComponent } = useAchievementToast(
         () => {
             setShowStats(true);
             setTimeout(() => setShowAchievements(true), 100);
         }
     );
+
+    // Auto-detect new achievements and show toast
+    const { achievement: detectedAchievement, clearAchievement } = useNewAchievement(computedStats, t);
+
+    useEffect(() => {
+        if (detectedAchievement && detectedAchievement.id) {
+            showAchievement(detectedAchievement.id);
+            clearAchievement();
+        }
+    }, [detectedAchievement, showAchievement, clearAchievement]);
 
 
 
