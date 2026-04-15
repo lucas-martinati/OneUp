@@ -368,7 +368,11 @@
     "autoBackup": "Sauvegarde automatique",
     "multiDevice": "Synchronisation multi-appareils",
     "neverLose": "Ne perds jamais ta progression",
-    "signInWithGoogle": "Se connecter avec Google"
+    "signInWithGoogle": "Se connecter avec Google",
+    "anonymousMergeTitle": "Progression locale détectée",
+    "anonymousMergeDesc": "Tu as fait des exercices hors-ligne ou déconnecté. Veux-tu les fusionner avec ton compte ?",
+    "merge": "Fusionner",
+    "mergeDesc": "Conserver local + cloud"
   },
   "onboarding": {
     "concept": "Le Concept",

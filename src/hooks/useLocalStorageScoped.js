@@ -44,19 +44,7 @@ export function useLocalStorageScoped(baseKey, userId, defaultValue, parse) {
   useEffect(() => {
     if (prevKeyRef.current !== storageKey) {
       prevKeyRef.current = storageKey;
-      if (userId) {
-        // Migrate legacy data if UID-scoped key doesn't exist yet
-        if (!localStorage.getItem(storageKey)) {
-          const legacyData = localStorage.getItem(baseKey);
-          if (legacyData) {
-            localStorage.setItem(storageKey, legacyData);
-          }
-        }
-        setValue(loadFromStorage(storageKey, defaultValueRef.current, parseRef.current));
-      } else {
-        // Signed out — reset to defaults
-        setValue(defaultValueRef.current);
-      }
+      setValue(loadFromStorage(storageKey, defaultValueRef.current, parseRef.current));
     }
   }, [storageKey, userId, baseKey]);
 

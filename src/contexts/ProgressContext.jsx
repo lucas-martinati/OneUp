@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from './AuthContext';
 import { useProgress } from '../hooks/useProgress';
 import { useSettings } from '../hooks/useSettings';
@@ -29,6 +30,7 @@ export function ProgressProvider({ children }) {
   const [isSyncPaused, setIsSyncPaused] = useState(false);
   const [syncError, setSyncError] = useState(null);
 
+  const { i18n } = useTranslation();
   const {
     startDate, completions, startChallenge, toggleCompletion,
     getDayNumber, getTotalReps, isDayDone, isSetup, userStartDate,
@@ -36,6 +38,7 @@ export function ProgressProvider({ children }) {
     getExerciseCount, updateExerciseCount, getExerciseDone,
     saveToCloud, loadFromCloud, syncWithCloud, startCloudListener, deleteExerciseHistory,
     setHasShared, hasShared, manualBadges, lastCompletionChange,
+    mergeWithAnonymousData, clearAnonymousData, hasGuestData,
   } = progress;
 
   const userDetailsCache = useUserDetailsCache(cloudSync);
@@ -112,6 +115,36 @@ export function ProgressProvider({ children }) {
     }
   }, [isSetup, settings.notificationsEnabled, settings.notificationTime, completions, scheduleNotification, settings]);
 
+  // ─── Session restoration vs manual login detection ─────────────────
+  const isRestoredSessionRef = useRef(false);
+  const wasAlreadySignedInRef = useRef(false);
+  const isManualSignInInProgressRef = useRef(false);
+
+  useEffect(() => {
+    if (auth.isSignedIn && !auth.loading && !wasAlreadySignedInRef.current) {
+      // If we are signed in and loading finished, and we weren't flagged yet:
+      // - If NO manual sign-in is in progress, it's a restored session (e.g. app start/refresh)
+      // - If manual sign-in IS in progress, it's NOT a restored session
+      if (!isManualSignInInProgressRef.current) {
+        isRestoredSessionRef.current = true;
+      }
+      wasAlreadySignedInRef.current = true;
+    }
+    if (!auth.isSignedIn && !auth.loading) {
+      wasAlreadySignedInRef.current = false;
+      // Reset manual flag when not signed in
+      isManualSignInInProgressRef.current = false;
+    }
+  }, [auth.isSignedIn, auth.loading]);
+
+  // When user clicks sign-in, it's NOT a restored session
+  const originalSignIn = auth.signIn;
+  const wrappedSignIn = useCallback(async () => {
+    isManualSignInInProgressRef.current = true;
+    isRestoredSessionRef.current = false;
+    return originalSignIn();
+  }, [originalSignIn]);
+
   // ── Auto-save to cloud on completion change ─────────────────────────
   useEffect(() => {
     if (auth.isSignedIn && !auth.loading && !conflictData && conflictCheckDone && isInitialSyncDone) {
@@ -167,20 +200,35 @@ export function ProgressProvider({ children }) {
   // ── Cloud auto-save for settings ────────────────────────────────────
   useCloudAutoSave(auth.isSignedIn && !auth.loading && isSetup, settings, cloudSync.saveSettingsToCloud, { delay: 2000 });
 
-  // ── Conflict detection ──────────────────────────────────────────────
-  // Only flag a real conflict when cloud and local share days with
-  // genuinely different isCompleted values.  Days that exist only on one
-  // side are simple additions — they will be combined by the merge step.
+  // ── Anonymous (Guest) Data Detection & Merging ──────────────────────
   useEffect(() => {
     if (auth.isSignedIn && !auth.loading && isSetup && !conflictCheckDone) {
-      let cancelled = false;
-      const detectConflict = async () => {
+      const checkGuestAndCloud = async () => {
         try {
           const cloudData = await cloudSync.loadFromCloud();
-          if (cancelled) return;
+          const hasGuest = hasGuestData();
+          
+          if (hasGuest) {
+            if (isRestoredSessionRef.current) {
+              logger.info('Restored session detected with guest data. Auto-merging.');
+              await mergeWithAnonymousData();
+              clearAnonymousData();
+              // After auto-merge guest, proceed to normal cloud sync
+              setConflictCheckDone(true);
+            } else {
+              // Manual sign-in with guest data.
+              // We flag a special conflict type "anonymous_merge"
+              setConflictData({ 
+                ...cloudData, 
+                isAnonymousMerge: true,
+                message: i18n.t('cloud.anonymousMergeTitle') || 'Données locales détectées'
+              });
+            }
+            return;
+          }
+
           if (cloudData && cloudData.completions) {
             const cloudKeys = Object.keys(cloudData.completions);
-            // Only inspect days that exist on BOTH sides
             const sharedKeys = cloudKeys.filter(key => completions[key]);
             const hasRealConflict = sharedKeys.some(key => {
               const cloudDay = cloudData.completions[key];
@@ -198,7 +246,6 @@ export function ProgressProvider({ children }) {
             if (hasRealConflict) {
               setConflictData(cloudData);
             } else {
-              // No real conflict — skip modal
               setConflictCheckDone(true);
             }
           } else {
@@ -206,15 +253,14 @@ export function ProgressProvider({ children }) {
           }
         } catch (error) {
           logger.error('Conflict detection failed:', error);
-          if (!cancelled) setConflictCheckDone(true);
+          setConflictCheckDone(true);
         }
       };
-      detectConflict();
-      return () => { cancelled = true; };
+      checkGuestAndCloud();
     } else if (auth.isSignedIn && !auth.loading && !isSetup && !conflictCheckDone) {
       queueMicrotask(() => setConflictCheckDone(true));
     }
-  }, [auth.isSignedIn, auth.loading, isSetup, conflictCheckDone, completions]);
+  }, [auth.isSignedIn, auth.loading, isSetup, conflictCheckDone, completions, hasGuestData, mergeWithAnonymousData, clearAnonymousData, i18n]);
 
   // ── Full sync on startup once conflict check is resolved ────────────
   useEffect(() => {
@@ -258,12 +304,21 @@ export function ProgressProvider({ children }) {
   // ── Conflict resolution ─────────────────────────────────────────────
   const handleResolveConflict = useCallback(async (action) => {
     try {
-      if (action === 'restore') await loadFromCloud();
-      else if (action === 'upload') await syncWithCloud(); // merge instead of overwrite
+      if (action === 'restore') {
+        await loadFromCloud();
+        clearAnonymousData();
+      } else if (action === 'upload') {
+        await syncWithCloud();
+        clearAnonymousData();
+      } else if (action === 'merge_anonymous') {
+        await mergeWithAnonymousData();
+        await syncWithCloud();
+        clearAnonymousData();
+      }
       setConflictData(null);
       setConflictCheckDone(true);
     } catch (error) { logger.error('Conflict resolution failed:', error); }
-  }, [loadFromCloud, syncWithCloud]);
+  }, [loadFromCloud, syncWithCloud, mergeWithAnonymousData, clearAnonymousData]);
 
   // Pause / resume sync
   const pauseCloudSync = useCallback(() => setIsSyncPaused(true), []);
@@ -272,7 +327,7 @@ export function ProgressProvider({ children }) {
   // Cloud sync object for components that need direct access
   const cloudSyncAPI = useMemo(() => ({
     saveToCloud, loadFromCloud, syncWithCloud,
-    signIn: auth.signIn, signOut: auth.signOut,
+    signIn: wrappedSignIn, signOut: auth.signOut,
     loadLeaderboard: () => cloudSync.loadLeaderboard(),
     loadUserDetails: (uid) => userDetailsCache.loadUserDetails(uid),
     getCurrentUserId: () => cloudSync.getCurrentUserId(),
@@ -288,7 +343,7 @@ export function ProgressProvider({ children }) {
     deleteNotification: (id) => cloudSync.deleteNotification(id),
     subscribe: (cb) => cloudSync.subscribe(cb),
     checkSignInStatus: () => cloudSync.checkSignInStatus(),
-  }), [auth.signIn, auth.signOut, saveToCloud, loadFromCloud, syncWithCloud, userDetailsCache]);
+  }), [wrappedSignIn, auth.signOut, saveToCloud, loadFromCloud, syncWithCloud, userDetailsCache]);
 
   const value = useMemo(() => ({
     // Progress data

@@ -368,7 +368,11 @@
     "autoBackup": "自动备份",
     "multiDevice": "多设备同步",
     "neverLose": "永不丢失你的进度",
-    "signInWithGoogle": "用 Google 登录"
+    "signInWithGoogle": "用 Google 登录",
+    "anonymousMergeTitle": "检测到本地进度",
+    "anonymousMergeDesc": "您在未登录时完成了练习。是否要将其与您的账户合并？",
+    "merge": "合并",
+    "mergeDesc": "合并本地和云端数据"
   },
   "onboarding": {
     "concept": "概念",

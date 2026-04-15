@@ -368,7 +368,11 @@
     "autoBackup": "Automatic backup",
     "multiDevice": "Multi-device sync",
     "neverLose": "Never lose your progress",
-    "signInWithGoogle": "Sign in with Google"
+    "signInWithGoogle": "Sign in with Google",
+    "anonymousMergeTitle": "Local progress detected",
+    "anonymousMergeDesc": "You completed exercises while signed out. Would you like to merge them with your account?",
+    "merge": "Merge",
+    "mergeDesc": "Combine local + cloud data"
   },
   "onboarding": {
     "concept": "The Concept",

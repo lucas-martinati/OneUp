@@ -34,12 +34,45 @@ export function CloudSyncPanel({
         <div className="conflict-modal">
           <div className="conflict-header">
             <AlertCircle className="conflict-icon" />
-            <h2>{t('cloud.cloudDataDetected')}</h2>
+            <h2>{conflictData.isAnonymousMerge ? t('cloud.anonymousMergeTitle') : t('cloud.cloudDataDetected')}</h2>
           </div>
           <p className="conflict-message">
-            {t('cloud.backupExists')}
+            {conflictData.isAnonymousMerge ? t('cloud.anonymousMergeDesc') : t('cloud.backupExists')}
           </p>
           <div className="conflict-actions">
+            {conflictData.isAnonymousMerge ? (
+              <button
+                className="btn-conflict btn-merge"
+                onClick={() => handleResolve('merge_anonymous')}
+                disabled={resolving}
+              >
+                <Upload />
+                <div>
+                  <strong>{t('cloud.merge')}</strong>
+                  <span>{t('cloud.mergeDesc')}</span>
+                </div>
+              </button>
+            ) : (
+              <button
+                className={`btn-conflict btn-upload ${confirmUpload ? 'confirming' : ''}`}
+                onClick={() => {
+                  if (!confirmUpload) {
+                    setConfirmUpload(true);
+                    setTimeout(() => setConfirmUpload(false), 3000);
+                  } else {
+                    handleResolve('upload');
+                  }
+                }}
+                disabled={resolving}
+                style={confirmUpload ? { background: 'linear-gradient(135deg, #ef4444, #dc2626)' } : {}}
+              >
+                {confirmUpload ? <AlertTriangle /> : <Upload />}
+                <div>
+                  <strong>{confirmUpload ? t('cloud.areYouSure') : t('cloud.replaceCloud')}</strong>
+                  <span>{confirmUpload ? t('cloud.cannotBeUndone') : t('cloud.replaceDesc')}</span>
+                </div>
+              </button>
+            )}
             <button
               className="btn-conflict btn-restore"
               onClick={() => handleResolve('restore')}
@@ -49,25 +82,6 @@ export function CloudSyncPanel({
               <div>
                 <strong>{t('cloud.restore')}</strong>
                 <span>{t('cloud.restoreDesc')}</span>
-              </div>
-            </button>
-            <button
-              className={`btn-conflict btn-upload ${confirmUpload ? 'confirming' : ''}`}
-              onClick={() => {
-                if (!confirmUpload) {
-                  setConfirmUpload(true);
-                  setTimeout(() => setConfirmUpload(false), 3000);
-                } else {
-                  handleResolve('upload');
-                }
-              }}
-              disabled={resolving}
-              style={confirmUpload ? { background: 'linear-gradient(135deg, #ef4444, #dc2626)' } : {}}
-            >
-              {confirmUpload ? <AlertTriangle /> : <Upload />}
-              <div>
-                <strong>{confirmUpload ? t('cloud.areYouSure') : t('cloud.replaceCloud')}</strong>
-                <span>{confirmUpload ? t('cloud.cannotBeUndone') : t('cloud.replaceDesc')}</span>
               </div>
             </button>
           </div>
@@ -158,8 +172,7 @@ export function CloudSyncPanel({
             transition: all 0.3s ease;
             text-align: left;
           }
-
-          .btn-conflict svg {
+          .btn-conflict svg {
             width: 28px;
             height: 28px;
             flex-shrink: 0;
@@ -189,6 +202,18 @@ export function CloudSyncPanel({
           .btn-restore:hover:not(:disabled) {
             transform: translateY(-3px);
             box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5);
+          }
+
+          .btn-merge {
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+          }
+
+          .btn-merge:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(124, 58, 237, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
           }
 
           .btn-upload {

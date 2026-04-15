@@ -462,6 +462,62 @@ export function useProgress(userId) {
   }, [setState]);
 
   /**
+   * Merges data from the guest (anonymous) account into the current user's state.
+   * Useful when a user performs exercises before signing in.
+   */
+  const mergeWithAnonymousData = useCallback(async () => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_BASE);
+      if (!saved) return { success: false, error: 'No guest data found' };
+      
+      const guestData = JSON.parse(saved);
+      const validated = validateProgressData(guestData);
+      if (!validated) return { success: false, error: 'Invalid guest data' };
+
+      setState(prev => {
+        const merged = cloudSync.mergeData(prev, validated);
+        return {
+          ...prev,
+          startDate: merged.startDate || prev.startDate,
+          userStartDate: merged.userStartDate || prev.userStartDate,
+          completions: merged.completions || prev.completions,
+          isSetup: merged.isSetup || prev.isSetup,
+          hasShared: merged.hasShared || prev.hasShared,
+          manualBadges: { ...prev.manualBadges, ...merged.manualBadges },
+          lastCompletionChange: Date.now(),
+        };
+      });
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to merge guest data:', error);
+      return { success: false, error: error.message };
+    }
+  }, [setState]);
+
+  /** 
+   * Clears the guest (anonymous) data from localStorage.
+   * Should be called after a successful merge or when the user chooses to discard guest data.
+   */
+  const clearAnonymousData = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY_BASE);
+  }, []);
+
+  /**
+   * Check if there is significant guest data (e.g. at least one completion).
+   */
+  const hasGuestData = useCallback(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_BASE);
+      if (!saved) return false;
+      const data = JSON.parse(saved);
+      return data?.completions && Object.keys(data.completions).length > 0;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  /**
    * Start listening to real-time cloud changes (Firebase onValue).
    * When another device writes, this callback fires and merges the incoming data.
    * Returns an unsubscribe function.
@@ -551,6 +607,9 @@ export function useProgress(userId) {
     syncWithCloud,
     startCloudListener,
     setHasShared,
+    mergeWithAnonymousData,
+    clearAnonymousData,
+    hasGuestData,
     setManualBadge: (badgeId, value) => {
       setState(prev => ({ ...prev, manualBadges: { ...prev.manualBadges, [badgeId]: value } }));
     },
