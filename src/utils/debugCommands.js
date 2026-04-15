@@ -1,3 +1,5 @@
+import { cloudSync } from '../services/cloudSync';
+
 /**
  * OneUp debug commands — available via window.oneupDebug in the browser console.
  * Extracted from App.jsx to keep the root component clean.
@@ -5,10 +7,19 @@
 export function installDebugCommands() {
   if (typeof window === 'undefined') return;
 
+  const getActiveKey = (baseKey) => {
+    const uid = cloudSync.getCurrentUserId();
+    return uid ? `${baseKey}_${uid}` : baseKey;
+  };
+
   window.oneupDebug = {
     resetExercises() {
-      const raw = localStorage.getItem('pushup_challenge_data');
-      if (!raw) { console.log('[OneUp Debug] No data found.'); return; }
+      const key = getActiveKey('pushup_challenge_data');
+      const raw = localStorage.getItem(key);
+      if (!raw) {
+        console.log(`[OneUp Debug] No data found at ${key}`);
+        return;
+      }
       try {
         const data = JSON.parse(raw);
         const todayStr = new Date().toLocaleDateString('sv-SE');
@@ -20,28 +31,33 @@ export function installDebugCommands() {
               delete day[exId].count;
             }
           }
-          localStorage.setItem('pushup_challenge_data', JSON.stringify(data));
-          console.log(`[OneUp Debug] Today (${todayStr}) exercises reset. Reload to apply.`);
+          localStorage.setItem(key, JSON.stringify(data));
+          console.log(`[OneUp Debug] Today (${todayStr}) exercises reset in ${key}. Reload to apply.`);
         } else {
-          console.log(`[OneUp Debug] No data for today (${todayStr}).`);
+          console.log(`[OneUp Debug] No data for today (${todayStr}) in ${key}.`);
         }
       } catch (e) {
         console.error('[OneUp Debug] Error:', e);
       }
     },
     resetHistory() {
-      localStorage.removeItem('oneup_session_history');
-      console.log('[OneUp Debug] Session history cleared. Reload to apply.');
+      const key = getActiveKey('oneup_session_history');
+      localStorage.removeItem(key);
+      console.log(`[OneUp Debug] Session history cleared for ${key}. Reload to apply.`);
     },
     resetSettings() {
-      localStorage.removeItem('oneup_settings');
-      console.log('[OneUp Debug] Settings reset. Reload to apply.');
+      const key = getActiveKey('oneup_settings');
+      localStorage.removeItem(key);
+      console.log(`[OneUp Debug] Settings reset for ${key}. Reload to apply.`);
     },
     showData() {
-      const progress = localStorage.getItem('pushup_challenge_data');
-      const history = localStorage.getItem('oneup_session_history');
-      console.log('[OneUp Debug] Progress:', progress ? JSON.parse(progress) : null);
-      console.log('[OneUp Debug] History:', history ? JSON.parse(history) : null);
+      const pKey = getActiveKey('pushup_challenge_data');
+      const hKey = getActiveKey('oneup_session_history');
+      const progress = localStorage.getItem(pKey);
+      const history = localStorage.getItem(hKey);
+      console.log(`[OneUp Debug] Current UID: ${cloudSync.getCurrentUserId() || 'Anonymous'}`);
+      console.log(`[OneUp Debug] Progress (${pKey}):`, progress ? JSON.parse(progress) : null);
+      console.log(`[OneUp Debug] History (${hKey}):`, history ? JSON.parse(history) : null);
     },
   };
   console.log('[OneUp Debug] Commands: window.oneupDebug.resetExercises(), .resetHistory(), .resetSettings(), .showData()');
