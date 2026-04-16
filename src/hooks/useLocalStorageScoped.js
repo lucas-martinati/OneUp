@@ -39,14 +39,14 @@ export function useLocalStorageScoped(baseKey, userId, defaultValue, parse) {
 
   const [value, setValue] = useState(() => loadFromStorage(storageKey, defaultValue, parse));
 
-  // Reload when userId changes (account switch)
-  const prevKeyRef = useRef(storageKey);
-  useEffect(() => {
-    if (prevKeyRef.current !== storageKey) {
-      prevKeyRef.current = storageKey;
-      setValue(loadFromStorage(storageKey, defaultValueRef.current, parseRef.current));
-    }
-  }, [storageKey, userId, baseKey]);
+  // Reload when userId changes (account switch) synchronously during render.
+  // We use useState to track the previous key to ensure purity during the render phase.
+  const [prevKey, setPrevKey] = useState(storageKey);
+  if (prevKey !== storageKey) {
+    setPrevKey(storageKey);
+    const newValue = loadFromStorage(storageKey, defaultValue, parse);
+    setValue(newValue);
+  }
 
   // Persist to scoped localStorage on change (skip initial mount to avoid
   // overwriting a legacy key before migration has a chance to read it)

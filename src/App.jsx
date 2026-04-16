@@ -62,6 +62,8 @@ function AppContent() {
     }
   }, [auth.isSignedIn, auth.loading, auth.user?.uid, setCustomExercisesFromCloud, setRoutinesFromCloud]);
 
+  const isInitializing = auth.loading;
+
   return (
     <Suspense fallback={
       <div style={{
@@ -72,7 +74,15 @@ function AppContent() {
         {t('app.initializing')}
       </div>
     }>
-      {!isSetup ? (
+      {isInitializing ? (
+        <div style={{
+          position: 'fixed', inset: 0, background: '#050505',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: '600'
+        }}>
+          {t('app.initializing')}
+        </div>
+      ) : !isSetup ? (
         <Onboarding onStart={startChallenge} />
       ) : (
         <Dashboard />

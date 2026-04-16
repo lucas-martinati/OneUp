@@ -560,7 +560,7 @@ export function useProgress(userId) {
         const localJSON = JSON.stringify(prev.completions);
         if (cloudJSON === localJSON) return prev;
 
-        console.log('[Real-time sync] Incoming cloud update applied');
+        console.debug('[Real-time sync] Incoming cloud update applied');
         const merged = cloudSync.mergeData(prev, validated);
 
         return {
