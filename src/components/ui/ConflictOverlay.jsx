@@ -4,17 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { Cloud, AlertCircle, Upload, AlertTriangle } from '../../utils/icons';
 
 /**
- * Full-screen conflict resolution overlay.
- * Shows when local data conflicts with cloud data, prompting the user
- * to merge/upload or restore from cloud.
+ * Full-screen overlay for anonymous (guest) data merge.
+ * Only shown when the user was using the app without being signed in,
+ * then signs in — prompting to merge guest data or restore from cloud.
  *
- * Rendered via portal so it always appears on top, regardless of where
- * it's placed in the component tree.
+ * Regular reload conflicts (already signed in) are auto-merged silently.
  */
 export function ConflictOverlay({ conflictData, onResolveConflict }) {
   const [resolving, setResolving] = useState(false);
   const { t } = useTranslation();
-  const [confirmUpload, setConfirmUpload] = useState(false);
   const [confirmRestore, setConfirmRestore] = useState(false);
 
   if (!conflictData) return null;
@@ -33,45 +31,23 @@ export function ConflictOverlay({ conflictData, onResolveConflict }) {
       <div className="conflict-modal">
         <div className="conflict-header">
           <AlertCircle className="conflict-icon" />
-          <h2>{conflictData.isAnonymousMerge ? t('cloud.anonymousMergeTitle') : t('cloud.cloudDataDetected')}</h2>
+          <h2>{t('cloud.anonymousMergeTitle')}</h2>
         </div>
         <p className="conflict-message">
-          {conflictData.isAnonymousMerge ? t('cloud.anonymousMergeDesc') : t('cloud.backupExists')}
+          {t('cloud.anonymousMergeDesc')}
         </p>
         <div className="conflict-actions">
-          {conflictData.isAnonymousMerge ? (
-            <button
-              className="btn-conflict btn-merge"
-              onClick={() => handleResolve('upload')}
-              disabled={resolving}
-            >
-              <Upload />
-              <div>
-                <strong>{t('cloud.merge')}</strong>
-                <span>{t('cloud.mergeDesc')}</span>
-              </div>
-            </button>
-          ) : (
-            <button
-              className={`btn-conflict btn-upload ${confirmUpload ? 'confirming' : ''}`}
-              onClick={() => {
-                if (!confirmUpload) {
-                  setConfirmUpload(true);
-                  setTimeout(() => setConfirmUpload(false), 3000);
-                } else {
-                  handleResolve('upload');
-                }
-              }}
-              disabled={resolving}
-              style={confirmUpload ? { background: 'linear-gradient(135deg, #ef4444, #dc2626)' } : {}}
-            >
-              {confirmUpload ? <AlertTriangle /> : <Upload />}
-              <div>
-                <strong>{confirmUpload ? t('cloud.areYouSure') : t('cloud.replaceCloud')}</strong>
-                <span>{confirmUpload ? t('cloud.cannotBeUndone') : t('cloud.replaceDesc')}</span>
-              </div>
-            </button>
-          )}
+          <button
+            className="btn-conflict btn-merge"
+            onClick={() => handleResolve('upload')}
+            disabled={resolving}
+          >
+            <Upload />
+            <div>
+              <strong>{t('cloud.merge')}</strong>
+              <span>{t('cloud.mergeDesc')}</span>
+            </div>
+          </button>
           <button
             className={`btn-conflict btn-restore ${confirmRestore ? 'confirming' : ''}`}
             onClick={() => {
@@ -83,7 +59,7 @@ export function ConflictOverlay({ conflictData, onResolveConflict }) {
               }
             }}
             disabled={resolving}
-            style={confirmRestore ? { background: 'linear-gradient(135deg, #3b82f6, #2563eb)' } : {}}
+            style={confirmRestore ? { background: 'linear-gradient(135deg, #ef4444, #dc2626)' } : {}}
           >
             {confirmRestore ? <AlertTriangle /> : <Cloud />}
             <div>
@@ -202,20 +178,6 @@ export function ConflictOverlay({ conflictData, onResolveConflict }) {
           opacity: 0.8;
         }
 
-        .btn-restore {
-          background: linear-gradient(135deg, #3b82f6, #2563eb);
-          color: white;
-        }
-
-        .btn-restore.confirming {
-           background: linear-gradient(135deg, #eb2525ff, #d81d1dff) !important;
-        }
-
-        .btn-restore:hover:not(:disabled) {
-          transform: translateY(-3px);
-          box-shadow: 0 12px 32px rgba(59, 130, 246, 0.5);
-        }
-
         .btn-merge {
           background: linear-gradient(135deg, #10b981, #059669);
           color: white;
@@ -228,14 +190,18 @@ export function ConflictOverlay({ conflictData, onResolveConflict }) {
           border-color: rgba(255, 255, 255, 0.3);
         }
 
-        .btn-upload {
-          background: linear-gradient(135deg, #7c3aed, #4f46e5);
+        .btn-restore {
+          background: linear-gradient(135deg, #3b82f6, #2563eb);
           color: white;
         }
 
-        .btn-upload:hover:not(:disabled) {
+        .btn-restore.confirming {
+           background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        }
+
+        .btn-restore:hover:not(:disabled) {
           transform: translateY(-3px);
-          box-shadow: 0 12px 32px rgba(124, 58, 237, 0.5);
+          box-shadow: 0 12px 32px rgba(59, 130, 246, 0.5);
         }
 
         .btn-conflict:active:not(:disabled) {

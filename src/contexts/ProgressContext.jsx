@@ -176,49 +176,23 @@ export function ProgressProvider({ children }) {
     if (auth.isSignedIn && !auth.loading && isSetup && !conflictCheckDone) {
       const checkGuestAndCloud = async () => {
         try {
-          const cloudData = await cloudSync.loadFromCloud();
           const hasGuest = hasGuestData();
           if (hasGuest) {
-            // If guest data exists, we MUST ask the user before merging.
-            // We flag it as an anonymous merge conflict.
+            // Guest data exists — user was using the app while not signed in,
+            // then signed in. We MUST ask the user before merging.
+            const cloudData = await cloudSync.loadFromCloud();
             setConflictData({
               ...cloudData,
               isAnonymousMerge: true
             });
-            // Still mark conflict check + sync as done so the Dashboard renders
-            // and can show the conflict resolution UI
+            // Mark as done so the Dashboard renders the conflict resolution UI
             setConflictCheckDone(true);
             setIsInitialSyncDone(true);
             return;
           }
 
-          if (cloudData && cloudData.completions) {
-            const cloudKeys = Object.keys(cloudData.completions);
-            const sharedKeys = cloudKeys.filter(key => completions[key]);
-            const hasRealConflict = sharedKeys.some(key => {
-              const cloudDay = cloudData.completions[key];
-              const localDay = completions[key];
-              if (!cloudDay || !localDay) return false;
-              const allExIds = new Set([...Object.keys(cloudDay), ...Object.keys(localDay)]);
-              for (const exId of allExIds) {
-                const cloudDone = cloudDay[exId]?.isCompleted || false;
-                const localDone = localDay[exId]?.isCompleted || false;
-                if (cloudDone !== localDone) return true;
-              }
-              return false;
-            });
-
-            if (hasRealConflict) {
-              setConflictData(cloudData);
-              // Still mark as done so the Dashboard renders the conflict dialog
-              setConflictCheckDone(true);
-              setIsInitialSyncDone(true);
-            } else {
-              setConflictCheckDone(true);
-            }
-          } else {
-            setConflictCheckDone(true);
-          }
+          // Already signed in (page reload) — auto-merge silently, no dialog needed
+          setConflictCheckDone(true);
         } catch (error) {
           logger.error('Conflict detection failed:', error);
           setConflictCheckDone(true);
@@ -247,7 +221,7 @@ export function ProgressProvider({ children }) {
       };
       tryLoadFromCloud();
     }
-  }, [auth.isSignedIn, auth.loading, isSetup, conflictCheckDone, completions, hasGuestData, mergeWithAnonymousData, clearAnonymousData, i18n, loadFromCloud]);
+  }, [auth.isSignedIn, auth.loading, isSetup, conflictCheckDone, hasGuestData, loadFromCloud]);
 
   // ── Full sync on startup once conflict check is resolved ────────────
   useEffect(() => {
