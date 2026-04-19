@@ -344,14 +344,10 @@
     "title": "成就解锁！"
   },
   "cloud": {
-    "cloudDataDetected": "检测到云端数据",
-    "backupExists": "云端已存在备份。你想怎么做？",
     "restore": "恢复",
     "restoreDesc": "从云端获取我的数据",
     "areYouSure": "您确定吗？",
-    "replaceCloud": "与云端合并",
     "cannotBeUndone": "您的本地数据和云端数据将被合并。",
-    "replaceDesc": "将我的本地数据与云端合并",
     "cloudBackup": "云端备份",
     "connectedGooglePlay": "已连接 Google Play",
     "notConnected": "未连接",

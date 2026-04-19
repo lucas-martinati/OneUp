@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useAuth } from './AuthContext';
 import { useProgress } from '../hooks/useProgress';
 import { useSettings } from '../hooks/useSettings';
@@ -11,6 +10,7 @@ import { EXERCISES } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
 import { createLogger } from '../utils/logger';
 import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';
+import { updateWidgetData } from '../utils/widgetBridge';
 
 const logger = createLogger('Progress');
 const ProgressContext = createContext(null);
@@ -30,7 +30,6 @@ export function ProgressProvider({ children }) {
   const [isSyncPaused, setIsSyncPaused] = useState(false);
   const [syncError, setSyncError] = useState(null);
 
-  const { i18n } = useTranslation();
   const {
     startDate, completions, startChallenge, toggleCompletion,
     getDayNumber, getTotalReps, isDayDone, isSetup, userStartDate,
@@ -74,6 +73,11 @@ export function ProgressProvider({ children }) {
       logger.error('Leaderboard publish failed:', e);
     }
   }, [auth, computedStats, completions, settings]);
+
+  // ── Push widget data to SharedPreferences for native Android widget ──
+  useEffect(() => {
+    updateWidgetData(computedStats, completions);
+  }, [computedStats, completions]);
 
   // ── Performance mode on document root ──────────────────────────────
   useEffect(() => {

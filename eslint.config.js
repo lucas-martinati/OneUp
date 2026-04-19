@@ -41,7 +41,7 @@ export default defineConfig([
   },
   // Exceptions for React Fast Refresh (Contexts, paired hooks, and bundled portable components)
   {
-    files: ['**/contexts/**/*.{js,jsx}', '**/hooks/**/*.{js,jsx}', '**/components/dashboard/Day100Event.jsx'],
+    files: ['**/contexts/**/*.{js,jsx}', '**/hooks/**/*.{js,jsx}', '**/features/events/Day100Event.jsx'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },

@@ -344,14 +344,10 @@
     "title": "Achievement Unlocked!"
   },
   "cloud": {
-    "cloudDataDetected": "Cloud Data Detected",
-    "backupExists": "A backup already exists in the cloud. What would you like to do?",
     "restore": "Restore",
     "restoreDesc": "Get my data from the cloud",
     "areYouSure": "Are you sure?",
-    "replaceCloud": "Merge with Cloud",
     "cannotBeUndone": "Your local and cloud data will be merged.",
-    "replaceDesc": "Merge my local data with the cloud",
     "cloudBackup": "Cloud Backup",
     "connectedGooglePlay": "Connected with Google Play",
     "notConnected": "Not connected",

@@ -28,6 +28,34 @@
             android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Streak Widget Small (2x1) -->
+        <receiver
+            android:name=".StreakWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_small_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.lucasm548.oneup.REFRESH_WIDGETS" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_streak_small_info" />
+        </receiver>
+
+        <!-- Streak Widget Large (4x2) -->
+        <receiver
+            android:name=".StreakWidgetLargeProvider"
+            android:exported="true"
+            android:label="@string/widget_large_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.lucasm548.oneup.REFRESH_WIDGETS" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_streak_large_info" />
+        </receiver>
     </application>
 
     <!-- Permissions -->

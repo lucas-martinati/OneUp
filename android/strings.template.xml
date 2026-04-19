@@ -5,4 +5,11 @@
     <string name="package_name">com.lucasm548.oneup</string>
     <string name="custom_url_scheme">com.lucasm548.oneup</string>
     <string name="server_client_id">__GOOGLE_CLIENT_ID__</string>
+
+    <!-- Widget strings -->
+    <string name="widget_small_name">OneUp Streak</string>
+    <string name="widget_small_description">Affiche ta streak actuelle</string>
+    <string name="widget_large_name">OneUp Semaine</string>
+    <string name="widget_large_description">Streak et progrès de la semaine</string>
 </resources>
+

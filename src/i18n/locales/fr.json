@@ -344,14 +344,10 @@
     "title": "Succès Débloqué!"
   },
   "cloud": {
-    "cloudDataDetected": "Données cloud détectées",
-    "backupExists": "Une sauvegarde existe déjà dans le cloud. Que veux-tu faire ?",
     "restore": "Restaurer",
     "restoreDesc": "Récupérer mes données du cloud",
     "areYouSure": "Êtes-vous sûr(e) ?",
-    "replaceCloud": "Fusionner avec le cloud",
     "cannotBeUndone": "Vos données locales et cloud seront fusionnées.",
-    "replaceDesc": "Fusionner mes données locales avec le cloud",
     "cloudBackup": "Sauvegarde Cloud",
     "connectedGooglePlay": "Connecté avec Google Play",
     "notConnected": "Non connecté",

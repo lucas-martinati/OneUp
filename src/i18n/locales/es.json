@@ -344,14 +344,10 @@
     "title": "¡Logro Desbloqueado!"
   },
   "cloud": {
-    "cloudDataDetected": "Datos en la Nube Detectados",
-    "backupExists": "Ya existe una copia de seguridad en la nube. ¿Qué te gustaría hacer?",
     "restore": "Restaurar",
     "restoreDesc": "Obtener mis datos de la nube",
     "areYouSure": "¿Estás seguro?",
-    "replaceCloud": "Fusionar con la Nube",
     "cannotBeUndone": "Tus datos locales y en la nube se fusionarán.",
-    "replaceDesc": "Fusionar mis datos locales con la nube",
     "cloudBackup": "Copia de Seguridad en la Nube",
     "connectedGooglePlay": "Conectado con Google Play",
     "notConnected": "No conectado",
