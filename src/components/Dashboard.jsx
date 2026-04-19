@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from './feedback/CSSConfetti';
 import { NotificationManager } from './social/NotificationManager';
+import { ConflictOverlay } from './ui/ConflictOverlay';
 import { DashboardHeader } from './dashboard/DashboardHeader';
 import { DashboardSlide } from './dashboard/DashboardSlide';
 import { DashboardActions } from './dashboard/DashboardActions';
@@ -45,6 +46,7 @@ export function Dashboard() {
         getExerciseCount, updateExerciseCount,
         pauseCloudSync, resumeCloudSync,
         computedStats,
+        conflictData, onResolveConflict,
     } = useProgressContext();
     const { isPro } = useSubscription();
     const {
@@ -201,6 +203,7 @@ export function Dashboard() {
 
     return (
         <>
+            <ConflictOverlay conflictData={conflictData} onResolveConflict={onResolveConflict} />
             <NotificationManager />
             <CSSConfetti
                 active={showDayConfetti}

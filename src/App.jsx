@@ -22,7 +22,7 @@ const Onboarding = lazy(() => import('./components/settings/Onboarding').then(mo
 function AppContent() {
   const { t } = useTranslation();
   const auth = useAuth();
-  const { isSetup, startChallenge, setCustomExercisesForStats } = useProgressContext();
+  const { isSetup, startChallenge, setCustomExercisesForStats, isInitialSyncDone } = useProgressContext();
   const { customExercises, routines, setRoutinesFromCloud, customExercisesHook } = useExercises();
 
   // Keep computedStats up-to-date with custom exercises
@@ -62,7 +62,9 @@ function AppContent() {
     }
   }, [auth.isSignedIn, auth.loading, auth.user?.uid, setCustomExercisesFromCloud, setRoutinesFromCloud]);
 
-  const isInitializing = auth.loading;
+  // Show loading only when: auth is loading, OR user is signed in with no local data
+  // (waiting for cloud). If local data exists, show it immediately and sync in background.
+  const isInitializing = auth.loading || (auth.isSignedIn && !isSetup && !isInitialSyncDone);
 
   return (
     <Suspense fallback={

@@ -185,6 +185,10 @@ export function ProgressProvider({ children }) {
               ...cloudData,
               isAnonymousMerge: true
             });
+            // Still mark conflict check + sync as done so the Dashboard renders
+            // and can show the conflict resolution UI
+            setConflictCheckDone(true);
+            setIsInitialSyncDone(true);
             return;
           }
 
@@ -206,6 +210,9 @@ export function ProgressProvider({ children }) {
 
             if (hasRealConflict) {
               setConflictData(cloudData);
+              // Still mark as done so the Dashboard renders the conflict dialog
+              setConflictCheckDone(true);
+              setIsInitialSyncDone(true);
             } else {
               setConflictCheckDone(true);
             }
@@ -219,9 +226,28 @@ export function ProgressProvider({ children }) {
       };
       checkGuestAndCloud();
     } else if (auth.isSignedIn && !auth.loading && !isSetup && !conflictCheckDone) {
-      queueMicrotask(() => setConflictCheckDone(true));
+      // No local data — try loading from cloud first (user may have cloud data)
+      const tryLoadFromCloud = async () => {
+        try {
+          const result = await loadFromCloud();
+          if (result.success) {
+            // Cloud data loaded and applied — skip the subsequent syncWithCloud
+            // since we just fetched fresh data (avoids a redundant round-trip)
+            logger.info('Cloud data restored for signed-in user with no local data');
+            queueMicrotask(() => {
+              setConflictCheckDone(true);
+              setIsInitialSyncDone(true);
+            });
+            return;
+          }
+        } catch (error) {
+          logger.error('Cloud load for signed-in user failed:', error);
+        }
+        queueMicrotask(() => setConflictCheckDone(true));
+      };
+      tryLoadFromCloud();
     }
-  }, [auth.isSignedIn, auth.loading, isSetup, conflictCheckDone, completions, hasGuestData, mergeWithAnonymousData, clearAnonymousData, i18n]);
+  }, [auth.isSignedIn, auth.loading, isSetup, conflictCheckDone, completions, hasGuestData, mergeWithAnonymousData, clearAnonymousData, i18n, loadFromCloud]);
 
   // ── Full sync on startup once conflict check is resolved ────────────
   useEffect(() => {
@@ -238,7 +264,7 @@ export function ProgressProvider({ children }) {
         };
         initialSync();
       } else {
-        // No setup yet, but conflict check completed (empty cloud)
+        // No setup yet, and cloud didn't have data either
         queueMicrotask(() => setIsInitialSyncDone(true));
       }
     }
@@ -326,6 +352,7 @@ export function ProgressProvider({ children }) {
     pauseCloudSync, resumeCloudSync,
     publishLeaderboardNow,
     syncError,
+    isInitialSyncDone,
   }), [
     startDate, completions, isSetup, userStartDate, hasShared, manualBadges,
     startChallenge, toggleCompletion, getDayNumber, getTotalReps, isDayDone,
@@ -334,7 +361,7 @@ export function ProgressProvider({ children }) {
     settings, updateSettings, computedStats, setCustomExercisesForStats,
     cloudSyncAPI, conflictData, handleResolveConflict,
     pauseCloudSync, resumeCloudSync, publishLeaderboardNow,
-    syncError,
+    syncError, isInitialSyncDone,
   ]);
 
   return (
