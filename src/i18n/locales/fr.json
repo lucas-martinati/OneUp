@@ -628,5 +628,13 @@
     "kg": "kg",
     "noData": "Aucune donnée de poids",
     "noDataHint": "Renseignez vos poids pendant une session pour voir l'évolution"
+  },
+  "announcement": {
+    "badge": "Nouveau",
+    "widgets": {
+      "title": "Widgets d'écran d'accueil",
+      "body": "Suis ta streak directement depuis ton écran d'accueil ! Ajoute le widget OneUp pour voir ta progression en un coup d'œil, sans ouvrir l'application.",
+      "cta": "J'ai compris !"
+    }
   }
 }

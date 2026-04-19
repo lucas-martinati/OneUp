@@ -628,5 +628,13 @@
     "kg": "kg",
     "noData": "No weight data yet",
     "noDataHint": "Set your weights during a session to see progression"
+  },
+  "announcement": {
+    "badge": "New",
+    "widgets": {
+      "title": "Home Screen Widgets",
+      "body": "Track your streak right from your home screen! Add the OneUp widget to see your progress at a glance, without opening the app.",
+      "cta": "Got it!"
+    }
   }
 }

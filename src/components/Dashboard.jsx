@@ -12,6 +12,8 @@ import { ProPaywall } from './dashboard/ProPaywall';
 import { useHardwareBack } from '../hooks/useHardwareBack';
 import { useModalManager } from '../hooks/useModalManager';
 import { useNewAchievement } from '../hooks/useNewAchievement';
+import { useAnnouncement } from '../features/announcements/useAnnouncement';
+import { AnnouncementOverlay } from '../features/announcements/AnnouncementOverlay';
 
 // Contexts
 import { useProgressContext } from '../contexts/ProgressContext';
@@ -55,6 +57,7 @@ export function Dashboard() {
     } = useExercises();
 
     const [today, setToday] = useState(getLocalDateStr(new Date()));
+    const { showAnnouncement, announcement, dismissAnnouncement } = useAnnouncement();
 
     const { modals, openModal, closeModal, anyModalOpen, activeModals } = useModalManager(
         { calendar: false, stats: false, settings: false, counter: false, leaderboard: false, achievements: false, session: false, clan: false, customExercises: false },
@@ -204,6 +207,7 @@ export function Dashboard() {
     return (
         <>
             <ConflictOverlay conflictData={conflictData} onResolveConflict={onResolveConflict} />
+            {showAnnouncement && <AnnouncementOverlay announcement={announcement} onDismiss={dismissAnnouncement} />}
             <NotificationManager />
             <CSSConfetti
                 active={showDayConfetti}

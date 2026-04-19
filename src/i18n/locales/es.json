@@ -628,5 +628,13 @@
     "kg": "kg",
     "noData": "Aún no hay datos de peso",
     "noDataHint": "Configura tus pesos durante una sesión para ver tu progresión"
+  },
+  "announcement": {
+    "badge": "Nuevo",
+    "widgets": {
+      "title": "Widgets de pantalla de inicio",
+      "body": "¡Sigue tu racha directamente desde tu pantalla de inicio! Añade el widget OneUp para ver tu progreso de un vistazo, sin abrir la aplicación.",
+      "cta": "¡Entendido!"
+    }
   }
 }
