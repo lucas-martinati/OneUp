@@ -136,22 +136,36 @@ public class StreakWidgetProvider extends AppWidgetProvider {
         views.setImageViewResource(R.id.widget_large_flame_icon,
             streakActive ? R.drawable.ic_flame : R.drawable.ic_flame_gray);
 
-        // Update week day dots
+        // Update week day dots and labels
         int[] dotIds = {
             R.id.dot_mon, R.id.dot_tue, R.id.dot_wed,
             R.id.dot_thu, R.id.dot_fri, R.id.dot_sat, R.id.dot_sun
         };
+        int[] labelIds = {
+            R.id.label_mon, R.id.label_tue, R.id.label_wed,
+            R.id.label_thu, R.id.label_fri, R.id.label_sat, R.id.label_sun
+        };
+
+        // Colors: green done, orange today, dim default
+        int colorDone = 0xFF10b981;
+        int colorToday = 0xFFf97316;
+        int colorDefault = 0x60FFFFFF;
 
         for (int i = 0; i < 7; i++) {
             int drawableRes;
+            int labelColor;
             if (weekDays[i]) {
                 drawableRes = R.drawable.dot_done;
+                labelColor = colorDone;
             } else if (i == todayIndex) {
                 drawableRes = R.drawable.dot_today;
+                labelColor = colorToday;
             } else {
                 drawableRes = R.drawable.dot_pending;
+                labelColor = colorDefault;
             }
             views.setImageViewResource(dotIds[i], drawableRes);
+            views.setTextColor(labelIds[i], labelColor);
         }
 
         // Clickable root layout

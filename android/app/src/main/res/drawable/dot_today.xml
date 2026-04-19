@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid android:color="#FFf97316" />
-    <size android:width="24dp" android:height="24dp" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer glow -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#30f97316" />
+            <size android:width="28dp" android:height="28dp" />
+        </shape>
+    </item>
+    <!-- Inner circle -->
+    <item android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp">
+        <shape android:shape="oval">
+            <solid android:color="#FFf97316" />
+            <size android:width="24dp" android:height="24dp" />
+        </shape>
+    </item>
+    <!-- Pulse ring -->
+    <item android:bottom="1dp" android:left="1dp" android:right="1dp" android:top="1dp">
+        <shape android:shape="oval">
+            <stroke android:width="1dp" android:color="#50fbbf24" />
+            <size android:width="26dp" android:height="26dp" />
+        </shape>
+    </item>
+</layer-list>
