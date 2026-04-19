@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import { cloudSync } from '../services/cloudSync';
 import { createLogger } from '../utils/logger';
@@ -77,41 +78,51 @@ export function useGoogleAuth() {
 
   // Check auth status on mount
   useEffect(() => {
-    checkAuthStatus();
+    let isMounted = true;
 
-    // Subscribe to cloudSync state changes
+    // Step 1: Check the local cached flag FIRST (instant, no network)
+    // This tells us if the user was previously signed in, so we can
+    // keep showing the loading screen instead of flashing the Onboarding.
+    const initAuth = async () => {
+      const { value: wasPreviouslySignedIn } = await Preferences.get({ key: 'user_signed_in' });
+
+      if (wasPreviouslySignedIn === 'true') {
+        // User was signed in before → keep loading=true, wait for onAuthStateChanged
+        // to fire with the real Firebase user (avoids flash of Onboarding)
+        logger.info('Previously signed-in user detected, waiting for Firebase to restore session...');
+      } else {
+        // Never signed in → resolve immediately, no need to wait
+        if (isMounted) {
+          setAuthState(prev => ({
+            ...prev,
+            loading: false,
+            isSignedIn: false,
+            user: null,
+          }));
+        }
+      }
+    };
+
+    initAuth();
+
+    // Step 2: Subscribe to cloudSync state changes (onAuthStateChanged)
+    // This is the source of truth — it fires once Firebase restores the session
     const unsubscribe = cloudSync.subscribe((state) => {
-      setAuthState(prev => ({
-        ...prev,
-        isSignedIn: state.isSignedIn,
-        user: state.user,
-        loading: false
-      }));
+      if (isMounted) {
+        setAuthState(prev => ({
+          ...prev,
+          isSignedIn: state.isSignedIn,
+          user: state.user,
+          loading: false
+        }));
+      }
     });
 
-    return () => unsubscribe();
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
-
-  const checkAuthStatus = async () => {
-    try {
-      const status = await cloudSync.checkSignInStatus();
-      setAuthState({
-        isSignedIn: status.isSignedIn,
-        user: status.user,
-        loading: false,
-        error: null,
-        syncStatus: 'idle'
-      });
-    } catch (error) {
-      logger.error('Error checking auth status:', error);
-      setAuthState(prev => ({
-        ...prev,
-        loading: false,
-        error: error.message,
-        syncStatus: 'error'
-      }));
-    }
-  };
 
   // Native sign-in using Capacitor
   const signInNative = async () => {
@@ -197,7 +208,7 @@ export function useGoogleAuth() {
     ...authState,
     signIn,
     signOut,
-    refresh: checkAuthStatus,
+    refresh: () => {}, // Auth state is now managed by onAuthStateChanged listener
     updateSyncStatus
   };
 }
