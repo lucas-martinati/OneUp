@@ -117,6 +117,7 @@ public class StreakWidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_streak_small);
 
         views.setTextViewText(R.id.widget_streak_count, String.valueOf(streak));
+        // Flame is colored only when today's exercise is done
         views.setImageViewResource(R.id.widget_flame_icon,
             streakActive ? R.drawable.ic_flame : R.drawable.ic_flame_gray);
 
@@ -133,6 +134,7 @@ public class StreakWidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_streak_large);
 
         views.setTextViewText(R.id.widget_large_streak_count, String.valueOf(streak));
+        // Flame is colored only when today's exercise is done
         views.setImageViewResource(R.id.widget_large_flame_icon,
             streakActive ? R.drawable.ic_flame : R.drawable.ic_flame_gray);
 

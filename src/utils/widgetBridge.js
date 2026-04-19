@@ -65,7 +65,12 @@ export async function updateWidgetData(computedStats, completions) {
 
   try {
     const widgetData = {
-      streak: computedStats.displayStreak || 0,
+      // Show the ongoing streak even if today isn't done yet.
+      // displayStreak = 0 when today isn't done and yesterday isn't done either,
+      // but if yesterdayStreak > 0, the streak is still alive — show it.
+      streak: computedStats.displayStreak
+        || computedStats.yesterdayStreak
+        || 0,
       streakActive: !!computedStats.streakActive,
       todayDone: !!computedStats.todayDone,
       weekDays: getWeekDaysStatus(completions),
