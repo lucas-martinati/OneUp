@@ -184,7 +184,8 @@ export function ProgressProvider({ children }) {
           if (hasGuest) {
             // Guest data exists — user was using the app while not signed in,
             // then signed in. We MUST ask the user before merging.
-            const cloudData = await cloudSync.loadFromCloud();
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 4000));
+            const cloudData = await Promise.race([cloudSync.loadFromCloud(), timeoutPromise]);
             setConflictData({
               ...cloudData,
               isAnonymousMerge: true
@@ -198,7 +199,7 @@ export function ProgressProvider({ children }) {
           // Already signed in (page reload) — auto-merge silently, no dialog needed
           setConflictCheckDone(true);
         } catch (error) {
-          logger.error('Conflict detection failed:', error);
+          logger.error('Conflict detection failed or timed out:', error);
           setConflictCheckDone(true);
         }
       };
@@ -207,8 +208,9 @@ export function ProgressProvider({ children }) {
       // No local data — try loading from cloud first (user may have cloud data)
       const tryLoadFromCloud = async () => {
         try {
-          const result = await loadFromCloud();
-          if (result.success) {
+          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 4000));
+          const result = await Promise.race([loadFromCloud(), timeoutPromise]);
+          if (result && result.success) {
             // Cloud data loaded and applied — skip the subsequent syncWithCloud
             // since we just fetched fresh data (avoids a redundant round-trip)
             logger.info('Cloud data restored for signed-in user with no local data');
@@ -219,7 +221,7 @@ export function ProgressProvider({ children }) {
             return;
           }
         } catch (error) {
-          logger.error('Cloud load for signed-in user failed:', error);
+          logger.error('Cloud load for signed-in user failed or timed out:', error);
         }
         queueMicrotask(() => setConflictCheckDone(true));
       };
@@ -233,10 +235,11 @@ export function ProgressProvider({ children }) {
       if (isSetup) {
         const initialSync = async () => {
           try {
-            await syncWithCloud();
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 4000));
+            await Promise.race([syncWithCloud(), timeoutPromise]);
             queueMicrotask(() => setIsInitialSyncDone(true));
           } catch (error) {
-            logger.error('Initial sync failed:', error);
+            logger.error('Initial sync failed or timed out:', error);
             queueMicrotask(() => setIsInitialSyncDone(true));
           }
         };
