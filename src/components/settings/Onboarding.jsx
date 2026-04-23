@@ -411,7 +411,7 @@ export function Onboarding({ onStart }) {
                 gap: '8px',
                 justifyContent: 'center'
             }}>
-                {[1, 2, 3].map(s => (
+                {(isPastDate ? [1, 2, 3] : [1, 2]).map(s => (
                     <div key={s} style={{
                         width: step === s ? '24px' : '8px',
                         height: '8px',
