@@ -20,6 +20,11 @@ export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps
   const existing = await get(lbRef);
   const existingData = existing.exists() ? existing.val() : {};
 
+  // Sanitize difficulties to ensure only valid numeric values are published
+  const sanitizedDifficulties = Object.fromEntries(
+    Object.entries(exerciseDifficulties || {}).filter(([_, v]) => typeof v === 'number')
+  );
+
   await set(lbRef, {
     pseudo: pseudo || auth.currentUser.displayName || i18n.t('common.anonymous'),
     photoURL: auth.currentUser.photoURL || null,
@@ -27,7 +32,7 @@ export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps
     weightsTotalReps: weightsTotalReps || 0,
     exerciseReps: exerciseReps || {},
     exerciseWeights: finalWeights || {},
-    exerciseDifficulties: exerciseDifficulties || {},
+    exerciseDifficulties: sanitizedDifficulties,
     achievements: achievements || 0,
     lastActiveDay,
     difficultyMultiplier: difficultyMultiplier || 1,

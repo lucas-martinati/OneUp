@@ -206,10 +206,10 @@ export function ProgressProvider({ children }) {
               return safeSettings;
             });
             // Mark as synced only AFTER updateSettings has been queued
-            queueMicrotask(() => setSettingsInitialSyncDone(true));
+            setTimeout(() => setSettingsInitialSyncDone(true), 0);
           } else {
             // No cloud data found — safe to assume local is the truth
-            queueMicrotask(() => setSettingsInitialSyncDone(true));
+            setTimeout(() => setSettingsInitialSyncDone(true), 0);
           }
         } catch (error) { 
           logger.error('Settings sync error:', error); 
@@ -218,7 +218,7 @@ export function ProgressProvider({ children }) {
       };
       loadSettings();
     } else if (!auth.isSignedIn && !auth.loading) {
-      queueMicrotask(() => setSettingsInitialSyncDone(true));
+      setTimeout(() => setSettingsInitialSyncDone(true), 0);
     }
   }, [auth.isSignedIn, auth.loading, updateSettings]);
 
