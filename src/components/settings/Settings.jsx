@@ -611,8 +611,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             {/* Bodyweight Exercises */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                                 {EXERCISES.map(ex => {
-                                    const today = new Date().toISOString().split('T')[0];
-                                    const val = getDifficulty ? getDifficulty(ex.id, today) : 1.0;
+                                    const val = getDifficulty ? getDifficulty(ex.id) : 1.0;
                                     const exColor = ex.color || '#ef4444';
                                     return (
                                         <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -657,8 +656,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                     }} />
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                                         {WEIGHT_EXERCISES.map(ex => {
-                                            const today = new Date().toISOString().split('T')[0];
-                                            const val = getDifficulty ? getDifficulty(ex.id, today) : 1.0;
+                                            const val = getDifficulty ? getDifficulty(ex.id) : 1.0;
                                             const exColor = ex.color || '#ef4444';
                                             return (
                                                 <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
