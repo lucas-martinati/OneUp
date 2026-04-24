@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Zap, Star } from '../../utils/icons';
 import { Avatar } from '../ui/Avatar';
+import { DifficultyBadge } from '../ui/DifficultyBadge';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { registerBackHandler } from '../../utils/backHandler';
@@ -109,15 +110,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                                 }
 
                                 if (difficulty === 1.0) return null;
-                                return (
-                                    <span style={{ 
-                                        fontSize: '0.65rem', fontWeight: '700', color: '#ef4444',
-                                        background: 'rgba(239, 68, 68, 0.15)', padding: '2px 6px', borderRadius: '8px',
-                                        border: '1px solid rgba(239, 68, 68, 0.2)'
-                                    }}>
-                                        x{difficulty.toFixed(1)}
-                                    </span>
-                                );
+                                return <DifficultyBadge difficulty={difficulty} style={{ marginLeft: 0, marginRight: '4px' }} />;
                             })()}
                             <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-primary)' }}>{reps.toLocaleString()}</span>
                         </div>

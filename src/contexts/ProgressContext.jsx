@@ -76,7 +76,13 @@ export function ProgressProvider({ children }) {
   // computedStats needs customExercises — we accept it as a param via a ref
   // that gets set by ExercisesProvider after mount. For now, use empty array.
   const [customExercisesForStats, setCustomExercisesForStats] = useState([]);
-  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesForStats, hasShared, manualBadges, getDifficulty);
+  
+  const internalGetConfig = useCallback((exId, dateStr) => ({
+    difficulty: getDifficulty(exId, dateStr),
+    weight: null,
+  }), [getDifficulty]);
+
+  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesForStats, hasShared, manualBadges, internalGetConfig);
 
   // ── Leaderboard publishing ──────────────────────────────────────────
   const publishLeaderboardNow = useCallback(async () => {

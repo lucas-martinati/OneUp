@@ -8,14 +8,14 @@ import { Z_INDEX } from '../../utils/zIndex';
 import { DynamicIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
-import { useExercises } from '../../contexts/ExercisesContext';
+import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 
 
 
 export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext }) {
     useWakeLock();
     const { t } = useTranslation();
-    const { getWeight, setWeight } = useExercises();
+    const { getConfig, updateConfig } = useExerciseConfig();
     const [isAnimating, setIsAnimating] = useState(false);
     const [completeFlash, setCompleteFlash] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
@@ -26,7 +26,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
 
     // Weight exercise support
     const isWeightExercise = !!WEIGHT_EXERCISES_MAP[exerciseConfig?.id];
-    const currentWeight = isWeightExercise ? getWeight(exerciseConfig.id) : null;
+    const currentWeight = isWeightExercise ? getConfig(exerciseConfig?.id).weight : null;
     
     const [localWeightStr, setLocalWeightStr] = useState('');
     // Reset localWeightStr carefully
@@ -49,7 +49,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     const handleValidateWeight = () => {
         const val = parseFloat(localWeightStr.replace(',', '.'));
         if (!isNaN(val) && val >= 0) {
-            setWeight(exerciseConfig.id, val);
+            updateConfig(exerciseConfig.id, { weight: val });
         } else {
             setLocalWeightStr(currentWeight?.toString() || '');
         }

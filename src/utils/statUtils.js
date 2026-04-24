@@ -7,16 +7,16 @@ import { WEIGHT_EXERCISES } from '../config/weights';
  * @param {Object} dayCompletions - Completions for a specific day
  * @param {number} dayNumber - Day number since start
  * @param {Array} exercises - List of exercises to sum up
- * @param {Function} getDifficulty - (exId, dateStr) => number
+ * @param {Function} getConfig - (exId, dateStr) => config
  * @param {string} dateStr - The date string
  * @returns {number} Total reps
  */
-export function calculateRepsForDay(dayCompletions, dayNumber, exercises, getDifficulty, dateStr) {
+export function calculateRepsForDay(dayCompletions, dayNumber, exercises, getConfig, dateStr) {
     if (!dayCompletions || !exercises) return 0;
     return exercises.reduce((sum, ex) => {
         const exData = dayCompletions[ex.id];
         if (!exData?.isCompleted) return sum;
-        const exDiff = getDifficulty ? getDifficulty(ex.id, dateStr) : 1.0;
+        const exDiff = getConfig(ex.id, dateStr).difficulty;
         return sum + getDailyGoal(ex, dayNumber, exDiff);
     }, 0);
 }

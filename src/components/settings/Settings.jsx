@@ -11,6 +11,7 @@ import { StoreCard } from '../store/StoreCard';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
@@ -19,7 +20,8 @@ export function Settings({ defaultShowStore = false, onClose }) {
 
     // ── Context consumption (replaces 11 props) ──
     const cloudAuth = useAuth();
-    const { settings, updateSettings, cloudSyncAPI: cloudSync, conflictData, scheduleNotification, getDifficulty, updateDifficulty } = useProgressContext();
+    const { settings, updateSettings, cloudSyncAPI: cloudSync, conflictData, scheduleNotification } = useProgressContext();
+    const { getConfig, updateConfig } = useExerciseConfig();
     const { isSupporter, isPro, purchaseSupporter: onPurchaseSupporter, purchasePro: onPurchasePro, restorePurchases: onRestorePurchases } = useSubscription();
 
     const onSave = (newSettings) => {
@@ -611,7 +613,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             {/* Bodyweight Exercises */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                                 {EXERCISES.map(ex => {
-                                    const val = getDifficulty ? getDifficulty(ex.id) : 1.0;
+                                    const val = getConfig(ex.id).difficulty;
                                     const exColor = ex.color || '#ef4444';
                                     return (
                                         <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -629,9 +631,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                                 value={val}
                                                 onChange={(e) => {
                                                     const newVal = Math.min(1.0, Math.max(0.1, parseFloat(e.target.value)));
-                                                    if (updateDifficulty) {
-                                                        updateDifficulty(ex.id, newVal);
-                                                    }
+                                                    updateConfig(ex.id, { difficulty: newVal });
                                                 }}
                                                 style={{
                                                     width: '100%',
@@ -656,7 +656,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                     }} />
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                                         {WEIGHT_EXERCISES.map(ex => {
-                                            const val = getDifficulty ? getDifficulty(ex.id) : 1.0;
+                                            const val = getConfig(ex.id).difficulty;
                                             const exColor = ex.color || '#ef4444';
                                             return (
                                                 <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -674,9 +674,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                                         value={val}
                                                         onChange={(e) => {
                                                             const newVal = Math.min(1.0, Math.max(0.1, parseFloat(e.target.value)));
-                                                            if (updateDifficulty) {
-                                                                updateDifficulty(ex.id, newVal);
-                                                            }
+                                                            updateConfig(ex.id, { difficulty: newVal });
                                                         }}
                                                         style={{
                                                             width: '100%',

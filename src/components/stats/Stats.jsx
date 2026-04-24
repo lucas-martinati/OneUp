@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 
 import { X, TrendingUp, Award, Flame, Target, Trophy, Activity, Hash, Crown, Star, Filter, Lock, Clock, ChevronRight } from '../../utils/icons';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../../hooks/useComputedStats';
+import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { BADGE_DEFINITIONS } from '../../config/badgeDefinitions';
 import { DynamicIcon } from '../../utils/icons';
@@ -24,11 +25,12 @@ const SessionDetailModal = lazy(() => import('../../features/share/components/Se
 export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStore }) {
 
     // ── Context consumption (replaces 8 props) ──
-    const { completions, settings, getDayNumber, computedStats: globalStats, getDifficulty } = useProgressContext();
+    const { completions, settings, getDayNumber, computedStats: globalStats } = useProgressContext();
     const { isPro, hadPro } = useSubscription();
     // For stats viewing, previously having pro is enough
     const hasProAccess = isPro || hadPro;
-    const { exercisesByCategory: exercisesList, getWeight } = useExercises();
+    const { exercisesByCategory: exercisesList } = useExercises();
+    const { getConfig } = useExerciseConfig();
     const { t, i18n } = useTranslation();
     const [chartsReady, setChartsReady] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
@@ -80,8 +82,8 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
     const computedStats = React.useMemo(() => {
         if (canAccessFeature(FEATURES.MERGED_STATS, { isPro: hasProAccess }) && activeCategories.length === 3) return globalStats;
-        return computeAllStats(completions, settings, getDayNumber, exercises, false, {}, getDifficulty);
-    }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess, getDifficulty]);
+        return computeAllStats(completions, settings, getDayNumber, exercises, false, {}, getConfig);
+    }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess, getConfig]);
 
     // All values come from computedStats
     const {
@@ -523,7 +525,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         <WeightEvolutionChart
                             title={t('weight.title')}
                             t={t}
-                            getWeight={getWeight}
+                            getConfig={getConfig}
                             completions={completions}
                         />
                     )}

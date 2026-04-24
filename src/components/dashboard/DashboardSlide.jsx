@@ -6,17 +6,17 @@ import { getDailyGoal } from '../../config/exercises';
 import { formatTime } from '../../utils/dateUtils';
 import { isPerfectDay } from '../../utils/statUtils';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
-import { useExercises } from '../../contexts/ExercisesContext';
+
 import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
 
 export const DashboardSlide = React.memo(({
     isFuture, effectiveStart, dayNumber, today, getExerciseCount, completions, computedStats,
     isCounterTransitioning, prevDayNumber, pauseCloudSync, setShowCounter,
-    activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, onManageCustom, isDay100, getDifficulty
+    activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, onManageCustom, isDay100, getConfig
 }) => {
     const { t, i18n } = useTranslation();
     const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
-    
+
     if (!safeSelectedExercise) {
         return (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '20px', textAlign: 'center' }}>
@@ -33,7 +33,7 @@ export const DashboardSlide = React.memo(({
         );
     }
 
-    const currentDiff = getDifficulty ? getDifficulty(safeSelectedExercise.id, today) : 1.0;
+    const currentDiff = getConfig(safeSelectedExercise.id, today).difficulty;
     const dailyGoal = getDailyGoal(safeSelectedExercise, dayNumber, currentDiff) || 1;
     const currentCount = getExerciseCount(today, safeSelectedExercise.id);
     const isExerciseDone = completions[today]?.[safeSelectedExercise.id]?.isCompleted || currentCount >= dailyGoal;
@@ -160,7 +160,7 @@ export const DashboardSlide = React.memo(({
                                 computedStats={computedStats}
                                 onSelect={onSelectExercise}
                                 isDay100={isDay100}
-                                getDifficulty={getDifficulty}
+                                getConfig={getConfig}
                             />
                         ))}
                     </div>
@@ -299,13 +299,12 @@ export const DashboardSlide = React.memo(({
 
 const ExerciseButton = React.memo(({
     ex, isActive, dayNumber, today,
-    getExerciseCount, completions, computedStats, onSelect, isDay100, getDifficulty
+    getExerciseCount, completions, computedStats, onSelect, isDay100, getConfig
 }) => {
-    const { getWeight } = useExercises();
     const statsEx = computedStats.exerciseStats?.find(e => e.id === ex.id);
     const exStreak = statsEx ? statsEx.streak : 0;
     const exCount = getExerciseCount(today, ex.id);
-    const exDiff = getDifficulty ? getDifficulty(ex.id, today) : 1.0;
+    const { difficulty: exDiff, weight } = getConfig(ex.id, today);
     const exGoal = getDailyGoal(ex, dayNumber, exDiff);
     const exDone = completions[today]?.[ex.id]?.isCompleted || exCount >= exGoal;
 
@@ -390,7 +389,7 @@ const ExerciseButton = React.memo(({
                         opacity: exDone ? 1 : 0.8,
                         filter: exDone ? 'none' : 'grayscale(50%)'
                     }}>
-                        🏋️{getWeight(ex.id)}kg
+                        🏋️{weight}kg
                     </span>
                 )}
                 {exStreak > 0 && (

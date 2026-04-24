@@ -10,6 +10,8 @@ import { CATEGORIES } from '../../../config/categories';
 import { EXERCISES, getDailyGoal } from '../../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../../config/weights';
 import { formatDuration } from '../../../utils/dateUtils';
+import { useExerciseConfig } from '../../../hooks/useExerciseConfig';
+import { DifficultyBadge } from '../../../components/ui/DifficultyBadge';
 
 function formatDate(dateStr, lang) {
   try {
@@ -126,9 +128,11 @@ function ExerciseList({ exercises, t }) {
             </span>
             <span style={{
               fontSize: '0.65rem', fontWeight: 700, color: '#10b981',
+              display: 'flex', alignItems: 'center'
             }}>
               {ex.type === 'timer' ? `${ex.reps}s` : `\u00d7${ex.reps}`}
               {ex.weight ? ` • ${ex.weight} ${t('weight.kg', 'kg')}` : ''}
+              <DifficultyBadge difficulty={ex.difficulty} />
             </span>
           </div>
         );
@@ -143,13 +147,17 @@ function ExerciseList({ exercises, t }) {
  *   - 'session': current workout session data
  *   - 'global': global stats from Stats screen
  */
-export function ShareCard({ cardRef, sessionData, stats, sessionHistory, completions, getDayNumber, settings, options, mode = 'session' }) {
+export function ShareCard({ cardRef, sessionData, stats, sessionHistory, completions, getDayNumber, options, mode = 'session' }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const { getConfig } = useExerciseConfig();
 
   const weightIds = WEIGHT_EXERCISES.map(e => e.id);
   const isGlobal = mode === 'global';
-  const allExercises = sessionData?.exercises || [];
+  const allExercises = (sessionData?.exercises || []).map(ex => ({
+    ...ex,
+    difficulty: ex.difficulty || (getConfig ? getConfig(ex.id, sessionData?.date).difficulty : 1.0)
+  }));
   const sessionType = sessionData?.type || CATEGORIES.BODYWEIGHT;
 
   const THEMES = {
@@ -165,23 +173,23 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
   let dailyExercises = [];
   let dailyStandardDone = false;
   let dailyWeightsDone = false;
-  
-  const displayMultiplier = settings?.difficultyMultiplier ?? 1;
 
   if (isGlobal && options.showDailyExercises && completions) {
     const targetDate = options.globalDate || new Date().toISOString().split('T')[0];
     const dayNum = getDayNumber ? getDayNumber(targetDate) : 1;
     const dayData = completions[targetDate];
     if (dayData) {
-      const allKnownExercises = stats?.exerciseStats || [];
+      const allKnownExercises = [...EXERCISES, ...WEIGHT_EXERCISES, ...(stats?.customExercises || [])];
       for (const [exId, exStats] of Object.entries(dayData)) {
         if (exStats?.isCompleted) {
           const knownEx = allKnownExercises.find(e => e.id === exId);
           if (knownEx) {
+             const conf = getConfig(exId, targetDate);
              dailyExercises.push({
                ...knownEx,
-               reps: exStats.count || getDailyGoal(knownEx, dayNum, displayMultiplier) || knownEx.reps || 0,
-               weight: exStats.weight
+               reps: exStats.count || getDailyGoal(knownEx, dayNum, conf.difficulty) || knownEx.reps || 0,
+               weight: exStats.weight,
+               difficulty: conf.difficulty
              });
           }
         }

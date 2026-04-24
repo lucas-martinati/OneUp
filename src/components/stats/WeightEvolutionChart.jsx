@@ -4,7 +4,7 @@ import { WEIGHT_EXERCISES } from '../../config/weights';
 import { DynamicIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
-export default function WeightEvolutionChart({ title, t, getWeight, completions }) {
+export default function WeightEvolutionChart({ title, t, getConfig, completions }) {
     const defaultId = WEIGHT_EXERCISES[0]?.id;
     const [selectedExIds, setSelectedExIds] = useState(defaultId ? [defaultId] : []);
 
@@ -108,7 +108,7 @@ export default function WeightEvolutionChart({ title, t, getWeight, completions 
                     {selectedExIds.map(id => {
                         const ex = WEIGHT_EXERCISES.find(e => e.id === id);
                         if (!ex) return null;
-                        const w = getWeight ? getWeight(id) : ex.defaultWeight || 0;
+                        const w = getConfig(id).weight || ex.defaultWeight || 0;
                         return (
                             <span key={id} style={{
                                 fontSize: '0.75rem', fontWeight: '800', color: ex.color,

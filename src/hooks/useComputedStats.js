@@ -19,18 +19,18 @@ import { isGlobalPerfectDay } from '../utils/statUtils';
  */
 const EMPTY_ARRAY = [];
 
-export function useComputedStats(completions, settings, getDayNumber, customExercises = EMPTY_ARRAY, hasShared = false, manualBadges = {}, getDifficulty = null) {
+export function useComputedStats(completions, settings, getDayNumber, customExercises = EMPTY_ARRAY, hasShared = false, manualBadges = {}, getConfig = null) {
     const allExercises = useMemo(() => [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises], [customExercises]);
     return useMemo(() => {
-        return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, manualBadges, getDifficulty);
-    }, [completions, settings, getDayNumber, allExercises, hasShared, manualBadges, getDifficulty]);
+        return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, manualBadges, getConfig);
+    }, [completions, settings, getDayNumber, allExercises, hasShared, manualBadges, getConfig]);
 }
 
 /**
  * Pure function that computes all stats in a single pass.
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
  */
-export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, manualBadges = {}, getDifficulty = null) {
+export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, manualBadges = {}, getConfig = null) {
     // Keep global fallback for things not tied to a specific exercise
     const difficultyMultiplier = settings?.difficultyMultiplier ?? 1.0;
     const todayStr = getLocalDateStr(new Date());
@@ -164,7 +164,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
             // Exercise reps
             const ex = allExercises.find(e => e.id === exId);
             if (ex) {
-                const diffToUse = getDifficulty ? getDifficulty(exId, dateStr) : difficultyMultiplier;
+                const diffToUse = getConfig ? getConfig(exId, dateStr).difficulty : difficultyMultiplier;
                 const reps = getDailyGoal(ex, dayNum, diffToUse);
                 exerciseReps[exId] = (exerciseReps[exId] || 0) + reps;
                 exerciseDays[exId] = (exerciseDays[exId] || 0) + 1;

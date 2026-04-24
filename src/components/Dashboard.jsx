@@ -19,6 +19,7 @@ import { AnnouncementOverlay } from '../features/announcements/AnnouncementOverl
 import { useProgressContext } from '../contexts/ProgressContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { useExercises } from '../contexts/ExercisesContext';
+import { useExerciseConfig } from '../hooks/useExerciseConfig';
 
 const Calendar = lazy(() => import('./stats/Calendar').then(m => ({ default: m.Calendar })));
 const Stats = lazy(() => import('./stats/Stats').then(m => ({ default: m.Stats })));
@@ -48,8 +49,9 @@ export function Dashboard() {
         getExerciseCount, updateExerciseCount,
         pauseCloudSync, resumeCloudSync,
         computedStats,
-        conflictData, onResolveConflict, getDifficulty, getWeight
+        conflictData, onResolveConflict
     } = useProgressContext();
+    const { getConfig } = useExerciseConfig();
     const { isPro } = useSubscription();
     const {
         customExercises, customExercisesMap,
@@ -127,7 +129,7 @@ export function Dashboard() {
     const selectedExerciseId = globalSelectedId;
     const isExerciseDone = completions[today]?.[selectedExerciseId]?.isCompleted || false;
     const currentCount = getExerciseCount(today, selectedExerciseId);
-    const currentDiff = getDifficulty ? getDifficulty(selectedExerciseId, today) : 1.0;
+    const currentDiff = getConfig(selectedExerciseId, today).difficulty;
     const dailyGoal = getDailyGoal(selectedExercise, dayNumber, currentDiff) || 1;
     const totalReps = computedStats.exerciseReps[globalSelectedId] || 0;
 
@@ -140,11 +142,11 @@ export function Dashboard() {
         if (!isDay100) return false;
         return EXERCISES.length > 0 && EXERCISES.every(ex => {
             const count = getExerciseCount(today, ex.id);
-            const exDiff = getDifficulty ? getDifficulty(ex.id, today) : 1.0;
+            const exDiff = getConfig(ex.id, today).difficulty;
             const goal = getDailyGoal(ex, dayNumber, exDiff);
             return completions[today]?.[ex.id]?.isCompleted || count >= goal;
         });
-    }, [isDay100, today, completions, dayNumber, getExerciseCount, getDifficulty]);
+    }, [isDay100, today, completions, dayNumber, getExerciseCount, getConfig]);
 
     const {
         hackActive,
@@ -271,7 +273,7 @@ export function Dashboard() {
                                 activeExerciseId={classicSelected} onSelectExercise={handleSelectExercise}
                                 exercisesList={EXERCISES} exercisesMap={EXERCISES_MAP}
                                 isDay100={isDay100}
-                                getDifficulty={getDifficulty}
+                                getConfig={getConfig}
                             />
                         </div>
 
@@ -286,7 +288,7 @@ export function Dashboard() {
                                     activeExerciseId={weightsSelected} onSelectExercise={handleSelectExercise}
                                     exercisesList={WEIGHT_EXERCISES} exercisesMap={WEIGHT_EXERCISES_MAP}
                                     isDay100={hackActive}
-                                    getDifficulty={getDifficulty}
+                                    getConfig={getConfig}
                                 />
                             ) : (
                                 <ProPaywall
@@ -308,7 +310,7 @@ export function Dashboard() {
                                     exercisesList={customExercises} exercisesMap={customExercisesMap}
                                     onManageCustom={() => { setShowCustomExercisesModal(true); pauseCloudSync?.(); }}
                                     isDay100={hackActive}
-                                    getDifficulty={getDifficulty}
+                                    getConfig={getConfig}
                                 />
                             ) : (
                                 <ProPaywall
@@ -354,7 +356,7 @@ export function Dashboard() {
                             getDayNumber={getDayNumber}
                             onClose={() => setShowCalendar(false)}
                             settings={settings}
-                            getDifficulty={getDifficulty}
+                            getConfig={getConfig}
                         />
                     )}
                     {showStats && (
@@ -378,7 +380,7 @@ export function Dashboard() {
                             dailyGoal={dailyGoal}
                             currentCount={currentCount}
                             onUpdateCount={(newCount) => {
-                                const weight = getWeight ? getWeight(selectedExerciseId) : null;
+                                const { weight } = getConfig(selectedExerciseId);
                                 updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight, currentDiff);
                             }}
                             isCompleted={isExerciseDone}
@@ -392,7 +394,7 @@ export function Dashboard() {
                             dailyGoal={dailyGoal}
                             currentCount={currentCount}
                             onUpdateCount={(newCount) => {
-                                const weight = getWeight ? getWeight(selectedExerciseId) : null;
+                                const { weight } = getConfig(selectedExerciseId);
                                 updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight, currentDiff);
                             }}
                             isCompleted={isExerciseDone}

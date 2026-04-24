@@ -7,8 +7,9 @@ import { getDailyGoal } from '../../config/exercises';
 import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 import { isPerfectDay, calculateRepsForDay } from '../../utils/statUtils';
+import { DifficultyBadge } from '../ui/DifficultyBadge';
 
-export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, getDifficulty }) {
+export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, getConfig }) {
     const { t } = useTranslation();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
@@ -374,7 +375,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                         getDayNumber={getDayNumber}
                         onClose={handleCloseDetail}
                         isClosing={isClosing}
-                        getDifficulty={getDifficulty}
+                        getConfig={getConfig}
                         t={t}
                     />
                 </>
@@ -402,7 +403,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 }
 
 /** Day detail bottom sheet */
-function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, getDifficulty, t }) {
+function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, getConfig, t }) {
     const dayNum = getDayNumber(dateString);
     const dayCompletions = completions[dateString] || {};
     const [dragY, setDragY] = useState(0);
@@ -553,14 +554,14 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                     background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
                     WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
                 }}>
-                    {calculateRepsForDay(dayCompletions, dayNum, exercises, getDifficulty, dateString)} <span style={{ fontSize: '0.7rem', WebkitTextFillColor: 'var(--text-secondary)' }}>{t('common.reps')}</span>
+                    {calculateRepsForDay(dayCompletions, dayNum, exercises, getConfig, dateString)} <span style={{ fontSize: '0.7rem', WebkitTextFillColor: 'var(--text-secondary)' }}>{t('common.reps')}</span>
                 </div>
             </div>
 
             <div data-scroll-content style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">
                 {exercises && exercises.map(ex => {
                     const ExIcon = getIcon(ex.icon);
-                    const exDiff = getDifficulty ? getDifficulty(ex.id, dateString) : 1.0;
+                    const exDiff = getConfig(ex.id, dateString).difficulty;
                     const goal = getDailyGoal(ex, dayNum, exDiff);
                     const exData = dayCompletions[ex.id] || { isCompleted: false };
                     return (
@@ -578,11 +579,12 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                                 <ExIcon size={16} color={ex.color} />
                             </div>
                             <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: '0.9rem', fontWeight: '600', color: exData.isCompleted ? ex.color : 'var(--text-primary)' }}>
+                                <div style={{ fontSize: '0.9rem', fontWeight: '600', color: exData.isCompleted ? ex.color : 'var(--text-primary)', display: 'flex', alignItems: 'center' }}>
                                     {getExerciseLabel(ex, t)}
                                 </div>
                                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                                     {t('calendar.repsCount', { done: exData.isCompleted ? goal : 0, goal })}
+                                    <DifficultyBadge difficulty={exDiff} />
                                 </div>
                             </div>
                             {exData.isCompleted && (
