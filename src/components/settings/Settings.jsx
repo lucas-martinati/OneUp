@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Z_INDEX } from '../../utils/zIndex';
-import { X, Bell, Volume2, Clock, Check, Users, SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Sparkles, Star, Smartphone, Palette } from '../../utils/icons';
+import { X, Bell, Volume2, Clock, Users, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Sparkles } from '../../utils/icons';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
 import { getPurchaseHistory } from '../../services/purchaseService';
@@ -533,7 +533,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                 overflow: 'hidden'
             }}>
                 <h3 style={sectionTitleStyle}>
-                    <Palette size={16} /> {t('settings.appTheme')} {!isPro && <Lock size={14} color="var(--accent)" style={{ marginLeft: 'auto', opacity: 0.8 }} />}
+                    {t('settings.appTheme')} {!isPro && <Lock size={14} color="var(--accent)" style={{ marginLeft: 'auto', opacity: 0.8 }} />}
                 </h3>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px', opacity: isPro ? 1 : 0.6, pointerEvents: isPro ? 'auto' : 'none' }}>
                     {[
