@@ -181,10 +181,14 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
             // Time of day (derived from timestamp)
             let timeOfDay = null;
             if (exData.timestamp) {
-                const hour = new Date(exData.timestamp).getHours();
-                if (hour < 12) timeOfDay = 'morning';
-                else if (hour < 18) timeOfDay = 'afternoon';
-                else timeOfDay = 'evening';
+                const tsDate = new Date(exData.timestamp);
+                // Only count if the timestamp date matches the entry date
+                if (getLocalDateStr(tsDate) === dateStr) {
+                    const hour = tsDate.getHours();
+                    if (hour < 12) timeOfDay = 'morning';
+                    else if (hour < 18) timeOfDay = 'afternoon';
+                    else timeOfDay = 'evening';
+                }
             }
 
             if (timeOfDay === 'morning') dayHasMorning = true;
