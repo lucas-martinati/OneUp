@@ -29,19 +29,20 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
             labelKey: 'common.global', 
             color: '#ec4899', 
             icon: Activity,
-            isSpecial: true
+            isSpecial: true,
+            isGlobal: true
         };
 
         if (domain === 'weights') { 
             return [
                 combinedTab,
-                { id: 'weights', customLabel: `${t('common.global')} ${t('common.weights')}`, color: '#8b5cf6', icon: getIcon('Dumbbell') },
+                { id: 'weights', customLabel: `${t('common.global')} ${t('common.weights')}`, color: '#8b5cf6', icon: getIcon('Dumbbell'), isGlobal: true },
                 ...WEIGHT_EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: getIcon(ex.icon) }))
             ];
         }
         return [
             combinedTab,
-            { id: 'bodyweight', customLabel: `${t('common.global')} ${t('common.bodyweight')}`, color: '#fbbf24', icon: Trophy },
+            { id: 'bodyweight', customLabel: `${t('common.global')} ${t('common.bodyweight')}`, color: '#fbbf24', icon: Trophy, isGlobal: true },
             ...EXERCISES.map(ex => ({ id: ex.id, labelKey: 'exercises.' + ex.id, color: ex.color, icon: getIcon(ex.icon) }))
         ];
     }, [domain, t]);
