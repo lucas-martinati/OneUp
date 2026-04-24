@@ -114,19 +114,19 @@ describe('sanitizeForCloud', () => {
     expect(sanitizeForCloud(null)).toBeNull();
   });
 
-  it('strips count from completions, keeps isCompleted/timestamp/timeOfDay', () => {
+  it('strips count from completions, keeps isCompleted/timestamp', () => {
     const data = {
       startDate: '2025-01-01',
       completions: {
         '2025-01-01': {
-          pushups: { isCompleted: true, timestamp: '2025-01-01T10:00:00Z', timeOfDay: 'morning', count: 20 },
+          pushups: { isCompleted: true, timestamp: '2025-01-01T10:00:00Z', count: 20 },
           squats: { isCompleted: false, count: 10 }
         }
       }
     };
     const sanitized = sanitizeForCloud(data);
     expect(sanitized.completions['2025-01-01'].pushups).toEqual({
-      isCompleted: true, timestamp: '2025-01-01T10:00:00Z', timeOfDay: 'morning'
+      isCompleted: true, timestamp: '2025-01-01T10:00:00Z'
     });
     expect(sanitized.completions['2025-01-01'].pushups.count).toBeUndefined();
     expect(sanitized.completions['2025-01-01'].squats.count).toBeUndefined();
