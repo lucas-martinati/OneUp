@@ -62,16 +62,16 @@ export function ProgressProvider({ children }) {
       return currentPrefs[exId];
     }
     return 1.0;
-  }, [completions, settings?.exerciseDifficulties]);
+  }, [completions, settings.exerciseDifficulties]);
 
-  const setDraftDifficulty = useCallback((exId, value) => {
-    updateSettings({
+  const updateDifficulty = useCallback((exId, value) => {
+    updateSettings(prev => ({
       exerciseDifficulties: {
-        ...(settings?.exerciseDifficulties || {}),
+        ...(prev.exerciseDifficulties || {}),
         [exId]: value
       }
-    });
-  }, [updateSettings, settings?.exerciseDifficulties]);
+    }));
+  }, [updateSettings]);
 
   // computedStats needs customExercises — we accept it as a param via a ref
   // that gets set by ExercisesProvider after mount. For now, use empty array.
@@ -94,6 +94,7 @@ export function ProgressProvider({ children }) {
         totalReps: classicTotalReps,
         weightsTotalReps,
         exerciseReps: computedStats.exerciseReps,
+        exerciseDifficulties: settings.exerciseDifficulties,
         achievements: computedStats.badgeCount,
         isPublic: !!settings.leaderboardEnabled,
         lastActiveDay,
@@ -180,7 +181,6 @@ export function ProgressProvider({ children }) {
     return () => window.removeEventListener('online', handleOnline);
   }, [auth.isSignedIn, auth.loading, isInitialSyncDone, syncWithCloud]);
 
-  // ── Sync settings with cloud on sign-in ─────────────────────────────
   useEffect(() => {
     if (auth.isSignedIn && !auth.loading) {
       const loadSettings = async () => {
@@ -206,10 +206,10 @@ export function ProgressProvider({ children }) {
               return safeSettings;
             });
             // Mark as synced only AFTER updateSettings has been queued
-            setSettingsInitialSyncDone(true);
+            queueMicrotask(() => setSettingsInitialSyncDone(true));
           } else {
             // No cloud data found — safe to assume local is the truth
-            setSettingsInitialSyncDone(true);
+            queueMicrotask(() => setSettingsInitialSyncDone(true));
           }
         } catch (error) { 
           logger.error('Settings sync error:', error); 
@@ -218,7 +218,7 @@ export function ProgressProvider({ children }) {
       };
       loadSettings();
     } else if (!auth.isSignedIn && !auth.loading) {
-      setSettingsInitialSyncDone(true);
+      queueMicrotask(() => setSettingsInitialSyncDone(true));
     }
   }, [auth.isSignedIn, auth.loading, updateSettings]);
 
@@ -315,7 +315,7 @@ export function ProgressProvider({ children }) {
     const timer = setTimeout(() => publishLeaderboardNow(), 2000);
     return () => clearTimeout(timer);
   }, [
-    completions, settings.leaderboardEnabled, settings.leaderboardPseudo, settings.difficultyMultiplier,
+    completions, settings.leaderboardEnabled, settings.leaderboardPseudo, settings.exerciseDifficulties,
     auth.isSignedIn, auth.loading, isSetup, isInitialSyncDone, computedStats, publishLeaderboardNow
   ]);
 
@@ -339,9 +339,14 @@ export function ProgressProvider({ children }) {
             try {
               const parsed = JSON.parse(guestSettings);
               if (parsed.exerciseDifficulties) {
-                updateSettings({ exerciseDifficulties: { ...parsed.exerciseDifficulties, ...(settings.exerciseDifficulties || {}) } });
+                updateSettings(prev => ({ 
+                    exerciseDifficulties: { 
+                        ...parsed.exerciseDifficulties, 
+                        ...(prev.exerciseDifficulties || {}) 
+                    } 
+                }));
               }
-            } catch (e) { /* ignore */ }
+            } catch { /* ignore */ }
           }
           await mergeWithAnonymousData();
           clearAnonymousData();
@@ -352,7 +357,7 @@ export function ProgressProvider({ children }) {
       setConflictData(null);
       setConflictCheckDone(true);
     } catch (error) { logger.error('Conflict resolution failed:', error); }
-  }, [loadFromCloud, syncWithCloud, hasGuestData, clearAnonymousData, mergeWithAnonymousData, updateSettings, settings.exerciseDifficulties]);
+  }, [loadFromCloud, syncWithCloud, hasGuestData, clearAnonymousData, mergeWithAnonymousData, updateSettings]);
 
   // Pause / resume sync
   const pauseCloudSync = useCallback(() => setIsSyncPaused(true), []);
@@ -391,7 +396,7 @@ export function ProgressProvider({ children }) {
     deleteExerciseHistory, saveToCloud,
     setHasShared,
     scheduleNotification,
-    getDifficulty, setDraftDifficulty,
+    getDifficulty, updateDifficulty,
     // Settings
     settings, updateSettings,
     // Computed stats
@@ -408,7 +413,7 @@ export function ProgressProvider({ children }) {
     startChallenge, toggleCompletion, getDayNumber, getTotalReps, isDayDone,
     getExerciseCount, updateExerciseCount, getExerciseDone,
     deleteExerciseHistory, saveToCloud, setHasShared, scheduleNotification,
-    getDifficulty, setDraftDifficulty,
+    getDifficulty, updateDifficulty,
     settings, updateSettings, computedStats, setCustomExercisesForStats,
     cloudSyncAPI, conflictData, handleResolveConflict,
     pauseCloudSync, resumeCloudSync, publishLeaderboardNow,

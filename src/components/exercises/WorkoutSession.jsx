@@ -80,7 +80,7 @@ export function WorkoutSession({
 }) {
 
     // ── Context consumption (replaces 12 props) ──
-    const { getExerciseCount, updateExerciseCount, completions, settings, computedStats, getDifficulty } = useProgressContext();
+    const { getExerciseCount, updateExerciseCount, completions, computedStats, getDifficulty } = useProgressContext();
     const { isPro } = useSubscription();
     const { routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, customExercises, getWeight } = useExercises();
     const { t } = useTranslation();
@@ -160,7 +160,7 @@ export function WorkoutSession({
 
             return { ...ex, goal, count, done, category };
         });
-    }, [availableExercises, dayNumber, today, completions, getExerciseCount, settings?.difficultyMultiplier, getDifficulty]);
+    }, [availableExercises, dayNumber, today, completions, getExerciseCount, getDifficulty]);
 
     // Toggle in queue
     const toggleExercise = (id) => {

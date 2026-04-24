@@ -48,12 +48,12 @@ export function Dashboard() {
         getExerciseCount, updateExerciseCount,
         pauseCloudSync, resumeCloudSync,
         computedStats,
-        conflictData, onResolveConflict, getDifficulty
+        conflictData, onResolveConflict, getDifficulty, getWeight
     } = useProgressContext();
     const { isPro } = useSubscription();
     const {
         customExercises, customExercisesMap,
-        customExercisesHook, getWeight
+        customExercisesHook
     } = useExercises();
 
     const [today, setToday] = useState(getLocalDateStr(new Date()));
@@ -144,7 +144,7 @@ export function Dashboard() {
             const goal = getDailyGoal(ex, dayNumber, exDiff);
             return completions[today]?.[ex.id]?.isCompleted || count >= goal;
         });
-    }, [isDay100, today, completions, dayNumber, settings, getExerciseCount, getDifficulty]);
+    }, [isDay100, today, completions, dayNumber, getExerciseCount, getDifficulty]);
 
     const {
         hackActive,
@@ -264,7 +264,7 @@ export function Dashboard() {
 
                         <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                             <DashboardSlide
-                                isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
+                                isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
                                 getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
                                 isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
                                 pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
@@ -279,7 +279,7 @@ export function Dashboard() {
                             {canAccessFeature(FEATURES.WEIGHTS, { isPro }) ? (
                                 <DashboardSlide
                                     title={t('common.weights')}
-                                    isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
+                                    isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
                                     getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
                                     isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
                                     pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
@@ -300,7 +300,7 @@ export function Dashboard() {
                             {canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) ? (
                                 <DashboardSlide
                                     title={t('common.custom')}
-                                    isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today} settings={settings}
+                                    isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
                                     getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
                                     isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
                                     pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}

@@ -10,7 +10,7 @@ import { useExercises } from '../../contexts/ExercisesContext';
 import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
 
 export const DashboardSlide = React.memo(({
-    isFuture, effectiveStart, dayNumber, today, settings, getExerciseCount, completions, computedStats,
+    isFuture, effectiveStart, dayNumber, today, getExerciseCount, completions, computedStats,
     isCounterTransitioning, prevDayNumber, pauseCloudSync, setShowCounter,
     activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, onManageCustom, isDay100, getDifficulty
 }) => {
@@ -40,8 +40,6 @@ export const DashboardSlide = React.memo(({
     const progress = Math.min((dayNumber / 365) * 100, 100);
 
     const isDayPerfect = isPerfectDay(completions[today], exercisesList);
-
-
 
     return (
         <div 
@@ -157,7 +155,6 @@ export const DashboardSlide = React.memo(({
                                 isActive={ex.id === activeExerciseId}
                                 dayNumber={dayNumber}
                                 today={today}
-                                settings={settings}
                                 getExerciseCount={getExerciseCount}
                                 completions={completions}
                                 computedStats={computedStats}
@@ -301,7 +298,7 @@ export const DashboardSlide = React.memo(({
 });
 
 const ExerciseButton = React.memo(({
-    ex, isActive, dayNumber, today, settings,
+    ex, isActive, dayNumber, today,
     getExerciseCount, completions, computedStats, onSelect, isDay100, getDifficulty
 }) => {
     const { getWeight } = useExercises();
@@ -310,7 +307,7 @@ const ExerciseButton = React.memo(({
     const exCount = getExerciseCount(today, ex.id);
     const exDiff = getDifficulty ? getDifficulty(ex.id, today) : 1.0;
     const exGoal = getDailyGoal(ex, dayNumber, exDiff);
-    const exDone = completions[today]?.[ex.id]?.isCompleted;
+    const exDone = completions[today]?.[ex.id]?.isCompleted || exCount >= exGoal;
 
     return (
         <button

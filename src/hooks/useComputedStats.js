@@ -3,7 +3,7 @@ import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW } from '../
 import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
-import { isGlobalPerfectDay, calculateRepsForDay } from '../utils/statUtils';
+import { isGlobalPerfectDay } from '../utils/statUtils';
 
 /**
  * Centralized computation hook.

@@ -8,7 +8,7 @@ import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 import { isPerfectDay, calculateRepsForDay } from '../../utils/statUtils';
 
-export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, settings, getDifficulty }) {
+export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, getDifficulty }) {
     const { t } = useTranslation();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
@@ -374,7 +374,6 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                         getDayNumber={getDayNumber}
                         onClose={handleCloseDetail}
                         isClosing={isClosing}
-                        settings={settings}
                         getDifficulty={getDifficulty}
                         t={t}
                     />
@@ -403,10 +402,9 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 }
 
 /** Day detail bottom sheet */
-function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, settings, getDifficulty, t }) {
+function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, getDifficulty, t }) {
     const dayNum = getDayNumber(dateString);
     const dayCompletions = completions[dateString] || {};
-    const date = new Date(dateString);
     const [dragY, setDragY] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [isVisible, setIsVisible] = useState(false);

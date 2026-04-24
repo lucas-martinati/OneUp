@@ -87,6 +87,19 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                                     {weight} {t('weight.kg')}
                                 </span>
                             )}
+                            {(() => {
+                                const difficulty = entry.exerciseDifficulties?.[ex.id] || 1.0;
+                                if (difficulty === 1.0) return null;
+                                return (
+                                    <span style={{ 
+                                        fontSize: '0.65rem', fontWeight: '700', color: '#ef4444',
+                                        background: 'rgba(239, 68, 68, 0.15)', padding: '2px 6px', borderRadius: '8px',
+                                        border: '1px solid rgba(239, 68, 68, 0.2)'
+                                    }}>
+                                        x{difficulty.toFixed(1)}
+                                    </span>
+                                );
+                            })()}
                             <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-primary)' }}>{reps.toLocaleString()}</span>
                         </div>
                     </div>
@@ -208,9 +221,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
 
                 <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', paddingRight: '4px' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: 'var(--spacing-md)', flexShrink: 0 }}>
-                        {entry.difficultyMultiplier && entry.difficultyMultiplier !== 1 && (
-                            <StatCard icon={<Zap size={16} color="#6366f1" />} label={t('common.difficulty')} value={`x${entry.difficultyMultiplier}`} color="#6366f1" />
-                        )}
+
                         
                         {canAccessFeature(FEATURES.WEIGHTS, entry) && entry.weightsTotalReps > 0 && (
                             <StatCard 
