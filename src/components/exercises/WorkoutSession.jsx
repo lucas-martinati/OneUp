@@ -18,6 +18,7 @@ import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
+import { getLocalDateStr } from '../../utils/dateUtils';
 
 // ── Exercise grid item ──────────────────────────────────────────────────
 function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
@@ -376,7 +377,7 @@ export function WorkoutSession({
             const ex = exerciseInfo.find(e => e.id === id);
             if (!ex) return null;
             const label = getExerciseLabel(ex, t);
-            const conf = getConfig(id, new Date().toISOString());
+            const conf = getConfig(id, getLocalDateStr(new Date()));
             const w = conf ? conf.weight : null;
             const diff = conf ? conf.difficulty : 1.0;
             return { id: ex.id, label, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff };
@@ -882,7 +883,7 @@ export function WorkoutSession({
     if (phase === 'done') {
         const completedExercises = queue.map(id => {
             const ex = exerciseInfo.find(e => e.id === id);
-            const conf = getConfig(id, new Date().toISOString());
+            const conf = getConfig(id, getLocalDateStr(new Date()));
             const w = conf ? conf.weight : null;
             const diff = conf ? conf.difficulty : 1.0;
             return ex ? { id: ex.id, label: getExerciseLabel(ex, t), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff } : null;

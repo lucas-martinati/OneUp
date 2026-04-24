@@ -18,6 +18,7 @@ export function useExerciseConfig() {
    * the saved historical weight and difficulty.
    */
   const getConfig = useCallback((exId, dateStr = null) => {
+    if (!exId) return { difficulty: 1.0, weight: null };
     // If completed on the specific date, use the saved info first
     if (dateStr && completions?.[dateStr]?.[exId]?.isCompleted) {
       const pastData = completions[dateStr][exId];
