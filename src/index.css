@@ -761,18 +761,6 @@ button:active {
   /* Chrome, Safari, Opera */
 }
 
-@container header (max-width: 371px) {
-  .hide-text-mobile {
-    display: none !important;
-  }
-}
-
-@container header (max-width: 325px) {
-  .hide-logo-mobile {
-    display: none !important;
-  }
-}
-
 /* ── Exercise Grid Responsive ──────────────────────────────────────── */
 @media (min-width: 500px) {
   .exercise-grid > button {

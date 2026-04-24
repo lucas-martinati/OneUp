@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { SettingsIcon, PieChart, Users, Shield, Flame, Trophy } from '../../utils/icons';
 
 export const DashboardHeader = React.memo(({
@@ -11,27 +11,56 @@ export const DashboardHeader = React.memo(({
         color: 'var(--text-primary)', border: 'none', cursor: 'pointer', flexShrink: 0
     };
 
+    const headerRef = useRef(null);
+    const rightSideRef = useRef(null);
+    const [availableSpace, setAvailableSpace] = useState(500);
+
+    useEffect(() => {
+        if (!headerRef.current || !rightSideRef.current) return;
+        
+        const observer = new ResizeObserver(() => {
+            if (headerRef.current && rightSideRef.current) {
+                // Get the total header width and the width taken by the right side (badges + buttons)
+                const headerWidth = headerRef.current.getBoundingClientRect().width;
+                const rightWidth = rightSideRef.current.getBoundingClientRect().width;
+                // padding-left is clamp(12px, 3vw, 20px), we leave a 20px margin of safety
+                setAvailableSpace(headerWidth - rightWidth - 40); 
+            }
+        });
+
+        observer.observe(headerRef.current);
+        observer.observe(rightSideRef.current);
+
+        return () => observer.disconnect();
+    }, []);
+
+    const showText = availableSpace >= 90; // Need at least ~90px for Logo + Gap + Text
+    const showLogo = availableSpace >= 35;  // Need at least ~35px for Logo alone
+
     return (
-        <header className={`glass ${isDay100 ? 'day100-header' : ''}`} style={{
+        <header ref={headerRef} className={`glass ${isDay100 ? 'day100-header' : ''}`} style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             padding: 'clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 20px)', borderRadius: 'var(--radius-lg)',
-            boxShadow: 'var(--shadow-md)', minWidth: 0,
-            containerType: 'inline-size', containerName: 'header'
+            boxShadow: 'var(--shadow-md)', minWidth: 0
         }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'visible' }}>
-                <img
-                    onClick={() => window.location.reload()}
-                    src={`${import.meta.env.BASE_URL}pwa-192x192.webp`} alt="OneUp Logo"
-                    className="bounce-on-hover hide-logo-mobile"
-                    style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', objectFit: 'cover', cursor: 'pointer', transition: 'transform 0.3s ease' }}
-                />
-                <span className="hide-text-mobile" style={{ 
-                    fontWeight: '600', fontSize: 'clamp(0.8rem, 1.8vh, 1.1rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                    ...(isDay100 ? { fontFamily: "'Courier New', monospace", color: '#ef4444', textShadow: '0 0 8px rgba(239,68,68,0.5)' } : {})
-                }}>{isDay100 ? 'HACKED' : 'OneUp'}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
+                {showLogo && (
+                    <img
+                        onClick={() => window.location.reload()}
+                        src={`${import.meta.env.BASE_URL}pwa-192x192.webp`} alt="OneUp Logo"
+                        className="bounce-on-hover"
+                        style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', objectFit: 'cover', cursor: 'pointer', transition: 'transform 0.3s ease' }}
+                    />
+                )}
+                {showText && (
+                    <span style={{ 
+                        fontWeight: '600', fontSize: 'clamp(0.8rem, 1.8vh, 1.1rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0,
+                        ...(isDay100 ? { fontFamily: "'Courier New', monospace", color: '#ef4444', textShadow: '0 0 8px rgba(239,68,68,0.5)' } : {})
+                    }}>{isDay100 ? 'HACKED' : 'OneUp'}</span>
+                )}
             </div>
 
-            <div style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 1, minWidth: 0, justifyContent: 'flex-end' }}>
+            <div ref={rightSideRef} style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 0, justifyContent: 'flex-end' }}>
                 <button onClick={() => setShowSettings(true)} className="hover-lift" style={iconBtnStyle}>
                     <SettingsIcon size={19} />
                 </button>
