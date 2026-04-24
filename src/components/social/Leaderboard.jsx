@@ -55,7 +55,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     
     // Community context state
     const [communityContext, setCommunityContext] = useState(initialClanData ? initialClanData.id : 'global'); // 'global' | 'manage' | clanId
-    const { userClans, refreshUserClans } = useProgressContext();
+    const {refreshUserClans } = useProgressContext();
     const [clanData, setClanData] = useState(initialClanData);
 
     const currentUid = cloudSync.getCurrentUserId();

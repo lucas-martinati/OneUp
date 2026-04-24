@@ -2,7 +2,7 @@ import React from 'react';
 import { SettingsIcon, PieChart, Users, Shield, Flame, Trophy } from '../../utils/icons';
 
 export const DashboardHeader = React.memo(({
-    setShowSettings, setShowStats, setShowLeaderboard, setShowClan, pauseCloudSync,
+    setShowSettings, setShowStats, setShowLeaderboard,
     streakActive, displayStreak, selectedExercise, totalReps, isDay100
 }) => {
     const iconBtnStyle = {

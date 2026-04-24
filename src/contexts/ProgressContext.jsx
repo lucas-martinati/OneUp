@@ -371,6 +371,22 @@ export function ProgressProvider({ children }) {
   const resumeCloudSync = useCallback(() => setIsSyncPaused(false), []);
 
   // Pre-load user clans
+  useEffect(() => {
+    let mounted = true;
+    const fetchClans = async () => {
+      if (auth.isSignedIn && !auth.loading) {
+        try {
+          const clans = await cloudSync.getUserClans();
+          if (mounted) setUserClans(clans);
+        } catch (e) {
+          logger.error('Failed to prefetch clans', e);
+        }
+      }
+    };
+    fetchClans();
+    return () => { mounted = false; };
+  }, [auth.isSignedIn, auth.loading]);
+
   const refreshUserClans = useCallback(async () => {
     if (auth.isSignedIn && !auth.loading) {
       try {
@@ -378,15 +394,11 @@ export function ProgressProvider({ children }) {
         setUserClans(clans);
         return clans;
       } catch (e) {
-        logger.error('Failed to prefetch clans', e);
+        logger.error('Failed to refresh clans', e);
       }
     }
     return [];
   }, [auth.isSignedIn, auth.loading]);
-
-  useEffect(() => {
-    refreshUserClans();
-  }, [refreshUserClans]);
 
   // Cloud sync object for components that need direct access
   const cloudSyncAPI = useMemo(() => ({
