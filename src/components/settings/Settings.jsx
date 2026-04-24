@@ -626,10 +626,10 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                             </div>
                                             <input
                                                 type="range"
-                                                min="0.1" max="5" step="0.1"
+                                                min="0.1" max="1" step="0.1"
                                                 value={val}
                                                 onChange={(e) => {
-                                                    const newVal = Math.min(5, Math.max(0.1, parseFloat(e.target.value)));
+                                                    const newVal = Math.min(1.0, Math.max(0.1, parseFloat(e.target.value)));
                                                     if (updateDifficulty) {
                                                         updateDifficulty(ex.id, newVal);
                                                     }
