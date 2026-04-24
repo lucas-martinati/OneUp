@@ -100,7 +100,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             <ArrowLeft size={22} />
                         </button>
                     )}
-                    <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: '800' }}>
+                    <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
                         {showStore ? t('store.title') : t('settings.title')}
                     </h2>
                 </div>
@@ -125,9 +125,9 @@ export function Settings({ defaultShowStore = false, onClose }) {
                         )}
                         <button onClick={onClose} className="hover-lift glass" style={{
                             background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-                            width: 'var(--touch-min)', height: 'var(--touch-min)',
-                            display: 'flex', alignItems: 'center',
-                            justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
+                            width: '40px', height: '40px', flexShrink: 0,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: 'var(--text-primary)', cursor: 'pointer'
                         }}>
                             <X size={22} />
                         </button>

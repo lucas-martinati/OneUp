@@ -127,11 +127,14 @@ export function CustomProgramPanel({
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}>
         <div style={{ padding: 'var(--spacing-md)', display: 'flex', justifyContent: 'flex-end' }}>
-          <button onClick={onClose} className="glass hover-lift" style={{
-            width: '40px', height: '40px', borderRadius: '50%',
+          <button onClick={onClose} className="hover-lift glass" style={{
+            background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
+            width: '40px', height: '40px', flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(255,255,255,0.08)', border: 'none', color: 'var(--text-secondary)'
-          }}><X size={20} /></button>
+            color: 'var(--text-primary)', cursor: 'pointer'
+          }}>
+            <X size={22} />
+          </button>
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'var(--spacing-lg)', gap: '20px' }}>
           <Lock size={64} color="#8b5cf6" style={{ marginBottom: '10px' }} />
@@ -467,11 +470,14 @@ export function CustomProgramPanel({
       paddingBottom: 'env(safe-area-inset-bottom)'
     }}>
       <div style={{ padding: 'var(--spacing-md)', display: 'flex', justifyContent: 'flex-end' }}>
-        <button onClick={onClose} className="glass hover-lift" style={{
-          width: '40px', height: '40px', borderRadius: '50%',
+        <button onClick={onClose} className="hover-lift glass" style={{
+          background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
+          width: '40px', height: '40px', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'rgba(255,255,255,0.08)', border: 'none', color: 'var(--text-secondary)'
-        }}><X size={20} /></button>
+          color: 'var(--text-primary)', cursor: 'pointer'
+        }}>
+          <X size={22} />
+        </button>
       </div>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'var(--spacing-lg)', gap: '20px' }}>

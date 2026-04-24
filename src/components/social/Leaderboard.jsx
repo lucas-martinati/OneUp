@@ -191,10 +191,10 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                 </div>
 
                 <button onClick={onClose} className="hover-lift glass" style={{
-                    background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
-                    width: 'var(--touch-min)', height: 'var(--touch-min)',
-                    display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', color: 'white', cursor: 'pointer', flexShrink: 0
+                    background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
+                    width: '40px', height: '40px', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: 'var(--text-primary)', cursor: 'pointer'
                 }}>
                     <X size={22} />
                 </button>

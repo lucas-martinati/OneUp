@@ -421,7 +421,7 @@ export function WorkoutSession({
                     padding: 'var(--spacing-md)'
                 }}>
                     <h2 style={{
-                        margin: 0, fontSize: '1.5rem', fontWeight: '800',
+                        margin: 0, fontSize: '1.8rem', fontWeight: '800',
                         background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
                         WebkitBackgroundClip: 'text', backgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
@@ -446,10 +446,11 @@ export function WorkoutSession({
                             <FolderOpen size={16} />
                             {t('routines.title')}
                         </button>
-                        <button onClick={onClose} className="hover-lift" style={{
-                            background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
-                            width: '40px', height: '40px', display: 'flex', alignItems: 'center',
-                            justifyContent: 'center', color: 'white', cursor: 'pointer'
+                        <button onClick={onClose} className="hover-lift glass" style={{
+                            background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
+                            width: '40px', height: '40px', flexShrink: 0,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: 'var(--text-primary)', cursor: 'pointer'
                         }}>
                             <X size={22} />
                         </button>

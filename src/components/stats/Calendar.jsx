@@ -194,15 +194,16 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 marginBottom: 'var(--spacing-md)'
             }}>
-                <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: '2rem', fontWeight: '800' }}>
+                <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
                     {t('calendar.title')}
                 </h2>
                 <button onClick={onClose} className="hover-lift glass" style={{
                     background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-                    width: '44px', height: '44px', display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
+                    width: '40px', height: '40px', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: 'var(--text-primary)', cursor: 'pointer'
                 }}>
-                    <X size={24} />
+                    <X size={22} />
                 </button>
             </div>
 
