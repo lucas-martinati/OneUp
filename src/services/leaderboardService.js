@@ -20,9 +20,8 @@ export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps
   const existing = await get(lbRef);
   const existingData = existing.exists() ? existing.val() : {};
 
-  // Sanitize difficulties to ensure only valid numeric values are published
   const sanitizedDifficulties = Object.fromEntries(
-    Object.entries(exerciseDifficulties || {}).filter(([_, v]) => typeof v === 'number')
+    Object.entries(exerciseDifficulties || {}).filter(([, v]) => typeof v === 'number')
   );
 
   await set(lbRef, {
