@@ -19,7 +19,6 @@ export function sanitizeForCloud(data) {
       sanitizedDay[exerciseId] = {
         isCompleted: ex.isCompleted || false,
         timestamp: ex.timestamp || null,
-        timeOfDay: ex.timeOfDay || null,
         ...(ex.weight !== undefined ? { weight: ex.weight } : {}),
         ...(ex.difficulty !== undefined ? { difficulty: ex.difficulty } : {})
       };

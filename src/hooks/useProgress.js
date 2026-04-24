@@ -59,7 +59,6 @@ function migrateLegacyEntry(entry) {
       migrated[key] = {
         isCompleted: val.isCompleted !== undefined ? val.isCompleted : (val.done || false),
         timestamp: val.timestamp || null,
-        timeOfDay: val.timeOfDay || null,
         ...(val.weight !== undefined ? { weight: val.weight } : {}),
         ...(val.difficulty !== undefined ? { difficulty: val.difficulty } : {})
       };
@@ -138,7 +137,6 @@ function makeAllDone(selectedExercises = null, difficulties = {}) {
     entry[ex.id] = { 
         isCompleted: true, 
         timestamp: now, 
-        timeOfDay: null, 
         validatedAt: validateTime,
         ...((diff !== undefined && diff !== null && diff !== 1.0) ? { difficulty: diff } : {})
     };
@@ -224,7 +222,7 @@ export function useProgress(userId) {
         const updated = {};
         const now = new Date().toISOString();
         for (const [exId, exData] of Object.entries(day)) {
-          updated[exId] = { ...exData, isCompleted: false, timestamp: now, timeOfDay: null };
+          updated[exId] = { ...exData, isCompleted: false, timestamp: now };
         }
         newCompletions[dateStr] = updated;
       } else {
@@ -262,27 +260,18 @@ export function useProgress(userId) {
       const finalCount = Math.max(0, Math.min(newCount, dailyGoal));
       const isNowDone = finalCount >= dailyGoal;
       const wasDone = current.isCompleted || false;
-
       let timestamp = current.timestamp;
-      let timeOfDay = current.timeOfDay;
 
       if (!wasDone && isNowDone) {
-        const now = new Date();
-        timestamp = now.toISOString();
-        const hour = now.getHours();
-        if (hour < 12) timeOfDay = 'morning';
-        else if (hour < 18) timeOfDay = 'afternoon';
-        else timeOfDay = 'evening';
+        timestamp = new Date().toISOString();
       } else if (wasDone && !isNowDone) {
         timestamp = new Date().toISOString(); // Keep a timestamp so cloud sync knows it was recently unchecked
-        timeOfDay = null;
       }
 
       day[exerciseId] = { 
         count: finalCount, 
         isCompleted: isNowDone, 
         timestamp, 
-        timeOfDay,
         ...((weight !== null && weight !== undefined) ? { weight } : {}),
         ...((difficulty !== null && difficulty !== undefined && difficulty !== 1.0) ? { difficulty } : {})
       };

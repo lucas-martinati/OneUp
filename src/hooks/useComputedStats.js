@@ -178,16 +178,24 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
                 }
             }
 
-            // Time of day
-            if (exData.timeOfDay === 'morning') dayHasMorning = true;
-            if (exData.timeOfDay === 'afternoon') dayHasAfternoon = true;
-            if (exData.timeOfDay === 'evening') dayHasEvening = true;
+            // Time of day (derived from timestamp)
+            let timeOfDay = null;
+            if (exData.timestamp) {
+                const hour = new Date(exData.timestamp).getHours();
+                if (hour < 12) timeOfDay = 'morning';
+                else if (hour < 18) timeOfDay = 'afternoon';
+                else timeOfDay = 'evening';
+            }
+
+            if (timeOfDay === 'morning') dayHasMorning = true;
+            if (timeOfDay === 'afternoon') dayHasAfternoon = true;
+            if (timeOfDay === 'evening') dayHasEvening = true;
 
             // Pie chart (first completed exercise per day)
-            if (!dayTimeTracked && exData.timeOfDay) {
-                if (exData.timeOfDay === 'morning') pieData[0].value++;
-                else if (exData.timeOfDay === 'afternoon') pieData[1].value++;
-                else if (exData.timeOfDay === 'evening') pieData[2].value++;
+            if (!dayTimeTracked && timeOfDay) {
+                if (timeOfDay === 'morning') pieData[0].value++;
+                else if (timeOfDay === 'afternoon') pieData[1].value++;
+                else if (timeOfDay === 'evening') pieData[2].value++;
                 trackedCount++;
                 dayTimeTracked = true;
             }
