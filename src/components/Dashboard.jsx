@@ -249,7 +249,7 @@ export function Dashboard() {
                         }}
                         style={{
                             flex: 1, overflowY: anyModalOpen ? 'hidden' : 'auto', overflowX: 'hidden',
-                            scrollSnapType: 'y mandatory', scrollBehavior: 'smooth',
+                            scrollSnapType: 'y mandatory',
                             display: 'flex', flexDirection: 'column', width: '100%',
                             scrollbarWidth: 'none', msOverflowStyle: 'none'
                         }}
