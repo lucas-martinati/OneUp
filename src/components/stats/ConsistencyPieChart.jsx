@@ -3,13 +3,8 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recha
 
 export default function ConsistencyPieChart({ activeData, trackedCount, title, subTitle, emptyTitle, emptySub }) {
     return (
-        <div className="glass-premium" style={{
-            padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            marginBottom: 'var(--spacing-md)',
-            background: 'linear-gradient(135deg, rgba(109,40,217,0.1), rgba(139,92,246,0.1))'
-        }}>
-            <h3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', textAlign: 'center', width: '100%' }}>
+        <div className="glass-premium chart-card" style={{ background: 'linear-gradient(135deg, rgba(109,40,217,0.1), rgba(139,92,246,0.1))' }}>
+            <h3 className="chart-title">
                 {title}
             </h3>
 

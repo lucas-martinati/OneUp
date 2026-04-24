@@ -4,16 +4,11 @@ import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadius
 export default function RadarChartPanel({ radarData, globalTotalReps, title }) {
     if (radarData.length <= 2 || globalTotalReps <= 0) return null;
     return (
-        <div className="glass-premium" style={{
-            padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            marginBottom: 'var(--spacing-md)',
-            background: 'linear-gradient(135deg, rgba(52,211,153,0.1), rgba(16,185,129,0.1))'
-        }}>
-            <h3 style={{ marginBottom: 'var(--spacing-sm)', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', textAlign: 'center', width: '100%' }}>
+        <div className="glass-premium chart-card" style={{ background: 'linear-gradient(135deg, rgba(52,211,153,0.1), rgba(16,185,129,0.1))' }}>
+            <h3 className="chart-title">
                 {title}
             </h3>
-            <div style={{ width: '100%', height: '220px', minHeight: '220px' }}>
+            <div className="chart-wrapper" style={{ height: '220px', minHeight: '220px' }}>
                 <ResponsiveContainer width="100%" height={220} debounce={100}>
                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
                         <PolarGrid stroke="rgba(255,255,255,0.2)" />

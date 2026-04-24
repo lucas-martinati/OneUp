@@ -12,20 +12,11 @@ export default function DailyRepsChart({ dailyRepsData, title, t }) {
     const maxReps = Math.max(...data.map(d => d.reps), 1);
 
     return (
-        <div className="glass-premium" style={{
-            padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            marginBottom: 'var(--spacing-md)',
-            background: 'linear-gradient(135deg, rgba(129,140,248,0.1), rgba(139,92,246,0.08))'
-        }}>
-            <h3 style={{
-                marginBottom: 'var(--spacing-sm)', fontSize: '0.85rem', fontWeight: '700',
-                textTransform: 'uppercase', letterSpacing: '1px',
-                color: 'var(--text-secondary)', textAlign: 'center', width: '100%'
-            }}>
+        <div className="glass-premium chart-card" style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.1), rgba(139,92,246,0.08))' }}>
+            <h3 className="chart-title">
                 {title}
             </h3>
-            <div style={{ width: 'calc(100% + 16px)', marginLeft: '-16px', height: '200px', minHeight: '200px' }}>
+            <div className="chart-wrapper-overflow">
                 <ResponsiveContainer width="100%" height={200} debounce={100}>
                     <LineChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />

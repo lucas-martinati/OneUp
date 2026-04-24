@@ -51,17 +51,8 @@ export default function WeightEvolutionChart({ title, t, getConfig, completions 
     }, [chartData, selectedExIds]);
 
     return (
-        <div className="glass-premium" style={{
-            padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-            display: 'flex', flexDirection: 'column',
-            marginBottom: 'var(--spacing-md)',
-            background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(234,88,12,0.08))'
-        }}>
-            <h3 style={{
-                marginBottom: 'var(--spacing-sm)', fontSize: '0.85rem', fontWeight: '700',
-                textTransform: 'uppercase', letterSpacing: '1px',
-                color: 'var(--text-secondary)', textAlign: 'center', width: '100%'
-            }}>
+        <div className="glass-premium chart-card" style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(234,88,12,0.08))' }}>
+            <h3 className="chart-title">
                 {title}
             </h3>
 
@@ -124,21 +115,17 @@ export default function WeightEvolutionChart({ title, t, getConfig, completions 
 
             {/* Chart or empty state */}
             {chartData.length < 2 ? (
-                <div style={{
-                    height: '180px', display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', justifyContent: 'center',
-                    gap: '8px', color: 'var(--text-secondary)'
-                }}>
-                    <span style={{ fontSize: '1.5rem' }}>📊</span>
-                    <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>
+                <div className="chart-empty-state">
+                    <span className="chart-empty-icon">📊</span>
+                    <span className="chart-empty-title">
                         {t('weight.noData')}
                     </span>
-                    <span style={{ fontSize: '0.7rem', opacity: 0.7, textAlign: 'center', maxWidth: '240px' }}>
+                    <span className="chart-empty-hint">
                         {t('weight.noDataHint')}
                     </span>
                 </div>
             ) : (
-                <div style={{ width: 'calc(100% + 16px)', marginLeft: '-16px', height: '200px', minHeight: '200px' }}>
+                <div className="chart-wrapper-overflow">
                     <ResponsiveContainer width="100%" height={200} debounce={100}>
                         <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
