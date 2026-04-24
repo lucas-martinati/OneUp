@@ -88,7 +88,26 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                                 </span>
                             )}
                             {(() => {
-                                const difficulty = entry.exerciseDifficulties?.[ex.id] || 1.0;
+                                // Prioritize difficulty recorded in the latest completion
+                                let difficulty = 1.0;
+                                let foundInHistory = false;
+                                if (details?.completions) {
+                                    const sortedDates = Object.keys(details.completions).sort().reverse();
+                                    for (const date of sortedDates) {
+                                        const day = details.completions[date];
+                                        if (day[ex.id]?.isCompleted && day[ex.id]?.difficulty !== undefined) {
+                                            difficulty = day[ex.id].difficulty;
+                                            foundInHistory = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                // Fallback to snapshot if no history found
+                                if (!foundInHistory) {
+                                    difficulty = entry.exerciseDifficulties?.[ex.id] || 1.0;
+                                }
+
                                 if (difficulty === 1.0) return null;
                                 return (
                                     <span style={{ 
