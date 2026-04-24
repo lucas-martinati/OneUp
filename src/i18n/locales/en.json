@@ -450,7 +450,6 @@
     "inviteCode": "Invite Code",
     "copied": "Copied",
     "copy": "Copy",
-    "yourClan": "Your Clan",
     "title": "Leaderboard",
     "empty": "No one here yet",
     "signInToAppear": "Sign in with Google to appear in the leaderboard!",
@@ -463,7 +462,6 @@
     "achievements": "Achievements"
   },
   "clan": {
-    "cannotLoad": "Unable to load this clan",
     "pseudoRequired": "A name is required",
     "nameRequired": "Clan name is required",
     "createError": "An error occurred",

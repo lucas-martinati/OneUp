@@ -450,7 +450,6 @@
     "inviteCode": "Código de Invitación",
     "copied": "Copiado",
     "copy": "Copiar",
-    "yourClan": "Tu Clan",
     "title": "Clasificación",
     "empty": "Todavía no hay nadie",
     "signInToAppear": "¡Inicia sesión con Google para aparecer en la clasificación!",
@@ -463,7 +462,6 @@
     "achievements": "Logros"
   },
   "clan": {
-    "cannotLoad": "No se puede cargar este clan",
     "pseudoRequired": "Se requiere un nombre",
     "nameRequired": "Se requiere el nombre del clan",
     "createError": "Se produjo un error",

@@ -450,7 +450,6 @@
     "inviteCode": "邀请码",
     "copied": "已复制",
     "copy": "复制",
-    "yourClan": "你的部落",
     "title": "排行榜",
     "empty": "还没有人",
     "signInToAppear": "用Google登录以出现在排行榜中！",
@@ -463,7 +462,6 @@
     "achievements": "成就"
   },
   "clan": {
-    "cannotLoad": "无法加载此部落",
     "pseudoRequired": "需要一个名字",
     "nameRequired": "需要部落名称",
     "createError": "发生错误",
