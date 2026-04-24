@@ -12,8 +12,9 @@ import { UserDetail } from './UserDetail';
 import { getIcon } from '../../utils/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProgressContext } from '../../contexts/ProgressContext';
+import { ClanManager } from './ClanManager';
 
-export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan }) {
+export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, onLeaveClan }) {
 
     // ── Context consumption ──
     const cloudAuth = useAuth();
@@ -51,6 +52,12 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
     const [selectedUser, setSelectedUser] = useState(null);
     const [nudgedMember, setNudgedMember] = useState(null);
     const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+    
+    // Community context state
+    const [communityContext, setCommunityContext] = useState(initialClanData ? initialClanData.id : 'global'); // 'global' | 'manage' | clanId
+    const { userClans, refreshUserClans } = useProgressContext();
+    const [clanData, setClanData] = useState(initialClanData);
+
     const currentUid = cloudSync.getCurrentUserId();
     const todayStr = getLocalDateStr(new Date());
 
@@ -63,27 +70,31 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
     };
 
     const loadData = useCallback(async () => {
-        // Only set loading if not already loading
-        setLoading(prev => (prev ? prev : true));
+        setLoading(true);
         try {
-            if (clanData) {
-                setEntries(clanData.members);
-            } else {
+            if (communityContext === 'global') {
+                setClanData(null);
                 const data = await cloudSync.loadLeaderboard();
                 setEntries(data);
+            } else if (communityContext !== 'manage') {
+                const data = await cloudSync.getClanDetails(communityContext);
+                setClanData(data);
+                if (data) setEntries(data.members);
             }
         } catch (e) {
             console.error('Failed to load leaderboard', e);
         }
         setLoading(false);
-    }, [clanData, cloudSync]);
+    }, [communityContext, cloudSync]);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            loadData();
-        }, 0);
-        return () => clearTimeout(timer);
-    }, [loadData]);
+        if (communityContext !== 'manage') {
+            const timer = setTimeout(() => {
+                loadData();
+            }, 0);
+            return () => clearTimeout(timer);
+        }
+    }, [loadData, communityContext]);
 
     const sorted = useMemo(() => {
         const filteredEntries = domain === 'weights' ? entries.filter(e => e.isPro) : entries;
@@ -122,21 +133,12 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
             overscrollBehavior: 'none',
             touchAction: 'auto'
         }}>
-            {/* Header */}
+            {/* Header with Switch */}
             <div style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 padding: 'var(--spacing-md) var(--spacing-md) 0'
             }}>
-                {clanData ? (
-                    <div>
-                        <div style={{ fontSize: '0.75rem', color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '2px' }}>
-                            {t('leaderboard.yourClan')}
-                        </div>
-                        <h2 style={{ margin: 0, fontSize: '1.6rem', fontWeight: '800', color: 'white' }}>
-                            {clanData.name}
-                        </h2>
-                    </div>
-                ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <h2 style={{
                         margin: 0, fontSize: '1.8rem', fontWeight: '800',
                         background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
@@ -145,18 +147,81 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
                     }}>
                         {t('leaderboard.title')}
                     </h2>
-                )}
+                    
+                    {/* Toggle Switch */}
+                    <button
+                        onClick={() => {
+                            if (communityContext === 'global') {
+                                setCommunityContext('manage');
+                            } else {
+                                setCommunityContext('global');
+                            }
+                        }}
+                        className="hover-lift"
+                        style={{
+                            display: 'flex', background: 'rgba(255,255,255,0.05)',
+                            borderRadius: '20px', padding: '2px', border: '1px solid rgba(255,255,255,0.1)',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <div
+                            style={{
+                                padding: '6px 12px', borderRadius: '18px',
+                                background: communityContext === 'global' ? '#fbbf24' : 'transparent',
+                                color: communityContext === 'global' ? '#000' : 'var(--text-secondary)',
+                                fontWeight: '800', fontSize: '0.8rem',
+                                transition: 'all 0.2s ease', pointerEvents: 'none'
+                            }}
+                        >
+                            {t('common.global')}
+                        </div>
+                        <div
+                            style={{
+                                padding: '6px 12px', borderRadius: '18px',
+                                background: communityContext !== 'global' ? '#8b5cf6' : 'transparent',
+                                color: communityContext !== 'global' ? '#fff' : 'var(--text-secondary)',
+                                fontWeight: '800', fontSize: '0.8rem',
+                                transition: 'all 0.2s ease', pointerEvents: 'none'
+                            }}
+                        >
+                            {t('clan.title')}
+                        </div>
+                    </button>
+                </div>
+
                 <button onClick={onClose} className="hover-lift glass" style={{
                     background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
                     width: 'var(--touch-min)', height: 'var(--touch-min)',
                     display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', color: 'white', cursor: 'pointer'
+                    justifyContent: 'center', color: 'white', cursor: 'pointer', flexShrink: 0
                 }}>
                     <X size={22} />
                 </button>
             </div>
 
-            <ClanInviteCard clanData={clanData} />
+            {/* Back button and Clan Name when viewing a specific clan */}
+            {communityContext !== 'global' && communityContext !== 'manage' && (
+                <div className="fade-in" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '16px var(--spacing-md) 0' }}>
+                    <button onClick={() => setCommunityContext('manage')} className="hover-lift" style={{
+                        background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '20px',
+                        padding: '6px 12px', color: 'white', fontWeight: '700', fontSize: '0.8rem',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'
+                    }}>
+                        ← {t('onboarding.back')}
+                    </button>
+                    <span style={{ fontWeight: '800', color: '#f59e0b', fontSize: '1.1rem' }}>{clanData?.name}</span>
+                </div>
+            )}
+
+            {communityContext === 'manage' ? (
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, marginTop: '12px' }}>
+                    <ClanManager onClanJoined={(clanId) => {
+                        setCommunityContext(clanId);
+                    }} />
+                </div>
+            ) : (
+                <>
+                    {clanData && <ClanInviteCard clanData={clanData} />}
 
             {/* Domain filter - stays fixed */}
             <LeaderboardTabs 
@@ -235,8 +300,9 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
                 )}
             </div>
 
+
             {/* Footer */}
-            {clanData && (
+            {clanData && communityContext !== 'manage' && (
                 <div style={{ padding: 'var(--spacing-md)' }}>
                     <button onClick={() => setShowLeaveConfirm(true)} style={{
                         width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
@@ -275,7 +341,15 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
                                 background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white',
                                 fontWeight: '600', cursor: 'pointer', minHeight: 'var(--touch-min)'
                             }}>{t('common.cancel')}</button>
-                            <button onClick={() => { setShowLeaveConfirm(false); onLeaveClan(); }} className="hover-lift" style={{
+                            <button onClick={async () => { 
+                                setShowLeaveConfirm(false); 
+                                const res = await cloudSync.leaveClan(clanData.id);
+                                if (res.success) {
+                                    await refreshUserClans();
+                                    setCommunityContext('global');
+                                }
+                                if (onLeaveClan) onLeaveClan(); 
+                            }} className="hover-lift" style={{
                                 flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
                                 background: '#ef4444', border: 'none', color: 'white',
                                 fontWeight: '700', cursor: 'pointer', minHeight: 'var(--touch-min)'
@@ -283,6 +357,9 @@ export function Leaderboard({ onClose, activeSlide = 0, clanData, onLeaveClan })
                         </div>
                     </div>
                 </div>
+            )}
+
+                </>
             )}
 
             {/* User Detail Modal */}

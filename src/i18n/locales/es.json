@@ -469,7 +469,7 @@
     "createError": "Se produjo un error",
     "codeRequired": "Código de 6 caracteres requerido",
     "invalidCode": "Código inválido",
-    "title": "Clan OneUp",
+    "title": "Clan",
     "signInRequired": "¡Inicia sesión con Google para crear o unirte a un clan!",
     "signIn": "Iniciar Sesión",
     "yourClans_one": "Tu Clan ({{count}})",

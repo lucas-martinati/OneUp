@@ -469,7 +469,7 @@
     "createError": "发生错误",
     "codeRequired": "需要6位代码",
     "invalidCode": "无效代码",
-    "title": "OneUp 部落",
+    "title": "部落",
     "signInRequired": "用Google登录以创建或加入部落！",
     "signIn": "登录",
     "yourClans_one": "你的部落 ({{count}})",

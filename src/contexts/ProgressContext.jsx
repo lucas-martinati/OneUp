@@ -76,6 +76,7 @@ export function ProgressProvider({ children }) {
   // computedStats needs customExercises — we accept it as a param via a ref
   // that gets set by ExercisesProvider after mount. For now, use empty array.
   const [customExercisesForStats, setCustomExercisesForStats] = useState([]);
+  const [userClans, setUserClans] = useState([]);
   
   const internalGetConfig = useCallback((exId, dateStr) => ({
     difficulty: getDifficulty(exId, dateStr),
@@ -369,6 +370,24 @@ export function ProgressProvider({ children }) {
   const pauseCloudSync = useCallback(() => setIsSyncPaused(true), []);
   const resumeCloudSync = useCallback(() => setIsSyncPaused(false), []);
 
+  // Pre-load user clans
+  const refreshUserClans = useCallback(async () => {
+    if (auth.isSignedIn && !auth.loading) {
+      try {
+        const clans = await cloudSync.getUserClans();
+        setUserClans(clans);
+        return clans;
+      } catch (e) {
+        logger.error('Failed to prefetch clans', e);
+      }
+    }
+    return [];
+  }, [auth.isSignedIn, auth.loading]);
+
+  useEffect(() => {
+    refreshUserClans();
+  }, [refreshUserClans]);
+
   // Cloud sync object for components that need direct access
   const cloudSyncAPI = useMemo(() => ({
     saveToCloud, loadFromCloud, syncWithCloud,
@@ -408,6 +427,7 @@ export function ProgressProvider({ children }) {
     // Computed stats
     computedStats,
     setCustomExercisesForStats,
+    userClans, refreshUserClans,
     // Cloud sync
     cloudSyncAPI, conflictData, onResolveConflict: handleResolveConflict,
     pauseCloudSync, resumeCloudSync,
@@ -421,6 +441,7 @@ export function ProgressProvider({ children }) {
     deleteExerciseHistory, saveToCloud, setHasShared, scheduleNotification,
     getDifficulty, updateDifficulty,
     settings, updateSettings, computedStats, setCustomExercisesForStats,
+    userClans, refreshUserClans,
     cloudSyncAPI, conflictData, handleResolveConflict,
     pauseCloudSync, resumeCloudSync, publishLeaderboardNow,
     syncError, isInitialSyncDone,

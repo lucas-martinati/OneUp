@@ -469,7 +469,7 @@
     "createError": "Произошла ошибка",
     "codeRequired": "Нужен код из 6 символов",
     "invalidCode": "Неверный код",
-    "title": "Клан OneUp",
+    "title": "Клан",
     "signInRequired": "Войдите через Google, чтобы создать или вступить в клан!",
     "signIn": "Войти",
     "yourClans_one": "Ваш клан ({{count}})",

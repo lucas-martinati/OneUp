@@ -29,7 +29,6 @@ const Leaderboard = lazy(() => import('./social/Leaderboard').then(m => ({ defau
 const Achievements = lazy(() => import('./feedback/Achievements').then(m => ({ default: m.Achievements })));
 const Timer = lazy(() => import('./exercises/Timer').then(m => ({ default: m.Timer })));
 const WorkoutSession = lazy(() => import('./exercises/WorkoutSession').then(m => ({ default: m.WorkoutSession })));
-const ClanModal = lazy(() => import('./social/ClanModal').then(m => ({ default: m.ClanModal })));
 const CustomExercisesModal = lazy(() => import('./exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
 
 import { setSoundSettingsGetter } from '../utils/soundManager';
@@ -62,8 +61,8 @@ export function Dashboard() {
     const { showAnnouncement, announcement, dismissAnnouncement } = useAnnouncement();
 
     const { modals, openModal, closeModal, anyModalOpen, activeModals } = useModalManager(
-        { calendar: false, stats: false, settings: false, counter: false, leaderboard: false, achievements: false, session: false, clan: false, customExercises: false },
-        ['counter', 'session', 'clan']
+        { calendar: false, stats: false, settings: false, counter: false, leaderboard: false, achievements: false, session: false, customExercises: false },
+        ['counter', 'session']
     );
     const setShowCalendar = (v) => v ? openModal('calendar') : closeModal('calendar');
     const setShowStats = (v) => v ? openModal('stats') : closeModal('stats');
@@ -72,7 +71,6 @@ export function Dashboard() {
     const setShowLeaderboard = (v) => v ? openModal('leaderboard') : closeModal('leaderboard');
     const setShowAchievements = (v) => v ? openModal('achievements') : closeModal('achievements');
     const setShowSession = (v) => v ? openModal('session') : closeModal('session');
-    const setShowClan = (v) => v ? openModal('clan') : closeModal('clan');
     const setShowCustomExercisesModal = (v) => v ? openModal('customExercises') : closeModal('customExercises');
     const showCalendar = modals.calendar;
     const showStats = modals.stats;
@@ -81,7 +79,6 @@ export function Dashboard() {
     const showLeaderboard = modals.leaderboard;
     const showAchievements = modals.achievements;
     const showSession = modals.session;
-    const showClan = modals.clan;
     const showCustomExercisesModal = modals.customExercises;
     const [activeSlide, setActiveSlide] = useState(0);
 
@@ -231,7 +228,6 @@ export function Dashboard() {
                     setShowSettings={setShowSettings}
                     setShowStats={setShowStats}
                     setShowLeaderboard={setShowLeaderboard}
-                    setShowClan={setShowClan}
                     pauseCloudSync={pauseCloudSync}
                     streakActive={streakActive}
                     displayStreak={displayStreak}
@@ -424,11 +420,6 @@ export function Dashboard() {
                             today={today}
                             dayNumber={dayNumber}
                             activeSlide={effectiveSlide}
-                        />
-                    )}
-                    {showClan && (
-                        <ClanModal
-                            onClose={() => { setShowClan(false); resumeCloudSync?.(); }}
                         />
                     )}
                     {showCustomExercisesModal && (

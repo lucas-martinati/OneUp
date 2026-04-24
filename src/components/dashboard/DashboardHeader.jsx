@@ -41,14 +41,7 @@ export const DashboardHeader = React.memo(({
                 <button onClick={() => setShowLeaderboard(true)} className="hover-lift" style={iconBtnStyle}>
                     <Users size={19} />
                 </button>
-                <button
-                    onClick={() => { setShowClan(true); pauseCloudSync?.(); }}
-                    title="Clan"
-                    className="hover-lift"
-                    style={iconBtnStyle}
-                >
-                    <Shield size={19} />
-                </button>
+
 
                 {/* Global streak badge */}
                 <div style={{
