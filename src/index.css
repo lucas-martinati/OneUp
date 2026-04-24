@@ -76,6 +76,107 @@
   color-scheme: dark;
 }
 
+/* App Themes */
+[data-theme="ocean"] {
+  --body-bg: linear-gradient(180deg, #040507 0%, #020304 100%);
+  --bg-color: #020304;
+  --surface-muted: rgba(6, 182, 212, 0.05);
+  --card-bg: rgba(10, 16, 22, 0.4);
+  --surface-section: linear-gradient(135deg, rgba(15, 22, 30, 0.4), rgba(20, 32, 45, 0.4));
+  --surface-elevated: linear-gradient(135deg, rgba(15, 22, 30, 0.3), rgba(20, 32, 45, 0.3));
+  --sheet-bg: rgba(10, 16, 22, 0.95);
+  --overlay-bg: rgba(5, 8, 12, 0.95);
+  --border-subtle: rgba(6, 182, 212, 0.08);
+  --border-muted: rgba(6, 182, 212, 0.12);
+  --border-default: rgba(6, 182, 212, 0.18);
+  --surface-hover: rgba(6, 182, 212, 0.08);
+
+  --accent: #06b6d4;
+  --accent-glow: #22d3ee;
+  --body-glow-1: rgba(6, 182, 212, 0.1);
+  --body-glow-2: rgba(14, 116, 144, 0.05);
+  --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+  --gradient-accent: linear-gradient(135deg, #38bdf8 0%, #22d3ee 100%);
+  --gradient-glow: linear-gradient(135deg, #0284c7 0%, #06b6d4 50%, #22d3ee 100%);
+  --glow-primary: 0 0 20px rgba(14, 165, 233, 0.4);
+  --glow-accent: 0 0 25px rgba(6, 182, 212, 0.5);
+}
+
+[data-theme="sunset"] {
+  --body-bg: linear-gradient(180deg, #080504 0%, #040302 100%);
+  --bg-color: #040302;
+  --surface-muted: rgba(249, 115, 22, 0.05);
+  --card-bg: rgba(22, 14, 10, 0.4);
+  --surface-section: linear-gradient(135deg, rgba(30, 18, 15, 0.4), rgba(45, 24, 20, 0.4));
+  --surface-elevated: linear-gradient(135deg, rgba(30, 18, 15, 0.3), rgba(45, 24, 20, 0.3));
+  --sheet-bg: rgba(22, 14, 10, 0.95);
+  --overlay-bg: rgba(12, 8, 5, 0.95);
+  --border-subtle: rgba(249, 115, 22, 0.08);
+  --border-muted: rgba(249, 115, 22, 0.12);
+  --border-default: rgba(249, 115, 22, 0.18);
+  --surface-hover: rgba(249, 115, 22, 0.08);
+
+  --accent: #f97316;
+  --accent-glow: #fb923c;
+  --body-glow-1: rgba(249, 115, 22, 0.1);
+  --body-glow-2: rgba(220, 38, 38, 0.05);
+  --gradient-primary: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+  --gradient-accent: linear-gradient(135deg, #f87171 0%, #fb923c 100%);
+  --gradient-glow: linear-gradient(135deg, #dc2626 0%, #f97316 50%, #fb923c 100%);
+  --glow-primary: 0 0 20px rgba(239, 68, 68, 0.4);
+  --glow-accent: 0 0 25px rgba(249, 115, 22, 0.5);
+}
+
+[data-theme="forest"] {
+  --body-bg: linear-gradient(180deg, #040605 0%, #020302 100%);
+  --bg-color: #020302;
+  --surface-muted: rgba(34, 197, 94, 0.05);
+  --card-bg: rgba(10, 18, 12, 0.4);
+  --surface-section: linear-gradient(135deg, rgba(15, 25, 18, 0.4), rgba(22, 38, 25, 0.4));
+  --surface-elevated: linear-gradient(135deg, rgba(15, 25, 18, 0.3), rgba(22, 38, 25, 0.3));
+  --sheet-bg: rgba(10, 18, 12, 0.95);
+  --overlay-bg: rgba(5, 10, 6, 0.95);
+  --border-subtle: rgba(34, 197, 94, 0.08);
+  --border-muted: rgba(34, 197, 94, 0.12);
+  --border-default: rgba(34, 197, 94, 0.18);
+  --surface-hover: rgba(34, 197, 94, 0.08);
+
+  --accent: #22c55e;
+  --accent-glow: #4ade80;
+  --body-glow-1: rgba(34, 197, 94, 0.1);
+  --body-glow-2: rgba(20, 83, 45, 0.05);
+  --gradient-primary: linear-gradient(135deg, #10b981 0%, #22c55e 100%);
+  --gradient-accent: linear-gradient(135deg, #34d399 0%, #4ade80 100%);
+  --gradient-glow: linear-gradient(135deg, #059669 0%, #22c55e 50%, #4ade80 100%);
+  --glow-primary: 0 0 20px rgba(16, 185, 129, 0.4);
+  --glow-accent: 0 0 25px rgba(34, 197, 94, 0.5);
+}
+
+[data-theme="purple"] {
+  --body-bg: linear-gradient(180deg, #060408 0%, #030204 100%);
+  --bg-color: #030204;
+  --surface-muted: rgba(168, 85, 247, 0.05);
+  --card-bg: rgba(16, 10, 22, 0.4);
+  --surface-section: linear-gradient(135deg, rgba(22, 15, 30, 0.4), rgba(35, 22, 45, 0.4));
+  --surface-elevated: linear-gradient(135deg, rgba(22, 15, 30, 0.3), rgba(35, 22, 45, 0.3));
+  --sheet-bg: rgba(16, 10, 22, 0.95);
+  --overlay-bg: rgba(8, 5, 12, 0.95);
+  --border-subtle: rgba(168, 85, 247, 0.08);
+  --border-muted: rgba(168, 85, 247, 0.12);
+  --border-default: rgba(168, 85, 247, 0.18);
+  --surface-hover: rgba(168, 85, 247, 0.08);
+
+  --accent: #a855f7;
+  --accent-glow: #c084fc;
+  --body-glow-1: rgba(168, 85, 247, 0.1);
+  --body-glow-2: rgba(126, 34, 206, 0.05);
+  --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+  --gradient-accent: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
+  --gradient-glow: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%);
+  --glow-primary: 0 0 20px rgba(139, 92, 246, 0.4);
+  --glow-accent: 0 0 25px rgba(168, 85, 247, 0.5);
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -137,6 +238,7 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
+  transition: background 0.5s ease;
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
 }

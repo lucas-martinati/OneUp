@@ -6,9 +6,10 @@ export const DashboardHeader = React.memo(({
     streakActive, displayStreak, selectedExercise, totalReps, isDay100
 }) => {
     const iconBtnStyle = {
-        background: 'var(--surface-hover)', width: 'var(--touch-min)', height: 'var(--touch-min)',
+        background: 'var(--surface-muted)', width: 'var(--touch-min)', height: 'var(--touch-min)',
         borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: 'var(--text-primary)', border: 'none', cursor: 'pointer', flexShrink: 0
+        color: 'var(--text-primary)', border: '1px solid var(--border-default)', cursor: 'pointer', flexShrink: 0,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
     };
 
     const headerRef = useRef(null);

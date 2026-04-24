@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Z_INDEX } from '../../utils/zIndex';
-import { X, Bell, Volume2, Clock, Check, Users, SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Sparkles, Star, Smartphone } from '../../utils/icons';
+import { X, Bell, Volume2, Clock, Check, Users, SettingsIcon, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Sparkles, Star, Smartphone, Palette } from '../../utils/icons';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
 import { getPurchaseHistory } from '../../services/purchaseService';
@@ -367,7 +367,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                     icon={Globe}
                     title={t('settings.language')}
                     description={t('settings.languageDesc')}
-                    color="#06b6d4"
+                    color="var(--accent)"
                     isLast={true}
                 >
                     <select
@@ -380,8 +380,8 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             padding: '8px 12px',
                             borderRadius: '10px',
                             border: '2px solid var(--border-subtle)',
-                            background: '#1a1a2e',
-                            color: '#ffffff',
+                            background: 'var(--surface-elevated)',
+                            color: 'var(--text-primary)',
                             fontSize: '0.85rem',
                             fontWeight: '600',
                             cursor: 'pointer',
@@ -391,11 +391,11 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             outline: 'none'
                         }}
                     >
-                        <option value="fr" style={{ background: '#1a1a2e', color: '#ffffff' }}>{t('settings.french')}</option>
-                        <option value="en" style={{ background: '#1a1a2e', color: '#ffffff' }}>{t('settings.english')}</option>
-                        <option value="es" style={{ background: '#1a1a2e', color: '#ffffff' }}>{t('settings.spanish')}</option>
-                        <option value="zh" style={{ background: '#1a1a2e', color: '#ffffff' }}>{t('settings.chinese')}</option>
-                        <option value="ru" style={{ background: '#1a1a2e', color: '#ffffff' }}>{t('settings.russian')}</option>
+                        <option value="fr" style={{ background: '#0a0a0f', color: '#ffffff' }}>{t('settings.french')}</option>
+                        <option value="en" style={{ background: '#0a0a0f', color: '#ffffff' }}>{t('settings.english')}</option>
+                        <option value="es" style={{ background: '#0a0a0f', color: '#ffffff' }}>{t('settings.spanish')}</option>
+                        <option value="zh" style={{ background: '#0a0a0f', color: '#ffffff' }}>{t('settings.chinese')}</option>
+                        <option value="ru" style={{ background: '#0a0a0f', color: '#ffffff' }}>{t('settings.russian')}</option>
                     </select>
                 </SettingRow>
             </div>
@@ -519,6 +519,74 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             marginTop: '8px', opacity: 0.8
                         }}>
                             {t('settings.maxChars')}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* ── Thème de l'application (PRO) ─────────────────────────── */}
+            <div className="glass-premium" style={{
+                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                marginBottom: 'var(--spacing-md)',
+                background: 'var(--surface-section)',
+                position: 'relative',
+                overflow: 'hidden'
+            }}>
+                <h3 style={sectionTitleStyle}>
+                    <Palette size={16} /> {t('settings.appTheme')} {!isPro && <Lock size={14} color="var(--accent)" style={{ marginLeft: 'auto', opacity: 0.8 }} />}
+                </h3>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px', opacity: isPro ? 1 : 0.6, pointerEvents: isPro ? 'auto' : 'none' }}>
+                    {[
+                        { key: 'dark', color: '#0f0f1a', accent: '#818cf8' },
+                        { key: 'ocean', color: '#0a1628', accent: '#06b6d4' },
+                        { key: 'sunset', color: '#1a0a0a', accent: '#f97316' },
+                        { key: 'forest', color: '#0a1a0f', accent: '#22c55e' },
+                        { key: 'purple', color: '#120a1a', accent: '#a855f7' }
+                    ].map(theme => {
+                        const isSelected = (settings.appTheme || 'dark') === theme.key;
+                        return (
+                            <button
+                                key={theme.key}
+                                onClick={() => updateSettings(prev => ({ ...prev, appTheme: theme.key }))}
+                                style={{
+                                    width: '42px', height: '42px', borderRadius: '12px',
+                                    border: isSelected ? `2px solid ${theme.accent}` : '2px solid rgba(255,255,255,0.1)',
+                                    background: theme.color,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.15s ease',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}
+                                title={t(`share.theme.${theme.key}`, theme.key)}
+                            >
+                                <div style={{
+                                    width: '16px', height: '16px', borderRadius: '50%',
+                                    background: theme.accent,
+                                    boxShadow: isSelected ? `0 0 8px ${theme.accent}66` : 'none'
+                                }} />
+                            </button>
+                        );
+                    })}
+                </div>
+                {!isPro && (
+                    <div 
+                        onClick={() => setShowStore(true)}
+                        style={{
+                            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                            background: 'rgba(0,0,0,0.2)', backdropFilter: 'blur(2px)',
+                            cursor: 'pointer', zIndex: 2
+                        }}
+                    >
+                        <div style={{
+                            background: 'var(--surface-elevated)', color: 'var(--text-primary)',
+                            padding: '8px 16px', borderRadius: '20px',
+                            fontSize: '0.85rem', fontWeight: 'bold',
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            border: '1px solid var(--border-default)',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                            marginTop: '24px'
+                        }}>
+                            <Lock size={14} color="var(--accent)" /> PRO
                         </div>
                     </div>
                 )}

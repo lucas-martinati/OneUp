@@ -368,7 +368,8 @@
     "anonymousMergeTitle": "检测到本地进度",
     "anonymousMergeDesc": "您在未登录时完成了练习。是否要将其与您的账户合并？",
     "merge": "合并",
-    "mergeDesc": "合并本地和云端数据"
+    "mergeDesc": "合并本地和云端数据",
+    "appTheme": "应用主题"
   },
   "onboarding": {
     "concept": "概念",

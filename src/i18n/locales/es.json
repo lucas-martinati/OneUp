@@ -368,7 +368,8 @@
     "anonymousMergeTitle": "Progreso local detectado",
     "anonymousMergeDesc": "Has realizado ejercicios sin iniciar sesión. ¿Quieres fusionarlos con tu cuenta?",
     "merge": "Fusionar",
-    "mergeDesc": "Combinar local + nube"
+    "mergeDesc": "Combinar local + nube",
+    "appTheme": "Tema de la aplicación"
   },
   "onboarding": {
     "concept": "El Concepto",

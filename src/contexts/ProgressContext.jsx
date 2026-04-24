@@ -117,10 +117,11 @@ export function ProgressProvider({ children }) {
     updateWidgetData(computedStats, completions);
   }, [computedStats, completions]);
 
-  // ── Performance mode on document root ──────────────────────────────
+  // ── Performance mode & Theme on document root ──────────────────────────────
   useEffect(() => {
     document.documentElement.setAttribute('data-perf', settings.performanceMode);
-  }, [settings.performanceMode]);
+    document.documentElement.setAttribute('data-theme', settings.appTheme || 'dark');
+  }, [settings.performanceMode, settings.appTheme]);
 
   // ── Reset sync state when user signs out ───────────────────────────
   useEffect(() => {

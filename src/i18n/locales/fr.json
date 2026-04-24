@@ -368,7 +368,8 @@
     "anonymousMergeTitle": "Progression locale détectée",
     "anonymousMergeDesc": "Tu as fait des exercices hors-ligne ou déconnecté. Veux-tu les fusionner avec ton compte ?",
     "merge": "Fusionner",
-    "mergeDesc": "Conserver local + cloud"
+    "mergeDesc": "Conserver local + cloud",
+    "appTheme": "Thème de l'application"
   },
   "onboarding": {
     "concept": "Le Concept",
