@@ -46,6 +46,7 @@ function migrateLegacyEntry(entry) {
         isCompleted: entry.isCompleted || entry.done || false,
         timestamp: entry.timestamp || null,
         timeOfDay: entry.timeOfDay || null,
+        ...(entry.difficulty !== undefined ? { difficulty: entry.difficulty } : {})
       };
     }
     return migrated;
@@ -59,7 +60,8 @@ function migrateLegacyEntry(entry) {
         isCompleted: val.isCompleted !== undefined ? val.isCompleted : (val.done || false),
         timestamp: val.timestamp || null,
         timeOfDay: val.timeOfDay || null,
-        ...(val.weight !== undefined ? { weight: val.weight } : {})
+        ...(val.weight !== undefined ? { weight: val.weight } : {}),
+        ...(val.difficulty !== undefined ? { difficulty: val.difficulty } : {})
       };
     }
   }
@@ -123,7 +125,7 @@ function parseProgressData(parsed) {
 }
 
 /** Build a "day done" object for all exercises (used in backfill) */
-function makeAllDone(selectedExercises = null) {
+function makeAllDone(selectedExercises = null, difficulties = {}) {
   const entry = {};
   const now = new Date().toISOString();
   const validateTime = Date.now();
@@ -132,7 +134,14 @@ function makeAllDone(selectedExercises = null) {
     : EXERCISES;
   
   for (const ex of exercisesToComplete) {
-    entry[ex.id] = { isCompleted: true, timestamp: now, timeOfDay: null, validatedAt: validateTime };
+    const diff = difficulties[ex.id];
+    entry[ex.id] = { 
+        isCompleted: true, 
+        timestamp: now, 
+        timeOfDay: null, 
+        validatedAt: validateTime,
+        ...((diff !== undefined && diff !== null && diff !== 1.0) ? { difficulty: diff } : {})
+    };
   }
   return entry;
 }
@@ -163,7 +172,7 @@ export function useProgress(userId) {
 
   // ─── Challenge Setup ──────────────────────────────────────────────────────
 
-  const startChallenge = (userStartDate, selectedExercises = null) => {
+  const startChallenge = (userStartDate, selectedExercises = null, difficulties = {}) => {
     setState(prev => {
       const newCompletions = { ...prev.completions };
       let userStartStr = prev.startDate;
@@ -181,7 +190,7 @@ export function useProgress(userId) {
 
         const loopDate = new Date(start);
         while (loopDate < today) {
-          newCompletions[getLocalDateStr(loopDate)] = makeAllDone(selectedExercises);
+          newCompletions[getLocalDateStr(loopDate)] = makeAllDone(selectedExercises, difficulties);
           loopDate.setDate(loopDate.getDate() + 1);
         }
       }
@@ -204,7 +213,7 @@ export function useProgress(userId) {
   };
 
   /** Toggle global day done status (marks/unmarks ALL exercises) */
-  const toggleCompletion = (dateStr) => {
+  const toggleCompletion = (dateStr, difficulties = {}) => {
     setState(prev => {
       const newCompletions = { ...prev.completions };
       const day = newCompletions[dateStr] || {};
@@ -220,7 +229,7 @@ export function useProgress(userId) {
         newCompletions[dateStr] = updated;
       } else {
         // Mark all exercises as done
-        newCompletions[dateStr] = makeAllDone();
+        newCompletions[dateStr] = makeAllDone(null, difficulties);
       }
       return { ...prev, completions: newCompletions, lastCompletionChange: Date.now() };
     });
@@ -243,7 +252,7 @@ export function useProgress(userId) {
    * Saves isCompleted boolean + timestamp. Count is kept locally for the counter UI
    * but NOT synced to Firebase (only isCompleted is synced).
    */
-  const updateExerciseCount = (dateStr, exerciseId, newCount, dailyGoal, weight = null) => {
+  const updateExerciseCount = (dateStr, exerciseId, newCount, dailyGoal, weight = null, difficulty = null) => {
     setState(prev => {
       const newCompletions = { ...prev.completions };
       const day = { ...(newCompletions[dateStr] || {}) };
@@ -274,14 +283,16 @@ export function useProgress(userId) {
         isCompleted: isNowDone, 
         timestamp, 
         timeOfDay,
-        ...((weight !== null && weight !== undefined) ? { weight } : {}) 
+        ...((weight !== null && weight !== undefined) ? { weight } : {}),
+        ...((difficulty !== null && difficulty !== undefined && difficulty !== 1.0) ? { difficulty } : {})
       };
       newCompletions[dateStr] = day;
 
       // Only trigger cloud save when completion status or weight actually changes
       const completionChanged = wasDone !== isNowDone;
       const weightChanged = weight !== null && weight !== (current.weight ?? null);
-      const needsCloudSync = completionChanged || weightChanged;
+      const difficultyChanged = difficulty !== null && difficulty !== (current.difficulty ?? null);
+      const needsCloudSync = completionChanged || weightChanged || difficultyChanged;
       return {
         ...prev,
         completions: newCompletions,

@@ -24,7 +24,7 @@ const SessionDetailModal = lazy(() => import('../../features/share/components/Se
 export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStore }) {
 
     // ── Context consumption (replaces 8 props) ──
-    const { completions, settings, getDayNumber, computedStats: globalStats } = useProgressContext();
+    const { completions, settings, getDayNumber, computedStats: globalStats, getDifficulty } = useProgressContext();
     const { isPro, hadPro } = useSubscription();
     // For stats viewing, previously having pro is enough
     const hasProAccess = isPro || hadPro;
@@ -80,8 +80,8 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
     const computedStats = React.useMemo(() => {
         if (canAccessFeature(FEATURES.MERGED_STATS, { isPro: hasProAccess }) && activeCategories.length === 3) return globalStats;
-        return computeAllStats(completions, settings, getDayNumber, exercises);
-    }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess]);
+        return computeAllStats(completions, settings, getDayNumber, exercises, false, {}, getDifficulty);
+    }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess, getDifficulty]);
 
     // All values come from computedStats
     const {

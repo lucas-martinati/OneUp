@@ -3,6 +3,7 @@ import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW } from '../
 import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
+import { isGlobalPerfectDay, calculateRepsForDay } from '../utils/statUtils';
 
 /**
  * Centralized computation hook.
@@ -18,18 +19,19 @@ import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
  */
 const EMPTY_ARRAY = [];
 
-export function useComputedStats(completions, settings, getDayNumber, customExercises = EMPTY_ARRAY, hasShared = false, manualBadges = {}) {
+export function useComputedStats(completions, settings, getDayNumber, customExercises = EMPTY_ARRAY, hasShared = false, manualBadges = {}, getDifficulty = null) {
     const allExercises = useMemo(() => [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises], [customExercises]);
     return useMemo(() => {
-        return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, manualBadges);
-    }, [completions, settings, getDayNumber, allExercises, hasShared, manualBadges]);
+        return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, manualBadges, getDifficulty);
+    }, [completions, settings, getDayNumber, allExercises, hasShared, manualBadges, getDifficulty]);
 }
 
 /**
  * Pure function that computes all stats in a single pass.
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
  */
-export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, manualBadges = {}) {
+export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, manualBadges = {}, getDifficulty = null) {
+    // Keep global fallback for things not tied to a specific exercise
     const difficultyMultiplier = settings?.difficultyMultiplier ?? 1.0;
     const todayStr = getLocalDateStr(new Date());
     const today = new Date(todayStr);
@@ -117,17 +119,15 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         if (!firstActiveDate) firstActiveDate = dateStr;
 
         // Perfect day check (category-aware, non-custom)
-        const hasStandard = EXERCISES.every(ex => allExercises.some(e => e.id === ex.id));
-        const hasWeights = WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => allExercises.some(e => e.id === ex.id));
-        
-        const standardDone = hasStandard && EXERCISES.every(ex => day[ex.id]?.isCompleted);
-        const weightsDone = hasWeights && WEIGHT_EXERCISES.every(ex => day[ex.id]?.isCompleted);
-        const isPerfect = standardDone || weightsDone;
+        const isPerfect = isGlobalPerfectDay(day, allExercises);
         
         if (isPerfect) perfectDays++;
         if (dateStr === todayStr) {
-            if (standardDone) standardPerfectToday = true;
-            if (weightsDone) weightsPerfectToday = true;
+            // Recalculate category-specific perfection for specific flags
+            const hasStandard = EXERCISES.every(ex => allExercises.some(e => e.id === ex.id));
+            const hasWeights = WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => allExercises.some(e => e.id === ex.id));
+            if (hasStandard && EXERCISES.every(ex => day[ex.id]?.isCompleted)) standardPerfectToday = true;
+            if (hasWeights && WEIGHT_EXERCISES.every(ex => day[ex.id]?.isCompleted)) weightsPerfectToday = true;
             if (isPerfect) isPerfectToday = true;
         }
 
@@ -164,7 +164,8 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
             // Exercise reps
             const ex = allExercises.find(e => e.id === exId);
             if (ex) {
-                const reps = getDailyGoal(ex, dayNum, difficultyMultiplier);
+                const diffToUse = getDifficulty ? getDifficulty(exId, dateStr) : difficultyMultiplier;
+                const reps = getDailyGoal(ex, dayNum, diffToUse);
                 exerciseReps[exId] = (exerciseReps[exId] || 0) + reps;
                 exerciseDays[exId] = (exerciseDays[exId] || 0) + 1;
                 dayReps += reps;

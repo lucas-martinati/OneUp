@@ -11,12 +11,15 @@ import { StoreCard } from '../store/StoreCard';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { EXERCISES } from '../../config/exercises';
+import { WEIGHT_EXERCISES } from '../../config/weights';
+import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 export function Settings({ defaultShowStore = false, onClose }) {
 
     // ── Context consumption (replaces 11 props) ──
     const cloudAuth = useAuth();
-    const { settings, updateSettings, cloudSyncAPI: cloudSync, conflictData, scheduleNotification } = useProgressContext();
+    const { settings, updateSettings, cloudSyncAPI: cloudSync, conflictData, scheduleNotification, getDifficulty, setDraftDifficulty } = useProgressContext();
     const { isSupporter, isPro, purchaseSupporter: onPurchaseSupporter, purchasePro: onPurchasePro, restorePurchases: onRestorePurchases } = useSubscription();
 
     const onSave = (newSettings) => {
@@ -588,7 +591,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                     </button>
                 ) : (
                     <div className="scale-in">
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <span style={{ fontWeight: '700', color: 'white', fontSize: '0.9rem' }}>{t('settings.multiplier')}</span>
                                 <button
@@ -602,27 +605,94 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                     {t('settings.lock')} <Unlock size={12} />
                                 </button>
                             </div>
-                            <span style={{ fontWeight: '800', color: '#fbbf24', fontSize: '1.4rem', textShadow: '0 0 10px rgba(251,191,36,0.3)' }}>
-                                {settings.difficultyMultiplier || 1.0}x
-                            </span>
                         </div>
 
-                        <input
-                            type="range"
-                            min="0.1" max="1.0" step="0.1"
-                            value={settings.difficultyMultiplier || 1.0}
-                            onChange={(e) => {
-                                const val = Math.min(1.0, Math.max(0.1, parseFloat(e.target.value)));
-                                onSave({ ...settings, difficultyMultiplier: val });
-                            }}
-                            style={{
-                                width: '100%',
-                                height: '6px',
-                                accentColor: '#fbbf24',
-                                cursor: 'pointer',
-                                filter: 'drop-shadow(0 0 5px rgba(251,191,36,0.2))'
-                            }}
-                        />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                            {/* Bodyweight Exercises */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                {EXERCISES.map(ex => {
+                                    const val = getDifficulty ? getDifficulty(ex.id) : 1.0;
+                                    const exColor = ex.color || '#ef4444';
+                                    return (
+                                        <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: '600' }}>
+                                                    {getExerciseLabel(ex)}
+                                                </span>
+                                                <span style={{ fontWeight: '800', color: exColor, fontSize: '1rem', textShadow: `0 0 10px ${exColor}4d` }}>
+                                                    {val.toFixed(1)}x
+                                                </span>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min="0.1" max="1.0" step="0.1"
+                                                value={val}
+                                                onChange={(e) => {
+                                                    const newVal = Math.min(1.0, Math.max(0.1, parseFloat(e.target.value)));
+                                                    if (setDraftDifficulty) {
+                                                        setDraftDifficulty(ex.id, newVal);
+                                                    }
+                                                }}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '6px',
+                                                    accentColor: exColor,
+                                                    cursor: 'pointer',
+                                                    filter: `drop-shadow(0 0 5px ${exColor}33)`
+                                                }}
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Separator and Weights */}
+                            {isPro && WEIGHT_EXERCISES && WEIGHT_EXERCISES.length > 0 && (
+                                <>
+                                    <div style={{ 
+                                        height: '1px', width: '100%', 
+                                        background: 'linear-gradient(90deg, transparent, var(--border-subtle), transparent)',
+                                        margin: '8px 0'
+                                    }} />
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                        {WEIGHT_EXERCISES.map(ex => {
+                                            const val = getDifficulty ? getDifficulty(ex.id) : 1.0;
+                                            const exColor = ex.color || '#ef4444';
+                                            return (
+                                                <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                        <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: '600' }}>
+                                                            {getExerciseLabel(ex)}
+                                                        </span>
+                                                        <span style={{ fontWeight: '800', color: exColor, fontSize: '1rem', textShadow: `0 0 10px ${exColor}4d` }}>
+                                                            {val.toFixed(1)}x
+                                                        </span>
+                                                    </div>
+                                                    <input
+                                                        type="range"
+                                                        min="0.1" max="1.0" step="0.1"
+                                                        value={val}
+                                                        onChange={(e) => {
+                                                            const newVal = Math.min(1.0, Math.max(0.1, parseFloat(e.target.value)));
+                                                            if (setDraftDifficulty) {
+                                                                setDraftDifficulty(ex.id, newVal);
+                                                            }
+                                                        }}
+                                                        style={{
+                                                            width: '100%',
+                                                            height: '6px',
+                                                            accentColor: exColor,
+                                                            cursor: 'pointer',
+                                                            filter: `drop-shadow(0 0 5px ${exColor}33)`
+                                                        }}
+                                                    />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>

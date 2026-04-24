@@ -6,8 +6,9 @@ import { registerBackHandler } from '../../utils/backHandler';
 import { getDailyGoal } from '../../config/exercises';
 import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
+import { isPerfectDay, calculateRepsForDay } from '../../utils/statUtils';
 
-export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, settings }) {
+export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, settings, getDifficulty }) {
     const { t } = useTranslation();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
@@ -267,7 +268,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                     const isToday = dateString === todayStr;
 
                     const dayCompletions = completions[dateString] || {};
-                    const isPerfect = !isCustom && exercises.length > 0 && exercises.every(ex => dayCompletions[ex.id]?.isCompleted);
+                    const isPerfect = !isCustom && isPerfectDay(dayCompletions, exercises);
                     const isAnyDone = !isPerfect && Object.values(dayCompletions).some(ex => ex?.isCompleted);
                     const isMissed = !isPerfect && !isAnyDone && !isFuture && !isBeforeStart;
                     const completedCount = exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length;
@@ -374,6 +375,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                         onClose={handleCloseDetail}
                         isClosing={isClosing}
                         settings={settings}
+                        getDifficulty={getDifficulty}
                         t={t}
                     />
                 </>
@@ -401,9 +403,10 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 }
 
 /** Day detail bottom sheet */
-function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, settings, t }) {
+function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, settings, getDifficulty, t }) {
     const dayNum = getDayNumber(dateString);
     const dayCompletions = completions[dateString] || {};
+    const date = new Date(dateString);
     const [dragY, setDragY] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
@@ -552,18 +555,15 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                     background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
                     WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
                 }}>
-                    {exercises.reduce((sum, ex) => {
-                        const exData = dayCompletions[ex.id];
-                        if (!exData?.isCompleted) return sum;
-                        return sum + getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
-                    }, 0)} <span style={{ fontSize: '0.7rem', WebkitTextFillColor: 'var(--text-secondary)' }}>{t('common.reps')}</span>
+                    {calculateRepsForDay(dayCompletions, dayNum, exercises, getDifficulty, dateString)} <span style={{ fontSize: '0.7rem', WebkitTextFillColor: 'var(--text-secondary)' }}>{t('common.reps')}</span>
                 </div>
             </div>
 
             <div data-scroll-content style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">
                 {exercises && exercises.map(ex => {
                     const ExIcon = getIcon(ex.icon);
-                    const goal = getDailyGoal(ex, dayNum, settings?.difficultyMultiplier);
+                    const exDiff = getDifficulty ? getDifficulty(ex.id, dateString) : 1.0;
+                    const goal = getDailyGoal(ex, dayNum, exDiff);
                     const exData = dayCompletions[ex.id] || { isCompleted: false };
                     return (
                         <div key={ex.id} style={{

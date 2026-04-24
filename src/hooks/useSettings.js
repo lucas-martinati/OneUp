@@ -9,18 +9,36 @@ const defaultSettings = {
   notificationTime: { hour: 9, minute: 0 }, // Default 9:00 AM
   leaderboardEnabled: false,
   leaderboardPseudo: '',
-  difficultyMultiplier: 1.0,
-  performanceMode: 'high' // 'low' | 'high'
+  performanceMode: 'high', // 'low' | 'high'
+  exerciseDifficulties: {}
 };
 
 export function useSettings(userId) {
   const [settings, setSettings] = useLocalStorageScoped(
     STORAGE_KEY, userId, defaultSettings,
-    (parsed) => ({ ...defaultSettings, ...parsed })
+    (parsed) => {
+      console.debug('[Settings] Loading from storage:', parsed);
+      const cleaned = { ...parsed };
+      delete cleaned.difficultyMultiplier;
+      delete cleaned.difficultyHistory;
+      return { ...defaultSettings, ...cleaned };
+    }
   );
 
-  const updateSettings = useCallback((newSettings) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
+  const updateSettings = useCallback((update) => {
+    setSettings(prev => {
+      const next = typeof update === 'function' ? update(prev) : update;
+      
+      // Special handling for exerciseDifficulties to ensure we don't wipe them
+      if (next.exerciseDifficulties && prev.exerciseDifficulties) {
+        next.exerciseDifficulties = {
+          ...prev.exerciseDifficulties,
+          ...next.exerciseDifficulties
+        };
+      }
+      
+      return { ...prev, ...next };
+    });
   }, [setSettings]);
 
   return { settings, updateSettings };

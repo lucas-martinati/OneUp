@@ -32,7 +32,7 @@ function AppContent() {
 
   // Cloud auto-save for routines
   useCloudAutoSave(
-    auth.isSignedIn && !auth.loading && isSetup,
+    auth.isSignedIn && !auth.loading && isSetup && isInitialSyncDone,
     routines,
     cloudSync.saveRoutinesToCloud,
     { delay: 2000 }
@@ -40,7 +40,7 @@ function AppContent() {
 
   // Cloud auto-save for custom exercises (Pro feature)
   useCloudAutoSave(
-    auth.isSignedIn && !auth.loading && isSetup,
+    auth.isSignedIn && !auth.loading && isSetup && isInitialSyncDone,
     customExercises,
     cloudSync.saveCustomExercisesToCloud,
     { delay: 2000 }

@@ -27,6 +27,7 @@ export function ProgressProvider({ children }) {
   const [conflictData, setConflictData] = useState(null);
   const [conflictCheckDone, setConflictCheckDone] = useState(false);
   const [isInitialSyncDone, setIsInitialSyncDone] = useState(false);
+  const [settingsInitialSyncDone, setSettingsInitialSyncDone] = useState(false);
   const [isSyncPaused, setIsSyncPaused] = useState(false);
   const [syncError, setSyncError] = useState(null);
 
@@ -41,11 +42,41 @@ export function ProgressProvider({ children }) {
   } = progress;
 
   const userDetailsCache = useUserDetailsCache(cloudSync);
+  const getDifficulty = useCallback((exId, dateStr = null) => {
+    // If a specific date is requested and the exercise is completed on that date,
+    // we use the difficulty saved at that time to ensure rep counts remain stable
+    // even if the user changes their current settings later.
+    if (dateStr && completions?.[dateStr]?.[exId]?.isCompleted) {
+      const savedDiff = completions[dateStr][exId].difficulty;
+      // If we have a saved difficulty for this specific workout, use it.
+      if (savedDiff !== undefined) return savedDiff;
+      
+      // If NO saved difficulty exists on a completed day, it's old data from 
+      // before the per-exercise difficulty system. Fallback to 1.0.
+      return 1.0;
+    }
+
+    // For current/future workouts or sessions in progress, use current settings.
+    const currentPrefs = settings?.exerciseDifficulties || {};
+    if (currentPrefs[exId] !== undefined) {
+      return currentPrefs[exId];
+    }
+    return 1.0;
+  }, [completions, settings?.exerciseDifficulties]);
+
+  const setDraftDifficulty = useCallback((exId, value) => {
+    updateSettings({
+      exerciseDifficulties: {
+        ...(settings?.exerciseDifficulties || {}),
+        [exId]: value
+      }
+    });
+  }, [updateSettings, settings?.exerciseDifficulties]);
 
   // computedStats needs customExercises — we accept it as a param via a ref
   // that gets set by ExercisesProvider after mount. For now, use empty array.
   const [customExercisesForStats, setCustomExercisesForStats] = useState([]);
-  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesForStats, hasShared, manualBadges);
+  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesForStats, hasShared, manualBadges, getDifficulty);
 
   // ── Leaderboard publishing ──────────────────────────────────────────
   const publishLeaderboardNow = useCallback(async () => {
@@ -67,7 +98,6 @@ export function ProgressProvider({ children }) {
         isPublic: !!settings.leaderboardEnabled,
         lastActiveDay,
         isPerfectToday: computedStats.isPerfectToday,
-        difficultyMultiplier: settings?.difficultyMultiplier,
       });
     } catch (e) {
       logger.error('Leaderboard publish failed:', e);
@@ -157,23 +187,43 @@ export function ProgressProvider({ children }) {
         try {
           const cloudSettings = await cloudSync.loadSettingsFromCloud();
           if (cloudSettings) {
-            const safeSettings = {
-              ...cloudSettings,
-              notificationTime: cloudSettings.notificationTime || { hour: 9, minute: 0 }
-            };
-            if (typeof safeSettings.notificationTime !== 'object') {
-              safeSettings.notificationTime = { hour: 9, minute: 0 };
-            }
-            updateSettings(safeSettings);
+            logger.info('Cloud settings loaded:', cloudSettings);
+            updateSettings(prev => {
+              const cleanedCloud = { ...cloudSettings };
+              delete cleanedCloud.difficultyHistory;
+              
+              const safeSettings = {
+                ...cleanedCloud,
+                notificationTime: cloudSettings.notificationTime || { hour: 9, minute: 0 },
+                exerciseDifficulties: {
+                  ...(prev.exerciseDifficulties || {}),
+                  ...(cloudSettings.exerciseDifficulties || {})
+                }
+              };
+              if (typeof safeSettings.notificationTime !== 'object') {
+                safeSettings.notificationTime = { hour: 9, minute: 0 };
+              }
+              return safeSettings;
+            });
+            // Mark as synced only AFTER updateSettings has been queued
+            setSettingsInitialSyncDone(true);
+          } else {
+            // No cloud data found — safe to assume local is the truth
+            setSettingsInitialSyncDone(true);
           }
-        } catch (error) { logger.error('Settings sync error:', error); }
+        } catch (error) { 
+          logger.error('Settings sync error:', error); 
+          // Don't set initialSyncDone to true on error to avoid overwriting cloud with empty local
+        }
       };
       loadSettings();
+    } else if (!auth.isSignedIn && !auth.loading) {
+      setSettingsInitialSyncDone(true);
     }
   }, [auth.isSignedIn, auth.loading, updateSettings]);
 
   // ── Cloud auto-save for settings ────────────────────────────────────
-  useCloudAutoSave(auth.isSignedIn && !auth.loading && isSetup, settings, cloudSync.saveSettingsToCloud, { delay: 2000 });
+  useCloudAutoSave(auth.isSignedIn && !auth.loading && isSetup && settingsInitialSyncDone, settings, cloudSync.saveSettingsToCloud, { delay: 2000 });
 
   // ── Anonymous (Guest) Data Detection & Merging ──────────────────────
   useEffect(() => {
@@ -274,19 +324,35 @@ export function ProgressProvider({ children }) {
     try {
       const hasGuest = hasGuestData();
       if (action === 'restore') {
-        if (hasGuest) clearAnonymousData();
+        if (hasGuest) {
+          clearAnonymousData();
+          localStorage.removeItem('oneup_settings'); // Clear guest settings too
+          localStorage.removeItem('oneup_routines');
+          localStorage.removeItem('oneup_custom_exercises');
+        }
         await loadFromCloud();
       } else if (action === 'upload') {
         if (hasGuest) {
+          // Merge settings
+          const guestSettings = localStorage.getItem('oneup_settings');
+          if (guestSettings) {
+            try {
+              const parsed = JSON.parse(guestSettings);
+              if (parsed.exerciseDifficulties) {
+                updateSettings({ exerciseDifficulties: { ...parsed.exerciseDifficulties, ...(settings.exerciseDifficulties || {}) } });
+              }
+            } catch (e) { /* ignore */ }
+          }
           await mergeWithAnonymousData();
           clearAnonymousData();
+          localStorage.removeItem('oneup_settings');
         }
         await syncWithCloud();
       }
       setConflictData(null);
       setConflictCheckDone(true);
     } catch (error) { logger.error('Conflict resolution failed:', error); }
-  }, [loadFromCloud, syncWithCloud, hasGuestData, clearAnonymousData, mergeWithAnonymousData]);
+  }, [loadFromCloud, syncWithCloud, hasGuestData, clearAnonymousData, mergeWithAnonymousData, updateSettings, settings.exerciseDifficulties]);
 
   // Pause / resume sync
   const pauseCloudSync = useCallback(() => setIsSyncPaused(true), []);
@@ -318,11 +384,14 @@ export function ProgressProvider({ children }) {
     startDate, completions, isSetup, userStartDate,
     hasShared, manualBadges,
     // Progress actions
-    startChallenge, toggleCompletion, getDayNumber, getTotalReps, isDayDone,
+    startChallenge: (userStart, selected) => startChallenge(userStart, selected, settings?.exerciseDifficulties || {}),
+    toggleCompletion: (dateStr) => toggleCompletion(dateStr, settings?.exerciseDifficulties || {}),
+    getDayNumber, getTotalReps, isDayDone,
     getExerciseCount, updateExerciseCount, getExerciseDone,
     deleteExerciseHistory, saveToCloud,
     setHasShared,
     scheduleNotification,
+    getDifficulty, setDraftDifficulty,
     // Settings
     settings, updateSettings,
     // Computed stats
@@ -339,6 +408,7 @@ export function ProgressProvider({ children }) {
     startChallenge, toggleCompletion, getDayNumber, getTotalReps, isDayDone,
     getExerciseCount, updateExerciseCount, getExerciseDone,
     deleteExerciseHistory, saveToCloud, setHasShared, scheduleNotification,
+    getDifficulty, setDraftDifficulty,
     settings, updateSettings, computedStats, setCustomExercisesForStats,
     cloudSyncAPI, conflictData, handleResolveConflict,
     pauseCloudSync, resumeCloudSync, publishLeaderboardNow,

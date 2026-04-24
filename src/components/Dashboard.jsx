@@ -48,7 +48,7 @@ export function Dashboard() {
         getExerciseCount, updateExerciseCount,
         pauseCloudSync, resumeCloudSync,
         computedStats,
-        conflictData, onResolveConflict,
+        conflictData, onResolveConflict, getDifficulty
     } = useProgressContext();
     const { isPro } = useSubscription();
     const {
@@ -127,7 +127,8 @@ export function Dashboard() {
     const selectedExerciseId = globalSelectedId;
     const isExerciseDone = completions[today]?.[selectedExerciseId]?.isCompleted || false;
     const currentCount = getExerciseCount(today, selectedExerciseId);
-    const dailyGoal = getDailyGoal(selectedExercise, dayNumber, settings?.difficultyMultiplier) || 1;
+    const currentDiff = getDifficulty ? getDifficulty(selectedExerciseId, today) : 1.0;
+    const dailyGoal = getDailyGoal(selectedExercise, dayNumber, currentDiff) || 1;
     const totalReps = computedStats.exerciseReps[globalSelectedId] || 0;
 
     const effectiveStart = userStartDate || startDate;
@@ -139,10 +140,11 @@ export function Dashboard() {
         if (!isDay100) return false;
         return EXERCISES.length > 0 && EXERCISES.every(ex => {
             const count = getExerciseCount(today, ex.id);
-            const goal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
+            const exDiff = getDifficulty ? getDifficulty(ex.id, today) : 1.0;
+            const goal = getDailyGoal(ex, dayNumber, exDiff);
             return completions[today]?.[ex.id]?.isCompleted || count >= goal;
         });
-    }, [isDay100, today, completions, dayNumber, settings, getExerciseCount]);
+    }, [isDay100, today, completions, dayNumber, settings, getExerciseCount, getDifficulty]);
 
     const {
         hackActive,
@@ -268,7 +270,8 @@ export function Dashboard() {
                                 pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                                 activeExerciseId={classicSelected} onSelectExercise={handleSelectExercise}
                                 exercisesList={EXERCISES} exercisesMap={EXERCISES_MAP}
-                                isDay100={hackActive}
+                                isDay100={isDay100}
+                                getDifficulty={getDifficulty}
                             />
                         </div>
 
@@ -283,6 +286,7 @@ export function Dashboard() {
                                     activeExerciseId={weightsSelected} onSelectExercise={handleSelectExercise}
                                     exercisesList={WEIGHT_EXERCISES} exercisesMap={WEIGHT_EXERCISES_MAP}
                                     isDay100={hackActive}
+                                    getDifficulty={getDifficulty}
                                 />
                             ) : (
                                 <ProPaywall
@@ -304,6 +308,7 @@ export function Dashboard() {
                                     exercisesList={customExercises} exercisesMap={customExercisesMap}
                                     onManageCustom={() => { setShowCustomExercisesModal(true); pauseCloudSync?.(); }}
                                     isDay100={hackActive}
+                                    getDifficulty={getDifficulty}
                                 />
                             ) : (
                                 <ProPaywall
@@ -349,6 +354,7 @@ export function Dashboard() {
                             getDayNumber={getDayNumber}
                             onClose={() => setShowCalendar(false)}
                             settings={settings}
+                            getDifficulty={getDifficulty}
                         />
                     )}
                     {showStats && (
@@ -373,7 +379,7 @@ export function Dashboard() {
                             currentCount={currentCount}
                             onUpdateCount={(newCount) => {
                                 const weight = getWeight ? getWeight(selectedExerciseId) : null;
-                                updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight);
+                                updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight, currentDiff);
                             }}
                             isCompleted={isExerciseDone}
                             dayNumber={dayNumber}
@@ -387,7 +393,7 @@ export function Dashboard() {
                             currentCount={currentCount}
                             onUpdateCount={(newCount) => {
                                 const weight = getWeight ? getWeight(selectedExerciseId) : null;
-                                updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight);
+                                updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight, currentDiff);
                             }}
                             isCompleted={isExerciseDone}
                             dayNumber={dayNumber}

@@ -80,7 +80,7 @@ export function WorkoutSession({
 }) {
 
     // ── Context consumption (replaces 12 props) ──
-    const { getExerciseCount, updateExerciseCount, completions, settings, computedStats } = useProgressContext();
+    const { getExerciseCount, updateExerciseCount, completions, settings, computedStats, getDifficulty } = useProgressContext();
     const { isPro } = useSubscription();
     const { routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, customExercises, getWeight } = useExercises();
     const { t } = useTranslation();
@@ -149,7 +149,8 @@ export function WorkoutSession({
     // Exercise info with current state
     const exerciseInfo = useMemo(() => {
         return availableExercises.map(ex => {
-            const goal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
+            const currentDiff = getDifficulty ? getDifficulty(ex.id, today) : 1.0;
+            const goal = getDailyGoal(ex, dayNumber, currentDiff);
             const count = getExerciseCount(today, ex.id);
             const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
             
@@ -159,7 +160,7 @@ export function WorkoutSession({
 
             return { ...ex, goal, count, done, category };
         });
-    }, [availableExercises, dayNumber, today, completions, getExerciseCount, settings?.difficultyMultiplier]);
+    }, [availableExercises, dayNumber, today, completions, getExerciseCount, settings?.difficultyMultiplier, getDifficulty]);
 
     // Toggle in queue
     const toggleExercise = (id) => {
@@ -221,7 +222,8 @@ export function WorkoutSession({
         
         // Filter out completed exercises
         const validExercises = routineExercises.filter(ex => {
-            const goal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
+            const currentDiff = getDifficulty ? getDifficulty(ex.id, today) : 1.0;
+            const goal = getDailyGoal(ex, dayNumber, currentDiff);
             const count = getExerciseCount(today, ex.id);
             const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
             return !done;
@@ -276,7 +278,8 @@ export function WorkoutSession({
         const validIds = routine.exerciseIds.filter(id => {
             const ex = allowedExercises.find(e => e.id === id);
             if (!ex) return false;
-            const goal = getDailyGoal(ex, dayNumber, settings?.difficultyMultiplier);
+            const currentDiff = getDifficulty ? getDifficulty(ex.id, today) : 1.0;
+            const goal = getDailyGoal(ex, dayNumber, currentDiff);
             const count = getExerciseCount(today, ex.id);
             const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
             return !done;
@@ -346,7 +349,8 @@ export function WorkoutSession({
     // ── Running phase ──
     const currentExId = queue[currentIdx];
     const currentEx = currentExId ? allExercises.find(e => e.id === currentExId) : null;
-    const currentGoal = currentEx ? getDailyGoal(currentEx, dayNumber, settings?.difficultyMultiplier) : 0;
+    const currentDifficulty = currentEx && getDifficulty ? getDifficulty(currentEx.id, today) : 1.0;
+    const currentGoal = currentEx ? getDailyGoal(currentEx, dayNumber, currentDifficulty) : 0;
     const currentCount = currentEx ? getExerciseCount(today, currentExId) : 0;
     const currentDone = currentEx ? (completions[today]?.[currentExId]?.isCompleted || currentCount >= currentGoal) : false;
 
@@ -861,7 +865,7 @@ export function WorkoutSession({
                 currentCount={currentCount}
                 onUpdateCount={(newCount) => {
                     const weight = getWeight ? getWeight(currentExId) : null;
-                    updateExerciseCount(today, currentExId, newCount, currentGoal, weight);
+                    updateExerciseCount(today, currentExId, newCount, currentGoal, weight, currentDifficulty);
                 }}
                 isCompleted={currentDone}
                 dayNumber={dayNumber}
