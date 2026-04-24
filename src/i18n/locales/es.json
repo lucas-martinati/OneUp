@@ -368,8 +368,7 @@
     "anonymousMergeTitle": "Progreso local detectado",
     "anonymousMergeDesc": "Has realizado ejercicios sin iniciar sesión. ¿Quieres fusionarlos con tu cuenta?",
     "merge": "Fusionar",
-    "mergeDesc": "Combinar local + nube",
-    "appTheme": "Tema de la aplicación"
+    "mergeDesc": "Combinar local + nube"
   },
   "onboarding": {
     "concept": "El Concepto",
@@ -432,7 +431,9 @@
     "multiplier": "Multiplicador (Máx 1.0)",
     "lock": "Bloquear",
     "disable": "Desactivar",
-    "enable": "Activar"
+    "enable": "Activar",
+    "appTheme": "Tema de la aplicación"
+
   },
   "supporter": {
     "title": "Apoya al desarrollador ❤️",

@@ -368,8 +368,7 @@
     "anonymousMergeTitle": "Local progress detected",
     "anonymousMergeDesc": "You completed exercises while signed out. Would you like to merge them with your account?",
     "merge": "Merge",
-    "mergeDesc": "Combine local + cloud data",
-    "appTheme": "App Theme"
+    "mergeDesc": "Combine local + cloud data"
   },
   "onboarding": {
     "concept": "The Concept",
@@ -432,7 +431,8 @@
     "multiplier": "Multiplier (Max 1.0)",
     "lock": "Lock",
     "disable": "Disable",
-    "enable": "Enable"
+    "enable": "Enable",
+    "appTheme": "App Theme"
   },
   "supporter": {
     "title": "Support the developer ❤️",
