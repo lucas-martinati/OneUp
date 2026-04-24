@@ -85,23 +85,25 @@ export function ClanManager({ onClanJoined }) {
         }}>
             <CSSConfetti active={showConfetti} onDone={() => setShowConfetti(false)} />
 
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--spacing-lg)', gap: '20px' }}>
-                <Users size={64} color="#f59e0b" style={{ marginBottom: '10px' }} />
-                <h2 style={{
-                    fontSize: '1.8rem', fontWeight: '800', textAlign: 'center', margin: 0,
-                    background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                    WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
-                }}>{t('clan.title')}</h2>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--spacing-lg)', gap: '24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                    <Users size={56} color="#f59e0b" />
+                    <h2 style={{
+                        fontSize: '1.8rem', fontWeight: '800', textAlign: 'center', margin: 0,
+                        background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                        WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
+                    }}>{t('clan.title')}</h2>
+                </div>
 
                 {view === 'menu' && (
-                    <>
+                    <div style={{ width: '100%', maxWidth: '300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {!cloudAuth?.isSignedIn ? (
                             <>
-                                <p style={{ color: 'var(--text-secondary)', textAlign: 'center', maxWidth: '300px', margin: '0 0 20px 0', lineHeight: '1.5' }}>
+                                <p style={{ color: 'var(--text-secondary)', textAlign: 'center', margin: 0, lineHeight: '1.5' }}>
                                     {t('clan.signInRequired')}
                                 </p>
                                 <button onClick={() => cloudAuth.signIn()} className="hover-lift" style={{
-                                    width: '100%', maxWidth: '300px', padding: '16px', borderRadius: 'var(--radius-lg)',
+                                    width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
                                     background: 'linear-gradient(135deg, #818cf8, #6366f1)', border: 'none', color: 'white',
                                     fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
                                 }}><LogIn size={20} /> {t('clan.signIn')}</button>
@@ -109,13 +111,13 @@ export function ClanManager({ onClanJoined }) {
                         ) : (
                             <>
                                 {userClans.length > 0 && (
-                                    <div style={{ width: '100%', maxWidth: '300px', display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
-                                        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800', textAlign: 'center', marginBottom: '4px' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800', textAlign: 'center' }}>
                                             {t('clan.yourClans', { count: userClans.length })}
                                         </div>
                                         {userClans.map(clan => (
                                             <button key={clan.id} onClick={() => { if(onClanJoined) onClanJoined(clan.id) }} className="hover-lift" style={{
-                                                width: '100%', padding: '16px', borderRadius: 'var(--radius-lg)',
+                                                width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
                                                 background: 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(217,119,6,0.15))',
                                                 border: '1px solid rgba(245,158,11,0.3)', color: 'white',
                                                 fontSize: '1.2rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -136,35 +138,36 @@ export function ClanManager({ onClanJoined }) {
                                                 </span>
                                             </button>
                                         ))}
-                                        <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '12px 0 4px 0' }} />
+                                        <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '8px 0' }} />
                                     </div>
                                 )}
 
                                 {userClans.length === 0 && (
-                                    <p style={{ color: 'var(--text-secondary)', textAlign: 'center', maxWidth: '300px', margin: '0 0 20px 0', lineHeight: '1.5' }}>
+                                    <p style={{ color: 'var(--text-secondary)', textAlign: 'center', margin: 0, lineHeight: '1.5' }}>
                                         {t('clan.joinFriends')}
                                     </p>
                                 )}
 
-                                <button onClick={() => { setView('join'); setError(''); setInputValue(''); }} className="hover-lift" style={{
-                                    width: '100%', maxWidth: '300px', padding: '16px', borderRadius: 'var(--radius-lg)',
-                                    background: 'linear-gradient(135deg, #818cf8, #6366f1)', border: 'none', color: 'white',
-                                    fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                                    marginBottom: '12px'
-                                }}><LogIn size={20} /> {t('clan.joinClan')}</button>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    <button onClick={() => { setView('join'); setError(''); setInputValue(''); }} className="hover-lift" style={{
+                                        width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
+                                        background: 'linear-gradient(135deg, #818cf8, #6366f1)', border: 'none', color: 'white',
+                                        fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                                    }}><LogIn size={20} /> {t('clan.joinClan')}</button>
 
-                                <button onClick={() => { setView('create'); setError(''); setInputValue(''); }} className="hover-lift" style={{
-                                    width: '100%', maxWidth: '300px', padding: '16px', borderRadius: 'var(--radius-lg)',
-                                    background: 'rgba(255,255,255,0.05)', border: '2px solid rgba(255,255,255,0.1)', color: 'var(--text-primary)',
-                                    fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
-                                }}><Plus size={20} /> {t('clan.createClan')}</button>
+                                    <button onClick={() => { setView('create'); setError(''); setInputValue(''); }} className="hover-lift" style={{
+                                        width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
+                                        background: 'rgba(255,255,255,0.05)', border: '2px solid rgba(255,255,255,0.1)', color: 'var(--text-primary)',
+                                        fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                                    }}><Plus size={20} /> {t('clan.createClan')}</button>
+                                </div>
                             </>
                         )}
-                    </>
+                    </div>
                 )}
 
                 {(view === 'create' || view === 'join') && (
-                    <div style={{ width: '100%', maxWidth: '300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="scale-in" style={{ width: '100%', maxWidth: '300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {!settings?.leaderboardPseudo && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <p style={{ margin: 0, color: 'var(--text-secondary)', textAlign: 'center', fontSize: '0.85rem' }}>
@@ -177,7 +180,7 @@ export function ClanManager({ onClanJoined }) {
                                     placeholder={t('common.yourPseudo')}
                                     maxLength={20}
                                     style={{
-                                        width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)',
+                                        width: '100%', padding: '14px', borderRadius: 'var(--radius-md)',
                                         background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)',
                                         color: 'white', fontSize: '1.1rem', textAlign: 'center', fontWeight: 'bold'
                                     }}
@@ -185,7 +188,7 @@ export function ClanManager({ onClanJoined }) {
                             </div>
                         )}
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: !settings?.leaderboardPseudo ? '16px' : '0' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <p style={{ margin: 0, color: 'var(--text-secondary)', textAlign: 'center', fontSize: '0.85rem' }}>
                                 {view === 'create' ? t('clan.clanNamePrompt') : t('clan.enterCode')}
                             </p>
@@ -196,25 +199,29 @@ export function ClanManager({ onClanJoined }) {
                                 placeholder={view === 'create' ? t('clan.clanNamePlaceholder') : "EX: ABC123"}
                                 maxLength={view === 'join' ? 6 : 20}
                                 style={{
-                                    width: '100%', padding: '16px', borderRadius: 'var(--radius-md)',
+                                    width: '100%', padding: '14px', borderRadius: 'var(--radius-md)',
                                     background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)',
                                     color: 'white', fontSize: '1.2rem', textAlign: 'center', fontWeight: '800'
                                 }}
                             />
                         </div>
+                        
                         {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
-                        <button onClick={view === 'create' ? handleCreate : handleJoin} disabled={isLoading} className="hover-lift" style={{
-                            width: '100%', padding: '16px', borderRadius: 'var(--radius-lg)',
-                            background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', border: 'none', color: 'black',
-                            fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                            opacity: isLoading ? 0.7 : 1
-                        }}>
-                            {isLoading ? t('common.loading') : view === 'create' ? t('clan.createButton') : t('clan.join')}
-                        </button>
-                        <button onClick={() => setView('menu')} style={{
-                            width: '100%', padding: '12px', background: 'transparent', border: 'none',
-                            color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '8px'
-                        }}>{t('common.cancel')}</button>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                            <button onClick={view === 'create' ? handleCreate : handleJoin} disabled={isLoading} className="hover-lift" style={{
+                                width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
+                                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', border: 'none', color: 'black',
+                                fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                opacity: isLoading ? 0.7 : 1
+                            }}>
+                                {isLoading ? t('common.loading') : view === 'create' ? t('clan.createButton') : t('clan.join')}
+                            </button>
+                            <button onClick={() => setView('menu')} style={{
+                                width: '100%', padding: '14px', background: 'transparent', border: 'none',
+                                color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: '600', cursor: 'pointer'
+                            }}>{t('common.cancel')}</button>
+                        </div>
                     </div>
                 )}
             </div>
