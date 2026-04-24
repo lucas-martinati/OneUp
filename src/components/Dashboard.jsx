@@ -342,94 +342,112 @@ export function Dashboard() {
                     isDay100={hackActive}
                 />
 
-                <Suspense fallback={null}>
+                <>
                     {showCalendar && (
-                        <Calendar
-                            startDate={startDate}
-                            completions={completions}
-                            exercises={effectiveSlide === 0 ? EXERCISES : effectiveSlide === 1 ? WEIGHT_EXERCISES : customExercises}
-                            isCustom={effectiveSlide === 2}
-                            getDayNumber={getDayNumber}
-                            onClose={() => setShowCalendar(false)}
-                            settings={settings}
-                            getConfig={getConfig}
-                        />
+                        <Suspense fallback={null}>
+                            <Calendar
+                                startDate={startDate}
+                                completions={completions}
+                                exercises={effectiveSlide === 0 ? EXERCISES : effectiveSlide === 1 ? WEIGHT_EXERCISES : customExercises}
+                                isCustom={effectiveSlide === 2}
+                                getDayNumber={getDayNumber}
+                                onClose={() => setShowCalendar(false)}
+                                settings={settings}
+                                getConfig={getConfig}
+                            />
+                        </Suspense>
                     )}
                     {showStats && (
-                        <Stats
-                            initialCategory={effectiveSlide === 0 ? 'standard' : effectiveSlide === 1 ? 'weights' : 'custom'}
-                            onClose={() => setShowStats(false)}
-                            onOpenAchievements={() => { setShowAchievements(true); }}
-                            onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
-                        />
+                        <Suspense fallback={null}>
+                            <Stats
+                                initialCategory={effectiveSlide === 0 ? 'standard' : effectiveSlide === 1 ? 'weights' : 'custom'}
+                                onClose={() => setShowStats(false)}
+                                onOpenAchievements={() => { setShowAchievements(true); }}
+                                onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
+                            />
+                        </Suspense>
                     )}
                     {showSettings && (
-                        <Settings
-                            defaultShowStore={openStoreDirectly}
-                            onClose={() => { setShowSettings(false); setOpenStoreDirectly(false); }}
-                        />
+                        <Suspense fallback={null}>
+                            <Settings
+                                defaultShowStore={openStoreDirectly}
+                                onClose={() => { setShowSettings(false); setOpenStoreDirectly(false); }}
+                            />
+                        </Suspense>
                     )}
                     {showCounter && selectedExercise?.type !== 'timer' && (
-                        <Counter
-                            exerciseConfig={selectedExercise}
-                            onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
-                            dailyGoal={dailyGoal}
-                            currentCount={currentCount}
-                            onUpdateCount={(newCount) => {
-                                const { weight } = getConfig(selectedExerciseId);
-                                updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight, currentDiff);
-                            }}
-                            isCompleted={isExerciseDone}
-                            dayNumber={dayNumber}
-                        />
+                        <Suspense fallback={null}>
+                            <Counter
+                                exerciseConfig={selectedExercise}
+                                onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
+                                dailyGoal={dailyGoal}
+                                currentCount={currentCount}
+                                onUpdateCount={(newCount) => {
+                                    const { weight } = getConfig(selectedExerciseId);
+                                    updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight, currentDiff);
+                                }}
+                                isCompleted={isExerciseDone}
+                                dayNumber={dayNumber}
+                            />
+                        </Suspense>
                     )}
                     {showCounter && selectedExercise?.type === 'timer' && (
-                        <Timer
-                            exerciseConfig={selectedExercise}
-                            onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
-                            dailyGoal={dailyGoal}
-                            currentCount={currentCount}
-                            onUpdateCount={(newCount) => {
-                                const { weight } = getConfig(selectedExerciseId);
-                                updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight, currentDiff);
-                            }}
-                            isCompleted={isExerciseDone}
-                            dayNumber={dayNumber}
-                        />
+                        <Suspense fallback={null}>
+                            <Timer
+                                exerciseConfig={selectedExercise}
+                                onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
+                                dailyGoal={dailyGoal}
+                                currentCount={currentCount}
+                                onUpdateCount={(newCount) => {
+                                    const { weight } = getConfig(selectedExerciseId);
+                                    updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight, currentDiff);
+                                }}
+                                isCompleted={isExerciseDone}
+                                dayNumber={dayNumber}
+                            />
+                        </Suspense>
                     )}
                     {showLeaderboard && (
-                        <Leaderboard
-                            onClose={() => setShowLeaderboard(false)}
-                            activeSlide={effectiveSlide}
-                        />
+                        <Suspense fallback={null}>
+                            <Leaderboard
+                                onClose={() => setShowLeaderboard(false)}
+                                activeSlide={effectiveSlide}
+                            />
+                        </Suspense>
                     )}
                     {showAchievements && (
-                        <Achievements
-                            completions={completions}
-                            exercises={EXERCISES}
-                            onClose={() => { setShowAchievements(false); }}
-                            settings={settings}
-                            getDayNumber={getDayNumber}
-                            highlightedBadgeId={null}
-                            computedStats={computedStats}
-                        />
+                        <Suspense fallback={null}>
+                            <Achievements
+                                completions={completions}
+                                exercises={EXERCISES}
+                                onClose={() => { setShowAchievements(false); }}
+                                settings={settings}
+                                getDayNumber={getDayNumber}
+                                highlightedBadgeId={null}
+                                computedStats={computedStats}
+                            />
+                        </Suspense>
                     )}
                     {showSession && (
-                        <WorkoutSession
-                            onClose={() => { setShowSession(false); resumeCloudSync?.(); }}
-                            today={today}
-                            dayNumber={dayNumber}
-                            activeSlide={effectiveSlide}
-                        />
+                        <Suspense fallback={null}>
+                            <WorkoutSession
+                                onClose={() => { setShowSession(false); resumeCloudSync?.(); }}
+                                today={today}
+                                dayNumber={dayNumber}
+                                activeSlide={effectiveSlide}
+                            />
+                        </Suspense>
                     )}
                     {showCustomExercisesModal && (
-                        <CustomExercisesModal
-                            onClose={() => { setShowCustomExercisesModal(false); resumeCloudSync?.(); }}
-                            customExercisesHook={customExercisesHook}
-                            computedStats={computedStats}
-                        />
+                        <Suspense fallback={null}>
+                            <CustomExercisesModal
+                                onClose={() => { setShowCustomExercisesModal(false); resumeCloudSync?.(); }}
+                                customExercisesHook={customExercisesHook}
+                                computedStats={computedStats}
+                            />
+                        </Suspense>
                     )}
-                </Suspense>
+                </>
             </div>
         </>
     );
