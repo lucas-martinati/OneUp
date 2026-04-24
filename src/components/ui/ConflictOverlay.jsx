@@ -31,7 +31,7 @@ export function ConflictOverlay({ conflictData, onResolveConflict }) {
       <div className="conflict-modal">
         <div className="conflict-header">
           <AlertCircle className="conflict-icon" />
-          <h2>{t('cloud.anonymousMergeTitle')}</h2>
+          <h2 className="panel-title">{t('cloud.anonymousMergeTitle')}</h2>
         </div>
         <p className="conflict-message">
           {t('cloud.anonymousMergeDesc')}

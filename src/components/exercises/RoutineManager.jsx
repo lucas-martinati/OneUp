@@ -86,8 +86,9 @@ export function RoutineManager({
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     padding: 'var(--spacing-md)'
                 }}>
-                    <h2 style={{
-                        margin: 0, fontSize: '1.5rem', fontWeight: '800',
+                    <h2 className="panel-title" style={{ 
+                        margin: 0, 
+                        textAlign: 'left',
                         background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
                         WebkitBackgroundClip: 'text', backgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
@@ -292,8 +293,9 @@ export function RoutineManager({
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 padding: 'var(--spacing-md)'
             }}>
-                <h2 style={{
-                    margin: 0, fontSize: '1.5rem', fontWeight: '800',
+                <h2 className="panel-title" style={{ 
+                    margin: 0, 
+                    textAlign: 'left',
                     background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
                     WebkitBackgroundClip: 'text', backgroundClip: 'text',
                     WebkitTextFillColor: 'transparent'

@@ -196,7 +196,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                     }}>
                         <DynamicIcon icon={exerciseConfig?.icon} size={20} color={activeColor} />
                     </div>
-                    <h2 style={{ fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', fontWeight: '700', color: activeColor, margin: 0 }}>
+                    <h2 className="panel-title" style={{ color: activeColor, margin: 0 }}>
                         {exerciseLabel}
                     </h2>
                 </div>

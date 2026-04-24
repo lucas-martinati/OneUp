@@ -141,7 +141,7 @@
   "workout": {
     "sessionDone": "Тренировка завершена!",
     "allCompleted": "Все упражнения выполнены 💪",
-    "newSession": "Новая тренировка",
+    "workout": "тренировка",
     "interDashboard": "Смешать упражнения",
     "interDashboardDesc": "Объединить упражнения со всех панелей.",
     "chooseOrder": "Выберите порядок упражнений",

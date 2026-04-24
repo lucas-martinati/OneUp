@@ -142,7 +142,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 marginBottom: 'var(--spacing-md)'
             }}>
-                <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: '800' }}>
+                <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
                     {t('stats.title')}
                 </h2>
                 <div style={{ display: 'flex', gap: '8px' }}>

@@ -100,7 +100,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             <ArrowLeft size={22} />
                         </button>
                     )}
-                    <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
+                    <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
                         {showStore ? t('store.title') : t('settings.title')}
                     </h2>
                 </div>

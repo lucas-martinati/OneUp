@@ -141,7 +141,7 @@
   "workout": {
     "sessionDone": "训练完成！",
     "allCompleted": "所有运动已完成 💪",
-    "newSession": "新训练",
+    "workout": "锻炼",
     "interDashboard": "混合运动",
     "interDashboardDesc": "合并所有仪表板的运动。",
     "chooseOrder": "选择运动顺序",

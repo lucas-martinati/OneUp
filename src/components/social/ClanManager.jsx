@@ -88,8 +88,8 @@ export function ClanManager({ onClanJoined }) {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--spacing-lg)', gap: '24px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                     <Users size={56} color="#f59e0b" />
-                    <h2 style={{
-                        fontSize: '1.8rem', fontWeight: '800', textAlign: 'center', margin: 0,
+                    <h2 className="panel-title" style={{
+                        margin: 0,
                         background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
                         WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
                     }}>{t('clan.title')}</h2>

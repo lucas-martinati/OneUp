@@ -33,10 +33,7 @@ export function WebPaymentModal({ onClose }) {
                     😕
                 </div>
                 
-                <h2 style={{
-                    fontSize: '1.4rem', fontWeight: '800', margin: '0 0 12px 0',
-                    color: 'var(--text-primary)'
-                }}>
+                <h2 className="panel-title">
                     {t('webPayment.oops')}
                 </h2>
                 

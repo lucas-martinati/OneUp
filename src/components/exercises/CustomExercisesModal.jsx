@@ -72,7 +72,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
       paddingBottom: 'env(safe-area-inset-bottom)'
     }}>
       <div style={{ padding: 'var(--spacing-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0, color: 'var(--text-primary)' }}>
+        <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
           {t('customExercises.title')}
         </h2>
         <button onClick={onClose} className="glass hover-lift" style={{

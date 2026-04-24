@@ -70,8 +70,8 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
         padding: '16px 20px',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
-        <h2 style={{
-          margin: 0, fontSize: '1.3rem', fontWeight: 800,
+        <h2 className="panel-title" style={{
+          margin: 0,
           background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
           WebkitBackgroundClip: 'text', backgroundClip: 'text',
           WebkitTextFillColor: 'transparent',

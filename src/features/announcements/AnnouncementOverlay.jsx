@@ -110,12 +110,7 @@ export function AnnouncementOverlay({ announcement, onDismiss }) {
         </div>
 
         {/* Title */}
-        <h2 style={{
-          fontSize: '20px',
-          fontWeight: 700,
-          color: '#fff',
-          marginBottom: '8px',
-          lineHeight: 1.3,
+        <h2 className="panel-title" style={{
           animation: 'ann-text-in 0.5s ease 0.35s backwards',
           position: 'relative',
         }}>

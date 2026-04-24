@@ -140,8 +140,8 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                 padding: 'var(--spacing-md) var(--spacing-md) 0'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <h2 style={{
-                        margin: 0, fontSize: '1.8rem', fontWeight: '800',
+                    <h2 className="panel-title" style={{
+                        margin: 0,
                         background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
                         WebkitBackgroundClip: 'text', backgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'

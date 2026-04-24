@@ -194,7 +194,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 marginBottom: 'var(--spacing-md)'
             }}>
-                <h2 className="rainbow-gradient" style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
+                <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
                     {t('calendar.title')}
                 </h2>
                 <button onClick={onClose} className="hover-lift glass" style={{

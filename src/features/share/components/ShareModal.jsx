@@ -54,8 +54,8 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         padding: '16px 20px 8px',
       }}>
-        <h2 style={{
-          margin: 0, fontSize: '1.3rem', fontWeight: 800,
+        <h2 className="panel-title" style={{
+          margin: 0,
           background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
           WebkitBackgroundClip: 'text', backgroundClip: 'text',
           WebkitTextFillColor: 'transparent',

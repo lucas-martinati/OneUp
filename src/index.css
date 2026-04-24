@@ -876,6 +876,15 @@ button:focus:not(:focus-visible) {
   outline: none;
 }
 
+/* ── Shared Typography ──────────────────────────────────────────────── */
+.panel-title {
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+
 /* ── Shared Modal Overlay ───────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;

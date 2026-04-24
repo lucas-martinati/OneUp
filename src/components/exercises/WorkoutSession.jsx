@@ -420,13 +420,14 @@ export function WorkoutSession({
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     padding: 'var(--spacing-md)'
                 }}>
-                    <h2 style={{
-                        margin: 0, fontSize: '1.8rem', fontWeight: '800',
+                    <h2 className="panel-title" style={{ 
+                        margin: 0, 
+                        textAlign: 'left',
                         background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
                         WebkitBackgroundClip: 'text', backgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
                     }}>
-                        {t('workout.newSession')}
+                        {t('workout.workout')}
                     </h2>
                     <div style={{ display: 'flex', gap: '6px' }}>
                         {/* Load Routine button */}

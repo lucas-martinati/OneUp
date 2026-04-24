@@ -21,7 +21,7 @@ export const ProPaywall = ({ title, onOpenStore }) => {
             }}>
                 <Lock size={28} color="#8b5cf6" />
             </div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>
+            <h2 className="panel-title" style={{ margin: 0 }}>
                 {t('paywall.proRequired')}
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5', margin: 0, maxWidth: '280px' }}>

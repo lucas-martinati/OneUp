@@ -138,7 +138,7 @@ export function CustomProgramPanel({
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'var(--spacing-lg)', gap: '20px' }}>
           <Lock size={64} color="#8b5cf6" style={{ marginBottom: '10px' }} />
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '800', textAlign: 'center', margin: 0, color: '#8b5cf6' }}>
+          <h2 className="panel-title">
             {t('pro.locked')}
           </h2>
           <p style={{ color: 'var(--text-secondary)', textAlign: 'center', maxWidth: '300px', lineHeight: '1.5' }}>
@@ -176,7 +176,7 @@ export function CustomProgramPanel({
         </div>
 
         <div style={{ flex: 1, overflow: 'auto', padding: '0 var(--spacing-md) var(--spacing-md)' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '800', textAlign: 'center', margin: '0 0 4px 0', color: 'var(--text-primary)' }}>
+          <h2 className="panel-title">
             {selectedProgram.name}
           </h2>
           {selectedProgram.description && (
@@ -482,11 +482,7 @@ export function CustomProgramPanel({
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'var(--spacing-lg)', gap: '20px' }}>
         <Sparkles size={64} color="#8b5cf6" style={{ marginBottom: '10px' }} />
-        <h2 style={{
-          fontSize: '1.8rem', fontWeight: '800', textAlign: 'center', margin: 0,
-          background: 'linear-gradient(135deg, #a78bfa, #8b5cf6)',
-          WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
-        }}>{t('customProgram.title')}</h2>
+        <h2 className="panel-title">{t('customProgram.title')}</h2>
 
         {/* Program list */}
         {programs.length > 0 && (

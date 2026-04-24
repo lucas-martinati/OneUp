@@ -20,7 +20,7 @@ export const DashboardSlide = React.memo(({
     if (!safeSelectedExercise) {
         return (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '20px', textAlign: 'center' }}>
-                {title && <h2 style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>{title}</h2>}
+                {title && <h2 className="panel-title">{title}</h2>}
                 <div style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>{t('dashboard.noExercisesConfigured')}</div>
                 {onManageCustom && (
                     <button onClick={onManageCustom} className="hover-lift" style={{
@@ -286,7 +286,7 @@ export const DashboardSlide = React.memo(({
                     textAlign: 'center', padding: 'var(--spacing-xl)',
                     borderRadius: 'var(--radius-xl)', maxWidth: '320px'
                 }}>
-                    <h2 style={{ marginBottom: '12px', fontSize: '1.5rem' }}>{t('dashboard.waiting')}</h2>
+                    <h2 className="panel-title">{t('dashboard.waiting')}</h2>
                     <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
                         {t('dashboard.challengeStarts')} <br />
                         <strong style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>{effectiveStart}</strong>
