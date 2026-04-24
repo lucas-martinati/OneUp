@@ -34,7 +34,7 @@ export const DashboardHeader = React.memo(({
         return () => observer.disconnect();
     }, []);
 
-    const showText = availableSpace >= 90; // Need at least ~90px for Logo + Gap + Text
+    const showText = availableSpace >= 93; // Need at least ~90px for Logo + Gap + Text
     const showLogo = availableSpace >= 35;  // Need at least ~35px for Logo alone
 
     return (
