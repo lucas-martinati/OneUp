@@ -1161,3 +1161,18 @@ button:focus:not(:focus-visible) {
 .premium-slider::-moz-range-thumb:hover {
   transform: scale(1.2);
 }
+
+/* Easter Egg Animations */
+@keyframes streak-float {
+  0% { transform: translate(-50%, -50%) scale(0.5) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 5px rgba(249,115,22,0.8)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 15px rgba(249,115,22,1)); }
+  100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.8) rotate(var(--rot)); opacity: 0; filter: drop-shadow(0 0 5px rgba(249,115,22,0)); }
+}
+
+.streak-particle {
+  position: fixed;
+  pointer-events: none;
+  opacity: 0;
+  animation: streak-float 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  z-index: 9999;
+}

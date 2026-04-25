@@ -15,6 +15,38 @@ export const DashboardHeader = React.memo(({
     const headerRef = useRef(null);
     const rightSideRef = useRef(null);
     const [availableSpace, setAvailableSpace] = useState(500);
+    const [particles, setParticles] = useState([]);
+
+    const handleStreakClick = (e) => {
+        if (!streakActive || displayStreak == 0 || displayStreak == '0') return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        
+        const newParticles = Array.from({ length: 12 }).map((_, i) => {
+            const angle = Math.random() * Math.PI; // downward half circle
+            const distance = 40 + Math.random() * 80;
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            return {
+                id: Date.now() + i + Math.random(),
+                x: cx,
+                y: cy,
+                tx: `${tx}px`,
+                ty: `${ty}px`,
+                rot: `${(Math.random() - 0.5) * 120}deg`,
+                delay: Math.random() * 0.15,
+                size: 16 + Math.random() * 14,
+                emoji: Math.random() > 0.3 ? '🔥' : '✨'
+            };
+        });
+        
+        setParticles(p => [...p, ...newParticles]);
+        
+        setTimeout(() => {
+            setParticles(p => p.filter(particle => !newParticles.find(np => np.id === particle.id)));
+        }, 1200);
+    };
 
     useEffect(() => {
         if (!headerRef.current || !rightSideRef.current) return;
@@ -74,7 +106,9 @@ export const DashboardHeader = React.memo(({
 
 
                 {/* Global streak badge */}
-                <div style={{
+                <div 
+                    onClick={handleStreakClick}
+                    style={{
                     background: streakActive
                         ? 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(239,68,68,0.22))'
                         : 'linear-gradient(135deg, rgba(120,120,120,0.18), rgba(90,90,90,0.18))',
@@ -82,7 +116,7 @@ export const DashboardHeader = React.memo(({
                     display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '700',
                     border: streakActive ? '1px solid rgba(249,115,22,0.3)' : '1px solid rgba(120,120,120,0.25)',
                     boxShadow: streakActive ? '0 2px 8px rgba(249,115,22,0.15)' : 'none',
-                    opacity: streakActive ? 1 : 0.7, flexShrink: 0
+                    opacity: streakActive ? 1 : 0.7, flexShrink: 0, cursor: 'pointer'
                 }}>
                     <Flame size={16} color={streakActive ? '#f97316' : '#888'} />
                     <span style={{ color: streakActive ? '#f97316' : '#888' }}>{displayStreak}</span>
@@ -100,6 +134,18 @@ export const DashboardHeader = React.memo(({
                     <span>{totalReps}</span>
                 </div>
             </div>
+
+            {/* Render streak easter egg particles */}
+            {particles.map(p => (
+                <div key={p.id} className="streak-particle" style={{
+                    left: p.x, top: p.y,
+                    '--tx': p.tx, '--ty': p.ty, '--rot': p.rot,
+                    animationDelay: `${p.delay}s`,
+                    fontSize: `${p.size}px`,
+                }}>
+                    {p.emoji}
+                </div>
+            ))}
         </header>
     );
 });
