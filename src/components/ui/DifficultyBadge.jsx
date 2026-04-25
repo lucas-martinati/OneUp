@@ -12,15 +12,22 @@ import React from 'react';
 export const DifficultyBadge = ({ difficulty, style = {} }) => {
     if (!difficulty || difficulty === 1.0) return null;
 
+    // Calculate hue from 0 (red) to 55 (orange-yellow/slightly green) based on difficulty 0.1 to 1.0
+    const clampedDiff = Math.max(0.1, Math.min(1.0, difficulty));
+    const hue = Math.round(((clampedDiff - 0.1) / 0.9) * 55);
+    const color = `hsl(${hue}, 85%, 55%)`;
+    const bgColor = `hsla(${hue}, 85%, 55%, 0.15)`;
+    const borderColor = `hsla(${hue}, 85%, 55%, 0.25)`;
+
     return (
         <span style={{
             fontSize: '0.65rem',
             fontWeight: '700',
-            color: '#ef4444',
-            background: 'rgba(239, 68, 68, 0.15)',
+            color: color,
+            background: bgColor,
             padding: '2px 6px',
             borderRadius: '8px',
-            border: '1px solid rgba(239, 68, 68, 0.2)',
+            border: `1px solid ${borderColor}`,
             marginLeft: '4px',
             display: 'inline-flex',
             alignItems: 'center',
