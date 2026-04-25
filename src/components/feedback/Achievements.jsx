@@ -243,7 +243,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                 onMouseLeave={handleEnd}
                 style={{
                     position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
-                    background: 'var(--card-bg)',
+                    background: 'var(--sheet-bg)',
                     borderRadius: 'calc(var(--radius-xl) * 1.5) calc(var(--radius-xl) * 1.5) 0 0',
                     padding: '24px 20px',
                     paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))',
@@ -285,7 +285,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                         
                         {/* Simple Progress Bar */}
                         <div style={{
-                            width: '100%', height: '6px', background: 'var(--surface-hover)',
+                            width: '100%', height: '6px', background: 'var(--progress-track)',
                             borderRadius: '3px', marginTop: '16px', overflow: 'hidden'
                         }}>
                             <div style={{

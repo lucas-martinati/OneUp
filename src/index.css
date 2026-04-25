@@ -64,8 +64,8 @@
   --select-option-bg: #1a1a2e;
   --sheet-bg: rgba(10, 10, 15, 0.97);
   --sheet-handle: rgba(255, 255, 255, 0.15);
-  --progress-track: rgba(255, 255, 255, 0.08);
-  --progress-track-thin: rgba(255, 255, 255, 0.05);
+  --progress-track: rgba(255, 255, 255, 0.15);
+  --progress-track-thin: rgba(255, 255, 255, 0.1);
   --shimmer-color: rgba(255, 255, 255, 0.1);
   --ripple-color: rgba(255, 255, 255, 0.3);
   --divider: rgba(255, 255, 255, 0.04);

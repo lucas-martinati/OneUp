@@ -511,7 +511,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
             onMouseLeave={handleMouseUp}
             style={{
                 position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
-                background: 'var(--card-bg)',
+                background: 'var(--sheet-bg)',
                 backdropFilter: isDragging ? 'none' : 'blur(20px)',
                 WebkitBackdropFilter: isDragging ? 'none' : 'blur(20px)',
                 borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
