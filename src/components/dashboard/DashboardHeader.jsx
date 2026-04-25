@@ -20,8 +20,9 @@ export const DashboardHeader = React.memo(({
     const handleStreakClick = (e) => {
         if (!streakActive || displayStreak == 0 || displayStreak == '0') return;
         const rect = e.currentTarget.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
+        const headerRect = headerRef.current.getBoundingClientRect();
+        const cx = (rect.left + rect.width / 2) - headerRect.left;
+        const cy = (rect.top + rect.height / 2) - headerRect.top;
         
         const newParticles = Array.from({ length: 12 }).map((_, i) => {
             const angle = Math.random() * Math.PI; // downward half circle
@@ -74,7 +75,7 @@ export const DashboardHeader = React.memo(({
         <header ref={headerRef} className={`glass ${isDay100 ? 'day100-header' : ''}`} style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             padding: 'clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 20px)', borderRadius: 'var(--radius-lg)',
-            boxShadow: 'var(--shadow-md)', minWidth: 0
+            boxShadow: 'var(--shadow-md)', minWidth: 0, position: 'relative'
         }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
                 {showLogo && (
