@@ -141,7 +141,6 @@
   "workout": {
     "sessionDone": "¡Sesión Completada!",
     "allCompleted": "Todos los ejercicios completados 💪",
-    "workout": "Entrenamiento",
     "interDashboard": "Mezclar ejercicios",
     "interDashboardDesc": "Combinar ejercicios de todos los paneles.",
     "chooseOrder": "Elige el orden de ejercicios",

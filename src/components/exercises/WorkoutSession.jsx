@@ -427,7 +427,7 @@ export function WorkoutSession({
                         WebkitBackgroundClip: 'text', backgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
                     }}>
-                        {t('workout.workout')}
+                        {t('dashboard.session')}
                     </h2>
                     <div style={{ display: 'flex', gap: '6px' }}>
                         {/* Load Routine button */}

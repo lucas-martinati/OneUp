@@ -141,7 +141,6 @@
   "workout": {
     "sessionDone": "Session Complete!",
     "allCompleted": "All exercises completed 💪",
-    "workout": "Workout",
     "interDashboard": "Mix exercises",
     "interDashboardDesc": "Combine exercises from all dashboards.",
     "chooseOrder": "Choose exercise order",
