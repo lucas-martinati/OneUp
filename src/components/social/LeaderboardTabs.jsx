@@ -134,7 +134,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                     }}
                 >
                     {showAll ? <ChevronUp size={14} /> : <Filter size={14} />}
-                    {showAll ? t('common.close') : "Exercices"}
+                    {showAll ? t('common.close') : t('share.exercises')}
                 </button>
             </div>
             )}
