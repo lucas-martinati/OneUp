@@ -20,6 +20,7 @@ const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
 const ConsistencyPieChart = lazy(() => import('./ConsistencyPieChart'));
 const DailyRepsChart = lazy(() => import('./DailyRepsChart'));
 const WeightEvolutionChart = lazy(() => import('./WeightEvolutionChart'));
+const DifficultyEvolutionChart = lazy(() => import('./DifficultyEvolutionChart'));
 const SessionDetailModal = lazy(() => import('../../features/share/components/SessionDetailModal').then(m => ({ default: m.SessionDetailModal })));
 
 export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStore }) {
@@ -529,6 +530,13 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                             completions={completions}
                         />
                     )}
+                    <DifficultyEvolutionChart
+                        title={t('stats.difficultyEvolution')}
+                        t={t}
+                        getConfig={getConfig}
+                        completions={completions}
+                        exercises={exercises}
+                    />
                     <RadarChartPanel 
                         radarData={translatedRadarData} 
                         globalTotalReps={globalTotalReps}

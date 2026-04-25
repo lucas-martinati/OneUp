@@ -25,9 +25,9 @@ export default function DailyRepsChart({ dailyRepsData, title, t }) {
             }}>
                 {title}
             </h3>
-            <div style={{ width: '100%', height: '200px', minHeight: '200px' }}>
+            <div style={{ width: 'calc(100% + 16px)', marginLeft: '-16px', height: '200px', minHeight: '200px' }}>
                 <ResponsiveContainer width="100%" height={200} debounce={100}>
-                    <LineChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: -10 }}>
+                    <LineChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                         <XAxis
                             dataKey="label"
@@ -41,7 +41,7 @@ export default function DailyRepsChart({ dailyRepsData, title, t }) {
                             tick={{ fill: 'var(--text-secondary)', fontSize: 10 }}
                             axisLine={false}
                             tickLine={false}
-                            width={32}
+                            width={38}
                         />
                         <Tooltip
                             contentStyle={{

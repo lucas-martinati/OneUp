@@ -1,11 +1,23 @@
 import React, { useState, useMemo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { WEIGHT_EXERCISES } from '../../config/weights';
 import { DynamicIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
-export default function WeightEvolutionChart({ title, t, getConfig, completions }) {
-    const defaultId = WEIGHT_EXERCISES[0]?.id;
+export default function DifficultyEvolutionChart({ title, t, getConfig, completions, exercises }) {
+    const exercisesWithDiffChanges = useMemo(() => {
+        return exercises.filter(ex => {
+            if (getConfig(ex.id).difficulty !== 1.0) return true;
+            if (!completions) return false;
+            for (const date in completions) {
+                if (completions[date]?.[ex.id]?.difficulty !== undefined && completions[date][ex.id].difficulty !== 1.0) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }, [exercises, completions, getConfig]);
+
+    const defaultId = exercisesWithDiffChanges[0]?.id;
     const [selectedExIds, setSelectedExIds] = useState(defaultId ? [defaultId] : []);
 
     const toggleExercise = (id) => {
@@ -19,10 +31,9 @@ export default function WeightEvolutionChart({ title, t, getConfig, completions 
         if (!completions) return [];
         const allDates = new Set();
         
-        // Find all dates where ANY selected weight exercise was completed with a weight
         Object.entries(completions).forEach(([date, dayData]) => {
             if (!dayData || typeof dayData !== 'object') return;
-            const hasDataForSelected = selectedExIds.some(id => dayData[id] && dayData[id].weight !== undefined && dayData[id].weight !== null && dayData[id].isCompleted);
+            const hasDataForSelected = selectedExIds.some(id => dayData[id] && dayData[id].difficulty !== undefined && dayData[id].isCompleted);
             if (hasDataForSelected) allDates.add(date);
         });
 
@@ -32,16 +43,16 @@ export default function WeightEvolutionChart({ title, t, getConfig, completions 
             const point = { date, label: date.slice(5).replace('-', '/') };
             const dayData = completions[date] || {};
             selectedExIds.forEach(id => {
-                if (dayData[id] && dayData[id].weight !== undefined && dayData[id].weight !== null && dayData[id].isCompleted) {
-                    point[id] = Number(dayData[id].weight) || 0;
+                if (dayData[id] && dayData[id].difficulty !== undefined && dayData[id].isCompleted) {
+                    point[id] = Number(dayData[id].difficulty) || 1.0;
                 }
             });
             return point;
         });
     }, [completions, selectedExIds]);
 
-    const maxWeight = useMemo(() => {
-        let max = 1;
+    const maxDiff = useMemo(() => {
+        let max = 1.0;
         chartData.forEach(d => {
             selectedExIds.forEach(id => {
                 if (d[id] > max) max = d[id];
@@ -50,12 +61,14 @@ export default function WeightEvolutionChart({ title, t, getConfig, completions 
         return max;
     }, [chartData, selectedExIds]);
 
+    if (exercisesWithDiffChanges.length === 0) return null;
+
     return (
         <div className="glass-premium" style={{
             padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
             display: 'flex', flexDirection: 'column',
             marginBottom: 'var(--spacing-md)',
-            background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(234,88,12,0.08))'
+            background: 'linear-gradient(135deg, rgba(239,68,68,0.1), rgba(220,38,38,0.08))'
         }}>
             <h3 style={{
                 marginBottom: 'var(--spacing-sm)', fontSize: '0.85rem', fontWeight: '700',
@@ -70,7 +83,7 @@ export default function WeightEvolutionChart({ title, t, getConfig, completions 
                 display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center',
                 paddingBottom: '8px', marginBottom: '12px'
             }}>
-                {WEIGHT_EXERCISES.map(ex => {
+                {exercisesWithDiffChanges.map(ex => {
                     const isActive = selectedExIds.includes(ex.id);
                     return (
                         <button
@@ -99,23 +112,23 @@ export default function WeightEvolutionChart({ title, t, getConfig, completions 
                 })}
             </div>
 
-            {/* Current weight badges */}
+            {/* Current difficulty badges */}
             {selectedExIds.length > 0 && (
                 <div style={{
                     display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center',
                     gap: '8px', marginBottom: '12px'
                 }}>
                     {selectedExIds.map(id => {
-                        const ex = WEIGHT_EXERCISES.find(e => e.id === id);
+                        const ex = exercisesWithDiffChanges.find(e => e.id === id);
                         if (!ex) return null;
-                        const w = getConfig(id).weight || ex.defaultWeight || 0;
+                        const diff = getConfig(id).difficulty || 1.0;
                         return (
                             <span key={id} style={{
                                 fontSize: '0.75rem', fontWeight: '800', color: ex.color,
                                 background: `${ex.color}15`, padding: '2px 8px', borderRadius: '8px',
                                 border: `1px solid ${ex.color}30`
                             }}>
-                                {w} {t('weight.kg')}
+                                x{diff.toFixed(1)}
                             </span>
                         );
                     })}
@@ -131,10 +144,10 @@ export default function WeightEvolutionChart({ title, t, getConfig, completions 
                 }}>
                     <span style={{ fontSize: '1.5rem' }}>📊</span>
                     <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>
-                        {t('weight.noData')}
+                        {t('stats.difficultyNoData')}
                     </span>
                     <span style={{ fontSize: '0.7rem', opacity: 0.7, textAlign: 'center', maxWidth: '240px' }}>
-                        {t('weight.noDataHint')}
+                        {t('stats.difficultyNoDataHint')}
                     </span>
                 </div>
             ) : (
@@ -150,12 +163,12 @@ export default function WeightEvolutionChart({ title, t, getConfig, completions 
                                 interval="preserveStartEnd"
                             />
                             <YAxis
-                                domain={[0, Math.ceil(maxWeight * 1.15)]}
+                                domain={[0, Math.max(1.0, maxDiff)]}
                                 tick={{ fill: 'var(--text-secondary)', fontSize: 10 }}
                                 axisLine={false}
                                 tickLine={false}
                                 width={38}
-                                unit=" kg"
+                                tickFormatter={(value) => `x${Number(value).toFixed(1)}`}
                             />
                             <Tooltip
                                 contentStyle={{
@@ -165,14 +178,14 @@ export default function WeightEvolutionChart({ title, t, getConfig, completions 
                                 }}
                                 labelStyle={{ color: 'var(--text-secondary)', fontWeight: 600, fontSize: '0.7rem' }}
                                 formatter={(value, name) => {
-                                    const ex = WEIGHT_EXERCISES.find(e => e.id === name);
+                                    const ex = exercisesWithDiffChanges.find(e => e.id === name);
                                     const label = ex ? getExerciseLabel(ex, t) : name;
-                                    return [`${value} ${t('weight.kg')}`, label];
+                                    return [`x${Number(value).toFixed(1)}`, label];
                                 }}
                                 labelFormatter={(label) => label}
                             />
                             {selectedExIds.map(id => {
-                                const ex = WEIGHT_EXERCISES.find(e => e.id === id);
+                                const ex = exercisesWithDiffChanges.find(e => e.id === id);
                                 if (!ex) return null;
                                 return (
                                     <Line
