@@ -22,6 +22,7 @@ export function useCustomExercises(userId) {
         label: exerciseData.label.trim(),
         icon: exerciseData.icon || 'Star',
         color: exerciseData.color || '#8b5cf6',
+        type: exerciseData.type || 'counter',
         gradient: exerciseData.gradient || ['#7c3aed', '#8b5cf6'],
         multiplier: parseFloat(exerciseData.multiplier) || 1.0,
         createdAt: Date.now(),
