@@ -195,7 +195,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                 marginBottom: 'var(--spacing-md)'
             }}>
                 <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
-                    {t('calendar.title')}
+                    {t('dashboard.calendar')}
                 </h2>
                 <button onClick={onClose} className="hover-lift glass" style={{
                     background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
