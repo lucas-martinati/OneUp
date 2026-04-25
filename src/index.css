@@ -1118,3 +1118,46 @@ button:focus:not(:focus-visible) {
     height: 200px;
     min-height: 200px;
 }
+
+/* Premium Slider */
+.premium-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.premium-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--slider-color, var(--accent));
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--slider-color, var(--accent));
+  border: 2px solid var(--bg-color);
+  transition: transform 0.15s ease;
+}
+
+.premium-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.premium-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--bg-color);
+  border-radius: 50%;
+  background: var(--slider-color, var(--accent));
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--slider-color, var(--accent));
+  transition: transform 0.15s ease;
+}
+
+.premium-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}

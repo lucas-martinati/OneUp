@@ -683,6 +683,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                 {EXERCISES.map(ex => {
                                     const val = getConfig(ex.id).difficulty;
                                     const exColor = ex.color || '#ef4444';
+                                    const percentage = ((val - 0.1) / 0.9) * 100;
                                     return (
                                         <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -695,6 +696,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                             </div>
                                             <input
                                                 type="range"
+                                                className="premium-slider"
                                                 min="0.1" max="1" step="0.1"
                                                 value={val}
                                                 onChange={(e) => {
@@ -702,11 +704,8 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                                     updateConfig(ex.id, { difficulty: newVal });
                                                 }}
                                                 style={{
-                                                    width: '100%',
-                                                    height: '6px',
-                                                    accentColor: exColor,
-                                                    cursor: 'pointer',
-                                                    filter: `drop-shadow(0 0 5px ${exColor}33)`
+                                                    '--slider-color': exColor,
+                                                    background: `linear-gradient(to right, ${exColor} ${percentage}%, var(--surface-muted) ${percentage}%)`
                                                 }}
                                             />
                                         </div>
@@ -726,6 +725,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                         {WEIGHT_EXERCISES.map(ex => {
                                             const val = getConfig(ex.id).difficulty;
                                             const exColor = ex.color || '#ef4444';
+                                            const percentage = ((val - 0.1) / 0.9) * 100;
                                             return (
                                                 <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -738,6 +738,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                                     </div>
                                                     <input
                                                         type="range"
+                                                        className="premium-slider"
                                                         min="0.1" max="1.0" step="0.1"
                                                         value={val}
                                                         onChange={(e) => {
@@ -745,11 +746,8 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                                             updateConfig(ex.id, { difficulty: newVal });
                                                         }}
                                                         style={{
-                                                            width: '100%',
-                                                            height: '6px',
-                                                            accentColor: exColor,
-                                                            cursor: 'pointer',
-                                                            filter: `drop-shadow(0 0 5px ${exColor}33)`
+                                                            '--slider-color': exColor,
+                                                            background: `linear-gradient(to right, ${exColor} ${percentage}%, var(--surface-muted) ${percentage}%)`
                                                         }}
                                                     />
                                                 </div>
