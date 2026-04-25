@@ -664,18 +664,9 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
             {/* ── Share & Session History ──────────────────────────────── */}
             <div style={{
-                display: 'flex', flexDirection: 'column', gap: '10px',
+                display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)',
                 marginBottom: 'var(--spacing-md)',
             }}>
-                {/* Share button */}
-                <SharePanel
-                    sessionData={{ date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') }}
-                    stats={globalStats}
-                    variant="stats"
-                    mode="global"
-                    activeCategories={activeCategories}
-                />
-
                 {/* Session history */}
                 {sessionHistory.length > 0 && (
                     <div className="glass-premium" style={{
@@ -749,6 +740,15 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         </div>
                     </div>
                 )}
+
+                {/* Share button */}
+                <SharePanel
+                    sessionData={{ date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') }}
+                    stats={globalStats}
+                    variant="stats"
+                    mode="global"
+                    activeCategories={activeCategories}
+                />
             </div>
 
             {/* ── Motivational footer ─────────────────────────────────── */}
