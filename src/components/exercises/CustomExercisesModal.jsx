@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  X, Plus, Settings2, Trash2, 
+  X, Plus, Settings2, Trash2, Edit2,
   Dumbbell, Activity, Flame, Heart, Zap, Star, Target, Trophy, Swords
 } from '../../utils/icons';
 import { Z_INDEX } from '../../utils/zIndex';
@@ -18,8 +18,9 @@ const PRESET_COLORS = [
 
 export function CustomExercisesModal({ onClose, customExercisesHook, computedStats }) {
   const { t, i18n } = useTranslation();
-  const { customExercises, saveCustomExercise, deleteCustomExercise, maxCustomExercises } = customExercisesHook;
+  const { customExercises, saveCustomExercise, updateCustomExercise, deleteCustomExercise, maxCustomExercises } = customExercisesHook;
   
+  const [editingId, setEditingId] = useState(null);
   const [confirmDeleteEx, setConfirmDeleteEx] = useState(null);
   const [view, setView] = useState('list'); // 'list' | 'create'
   const [label, setLabel] = useState('');
@@ -29,7 +30,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
   const [multiplier, setMultiplier] = useState(1);
   const [error, setError] = useState('');
 
-  const handleCreate = () => {
+  const handleSave = () => {
     if (!label.trim()) {
       setError(t('customExercises.errorNameRequired'));
       return;
@@ -38,26 +39,56 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
     // Auto-generate gradient based on selected color (simplified)
     const gradient = [color, color]; // We could use a slightly darker shade for the first one
     
-    const success = saveCustomExercise({
-      label: label.trim(),
-      icon: iconName,
-      color,
-      type,
-      gradient,
-      multiplier
-    });
-
-    if (success) {
+    if (editingId) {
+      updateCustomExercise(editingId, {
+        label: label.trim(),
+        icon: iconName,
+        color,
+        type,
+        gradient,
+        multiplier
+      });
       setLabel('');
       setIconName('Star');
       setColor('#8b5cf6');
       setType('counter');
       setMultiplier(1);
       setError('');
+      setEditingId(null);
       setView('list');
     } else {
-      setError(t('customExercises.errorLimit'));
+      const success = saveCustomExercise({
+        label: label.trim(),
+        icon: iconName,
+        color,
+        type,
+        gradient,
+        multiplier
+      });
+
+      if (success) {
+        setLabel('');
+        setIconName('Star');
+        setColor('#8b5cf6');
+        setType('counter');
+        setMultiplier(1);
+        setError('');
+        setView('list');
+      } else {
+        setError(t('customExercises.errorLimit'));
+      }
     }
+  };
+
+  const handleEdit = (ex) => {
+    setEditingId(ex.id);
+    setLabel(ex.label);
+    setIconName(ex.icon);
+    setColor(ex.color);
+    setType(ex.type || 'counter');
+    setMultiplier(ex.multiplier || 1.0);
+    setError('');
+    setView('create');
   };
 
   const handleDelete = (ex) => {
@@ -116,12 +147,20 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                           </div>
                         </div>
                       </div>
-                      <button onClick={() => handleDelete(ex)} style={{
-                        background: 'transparent', border: 'none', color: '#ef4444',
-                        padding: '8px', cursor: 'pointer', opacity: 0.8
-                      }}>
-                        <Trash2 size={20} />
-                      </button>
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        <button onClick={() => handleEdit(ex)} style={{
+                          background: 'transparent', border: 'none', color: 'var(--text-secondary)',
+                          padding: '8px', cursor: 'pointer', opacity: 0.8
+                        }}>
+                          <Edit2 size={20} />
+                        </button>
+                        <button onClick={() => handleDelete(ex)} style={{
+                          background: 'transparent', border: 'none', color: '#ef4444',
+                          padding: '8px', cursor: 'pointer', opacity: 0.8
+                        }}>
+                          <Trash2 size={20} />
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
@@ -130,6 +169,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
 
             {customExercises.length < maxCustomExercises && (
               <button onClick={() => {
+                setEditingId(null);
                 setLabel('');
                 const iconKeys = Object.keys(ICONS);
                 setIconName(iconKeys[Math.floor(Math.random() * iconKeys.length)]);
@@ -256,38 +296,48 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
               </div>
             </div>
 
-            {/* MULTIPLIER */}
-            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 'var(--radius-lg)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <label style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  {t('customExercises.multiplierLabel')}
-                </label>
-                <div style={{ fontSize: '1.4rem', fontWeight: '900', color: color }}>
-                  x{multiplier.toFixed(1)}
+            {/* MULTIPLIER (Only show when creating a new exercise) */}
+            {!editingId && (
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 'var(--radius-lg)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    {t('customExercises.multiplierLabel')}
+                  </label>
+                  <div style={{ fontSize: '1.4rem', fontWeight: '900', color: color }}>
+                    x{multiplier.toFixed(1)}
+                  </div>
                 </div>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '16px', marginTop: 0, lineHeight: 1.4 }}>
+                  {t('customExercises.multiplierHint', { value: multiplier.toFixed(1), unit: type === 'timer' ? `(${t('customExercises.seconds')})` : `(${t('customExercises.repetitions')})` })}
+                </p>
+                <input
+                  type="range"
+                  className="premium-slider"
+                  min="0.1" max="5" step="0.1"
+                  value={multiplier}
+                  onChange={e => setMultiplier(parseFloat(e.target.value))}
+                  style={{ 
+                    width: '100%', 
+                    '--slider-color': color,
+                    background: `linear-gradient(to right, ${color} ${((multiplier - 0.1) / 4.9) * 100}%, var(--surface-muted) ${((multiplier - 0.1) / 4.9) * 100}%)`
+                  }}
+                />
               </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '16px', marginTop: 0, lineHeight: 1.4 }}>
-                {t('customExercises.multiplierHint', { value: multiplier.toFixed(1), unit: type === 'timer' ? `(${t('customExercises.seconds')})` : `(${t('customExercises.repetitions')})` })}
-              </p>
-              <input
-                type="range"
-                min="0.1" max="5" step="0.1"
-                value={multiplier}
-                onChange={e => setMultiplier(parseFloat(e.target.value))}
-                style={{ width: '100%', accentColor: color }}
-              />
-            </div>
+            )}
 
             {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
 
             <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-              <button onClick={() => setView('list')} style={{
+              <button onClick={() => {
+                setEditingId(null);
+                setView('list');
+              }} style={{
                 flex: 1, padding: '14px', borderRadius: 'var(--radius-md)',
                 background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
                 color: 'var(--text-primary)', fontSize: '1rem', fontWeight: '600'
               }}>{t('common.cancel')}</button>
               
-              <button onClick={handleCreate} style={{
+              <button onClick={handleSave} style={{
                 flex: 1, padding: '14px', borderRadius: 'var(--radius-md)',
                 background: '#8b5cf6', border: 'none',
                 color: 'white', fontSize: '1rem', fontWeight: '700'
