@@ -47,7 +47,7 @@
             android:id="@+id/widget_large_streak_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="JOURS"
+            android:text="DAYS"
             android:textColor="#60FFFFFF"
             android:textSize="12sp"
             android:fontFamily="sans-serif"
@@ -74,13 +74,13 @@
         android:gravity="center"
         android:layout_marginBottom="8dp">
 
-        <TextView android:id="@+id/label_mon" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="L" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
-        <TextView android:id="@+id/label_tue" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="M" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
-        <TextView android:id="@+id/label_wed" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="M" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
-        <TextView android:id="@+id/label_thu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="J" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
-        <TextView android:id="@+id/label_fri" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="V" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
+        <TextView android:id="@+id/label_mon" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="M" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
+        <TextView android:id="@+id/label_tue" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="T" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
+        <TextView android:id="@+id/label_wed" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="W" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
+        <TextView android:id="@+id/label_thu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="T" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
+        <TextView android:id="@+id/label_fri" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="F" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
         <TextView android:id="@+id/label_sat" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
-        <TextView android:id="@+id/label_sun" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="D" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
+        <TextView android:id="@+id/label_sun" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="S" android:textColor="#60FFFFFF" android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.05" />
     </LinearLayout>
 
     <!-- Week days dots -->

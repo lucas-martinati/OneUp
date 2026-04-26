@@ -1,5 +1,6 @@
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
+import i18n from '../i18n';
 import { getLocalDateStr } from './dateUtils';
 
 /**
@@ -76,6 +77,10 @@ export async function updateWidgetData(computedStats, completions) {
       weekDays: getWeekDaysStatus(completions),
       todayIndex: getTodayIndex(),
       updatedAt: Date.now(),
+      // Translations
+      streakLabel: i18n.t('widgets.streak'),
+      daysLabel: i18n.t('widgets.days'),
+      weekdayLabels: i18n.t('widgets.weekdays', { returnObjects: true }),
     };
 
     await Preferences.set({

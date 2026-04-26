@@ -45,7 +45,7 @@
             android:id="@+id/widget_streak_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Streak"
+            android:text="STREAK"
             android:textColor="#80FFFFFF"
             android:textSize="11sp"
             android:fontFamily="sans-serif"

@@ -71,6 +71,10 @@ public class StreakWidgetProvider extends AppWidgetProvider {
         boolean[] weekDays = new boolean[7];
         int storedTodayIndex = -1;
 
+        String streakLabel = "STREAK";
+        String daysLabel = "DAYS";
+        String[] weekdayLabels = {"M", "T", "W", "T", "F", "S", "S"};
+
         if (rawData != null) {
             try {
                 JSONObject data = new JSONObject(rawData);
@@ -78,6 +82,15 @@ public class StreakWidgetProvider extends AppWidgetProvider {
                 streakActive = data.optBoolean("streakActive", false);
                 todayDone = data.optBoolean("todayDone", false);
                 storedTodayIndex = data.optInt("todayIndex", -1);
+
+                streakLabel = data.optString("streakLabel", streakLabel);
+                daysLabel = data.optString("daysLabel", daysLabel);
+                JSONArray labelsArray = data.optJSONArray("weekdayLabels");
+                if (labelsArray != null) {
+                    for (int i = 0; i < Math.min(labelsArray.length(), 7); i++) {
+                        weekdayLabels[i] = labelsArray.optString(i, weekdayLabels[i]);
+                    }
+                }
 
                 JSONArray weekArray = data.optJSONArray("weekDays");
                 if (weekArray != null) {
@@ -136,10 +149,11 @@ public class StreakWidgetProvider extends AppWidgetProvider {
 
             if (minWidth >= 200) {
                 updateLargeWidget(context, appWidgetManager, appWidgetId, pendingIntent,
-                    streak, streakActive, todayDone, weekDays, todayIndex);
+                    streak, streakActive, todayDone, weekDays, todayIndex,
+                    streakLabel, daysLabel, weekdayLabels);
             } else {
                 updateSmallWidget(context, appWidgetManager, appWidgetId, pendingIntent,
-                    streak, streakActive);
+                    streak, streakActive, streakLabel);
             }
         }
     }
@@ -152,10 +166,11 @@ public class StreakWidgetProvider extends AppWidgetProvider {
 
     private void updateSmallWidget(Context context, AppWidgetManager appWidgetManager,
                                     int appWidgetId, PendingIntent pendingIntent,
-                                    int streak, boolean streakActive) {
+                                    int streak, boolean streakActive, String streakLabel) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_streak_small);
 
         views.setTextViewText(R.id.widget_streak_count, String.valueOf(streak));
+        views.setTextViewText(R.id.widget_streak_label, streakLabel);
 
         // Sad state when streak is 0: frozen/icy look
         boolean isSad = streak == 0;
@@ -183,7 +198,8 @@ public class StreakWidgetProvider extends AppWidgetProvider {
     private void updateLargeWidget(Context context, AppWidgetManager appWidgetManager,
                                     int appWidgetId, PendingIntent pendingIntent,
                                     int streak, boolean streakActive, boolean todayDone,
-                                    boolean[] weekDays, int todayIndex) {
+                                    boolean[] weekDays, int todayIndex,
+                                    String streakLabel, String daysLabel, String[] weekdayLabels) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_streak_large);
 
         // Sad state when streak is 0: frozen/icy look
@@ -192,6 +208,8 @@ public class StreakWidgetProvider extends AppWidgetProvider {
             isSad ? R.drawable.widget_background_sad : R.drawable.widget_background);
 
         views.setTextViewText(R.id.widget_large_streak_count, String.valueOf(streak));
+        views.setTextViewText(R.id.widget_large_streak_label, daysLabel);
+
         views.setTextColor(R.id.widget_large_streak_count,
             isSad ? 0x80a0c4e8 : 0xFFFFFFFF);
         views.setTextColor(R.id.widget_large_streak_label,
@@ -240,6 +258,7 @@ public class StreakWidgetProvider extends AppWidgetProvider {
             }
             views.setImageViewResource(dotIds[i], drawableRes);
             views.setTextColor(labelIds[i], labelColor);
+            views.setTextViewText(labelIds[i], weekdayLabels[i]);
         }
 
         // Clickable root layout

@@ -637,5 +637,10 @@
       "body": "¡Sigue tu racha directamente desde tu pantalla de inicio! Añade el widget OneUp para ver tu progreso de un vistazo, sin abrir la aplicación.",
       "cta": "¡Entendido!"
     }
+  },
+  "widgets": {
+    "streak": "RACHA",
+    "days": "DÍAS",
+    "weekdays": ["L", "M", "M", "J", "V", "S", "D"]
   }
 }

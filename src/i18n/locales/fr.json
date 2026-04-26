@@ -637,5 +637,10 @@
       "body": "Suis ta streak directement depuis ton écran d'accueil ! Ajoute le widget OneUp pour voir ta progression en un coup d'œil, sans ouvrir l'application.",
       "cta": "J'ai compris !"
     }
+  },
+  "widgets": {
+    "streak": "SÉRIE",
+    "days": "JOURS",
+    "weekdays": ["L", "M", "M", "J", "V", "S", "D"]
   }
 }

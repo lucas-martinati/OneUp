@@ -636,5 +636,10 @@
       "body": "Track your streak right from your home screen! Add the OneUp widget to see your progress at a glance, without opening the app.",
       "cta": "Got it!"
     }
+  },
+  "widgets": {
+    "streak": "STREAK",
+    "days": "DAYS",
+    "weekdays": ["M", "T", "W", "T", "F", "S", "S"]
   }
 }
