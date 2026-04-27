@@ -6,12 +6,20 @@ import React, { useState, useEffect } from 'react';
  */
 export function SegmentedControl({ options, value, onChange, style = {} }) {
   const [isBumping, setIsBumping] = useState(false);
+  const [prevValue, setPrevValue] = useState(value);
+
+  // Sync state with prop change during render to avoid useEffect cascading renders
+  if (value !== prevValue) {
+    setPrevValue(value);
+    setIsBumping(true);
+  }
 
   useEffect(() => {
-    setIsBumping(true);
-    const timer = setTimeout(() => setIsBumping(false), 300);
-    return () => clearTimeout(timer);
-  }, [value]);
+    if (isBumping) {
+      const timer = setTimeout(() => setIsBumping(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isBumping]);
 
   const activeIndex = options.findIndex(o => o.id === value);
   const activeOption = options[activeIndex] || options[0];
