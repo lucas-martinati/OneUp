@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCardio } from './useCardio';
+import { useSwipe } from '../../hooks/useSwipe';
 import { CardioWeeklyGoal } from './CardioWeeklyGoal';
 import { CardioMap } from './CardioMap';
 import { CardioLastSession } from './CardioLastSession';
@@ -45,6 +46,15 @@ export function CardioModule() {
     lastSession, streak, sessions, loading, refresh
   } = useCardio();
 
+  const swipeHandlers = useSwipe({
+    onSwipeLeft: () => {
+      if (activeMode === 'running') setActiveMode('cycling');
+    },
+    onSwipeRight: () => {
+      if (activeMode === 'cycling') setActiveMode('running');
+    }
+  });
+
   const [stravaConnected, setStravaConnected] = useState(false);
 
   // Fake demo values for the paywall
@@ -87,7 +97,10 @@ export function CardioModule() {
 
   return (
     <>
-      <div className="cardio-module fade-in" style={{
+      <div 
+        className="cardio-module fade-in" 
+        {...swipeHandlers}
+        style={{
         width: '100%', height: '100%',
         display: 'flex', flexDirection: 'column',
         padding: 'clamp(14px, 2vh, 22px)',

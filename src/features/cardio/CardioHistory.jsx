@@ -41,7 +41,6 @@ function formatDate(timestamp) {
 }
 
 function SessionCard({ session, mode }) {
-  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const hasGps = session.gpsTrack && session.gpsTrack.length > 1;
 

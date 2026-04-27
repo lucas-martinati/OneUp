@@ -12,6 +12,7 @@ import { UserDetail } from './UserDetail';
 import { getIcon } from '../../utils/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProgressContext } from '../../contexts/ProgressContext';
+import { useSwipe } from '../../hooks/useSwipe';
 import { ClanManager } from './ClanManager';
 
 export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, onLeaveClan }) {
@@ -58,6 +59,16 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     const [communityContext, setCommunityContext] = useState(initialClanData ? initialClanData.id : 'global'); // 'global' | 'manage' | clanId
     const {refreshUserClans } = useProgressContext();
     const [clanData, setClanData] = useState(initialClanData);
+
+    // Swipe gesture handling
+    const swipeHandlers = useSwipe({
+        onSwipeLeft: () => {
+            if (communityContext === 'global') setCommunityContext('manage');
+        },
+        onSwipeRight: () => {
+            if (communityContext === 'manage') setCommunityContext('global');
+        }
+    });
 
     const currentUid = cloudSync.getCurrentUserId();
     const todayStr = getLocalDateStr(new Date());
@@ -125,7 +136,10 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     const activeTabConfig = VISIBLE_TABS.find(t => t.id === activeTab) || VISIBLE_TABS[0];
 
     return (
-        <div className="fade-in" style={{
+        <div 
+            className="fade-in" 
+            {...swipeHandlers}
+            style={{
             position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
             background: 'var(--overlay-bg)', zIndex: Z_INDEX.MODAL,
             display: 'flex', flexDirection: 'column',
