@@ -634,10 +634,10 @@
   },
   "announcement": {
     "badge": "Nouveau",
-    "widgets": {
-      "title": "Widgets d'écran d'accueil",
-      "body": "Suis ta streak directement depuis ton écran d'accueil ! Ajoute le widget OneUp pour voir ta progression en un coup d'œil, sans ouvrir l'application.",
-      "cta": "J'ai compris !"
+    "cardio": {
+      "title": "Nouveau module Cardio ! 🏃🚴",
+      "body": "Connectez Strava pour synchroniser automatiquement vos courses et sorties vélo. Suivez vos objectifs hebdomadaires, votre streak et visualisez vos parcours GPS. Le cardio contribue désormais à votre streak globale.",
+      "cta": "Génial !"
     }
   },
   "widgets": {
@@ -672,8 +672,6 @@
     "start": "Départ",
     "finish": "Arrivée",
     "tap": "Tap",
-    "hideMap": "Masquer la carte",
-    "showMap": "Voir la carte",
     "stravaWallTitle": "Connectez Strava",
     "stravaWallDesc": "Synchronisez automatiquement vos sessions de course et de vélo pour faire progresser votre streak globale."
   }

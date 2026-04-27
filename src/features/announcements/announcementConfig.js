@@ -28,16 +28,13 @@
  *   images   — optional array of image paths (relative to public/) to display
  */
 const CURRENT_ANNOUNCEMENT = {
-  id: 'widgets-v1',
+  id: 'cardio-v1',
   enabled: true,
-  emoji: '📱',
-  titleKey: 'announcement.widgets.title',
-  bodyKey: 'announcement.widgets.body',
-  ctaKey: 'announcement.widgets.cta',
-  images: [
-    '/announcements/widget_preview_small.png',
-    '/announcements/widget_preview_large.png',
-  ],
+  emoji: '🏃',
+  titleKey: 'announcement.cardio.title',
+  bodyKey: 'announcement.cardio.body',
+  ctaKey: 'announcement.cardio.cta',
+  images: [],
 };
 
 export default CURRENT_ANNOUNCEMENT;

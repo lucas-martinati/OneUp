@@ -633,10 +633,10 @@
   },
   "announcement": {
     "badge": "New",
-    "widgets": {
-      "title": "Home Screen Widgets",
-      "body": "Track your streak right from your home screen! Add the OneUp widget to see your progress at a glance, without opening the app.",
-      "cta": "Got it!"
+    "cardio": {
+      "title": "New Cardio Module! 🏃🚴",
+      "body": "Connect Strava to automatically sync your runs and bike rides. Track your weekly goals, your streak, and view your GPS tracks. Cardio now contributes to your global streak.",
+      "cta": "Awesome!"
     }
   },
   "widgets": {
@@ -672,8 +672,6 @@
     "start": "Start",
     "finish": "Finish",
     "tap": "Tap",
-    "hideMap": "Hide map",
-    "showMap": "Show map",
     "stravaWallTitle": "Connect Strava",
     "stravaWallDesc": "Automatically sync your running and cycling sessions to progress your global streak."
   }

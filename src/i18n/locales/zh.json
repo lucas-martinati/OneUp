@@ -633,10 +633,10 @@
   },
   "announcement": {
     "badge": "新功能",
-    "widgets": {
-      "title": "主屏幕小组件",
-      "body": "直接在主屏幕上追踪你的连续天数！添加 OneUp 小组件，一目了然地查看进度，无需打开应用。",
-      "cta": "知道了！"
+    "cardio": {
+      "title": "全新有氧运动模块！🏃🚴",
+      "body": "连接 Strava 以自动同步您的跑步和骑行。追踪您的每周目标、连续纪录，并查看您的 GPS 轨迹。有氧运动现在计入您的总连续纪录。",
+      "cta": "太棒了！"
     }
   },
   "widgets": {
@@ -671,8 +671,6 @@
     "start": "起点",
     "finish": "终点",
     "tap": "轻触",
-    "hideMap": "隐藏地图",
-    "showMap": "查看地图",
     "stravaWallTitle": "连接 Strava",
     "stravaWallDesc": "自动同步您的跑步和骑行活动，以提升您的全球连胜记录。"
   }

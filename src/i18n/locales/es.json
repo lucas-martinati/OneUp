@@ -634,10 +634,10 @@
   },
   "announcement": {
     "badge": "Nuevo",
-    "widgets": {
-      "title": "Widgets de pantalla de inicio",
-      "body": "¡Sigue tu racha directamente desde tu pantalla de inicio! Añade el widget OneUp para ver tu progreso de un vistazo, sin abrir la aplicación.",
-      "cta": "¡Entendido!"
+    "cardio": {
+      "title": "¡Nuevo módulo de Cardio! 🏃🚴",
+      "body": "Conecta Strava para sincronizar automáticamente tus carreras y salidas en bicicleta. Sigue tus objetivos semanales, tu racha y visualiza tus rutas GPS. El cardio ahora contribuye a tu racha global.",
+      "cta": "¡Genial!"
     }
   },
   "widgets": {
@@ -672,8 +672,6 @@
     "start": "Inicio",
     "finish": "Fin",
     "tap": "Tocar",
-    "hideMap": "Ocultar mapa",
-    "showMap": "Ver mapa",
     "stravaWallTitle": "Conectar Strava",
     "stravaWallDesc": "Sincroniza automáticamente tus sesiones de carrera y ciclismo para progresar en tu racha global."
   }
