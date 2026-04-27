@@ -10,9 +10,7 @@ export const DashboardActions = React.memo(({
     return (
         <div className={isDay100 ? 'day100-actions' : ''} style={{
             display: 'flex', gap: '8px', width: '100%',
-            paddingBottom: '2px',
-            position: 'relative',
-            zIndex: 10
+            paddingBottom: '2px'
         }}>
             {/* Calendar Button */}
             <button

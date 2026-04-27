@@ -49,7 +49,7 @@ export const DashboardSlide = React.memo(({
                 alignItems: 'center', justifyContent: 'space-evenly', gap: 'clamp(4px, 0.8vh, 12px)',
                 height: '100%', width: '100%', paddingTop: title ? '12px' : '0',
                 transition: 'all 0.6s ease-in-out',
-                position: 'relative', overflow: 'visible'
+                position: 'relative', overflow: 'hidden'
             }}
         >
             {isDayPerfect && (
