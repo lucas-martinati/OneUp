@@ -9,6 +9,7 @@ import { CardioStreak } from './CardioStreak';
 import { stravaService } from '../../services/stravaService';
 import { Capacitor } from '@capacitor/core';
 import { ChevronRight, Play, Link2, CheckCircle2 } from '../../utils/icons';
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
 
 const MODES = [
   { key: 'running', emoji: '🏃' },
@@ -133,56 +134,14 @@ export function CardioModule() {
             {t('cardio.title')}
           </h2>
 
-          {/* Mode tabs - click anywhere to toggle */}
-          <div
-            onClick={() => setActiveMode(activeMode === 'running' ? 'cycling' : 'running')}
-            style={{
-              display: 'flex',
-              background: 'var(--surface-subtle)',
-              borderRadius: 'var(--radius-full)',
-              padding: '3px',
-              border: '1px solid var(--border-subtle)',
-              cursor: 'pointer',
-            }}>
-            <button
-              style={{
-                padding: '8px 18px',
-                borderRadius: 'var(--radius-full)',
-                fontSize: 'clamp(0.7rem, 1.3vh, 0.85rem)',
-                fontWeight: '700',
-                border: 'none',
-                display: 'flex', alignItems: 'center', gap: '6px',
-                transition: 'all 0.25s ease',
-                background: activeMode === 'running'
-                  ? 'var(--gradient-glow)'
-                  : 'transparent',
-                color: activeMode === 'running'
-                  ? '#fff'
-                  : 'var(--text-secondary)',
-              }}
-            >
-              🏃 {t('exercises.running')}
-            </button>
-            <button
-              style={{
-                padding: '8px 18px',
-                borderRadius: 'var(--radius-full)',
-                fontSize: 'clamp(0.7rem, 1.3vh, 0.85rem)',
-                fontWeight: '700',
-                border: 'none',
-                display: 'flex', alignItems: 'center', gap: '6px',
-                transition: 'all 0.25s ease',
-                background: activeMode === 'cycling'
-                  ? 'var(--gradient-glow)'
-                  : 'transparent',
-                color: activeMode === 'cycling'
-                  ? '#fff'
-                  : 'var(--text-secondary)',
-              }}
-            >
-              🚴 {t('exercises.cycling')}
-            </button>
-          </div>
+          <SegmentedControl 
+            value={activeMode}
+            onChange={setActiveMode}
+            options={[
+              { id: 'running', label: t('exercises.running'), icon: '🏃' },
+              { id: 'cycling', label: t('exercises.cycling'), icon: '🚴' }
+            ]}
+          />
         </div>
 
         {loading ? (

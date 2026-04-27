@@ -19,7 +19,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
             {showDomainFilter && (
             <div style={{
                 display: 'flex', gap: '8px', padding: '12px var(--spacing-md) 16px',
-                background: '#000000',
+                background: 'transparent',
                 marginBottom: '4px'
             }}>
                 <button

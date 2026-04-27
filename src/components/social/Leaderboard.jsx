@@ -14,6 +14,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSwipe } from '../../hooks/useSwipe';
 import { ClanManager } from './ClanManager';
+import { SegmentedControl } from '../ui/SegmentedControl';
 
 export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, onLeaveClan }) {
 
@@ -163,45 +164,17 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                         {t('leaderboard.title')}
                     </h2>
                     
-                    {/* Toggle Switch */}
-                    <button
-                        onClick={() => {
-                            if (communityContext === 'global') {
-                                setCommunityContext('manage');
-                            } else {
-                                setCommunityContext('global');
-                            }
+                    <SegmentedControl 
+                        value={communityContext === 'global' ? 'global' : 'clans'}
+                        onChange={(val) => {
+                            if (val === 'global') setCommunityContext('global');
+                            else setCommunityContext('manage');
                         }}
-                        className="hover-lift"
-                        style={{
-                            display: 'flex', background: 'rgba(255,255,255,0.05)',
-                            borderRadius: '20px', padding: '2px', border: '1px solid rgba(255,255,255,0.1)',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        <div
-                            style={{
-                                padding: '6px 12px', borderRadius: '18px',
-                                background: communityContext === 'global' ? '#fbbf24' : 'transparent',
-                                color: communityContext === 'global' ? '#000' : 'var(--text-secondary)',
-                                fontWeight: '800', fontSize: '0.8rem',
-                                transition: 'all 0.2s ease', pointerEvents: 'none'
-                            }}
-                        >
-                            {t('common.global')}
-                        </div>
-                        <div
-                            style={{
-                                padding: '6px 12px', borderRadius: '18px',
-                                background: communityContext !== 'global' ? '#8b5cf6' : 'transparent',
-                                color: communityContext !== 'global' ? '#fff' : 'var(--text-secondary)',
-                                fontWeight: '800', fontSize: '0.8rem',
-                                transition: 'all 0.2s ease', pointerEvents: 'none'
-                            }}
-                        >
-                            {t('clan.title')}
-                        </div>
-                    </button>
+                        options={[
+                            { id: 'global', label: t('common.global'), activeBg: '#fbbf24', activeColor: '#000' },
+                            { id: 'clans', label: t('clan.title'), activeBg: '#8b5cf6', activeColor: '#fff' }
+                        ]}
+                    />
                 </div>
 
                 <button onClick={onClose} className="hover-lift glass" style={{
