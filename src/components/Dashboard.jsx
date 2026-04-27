@@ -239,7 +239,7 @@ export function Dashboard() {
             {hackActive && <Day100Overlay />}
             <div className={`fade-in ${hackActive ? 'day100-global day100-flicker' : ''} ${day100Unhacked ? 'day100-unhacking' : ''}`} style={{
                 display: 'flex', flexDirection: 'column', height: '100%',
-                gap: 'clamp(4px, 1vh, 10px)', paddingBottom: 'clamp(2px, 0.5vh, 8px)'
+                gap: 0, paddingBottom: 0
             }}>
                 <DashboardHeader
                     setShowSettings={setShowSettings}
@@ -253,7 +253,7 @@ export function Dashboard() {
                     isDay100={hackActive}
                 />
 
-                <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, position: 'relative' }}>
+                <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, position: 'relative', margin: '0 -8px' }}>
                     <div
                         ref={scrollContainerRef}
                         onScroll={(e) => {
@@ -266,10 +266,11 @@ export function Dashboard() {
                             }
                         }}
                         style={{
-                            flex: 1, overflowY: anyModalOpen ? 'hidden' : 'auto', overflowX: 'hidden',
+                            flex: 1, overflowY: anyModalOpen ? 'hidden' : 'auto', overflowX: 'visible',
                             scrollSnapType: 'y mandatory',
                             display: 'flex', flexDirection: 'column', width: '100%',
-                            scrollbarWidth: 'none', msOverflowStyle: 'none'
+                            scrollbarWidth: 'none', msOverflowStyle: 'none',
+                            paddingTop: '100px', marginTop: '-100px'
                         }}
                     >
 
@@ -279,7 +280,7 @@ export function Dashboard() {
                             }
                         }}></button>
 
-                        <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                        <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%', marginTop: '-100px', paddingTop: '100px' }}>
                             <Suspense fallback={null}>
                                 <CardioModule />
                             </Suspense>

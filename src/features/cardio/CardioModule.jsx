@@ -107,7 +107,7 @@ export function CardioModule() {
         padding: 'clamp(14px, 2vh, 22px)',
         gap: 'clamp(8px, 1.2vh, 14px)',
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'visible',
         boxSizing: 'border-box',
       }}>
         {/* Decorative glow */}
@@ -115,7 +115,7 @@ export function CardioModule() {
           position: 'absolute', top: '-40px', right: '-40px',
           width: '120px', height: '120px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)',
           pointerEvents: 'none'
         }} />
 
