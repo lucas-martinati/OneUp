@@ -35,7 +35,12 @@ function decodePolyline(encoded) {
 
 function getRedirectUri() {
   if (Capacitor.getPlatform() === 'web') {
-    return window.location.origin;
+    // Use the full URL including the base path (e.g., /OneUp/) for GitHub Pages
+    const baseUrl = import.meta.env.BASE_URL;
+    const origin = window.location.origin;
+    // Combine origin and base, ensuring a clean URL without trailing slash unless it's just root
+    const fullUrl = (origin + baseUrl).replace(/\/$/, '') || origin;
+    return fullUrl;
   }
   // Now that Strava dashboard has ONLY lucas-martinati.github.io,
   // we can use our custom scheme with that exact domain as the host!
