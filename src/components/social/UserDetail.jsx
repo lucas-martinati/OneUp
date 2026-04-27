@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Zap, Star } from '../../utils/icons';
 import { Avatar } from '../ui/Avatar';
 import { DifficultyBadge } from '../ui/DifficultyBadge';
-import { EXERCISES } from '../../config/exercises';
+import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { registerBackHandler } from '../../utils/backHandler';
 import { getLocalDateStr, calculateStreak, calculateExerciseStreak, calculateMaxStreak } from '../../utils/dateUtils';
@@ -268,7 +268,16 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0, paddingBottom: '16px' }}>
-                        <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '4px', letterSpacing: '1px' }}>
+                        {CARDIO_EXERCISES && CARDIO_EXERCISES.length > 0 && (
+                            <>
+                                <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '4px', letterSpacing: '1px' }}>
+                                    Cardio
+                                </div>
+                                {CARDIO_EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
+                            </>
+                        )}
+
+                        <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '16px', letterSpacing: '1px' }}>
                             {t('common.bodyweight')}
                         </div>
                         {EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
@@ -303,7 +312,7 @@ function StatCard({ icon, label, value, color }) {
 function computeStats(details) {
     if (!details?.completions) return { maxStreak: 0, currentStreak: 0, totalDays: 0, perfectDays: 0, exerciseDays: {} };
 
-    const ALL_EXERCISES = [...EXERCISES, ...WEIGHT_EXERCISES];
+    const ALL_EXERCISES = [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES];
     const completions = details.completions;
     const today = getLocalDateStr(new Date());
 

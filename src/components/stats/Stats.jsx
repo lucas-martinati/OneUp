@@ -14,6 +14,7 @@ import { SharePanel } from '../../features/share/components/SharePanel';
 import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
+import { useCardio } from '../../features/cardio/useCardio';
 
 // Lazy load Recharts components
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
@@ -21,6 +22,7 @@ const ConsistencyPieChart = lazy(() => import('./ConsistencyPieChart'));
 const DailyRepsChart = lazy(() => import('./DailyRepsChart'));
 const WeightEvolutionChart = lazy(() => import('./WeightEvolutionChart'));
 const DifficultyEvolutionChart = lazy(() => import('./DifficultyEvolutionChart'));
+const CardioStatsPanel = lazy(() => import('../../features/cardio/CardioStatsPanel').then(m => ({ default: m.CardioStatsPanel })));
 const SessionDetailModal = lazy(() => import('../../features/share/components/SessionDetailModal').then(m => ({ default: m.SessionDetailModal })));
 
 export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStore }) {
@@ -37,10 +39,16 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
     const [selectedSession, setSelectedSession] = useState(null);
     const [activeCategories, setActiveCategories] = useState(() => {
         if (initialCategory === 'global') return ['standard', 'weights', 'custom'];
+        if (initialCategory === 'cardio') return ['cardio'];
         return [initialCategory || 'standard'];
     });
     const [showFilters, setShowFilters] = useState(false);
     const isClosingRef = useRef(false);
+
+    const hasCardio = activeCategories.includes('cardio');
+    const onlyCardio = hasCardio && activeCategories.length === 1;
+    const cardioData = useCardio();
+    const cardioKm = onlyCardio ? cardioData.allSessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000 : null;
 
     const handleClose = useCallback(() => {
         if (isClosingRef.current) return;
@@ -78,11 +86,12 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         if (activeCategories.includes('standard')) list.push(...(exercisesList.standard || []));
         if (activeCategories.includes('weights')) list.push(...(exercisesList.weights || []));
         if (activeCategories.includes('custom')) list.push(...(exercisesList.custom || []));
+        if (activeCategories.includes('cardio')) list.push(...(exercisesList.cardio || []));
         return list;
     }, [activeCategories, exercisesList]);
 
     const computedStats = React.useMemo(() => {
-        if (canAccessFeature(FEATURES.MERGED_STATS, { isPro: hasProAccess }) && activeCategories.length === 3) return globalStats;
+        if (canAccessFeature(FEATURES.MERGED_STATS, { isPro: hasProAccess }) && activeCategories.length === 4) return globalStats;
         return computeAllStats(completions, settings, getDayNumber, exercises, false, {}, getConfig);
     }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess, getConfig]);
 
@@ -193,6 +202,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         display: 'flex', flexWrap: 'wrap', gap: '8px'
                     }}>
                         {[
+                            { id: 'cardio', label: 'Cardio', locked: false },
                             { id: 'standard', label: t('common.bodyweight'), locked: false },
                             { id: 'weights', label: t('common.weights'), locked: !canAccessFeature(FEATURES.WEIGHTS, { isPro: hasProAccess }) },
                             { id: 'custom', label: t('common.custom'), locked: !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro: hasProAccess }) }
@@ -241,23 +251,22 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 padding: 'var(--spacing-lg) var(--spacing-md)',
                 borderRadius: 'var(--radius-xl)', textAlign: 'center',
                 marginBottom: 'var(--spacing-md)',
-                background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.12), rgba(236,72,153,0.1))'
+                background: onlyCardio && cardioKm !== null ? 'linear-gradient(135deg, rgba(249,115,22,0.15), rgba(239,68,68,0.12))' : 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.12), rgba(236,72,153,0.1))'
             }}>
                 <div style={{
                     fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '2px',
                     color: 'var(--text-secondary)', marginBottom: '4px'
                 }}>
-                    {t('stats.totalReps')}
+                    {onlyCardio && cardioKm !== null ? t('cardio.totalDistance') : t('stats.totalReps')}
                 </div>
                 <div style={{
                     fontSize: 'clamp(2.5rem, 10vw, 4.5rem)', fontWeight: '900', lineHeight: 1.1,
-                    background: 'linear-gradient(135deg, #818cf8, #a78bfa, #f472b6)',
-                    WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
+                    color: onlyCardio && cardioKm !== null ? '#f97316' : '#818cf8'
                 }}>
-                    {globalTotalReps.toLocaleString()}
+                    {onlyCardio && cardioKm !== null ? cardioKm.toFixed(1) : globalTotalReps.toLocaleString()}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                    {t('stats.overExercises', { count: exercises?.length || 0, days: totalDays, plural: totalDays !== 1 ? 's' : '' })}
+                    {onlyCardio && cardioKm !== null ? t('cardio.overSessions', { count: cardioData.allSessions.length }) : t('stats.overExercises', { count: exercises?.length || 0, days: totalDays, plural: totalDays !== 1 ? 's' : '' })}
                 </div>
             </div>
 
@@ -553,6 +562,8 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 </Suspense>
             ) : null}
 
+            {hasCardio && <CardioStatsPanel />}
+
             {/* ── Per-exercise breakdown ───────────────────────────────── */}
             {exerciseStats.length > 0 && (
                 <div className="glass-premium" style={{
@@ -629,17 +640,31 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                                 display: 'flex', alignItems: 'center',
                                                 gap: '8px', marginTop: '2px'
                                             }}>
-                                                <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                                                    {ex.totalReps.toLocaleString()} {t('common.reps')}
-                                                </span>
-                                                <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
-                                                <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                                                    {ex.daysCompleted}{t('common.daysAbbr')}
-                                                </span>
-                                                <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
-                                                <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                                                    {ex.completionRate}%
-                                                </span>
+                                                {hasCardio && (ex.id === 'running' || ex.id === 'cycling') ? (
+                                                    <>
+                                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                            {((cardioData.allSessions.filter(s => s.type === ex.id).reduce((sum, s) => sum + (s.distance || 0), 0)) / 1000).toFixed(1)} km
+                                                        </span>
+                                                        <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
+                                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                            {t('cardio.sessionsCount', { count: cardioData.allSessions.filter(s => s.type === ex.id).length })}
+                                                        </span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                            {ex.totalReps.toLocaleString()} {t('common.reps')}
+                                                        </span>
+                                                        <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
+                                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                            {ex.daysCompleted}{t('common.daysAbbr')}
+                                                        </span>
+                                                        <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
+                                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                            {ex.completionRate}%
+                                                        </span>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -748,7 +773,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                     variant="stats"
                     mode="global"
                     activeCategories={activeCategories}
-                />
+/>
             </div>
 
             {/* ── Motivational footer ─────────────────────────────────── */}

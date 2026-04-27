@@ -3,7 +3,7 @@ import { useAuth } from './AuthContext';
 import { useRoutines } from '../hooks/useRoutines';
 import { useCustomExercises } from '../hooks/useCustomExercises';
 import { useExerciseWeights } from '../hooks/useExerciseWeights';
-import { EXERCISES, EXERCISES_MAP } from '../config/exercises';
+import { EXERCISES, EXERCISES_MAP, CARDIO_EXERCISES } from '../config/exercises';
 import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
 
 const ExercisesContext = createContext(null);
@@ -51,6 +51,7 @@ export function ExercisesProvider({ children, onDeleteExerciseHistory, onSaveToC
     standard: EXERCISES,
     weights: WEIGHT_EXERCISES,
     custom: customExercises,
+    cardio: CARDIO_EXERCISES,
   }), [customExercises]);
 
   // Wrapped deleteCustomExercise that also cleans up completions and routines

@@ -1177,3 +1177,39 @@ button:focus:not(:focus-visible) {
   animation: streak-float 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   z-index: 9999;
 }
+
+/* ── Cardio Module ──────────────────────────────────────────────────── */
+
+.cardio-module {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.cardio-tabs button:active {
+  transform: scale(0.95);
+}
+
+.cardio-progress-fill {
+  position: relative;
+  overflow: hidden;
+}
+
+.cardio-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: cardioShimmer 2.5s ease-in-out infinite;
+}
+
+@keyframes cardioShimmer {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+.cardio-map-container {
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+}

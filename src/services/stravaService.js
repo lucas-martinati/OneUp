@@ -1,0 +1,200 @@
+import { Browser } from '@capacitor/browser';
+import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('Strava');
+
+const STRAVA_CLIENT_ID = import.meta.env.VITE_STRAVA_CLIENT_ID || '';
+const STRAVA_CLIENT_SECRET = import.meta.env.VITE_STRAVA_CLIENT_SECRET || '';
+
+function decodePolyline(encoded) {
+  if (!encoded) return null;
+  const poly = [];
+  let index = 0, lat = 0, lng = 0;
+  while (index < encoded.length) {
+    let b, shift = 0, result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    lat += (result & 1) !== 0 ? ~(result >> 1) : (result >> 1);
+    shift = 0; result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    lng += (result & 1) !== 0 ? ~(result >> 1) : (result >> 1);
+    poly.push({ lat: lat / 1e5, lng: lng / 1e5 });
+  }
+  return poly;
+}
+
+function getRedirectUri() {
+  if (Capacitor.getPlatform() === 'web') {
+    return window.location.origin;
+  }
+  // Now that Strava dashboard has ONLY lucas-martinati.github.io,
+  // we can use our custom scheme with that exact domain as the host!
+  // This bypasses Android 12+ App Links requirements.
+  return 'com.lucasm548.oneup://lucas-martinati.github.io/strava-auth';
+}
+
+class StravaService {
+  constructor() {
+    this.token = null;
+    this.init();
+  }
+
+  async init() {
+    const { value } = await Preferences.get({ key: 'strava_token' });
+    if (value) {
+      this.token = JSON.parse(value);
+    }
+
+    if (Capacitor.isNativePlatform()) {
+      // Listen for app opens (deep links)
+      App.addListener('appUrlOpen', async (data) => {
+        if (data.url.startsWith(getRedirectUri())) {
+          await this.handleCallback(data.url);
+        }
+      });
+    } else {
+      // On web, check if we just returned from OAuth
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      if (code) {
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        await this.exchangeToken(code);
+      }
+    }
+  }
+
+  async isAuthenticated() {
+    if (!this.token) return false;
+    // Check if expired
+    if (Date.now() / 1000 > this.token.expires_at - 60) {
+      return await this.refreshToken();
+    }
+    return true;
+  }
+
+  async connect() {
+    const scope = 'activity:read_all';
+    const redirectUri = getRedirectUri();
+    const authUrl = `https://www.strava.com/oauth/mobile/authorize?client_id=${STRAVA_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&approval_prompt=auto&scope=${scope}`;
+    
+    if (Capacitor.getPlatform() === 'web') {
+      window.location.assign(authUrl);
+    } else {
+      await Browser.open({ url: authUrl, windowName: '_self' });
+    }
+  }
+
+  async handleCallback(url) {
+    const urlObj = new URL(url);
+    const code = urlObj.searchParams.get('code');
+    if (code) {
+      logger.info('Received Strava auth code');
+      await Browser.close();
+      await this.exchangeToken(code);
+    }
+  }
+
+  async exchangeToken(code) {
+    try {
+      const response = await fetch('https://www.strava.com/oauth/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: STRAVA_CLIENT_ID,
+          client_secret: STRAVA_CLIENT_SECRET,
+          code,
+          grant_type: 'authorization_code',
+        }),
+      });
+
+      const data = await response.json();
+      if (data.access_token) {
+        this.token = data;
+        await Preferences.set({ key: 'strava_token', value: JSON.stringify(data) });
+        logger.success('Strava connected successfully');
+        window.dispatchEvent(new CustomEvent('strava-connected'));
+      }
+    } catch (err) {
+      logger.error('Failed to exchange Strava token', err);
+    }
+  }
+
+  async refreshToken() {
+    if (!this.token?.refresh_token) return false;
+    try {
+      const response = await fetch('https://www.strava.com/oauth/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: STRAVA_CLIENT_ID,
+          client_secret: STRAVA_CLIENT_SECRET,
+          refresh_token: this.token.refresh_token,
+          grant_type: 'refresh_token',
+        }),
+      });
+
+      const data = await response.json();
+      if (data.access_token) {
+        this.token = { ...this.token, ...data };
+        await Preferences.set({ key: 'strava_token', value: JSON.stringify(this.token) });
+        return true;
+      }
+    } catch (err) {
+      logger.error('Failed to refresh Strava token', err);
+    }
+    return false;
+  }
+
+  async getActivities(afterTimestamp) {
+    if (!(await this.isAuthenticated())) return [];
+
+    try {
+      let url = 'https://www.strava.com/api/v3/athlete/activities?per_page=30';
+      if (afterTimestamp) {
+        url += `&after=${Math.floor(afterTimestamp / 1000)}`;
+      }
+
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${this.token.access_token}` },
+      });
+
+      const activities = await response.json();
+      return activities.map(a => ({
+        id: `strava_${a.id}`,
+        source: 'strava',
+        type: a.type === 'Run' ? 'running' : a.type === 'Ride' ? 'cycling' : 'other',
+        distance: a.distance, // meters
+        duration: a.moving_time, // seconds
+        movingTime: a.moving_time,
+        startTime: new Date(a.start_date).getTime(),
+        name: a.name,
+        gpsTrack: decodePolyline(a.map?.summary_polyline) || decodePolyline(a.map?.polyline) || null,
+        polyline: a.map?.summary_polyline || null,
+        elevation: a.total_elevation_gain,
+        averageSpeed: a.average_speed,
+      })).filter(a => a.type !== 'other');
+    } catch (err) {
+      logger.error('Failed to fetch Strava activities', err);
+      return [];
+    }
+  }
+
+  async disconnect() {
+    this.token = null;
+    await Preferences.remove({ key: 'strava_token' });
+    logger.info('Strava disconnected');
+  }
+}
+
+export const stravaService = new StravaService();

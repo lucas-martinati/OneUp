@@ -12,9 +12,26 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
-import { EXERCISES } from '../../config/exercises';
+import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
+
+function CategorySeparator({ label, color }) {
+    return (
+        <div style={{ 
+            display: 'flex', alignItems: 'center', gap: '12px',
+            padding: '0 8px'
+        }}>
+            <div style={{ flex: 1, height: '1px', background: `linear-gradient(90deg, transparent, ${color}25)` }} />
+            <span style={{ 
+                fontSize: '0.7rem', fontWeight: '800', 
+                color: `${color}`, textTransform: 'uppercase', 
+                letterSpacing: '1.5px', whiteSpace: 'nowrap'
+            }}>{label}</span>
+            <div style={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${color}25, transparent)` }} />
+        </div>
+    );
+}
 
 export function Settings({ defaultShowStore = false, onClose }) {
 
@@ -678,8 +695,49 @@ export function Settings({ defaultShowStore = false, onClose }) {
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                            {/* Cardio Exercises */}
+                            {CARDIO_EXERCISES && CARDIO_EXERCISES.length > 0 && (
+                                <>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                        <CategorySeparator label="Cardio" color="#f97316" />
+                                        {CARDIO_EXERCISES.map(ex => {
+                                            const val = getConfig(ex.id).difficulty;
+                                            const exColor = ex.color || '#f97316';
+                                            const percentage = ((val - 0.1) / 0.9) * 100;
+                                            return (
+                                                <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                        <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: '600' }}>
+                                                            {getExerciseLabel(ex, t)}
+                                                        </span>
+                                                        <span style={{ fontSize: '0.8rem', color: exColor, fontWeight: '700', background: `${exColor}25`, padding: '2px 8px', borderRadius: '10px' }}>
+                                                            x{val.toFixed(1)}
+                                                        </span>
+                                                    </div>
+                                                    <input
+                                                        type="range"
+                                                        className="premium-slider"
+                                                        min="0.1" max="1.0" step="0.1"
+                                                        value={val}
+                                                        onChange={(e) => {
+                                                            const newVal = Math.min(1.0, Math.max(0.1, parseFloat(e.target.value)));
+                                                            updateConfig(ex.id, { difficulty: newVal });
+                                                        }}
+                                                        style={{
+                                                            '--slider-color': exColor,
+                                                            background: `linear-gradient(to right, ${exColor} ${percentage}%, var(--surface-muted) ${percentage}%)`
+                                                        }}
+                                                    />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </>
+                            )}
+
                             {/* Bodyweight Exercises */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                <CategorySeparator label={t('common.bodyweight')} color="#ef4444" />
                                 {EXERCISES.map(ex => {
                                     const val = getConfig(ex.id).difficulty;
                                     const exColor = ex.color || '#ef4444';
@@ -690,7 +748,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                                 <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: '600' }}>
                                                     {getExerciseLabel(ex, t)}
                                                 </span>
-                                                <span style={{ fontSize: '0.8rem', color: exColor, fontWeight: '700', background: `${exColor}15`, padding: '2px 8px', borderRadius: '10px' }}>
+                                                <span style={{ fontSize: '0.8rem', color: exColor, fontWeight: '700', background: `${exColor}25`, padding: '2px 8px', borderRadius: '10px' }}>
                                                     x{val.toFixed(1)}
                                                 </span>
                                             </div>
@@ -713,15 +771,11 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                 })}
                             </div>
 
-                            {/* Separator and Weights */}
+                            {/* Weights Exercises */}
                             {isPro && WEIGHT_EXERCISES && WEIGHT_EXERCISES.length > 0 && (
                                 <>
-                                    <div style={{ 
-                                        height: '1px', width: '100%', 
-                                        background: 'linear-gradient(90deg, transparent, var(--border-subtle), transparent)',
-                                        margin: '8px 0'
-                                    }} />
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                        <CategorySeparator label={t('common.weights')} color="#8b5cf6" />
                                         {WEIGHT_EXERCISES.map(ex => {
                                             const val = getConfig(ex.id).difficulty;
                                             const exColor = ex.color || '#ef4444';
@@ -732,7 +786,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                                         <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: '600' }}>
                                                             {getExerciseLabel(ex, t)}
                                                         </span>
-                                                        <span style={{ fontSize: '0.8rem', color: exColor, fontWeight: '700', background: `${exColor}15`, padding: '2px 8px', borderRadius: '10px' }}>
+                                                        <span style={{ fontSize: '0.8rem', color: exColor, fontWeight: '700', background: `${exColor}25`, padding: '2px 8px', borderRadius: '10px' }}>
                                                             x{val.toFixed(1)}
                                                         </span>
                                                     </div>
@@ -762,8 +816,6 @@ export function Settings({ defaultShowStore = false, onClose }) {
             </div>
             </>
             )}
-
-
         </div>
     </div>
     );

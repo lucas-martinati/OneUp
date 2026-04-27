@@ -593,7 +593,9 @@
     "overhead_press": "Жим над головой",
     "squat_weights": "Приседания с весом",
     "deadlift": "Становая тяга",
-    "barbell_row": "Тяга штанги"
+    "barbell_row": "Тяга штанги",
+    "running": "Бег",
+    "cycling": "Велосипед"
   },
   "share": {
     "duration": "Длительность",
@@ -641,5 +643,37 @@
     "streak": "СЕРИЯ",
     "days": "ДНЕЙ",
     "weekdays": ["П", "В", "С", "Ч", "П", "С", "В"]
+  },
+  "cardio": {
+    "title": "Кардио",
+    "weeklyGoal": "Цель на неделю",
+    "week": "Нед.",
+    "connectTitle": "Подключенные сервисы",
+    "lastSession": "Последняя тренировка",
+    "duration": "Время",
+    "distance": "Расстояние",
+    "elevation": "Набор высоты",
+    "avgSpeed": "Ср. скорость",
+    "streak": "Серия",
+    "streakWeeks": "нед.",
+    "viewHistory": "Посмотреть историю",
+    "noSessions": "Нет записанных тренировок",
+    "history": "История кардио",
+    "goalReached": "Цель достигнута!",
+    "totalDistance": "Общая дистанция (км)",
+    "overSessions": "За {{count}} сессий",
+    "sessionsCount_one": "{{count}} сессия",
+    "sessionsCount_other": "{{count}} сессий",
+    "loading": "Загрузка данных кардио...",
+    "speed": "Скорость",
+    "noGpsTrack": "Нет данных GPS",
+    "gpsTrack": "GPS Маршрут",
+    "start": "Старт",
+    "finish": "Финиш",
+    "tap": "Нажмите",
+    "hideMap": "Скрыть карту",
+    "showMap": "Показать карту",
+    "stravaWallTitle": "Подключить Strava",
+    "stravaWallDesc": "Автоматически синхронизируйте свои пробежки и велопоездки, чтобы продвигаться в глобальной серии."
   }
 }

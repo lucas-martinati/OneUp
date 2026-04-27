@@ -594,7 +594,9 @@
     "overhead_press": "Press Militar",
     "squat_weights": "Sentadilla con Peso",
     "deadlift": "Peso Muerto",
-    "barbell_row": "Remo con Barra"
+    "barbell_row": "Remo con Barra",
+    "running": "Carrera",
+    "cycling": "Ciclismo"
   },
   "share": {
     "duration": "Duración",
@@ -642,5 +644,37 @@
     "streak": "RACHA",
     "days": "DÍAS",
     "weekdays": ["L", "M", "M", "J", "V", "S", "D"]
+  },
+  "cardio": {
+    "title": "Cardio",
+    "weeklyGoal": "Objetivo semanal",
+    "week": "Sem.",
+    "connectTitle": "Servicios conectados",
+    "lastSession": "Última salida",
+    "duration": "Tiempo",
+    "distance": "Distancia",
+    "elevation": "Desnivel+",
+    "avgSpeed": "Vel. media",
+    "streak": "Racha",
+    "streakWeeks": "sem.",
+    "viewHistory": "Ver historial",
+    "noSessions": "Sin sesiones registradas",
+    "history": "Historial Cardio",
+    "goalReached": "¡Objetivo alcanzado!",
+    "totalDistance": "Distancia Total (km)",
+    "overSessions": "En {{count}} sesiones",
+    "sessionsCount_one": "{{count}} sesión",
+    "sessionsCount_other": "{{count}} sesiones",
+    "loading": "Cargando datos de cardio...",
+    "speed": "Velocidad",
+    "noGpsTrack": "Sin rastro GPS",
+    "gpsTrack": "Ruta GPS",
+    "start": "Inicio",
+    "finish": "Fin",
+    "tap": "Tocar",
+    "hideMap": "Ocultar mapa",
+    "showMap": "Ver mapa",
+    "stravaWallTitle": "Conectar Strava",
+    "stravaWallDesc": "Sincroniza automáticamente tus sesiones de carrera y ciclismo para progresar en tu racha global."
   }
 }

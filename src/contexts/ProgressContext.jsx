@@ -98,8 +98,9 @@ export function ProgressProvider({ children }) {
 
       await cloudSync.publishToLeaderboard({
         pseudo: settings.leaderboardPseudo || auth.user?.displayName || 'Anonyme',
-        totalReps: classicTotalReps,
+        totalReps: classicTotalReps + (settings.cardioTotalReps || 0),
         weightsTotalReps,
+        cardioTotalReps: settings.cardioTotalReps || 0,
         exerciseReps: computedStats.exerciseReps,
         exerciseDifficulties: settings.exerciseDifficulties,
         achievements: computedStats.badgeCount,

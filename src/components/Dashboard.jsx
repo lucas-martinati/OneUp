@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, Suspense, lazy } from 'react';
+import React, { useEffect, useState, useMemo, useRef, Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from './feedback/CSSConfetti';
 import { NotificationManager } from './social/NotificationManager';
@@ -30,10 +30,11 @@ const Achievements = lazy(() => import('./feedback/Achievements').then(m => ({ d
 const Timer = lazy(() => import('./exercises/Timer').then(m => ({ default: m.Timer })));
 const WorkoutSession = lazy(() => import('./exercises/WorkoutSession').then(m => ({ default: m.WorkoutSession })));
 const CustomExercisesModal = lazy(() => import('./exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
+const CardioModule = lazy(() => import('../features/cardio/CardioModule'));
 
 import { setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr } from '../utils/dateUtils';
-import { EXERCISES, EXERCISES_MAP, getDailyGoal } from '../config/exercises';
+import { EXERCISES, EXERCISES_MAP, CARDIO_EXERCISES, getDailyGoal } from '../config/exercises';
 import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
 import { canAccessFeature, FEATURES } from '../utils/entitlements';
 
@@ -80,7 +81,7 @@ export function Dashboard() {
     const showAchievements = modals.achievements;
     const showSession = modals.session;
     const showCustomExercisesModal = modals.customExercises;
-    const [activeSlide, setActiveSlide] = useState(0);
+    const [activeSlide, setActiveSlide] = useState(1);
 
     const [classicSelected, setClassicSelected] = useState('pushups');
     const [weightsSelected, setWeightsSelected] = useState('biceps_curl');
@@ -89,12 +90,24 @@ export function Dashboard() {
     const [prevDayNumber, setPrevDayNumber] = useState(null);
     const [showDayConfetti, setShowDayConfetti] = useState(false);
     const [openStoreDirectly, setOpenStoreDirectly] = useState(false);
+    const scrollContainerRef = useRef(null);
 
-    const effectiveSlide = isPro ? activeSlide : 0;
-    const globalSelectedId = effectiveSlide === 0 ? classicSelected : effectiveSlide === 1 ? weightsSelected : customSelected;
+    // Scroll to default slide (bodyweight = slide 1) on mount
+    useEffect(() => {
+        const el = scrollContainerRef.current;
+        if (el) {
+            requestAnimationFrame(() => {
+                el.scrollTo({ top: el.clientHeight, behavior: 'instant' });
+            });
+        }
+    }, []);
+
+    const effectiveSlide = isPro ? activeSlide : 1;
+    const globalSelectedId = effectiveSlide === 0 ? 'cardio' : effectiveSlide === 1 ? classicSelected : effectiveSlide === 2 ? weightsSelected : customSelected;
     const selectedExercise = useMemo(() => {
-        if (effectiveSlide === 0) return EXERCISES_MAP[globalSelectedId] || EXERCISES[0];
-        if (effectiveSlide === 1) return WEIGHT_EXERCISES_MAP[globalSelectedId] || WEIGHT_EXERCISES[0];
+        if (effectiveSlide === 0) return { id: 'cardio', color: '#ef4444', gradient: ['#ef4444', '#dc2626'], icon: 'Heart', name: 'Cardio' };
+        if (effectiveSlide === 1) return EXERCISES_MAP[globalSelectedId] || EXERCISES[0];
+        if (effectiveSlide === 2) return WEIGHT_EXERCISES_MAP[globalSelectedId] || WEIGHT_EXERCISES[0];
         return customExercisesMap[globalSelectedId] || customExercises[0] || { id: 'custom_placeholder', color: '#8b5cf6', gradient: ['#8b5cf6', '#7c3aed'], icon: 'Star', name: 'Exercice Perso' };
     }, [effectiveSlide, globalSelectedId, customExercises, customExercisesMap]);
 
@@ -128,7 +141,11 @@ export function Dashboard() {
     const currentCount = getExerciseCount(today, selectedExerciseId);
     const currentDiff = getConfig(selectedExerciseId, today).difficulty;
     const dailyGoal = getDailyGoal(selectedExercise, dayNumber, currentDiff) || 1;
-    const totalReps = computedStats.exerciseReps[globalSelectedId] || 0;
+    
+    // For Cardio slide, use the cardioTotalReps from settings, else use computedStats
+    const totalReps = effectiveSlide === 0 
+        ? (settings.cardioTotalReps || 0) 
+        : (computedStats.exerciseReps[globalSelectedId] || 0);
 
     const effectiveStart = userStartDate || startDate;
     const isFuture = today < effectiveStart;
@@ -238,11 +255,12 @@ export function Dashboard() {
 
                 <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, position: 'relative' }}>
                     <div
+                        ref={scrollContainerRef}
                         onScroll={(e) => {
                             const slideHeight = e.target.clientHeight;
                             if (slideHeight === 0) return;
                             const newSlide = Math.round(e.target.scrollTop / slideHeight);
-                            if (newSlide >= 0 && newSlide <= 2) {
+                            if (newSlide >= 0 && newSlide <= 3) {
                                 document.getElementById('active-slide-updater').click();
                                 window.__latestSlide = newSlide;
                             }
@@ -254,11 +272,18 @@ export function Dashboard() {
                             scrollbarWidth: 'none', msOverflowStyle: 'none'
                         }}
                     >
+
                         <button id="active-slide-updater" style={{display:'none'}} onClick={() => {
                             if (window.__latestSlide !== undefined && window.__latestSlide !== activeSlide) {
                                 setActiveSlide(window.__latestSlide);
                             }
                         }}></button>
+
+                        <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                            <Suspense fallback={null}>
+                                <CardioModule />
+                            </Suspense>
+                        </div>
 
                         <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                             <DashboardSlide
@@ -322,7 +347,7 @@ export function Dashboard() {
                         display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10,
                         pointerEvents: 'none'
                     }}>
-                        {[0, 1, 2].map(i => (
+                        {[0, 1, 2, 3].map(i => (
                             <div key={i} style={{
                                 width: '4px', height: activeSlide === i ? '24px' : '6px',
                                 borderRadius: '4px',
@@ -348,8 +373,8 @@ export function Dashboard() {
                             <Calendar
                                 startDate={startDate}
                                 completions={completions}
-                                exercises={effectiveSlide === 0 ? EXERCISES : effectiveSlide === 1 ? WEIGHT_EXERCISES : customExercises}
-                                isCustom={effectiveSlide === 2}
+                                exercises={effectiveSlide === 0 ? CARDIO_EXERCISES : effectiveSlide === 1 ? EXERCISES : effectiveSlide === 2 ? WEIGHT_EXERCISES : customExercises}
+                                isCustom={effectiveSlide === 3}
                                 getDayNumber={getDayNumber}
                                 onClose={() => setShowCalendar(false)}
                                 settings={settings}
@@ -360,7 +385,7 @@ export function Dashboard() {
                     {showStats && (
                         <Suspense fallback={null}>
                             <Stats
-                                initialCategory={effectiveSlide === 0 ? 'standard' : effectiveSlide === 1 ? 'weights' : 'custom'}
+                                initialCategory={effectiveSlide === 0 ? 'cardio' : effectiveSlide === 1 ? 'standard' : effectiveSlide === 2 ? 'weights' : 'custom'}
                                 onClose={() => setShowStats(false)}
                                 onOpenAchievements={() => { setShowAchievements(true); }}
                                 onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}

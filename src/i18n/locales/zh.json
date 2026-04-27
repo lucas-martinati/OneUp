@@ -593,7 +593,9 @@
     "overhead_press": "推举",
     "squat_weights": "负重深蹲",
     "deadlift": "硬拉",
-    "barbell_row": "杠铃划船"
+    "barbell_row": "杠铃划船",
+    "running": "跑步",
+    "cycling": "骑行"
   },
   "share": {
     "duration": "时长",
@@ -641,5 +643,37 @@
     "streak": "连续天数",
     "days": "天",
     "weekdays": ["一", "二", "三", "四", "五", "六", "日"]
+  },
+  "cardio": {
+    "title": "有氧运动",
+    "weeklyGoal": "每周目标",
+    "week": "第",
+    "connectTitle": "已连接服务",
+    "lastSession": "上次训练",
+    "duration": "用时",
+    "distance": "距离",
+    "elevation": "爬升+",
+    "avgSpeed": "平均速度",
+    "streak": "连续",
+    "streakWeeks": "周",
+    "viewHistory": "查看历史",
+    "noSessions": "暂无训练记录",
+    "history": "有氧历史",
+    "goalReached": "目标达成！",
+    "totalDistance": "总距离 (km)",
+    "overSessions": "共 {{count}} 次训练",
+    "sessionsCount_one": "{{count}} 次训练",
+    "sessionsCount_other": "{{count}} 次训练",
+    "loading": "正在加载有氧运动数据...",
+    "speed": "速度",
+    "noGpsTrack": "无 GPS 轨迹",
+    "gpsTrack": "GPS 路线",
+    "start": "起点",
+    "finish": "终点",
+    "tap": "轻触",
+    "hideMap": "隐藏地图",
+    "showMap": "查看地图",
+    "stravaWallTitle": "连接 Strava",
+    "stravaWallDesc": "自动同步您的跑步和骑行活动，以提升您的全球连胜记录。"
   }
 }

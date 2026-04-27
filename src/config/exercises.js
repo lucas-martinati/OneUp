@@ -113,6 +113,23 @@ export const EXERCISES = [
     }
 ];
 
+export const CARDIO_EXERCISES = [
+    {
+        id: 'running',
+        icon: 'Footprints',
+        color: '#f97316', // Orange
+        colorDim: 'rgba(249,115,22,0.15)',
+        multiplier: 1, // Will be overridden by settings
+    },
+    {
+        id: 'cycling',
+        icon: 'Bike',
+        color: '#06b6d4', // Cyan
+        colorDim: 'rgba(6,182,212,0.15)',
+        multiplier: 1,
+    }
+];
+
 /** Quick lookup by exercise id */
 export const EXERCISES_MAP = Object.fromEntries(EXERCISES.map(e => [e.id, e]));
 

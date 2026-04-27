@@ -33,6 +33,18 @@ android {
         }
     }
 
+    flavorDimensions "environment"
+    productFlavors {
+        prod {
+            dimension "environment"
+            // Uses default applicationId from defaultConfig
+        }
+        dev {
+            dimension "environment"
+            applicationIdSuffix ".dev" // Adds .dev suffix to allow installing alongside prod app
+        }
+    }
+
     buildTypes {
         release {
             signingConfig signingConfigs.release

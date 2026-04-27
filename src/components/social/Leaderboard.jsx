@@ -21,7 +21,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     const { cloudSyncAPI: cloudSync, computedStats, settings } = useProgressContext();
     const { t } = useTranslation();
 
-    const [domain, setDomain] = useState(activeSlide === 1 ? 'weights' : 'bodyweight');
+    const [domain, setDomain] = useState(activeSlide === 2 ? 'weights' : 'bodyweight');
 
     const VISIBLE_TABS = useMemo(() => {
         const combinedTab = { 
@@ -49,7 +49,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
 
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState(activeSlide === 1 ? 'weights' : 'bodyweight');
+    const [activeTab, setActiveTab] = useState(activeSlide === 2 ? 'weights' : 'bodyweight');
     const [selectedUser, setSelectedUser] = useState(null);
     const [nudgedMember, setNudgedMember] = useState(null);
     const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);

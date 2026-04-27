@@ -621,7 +621,9 @@
     "overhead_press": "Overhead Press",
     "squat_weights": "Weighted Squat",
     "deadlift": "Deadlift",
-    "barbell_row": "Barbell Row"
+    "barbell_row": "Barbell Row",
+    "running": "Running",
+    "cycling": "Cycling"
   },
   "weight": {
     "title": "Weight Evolution",
@@ -641,5 +643,38 @@
     "streak": "STREAK",
     "days": "DAYS",
     "weekdays": ["M", "T", "W", "T", "F", "S", "S"]
+  },
+  "cardio": {
+    "title": "Cardio",
+    "weeklyGoal": "Weekly goal",
+    "week": "Wk",
+    "connectTitle": "Connected Services",
+    "noSessions": "No sessions recorded yet.",
+    "lastSession": "Last session",
+    "duration": "Time",
+    "distance": "Distance",
+    "elevation": "Elevation+",
+    "avgSpeed": "Avg speed",
+    "streak": "Streak",
+    "streakWeeks": "wks",
+    "viewHistory": "View history",
+    "noSessions": "No sessions recorded",
+    "history": "Cardio History",
+    "goalReached": "Goal reached!",
+    "totalDistance": "Total Distance (km)",
+    "overSessions": "Across {{count}} sessions",
+    "sessionsCount_one": "{{count}} session",
+    "sessionsCount_other": "{{count}} sessions",
+    "loading": "Loading cardio data...",
+    "speed": "Speed",
+    "noGpsTrack": "No GPS track",
+    "gpsTrack": "GPS Track",
+    "start": "Start",
+    "finish": "Finish",
+    "tap": "Tap",
+    "hideMap": "Hide map",
+    "showMap": "Show map",
+    "stravaWallTitle": "Connect Strava",
+    "stravaWallDesc": "Automatically sync your running and cycling sessions to progress your global streak."
   }
 }

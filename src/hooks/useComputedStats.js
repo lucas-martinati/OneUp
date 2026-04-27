@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW } from '../utils/dateUtils';
-import { EXERCISES, getDailyGoal } from '../config/exercises';
+import { EXERCISES, getDailyGoal, CARDIO_EXERCISES } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
 import { isGlobalPerfectDay } from '../utils/statUtils';
@@ -20,7 +20,7 @@ import { isGlobalPerfectDay } from '../utils/statUtils';
 const EMPTY_ARRAY = [];
 
 export function useComputedStats(completions, settings, getDayNumber, customExercises = EMPTY_ARRAY, hasShared = false, manualBadges = {}, getConfig = null) {
-    const allExercises = useMemo(() => [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises], [customExercises]);
+    const allExercises = useMemo(() => [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES, ...customExercises], [customExercises]);
     return useMemo(() => {
         return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, manualBadges, getConfig);
     }, [completions, settings, getDayNumber, allExercises, hasShared, manualBadges, getConfig]);
@@ -297,7 +297,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     }
 
     // ─── Derived values ──────────────────────────────────────────────────
-    const globalTotalReps = Object.values(exerciseReps).reduce((sum, r) => sum + r, 0);
+    const globalTotalReps = Object.values(exerciseReps).reduce((sum, r) => sum + r, 0) + (settings?.cardioTotalReps || 0);
     const successRate = totalDays > 0 ? Math.round((totalDays / MAX_STREAK_WINDOW) * 100) : 0;
     const hasCompletedAllExercisesOnce = EXERCISES.every(ex => completedExIds.has(ex.id));
     const todayDone = isDayDoneLocal(todayStr);

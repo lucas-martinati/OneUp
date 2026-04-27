@@ -28,6 +28,9 @@ import {
 import {
   saveWeightEntry, loadWeightHistory, loadAllWeightHistories, loadLatestWeights
 } from './weightHistoryService';
+import {
+  saveCardioSession, loadCardioSessions, deleteCardioSession
+} from './cardioService';
 
 class CloudSyncService {
   constructor() {
@@ -91,6 +94,11 @@ class CloudSyncService {
   loadWeightHistory(exId) { return loadWeightHistory(exId); }
   loadAllWeightHistories() { return loadAllWeightHistories(); }
   loadLatestWeights(uid) { return loadLatestWeights(uid); }
+
+  // Cardio sessions
+  saveCardioSession(session) { return saveCardioSession(session); }
+  loadCardioSessions() { return loadCardioSessions(); }
+  deleteCardioSession(id) { return deleteCardioSession(id); }
 
   // Clan
   createClan(name) { return createClan(name); }

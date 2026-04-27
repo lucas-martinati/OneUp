@@ -38,7 +38,7 @@ export const DashboardActions = React.memo(({
                     color: 'var(--text-primary)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     gap: '8px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
-                    background: 'linear-gradient(135deg, rgba(129,140,248,0.2), rgba(99,102,241,0.2))',
+                    background: `linear-gradient(135deg, ${selectedExercise.color}28, ${selectedExercise.gradient[0]}28)`,
                     boxShadow: 'var(--shadow-md)'
                 }}
             >

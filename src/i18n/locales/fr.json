@@ -622,7 +622,9 @@
     "overhead_press": "Développé Militaire",
     "squat_weights": "Squat (Poids)",
     "deadlift": "Soulevé de Terre",
-    "barbell_row": "Rowing Barre"
+    "barbell_row": "Rowing Barre",
+    "running": "Course",
+    "cycling": "Vélo"
   },
   "weight": {
     "title": "Évolution du poids",
@@ -642,5 +644,37 @@
     "streak": "SÉRIE",
     "days": "JOURS",
     "weekdays": ["L", "M", "M", "J", "V", "S", "D"]
+  },
+  "cardio": {
+    "title": "Cardio",
+    "weeklyGoal": "Objectif hebdo",
+    "week": "Sem.",
+    "connectTitle": "Services connectés",
+    "noSessions": "Aucune séance enregistrée pour le moment.",
+    "lastSession": "Dernière sortie",
+    "duration": "Temps",
+    "distance": "Distance",
+    "elevation": "Dénivelé+",
+    "avgSpeed": "Vit. moy.",
+    "streak": "Streak",
+    "streakWeeks": "sem.",
+    "viewHistory": "Voir l'historique",
+    "history": "Historique Cardio",
+    "goalReached": "Objectif atteint !",
+    "totalDistance": "Distance Totale (km)",
+    "overSessions": "Sur {{count}} sessions",
+    "sessionsCount_one": "{{count}} séance",
+    "sessionsCount_other": "{{count}} séances",
+    "loading": "Chargement des données cardio...",
+    "speed": "Vitesse",
+    "noGpsTrack": "Aucun tracé GPS",
+    "gpsTrack": "Parcours GPS",
+    "start": "Départ",
+    "finish": "Arrivée",
+    "tap": "Tap",
+    "hideMap": "Masquer la carte",
+    "showMap": "Voir la carte",
+    "stravaWallTitle": "Connectez Strava",
+    "stravaWallDesc": "Synchronisez automatiquement vos sessions de course et de vélo pour faire progresser votre streak globale."
   }
 }
