@@ -174,12 +174,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Update the workflow file itself with the new version description
-          WORKFLOW_FILE=".github/workflows/release-play-store.yml"
-          NEW_DESC="description: 'Nom de version (actuelle: ${{ env.VERSION_NAME }}) — laisser vide pour garder ${{ env.VERSION_NAME }}'"
-          sed -i "s/description: 'Nom de version (actuelle: .*'/$NEW_DESC/" "$WORKFLOW_FILE"
-          
-          git add android/app/build.gradle "$WORKFLOW_FILE"
+          # Commit only build.gradle
+          git add android/app/build.gradle
           git commit -m "chore: bump version to ${{ env.VERSION_NAME }} (code ${{ env.VERSION_CODE }}) [skip ci]"
           git stash --include-untracked
           git pull --rebase origin main
