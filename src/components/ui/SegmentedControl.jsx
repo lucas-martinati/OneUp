@@ -13,11 +13,14 @@ export function SegmentedControl({ options, value, onChange, style = {} }) {
     return () => clearTimeout(timer);
   }, [value]);
 
+  const activeIndex = options.findIndex(o => o.id === value);
+  const activeOption = options[activeIndex] || options[0];
+
   return (
     <div
       onClick={() => {
         if (options.length === 2) {
-          const nextIndex = options.findIndex(o => o.id === value) === 0 ? 1 : 0;
+          const nextIndex = activeIndex === 0 ? 1 : 0;
           onChange(options[nextIndex].id);
         }
       }}
@@ -30,9 +33,27 @@ export function SegmentedControl({ options, value, onChange, style = {} }) {
         border: '1px solid var(--border-subtle)',
         cursor: 'pointer',
         width: 'fit-content',
+        position: 'relative',
+        minWidth: '160px', // Ensure a minimum width for the slide effect
         ...style
       }}
     >
+      {/* Sliding Indicator */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: '3px',
+          bottom: '3px',
+          left: `calc(${(activeIndex * 100) / options.length}% + ${3 - (activeIndex * 3)}px)`,
+          width: `calc(${100 / options.length}% - 6px)`,
+          background: activeOption.activeBg || 'var(--gradient-glow)',
+          borderRadius: 'var(--radius-full)',
+          transition: 'all 0.30s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          zIndex: 0,
+          boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+        }}
+      />
+
       {options.map((option) => {
         const isActive = value === option.id;
         return (
@@ -54,16 +75,16 @@ export function SegmentedControl({ options, value, onChange, style = {} }) {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              transition: 'all 0.25s ease',
-              background: isActive 
-                ? (option.activeBg || 'var(--gradient-glow)') 
-                : 'transparent',
+              transition: 'all 0.35s ease',
+              background: 'transparent', // Indicator handles the background
               color: isActive 
                 ? (option.activeColor || '#fff') 
                 : 'var(--text-secondary)',
               cursor: 'pointer',
               minHeight: 'unset',
-              flex: 1
+              flex: 1,
+              position: 'relative',
+              zIndex: 1
             }}
           >
             {option.icon && <span>{option.icon}</span>}
