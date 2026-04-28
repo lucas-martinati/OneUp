@@ -673,6 +673,11 @@
     "tap": "Нажмите",
     "stravaWallTitle": "Подключить Strava",
     "stravaWallDesc": "Автоматически синхронизируйте свои пробежки и велопоездки, чтобы продвигаться в глобальной серии.",
+    "googleWallTitle": "Требуется аккаунт",
+    "googleWallDesc": "Войдите через Google, чтобы получить доступ к модулю кардио и синхронизировать данные.",
+    "googleWallStep1": "Войти через Google",
+    "googleWallStep2": "Связать Strava",
+    "googleWallStep3": "Автосинхронизация",
     "difficultyModified": "Сложность изменена",
     "difficultyMismatchDesc": "Сложность изменилась ({{saved}}x → {{current}}x). Хотите продолжить с новыми настройками?",
     "revalidate": "Продолжить"

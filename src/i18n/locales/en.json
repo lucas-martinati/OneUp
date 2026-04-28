@@ -674,6 +674,11 @@
     "tap": "Tap",
     "stravaWallTitle": "Connect Strava",
     "stravaWallDesc": "Automatically sync your running and cycling sessions to progress your global streak.",
+    "googleWallTitle": "Account Required",
+    "googleWallDesc": "Sign in with your Google account to access the Cardio module and sync your data.",
+    "googleWallStep1": "Google Sign-in",
+    "googleWallStep2": "Link Strava",
+    "googleWallStep3": "Auto Sync",
     "difficultyModified": "Difficulty Modified",
     "difficultyMismatchDesc": "Difficulty has changed ({{saved}}x → {{current}}x). Do you want to continue with this new setting?",
     "revalidate": "Continue"

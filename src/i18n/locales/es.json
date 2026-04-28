@@ -674,6 +674,11 @@
     "tap": "Tocar",
     "stravaWallTitle": "Conectar Strava",
     "stravaWallDesc": "Sincroniza automáticamente tus sesiones de carrera y ciclismo para progresar en tu racha global.",
+    "googleWallTitle": "Cuenta requerida",
+    "googleWallDesc": "Inicia sesión con tu cuenta de Google para acceder al módulo Cardio y sincronizar tus datos.",
+    "googleWallStep1": "Iniciar sesión Google",
+    "googleWallStep2": "Vincular Strava",
+    "googleWallStep3": "Sincronización auto",
     "difficultyModified": "Dificultad modificada",
     "difficultyMismatchDesc": "La dificultad ha cambiado ({{saved}}x → {{current}}x). ¿Quieres continuar con esta nueva configuración?",
     "revalidate": "Continuar"
