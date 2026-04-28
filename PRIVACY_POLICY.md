@@ -1,4 +1,4 @@
-# Privacy Policy for OneUpé
+# Privacy Policy for OneUp
 
 **Last updated:** March 13, 2026
 
