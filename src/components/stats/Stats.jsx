@@ -559,7 +559,11 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 </Suspense>
             ) : null}
 
-            {hasCardio && <CardioStatsPanel />}
+            {hasCardio && (
+                <Suspense fallback={null}>
+                    <CardioStatsPanel />
+                </Suspense>
+            )}
 
             {/* ── Per-exercise breakdown ───────────────────────────────── */}
             {exerciseStats.length > 0 && (

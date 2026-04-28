@@ -262,8 +262,8 @@ export function Dashboard() {
                             if (slideHeight === 0) return;
                             const newSlide = Math.round(e.target.scrollTop / slideHeight);
                             if (newSlide >= 0 && newSlide <= 3) {
-                                document.getElementById('active-slide-updater').click();
                                 window.__latestSlide = newSlide;
+                                document.getElementById('active-slide-updater').click();
                             }
                         }}
                         style={{
