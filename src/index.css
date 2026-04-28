@@ -1205,6 +1205,7 @@ button:focus:not(:focus-visible) {
 .cardio-module {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  border-radius: 28px;
 }
 
 .cardio-tabs button:active {

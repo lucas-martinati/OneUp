@@ -279,7 +279,8 @@ export function CardioModule() {
             backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
             zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             padding: '28px', textAlign: 'center', gap: '14px', borderRadius: 'inherit',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            boxShadow: 'inset 0 0 60px rgba(0,0,0,0.7), 0 0 80px rgba(0,0,0,0.4)'
           }}>
             {/* Animated particles */}
             <div className="cardio-wall-particles">
@@ -336,7 +337,8 @@ export function CardioModule() {
             backdropFilter: 'blur(36px)', WebkitBackdropFilter: 'blur(36px)',
             zIndex: 11, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             padding: '28px', textAlign: 'center', gap: '12px', borderRadius: 'inherit',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            boxShadow: 'inset 0 0 60px rgba(0,0,0,0.7), 0 0 80px rgba(0,0,0,0.4)'
           }}>
             {/* Ambient glow */}
             <div style={{
