@@ -12,8 +12,8 @@ import { getLocalDateStr } from '../../utils/dateUtils';
  * Cycling: +210 m/week cumulative (week N → N × 210 m)
  */
 const WEEKLY_INCREMENT = {
-  running: 100,   // meters
-  cycling: 210,   // meters
+  running: 450,   // meters
+  cycling: 750,   // meters
 };
 
 /**
