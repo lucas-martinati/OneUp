@@ -23,6 +23,7 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
   const [isSupporter, setIsSupporter] = useState(() => loadCachedEntitlements().isSupporter);
   const [isPro, setIsPro] = useState(() => loadCachedEntitlements().isPro);
   const [hadPro, setHadPro] = useState(() => loadCachedEntitlements().hadPro);
+  const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true);
 
   const isSupporterRef = useRef(isSupporter);
   const isProRef = useRef(isPro);
@@ -59,6 +60,7 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
   useEffect(() => {
     if (auth.isSignedIn && !auth.loading && auth.user?.uid) {
       const initAndCheck = async () => {
+        setIsSubscriptionLoading(true);
         try {
           await initPurchases(cloudSync.getCurrentUserId());
 
@@ -92,9 +94,13 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
           }
         } catch (error) {
           logger.error('Purchase init error:', error);
+        } finally {
+          setIsSubscriptionLoading(false);
         }
       };
       initAndCheck();
+    } else if (!auth.isSignedIn && !auth.loading) {
+      setIsSubscriptionLoading(false);
     }
     // Intentionally omitted from deps: this effect is an auth-triggered initializer.
     // initPurchases, cloudSync, resolveEntitlements are stable references (module-level
@@ -152,13 +158,14 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
     isSupporter: auth.isSignedIn ? isSupporter : false,
     isPro: auth.isSignedIn ? isPro : false,
     hadPro: auth.isSignedIn ? hadPro : false,
+    isSubscriptionLoading,
     rawIsSupporter: isSupporter,
     rawIsPro: isPro,
     rawHadPro: hadPro,
     purchaseSupporter: handlePurchaseSupporter,
     purchasePro: handlePurchasePro,
     restorePurchases: handleRestorePurchases,
-  }), [auth.isSignedIn, isSupporter, isPro, hadPro, handlePurchaseSupporter, handlePurchasePro, handleRestorePurchases]);
+  }), [auth.isSignedIn, isSupporter, isPro, hadPro, isSubscriptionLoading, handlePurchaseSupporter, handlePurchasePro, handleRestorePurchases]);
 
   return (
     <SubscriptionContext.Provider value={value}>

@@ -24,7 +24,7 @@ const Onboarding = lazy(() => import('./components/settings/Onboarding').then(mo
 function AppContent() {
   const { t } = useTranslation();
   const auth = useAuth();
-  const { isPro } = useSubscription();
+  const { isPro, isSubscriptionLoading } = useSubscription();
   const { settings, updateSettings, isSetup, startChallenge, setCustomExercisesForStats, isInitialSyncDone } = useProgressContext();
   const { customExercises, routines, setRoutinesFromCloud, customExercisesHook } = useExercises();
   const { resumeCloudSync } = useProgressContext();
@@ -35,10 +35,10 @@ function AppContent() {
   // Reset theme if Pro is lost
   useEffect(() => {
     const premiumThemes = ['ocean', 'sunset', 'forest', 'purple'];
-    if (isPro === false && settings.appTheme && premiumThemes.includes(settings.appTheme)) {
+    if (!isSubscriptionLoading && isPro === false && settings.appTheme && premiumThemes.includes(settings.appTheme)) {
       updateSettings(prev => ({ ...prev, appTheme: 'dark' }));
     }
-  }, [isPro, settings.appTheme, updateSettings]);
+  }, [isPro, isSubscriptionLoading, settings.appTheme, updateSettings]);
 
   // Keep computedStats up-to-date with custom exercises
   useEffect(() => {
