@@ -341,7 +341,6 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
         backgroundSize: options.bgSize && options.bgSize !== 100 ? `${options.bgSize}%` : 'cover',
         backgroundRepeat: 'no-repeat',
         opacity: options.backgroundImage ? 1 : 0,
-        transition: 'opacity 0.5s ease',
       }} />
       
       {/* Overlay for readability when background image is present */}
@@ -349,7 +348,6 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
         position: 'absolute', inset: 0,
         background: 'rgba(10,10,18,0.75)',
         opacity: options.backgroundImage ? 1 : 0,
-        transition: 'opacity 0.5s ease',
         pointerEvents: 'none',
       }} />
 

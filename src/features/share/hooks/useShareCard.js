@@ -143,6 +143,10 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
       // Force fixed size for consistent export
       el.style.width = '360px';
       el.style.maxWidth = '360px';
+      
+      // Wait for layout to settle after forced resize and for any potential re-renders
+      await new Promise(r => setTimeout(r, 50));
+
       const dataUrl = await captureElement(el, {
         format: options.format,
         quality: 0.95,
@@ -155,7 +159,7 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
       el.style.maxWidth = prevMaxWidth;
       setIsExporting(false);
     }
-  }, [options.format]);
+  }, [options.format, options.backgroundImage, options.theme]);
 
   const exportCard = useCallback(async () => {
     const dataUrl = await captureCard();

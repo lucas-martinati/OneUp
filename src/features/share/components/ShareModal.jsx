@@ -77,7 +77,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
         width: '100%', maxWidth: '400px',
         padding: '0 20px 12px',
       }}>
-        <div ref={cardRef} style={{ width: '100%' }}>
+        <div style={{ width: '100%' }}>
           <ShareCard
             cardRef={cardRef}
             sessionData={sessionData}
