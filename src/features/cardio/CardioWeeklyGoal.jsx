@@ -80,6 +80,81 @@ export const CardioWeeklyGoal = React.memo(({
           />
         </div>
 
+        {/* Difficulty Mismatch Alert - Integrated between progress and map */}
+        {isDifficultyMismatch && (
+          <div className="fade-in" style={{
+            marginTop: '12px',
+            padding: '10px 14px',
+            borderRadius: 'var(--radius-md)',
+            background: 'rgba(139, 92, 246, 0.08)',
+            border: '1px solid rgba(139, 92, 246, 0.2)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            {/* Accent side border */}
+            <div style={{
+              position: 'absolute', left: 0, top: 0, bottom: 0, width: '3px',
+              background: 'var(--gradient-glow)'
+            }} />
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+              <span style={{ 
+                fontSize: '1.1rem', 
+                filter: 'drop-shadow(0 0 8px var(--accent-glow))',
+                animation: 'pulse 2s infinite' 
+              }}>⚙️</span>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ 
+                  fontSize: '0.65rem', 
+                  color: 'var(--text-primary)', 
+                  fontWeight: '800',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  marginBottom: '1px'
+                }}>
+                  {t('cardio.difficultyModified')}
+                </span>
+                <span style={{ 
+                  fontSize: '0.6rem', 
+                  color: 'var(--text-secondary)',
+                  lineHeight: '1.3',
+                  opacity: 0.8
+                }}>
+                  {t('cardio.difficultyMismatchDesc', { saved: savedDifficulty, current: currentDifficulty })}
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={onInvalidate}
+              className="hover-lift"
+              style={{
+                padding: '6px 14px',
+                borderRadius: 'var(--radius-full)',
+                background: 'var(--gradient-glow)',
+                color: 'white',
+                border: 'none',
+                fontSize: '0.65rem',
+                fontWeight: '800',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s ease',
+                flexShrink: 0
+              }}
+            >
+              {t('cardio.revalidate')}
+            </button>
+          </div>
+        )}
+
         {isComplete && !isDifficultyMismatch && (
           <div className="scale-in" style={{
             marginTop: '8px',
@@ -92,68 +167,6 @@ export const CardioWeeklyGoal = React.memo(({
           </div>
         )}
       </div>
-
-      {/* Difficulty Mismatch Alert */}
-      {isDifficultyMismatch && (
-        <div className="fade-in" style={{
-          padding: 'clamp(12px, 1.8vh, 16px)',
-          borderRadius: 'var(--radius-lg)',
-          background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.05))',
-          border: '1px solid rgba(139, 92, 246, 0.3)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(139, 92, 246, 0.05)',
-          animation: 'slideUp 0.4s ease-out'
-        }}>
-          <div style={{
-            fontSize: '0.8rem',
-            color: 'var(--text-primary)',
-            fontWeight: '800',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}>
-            <span style={{ 
-              fontSize: '1rem', 
-              filter: 'drop-shadow(0 0 8px var(--accent-glow))',
-              animation: 'pulse 2s infinite' 
-            }}>⚙️</span>
-            {t('cardio.difficultyModified')}
-          </div>
-          <div style={{
-            fontSize: '0.7rem',
-            color: 'var(--text-secondary)',
-            lineHeight: '1.5',
-            opacity: 0.9
-          }}>
-            {t('cardio.difficultyMismatchDesc', { saved: savedDifficulty, current: currentDifficulty })}
-          </div>
-          <button
-            onClick={onInvalidate}
-            className="hover-lift"
-            style={{
-              padding: '8px 16px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--gradient-glow)',
-              color: 'white',
-              border: 'none',
-              fontSize: '0.7rem',
-              fontWeight: '800',
-              cursor: 'pointer',
-              boxShadow: '0 4px 15px rgba(139, 92, 246, 0.4)',
-              alignSelf: 'flex-start',
-              transition: 'all 0.2s ease',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}
-          >
-            {t('cardio.revalidate')}
-          </button>
-        </div>
-      )}
     </div>
   );
 });
