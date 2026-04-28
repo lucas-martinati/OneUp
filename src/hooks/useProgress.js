@@ -109,7 +109,7 @@ function parseProgressData(parsed) {
 
   const currentYear = new Date().getFullYear();
   const fixedStartDate = `${currentYear}-01-01`;
-  const lastChange = parsed?.lastCompletionChange || serverTimestamp();
+  const lastChange = parsed?.lastCompletionChange || null;
 
   if (validated.startDate !== fixedStartDate) {
     return {

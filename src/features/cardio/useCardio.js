@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { loadCardioSessions, saveCardioSession } from '../../services/cardioService';
 import { stravaService } from '../../services/stravaService';
 import { useAuth } from '../../contexts/AuthContext';
@@ -188,41 +188,45 @@ export function useCardio() {
   const { settings, updateSettings, completions, updateExerciseCount } = useProgressContext();
 
   // Compute total cardio reps: each valid session gives (its weekNumber * 7) reps
+  const cardioTotalReps = settings?.cardioTotalReps;
   useEffect(() => {
     if (!sessions.length || !startDate) return;
     
     let totalReps = 0;
-    // Map of week numbers already counted to avoid duplicates if multiple sessions in same week
-    // Actually, we want to count EACH session's contribution to total reps?
-    // User says: "chaque session valide donne (weekNum * 7) reps"
-    // Wait, if I have 3 sessions in Week 4, do I get 3 * 28 = 84 reps?
-    // Current logic does this. I'll keep it as is unless asked otherwise.
     sessions.forEach(s => {
       const weekNum = getCurrentWeekNumber(startDate, new Date(s.startTime));
       totalReps += (weekNum * 7);
     });
 
-    if (settings && settings.cardioTotalReps !== totalReps) {
-      updateSettings({ ...settings, cardioTotalReps: totalReps });
+    if (cardioTotalReps !== totalReps) {
+      updateSettings({ cardioTotalReps: totalReps });
     }
-  }, [sessions, startDate, settings, updateSettings]);
+  }, [sessions, startDate, cardioTotalReps, updateSettings]);
 
-  // Helper to find if a week has a completion and return its data
+  // Helper to find if a week has a completion and return its data.
+  // Uses a ref to avoid the sync effect below re-triggering on every completions change.
+  const completionsRef = useRef(completions);
+  useEffect(() => { completionsRef.current = completions; }, [completions]);
+
   const getWeeklyCompletion = useCallback((mode, refDate = new Date()) => {
+    const currentCompletions = completionsRef.current;
     const { start, end } = getWeekBounds(refDate);
     const loop = new Date(start);
     while (loop <= end) {
       const dateStr = getLocalDateStr(loop);
-      const comp = completions[dateStr]?.[mode];
+      const comp = currentCompletions[dateStr]?.[mode];
       if (comp?.isCompleted) return { dateStr, ...comp };
       loop.setDate(loop.getDate() + 1);
     }
     return null;
-  }, [completions]);
+  }, []);
 
-  // Sync cardio sessions to global completions to update the global streak & firebase
+  // Sync cardio sessions to global completions to update the global streak & firebase.
+  // IMPORTANT: `completions` is intentionally NOT in the dependency array to prevent
+  // an infinite loop (this effect calls updateExerciseCount which modifies completions).
+  // We read completions via completionsRef instead.
   useEffect(() => {
-    if (!sessions.length || !completions || !updateExerciseCount) return;
+    if (!sessions.length || !updateExerciseCount) return;
 
     // Group sessions by week to validate the goal only once per week
     const sessionsByWeek = {};
@@ -258,7 +262,7 @@ export function useCardio() {
         updateExerciseCount(existingComp.dateStr, activeMode, 0, 1, null, goalDifficulty);
       }
     });
-  }, [sessions, completions, updateExerciseCount, activeMode, startDate, runningMultiplier, cyclingMultiplier, getWeeklyCompletion]);
+  }, [sessions, updateExerciseCount, activeMode, startDate, runningMultiplier, cyclingMultiplier, getWeeklyCompletion]);
 
   // Current week number
   const weekNumber = useMemo(
@@ -266,7 +270,8 @@ export function useCardio() {
     [startDate]
   );
 
-  const existingWeeklyComp = useMemo(() => getWeeklyCompletion(activeMode), [getWeeklyCompletion, activeMode]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- completions included for UI reactivity
+  const existingWeeklyComp = useMemo(() => getWeeklyCompletion(activeMode), [getWeeklyCompletion, activeMode, completions]);
 
   // Weekly goal for current week (in km) - apply difficulty multiplier
   const weeklyGoal = useMemo(() => {
