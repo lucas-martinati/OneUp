@@ -125,7 +125,7 @@ function parseProgressData(parsed) {
 }
 
 /** Build a "day done" object for all exercises (used in backfill) */
-function makeAllDone(selectedExercises = null, difficulties = {}) {
+function makeAllDone(selectedExercises = null, difficulties = {}, includeTimestamp = true) {
   const entry = {};
   const exercisesToComplete = selectedExercises 
     ? EXERCISES.filter(ex => selectedExercises.includes(ex.id))
@@ -135,8 +135,7 @@ function makeAllDone(selectedExercises = null, difficulties = {}) {
     const diff = difficulties[ex.id];
     entry[ex.id] = { 
         isCompleted: true, 
-        timestamp: serverTimestamp(), 
-        validatedAt: serverTimestamp(),
+        ...(includeTimestamp ? { timestamp: serverTimestamp() } : {}),
         ...((diff !== undefined && diff !== null && diff !== 1.0) ? { difficulty: diff } : {})
     };
   }
@@ -187,7 +186,7 @@ export function useProgress(userId) {
 
         const loopDate = new Date(start);
         while (loopDate < today) {
-          newCompletions[getLocalDateStr(loopDate)] = makeAllDone(selectedExercises, difficulties);
+          newCompletions[getLocalDateStr(loopDate)] = makeAllDone(selectedExercises, difficulties, false);
           loopDate.setDate(loopDate.getDate() + 1);
         }
       }
