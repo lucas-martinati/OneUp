@@ -10,6 +10,7 @@
  */
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useBackHandler } from '../../hooks/useBackHandler';
 
 /**
  * Full-screen announcement overlay with smooth enter/exit animations.
@@ -25,6 +26,12 @@ export function AnnouncementOverlay({ announcement, onDismiss }) {
     setExiting(true);
     setTimeout(onDismiss, 400);
   };
+
+  // Handle back button to dismiss announcement
+  useBackHandler(() => {
+    handleDismiss();
+    return true;
+  }, true);
 
   const title = t(announcement.titleKey, { defaultValue: announcement.titleKey });
   const body = t(announcement.bodyKey, { defaultValue: announcement.bodyKey });

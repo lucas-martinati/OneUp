@@ -6,6 +6,7 @@ import { getIcon } from '../../utils/icons';
 import { Z_INDEX } from '../../utils/zIndex';
 import { updateSessionName } from '../../features/share/services/sessionHistoryService';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { SharePanel } from '../../features/share/components/SharePanel';
 
 function formatDuration(seconds) {
@@ -20,6 +21,16 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
     const [editingName, setEditingName] = useState(false);
     const [sessionName, setSessionName] = useState(defaultSessionName);
     const [confettiDone, setConfettiDone] = useState(false);
+
+    // Handle back button to close summary or cancel editing
+    useBackHandler(() => {
+        if (editingName) {
+            setEditingName(false);
+            return true;
+        }
+        onClose();
+        return true;
+    }, true);
 
     const exercises = useMemo(() => {
         return queue.map(id => {

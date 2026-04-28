@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-leaflet';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import 'leaflet/dist/leaflet.css';
 
 // Dark map tiles (CartoDB Dark Matter)
@@ -36,6 +37,15 @@ export const CardioMap = React.memo(({ gpsTrack, height = '160px', onShowFullscr
   const handleClose = () => {
     setExpanded(false);
   };
+
+  // Handle back button to close expanded map
+  useBackHandler(() => {
+    if (expanded) {
+      handleClose();
+      return true;
+    }
+    return false;
+  }, expanded);
 
   const positions = useMemo(() => {
     if (!gpsTrack) return [];

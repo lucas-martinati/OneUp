@@ -4,6 +4,7 @@ import {
   X, Plus, Settings2, Trash2, Edit2,
   Dumbbell, Activity, Flame, Heart, Zap, Star, Target, Trophy, Swords
 } from '../../utils/icons';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { Z_INDEX } from '../../utils/zIndex';
 
 const ICONS = {
@@ -29,6 +30,21 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
   const [type, setType] = useState('counter');
   const [multiplier, setMultiplier] = useState(1);
   const [error, setError] = useState('');
+
+  // Handle back button to switch view or close modal
+  useBackHandler(() => {
+    if (confirmDeleteEx) {
+      setConfirmDeleteEx(null);
+      return true;
+    }
+    if (view === 'create') {
+      setView('list');
+      setEditingId(null);
+      return true;
+    }
+    onClose();
+    return true;
+  }, true);
 
   const handleSave = () => {
     if (!label.trim()) {

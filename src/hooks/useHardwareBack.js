@@ -4,29 +4,23 @@ import { runBackHandler } from '../utils/backHandler';
 
 /**
  * useHardwareBack Hook
- * Allows seamless chaining of modal dismissals via the Android back hardware button.
  * 
- * @param {Array} modals - Array of objects: { isOpen, close, shouldResumeSync }. Order matters for priority.
- * @param {Function} onResumeSync - Callback to resume global cloud sync if a state dictates it.
+ * Global listener for the Capacitor hardware back button.
+ * It executes the top-most registered back handler in the global stack.
+ * If no handler is registered or handles the event, it exits the app.
+ * 
+ * @param {Function} onResumeSync - Optional callback to resume global cloud sync if needed.
  */
-export function useHardwareBack(modals, onResumeSync) {
+export function useHardwareBack(onResumeSync) {
     useEffect(() => {
         const handleBackButton = () => {
-            // Priority 1: Any imperative non-hook back handlers (popups, etc)
-            if (runBackHandler()) return;
-            
-            // Priority 2: Walk the active UI modals and close the first active one
-            for (const modal of modals) {
-                if (modal.isOpen) {
-                    modal.close();
-                    if (modal.shouldResumeSync && onResumeSync) {
-                        onResumeSync();
-                    }
-                    return; // Prevent further bubbling, handled
-                }
+            // Priority 1: Check the global back handler stack (modals, panels, etc)
+            if (runBackHandler()) {
+                if (onResumeSync) onResumeSync();
+                return;
             }
             
-            // Fallback: If no modal is open, exit the app
+            // Fallback: Exit the app
             CapacitorApp.exitApp();
         };
 
@@ -43,5 +37,5 @@ export function useHardwareBack(modals, onResumeSync) {
                 }
             });
         };
-    }, [modals, onResumeSync]);
+    }, [onResumeSync]);
 }

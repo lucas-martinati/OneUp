@@ -5,6 +5,7 @@ import { useShareCard } from '../hooks/useShareCard';
 import { getSessionHistory } from '../services/sessionHistoryService';
 import { useSubscription } from '../../../contexts/SubscriptionContext';
 import { useProgressContext } from '../../../contexts/ProgressContext';
+import { useBackHandler } from '../../../hooks/useBackHandler';
 import { CATEGORIES } from '../../../config/categories';
 
 const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
@@ -49,6 +50,15 @@ export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 
 
   const isCompact = variant === 'compact';
   const isStats = variant === 'stats';
+
+  // Handle back button to close share modal
+  useBackHandler(() => {
+    if (showShare) {
+      setShowShare(false);
+      return true;
+    }
+    return false;
+  }, showShare);
 
   const buttonStyle = isStats ? {
     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',

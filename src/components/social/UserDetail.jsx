@@ -8,6 +8,7 @@ import { WEIGHT_EXERCISES } from '../../config/weights';
 import { registerBackHandler } from '../../utils/backHandler';
 import { getLocalDateStr, calculateStreak, calculateExerciseStreak, calculateMaxStreak } from '../../utils/dateUtils';
 import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '../../utils/entitlements';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
@@ -21,13 +22,10 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
     const [details, setDetails] = useState(null);
     const [loadingDetails, setLoadingDetails] = useState(true);
 
-    useEffect(() => {
-        const unregister = registerBackHandler(() => {
-            onClose();
-            return true;
-        });
-        return unregister;
-    }, [onClose]);
+    useBackHandler(() => {
+        onClose();
+        return true;
+    }, true);
 
     useEffect(() => {
         let cancelled = false;

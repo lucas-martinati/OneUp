@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2 } from '../../utils/icons';
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr } from '../../utils/dateUtils';
-import { registerBackHandler } from '../../utils/backHandler';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { getDailyGoal } from '../../config/exercises';
 import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
@@ -138,6 +138,16 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
         touchStartX.current = null;
         touchStartY.current = null;
     };
+
+    // Handle back button
+    useBackHandler(() => {
+        if (selectedDay) {
+            handleCloseDetail();
+            return true;
+        }
+        onClose();
+        return true;
+    }, true);
 
     const monthNames = t('calendar.months', { returnObjects: true });
 
@@ -419,22 +429,10 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
         requestAnimationFrame(() => setIsVisible(true));
     }, []);
 
-    useEffect(() => {
-        history.pushState({ sheetOpen: true }, '');
-        const handlePopState = () => {
-            onClose();
-        };
-        window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
-    }, [onClose]);
-
-    useEffect(() => {
-        const unregister = registerBackHandler(() => {
-            onClose();
-            return true;
-        });
-        return unregister;
-    }, [onClose]);
+    useBackHandler(() => {
+        onClose();
+        return true;
+    }, true);
 
     const handleTouchStart = (e) => {
         const contentEl = sheetRef.current?.querySelector('[data-scroll-content]');

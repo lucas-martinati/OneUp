@@ -11,6 +11,7 @@ import { StoreCard } from '../store/StoreCard';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
@@ -60,6 +61,15 @@ export function Settings({ defaultShowStore = false, onClose }) {
             });
         }
     }, [showStore]);
+    
+    // Register back handler to close store before settings
+    useBackHandler(() => {
+        if (showStore) {
+            setShowStore(false);
+            return true;
+        }
+        return false;
+    }, showStore);
 
     const handleToggleNotifications = () => {
         const newSettings = { ...settings, notificationsEnabled: !settings.notificationsEnabled };

@@ -1,36 +1,62 @@
 import { useState, useMemo, useCallback } from 'react';
 
+/**
+ * useModalManager Hook
+ * 
+ * Manages multiple modals and maintains an opening stack to handle 
+ * hardware back button logic in the correct order (LIFO).
+ */
 export function useModalManager(initialModals = {}, syncModals = []) {
-    const [keys] = useState(() => Object.keys(initialModals));
-
     const [modals, setModals] = useState(() => ({ ...initialModals }));
+    
+    // Maintain a stack of active modal IDs to know which one was opened last
+    const [stack, setStack] = useState([]);
 
     const openModal = useCallback((id) => {
         setModals(prev => ({ ...prev, [id]: true }));
+        setStack(prev => [...prev.filter(item => item !== id), id]);
     }, []);
 
     const closeModal = useCallback((id) => {
         setModals(prev => ({ ...prev, [id]: false }));
+        setStack(prev => prev.filter(item => item !== id));
     }, []);
 
     const toggleModal = useCallback((id) => {
-        setModals(prev => ({ ...prev, [id]: !prev[id] }));
+        setModals(prev => {
+            const isOpen = !prev[id];
+            if (isOpen) {
+                setStack(s => [...s.filter(item => item !== id), id]);
+            } else {
+                setStack(s => s.filter(item => item !== id));
+            }
+            return { ...prev, [id]: isOpen };
+        });
     }, []);
 
-    const anyModalOpen = useMemo(
-        () => keys.some(k => modals[k]),
-        [modals, keys]
-    );
+    const anyModalOpen = stack.length > 0;
 
-    // activeModals for useHardwareBack: { isOpen, close, shouldResumeSync? }
+    /**
+     * Back handler function to be registered globally.
+     * Closes the most recently opened modal.
+     */
+    const handleBack = useCallback(() => {
+        if (stack.length === 0) return false;
+        
+        const lastId = stack[stack.length - 1];
+        closeModal(lastId);
+        return true;
+    }, [stack, closeModal]);
+
+    // This is for backward compatibility with the old useHardwareBack signature if needed
     const activeModals = useMemo(
-        () => keys.filter(k => modals[k]).map(k => ({
+        () => stack.slice().reverse().map(id => ({
             isOpen: true,
-            close: () => closeModal(k),
-            shouldResumeSync: syncModals.includes(k),
+            close: () => closeModal(id),
+            shouldResumeSync: syncModals.includes(id),
         })),
-        [modals, keys, syncModals, closeModal]
+        [stack, syncModals, closeModal]
     );
 
-    return { modals, openModal, closeModal, toggleModal, anyModalOpen, activeModals };
+    return { modals, openModal, closeModal, toggleModal, anyModalOpen, activeModals, handleBack };
 }

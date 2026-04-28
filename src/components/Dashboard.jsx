@@ -9,7 +9,7 @@ import { DashboardActions } from './dashboard/DashboardActions';
 import { Day100Overlay, Day100HackModal, Day100UnhackAnimation, useDay100Logic } from '../features/events/Day100Event';
 import { useAchievementToast } from '../hooks/useAchievementToast';
 import { ProPaywall } from './dashboard/ProPaywall';
-import { useHardwareBack } from '../hooks/useHardwareBack';
+import { useBackHandler } from '../hooks/useBackHandler';
 import { useModalManager } from '../hooks/useModalManager';
 import { useNewAchievement } from '../hooks/useNewAchievement';
 import { useAnnouncement } from '../features/announcements/useAnnouncement';
@@ -61,7 +61,7 @@ export function Dashboard() {
     const [today, setToday] = useState(getLocalDateStr(new Date()));
     const { showAnnouncement, announcement, dismissAnnouncement } = useAnnouncement();
 
-    const { modals, openModal, closeModal, anyModalOpen, activeModals } = useModalManager(
+    const { modals, openModal, closeModal, anyModalOpen, handleBack } = useModalManager(
         { calendar: false, stats: false, settings: false, counter: false, leaderboard: false, achievements: false, session: false, customExercises: false },
         ['counter', 'session']
     );
@@ -201,7 +201,8 @@ export function Dashboard() {
         return () => clearInterval(interval);
     }, [today, getDayNumber, settings, scheduleNotification]);
 
-    useHardwareBack(activeModals, resumeCloudSync);
+    // Register modal manager back handler
+    useBackHandler(handleBack, anyModalOpen);
 
 
 

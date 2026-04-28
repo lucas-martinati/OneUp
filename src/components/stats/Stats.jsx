@@ -7,7 +7,7 @@ import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { BADGE_DEFINITIONS } from '../../config/badgeDefinitions';
 import { DynamicIcon } from '../../utils/icons';
 import { Z_INDEX } from '../../utils/zIndex';
-import { registerBackHandler } from '../../utils/backHandler';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { getSessionHistory, removeSession } from '../../features/share/services/sessionHistoryService';
 import { getExerciseLabel, getExerciseColor } from '../../utils/exerciseLabel';
 import { SharePanel } from '../../features/share/components/SharePanel';
@@ -56,22 +56,19 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         onClose();
     }, [onClose]);
 
-    // Back button handling
-    useEffect(() => {
-        history.pushState({ statsOpen: true }, '');
-        const handlePopState = () => handleClose();
-        window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
-    }, [handleClose]);
-
-    // Android hardware back button
-    useEffect(() => {
-        const unregister = registerBackHandler(() => {
-            handleClose();
+    // Handle back button
+    useBackHandler(() => {
+        if (selectedSession) {
+            setSelectedSession(null);
             return true;
-        });
-        return unregister;
-    }, [handleClose]);
+        }
+        if (showFilters) {
+            setShowFilters(false);
+            return true;
+        }
+        handleClose();
+        return true;
+    }, true);
 
     // Wait for the modal transition to finish before attempting to load huge charting libraries
     useEffect(() => {

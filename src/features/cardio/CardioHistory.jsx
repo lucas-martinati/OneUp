@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-l
 import 'leaflet/dist/leaflet.css';
 import { X, Clock, Target, Footprints } from '../../utils/icons';
 import { Capacitor } from '@capacitor/core';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { CardioMap } from './CardioMap';
 
 const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
@@ -164,6 +165,16 @@ export function CardioHistory({ sessions, mode, onClose }) {
     window.addEventListener('show-cardio-fullscreen', handleFullscreen);
     return () => window.removeEventListener('show-cardio-fullscreen', handleFullscreen);
   }, []);
+
+  // Handle back button to close fullscreen map or the history panel itself
+  useBackHandler(() => {
+    if (fullscreenSession) {
+      setFullscreenSession(null);
+      return true;
+    }
+    onClose();
+    return true;
+  }, true);
 
   return (
     <>

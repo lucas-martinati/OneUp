@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Plus, Play, Trash2, Edit3, Check, Save, FolderOpen } from '../../utils/icons';
 import { EXERCISES } from '../../config/exercises';
-import { registerBackHandler } from '../../utils/backHandler';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { getIcon } from '../../utils/icons';
 import { Z_INDEX } from '../../utils/zIndex';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
@@ -24,18 +24,15 @@ export function RoutineManager({
     }, []);
 
     // Back handler
-    useEffect(() => {
-        const unreg = registerBackHandler(() => {
-            if (mode === 'create' || mode === 'edit') {
-                setMode('list');
-                resetForm();
-                return true;
-            }
-            onClose();
+    useBackHandler(() => {
+        if (mode === 'create' || mode === 'edit') {
+            setMode('list');
+            resetForm();
             return true;
-        });
-        return unreg;
-    }, [mode, onClose, resetForm]);
+        }
+        onClose();
+        return true;
+    }, true);
 
     const handleCreate = () => {
         if (routines.length >= maxRoutines) return;

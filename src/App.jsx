@@ -5,6 +5,7 @@ import { ProgressProvider, useProgressContext } from './contexts/ProgressContext
 import { SubscriptionProvider, useSubscription } from './contexts/SubscriptionContext';
 import { ExercisesProvider, useExercises } from './contexts/ExercisesContext';
 import { PWAReloadHandler } from './components/core/PWAReloadHandler';
+import { useHardwareBack } from './hooks/useHardwareBack';
 import { useCloudAutoSave } from './hooks/useCloudAutoSave';
 import { cloudSync } from './services/cloudSync';
 // Only install debug utilities in development builds
@@ -26,6 +27,10 @@ function AppContent() {
   const { isPro } = useSubscription();
   const { settings, updateSettings, isSetup, startChallenge, setCustomExercisesForStats, isInitialSyncDone } = useProgressContext();
   const { customExercises, routines, setRoutinesFromCloud, customExercisesHook } = useExercises();
+  const { resumeCloudSync } = useProgressContext();
+
+  // Initialize global hardware back button listener
+  useHardwareBack(resumeCloudSync);
 
   // Reset theme if Pro is lost
   useEffect(() => {

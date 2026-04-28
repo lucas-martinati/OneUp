@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next';
 import { Award, Lock } from '../../utils/icons';
 import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '../../config/badgeDefinitions';
+import { useBackHandler } from '../../hooks/useBackHandler';
 
 const CATEGORY_COLORS = {
     streak: '#f97316',
@@ -103,12 +104,10 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
         });
     }, []);
 
-    useEffect(() => {
-        history.pushState({ sheetOpen: true }, '');
-        const handlePopState = () => handleClose();
-        window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
-    }, [handleClose]);
+    useBackHandler(() => {
+        handleClose();
+        return true;
+    }, true);
 
     // Touch/Mouse Handlers optimized with DOM refs
     const handleStart = (y) => {

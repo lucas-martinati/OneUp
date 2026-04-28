@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCardio } from './useCardio';
 import { useSwipe } from '../../hooks/useSwipe';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { CardioWeeklyGoal } from './CardioWeeklyGoal';
 import { CardioMap } from './CardioMap';
 import { CardioLastSession } from './CardioLastSession';

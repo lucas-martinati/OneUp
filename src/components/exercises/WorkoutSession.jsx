@@ -8,7 +8,7 @@ import { Counter } from './Counter';
 import { Z_INDEX } from '../../utils/zIndex';
 import { Timer } from './Timer';
 import { SessionSummary } from './SessionSummary';
-import { registerBackHandler } from '../../utils/backHandler';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { DynamicIcon } from '../../utils/icons';
 import { addSession, getSessionHistory } from '../../features/share/services/sessionHistoryService';
@@ -110,25 +110,22 @@ export function WorkoutSession({
     const [savedSession, setSavedSession] = useState(null);
     const [sessionName, setSessionName] = useState('');
 
-    useEffect(() => {
-        const unreg = registerBackHandler(() => {
-            if (showSaveRoutine) {
-                setShowSaveRoutine(false);
-                return true;
-            }
-            if (showRoutineList) {
-                setShowRoutineList(false);
-                return true;
-            }
-            if (phase === 'running') {
-                setPhase('config');
-                return true;
-            }
-            onClose();
+    useBackHandler(() => {
+        if (showSaveRoutine) {
+            setShowSaveRoutine(false);
             return true;
-        });
-        return unreg;
-    }, [phase, onClose, showSaveRoutine, showRoutineList]);
+        }
+        if (showRoutineList) {
+            setShowRoutineList(false);
+            return true;
+        }
+        if (phase === 'running') {
+            setPhase('config');
+            return true;
+        }
+        onClose();
+        return true;
+    }, true);
 
     const localExercises = useMemo(() => {
         if (activeSlide === 0) return EXERCISES;

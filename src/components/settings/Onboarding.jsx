@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { useTranslation, Trans } from 'react-i18next';
 import { Calendar, ArrowRight, Zap, Target, Dumbbell, getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
@@ -10,6 +11,15 @@ export function Onboarding({ onStart }) {
     const [step, setStep] = useState(1);
     const currentYear = new Date().getFullYear();
     const todayStr = getLocalDateStr(new Date());
+
+    // Handle back button for step navigation
+    useBackHandler(() => {
+        if (step > 1) {
+            setStep(step - 1);
+            return true;
+        }
+        return false; // Let it bubble up
+    }, true);
 
     const [date, setDate] = useState(getLocalDateStr(new Date()));
     const [selectedExercises, setSelectedExercises] = useState(['pushups']);

@@ -6,7 +6,7 @@ import {
 } from '../../utils/icons';
 import { EXERCISES, EXERCISES_MAP } from '../../config/exercises';
 import { getLocalDateStr } from '../../utils/dateUtils';
-import { registerBackHandler } from '../../utils/backHandler';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { Z_INDEX } from '../../utils/zIndex';
 
@@ -41,23 +41,20 @@ export function CustomProgramPanel({
   }, []);
 
   // Back handler
-  useEffect(() => {
-    const unreg = registerBackHandler(() => {
-      if (view === 'create' || view === 'edit') {
-        setView('list');
-        resetForm();
-        return true;
-      }
-      if (view === 'detail') {
-        setView('list');
-        setSelectedProgram(null);
-        return true;
-      }
-      onClose();
+  useBackHandler(() => {
+    if (view === 'create' || view === 'edit') {
+      setView('list');
+      resetForm();
       return true;
-    });
-    return unreg;
-  }, [view, onClose, resetForm]);
+    }
+    if (view === 'detail') {
+      setView('list');
+      setSelectedProgram(null);
+      return true;
+    }
+    onClose();
+    return true;
+  }, true);
 
   const toggleExercise = (exId) => {
     setFormExercises((prev) => {

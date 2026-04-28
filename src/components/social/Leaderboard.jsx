@@ -14,6 +14,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSwipe } from '../../hooks/useSwipe';
 import { ClanManager } from './ClanManager';
+import { useBackHandler } from '../../hooks/useBackHandler';
 import { SegmentedControl } from '../ui/SegmentedControl';
 
 export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, onLeaveClan }) {
@@ -55,6 +56,28 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     const [selectedUser, setSelectedUser] = useState(null);
     const [nudgedMember, setNudgedMember] = useState(null);
     const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+    
+    // Handle back button to close internal modals or sub-views
+    useBackHandler(() => {
+        if (selectedUser) {
+            setSelectedUser(null);
+            return true;
+        }
+        if (showLeaveConfirm) {
+            setShowLeaveConfirm(false);
+            return true;
+        }
+        if (communityContext !== 'global' && communityContext !== 'manage') {
+            setCommunityContext('manage');
+            return true;
+        }
+        if (communityContext === 'manage') {
+            setCommunityContext('global');
+            return true;
+        }
+        onClose();
+        return true;
+    }, true);
     
     // Community context state
     const [communityContext, setCommunityContext] = useState(initialClanData ? initialClanData.id : 'global'); // 'global' | 'manage' | clanId

@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { useTranslation } from 'react-i18next';
 import { X, Check } from '../../../utils/icons';
+import { useBackHandler } from '../../../hooks/useBackHandler';
 import { Z_INDEX } from '../../../utils/zIndex';
 
 const createImage = (url) =>
@@ -62,6 +63,12 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
   const [crop, setCrop] = useState(initialCrop || { x: 0, y: 0 });
   const [zoom, setZoom] = useState(initialZoom || 1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
+  // Handle back button to close crop modal
+  useBackHandler(() => {
+    onClose();
+    return true;
+  }, true);
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels);
