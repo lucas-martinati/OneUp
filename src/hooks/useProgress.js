@@ -98,6 +98,7 @@ function validateProgressData(data) {
     isSetup: typeof data.isSetup === 'boolean' ? data.isSetup : false,
     hasShared: typeof data.hasShared === 'boolean' ? data.hasShared : false,
     manualBadges: typeof data.manualBadges === 'object' && data.manualBadges !== null ? data.manualBadges : {},
+    lastCompletionChange: data.lastCompletionChange || null,
   };
 }
 
@@ -108,20 +109,23 @@ function parseProgressData(parsed) {
 
   const currentYear = new Date().getFullYear();
   const fixedStartDate = `${currentYear}-01-01`;
+  const lastChange = parsed?.lastCompletionChange || serverTimestamp();
 
   if (validated.startDate !== fixedStartDate) {
     return {
       ...getDefaultState(),
       hasShared: validated.hasShared ?? false,
       manualBadges: validated.manualBadges ?? {},
+      lastCompletionChange: lastChange
     };
   }
 
-  if (validated.isSetup === undefined) {
-    return { ...validated, isSetup: true, userStartDate: validated.startDate, lastCompletionChange: serverTimestamp(), manualBadges: validated.manualBadges ?? {} };
-  }
-
-  return { ...validated, lastCompletionChange: serverTimestamp(), hasShared: validated.hasShared ?? false, manualBadges: validated.manualBadges ?? {} };
+  return { 
+    ...validated, 
+    lastCompletionChange: lastChange, 
+    hasShared: validated.hasShared ?? false, 
+    manualBadges: validated.manualBadges ?? {} 
+  };
 }
 
 /** Build a "day done" object for all exercises (used in backfill) */
@@ -561,6 +565,8 @@ export function useProgress(userId) {
         console.debug('[Real-time sync] Incoming cloud update applied');
         const merged = cloudSync.mergeData(prev, validated);
 
+        // Important: we use the merged result which now contains the best
+        // lastCompletionChange (either local placeholder or cloud timestamp).
         return {
           startDate: merged.startDate || prev.startDate,
           userStartDate: merged.userStartDate || prev.userStartDate,
@@ -568,7 +574,7 @@ export function useProgress(userId) {
           isSetup: merged.isSetup ?? prev.isSetup,
           hasShared: merged.hasShared ?? prev.hasShared,
           manualBadges: merged.manualBadges || prev.manualBadges,
-          lastCompletionChange: serverTimestamp(),
+          lastCompletionChange: merged.lastCompletionChange,
         };
       });
     });

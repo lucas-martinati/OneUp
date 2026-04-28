@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { X, Clock, Target, Footprints } from '../../utils/icons';
 import { Capacitor } from '@capacitor/core';
@@ -141,7 +140,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
   const [fullscreenSession, setFullscreenSession] = useState(null);
 
   // Listen for fullscreen events from child CardioMap
-  React.useEffect(() => {
+  useEffect(() => {
     const handleFullscreen = (e) => {
       setFullscreenSession(e.detail);
     };

@@ -4,8 +4,6 @@ import { getAuthInstance, getDatabaseInstance } from './firebase';
 
 const logger = createLogger('DataSync');
 
-
-
 export function sanitizeForCloud(data) {
   if (!data || !data.completions) return data;
   const sanitizedCompletions = {};
@@ -36,7 +34,10 @@ export async function saveToCloud(data) {
   const cleanData = sanitizeForCloud(data);
   
   try {
-    await set(ref(database, `users/${userId}/progress`), { ...cleanData, lastSyncedAt: serverTimestamp() });
+    await set(ref(database, `users/${userId}/progress`), { 
+      ...cleanData, 
+      lastCompletionChange: data.lastCompletionChange || serverTimestamp() 
+    });
     logger.success('Data saved to cloud successfully');
     return true;
   } catch (error) {
@@ -86,15 +87,18 @@ export function mergeData(localData, cloudData) {
           const localEx = merged[exId];
           
           // Use cloud version if it has a strictly newer timestamp,
-          // or if local doesn't have a timestamp yet (fresh entry).
-          // If local has a serverTimestamp placeholder ({.sv: 'timestamp'}), 
-          // it means it's a fresh local change that hasn't reached the server yet,
-          // so we treat it as newer than any cloud data.
+          // or if local has a placeholder and cloud has a real timestamp.
           const localIsPlaceholder = localEx?.timestamp && typeof localEx.timestamp === 'object' && localEx.timestamp['.sv'];
-          const cloudIsNewer = !localIsPlaceholder && (cloudEx?.timestamp && localEx?.timestamp && new Date(cloudEx.timestamp) > new Date(localEx.timestamp));
+          const cloudIsPlaceholder = cloudEx?.timestamp && typeof cloudEx.timestamp === 'object' && cloudEx.timestamp['.sv'];
+          
+          const localTs = localIsPlaceholder ? 0 : (localEx?.timestamp ? new Date(localEx.timestamp).getTime() : 0);
+          const cloudTs = cloudIsPlaceholder ? 0 : (cloudEx?.timestamp ? new Date(cloudEx.timestamp).getTime() : 0);
+          
+          const cloudIsNewer = cloudTs > localTs;
           const localHasNoTimestamp = (cloudEx?.timestamp && !localEx?.timestamp);
+          const cloudReplacesPlaceholder = localIsPlaceholder && !cloudIsPlaceholder && cloudEx?.timestamp;
 
-          if (!localEx || (cloudIsNewer && !localIsPlaceholder) || localHasNoTimestamp) {
+          if (!localEx || cloudIsNewer || localHasNoTimestamp || cloudReplacesPlaceholder) {
             merged[exId] = { ...localEx, ...cloudEx };
           }
         });
@@ -109,6 +113,18 @@ export function mergeData(localData, cloudData) {
     });
   }
 
+  const localLCC = localData.lastCompletionChange;
+  const cloudLCC = cloudData.lastCompletionChange;
+  const localLCCIsPlaceholder = localLCC && typeof localLCC === 'object' && localLCC['.sv'];
+  const cloudLCCIsPlaceholder = cloudLCC && typeof cloudLCC === 'object' && cloudLCC['.sv'];
+  
+  const localLCCTs = localLCCIsPlaceholder ? 0 : (localLCC ? new Date(localLCC).getTime() : 0);
+  const cloudLCCTs = cloudLCCIsPlaceholder ? 0 : (cloudLCC ? new Date(cloudLCC).getTime() : 0);
+  
+  const finalLCC = (cloudLCCTs > localLCCTs || (localLCCIsPlaceholder && !cloudLCCIsPlaceholder)) 
+    ? cloudLCC 
+    : localLCC;
+
   const result = {
     startDate: localData.startDate || cloudData.startDate,
     userStartDate: localData.userStartDate || cloudData.userStartDate,
@@ -116,7 +132,7 @@ export function mergeData(localData, cloudData) {
     isSetup: localData.isSetup || cloudData.isSetup,
     hasShared: localData.hasShared || cloudData.hasShared || false,
     manualBadges: { ...cloudData.manualBadges, ...localData.manualBadges },
-    lastSyncedAt: new Date().toISOString()
+    lastCompletionChange: finalLCC
   };
 
   logger.debug(`Merge complete. Final completion days: ${Object.keys(result.completions).length}`);

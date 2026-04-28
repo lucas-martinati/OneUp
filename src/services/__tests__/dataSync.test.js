@@ -80,11 +80,11 @@ describe('mergeData', () => {
     expect(merged.completions['2025-01-01'].squats).toBeDefined();
   });
 
-  it('includes lastSyncedAt in result', () => {
-    const local = { startDate: '2025-01-01', completions: {} };
-    const cloud = { startDate: '2025-01-01', completions: {} };
+  it('includes lastCompletionChange in result', () => {
+    const local = { startDate: '2025-01-01', completions: {}, lastCompletionChange: '2025-01-01T10:00:00Z' };
+    const cloud = { startDate: '2025-01-01', completions: {}, lastCompletionChange: '2025-01-01T12:00:00Z' };
     const merged = mergeData(local, cloud);
-    expect(merged.lastSyncedAt).toBeDefined();
+    expect(merged.lastCompletionChange).toBe('2025-01-01T12:00:00Z');
   });
 
   it('falls back to local startDate when cloud has none', () => {
