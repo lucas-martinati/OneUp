@@ -2,7 +2,7 @@ import { useEffect, Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProgressProvider, useProgressContext } from './contexts/ProgressContext';
-import { SubscriptionProvider } from './contexts/SubscriptionContext';
+import { SubscriptionProvider, useSubscription } from './contexts/SubscriptionContext';
 import { ExercisesProvider, useExercises } from './contexts/ExercisesContext';
 import { PWAReloadHandler } from './components/core/PWAReloadHandler';
 import { useCloudAutoSave } from './hooks/useCloudAutoSave';
@@ -23,8 +23,17 @@ const Onboarding = lazy(() => import('./components/settings/Onboarding').then(mo
 function AppContent() {
   const { t } = useTranslation();
   const auth = useAuth();
-  const { isSetup, startChallenge, setCustomExercisesForStats, isInitialSyncDone } = useProgressContext();
+  const { isPro } = useSubscription();
+  const { settings, updateSettings, isSetup, startChallenge, setCustomExercisesForStats, isInitialSyncDone } = useProgressContext();
   const { customExercises, routines, setRoutinesFromCloud, customExercisesHook } = useExercises();
+
+  // Reset theme if Pro is lost
+  useEffect(() => {
+    const premiumThemes = ['ocean', 'sunset', 'forest', 'purple'];
+    if (isPro === false && settings.appTheme && premiumThemes.includes(settings.appTheme)) {
+      updateSettings(prev => ({ ...prev, appTheme: 'dark' }));
+    }
+  }, [isPro, settings.appTheme, updateSettings]);
 
   // Keep computedStats up-to-date with custom exercises
   useEffect(() => {
