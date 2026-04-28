@@ -50,12 +50,16 @@ export function CardioModule() {
     isDifficultyMismatch, savedDifficulty, currentDifficulty, invalidateCurrentWeek
   } = useCardio();
 
+  const [mapExpanded, setMapExpanded] = useState(false);
+  const mapExpandedRef = React.useRef(false);
+  const handleMapExpandChange = (val) => { mapExpandedRef.current = val; setMapExpanded(val); };
+
   const swipeHandlers = useSwipe({
     onSwipeLeft: () => {
-      if (activeMode === 'running') setActiveMode('cycling');
+      if (activeMode === 'running' && !mapExpandedRef.current) setActiveMode('cycling');
     },
     onSwipeRight: () => {
-      if (activeMode === 'cycling') setActiveMode('running');
+      if (activeMode === 'cycling' && !mapExpandedRef.current) setActiveMode('running');
     }
   });
 
@@ -181,7 +185,7 @@ export function CardioModule() {
               />
 
               {/* Map */}
-              <CardioMap gpsTrack={displaySession?.gpsTrack} />
+              <CardioMap gpsTrack={displaySession?.gpsTrack} onExpandChange={handleMapExpandChange} />
 
               {/* Last Session Stats */}
               <CardioLastSession session={displaySession} />

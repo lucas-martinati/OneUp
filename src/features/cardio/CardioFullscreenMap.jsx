@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -42,7 +43,7 @@ export function CardioFullscreenMap({ gpsTrack, title, onClose }) {
     [Math.max(...lats), Math.max(...lngs)],
   ];
 
-  return (
+  return createPortal(
     <div className="modal-overlay" style={{ background: '#0a0a0f', zIndex: 9999 }}>
       <div className="modal-content" style={{ padding: 0 }}>
         {/* Header using centralized system padding */}
@@ -134,6 +135,7 @@ export function CardioFullscreenMap({ gpsTrack, title, onClose }) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

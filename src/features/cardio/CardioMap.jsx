@@ -22,7 +22,7 @@ function FitBounds({ gpsTrack }) {
   return null;
 }
 
-export const CardioMap = React.memo(({ gpsTrack, height = '160px', onShowFullscreen }) => {
+export const CardioMap = React.memo(({ gpsTrack, height = '160px', onShowFullscreen, onExpandChange }) => {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
@@ -32,11 +32,13 @@ export const CardioMap = React.memo(({ gpsTrack, height = '160px', onShowFullscr
       onShowFullscreen(gpsTrack);
     } else {
       setExpanded(true);
+      onExpandChange?.(true);
     }
   };
 
   const handleClose = () => {
     setExpanded(false);
+    onExpandChange?.(false);
   };
 
   // Handle back button to close expanded map
