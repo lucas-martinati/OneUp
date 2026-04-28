@@ -44,7 +44,8 @@ export function CardioModule() {
   const {
     activeMode, setActiveMode,
     weekNumber, weeklyDistance, weeklyGoal,
-    lastSession, streak, sessions, loading, refresh
+    lastSession, streak, sessions, loading, refresh,
+    isDifficultyMismatch, savedDifficulty, currentDifficulty, invalidateCurrentWeek
   } = useCardio();
 
   const swipeHandlers = useSwipe({
@@ -169,6 +170,10 @@ export function CardioModule() {
                 distance={displayDistance}
                 goal={displayGoal}
                 weekNumber={displayWeekNumber}
+                isDifficultyMismatch={isDifficultyMismatch}
+                savedDifficulty={savedDifficulty}
+                currentDifficulty={currentDifficulty}
+                onInvalidate={invalidateCurrentWeek}
               />
 
               {/* Map */}
@@ -285,10 +290,10 @@ export function CardioModule() {
                 <img src={`${import.meta.env.BASE_URL}strava-icon.svg`} alt="Strava" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
             </div>
             <h2 style={{ margin: 0, fontSize: 'clamp(1.3rem, 3vh, 1.6rem)', fontWeight: '800', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-                {t('cardio.stravaWallTitle', 'Connectez Strava')}
+                {t('cardio.stravaWallTitle')}
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'clamp(0.85rem, 1.8vh, 1rem)', lineHeight: '1.6', margin: 0, maxWidth: '280px', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
-                {t('cardio.stravaWallDesc', 'Synchronisez automatiquement vos sessions de course et de vélo pour faire progresser votre streak globale.')}
+                {t('cardio.stravaWallDesc')}
             </p>
             <button onClick={handleConnectStrava} className="hover-lift" style={{
                 marginTop: '16px', padding: '16px 32px', borderRadius: '30px',

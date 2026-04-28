@@ -673,6 +673,9 @@
     "finish": "Finish",
     "tap": "Tap",
     "stravaWallTitle": "Connect Strava",
-    "stravaWallDesc": "Automatically sync your running and cycling sessions to progress your global streak."
+    "stravaWallDesc": "Automatically sync your running and cycling sessions to progress your global streak.",
+    "difficultyModified": "Difficulty Modified",
+    "difficultyMismatchDesc": "Difficulty has changed ({{saved}}x → {{current}}x). Do you want to continue with this new setting?",
+    "revalidate": "Continue"
   }
 }

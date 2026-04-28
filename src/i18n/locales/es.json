@@ -673,6 +673,9 @@
     "finish": "Fin",
     "tap": "Tocar",
     "stravaWallTitle": "Conectar Strava",
-    "stravaWallDesc": "Sincroniza automáticamente tus sesiones de carrera y ciclismo para progresar en tu racha global."
+    "stravaWallDesc": "Sincroniza automáticamente tus sesiones de carrera y ciclismo para progresar en tu racha global.",
+    "difficultyModified": "Dificultad modificada",
+    "difficultyMismatchDesc": "La dificultad ha cambiado ({{saved}}x → {{current}}x). ¿Quieres continuar con esta nueva configuración?",
+    "revalidate": "Continuar"
   }
 }

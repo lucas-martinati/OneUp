@@ -673,6 +673,9 @@
     "finish": "Arrivée",
     "tap": "Tap",
     "stravaWallTitle": "Connectez Strava",
-    "stravaWallDesc": "Synchronisez automatiquement vos sessions de course et de vélo pour faire progresser votre streak globale."
+    "stravaWallDesc": "Synchronisez automatiquement vos sessions de course et de vélo pour faire progresser votre streak globale.",
+    "difficultyModified": "Difficulté modifiée",
+    "difficultyMismatchDesc": "La difficulté a changé ({{saved}}x → {{current}}x). Voulez-vous continuer avec cette nouvelle configuration ?",
+    "revalidate": "Continuer"
   }
 }

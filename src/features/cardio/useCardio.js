@@ -266,13 +266,14 @@ export function useCardio() {
     [startDate]
   );
 
+  const existingWeeklyComp = useMemo(() => getWeeklyCompletion(activeMode), [getWeeklyCompletion, activeMode]);
+
   // Weekly goal for current week (in km) - apply difficulty multiplier
   const weeklyGoal = useMemo(() => {
-    const existingComp = getWeeklyCompletion(activeMode);
-    const multiplier = existingComp ? (existingComp.difficulty || 1) : (activeMode === 'running' ? runningMultiplier : cyclingMultiplier);
+    const multiplier = existingWeeklyComp ? (existingWeeklyComp.difficulty || 1) : (activeMode === 'running' ? runningMultiplier : cyclingMultiplier);
     const baseGoal = getWeeklyGoalKm(activeMode, weekNumber);
     return baseGoal * multiplier;
-  }, [activeMode, weekNumber, runningMultiplier, cyclingMultiplier, getWeeklyCompletion]);
+  }, [activeMode, weekNumber, runningMultiplier, cyclingMultiplier, existingWeeklyComp]);
 
   // Filter sessions by current mode
   const modeSessions = useMemo(
@@ -320,5 +321,13 @@ export function useCardio() {
     allSessions: sessions,
     loading,
     refresh: fetchSessions,
+    isDifficultyMismatch: !!existingWeeklyComp && existingWeeklyComp.difficulty !== undefined && existingWeeklyComp.difficulty !== (activeMode === 'running' ? runningMultiplier : cyclingMultiplier),
+    savedDifficulty: existingWeeklyComp?.difficulty || 1,
+    currentDifficulty: activeMode === 'running' ? runningMultiplier : cyclingMultiplier,
+    invalidateCurrentWeek: () => {
+      if (existingWeeklyComp) {
+        updateExerciseCount(existingWeeklyComp.dateStr, activeMode, 0, 1, null, activeMode === 'running' ? runningMultiplier : cyclingMultiplier);
+      }
+    }
   };
 }
