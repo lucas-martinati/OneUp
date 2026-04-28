@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProgressProvider, useProgressContext } from './contexts/ProgressContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import { ExercisesProvider, useExercises } from './contexts/ExercisesContext';
+import { PWAReloadHandler } from './components/core/PWAReloadHandler';
 import { useCloudAutoSave } from './hooks/useCloudAutoSave';
 import { cloudSync } from './services/cloudSync';
 // Only install debug utilities in development builds
@@ -122,6 +123,7 @@ function SubscriptionAndExercises() {
 
   return (
     <SubscriptionProvider publishLeaderboardNow={publishLeaderboardNow}>
+      <PWAReloadHandler />
       <ExercisesProvider
         onDeleteExerciseHistory={deleteExerciseHistory}
         onSaveToCloud={saveToCloud}
