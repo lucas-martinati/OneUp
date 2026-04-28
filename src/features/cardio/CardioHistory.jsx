@@ -6,27 +6,9 @@ import { X, Clock, Target, Footprints } from '../../utils/icons';
 import { Capacitor } from '@capacitor/core';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { CardioMap } from './CardioMap';
+import { CardioFullscreenMap } from './CardioFullscreenMap';
 import { parseTimestamp } from '../../utils/dateUtils';
 
-const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-
-// Fit bounds for fullscreen map - no animation to avoid zoom effect
-function FullscreenFitBounds({ gpsTrack }) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!gpsTrack || gpsTrack.length < 2) return;
-    // Invalidate size then fit bounds without animation
-    const timer = setTimeout(() => {
-      map.invalidateSize();
-      const bounds = gpsTrack.map(p => [p.lat, p.lng]);
-      map.fitBounds(bounds, { padding: [30, 30], maxZoom: 17, animate: false });
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [gpsTrack, map]);
-
-  return null;
-}
 
 function formatDuration(seconds) {
   if (!seconds || seconds <= 0) return '—';
@@ -179,43 +161,36 @@ export function CardioHistory({ sessions, mode, onClose }) {
 
   return (
     <>
-      <div style={{
-        position: 'fixed', inset: 0,
-        background: 'var(--overlay-bg)',
-        zIndex: 200,
-        display: 'flex', flexDirection: 'column',
-        animation: 'fadeIn 0.3s ease-out',
-      }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: 'clamp(14px, 2vh, 22px) clamp(16px, 3vw, 24px)',
-          paddingTop: Capacitor.isNativePlatform() ? 'calc(env(safe-area-inset-top, 24px) + 10px)' : 'clamp(14px, 2vh, 22px)',
-          borderBottom: '1px solid var(--border-subtle)',
-          background: 'var(--surface-subtle)',
-        }}>
-          <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
-            {t('cardio.history')}
-          </h2>
-          <button
-            onClick={onClose}
-            className="hover-lift glass"
-            style={{
-              width: 'var(--touch-min)', height: 'var(--touch-min)',
-              borderRadius: '50%', background: 'var(--surface-hover)',
-              border: 'none',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'var(--text-primary)', cursor: 'pointer',
-            }}
-          >
-            <X size={22} />
-          </button>
-        </div>
+      <div className="modal-overlay" style={{ zIndex: 200 }}>
+        <div className="modal-content" style={{ maxWidth: '600px', width: '100%', margin: '0 auto' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            marginBottom: 'var(--spacing-md)',
+            flexShrink: 0
+          }}>
+            <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
+              {t('cardio.history')}
+            </h2>
+            <button
+              onClick={onClose}
+              className="hover-lift glass"
+              style={{
+                width: 'var(--touch-min)', height: 'var(--touch-min)',
+                borderRadius: '50%', background: 'var(--surface-hover)',
+                border: 'none',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--text-primary)', cursor: 'pointer',
+              }}
+            >
+              <X size={22} />
+            </button>
+          </div>
 
-        <div className="custom-scrollbar" style={{
-          flex: 1, overflowY: 'auto',
-          padding: 'clamp(12px, 2vh, 20px) clamp(16px, 3vw, 24px)',
-          display: 'flex', flexDirection: 'column', gap: '10px',
-        }}>
+          <div className="custom-scrollbar" style={{
+            flex: 1, overflowY: 'auto',
+            display: 'flex', flexDirection: 'column', gap: '10px',
+            margin: '0 -10px', padding: '0 10px'
+          }}>
           {sessions.length === 0 ? (
             <div style={{
               textAlign: 'center', padding: '60px 20px',
@@ -235,113 +210,16 @@ export function CardioHistory({ sessions, mode, onClose }) {
           )}
         </div>
       </div>
+    </div>
 
       {/* Fullscreen map modal */}
-      {fullscreenSession && (() => {
-        const positions = fullscreenSession.gpsTrack.map(p => [p.lat, p.lng]);
-        // Compute initial bounds to avoid zoom animation
-        const latLngs = fullscreenSession.gpsTrack.map(p => [p.lat, p.lng]);
-        const lats = latLngs.map(p => p[0]);
-        const lngs = latLngs.map(p => p[1]);
-        const initialBounds = [
-          [Math.min(...lats), Math.min(...lngs)],
-          [Math.max(...lats), Math.max(...lngs)],
-        ];
-        return (
-          <div style={{
-            position: 'fixed', inset: 0,
-            background: '#0a0a0f',
-            zIndex: 9999,
-            display: 'flex', flexDirection: 'column',
-          }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '16px 20px',
-              paddingTop: Capacitor.isNativePlatform() ? 'calc(env(safe-area-inset-top, 24px) + 10px)' : '16px',
-              background: '#12121a',
-              borderBottom: '1px solid var(--border-subtle)'
-            }}>
-              <span style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--text-primary)' }}>
-                {formatDate(fullscreenSession.session.startTime)}
-              </span>
-              <button
-                onClick={() => setFullscreenSession(null)}
-                style={{
-                  background: 'var(--surface-muted)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-full)',
-                  padding: '8px 16px',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.85rem', fontWeight: '700',
-                  cursor: 'pointer'
-                }}
-              >
-                {t('common.close')}
-              </button>
-            </div>
-
-            {/* Interactive fullscreen map */}
-            <div style={{ flex: 1 }}>
-              <MapContainer
-                bounds={initialBounds}
-                boundsOptions={{ padding: [30, 30], maxZoom: 17 }}
-                style={{ height: '100%', width: '100%', background: '#1a1a2e' }}
-                zoomControl={true}
-                scrollWheelZoom={true}
-                dragging={true}
-                touchZoom={true}
-                doubleClickZoom={true}
-                boxZoom={true}
-                keyboard={true}
-              >
-                <TileLayer url={TILE_URL} attribution="" />
-                <FullscreenFitBounds gpsTrack={fullscreenSession.gpsTrack} />
-
-                {/* Track line with glow */}
-                <Polyline
-                  positions={positions}
-                  pathOptions={{ color: '#8b5cf6', weight: 5, opacity: 0.9 }}
-                />
-                <Polyline
-                  positions={positions}
-                  pathOptions={{ color: '#c084fc', weight: 2, opacity: 1 }}
-                />
-
-                {/* Start marker */}
-                <CircleMarker
-                  center={positions[0]}
-                  radius={8}
-                  pathOptions={{ fillColor: '#10b981', fillOpacity: 1, color: '#fff', weight: 2 }}
-                />
-
-                {/* End marker */}
-                <CircleMarker
-                  center={positions[positions.length - 1]}
-                  radius={8}
-                  pathOptions={{ fillColor: '#ef4444', fillOpacity: 1, color: '#fff', weight: 2 }}
-                />
-              </MapContainer>
-            </div>
-
-            {/* Legend */}
-            <div style={{
-              display: 'flex', justifyContent: 'center', gap: '32px',
-              padding: '16px',
-              background: '#12121a',
-              borderTop: '1px solid var(--border-subtle)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981' }} />
-                <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{t('cardio.start')}</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444' }} />
-                <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{t('cardio.finish')}</span>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      {fullscreenSession && (
+        <CardioFullscreenMap
+          gpsTrack={fullscreenSession.gpsTrack}
+          title={formatDate(fullscreenSession.session.startTime)}
+          onClose={() => setFullscreenSession(null)}
+        />
+      )}
     </>
   );
 }

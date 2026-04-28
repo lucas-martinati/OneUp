@@ -61,7 +61,7 @@ function getWeeklyGoalKm(mode, weekNumber) {
  * where the weekly goal was met. The day that "counts" for the streak is the
  * day the user reached or exceeded the weekly goal.
  */
-function computeStreak(sessions, mode, challengeStartDate, currentDifficulty) {
+function computeStreak(sessions, mode, challengeStartDate, currentDifficulty, completions = {}) {
   if (!sessions.length) return 0;
 
   const now = new Date();
@@ -77,15 +77,27 @@ function computeStreak(sessions, mode, challengeStartDate, currentDifficulty) {
     const weekNum = getCurrentWeekNumber(challengeStartDate) - weekOffset;
     if (weekNum < 1) break;
 
-    // Use current difficulty for goal comparison
-    const goalKm = getWeeklyGoalKm(mode, weekNum) * currentDifficulty;
+    // Use recorded difficulty if available in completions for this week
+    let weekDifficulty = currentDifficulty;
+    const loop = new Date(start);
+    while (loop <= end) {
+      const dateStr = getLocalDateStr(loop);
+      const comp = completions[dateStr]?.[mode];
+      if (comp?.isCompleted && comp.difficulty !== undefined) {
+        weekDifficulty = comp.difficulty;
+        break;
+      }
+      loop.setDate(loop.getDate() + 1);
+    }
+
+    const goalKm = getWeeklyGoalKm(mode, weekNum) * weekDifficulty;
 
     const weekSessions = sessions.filter(
       s => s.type === mode && s.startTime >= start && s.startTime <= end
     );
     const weekDistanceKm = weekSessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
 
-    if (weekDistanceKm >= goalKm) {
+    if (weekDistanceKm >= goalKm - 0.01) { // Small margin for rounding
       streak++;
     } else if (weekOffset > 0) {
       // Current week can be incomplete, skip it for break detection
@@ -291,8 +303,8 @@ export function useCardio() {
 
   // Streak
   const streak = useMemo(
-    () => computeStreak(sessions, activeMode, startDate, activeMode === 'running' ? runningMultiplier : cyclingMultiplier),
-    [sessions, activeMode, startDate, runningMultiplier, cyclingMultiplier]
+    () => computeStreak(sessions, activeMode, startDate, activeMode === 'running' ? runningMultiplier : cyclingMultiplier, completions),
+    [sessions, activeMode, startDate, runningMultiplier, cyclingMultiplier, completions]
   );
 
   return {
