@@ -171,6 +171,11 @@ export function useCardio() {
     if (!sessions.length || !startDate) return;
     
     let totalReps = 0;
+    // Map of week numbers already counted to avoid duplicates if multiple sessions in same week
+    // Actually, we want to count EACH session's contribution to total reps?
+    // User says: "chaque session valide donne (weekNum * 7) reps"
+    // Wait, if I have 3 sessions in Week 4, do I get 3 * 28 = 84 reps?
+    // Current logic does this. I'll keep it as is unless asked otherwise.
     sessions.forEach(s => {
       const weekNum = getCurrentWeekNumber(startDate, new Date(s.startTime));
       totalReps += (weekNum * 7);
@@ -181,34 +186,58 @@ export function useCardio() {
     }
   }, [sessions, startDate, settings, updateSettings]);
 
+  // Helper to find if a week has a completion and return its data
+  const getWeeklyCompletion = useCallback((mode, refDate = new Date()) => {
+    const { start, end } = getWeekBounds(refDate);
+    const loop = new Date(start);
+    while (loop <= end) {
+      const dateStr = getLocalDateStr(loop);
+      const comp = completions[dateStr]?.[mode];
+      if (comp?.isCompleted) return { dateStr, ...comp };
+      loop.setDate(loop.getDate() + 1);
+    }
+    return null;
+  }, [completions]);
+
   // Sync cardio sessions to global completions to update the global streak & firebase
   useEffect(() => {
     if (!sessions.length || !completions || !updateExerciseCount) return;
 
-    // Check if any session is missing from completions
-    let hasMissing = false;
-    for (const s of sessions) {
-      if (!s.startTime) continue;
-      const dateStr = getLocalDateStr(new Date(s.startTime));
-      const exId = s.type; // 'running' or 'cycling'
-      if (!completions[dateStr]?.[exId]?.isCompleted) {
-        hasMissing = true;
-        break;
-      }
-    }
+    // Group sessions by week to validate the goal only once per week
+    const sessionsByWeek = {};
+    sessions.forEach(s => {
+      if (!s.startTime) return;
+      const { start } = getWeekBounds(new Date(s.startTime));
+      if (!sessionsByWeek[start]) sessionsByWeek[start] = [];
+      sessionsByWeek[start].push(s);
+    });
 
-    if (hasMissing) {
-      sessions.forEach(s => {
-        if (!s.startTime) return;
-        const dateStr = getLocalDateStr(new Date(s.startTime));
-        const exId = s.type;
-        if (!completions[dateStr]?.[exId]?.isCompleted) {
-          // Setting count = 1 and goal = 1 forces isCompleted = true
-          updateExerciseCount(dateStr, exId, 1, 1, null, s.difficulty);
-        }
-      });
-    }
-  }, [sessions, completions, updateExerciseCount]);
+    Object.keys(sessionsByWeek).forEach(weekStart => {
+      const weekSessions = sessionsByWeek[weekStart];
+      const weekStartNum = parseInt(weekStart);
+      const modeSessions = weekSessions.filter(s => s.type === activeMode);
+      if (modeSessions.length === 0) return;
+
+      const totalDistanceKm = modeSessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
+      const weekNum = getCurrentWeekNumber(startDate, new Date(weekStartNum));
+      
+      const existingComp = getWeeklyCompletion(activeMode, new Date(weekStartNum));
+      const goalDifficulty = existingComp ? (existingComp.difficulty || 1) : (activeMode === 'running' ? runningMultiplier : cyclingMultiplier);
+      const goalKm = getWeeklyGoalKm(activeMode, weekNum) * goalDifficulty;
+
+      const isGoalReached = totalDistanceKm >= goalKm;
+
+      if (isGoalReached && !existingComp) {
+        // Mark the LAST session's date as completed
+        const lastSession = modeSessions.sort((a, b) => b.startTime - a.startTime)[0];
+        const dateStr = getLocalDateStr(new Date(lastSession.startTime));
+        updateExerciseCount(dateStr, activeMode, 1, 1, null, goalDifficulty);
+      } else if (!isGoalReached && existingComp) {
+        // Unmark if distance dropped below goal (session deleted or difficulty increased)
+        updateExerciseCount(existingComp.dateStr, activeMode, 0, 1, null, goalDifficulty);
+      }
+    });
+  }, [sessions, completions, updateExerciseCount, activeMode, startDate, runningMultiplier, cyclingMultiplier, getWeeklyCompletion]);
 
   // Current week number
   const weekNumber = useMemo(
@@ -218,10 +247,11 @@ export function useCardio() {
 
   // Weekly goal for current week (in km) - apply difficulty multiplier
   const weeklyGoal = useMemo(() => {
+    const existingComp = getWeeklyCompletion(activeMode);
+    const multiplier = existingComp ? (existingComp.difficulty || 1) : (activeMode === 'running' ? runningMultiplier : cyclingMultiplier);
     const baseGoal = getWeeklyGoalKm(activeMode, weekNumber);
-    const multiplier = activeMode === 'running' ? runningMultiplier : cyclingMultiplier;
     return baseGoal * multiplier;
-  }, [activeMode, weekNumber, runningMultiplier, cyclingMultiplier]);
+  }, [activeMode, weekNumber, runningMultiplier, cyclingMultiplier, getWeeklyCompletion]);
 
   // Filter sessions by current mode
   const modeSessions = useMemo(
