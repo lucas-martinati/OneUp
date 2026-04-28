@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useLocalStorageScoped } from './useLocalStorageScoped';
+import { serverTimestamp } from '../services/firebase';
 
 const STORAGE_KEY = 'oneup_routines';
 const MAX_ROUTINES = 10;
@@ -23,7 +24,7 @@ export function useRoutines(userId) {
           id: crypto.randomUUID(),
           name: name.trim(),
           exerciseIds: [...exerciseIds],
-          createdAt: Date.now(),
+          createdAt: serverTimestamp(),
         }
       ];
     });

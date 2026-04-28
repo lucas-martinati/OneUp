@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Settings, Star } from '../../utils/icons';
 import { UI_ICONS, DynamicIcon } from '../../utils/icons';
 import { getDailyGoal } from '../../config/exercises';
-import { formatTime } from '../../utils/dateUtils';
+import { formatTime, parseTimestamp } from '../../utils/dateUtils';
 import { isPerfectDay } from '../../utils/statUtils';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
@@ -265,7 +265,7 @@ export const DashboardSlide = React.memo(({
                         {/* Completion status (under button with spacing) */}
                         {isExerciseDone && (() => {
                             const exData = completions[today]?.[activeExerciseId];
-                            const completedAt = exData?.timestamp ? new Date(exData.timestamp) : null;
+                            const completedAt = exData?.timestamp ? parseTimestamp(exData.timestamp) : null;
                             const timeStr = completedAt
                                 ? completedAt.toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' })
                                 : null;

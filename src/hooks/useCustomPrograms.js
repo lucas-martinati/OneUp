@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getLocalDateStr } from '../utils/dateUtils';
+import { serverTimestamp } from '../services/firebase';
 
 const STORAGE_KEY = 'oneup_custom_programs';
 const MAX_PROGRAMS = 5;
@@ -62,7 +63,7 @@ export function useCustomPrograms() {
         duration: programData.duration || 30,
         startDate: programData.startDate || null,
         status: 'draft',
-        createdAt: Date.now(),
+        createdAt: serverTimestamp(),
       };
       return [...prev, newProgram];
     });
@@ -125,7 +126,7 @@ export function useCustomPrograms() {
           [dateStr]: {
             ...dayCompletions,
             [exerciseId]: newValue,
-            validatedAt: newValue ? Date.now() : dayCompletions.validatedAt,
+            validatedAt: newValue ? serverTimestamp() : dayCompletions.validatedAt,
           },
         },
       };

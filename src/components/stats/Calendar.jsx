@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2 } from '../../utils/icons';
 import { useTranslation } from 'react-i18next';
-import { getLocalDateStr } from '../../utils/dateUtils';
+import { getLocalDateStr, parseTimestamp } from '../../utils/dateUtils';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { getDailyGoal } from '../../config/exercises';
 import { getIcon } from '../../utils/icons';
@@ -536,7 +536,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                     {(() => {
                         const timestamps = Object.values(dayCompletions)
                             .filter(ex => ex?.timestamp)
-                            .map(ex => new Date(ex.timestamp).getTime());
+                            .map(ex => parseTimestamp(ex.timestamp).getTime());
                         if (timestamps.length > 0) {
                             const earliest = new Date(Math.min(...timestamps));
                             return (

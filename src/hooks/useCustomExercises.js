@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useLocalStorageScoped } from './useLocalStorageScoped';
+import { serverTimestamp } from '../services/firebase';
 
 const STORAGE_KEY = 'oneup_custom_exercises';
 const MAX_CUSTOM_EXERCISES = 10;
@@ -25,7 +26,7 @@ export function useCustomExercises(userId) {
         type: exerciseData.type || 'counter',
         gradient: exerciseData.gradient || ['#7c3aed', '#8b5cf6'],
         multiplier: parseFloat(exerciseData.multiplier) || 1.0,
-        createdAt: Date.now(),
+        createdAt: serverTimestamp(),
       };
       return [...prev, newExercise];
     });

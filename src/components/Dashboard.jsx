@@ -175,9 +175,9 @@ export function Dashboard() {
     const streakActive = computedStats.streakActive;
 
     const handleSelectExercise = (id) => {
-        if (effectiveSlide === 0) setClassicSelected(id);
-        else if (effectiveSlide === 1) setWeightsSelected(id);
-        else setCustomSelected(id);
+        if (effectiveSlide === 1) setClassicSelected(id);
+        else if (effectiveSlide === 2) setWeightsSelected(id);
+        else if (effectiveSlide === 3) setCustomSelected(id);
     };
 
     useEffect(() => {

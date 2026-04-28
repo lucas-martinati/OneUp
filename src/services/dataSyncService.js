@@ -86,11 +86,15 @@ export function mergeData(localData, cloudData) {
           const localEx = merged[exId];
           
           // Use cloud version if it has a strictly newer timestamp,
-          // or if local doesn't have a timestamp yet (fresh entry)
-          const cloudIsNewer = (cloudEx?.timestamp && localEx?.timestamp && new Date(cloudEx.timestamp) > new Date(localEx.timestamp));
+          // or if local doesn't have a timestamp yet (fresh entry).
+          // If local has a serverTimestamp placeholder ({.sv: 'timestamp'}), 
+          // it means it's a fresh local change that hasn't reached the server yet,
+          // so we treat it as newer than any cloud data.
+          const localIsPlaceholder = localEx?.timestamp && typeof localEx.timestamp === 'object' && localEx.timestamp['.sv'];
+          const cloudIsNewer = !localIsPlaceholder && (cloudEx?.timestamp && localEx?.timestamp && new Date(cloudEx.timestamp) > new Date(localEx.timestamp));
           const localHasNoTimestamp = (cloudEx?.timestamp && !localEx?.timestamp);
 
-          if (!localEx || cloudIsNewer || localHasNoTimestamp) {
+          if (!localEx || (cloudIsNewer && !localIsPlaceholder) || localHasNoTimestamp) {
             merged[exId] = { ...localEx, ...cloudEx };
           }
         });

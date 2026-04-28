@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW } from '../utils/dateUtils';
+import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal, CARDIO_EXERCISES } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
@@ -181,7 +181,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
             // Time of day (derived from timestamp)
             let timeOfDay = null;
             if (exData.timestamp) {
-                const tsDate = new Date(exData.timestamp);
+                const tsDate = parseTimestamp(exData.timestamp);
                 // Only count if the timestamp date matches the entry date
                 if (getLocalDateStr(tsDate) === dateStr) {
                     const hour = tsDate.getHours();
@@ -206,7 +206,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
 
             // Ghost check (3h-4h)
             if (!ghostWorkout && exData.timestamp) {
-                const hour = new Date(exData.timestamp).getHours();
+                const hour = parseTimestamp(exData.timestamp).getHours();
                 if (hour >= 3 && hour < 4) ghostWorkout = true;
             }
         }

@@ -1,4 +1,4 @@
-import { ref, set, get, remove, push } from 'firebase/database';
+import { ref, set, get, remove, push, serverTimestamp } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
 
@@ -16,7 +16,7 @@ export async function saveCardioSession(session) {
   const payload = {
     ...session,
     id: session.id || newRef.key, // Use provided ID (Strava ID) or Firebase key
-    createdAt: Date.now(),
+    createdAt: serverTimestamp(),
   };
 
   await set(newRef, payload);

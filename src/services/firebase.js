@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getDatabase } from 'firebase/database';
+import { getDatabase, serverTimestamp } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('Firebase');
@@ -36,3 +36,4 @@ export function initializeFirebase() {
 
 export function getAuthInstance() { return auth; }
 export function getDatabaseInstance() { return database; }
+export { serverTimestamp };

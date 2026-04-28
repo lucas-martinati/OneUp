@@ -5,6 +5,7 @@ import { cloudSync } from '../services/cloudSync';
 import { getLocalDateStr } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { saveManualBadgesToCloud, loadManualBadgesFromCloud } from '../services/userDataService';
+import { serverTimestamp } from '../services/firebase';
 import i18n from '../i18n';
 
 const STORAGE_KEY_BASE = 'pushup_challenge_data';
@@ -117,17 +118,15 @@ function parseProgressData(parsed) {
   }
 
   if (validated.isSetup === undefined) {
-    return { ...validated, isSetup: true, userStartDate: validated.startDate, lastCompletionChange: Date.now(), manualBadges: validated.manualBadges ?? {} };
+    return { ...validated, isSetup: true, userStartDate: validated.startDate, lastCompletionChange: serverTimestamp(), manualBadges: validated.manualBadges ?? {} };
   }
 
-  return { ...validated, lastCompletionChange: Date.now(), hasShared: validated.hasShared ?? false, manualBadges: validated.manualBadges ?? {} };
+  return { ...validated, lastCompletionChange: serverTimestamp(), hasShared: validated.hasShared ?? false, manualBadges: validated.manualBadges ?? {} };
 }
 
 /** Build a "day done" object for all exercises (used in backfill) */
 function makeAllDone(selectedExercises = null, difficulties = {}) {
   const entry = {};
-  const now = new Date().toISOString();
-  const validateTime = Date.now();
   const exercisesToComplete = selectedExercises 
     ? EXERCISES.filter(ex => selectedExercises.includes(ex.id))
     : EXERCISES;
@@ -136,8 +135,8 @@ function makeAllDone(selectedExercises = null, difficulties = {}) {
     const diff = difficulties[ex.id];
     entry[ex.id] = { 
         isCompleted: true, 
-        timestamp: now, 
-        validatedAt: validateTime,
+        timestamp: serverTimestamp(), 
+        validatedAt: serverTimestamp(),
         ...((diff !== undefined && diff !== null && diff !== 1.0) ? { difficulty: diff } : {})
     };
   }
@@ -220,16 +219,15 @@ export function useProgress(userId) {
       if (currentlyDone) {
         // Mark all exercises as undone
         const updated = {};
-        const now = new Date().toISOString();
         for (const [exId, exData] of Object.entries(day)) {
-          updated[exId] = { ...exData, isCompleted: false, timestamp: now };
+          updated[exId] = { ...exData, isCompleted: false, timestamp: serverTimestamp() };
         }
         newCompletions[dateStr] = updated;
       } else {
         // Mark all exercises as done
         newCompletions[dateStr] = makeAllDone(null, difficulties);
       }
-      return { ...prev, completions: newCompletions, lastCompletionChange: Date.now() };
+      return { ...prev, completions: newCompletions, lastCompletionChange: serverTimestamp() };
     });
   };
 
@@ -263,9 +261,9 @@ export function useProgress(userId) {
       let timestamp = current.timestamp;
 
       if (!wasDone && isNowDone) {
-        timestamp = new Date().toISOString();
+        timestamp = serverTimestamp();
       } else if (wasDone && !isNowDone) {
-        timestamp = new Date().toISOString(); // Keep a timestamp so cloud sync knows it was recently unchecked
+        timestamp = serverTimestamp(); // Keep a timestamp so cloud sync knows it was recently unchecked
       }
 
       day[exerciseId] = { 
@@ -285,7 +283,7 @@ export function useProgress(userId) {
       return {
         ...prev,
         completions: newCompletions,
-        ...(needsCloudSync ? { lastCompletionChange: Date.now() } : {}),
+        ...(needsCloudSync ? { lastCompletionChange: serverTimestamp() } : {}),
       };
     });
   };
@@ -484,7 +482,7 @@ export function useProgress(userId) {
           isSetup: merged.isSetup || prev.isSetup,
           hasShared: merged.hasShared || prev.hasShared,
           manualBadges: { ...prev.manualBadges, ...merged.manualBadges },
-          lastCompletionChange: Date.now(),
+          lastCompletionChange: serverTimestamp(),
         };
       });
       
@@ -540,7 +538,7 @@ export function useProgress(userId) {
 
       if (!changed) return prev;
 
-      const newState = { ...prev, completions: nextCompletions, lastCompletionChange: Date.now() };
+      const newState = { ...prev, completions: nextCompletions, lastCompletionChange: serverTimestamp() };
       newStateToSync = newState;
       return newState;
     });
@@ -570,7 +568,7 @@ export function useProgress(userId) {
           isSetup: merged.isSetup ?? prev.isSetup,
           hasShared: merged.hasShared ?? prev.hasShared,
           manualBadges: merged.manualBadges || prev.manualBadges,
-          lastCompletionChange: Date.now(),
+          lastCompletionChange: serverTimestamp(),
         };
       });
     });

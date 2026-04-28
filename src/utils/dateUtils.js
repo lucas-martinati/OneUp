@@ -129,3 +129,19 @@ export function formatDuration(seconds) {
     }
     return `${s}s`;
 }
+
+/**
+ * Safely parse a timestamp that could be a number (ms), ISO string, 
+ * or a Firebase serverTimestamp placeholder ({.sv: 'timestamp'}).
+ * Returns a valid Date object.
+ * @param {any} ts
+ * @returns {Date}
+ */
+export function parseTimestamp(ts) {
+    if (!ts) return new Date();
+    // Handle Firebase serverTimestamp placeholder
+    if (typeof ts === 'object' && ts['.sv']) return new Date();
+    // Handle potential invalid formats
+    const date = new Date(ts);
+    return isNaN(date.getTime()) ? new Date() : date;
+}
