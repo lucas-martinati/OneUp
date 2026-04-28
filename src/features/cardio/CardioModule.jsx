@@ -50,7 +50,7 @@ export function CardioModule() {
     isDifficultyMismatch, savedDifficulty, currentDifficulty, invalidateCurrentWeek
   } = useCardio();
 
-  const [mapExpanded, setMapExpanded] = useState(false);
+  const [, setMapExpanded] = useState(false);
   const mapExpandedRef = React.useRef(false);
   const handleMapExpandChange = (val) => { mapExpandedRef.current = val; setMapExpanded(val); };
 
@@ -185,7 +185,7 @@ export function CardioModule() {
               />
 
               {/* Map */}
-              <CardioMap gpsTrack={displaySession?.gpsTrack} onExpandChange={handleMapExpandChange} />
+              <CardioMap gpsTrack={displaySession?.gpsTrack} onExpandChange={handleMapExpandChange} session={displaySession} />
 
               {/* Last Session Stats */}
               <CardioLastSession session={displaySession} />

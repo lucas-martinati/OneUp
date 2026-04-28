@@ -22,7 +22,7 @@ function FitBounds({ gpsTrack }) {
   return null;
 }
 
-export const CardioMap = React.memo(({ gpsTrack, height = '160px', onShowFullscreen, onExpandChange }) => {
+export const CardioMap = React.memo(({ gpsTrack, height = '160px', onShowFullscreen, onExpandChange, session }) => {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
@@ -76,6 +76,7 @@ export const CardioMap = React.memo(({ gpsTrack, height = '160px', onShowFullscr
     return (
       <CardioFullscreenMap
         gpsTrack={gpsTrack}
+        session={session}
         onClose={handleClose}
       />
     );

@@ -31,14 +31,21 @@ export function CardioStatsPanel() {
         const cyclingHours = Math.floor(cyclingTime / 3600);
         const cyclingMins = Math.floor((cyclingTime % 3600) / 60);
 
-        const runningSpeed = runningTime > 0 ? (runningDistance / 1000) / (runningTime / 3600) : 0;
+        let runningPaceStr = '—';
+        if (runningTime > 0 && runningDistance > 0) {
+            const secondsPerKm = runningTime / (runningDistance / 1000);
+            const paceMins = Math.floor(secondsPerKm / 60);
+            const paceSecs = Math.floor(secondsPerKm % 60);
+            runningPaceStr = `${paceMins}:${paceSecs.toString().padStart(2, '0')} /km`;
+        }
+
         const cyclingSpeed = cyclingTime > 0 ? (cyclingDistance / 1000) / (cyclingTime / 3600) : 0;
 
         return {
             runningTimeStr: `${runningHours}h ${runningMins}m`,
             cyclingTimeStr: `${cyclingHours}h ${cyclingMins}m`,
-            runningSpeed: runningSpeed.toFixed(1),
-            cyclingSpeed: cyclingSpeed.toFixed(1),
+            runningPaceStr: runningPaceStr,
+            cyclingSpeed: cyclingSpeed > 0 ? `${cyclingSpeed.toFixed(1)} km/h` : '—',
         };
     }, [allSessions]);
 
@@ -76,8 +83,8 @@ export function CardioStatsPanel() {
                     </div>
                     <div className="glass-premium scale-in" style={statCardStyle('rgba(249,115,22,0.15)', 'rgba(239,68,68,0.15)')}>
                         <TrendingUp size={20} color="#f97316" style={{ marginBottom: '4px' }} />
-                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#f97316', lineHeight: 1 }}>{stats.runningSpeed} km/h</div>
-                        <div style={statLabelStyle}>{t('cardio.speed')}</div>
+                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#f97316', lineHeight: 1 }}>{stats.runningPaceStr}</div>
+                        <div style={statLabelStyle}>{t('cardio.pace') || t('cardio.avgSpeed')}</div>
                     </div>
                 </div>
             </div>
@@ -100,8 +107,8 @@ export function CardioStatsPanel() {
                     </div>
                     <div className="glass-premium scale-in" style={statCardStyle('rgba(6,182,212,0.15)', 'rgba(6,182,212,0.15)')}>
                         <TrendingUp size={20} color="#06b6d4" style={{ marginBottom: '4px' }} />
-                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#06b6d4', lineHeight: 1 }}>{stats.cyclingSpeed} km/h</div>
-                        <div style={statLabelStyle}>{t('cardio.speed')}</div>
+                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#06b6d4', lineHeight: 1 }}>{stats.cyclingSpeed}</div>
+                        <div style={statLabelStyle}>{t('cardio.avgSpeed') || t('cardio.speed')}</div>
                     </div>
                 </div>
             </div>

@@ -216,6 +216,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
         <CardioFullscreenMap
           gpsTrack={fullscreenSession.gpsTrack}
           title={formatDate(fullscreenSession.session.startTime)}
+          session={fullscreenSession.session}
           onClose={() => setFullscreenSession(null)}
         />
       )}

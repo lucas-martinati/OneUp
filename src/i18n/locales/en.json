@@ -655,6 +655,7 @@
     "distance": "Distance",
     "elevation": "Elevation+",
     "avgSpeed": "Avg speed",
+    "pace": "Pace",
     "streak": "Streak",
     "streakWeeks": "wks",
     "viewHistory": "View history",
