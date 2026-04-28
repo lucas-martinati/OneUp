@@ -672,6 +672,9 @@
     "finish": "终点",
     "tap": "轻触",
     "stravaWallTitle": "连接 Strava",
-    "stravaWallDesc": "自动同步您的跑步和骑行活动，以提升您的全球连胜记录。"
+    "stravaWallDesc": "自动同步您的跑步和骑行活动，以提升您的全球连胜记录。",
+    "difficultyModified": "难度已修改",
+    "difficultyMismatchDesc": "难度已更改 ({{saved}}x → {{current}}x)。您想继续使用此新设置吗？",
+    "revalidate": "继续"
   }
 }
