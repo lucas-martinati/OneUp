@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle } from '../../utils/icons';
 import { EXERCISES, getDailyGoal } from '../../config/exercises';

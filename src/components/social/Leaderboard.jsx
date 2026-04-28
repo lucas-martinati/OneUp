@@ -57,6 +57,9 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     const [nudgedMember, setNudgedMember] = useState(null);
     const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
     
+    // Community context state
+    const [communityContext, setCommunityContext] = useState(initialClanData ? initialClanData.id : 'global'); // 'global' | 'manage' | clanId
+
     // Handle back button to close internal modals or sub-views
     useBackHandler(() => {
         if (selectedUser) {
@@ -78,9 +81,6 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
         onClose();
         return true;
     }, true);
-    
-    // Community context state
-    const [communityContext, setCommunityContext] = useState(initialClanData ? initialClanData.id : 'global'); // 'global' | 'manage' | clanId
     const {refreshUserClans } = useProgressContext();
     const [clanData, setClanData] = useState(initialClanData);
 

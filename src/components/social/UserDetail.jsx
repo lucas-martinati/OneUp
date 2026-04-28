@@ -5,7 +5,6 @@ import { Avatar } from '../ui/Avatar';
 import { DifficultyBadge } from '../ui/DifficultyBadge';
 import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
-import { registerBackHandler } from '../../utils/backHandler';
 import { getLocalDateStr, calculateStreak, calculateExerciseStreak, calculateMaxStreak } from '../../utils/dateUtils';
 import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { useBackHandler } from '../../hooks/useBackHandler';
