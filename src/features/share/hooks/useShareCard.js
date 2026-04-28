@@ -159,7 +159,7 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
       el.style.maxWidth = prevMaxWidth;
       setIsExporting(false);
     }
-  }, [options.format, options.backgroundImage, options.theme]);
+  }, [options.format]);
 
   const exportCard = useCallback(async () => {
     const dataUrl = await captureCard();
