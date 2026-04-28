@@ -172,10 +172,23 @@ export function ProgressProvider({ children }) {
           setSyncError(error.message);
         }
       };
-      const timer = setTimeout(doSave, 1000);
+      // Reduce delay to 400ms for better responsiveness
+      const timer = setTimeout(doSave, 400);
       return () => clearTimeout(timer);
     }
   }, [lastCompletionChange, auth.isSignedIn, auth.loading, conflictData, conflictCheckDone, isInitialSyncDone, saveToCloud]);
+
+  // ── Force save on visibility change (Capacitor / Web) ────────────────
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && auth.isSignedIn && isInitialSyncDone) {
+        logger.info('App hidden, forcing immediate cloud save...');
+        saveToCloud().catch(err => logger.error('Force save failed:', err));
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [auth.isSignedIn, isInitialSyncDone, saveToCloud]);
 
   // ── Online recovery listener ────────────────────────────────────────
   useEffect(() => {

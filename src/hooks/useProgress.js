@@ -274,11 +274,12 @@ export function useProgress(userId) {
       };
       newCompletions[dateStr] = day;
 
-      // Only trigger cloud save when completion status or weight actually changes
+      // Trigger cloud save when completion, count, weight, or difficulty changes
       const completionChanged = wasDone !== isNowDone;
+      const countChanged = finalCount !== (current.count || 0);
       const weightChanged = weight !== null && weight !== (current.weight ?? null);
       const difficultyChanged = difficulty !== null && difficulty !== (current.difficulty ?? null);
-      const needsCloudSync = completionChanged || weightChanged || difficultyChanged;
+      const needsCloudSync = completionChanged || countChanged || weightChanged || difficultyChanged;
       return {
         ...prev,
         completions: newCompletions,
