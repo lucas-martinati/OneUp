@@ -227,7 +227,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
           ) : (
             sessions.map((session, idx) => (
               <SessionCard
-                key={session.id || idx}
+                key={`${session.id || 'session'}-${idx}`}
                 session={session}
                 mode={mode}
               />

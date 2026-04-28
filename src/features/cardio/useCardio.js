@@ -128,8 +128,17 @@ export function useCardio() {
       ]);
 
       // Merge and deduplicate (by ID)
-      const all = [...(firebaseSessions || [])];
-      const existingIds = new Set(all.map(s => s.id));
+      const rawFirebase = firebaseSessions || [];
+      const all = [];
+      const existingIds = new Set();
+      
+      // First, filter out any duplicates already present in Firebase
+      rawFirebase.forEach(s => {
+        if (!existingIds.has(s.id)) {
+          all.push(s);
+          existingIds.add(s.id);
+        }
+      });
 
       // Save new Strava activities to Firebase (with difficulty at time of save)
       const newSessions = [];
