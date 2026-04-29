@@ -1,6 +1,7 @@
 {
   "ignore": ["functions/index.js"],
   "ignoreDependencies": [
+    "@capacitor/android",
     "@capacitor/assets",
     "@testing-library/react",
     "i18next-parser",
