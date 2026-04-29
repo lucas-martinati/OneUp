@@ -656,9 +656,9 @@
     }
   },
   "routines": {
-    "title": "Mes Routines",
-    "empty": "Aucune routine enregistrée",
-    "load": "Charger",
-    "namePlaceholder": "Nom de la routine"
+    "title": "我的训练计划",
+    "empty": "没有保存的训练计划",
+    "load": "加载",
+    "namePlaceholder": "训练计划名称"
   }
 }

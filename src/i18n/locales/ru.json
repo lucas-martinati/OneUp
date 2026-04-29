@@ -656,9 +656,9 @@
     }
   },
   "routines": {
-    "title": "Mes Routines",
-    "empty": "Aucune routine enregistrée",
-    "load": "Charger",
-    "namePlaceholder": "Nom de la routine"
+    "title": "Мои программы",
+    "empty": "Нет сохранённых программ",
+    "load": "Загрузить",
+    "namePlaceholder": "Название программы"
   }
 }

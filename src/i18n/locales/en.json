@@ -656,9 +656,9 @@
     }
   },
   "routines": {
-    "title": "Mes Routines",
-    "empty": "Aucune routine enregistrée",
-    "load": "Charger",
-    "namePlaceholder": "Nom de la routine"
+    "title": "My Routines",
+    "empty": "No routine saved",
+    "load": "Load",
+    "namePlaceholder": "Routine name"
   }
 }
