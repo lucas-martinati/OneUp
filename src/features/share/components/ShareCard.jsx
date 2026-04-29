@@ -211,7 +211,6 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
           const dateStr = getLocalDateStr(checkDate);
           if (completions[dateStr]?.[cardio.id]?.isCompleted) {
             isDoneInWeek = true;
-            weekStats = completions[dateStr][cardio.id];
             weekDate = dateStr;
             break;
           }
