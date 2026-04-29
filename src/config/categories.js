@@ -13,8 +13,8 @@ export const CATEGORY_ORDER = [
 ];
 
 export const CATEGORY_COLORS = {
-    [CATEGORIES.BODYWEIGHT]: '#34d399', // Emerald
+    [CATEGORIES.BODYWEIGHT]: '#8b5cf6', // Purple
     [CATEGORIES.WEIGHTS]: '#f97316',    // Orange
     [CATEGORIES.CARDIO]: '#ef4444',     // Red
-    [CATEGORIES.CUSTOM]: '#8b5cf6',     // Purple
+    [CATEGORIES.CUSTOM]: '#34d399',     // Emerald
 };
