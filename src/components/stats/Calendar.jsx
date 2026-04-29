@@ -236,7 +236,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 marginBottom: 'var(--spacing-md)', padding: '0 var(--spacing-xs)'
             }}>
-                <button onClick={goToPrevMonth} className="hover-lift glass" style={navBtnStyle}>
+                <button onClick={goToPrevMonth} aria-label="Previous month" className="hover-lift glass" style={navBtnStyle}>
                     <ChevronLeft size={24} />
                 </button>
                 <span style={{
@@ -246,7 +246,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                 }}>
                     {monthNames[month]} {year}
                 </span>
-                <button onClick={goToNextMonth} className="hover-lift glass" style={navBtnStyle}>
+                <button onClick={goToNextMonth} aria-label="Next month" className="hover-lift glass" style={navBtnStyle}>
                     <ChevronRight size={24} />
                 </button>
             </div>

@@ -84,7 +84,7 @@ export const DashboardSlide = React.memo(({
                         {title}
                     </div>
                     {onManageCustom && (
-                        <button onClick={onManageCustom} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', opacity: 0.6, padding: '4px' }}>
+                        <button onClick={onManageCustom} aria-label="Manage custom exercises" style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', opacity: 0.6, padding: '4px' }}>
                             <Settings size={14} />
                         </button>
                     )}

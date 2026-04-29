@@ -20,9 +20,9 @@ export default defineConfig({
       },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
-        name: '1 Pushup Per Day Challenge',
-        short_name: '1Pushup',
-        description: 'Track your daily pushup challenge progress.',
+        name: 'OneUp : Le Défi Fitness Ultime',
+        short_name: 'OneUp',
+        description: 'Un défi fitness progressif sur 365 jours pour bâtir la discipline. Suivez votre progression et transformez votre corps.',
         theme_color: '#050505',
         background_color: '#050505',
         display: 'standalone',

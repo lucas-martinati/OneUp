@@ -96,13 +96,13 @@ export const DashboardHeader = React.memo(({
             </div>
 
             <div ref={rightSideRef} style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 0, justifyContent: 'flex-end' }}>
-                <button onClick={() => setShowSettings(true)} className="hover-lift" style={iconBtnStyle}>
+                <button onClick={() => setShowSettings(true)} aria-label="Settings" className="hover-lift" style={iconBtnStyle}>
                     <SettingsIcon size={19} />
                 </button>
-                <button onClick={() => setShowStats(true)} className="hover-lift" style={iconBtnStyle}>
+                <button onClick={() => setShowStats(true)} aria-label="Statistics" className="hover-lift" style={iconBtnStyle}>
                     <PieChart size={19} />
                 </button>
-                <button onClick={() => setShowLeaderboard(true)} className="hover-lift" style={iconBtnStyle}>
+                <button onClick={() => setShowLeaderboard(true)} aria-label="Leaderboard" className="hover-lift" style={iconBtnStyle}>
                     <Users size={19} />
                 </button>
 
