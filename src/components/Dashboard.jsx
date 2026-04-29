@@ -31,7 +31,7 @@ const Achievements = lazy(() => import('./feedback/Achievements').then(m => ({ d
 const Timer = lazy(() => import('./exercises/Timer').then(m => ({ default: m.Timer })));
 const WorkoutSession = lazy(() => import('./exercises/WorkoutSession').then(m => ({ default: m.WorkoutSession })));
 const CustomExercisesModal = lazy(() => import('./exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
-const CardioModule = lazy(() => import('../features/cardio/CardioModule'));
+const CardioModule = lazy(() => import('../features/cardio/CardioModule').then(m => ({ default: m.CardioModule })));
 
 import { setSoundSettingsGetter } from '../utils/soundManager';
 import { getLocalDateStr } from '../utils/dateUtils';

@@ -62,4 +62,3 @@ class Logger {
 // Create default logger instances for different modules
 export const createLogger = (context) => new Logger(context);
 
-export default new Logger('OneUp');

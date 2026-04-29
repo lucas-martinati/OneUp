@@ -1,0 +1,10 @@
+{
+  "ignore": ["functions/index.js"],
+  "ignoreDependencies": [
+    "@capacitor/assets",
+    "@testing-library/react",
+    "i18next-parser",
+    "playwright"
+  ],
+  "ignoreBinaries": ["firebase-tools"]
+}

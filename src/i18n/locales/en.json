@@ -82,32 +82,7 @@
     "repetitions": "repetitions",
     "multiplierHint": "Target goal: Day #X multiplied by {{value}} {{unit}}."
   },
-  "customProgram": {
-    "nameRequired": "A name is required",
-    "exerciseRequired": "Select at least one exercise",
-    "maxPrograms_one": "Maximum {{count}} program reached",
-    "maxPrograms_other": "Maximum {{count}} programs reached",
-    "day": "Day {{current}} / {{total}}",
-    "streak": "streak",
-    "start": "Start",
-    "pause": "Pause",
-    "resume": "Resume",
-    "editProgram": "Edit Program",
-    "newProgram": "New Program",
-    "namePlaceholder": "E.g. Full Body, Push Day...",
-    "descPlaceholder": "Short description (optional)",
-    "selectExercises": "Select exercises",
-    "dailyGoal": "Daily goal",
-    "duration": "Duration (days)",
-    "title": "My Programs",
-    "noProgramsHint": "Create a custom program to get started!",
-    "active": "Active",
-    "paused": "Paused",
-    "draft": "Draft"
-  },
   "pro": {
-    "locked": "Pro subscription required",
-    "lockedDesc": "Upgrade to Pro to create your programs!",
     "title": "Pro Subscription",
     "activeTitle": "Pro Member",
     "activeDesc": "You can create custom programs.",
@@ -125,18 +100,6 @@
     "promotionalDesc": "Gifted by OneUp Team",
     "lifetimeDesc": "Lifetime Access",
     "oneTimeDesc": "One-time payment"
-  },
-  "routines": {
-    "title": "My Routines",
-    "empty": "No saved routines",
-    "emptyHint": "Save an exercise order to launch it quickly!",
-    "maxReached": "Maximum 10 routines",
-    "newRoutine": "New Routine",
-    "editRoutine": "Edit Routine",
-    "routineName": "Routine name",
-    "namePlaceholder": "E.g. Full Body, Push Day...",
-    "selectExercises": "Select exercises (in order)",
-    "load": "Load"
   },
   "workout": {
     "sessionDone": "Session Complete!",
@@ -564,11 +527,6 @@
       "evening": "Evening"
     }
   },
-  "webPayment": {
-    "oops": "Oops...",
-    "description": "In-App payments are not available on the Web version.<br/><br/>Please use the Android app to access the store and unlock these features!",
-    "gotIt": "Got it"
-  },
   "notifications": {
     "body1": "🎯 Day {{day}} — Exercises await! 💪",
     "body2": "💥 Challenge: keep your streak! 🔥",
@@ -696,5 +654,11 @@
       "kmh": "km/h",
       "minKm": "/km"
     }
+  },
+  "routines": {
+    "title": "Mes Routines",
+    "empty": "Aucune routine enregistrée",
+    "load": "Charger",
+    "namePlaceholder": "Nom de la routine"
   }
 }

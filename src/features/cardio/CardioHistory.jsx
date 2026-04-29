@@ -225,4 +225,3 @@ export function CardioHistory({ sessions, mode, onClose }) {
   );
 }
 
-export default CardioHistory;

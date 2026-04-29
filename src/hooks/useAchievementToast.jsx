@@ -202,10 +202,3 @@ export function useAchievementToast(onViewAchievement, onValidateBadge) {
         ) : null
     };
 }
-
-/**
- * Version autonome du composant - pour usage direct
- */
-export function AchievementToast({ achievement, onClose, onView }) {
-    return <AchievementNotification achievement={achievement} onClose={onClose} onView={onView} />;
-}

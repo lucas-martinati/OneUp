@@ -213,10 +213,6 @@ export async function checkSupporterStatus() {
   return _checkEntitlement('supporter');
 }
 
-export async function getSupporterOffering() {
-  return _getOffering('supporter');
-}
-
 export async function purchaseSupporter() {
   const res = await _purchase('supporter');
   // Keep backward-compatible field name
@@ -227,10 +223,6 @@ export async function purchaseSupporter() {
 
 export async function checkProStatus() {
   return _checkEntitlement('pro');
-}
-
-export async function getProOffering() {
-  return _getOffering('pro');
 }
 
 export async function purchasePro() {

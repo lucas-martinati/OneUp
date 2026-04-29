@@ -498,4 +498,4 @@ export function CardioModule() {
   );
 }
 
-export default CardioModule;
+

@@ -82,32 +82,7 @@
     "repetitions": "повторений",
     "multiplierHint": "Цель: День №X умноженный на {{value}} {{unit}}."
   },
-  "customProgram": {
-    "nameRequired": "Требуется название",
-    "exerciseRequired": "Выберите хотя бы одно упражнение",
-    "maxPrograms_one": "Достигнут лимит {{count}} программы",
-    "maxPrograms_other": "Достигнут лимит {{count}} программ",
-    "day": "День {{current}} / {{total}}",
-    "streak": "серия",
-    "start": "Начать",
-    "pause": "Пауза",
-    "resume": "Продолжить",
-    "editProgram": "Редактировать программу",
-    "newProgram": "Новая программа",
-    "namePlaceholder": "Напр.: Всё тело, День жима...",
-    "descPlaceholder": "Краткое описание (необязательно)",
-    "selectExercises": "Выберите упражнения",
-    "dailyGoal": "Ежедневная цель",
-    "duration": "Продолжительность (дни)",
-    "title": "Мои программы",
-    "noProgramsHint": "Создайте программу, чтобы начать!",
-    "active": "Активна",
-    "paused": "Приостановлена",
-    "draft": "Черновик"
-  },
   "pro": {
-    "locked": "Требуется подписка Pro",
-    "lockedDesc": "Переходи на Pro, чтобы создавать программы!",
     "title": "Подписка Pro",
     "activeTitle": "Участник Pro",
     "activeDesc": "Ты можешь создавать персональные программы.",
@@ -125,18 +100,6 @@
     "promotionalDesc": "Подарок от команды OneUp",
     "lifetimeDesc": "Пожизненный доступ",
     "oneTimeDesc": "Единоразовый платеж"
-  },
-  "routines": {
-    "title": "Мои программы",
-    "empty": "Нет сохранённых программ",
-    "emptyHint": "Сохрани порядок упражнений для быстрого запуска!",
-    "maxReached": "Максимум 10 программ",
-    "newRoutine": "Новая программа",
-    "editRoutine": "Редактировать",
-    "routineName": "Название программы",
-    "namePlaceholder": "Напр.: Всё тело, День жима...",
-    "selectExercises": "Выбери упражнения (по порядку)",
-    "load": "Загрузить"
   },
   "workout": {
     "sessionDone": "Тренировка завершена!",
@@ -564,11 +527,6 @@
       "evening": "Вечер"
     }
   },
-  "webPayment": {
-    "oops": "Упс...",
-    "description": "Встроенные покупки недоступны в веб-версии.<br/><br/>Пожалуйста, используйте приложение Android для доступа к магазину и разблокировки этих функций!",
-    "gotIt": "Понятно"
-  },
   "notifications": {
     "body1": "🎯 День {{day}} — Упражнения ждут! 💪",
     "body2": "💥 Челлендж: держите серию! 🔥",
@@ -696,5 +654,11 @@
       "kmh": "км/ч",
       "minKm": "/км"
     }
+  },
+  "routines": {
+    "title": "Mes Routines",
+    "empty": "Aucune routine enregistrée",
+    "load": "Charger",
+    "namePlaceholder": "Nom de la routine"
   }
 }

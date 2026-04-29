@@ -8,10 +8,6 @@ export const BADGE_ICONS = {
   Star, Award, Crown, Activity, Sun, Moon, Users, Ghost, Share2
 };
 
-export function getBadgeIcon(iconName) {
-  return BADGE_ICONS[iconName] || Star;
-}
-
 // Single source of truth for all 40 achievement badges.
 // test(stats) → boolean determines unlock condition.
 // i18n keys are derived as `achievements.badges.${def.id}.title` / `.desc`

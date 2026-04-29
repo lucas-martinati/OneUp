@@ -135,7 +135,7 @@ export const CARDIO_EXERCISES = [
  * Running: +450 m/week cumulative
  * Cycling: +750 m/week cumulative
  */
-export const WEEKLY_INCREMENT = {
+const WEEKLY_INCREMENT = {
     running: 450,
     cycling: 750,
 };

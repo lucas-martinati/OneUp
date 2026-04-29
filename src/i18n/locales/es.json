@@ -82,32 +82,7 @@
     "repetitions": "repeticiones",
     "multiplierHint": "Objetivo: Día #X multiplicado por {{value}} {{unit}}."
   },
-  "customProgram": {
-    "nameRequired": "Se requiere un nombre",
-    "exerciseRequired": "Selecciona al menos un ejercicio",
-    "maxPrograms_one": "Máximo {{count}} programa alcanzado",
-    "maxPrograms_other": "Máximo {{count}} programas alcanzados",
-    "day": "Día {{current}} / {{total}}",
-    "streak": "racha",
-    "start": "Iniciar",
-    "pause": "Pausar",
-    "resume": "Reanudar",
-    "editProgram": "Editar Programa",
-    "newProgram": "Nuevo Programa",
-    "namePlaceholder": "Ej: Cuerpo Completo, Día de Empuje...",
-    "descPlaceholder": "Descripción corta (opcional)",
-    "selectExercises": "Seleccionar ejercicios",
-    "dailyGoal": "Objetivo diario",
-    "duration": "Duración (días)",
-    "title": "Mis Programas",
-    "noProgramsHint": "¡Crea un programa personalizado para empezar!",
-    "active": "Activo",
-    "paused": "En pausa",
-    "draft": "Borrador"
-  },
   "pro": {
-    "locked": "Suscripción Pro requerida",
-    "lockedDesc": "¡Pásate a Pro para crear tus programas!",
     "title": "Suscripción Pro",
     "activeTitle": "Miembro Pro",
     "activeDesc": "Puedes crear programas personalizados.",
@@ -125,18 +100,6 @@
     "promotionalDesc": "Regalo del equipo OneUp",
     "lifetimeDesc": "Acceso Permanente",
     "oneTimeDesc": "Pago único"
-  },
-  "routines": {
-    "title": "Mis Rutinas",
-    "empty": "Sin rutinas guardadas",
-    "emptyHint": "¡Guarda un orden de ejercicios para lanzarlo rápidamente!",
-    "maxReached": "Máximo 10 rutinas",
-    "newRoutine": "Nueva rutina",
-    "editRoutine": "Editar rutina",
-    "routineName": "Nombre de la rutina",
-    "namePlaceholder": "Ej: Cuerpo Completo, Día de Empujar...",
-    "selectExercises": "Selecciona los ejercicios (en orden)",
-    "load": "Cargar"
   },
   "workout": {
     "sessionDone": "¡Sesión Completada!",
@@ -564,11 +527,6 @@
       "evening": "Noche"
     }
   },
-  "webPayment": {
-    "oops": "Ups...",
-    "description": "Los pagos In-App no están disponibles en la versión Web.<br/><br/>¡Usa la aplicación Android para acceder a la tienda y desbloquear estas funciones!",
-    "gotIt": "Entendido"
-  },
   "notifications": {
     "body1": "🎯 Día {{day}} — ¡Los ejercicios te esperan! 💪",
     "body2": "💥 Desafío: ¡mantén tu racha! 🔥",
@@ -696,5 +654,11 @@
       "kmh": "km/h",
       "minKm": "/km"
     }
+  },
+  "routines": {
+    "title": "Mes Routines",
+    "empty": "Aucune routine enregistrée",
+    "load": "Charger",
+    "namePlaceholder": "Nom de la routine"
   }
 }

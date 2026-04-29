@@ -26,10 +26,10 @@ import {
 
 // ============ INDIVIDUAL EXPORTS ============
 export {
-  Dumbbell, ArrowDownUp, ArrowUp, Zap, ChevronsUp, Footprints,
-  Flame, Activity, MoveDown, MoveDiagonal, Square,
+  Dumbbell, Zap, Footprints,
+  Flame, Activity, Square,
   X, Check, CheckCheck, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Plus, Minus,
-  Play, Pause, RotateCcw, Save, Trash2, Edit3, Edit2,
+  Play, Pause, RotateCcw, Save, Trash2, Edit2,
   FolderOpen, GripVertical, Shuffle, ArrowLeft, ArrowRight,
   Trophy, Medal, Award, Star, Crown,
   Users, User, LogIn, UserPlus, Shield, HeartHandshake,
@@ -37,18 +37,15 @@ export {
   Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
   Globe, Gauge, ShoppingBag, PieChart,
   Share2, Download, Image, Palette, Target,
-  History, Weight, Filter, Loader2, Smartphone,
+  History, Weight, Filter, Loader2,
   Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
-  RefreshCw, Heart, Sparkles, Link, Link2, Calendar, TrendingUp, BarChart3,
+  RefreshCw, Heart, Sparkles, Link, Link2, Calendar, TrendingUp,
   Gem, Ghost, Moon, Rocket, Sun
 };
 
 // ============ ALIASES ============
 export { 
   Edit2 as Pencil,
-  Clock as TimerIcon,
-  Flame as FireStreak,
-  ChevronRight as ChevronNext,
   Settings as SettingsIcon
 };
 
@@ -70,7 +67,7 @@ export const SOCIAL_ICONS = {
   LogOut, Activity, Hash, Swords,
 };
 
-export const NAV_ICONS = {
+const NAV_ICONS = {
   Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
   Globe, Gauge, ShoppingBag, PieChart,
 };
@@ -80,22 +77,22 @@ export const SHARE_ICONS = {
   History, Weight, Filter, Loader2, Smartphone,
 };
 
-export const CLOUD_ICONS = {
+const CLOUD_ICONS = {
   Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
 };
 
-export const MISC_ICONS = {
+const MISC_ICONS = {
   RefreshCw, Heart, Sparkles, Link, Calendar, TrendingUp, BarChart3,
 };
 
-export const CATEGORY_ICONS = {
+const CATEGORY_ICONS = {
   BODYWEIGHT: Dumbbell,
   WEIGHTS: ArrowUp,
   CUSTOM: Star,
 };
 
 // ============ MERGED MAP ============
-export const ICON_MAP = {
+const ICON_MAP = {
   ...EXERCISE_ICONS,
   ...UI_ICONS,
   ...SOCIAL_ICONS,
@@ -117,28 +114,7 @@ export function getIcon(name, fallback = 'Dumbbell') {
   return ICON_MAP[name] || ICON_MAP[fallback] || Dumbbell;
 }
 
-/**
- * Get icon by category type
- */
-export function getCategoryIcon(category) {
-  const map = {
-    bodyweight: 'Dumbbell',
-    weights: 'ArrowUp',
-    custom: 'Star',
-  };
-  return getIcon(map[category], 'Dumbbell');
-}
 
-/**
- * Get icon from exercise object
- */
-export function getExerciseIcon(exercise) {
-  if (!exercise) return Dumbbell;
-  if (typeof exercise === 'string') return getIcon(exercise);
-  return getIcon(exercise.icon, 'Dumbbell');
-}
-
-export default getIcon;
 
 /**
  * A stable component for rendering icons dynamically by name.

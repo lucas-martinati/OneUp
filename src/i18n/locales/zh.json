@@ -82,32 +82,7 @@
     "repetitions": "次",
     "multiplierHint": "目标：第X天乘以 {{value}} {{unit}}。"
   },
-  "customProgram": {
-    "nameRequired": "需要一个名称",
-    "exerciseRequired": "请至少选择一个运动",
-    "maxPrograms_one": "已达到 {{count}} 个计划的限制",
-    "maxPrograms_other": "已达到 {{count}} 个计划的限制",
-    "day": "第{{current}}天 / 共{{total}}天",
-    "streak": "连续",
-    "start": "开始",
-    "pause": "暂停",
-    "resume": "继续",
-    "editProgram": "编辑计划",
-    "newProgram": "新计划",
-    "namePlaceholder": "例如：全身、推日...",
-    "descPlaceholder": "简短描述（可选）",
-    "selectExercises": "选择运动",
-    "dailyGoal": "每日目标",
-    "duration": "持续天数",
-    "title": "我的计划",
-    "noProgramsHint": "创建一个自定义计划开始吧！",
-    "active": "进行中",
-    "paused": "已暂停",
-    "draft": "草稿"
-  },
   "pro": {
-    "locked": "需要 Pro 订阅",
-    "lockedDesc": "升级到 Pro 以创建你的计划！",
     "title": "Pro 订阅",
     "activeTitle": "Pro 会员",
     "activeDesc": "你可以创建自定义计划。",
@@ -125,18 +100,6 @@
     "promotionalDesc": "OneUp 团队赠送",
     "lifetimeDesc": "永久访问",
     "oneTimeDesc": "一次性支付"
-  },
-  "routines": {
-    "title": "我的日常训练",
-    "empty": "没有保存的日常训练",
-    "emptyHint": "保存一个练习顺序，快速启动！",
-    "maxReached": "最多10个日常",
-    "newRoutine": "新建日常",
-    "editRoutine": "编辑日常",
-    "routineName": "日常名称",
-    "namePlaceholder": "例: 全身, 推日...",
-    "selectExercises": "选择练习（按顺序）",
-    "load": "加载"
   },
   "workout": {
     "sessionDone": "训练完成！",
@@ -564,11 +527,6 @@
       "evening": "晚上"
     }
   },
-  "webPayment": {
-    "oops": "哎呀...",
-    "description": "应用内购买在网页版上不可用。<br/><br/>请使用 Android 应用访问商店并解锁这些功能！",
-    "gotIt": "知道了"
-  },
   "notifications": {
     "body1": "🎯 第{{day}}天 — 运动在等你！💪",
     "body2": "💥 挑战：保持你的连续！🔥",
@@ -696,5 +654,11 @@
       "kmh": "公里/小时",
       "minKm": "/公里"
     }
+  },
+  "routines": {
+    "title": "Mes Routines",
+    "empty": "Aucune routine enregistrée",
+    "load": "Charger",
+    "namePlaceholder": "Nom de la routine"
   }
 }

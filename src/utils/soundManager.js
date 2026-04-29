@@ -71,7 +71,7 @@ function playAudioFile(soundName) {
   });
 }
 
-export function playSound(soundName) {
+function playSound(soundName) {
   // Check if sounds are enabled
   if (settingsGetter) {
     const settings = settingsGetter();
