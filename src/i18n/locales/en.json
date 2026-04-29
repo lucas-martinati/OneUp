@@ -642,14 +642,22 @@
   "widgets": {
     "streak": "STREAK",
     "days": "DAYS",
-    "weekdays": ["M", "T", "W", "T", "F", "S", "S"]
+    "weekdays": [
+      "M",
+      "T",
+      "W",
+      "T",
+      "F",
+      "S",
+      "S"
+    ]
   },
   "cardio": {
     "title": "Cardio",
     "weeklyGoal": "Weekly goal",
     "week": "Wk",
     "connectTitle": "Connected Services",
-    "noSessions": "No sessions recorded yet.",
+    "noSessions": "No sessions recorded",
     "lastSession": "Last session",
     "duration": "Time",
     "distance": "Distance",
@@ -659,10 +667,9 @@
     "streak": "Streak",
     "streakWeeks": "wks",
     "viewHistory": "View history",
-    "noSessions": "No sessions recorded",
     "history": "Cardio History",
     "goalReached": "Goal reached!",
-    "totalDistance": "Total Distance (km)",
+    "totalDistance": "Total Distance ({{unit}})",
     "overSessions": "Across {{count}} sessions",
     "sessionsCount_one": "{{count}} session",
     "sessionsCount_other": "{{count}} sessions",
@@ -682,6 +689,12 @@
     "googleWallStep3": "Auto Sync",
     "difficultyModified": "Difficulty Modified",
     "difficultyMismatchDesc": "Difficulty has changed ({{saved}}x → {{current}}x). Do you want to continue with this new setting?",
-    "revalidate": "Continue"
+    "revalidate": "Continue",
+    "units": {
+      "km": "km",
+      "m": "m",
+      "kmh": "km/h",
+      "minKm": "/km"
+    }
   }
 }

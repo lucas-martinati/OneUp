@@ -642,7 +642,15 @@
   "widgets": {
     "streak": "连续天数",
     "days": "天",
-    "weekdays": ["一", "二", "三", "四", "五", "六", "日"]
+    "weekdays": [
+      "一",
+      "二",
+      "三",
+      "四",
+      "五",
+      "六",
+      "日"
+    ]
   },
   "cardio": {
     "title": "有氧运动",
@@ -661,7 +669,7 @@
     "noSessions": "暂无训练记录",
     "history": "有氧历史",
     "goalReached": "目标达成！",
-    "totalDistance": "总距离 (km)",
+    "totalDistance": "总距离 ({{unit}})",
     "overSessions": "共 {{count}} 次训练",
     "sessionsCount_one": "{{count}} 次训练",
     "sessionsCount_other": "{{count}} 次训练",
@@ -681,6 +689,12 @@
     "googleWallStep3": "自动同步",
     "difficultyModified": "难度已修改",
     "difficultyMismatchDesc": "难度已更改 ({{saved}}x → {{current}}x)。您想继续使用此新设置吗？",
-    "revalidate": "继续"
+    "revalidate": "继续",
+    "units": {
+      "km": "公里",
+      "m": "米",
+      "kmh": "公里/小时",
+      "minKm": "/公里"
+    }
   }
 }

@@ -23,7 +23,7 @@ function formatDate(timestamp) {
   return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function SessionCard({ session, mode }) {
+function SessionCard({ session, mode, t }) {
   const [expanded, setExpanded] = useState(false);
   const hasGps = session.gpsTrack && session.gpsTrack.length > 1;
 
@@ -71,14 +71,14 @@ function SessionCard({ session, mode }) {
           }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
               <Target size={11} />
-              {session.distance ? `${(session.distance / 1000).toFixed(1)} km` : '—'}
+              {session.distance ? `${(session.distance / 1000).toFixed(1)} ${t('cardio.units.km')}` : '—'}
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
               <Clock size={11} />
               {formatDuration(session.duration)}
             </span>
             {session.avgSpeed > 0 && (
-              <span>{session.avgSpeed.toFixed(1)} km/h</span>
+              <span>{session.avgSpeed.toFixed(1)} {t('cardio.units.kmh')}</span>
             )}
           </div>
         </div>
@@ -204,6 +204,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
                 key={`${session.id || 'session'}-${idx}`}
                 session={session}
                 mode={mode}
+                t={t}
               />
             ))
           )}

@@ -36,7 +36,7 @@ export function CardioStatsPanel() {
             const secondsPerKm = runningTime / (runningDistance / 1000);
             const paceMins = Math.floor(secondsPerKm / 60);
             const paceSecs = Math.floor(secondsPerKm % 60);
-            runningPaceStr = `${paceMins}:${paceSecs.toString().padStart(2, '0')} /km`;
+            runningPaceStr = `${paceMins}:${paceSecs.toString().padStart(2, '0')} ${t('cardio.units.minKm')}`;
         }
 
         const cyclingSpeed = cyclingTime > 0 ? (cyclingDistance / 1000) / (cyclingTime / 3600) : 0;
@@ -45,9 +45,9 @@ export function CardioStatsPanel() {
             runningTimeStr: `${runningHours}h ${runningMins}m`,
             cyclingTimeStr: `${cyclingHours}h ${cyclingMins}m`,
             runningPaceStr: runningPaceStr,
-            cyclingSpeed: cyclingSpeed > 0 ? `${cyclingSpeed.toFixed(1)} km/h` : '—',
+            cyclingSpeed: cyclingSpeed > 0 ? `${cyclingSpeed.toFixed(1)} ${t('cardio.units.kmh')}` : '—',
         };
-    }, [allSessions]);
+    }, [allSessions, t]);
 
     if (loading) {
         return <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>{t('cardio.loading')}</div>;

@@ -51,7 +51,7 @@ export const CardioWeeklyGoal = React.memo(({
             color: 'var(--text-secondary)',
             opacity: 0.8
           }}>
-            / {goal.toFixed(1)} km
+            / {goal.toFixed(1)} {t('cardio.units.km')}
           </span>
         </div>
 

@@ -583,7 +583,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                     transition: 'all 0.15s ease',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 }}
-                                title={t(`share.theme.${theme.key}`, theme.key)}
+                                title={t(`share.theme.${theme.key}`)}
                             >
                                 <div style={{
                                     width: '16px', height: '16px', borderRadius: '50%',
@@ -709,7 +709,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             {CARDIO_EXERCISES && CARDIO_EXERCISES.length > 0 && (
                                 <>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                        <CategorySeparator label="Cardio" color="#f97316" />
+                                        <CategorySeparator label={t('cardio.title')} color="#f97316" />
                                         {CARDIO_EXERCISES.map(ex => {
                                             const val = getConfig(ex.id).difficulty;
                                             const exColor = ex.color || '#f97316';

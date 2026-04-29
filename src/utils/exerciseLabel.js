@@ -20,7 +20,7 @@ export function getExerciseLabel(ex) {
   // If label has uppercase/accented chars, it's a proper stored name
   if (ex.label && /[A-Z\u00C0-\u017F]/.test(ex.label)) return ex.label;
   // Standard: use i18n, fallback to label or id
-  return i18n.t('exercises.' + ex.id, { defaultValue: ex.label || ex.id });
+  return i18n.t('exercises.' + ex.id);
 }
 
 /**

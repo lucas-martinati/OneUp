@@ -17,23 +17,23 @@ function formatDuration(seconds) {
 /**
  * Format meters to km with 1 decimal
  */
-function formatDistance(meters) {
+function formatDistance(meters, t) {
   if (!meters || meters <= 0) return '—';
-  return `${(meters / 1000).toFixed(1)} km`;
+  return `${(meters / 1000).toFixed(1)} ${t('cardio.units.km')}`;
 }
 
 /**
  * Format m/s to either Pace (min/km) for running or Speed (km/h) for others
  */
-function formatSpeed(speedMs, type) {
+function formatSpeed(speedMs, type, t) {
   if (!speedMs || speedMs <= 0) return '—';
   if (type === 'running') {
     const secondsPerKm = 1000 / speedMs;
     const mins = Math.floor(secondsPerKm / 60);
     const secs = Math.floor(secondsPerKm % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')} /km`;
+    return `${mins}:${secs.toString().padStart(2, '0')} ${t('cardio.units.minKm')}`;
   }
-  return `${(speedMs * 3.6).toFixed(1)} km/h`;
+  return `${(speedMs * 3.6).toFixed(1)} ${t('cardio.units.kmh')}`;
 }
 
 const StatCard = ({ icon: Icon, label, value, color }) => (
@@ -99,19 +99,19 @@ export const CardioLastSession = React.memo(({ session }) => {
         <StatCard
           icon={Target}
           label={t('cardio.distance')}
-          value={formatDistance(session.distance)}
+          value={formatDistance(session.distance, t)}
           color="#8b5cf6"
         />
         <StatCard
           icon={TrendingUp}
           label={t('cardio.elevation')}
-          value={elevation > 0 ? `+${elevation}m` : '—'}
+          value={elevation > 0 ? `+${elevation}${t('cardio.units.m')}` : '—'}
           color="#6d28d9"
         />
         <StatCard
           icon={TrendingUp}
           label={session.type === 'running' ? t('cardio.pace') : t('cardio.avgSpeed')}
-          value={formatSpeed(speed, session.type)}
+          value={formatSpeed(speed, session.type, t)}
           color="#c084fc"
         />
       </div>

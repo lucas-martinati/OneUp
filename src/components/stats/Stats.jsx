@@ -199,7 +199,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         display: 'flex', flexWrap: 'wrap', gap: '8px'
                     }}>
                         {[
-                            { id: 'cardio', label: 'Cardio', locked: false },
+                            { id: 'cardio', label: t('cardio.title'), locked: false },
                             { id: 'standard', label: t('common.bodyweight'), locked: false },
                             { id: 'weights', label: t('common.weights'), locked: !canAccessFeature(FEATURES.WEIGHTS, { isPro: hasProAccess }) },
                             { id: 'custom', label: t('common.custom'), locked: !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro: hasProAccess }) }
@@ -254,7 +254,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                     fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '2px',
                     color: 'var(--text-secondary)', marginBottom: '4px'
                 }}>
-                    {onlyCardio && cardioKm !== null ? t('cardio.totalDistance') : t('stats.totalReps')}
+                    {onlyCardio && cardioKm !== null ? t('cardio.totalDistance', { unit: t('cardio.units.km') }) : t('stats.totalReps')}
                 </div>
                 <div style={{
                     fontSize: 'clamp(2.5rem, 10vw, 4.5rem)', fontWeight: '900', lineHeight: 1.1,
@@ -644,7 +644,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                                 {hasCardio && (ex.id === 'running' || ex.id === 'cycling') ? (
                                                     <>
                                                         <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                                                            {((cardioData.allSessions.filter(s => s.type === ex.id).reduce((sum, s) => sum + (s.distance || 0), 0)) / 1000).toFixed(1)} km
+                                                            {((cardioData.allSessions.filter(s => s.type === ex.id).reduce((sum, s) => sum + (s.distance || 0), 0)) / 1000).toFixed(1)} {t('cardio.units.km')}
                                                         </span>
                                                         <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
                                                         <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>

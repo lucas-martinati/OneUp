@@ -432,7 +432,6 @@
     "disable": "Désactiver",
     "enable": "Activer",
     "appTheme": "Thème de l'application"
-
   },
   "supporter": {
     "title": "Soutenir le développeur ❤️",
@@ -643,7 +642,15 @@
   "widgets": {
     "streak": "SÉRIE",
     "days": "JOURS",
-    "weekdays": ["L", "M", "M", "J", "V", "S", "D"]
+    "weekdays": [
+      "L",
+      "M",
+      "M",
+      "J",
+      "V",
+      "S",
+      "D"
+    ]
   },
   "cardio": {
     "title": "Cardio",
@@ -662,7 +669,7 @@
     "viewHistory": "Voir l'historique",
     "history": "Historique Cardio",
     "goalReached": "Objectif atteint !",
-    "totalDistance": "Distance Totale (km)",
+    "totalDistance": "Distance Totale ({{unit}})",
     "overSessions": "Sur {{count}} sessions",
     "sessionsCount_one": "{{count}} séance",
     "sessionsCount_other": "{{count}} séances",
@@ -682,6 +689,12 @@
     "googleWallStep3": "Sync automatique",
     "difficultyModified": "Difficulté modifiée",
     "difficultyMismatchDesc": "La difficulté a changé ({{saved}}x → {{current}}x). Voulez-vous continuer avec cette nouvelle configuration ?",
-    "revalidate": "Continuer"
+    "revalidate": "Continuer",
+    "units": {
+      "km": "km",
+      "m": "m",
+      "kmh": "km/h",
+      "minKm": "/km"
+    }
   }
 }

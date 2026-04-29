@@ -105,7 +105,7 @@ export function Dashboard() {
     const effectiveSlide = isPro ? activeSlide : 1;
     const globalSelectedId = effectiveSlide === 0 ? 'cardio' : effectiveSlide === 1 ? classicSelected : effectiveSlide === 2 ? weightsSelected : customSelected;
     const selectedExercise = useMemo(() => {
-        if (effectiveSlide === 0) return { id: 'cardio', color: '#ef4444', gradient: ['#ef4444', '#dc2626'], icon: 'Heart', name: 'Cardio' };
+        if (effectiveSlide === 0) return { id: 'cardio', color: '#ef4444', gradient: ['#ef4444', '#dc2626'], icon: 'Heart', name: t('cardio.title') };
         if (effectiveSlide === 1) return EXERCISES_MAP[globalSelectedId] || EXERCISES[0];
         if (effectiveSlide === 2) return WEIGHT_EXERCISES_MAP[globalSelectedId] || WEIGHT_EXERCISES[0];
         return customExercisesMap[globalSelectedId] || customExercises[0] || { id: 'custom_placeholder', color: '#8b5cf6', gradient: ['#8b5cf6', '#7c3aed'], icon: 'Star', name: 'Exercice Perso' };

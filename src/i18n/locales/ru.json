@@ -642,7 +642,15 @@
   "widgets": {
     "streak": "СЕРИЯ",
     "days": "ДНЕЙ",
-    "weekdays": ["П", "В", "С", "Ч", "П", "С", "В"]
+    "weekdays": [
+      "П",
+      "В",
+      "С",
+      "Ч",
+      "П",
+      "С",
+      "В"
+    ]
   },
   "cardio": {
     "title": "Кардио",
@@ -661,7 +669,7 @@
     "noSessions": "Нет записанных тренировок",
     "history": "История кардио",
     "goalReached": "Цель достигнута!",
-    "totalDistance": "Общая дистанция (км)",
+    "totalDistance": "Общая дистанция ({{unit}})",
     "overSessions": "За {{count}} сессий",
     "sessionsCount_one": "{{count}} сессия",
     "sessionsCount_other": "{{count}} сессий",
@@ -681,6 +689,12 @@
     "googleWallStep3": "Автосинхронизация",
     "difficultyModified": "Сложность изменена",
     "difficultyMismatchDesc": "Сложность изменилась ({{saved}}x → {{current}}x). Хотите продолжить с новыми настройками?",
-    "revalidate": "Продолжить"
+    "revalidate": "Продолжить",
+    "units": {
+      "km": "км",
+      "m": "м",
+      "kmh": "км/ч",
+      "minKm": "/км"
+    }
   }
 }

@@ -268,7 +268,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
                         {CARDIO_EXERCISES && CARDIO_EXERCISES.length > 0 && (
                             <>
                                 <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '4px', letterSpacing: '1px' }}>
-                                    Cardio
+                                    {t('cardio.title')}
                                 </div>
                                 {CARDIO_EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
                             </>

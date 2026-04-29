@@ -38,15 +38,15 @@ function formatDistance(meters) {
   return `${(meters / 1000).toFixed(2)}`;
 }
 
-function formatSpeed(speedMs, type) {
-  if (!speedMs || speedMs <= 0) return { value: '—', label: 'km/h' };
+function formatSpeed(speedMs, type, t) {
+  if (!speedMs || speedMs <= 0) return { value: '—', label: t('cardio.units.kmh') };
   if (type === 'running') {
     const secondsPerKm = 1000 / speedMs;
     const mins = Math.floor(secondsPerKm / 60);
     const secs = Math.floor(secondsPerKm % 60);
-    return { value: `${mins}:${secs.toString().padStart(2, '0')}`, label: '/km' };
+    return { value: `${mins}:${secs.toString().padStart(2, '0')}`, label: t('cardio.units.minKm') };
   }
-  return { value: `${(speedMs * 3.6).toFixed(1)}`, label: 'km/h' };
+  return { value: `${(speedMs * 3.6).toFixed(1)}`, label: t('cardio.units.kmh') };
 }
 
 export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
@@ -62,15 +62,15 @@ export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
     if (!session) return null;
     const speed = session.avgSpeed || session.averageSpeed || 0;
     const elevation = session.elevationGain || session.elevation || 0;
-    const speedInfo = formatSpeed(speed, session.type);
+    const speedInfo = formatSpeed(speed, session.type, t);
     
     return [
-      { icon: Target, label: 'km', value: formatDistance(session.distance), color: '#8b5cf6' },
+      { icon: Target, label: t('cardio.units.km'), value: formatDistance(session.distance), color: '#8b5cf6' },
       { icon: Clock, label: '', value: formatDuration(session.duration), color: '#a78bfa' },
       ...(speed > 0 ? [{ icon: TrendingUp, label: speedInfo.label, value: speedInfo.value, color: '#c084fc' }] : []),
-      ...(elevation > 0 ? [{ icon: TrendingUp, label: 'm', value: `+${elevation}`, color: '#6d28d9' }] : []),
+      ...(elevation > 0 ? [{ icon: TrendingUp, label: t('cardio.units.m'), value: `+${elevation}`, color: '#6d28d9' }] : []),
     ];
-  }, [session]);
+  }, [session, t]);
 
   if (!gpsTrack || gpsTrack.length < 2) return null;
 
