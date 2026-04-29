@@ -55,18 +55,15 @@ export default defineConfig({
     cssCodeSplit: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'firebase-vendor': ['firebase/app', 'firebase/auth', 'firebase/database'],
-          'capacitor-vendor': [
-            '@capacitor/core',
-            '@capacitor/app',
-            '@capacitor/local-notifications',
-            '@capacitor/preferences',
-            '@revenuecat/purchases-capacitor'
-          ],
-          'charts-vendor': ['recharts'],
-          'ui-vendor': ['lucide-react']
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('scheduler')) return 'react-vendor';
+            if (id.includes('firebase')) return 'firebase-vendor';
+            if (id.includes('@capacitor') || id.includes('@revenuecat')) return 'capacitor-vendor';
+            if (id.includes('recharts') || id.includes('d3')) return 'charts-vendor';
+            if (id.includes('lucide-react')) return 'ui-vendor';
+            if (id.includes('leaflet') || id.includes('react-leaflet')) return 'map-vendor';
+          }
         }
       }
     },
