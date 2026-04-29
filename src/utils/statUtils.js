@@ -2,6 +2,8 @@ import { getDailyGoal } from '../config/exercises';
 import { EXERCISES } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
 
+import { getCurrentWeekNumber } from './dateUtils';
+
 /**
  * Calculates total reps for a day across given exercises.
  * @param {Object} dayCompletions - Completions for a specific day
@@ -9,15 +11,20 @@ import { WEIGHT_EXERCISES } from '../config/weights';
  * @param {Array} exercises - List of exercises to sum up
  * @param {Function} getConfig - (exId, dateStr) => config
  * @param {string} dateStr - The date string
+ * @param {string} startDate - The start date string (optional, needed for cardio)
  * @returns {number} Total reps
  */
-export function calculateRepsForDay(dayCompletions, dayNumber, exercises, getConfig, dateStr) {
+export function calculateRepsForDay(dayCompletions, dayNumber, exercises, getConfig, dateStr, startDate = null) {
     if (!dayCompletions || !exercises) return 0;
     return exercises.reduce((sum, ex) => {
         const exData = dayCompletions[ex.id];
         if (!exData?.isCompleted) return sum;
         const exDiff = getConfig(ex.id, dateStr).difficulty;
-        return sum + getDailyGoal(ex, dayNumber, exDiff);
+        
+        const isCardio = ex.id === 'running' || ex.id === 'cycling';
+        const num = isCardio ? getCurrentWeekNumber(startDate || dateStr, new Date(dateStr)) : dayNumber;
+        
+        return sum + getDailyGoal(ex, num, exDiff, isCardio);
     }, 0);
 }
 

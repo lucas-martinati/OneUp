@@ -7,6 +7,7 @@ import { getDailyGoal } from '../../config/exercises';
 import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 import { isPerfectDay, calculateRepsForDay } from '../../utils/statUtils';
+import { getCurrentWeekNumber } from '../../utils/dateUtils';
 import { DifficultyBadge } from '../ui/DifficultyBadge';
 
 export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, getConfig }) {
@@ -388,6 +389,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                         isClosing={isClosing}
                         getConfig={getConfig}
                         t={t}
+                        startDate={startDate}
                     />
                 </>
             )}
@@ -414,7 +416,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 }
 
 /** Day detail bottom sheet */
-function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, getConfig, t }) {
+function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, getConfig, t, startDate }) {
     const dayNum = getDayNumber(dateString);
     const dayCompletions = completions[dateString] || {};
     const [dragY, setDragY] = useState(0);
@@ -553,7 +555,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                     background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
                     WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
                 }}>
-                    {calculateRepsForDay(dayCompletions, dayNum, exercises, getConfig, dateString)} <span style={{ fontSize: '0.7rem', WebkitTextFillColor: 'var(--text-secondary)' }}>{t('common.reps')}</span>
+                    {calculateRepsForDay(dayCompletions, dayNum, exercises, getConfig, dateString, startDate)} <span style={{ fontSize: '0.7rem', WebkitTextFillColor: 'var(--text-secondary)' }}>{t('common.reps')}</span>
                 </div>
             </div>
 
@@ -561,7 +563,9 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                 {exercises && exercises.map(ex => {
                     const ExIcon = getIcon(ex.icon);
                     const exDiff = getConfig(ex.id, dateString).difficulty;
-                    const goal = getDailyGoal(ex, dayNum, exDiff);
+                    const isCardio = ex.id === 'running' || ex.id === 'cycling';
+                    const num = isCardio ? getCurrentWeekNumber(startDate, new Date(dateString)) : dayNum;
+                    const goal = getDailyGoal(ex, num, exDiff, isCardio);
                     const exData = dayCompletions[ex.id] || { isCompleted: false };
                     return (
                         <div key={ex.id} style={{
