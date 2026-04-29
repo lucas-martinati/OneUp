@@ -399,7 +399,6 @@ export function useProgress(userId) {
   // ─── Cloud Sync ───────────────────────────────────────────────────────────
 
   // Guard: skip incoming cloud updates triggered by our own writes
-  const isLocalWriteRef = useRef(false);
   // Ref to always have the latest state without re-creating callbacks
   const stateRef = useRef(state);
   useEffect(() => { stateRef.current = state; }, [state]);
@@ -410,13 +409,9 @@ export function useProgress(userId) {
     if (isSavingRef.current) return { success: false, error: 'Save in progress' };
     isSavingRef.current = true;
     try {
-      isLocalWriteRef.current = true;
       await cloudSync.saveToCloud(stateRef.current);
-      // Reset after a shorter delay to avoid missing legitimate incoming changes
-      setTimeout(() => { isLocalWriteRef.current = false; }, 800);
       return { success: true };
     } catch (error) {
-      isLocalWriteRef.current = false;
       console.error('Failed to save to cloud:', error);
       return { success: false, error: error.message };
     } finally {
@@ -450,14 +445,10 @@ export function useProgress(userId) {
 
   const syncWithCloud = useCallback(async () => {
     try {
-      isLocalWriteRef.current = true;
       const mergedData = await cloudSync.syncData(stateRef.current);
       setState(validateProgressData(mergedData) || mergedData);
-      // Reset after a shorter delay
-      setTimeout(() => { isLocalWriteRef.current = false; }, 800);
       return { success: true, data: mergedData };
     } catch (error) {
-      isLocalWriteRef.current = false;
       console.error('Failed to sync with cloud:', error);
       return { success: false, error: error.message };
     }
@@ -551,8 +542,6 @@ export function useProgress(userId) {
 
   const startCloudListener = useCallback(() => {
     return cloudSync.listenToCloudChanges((cloudData) => {
-      // Skip if this change was triggered by our own write
-      if (isLocalWriteRef.current) return;
       if (!cloudData || !cloudData.completions) return;
 
       setState(prev => {
