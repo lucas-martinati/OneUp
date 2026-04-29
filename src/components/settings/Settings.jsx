@@ -414,11 +414,16 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             outline: 'none'
                         }}
                     >
-                        <option value="fr" style={{ background: '#0a0a0f', color: '#ffffff' }}>{t('settings.french')}</option>
-                        <option value="en" style={{ background: '#0a0a0f', color: '#ffffff' }}>{t('settings.english')}</option>
-                        <option value="es" style={{ background: '#0a0a0f', color: '#ffffff' }}>{t('settings.spanish')}</option>
-                        <option value="zh" style={{ background: '#0a0a0f', color: '#ffffff' }}>{t('settings.chinese')}</option>
-                        <option value="ru" style={{ background: '#0a0a0f', color: '#ffffff' }}>{t('settings.russian')}</option>
+                        <option value="fr" style={{ background: '#0a0a0f', color: '#ffffff' }}>Français</option>
+                        <option value="en" style={{ background: '#0a0a0f', color: '#ffffff' }}>English</option>
+                        <option value="es" style={{ background: '#0a0a0f', color: '#ffffff' }}>Español</option>
+                        <option value="de" style={{ background: '#0a0a0f', color: '#ffffff' }}>Deutsch</option>
+                        <option value="it" style={{ background: '#0a0a0f', color: '#ffffff' }}>Italiano</option>
+                        <option value="pt" style={{ background: '#0a0a0f', color: '#ffffff' }}>Português</option>
+                        <option value="zh" style={{ background: '#0a0a0f', color: '#ffffff' }}>中文</option>
+                        <option value="ja" style={{ background: '#0a0a0f', color: '#ffffff' }}>日本語</option>
+                        <option value="ko" style={{ background: '#0a0a0f', color: '#ffffff' }}>한국어</option>
+                        <option value="ru" style={{ background: '#0a0a0f', color: '#ffffff' }}>Русский</option>
                     </select>
                 </SettingRow>
             </div>

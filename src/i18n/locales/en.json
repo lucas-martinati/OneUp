@@ -254,9 +254,9 @@
     "totalDistance": "Total Distance ({{unit}})",
     "units": {
       "km": "km",
-      "kmh": "km/h",
       "m": "m",
-      "minKm": "/km"
+      "kmh": "km/h",
+      "minKm": "min/km"
     },
     "viewHistory": "View history",
     "week": "Wk",
@@ -487,15 +487,12 @@
   "settings": {
     "allEffects": "All effects enabled",
     "appTheme": "App Theme",
-    "chinese": "中文",
     "community": "Community",
     "dataCloud": "Data & Cloud",
     "disable": "Disable",
     "displayName": "Display Name",
     "eco": "Eco",
     "enable": "Enable",
-    "english": "English",
-    "french": "Français",
     "graphicsMode": "Graphics Mode",
     "language": "Language",
     "languageDesc": "Change the application language",
@@ -510,12 +507,10 @@
     "reducedEffects": "Reduced visual effects",
     "reminder": "Workout reminder",
     "reminderTime": "REMINDER TIME",
-    "russian": "Русский",
     "sensitiveParam": "SENSITIVE SETTING",
     "sensitiveWarning": "Changing this will modify your daily rep targets. A setting of 0.5 halves your targets.",
     "soundEffects": "Sound Effects",
     "soundsDescription": "Sounds on actions",
-    "spanish": "Español",
     "title": "Settings",
     "unlockSettings": "UNLOCK SETTINGS"
   },

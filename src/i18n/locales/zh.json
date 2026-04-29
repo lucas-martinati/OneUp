@@ -254,9 +254,9 @@
     "totalDistance": "总距离 ({{unit}})",
     "units": {
       "km": "公里",
-      "kmh": "公里/小时",
       "m": "米",
-      "minKm": "/公里"
+      "kmh": "km/h",
+      "minKm": "分/公里"
     },
     "viewHistory": "查看历史",
     "week": "第",
@@ -487,15 +487,12 @@
   "settings": {
     "allEffects": "所有效果已启用",
     "appTheme": "应用主题",
-    "chinese": "中文",
     "community": "社区",
     "dataCloud": "数据与云端",
     "disable": "禁用",
     "displayName": "显示名称",
     "eco": "节能",
     "enable": "启用",
-    "english": "English",
-    "french": "Français",
     "graphicsMode": "图形模式",
     "language": "语言",
     "languageDesc": "更改应用语言",
@@ -510,12 +507,10 @@
     "reducedEffects": "减少视觉效果",
     "reminder": "锻炼提醒",
     "reminderTime": "提醒时间",
-    "russian": "Русский",
     "sensitiveParam": "敏感设置",
     "sensitiveWarning": "更改此设置将修改你的每日目标。设为0.5会将目标减半。",
     "soundEffects": "音效",
     "soundsDescription": "操作音效",
-    "spanish": "Español",
     "title": "设置",
     "unlockSettings": "解锁设置"
   },

@@ -254,9 +254,9 @@
     "totalDistance": "Общая дистанция ({{unit}})",
     "units": {
       "km": "км",
-      "kmh": "км/ч",
       "m": "м",
-      "minKm": "/км"
+      "kmh": "км/ч",
+      "minKm": "мин/км"
     },
     "viewHistory": "Посмотреть историю",
     "week": "Нед.",
@@ -487,15 +487,12 @@
   "settings": {
     "allEffects": "Все эффекты включены",
     "appTheme": "Тема приложения",
-    "chinese": "中文",
     "community": "Сообщество",
     "dataCloud": "Данные и облако",
     "disable": "Отключить",
     "displayName": "Отображаемое имя",
     "eco": "Эко",
     "enable": "Включить",
-    "english": "English",
-    "french": "Français",
     "graphicsMode": "Графический режим",
     "language": "Язык",
     "languageDesc": "Изменить язык приложения",
@@ -510,12 +507,10 @@
     "reducedEffects": "Уменьшенные визуальные эффекты",
     "reminder": "Напоминание о тренировке",
     "reminderTime": "ВРЕМЯ НАПОМИНАНИЯ",
-    "russian": "Русский",
     "sensitiveParam": "ЧУВСТВИТЕЛЬНАЯ НАСТРОЙКА",
     "sensitiveWarning": "Изменение этого параметра повлияет на ваши ежедневные цели. Значение 0.5 уменьшит цели вдвое.",
     "soundEffects": "Звуковые эффекты",
     "soundsDescription": "Звуки при действиях",
-    "spanish": "Español",
     "title": "Настройки",
     "unlockSettings": "РАЗБЛОКИРОВАТЬ НАСТРОЙКИ"
   },

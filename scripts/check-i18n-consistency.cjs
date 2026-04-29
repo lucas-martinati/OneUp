@@ -4,7 +4,7 @@ const path = require('path');
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 const LOCALES_DIR = path.join(__dirname, '../src/i18n/locales');
-const LANGUAGES   = ['en', 'fr', 'es', 'zh', 'ru'];
+const LANGUAGES   = ['en', 'fr', 'es', 'zh', 'ru', 'de', 'it', 'pt', 'ja', 'ko'];
 const REFERENCE   = 'en';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

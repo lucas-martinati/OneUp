@@ -254,9 +254,9 @@
     "totalDistance": "Distance Totale ({{unit}})",
     "units": {
       "km": "km",
-      "kmh": "km/h",
       "m": "m",
-      "minKm": "/km"
+      "kmh": "km/h",
+      "minKm": "min/km"
     },
     "viewHistory": "Voir l'historique",
     "week": "Sem.",
@@ -487,15 +487,12 @@
   "settings": {
     "allEffects": "Tous les effets activés",
     "appTheme": "Thème de l'application",
-    "chinese": "中文",
     "community": "Communauté",
     "dataCloud": "Données & Cloud",
     "disable": "Désactiver",
     "displayName": "Pseudo affiché",
     "eco": "Éco",
     "enable": "Activer",
-    "english": "English",
-    "french": "Français",
     "graphicsMode": "Mode graphique",
     "language": "Langue",
     "languageDesc": "Changer la langue de l'application",
@@ -510,12 +507,10 @@
     "reducedEffects": "Effets visuels réduits",
     "reminder": "Rappel d'entraînement",
     "reminderTime": "HEURE DU RAPPEL",
-    "russian": "Русский",
     "sensitiveParam": "PARAMÈTRE SENSIBLE",
     "sensitiveWarning": "Modifier ceci changera tes objectifs de répétitions quotidiens. Un réglage à 0.5 divise tes objectifs par deux.",
     "soundEffects": "Effets sonores",
     "soundsDescription": "Sons lors des actions",
-    "spanish": "Español",
     "title": "Paramètres",
     "unlockSettings": "DÉBLOQUER LES PARAMÈTRES"
   },

@@ -1,0 +1,659 @@
+{
+  "achievementToast": {
+    "title": "업적 잠금 해제!"
+  },
+  "achievements": {
+    "badges": {
+      "afternoon_10": {
+        "desc": "10 오후 운동",
+        "title": "오후"
+      },
+      "afternoon_25": {
+        "desc": "25일 오후 운동",
+        "title": "율"
+      },
+      "afternoon_5": {
+        "desc": "5 오후 운동",
+        "title": "킥스타트"
+      },
+      "all_exercises": {
+        "desc": "모든 운동을 적어도 한 번은 수행하십시오.",
+        "title": "만능인"
+      },
+      "balanced": {
+        "desc": "주중, 주말 동일하게 운동",
+        "title": "균형 잡힌"
+      },
+      "beast": {
+        "desc": "총 반복수 100,000",
+        "title": "짐승"
+      },
+      "consistent": {
+        "desc": "3일 연속으로 운동하세요",
+        "title": "일관성"
+      },
+      "evening_10": {
+        "desc": "10 저녁 운동",
+        "title": "야행성"
+      },
+      "evening_25": {
+        "desc": "25 저녁 운동",
+        "title": "달"
+      },
+      "evening_5": {
+        "desc": "5 저녁 운동",
+        "title": "올빼미"
+      },
+      "fifty_sessions": {
+        "desc": "총 50가지 운동",
+        "title": "오십"
+      },
+      "first_blood": {
+        "desc": "첫 번째 운동을 완료하세요",
+        "title": "첫 번째 단계"
+      },
+      "first_share": {
+        "desc": "처음으로 통계를 공유하세요",
+        "title": "소셜 나비"
+      },
+      "five_hundred_sessions": {
+        "desc": "총 500번의 운동",
+        "title": "신화적인"
+      },
+      "ghost": {
+        "desc": "새벽 3시부터 4시까지 운동",
+        "title": "귀신"
+      },
+      "half_year": {
+        "desc": "180일 연속",
+        "title": "반년"
+      },
+      "hundred_sessions": {
+        "desc": "총 100가지 운동",
+        "title": "백부장"
+      },
+      "month_warrior": {
+        "desc": "30일 연속",
+        "title": "월병"
+      },
+      "morning_10": {
+        "desc": "10 아침 운동",
+        "title": "아침형 인간"
+      },
+      "morning_25": {
+        "desc": "25 아침 운동",
+        "title": "새벽"
+      },
+      "morning_5": {
+        "desc": "5 아침 운동",
+        "title": "얼리버드"
+      },
+      "perfect_fifty": {
+        "desc": "완벽한 50일",
+        "title": "지배"
+      },
+      "perfect_five": {
+        "desc": "완벽한 5일",
+        "title": "우수"
+      },
+      "perfect_hundred": {
+        "desc": "완벽한 100일",
+        "title": "완벽주의자"
+      },
+      "perfect_one": {
+        "desc": "완벽한 하루(모든 운동)",
+        "title": "첫 번째 완벽한 날"
+      },
+      "perfectionist": {
+        "desc": "30일 연속 완벽한 날",
+        "title": "멈출 수 없는"
+      },
+      "quarter_year": {
+        "desc": "90일 연속",
+        "title": "쿼터백"
+      },
+      "rep_1000": {
+        "desc": "총 반복수 1,000",
+        "title": "천"
+      },
+      "rep_10000": {
+        "desc": "총 반복수 10,000",
+        "title": "계수기"
+      },
+      "rep_500": {
+        "desc": "총 반복수 500회",
+        "title": "500회"
+      },
+      "rep_5000": {
+        "desc": "총 반복수 5,000",
+        "title": "5천"
+      },
+      "rep_50000": {
+        "desc": "총 반복수 50,000",
+        "title": "도살자"
+      },
+      "secret": "비밀",
+      "ten_sessions": {
+        "desc": "총 10가지 운동",
+        "title": "톱 10"
+      },
+      "two_hundred_sessions": {
+        "desc": "총 200가지 운동",
+        "title": "전설"
+      },
+      "two_months": {
+        "desc": "연속 60일",
+        "title": "철의 규율"
+      },
+      "two_weeks": {
+        "desc": "14일 연속",
+        "title": "끈기"
+      },
+      "week_warrior": {
+        "desc": "7일 연속",
+        "title": "주간 전사"
+      },
+      "weekday_warrior": {
+        "desc": "평일 운동 25회",
+        "title": "월요일부터 금요일까지"
+      },
+      "weekend_warrior": {
+        "desc": "주말 운동 25회",
+        "title": "주말"
+      },
+      "year_beast": {
+        "desc": "365일 연속",
+        "title": "경쟁의 짐승"
+      }
+    },
+    "badgesUnlocked": "배지 잠금 해제",
+    "categories": {
+      "horaires": "하루 중 시간",
+      "perfection": "완전",
+      "quantity": "수량",
+      "secrets": "기미",
+      "social": "사회의",
+      "streak": "줄",
+      "volume": "용량"
+    },
+    "validated": "완료"
+  },
+  "announcement": {
+    "badge": "새로운",
+    "cardio": {
+      "body": "Strava를 연결하여 달리기와 자전거 타기를 자동으로 동기화하세요. 주간 목표와 연속 기록을 추적하고 GPS 트랙을 확인하세요. 심장 강화 운동은 이제 귀하의 글로벌 연속 기록에 기여합니다.",
+      "cta": "엄청난!",
+      "title": "새로운 심장강화 모듈! 🏃🚴"
+    }
+  },
+  "app": {
+    "initializing": "초기화 중..."
+  },
+  "calendar": {
+    "completed": "완전한",
+    "day": "일 {{num}}",
+    "months": [
+      "1월",
+      "2월",
+      "3월",
+      "4월",
+      "5월",
+      "6월",
+      "칠월",
+      "팔월",
+      "구월",
+      "십월",
+      "십일월",
+      "12월"
+    ],
+    "repsCount": "{{done}} / {{goal}} 담당자",
+    "success": "성공",
+    "weekdays": [
+      "해",
+      "월",
+      "화요일",
+      "수요일",
+      "목",
+      "금",
+      "앉았다"
+    ]
+  },
+  "cardio": {
+    "avgSpeed": "평균 속도",
+    "connectTitle": "연결된 서비스",
+    "difficultyMismatchDesc": "난이도가 변경되었습니다({{saved}}x → {{current}}x). 이 새로운 설정을 계속하시겠습니까?",
+    "difficultyModified": "난이도가 수정되었습니다.",
+    "distance": "거리",
+    "duration": "시간",
+    "elevation": "고도+",
+    "finish": "마치다",
+    "goalReached": "목표 달성!",
+    "googleWallDesc": "심장 강화 모듈에 액세스하고 데이터를 동기화하려면 Google 계정으로 로그인하세요.",
+    "googleWallStep1": "구글 로그인",
+    "googleWallStep2": "링크 스트라바",
+    "googleWallStep3": "자동 동기화",
+    "googleWallTitle": "계정 필요",
+    "gpsTrack": "GPS 트랙",
+    "history": "심장 강화 역사",
+    "lastSession": "마지막 세션",
+    "loading": "심장 강화 데이터 로드 중...",
+    "noGpsTrack": "GPS 트랙 없음",
+    "noSessions": "기록된 세션이 없습니다.",
+    "overSessions": "{{count}} 세션 전반에 걸쳐",
+    "pace": "속도",
+    "revalidate": "계속하다",
+    "sessionsCount_one": "{{count}} 세션",
+    "sessionsCount_other": "{{count}} 세션",
+    "speed": "속도",
+    "start": "시작",
+    "stravaWallDesc": "달리기 및 사이클링 세션을 자동으로 동기화하여 글로벌 연속 기록을 달성하세요.",
+    "stravaWallTitle": "Strava 연결",
+    "streak": "줄",
+    "streakWeeks": "몇주",
+    "tap": "수도꼭지",
+    "totalDistance": "총 거리({{unit}})",
+    "units": {
+      "km": "km",
+      "m": "m",
+      "kmh": "km/h",
+      "minKm": "분/km"
+    },
+    "viewHistory": "기록 보기",
+    "week": "주",
+    "weeklyGoal": "주간 목표"
+  },
+  "clan": {
+    "alreadyMember": "귀하는 이미 이 클랜에 가입되어 있습니다.",
+    "choosePseudo": "클랜에 표시할 이름을 선택하세요.",
+    "clanNamePlaceholder": "클랜 이름...",
+    "clanNamePrompt": "클랜에 멋진 이름을 지정하세요.",
+    "codeRequired": "6자리 코드가 필요합니다.",
+    "createButton": "클랜 생성",
+    "createClan": "클랜 만들기",
+    "createError": "오류가 발생했습니다",
+    "enterCode": "6자리 코드를 입력하세요.",
+    "invalidCode": "잘못된 코드",
+    "join": "가입하다",
+    "joinClan": "클랜에 가입하세요",
+    "joinError": "클랜 가입 오류",
+    "joinFriends": "친구들과 함께 노력을 비교하고 서로 동기를 부여하세요!",
+    "leaveError": "클랜 탈퇴 오류",
+    "missingId": "클랜 ID가 누락되었습니다.",
+    "nameRequired": "클랜 이름은 필수 항목입니다.",
+    "pseudoRequired": "이름은 필수 항목입니다.",
+    "signIn": "로그인",
+    "signInRequired": "클랜을 만들거나 가입하려면 Google에 로그인하세요!",
+    "title": "씨족",
+    "yourClans": "귀하의 클랜({{count}})",
+    "yourClans_one": "귀하의 클랜({{count}})"
+  },
+  "cloud": {
+    "anonymousMergeDesc": "로그아웃한 상태에서 운동을 완료했습니다. 이를 귀하의 계정과 병합하시겠습니까?",
+    "anonymousMergeTitle": "로컬 진행 상황이 감지되었습니다.",
+    "areYouSure": "확실합니까?",
+    "autoBackup": "자동 백업",
+    "autoSyncEnabled": "자동 동기화 활성화됨",
+    "cannotBeUndone": "로컬 및 클라우드 데이터가 병합됩니다.",
+    "cloudBackup": "클라우드 백업",
+    "connectedGooglePlay": "Google Play와 연결됨",
+    "dataConflict": "데이터 충돌",
+    "deleteAccount": "내 계정 삭제",
+    "deleteCannotUndo": "이 작업은 취소할 수 없습니다.",
+    "deleteWarning": "이 작업은 <1>되돌릴 수 없습니다</1>. 진행 상황 및 설정을 포함한 모든 데이터가 영구적으로 삭제됩니다.",
+    "deleting": "삭제 중...",
+    "merge": "병합",
+    "mergeDesc": "로컬 + 클라우드 데이터 결합",
+    "multiDevice": "다중 장치 동기화",
+    "neverLose": "진행 상황을 잃지 마세요",
+    "notConnected": "연결되지 않음",
+    "promoText": "Google 계정으로 로그인하여 진행 상황을 클라우드에 저장하고 여러 기기에서 동기화하세요.",
+    "resolving": "해결 중...",
+    "restore": "복원하다",
+    "restoreDesc": "클라우드에서 내 데이터 가져오기",
+    "signInWithGoogle": "Google로 로그인",
+    "signOut": "로그아웃",
+    "user": "사용자"
+  },
+  "common": {
+    "anonymous": "익명의",
+    "bestStreak": "최고의 연속",
+    "bodyweight": "체중",
+    "cancel": "취소",
+    "cardio": "심장강화",
+    "close": "닫다",
+    "completed": "완전한",
+    "confirm": "확인하다",
+    "custom": "관습",
+    "daysAbbr": "디",
+    "delete": "삭제",
+    "difficulty": "어려움",
+    "global": "글로벌",
+    "loading": "로드 중...",
+    "member": "회원",
+    "next": "다음",
+    "perfectDays": "완벽한 날들",
+    "poke": "너한테 찔러 보냈어!",
+    "remaining": "{{count}} 남음",
+    "reps": "담당자",
+    "repsCount": "{{count}} 담당자",
+    "save": "구하다",
+    "share": "공유하다",
+    "weights": "가중치",
+    "you": "너",
+    "yourPseudo": "당신의 이름은..."
+  },
+  "counter": {
+    "completeAll": "모두 완료",
+    "reset": "다시 놓기",
+    "tips": [
+      "물을 마시면 성능이 향상됩니다.",
+      "허리를 곧게 펴세요!",
+      "일관성이 강도를 이긴다.",
+      "노력한 후에는 숨을 잘 쉬십시오.",
+      "매일 1% 더 좋아집니다."
+    ],
+    "validated": "{{exercise}} 완료되었습니다!"
+  },
+  "customExercises": {
+    "colorLabel": "테마 색상",
+    "create": "운동 만들기",
+    "deleteConfirm": "{{name}}을(를) 삭제하시겠습니까?",
+    "deleteTitle": "운동을 삭제하시겠습니까?",
+    "deleteWarning": "경고: 전체 합계에서 {{count}} {{unit}}을(를) 잃게 됩니다.",
+    "empty": "아직 맞춤 운동을 만들지 않았습니다.",
+    "errorLimit": "운동 한도에 도달했거나 오류가 발생했습니다.",
+    "errorNameRequired": "이름은 필수입니다",
+    "iconLabel": "상",
+    "limitReached_one": "{{count}} 운동 한도에 도달했습니다.",
+    "limitReached_other": "{{count}} 연습 한도에 도달했습니다.",
+    "multiplierHint": "목표 목표: #X일에 {{value}} {{unit}}을 곱합니다.",
+    "multiplierLabel": "목표 배율",
+    "multiplierShort": "승수",
+    "nameLabel": "운동명",
+    "namePlaceholder": "예: 의자 판자, 줄넘기...",
+    "repetitions": "반복",
+    "seconds": "초",
+    "title": "맞춤형 운동",
+    "typeCounter": "계수기",
+    "typeLabel": "추적 유형",
+    "typeReps": "담당자",
+    "typeTime": "시간",
+    "typeTimer": "시간제 노동자"
+  },
+  "dashboard": {
+    "calendar": "달력",
+    "challengeStarts": "귀하의 도전은 다음 날짜에 시작됩니다",
+    "configure": "구성",
+    "day": "낮",
+    "doneAt": "{{time}}에 완료됨",
+    "noExercisesConfigured": "여기에는 아직 어떤 운동도 구성하지 않았습니다.",
+    "session": "세션",
+    "waiting": "⏳ 대기 중"
+  },
+  "exercises": {
+    "abs": "복근",
+    "barbell_row": "바벨 로우",
+    "bench_press": "벤치프레스",
+    "biceps_curl": "이두근 컬",
+    "burpees": "버피",
+    "cycling": "사이클링",
+    "deadlift": "데드리프트",
+    "dips": "딥",
+    "hammer_curl": "해머 컬",
+    "jumpingjacks": "점핑잭",
+    "lunges": "런지",
+    "mountain": "산악인",
+    "overhead_press": "오버헤드 프레스",
+    "planche": "판자(들)",
+    "pullups": "풀업",
+    "pushups": "팔굽혀펴기",
+    "running": "달리기",
+    "squat_weights": "가중 스쿼트",
+    "squats": "스쿼트"
+  },
+  "leaderboard": {
+    "achievements": "업적",
+    "activeDays": "활동일수",
+    "copied": "복사됨",
+    "copy": "복사",
+    "currentStreak": "현재 연속",
+    "empty": "아직 여기에 아무도 없습니다",
+    "enableToAppear": "설정에서 리더보드를 활성화하면 표시됩니다!",
+    "inviteCode": "코드 초대",
+    "leaveClan": "클랜 탈퇴",
+    "leaveClanConfirm": "클랜을 탈퇴하시겠습니까?",
+    "leaveClanWarning": "<1>{{name}}</1>에서 나가시겠습니까? 귀하의 개인 통계는 안전하지만 더 이상 순위표에 표시되지 않습니다.",
+    "signInToAppear": "리더보드에 표시하려면 Google에 로그인하세요!",
+    "title": "리더보드"
+  },
+  "notifications": {
+    "body1": "🎯 {{day}}일 — 운동이 기다리고 있습니다! 💪",
+    "body2": "🔥 도전: 연속 기록을 유지하세요! 🔥",
+    "body3": "⚡ 오늘 훈련하고 순조롭게 나아가세요! ✨",
+    "body4": "🚀 {{day}} 담당자가 불꽃을 유지합니다! 🏆",
+    "title": "💪 OneUp — 일일 챌린지!"
+  },
+  "onboarding": {
+    "back": "뒤쪽에",
+    "backfillDesc": "이전 날짜를 채워드리겠습니다.",
+    "chooseAtLeast": "(적어도 하나를 선택하세요)",
+    "concept": "개념",
+    "consistencySuperpower": "💪 일관성은 당신의 초능력입니다.",
+    "day1": "1일차",
+    "day1Desc": "= 푸쉬업 1회",
+    "day365": "365일",
+    "day365Desc": "= 팔굽혀펴기 365개",
+    "discipline": "매일 진행하면서 <1>흔들리지 않는 규율</1>을 구축하세요.",
+    "letsGo": "갑시다!",
+    "limitedTo": "({{year}}로 제한됨)",
+    "next": "다음",
+    "selectPastExercises": "지난 며칠 동안 완료할 운동을 선택하세요.",
+    "startChallenge": "챌린지 시작",
+    "whenStarted": "📅 언제부터 시작하셨나요?",
+    "whichExercises": "🎯 어떤 운동을 계산해야 할까요?",
+    "yourExercises": "당신의 운동",
+    "yourJourney": "당신의 여행"
+  },
+  "paywall": {
+    "proRequired": "프로 모드 필요",
+    "proRequiredDesc": "웨이트 트레이닝 대시보드에 액세스하고 나만의 맞춤형 운동을 만들어보세요.",
+    "viewStore": "매장 보기"
+  },
+  "pro": {
+    "activeDesc": "사용자 정의 프로그램을 만들 수 있습니다.",
+    "activeTitle": "프로회원",
+    "buyButton": "프로로 전환",
+    "description": "맞춤형 프로그램",
+    "explanation": "나만의 운동 프로그램을 만드세요. 운동을 선택하고, 일일 진행 상황을 설정하고, 연속 기록과 달력을 통해 전용 통계를 추적하세요.",
+    "features": {
+      "customExercises": "100% 맞춤형 운동",
+      "exclusiveLeaderboards": "독점 순위표",
+      "shareThemes": "독점 공유 테마",
+      "weightDashboard": "웨이트 트레이닝 대시보드"
+    },
+    "historyDesc": "자동 갱신",
+    "lifetimeDesc": "평생 액세스",
+    "oneTimeDesc": "일회성 결제",
+    "price": "€1.99/월",
+    "promotionalDesc": "원업팀에서 선물함",
+    "title": "프로 구독"
+  },
+  "routines": {
+    "empty": "저장된 루틴이 없습니다.",
+    "load": "짐",
+    "namePlaceholder": "루틴 이름",
+    "title": "내 루틴"
+  },
+  "settings": {
+    "allEffects": "모든 효과 활성화",
+    "appTheme": "앱 테마",
+    "community": "지역 사회",
+    "dataCloud": "데이터 및 클라우드",
+    "disable": "장애를 입히다",
+    "displayName": "표시 이름",
+    "eco": "에코",
+    "enable": "할 수 있게 하다",
+    "graphicsMode": "그래픽 모드",
+    "language": "언어",
+    "languageDesc": "애플리케이션 언어 변경",
+    "leaderboardDesc": "공개 리더보드에 표시",
+    "lock": "잠그다",
+    "max": "맥스",
+    "maxChars": "최대 20자 · Google 사진이 사용됩니다.",
+    "multiplier": "승수(최대 1.0)",
+    "notifications": "알림",
+    "performance": "성능",
+    "preferences": "환경설정",
+    "reducedEffects": "시각 효과 감소",
+    "reminder": "운동 알림",
+    "reminderTime": "알림 시간",
+    "sensitiveParam": "민감한 설정",
+    "sensitiveWarning": "이를 변경하면 일일 담당자 목표가 수정됩니다. 0.5로 설정하면 목표가 절반으로 줄어듭니다.",
+    "soundEffects": "음향 효과",
+    "soundsDescription": "행동에 대한 소리",
+    "title": "설정",
+    "unlockSettings": "잠금 해제 설정"
+  },
+  "share": {
+    "backgroundImage": "배경 이미지",
+    "categoryFilter": "범주",
+    "cropImage": "이미지 자르기",
+    "download": "다운로드",
+    "duration": "지속",
+    "exercises": "수업 과정",
+    "exercisesCompleted": "운동 완료",
+    "globalStats": "글로벌 통계",
+    "imageSelected": "선택한 이미지",
+    "metrics": "표시된 측정항목",
+    "recentSessions": "최근 세션",
+    "recropImage": "다시 자르기",
+    "sessionDetail": "세션 세부정보",
+    "sessionNamePlaceholder": "세션 이름(선택사항)",
+    "shareCard": "내 통계를 공유하세요",
+    "showDailyExercises": "일일 루틴",
+    "showHistory": "세션 기록",
+    "showWeights": "카테고리별로 구분",
+    "takePhoto": "사진 찍기",
+    "theme": "주제",
+    "theme.dark": "어두운",
+    "theme.forest": "숲",
+    "theme.ocean": "대양",
+    "theme.purple": "보라",
+    "theme.sunset": "일몰",
+    "uploadGallery": "갱도"
+  },
+  "stats": {
+    "basedOnManual": "{{count}} 수동일{{plural}} 기준",
+    "basedOnManual_one": "{{count}} 수동일 기준",
+    "basedOnManual_other": "{{count}} 수동 일수 기준",
+    "byExercise": "운동으로",
+    "champion": "챔피언",
+    "completeForHabits": "일일 운동을 완료하여<br />여기에서 습관을 확인하세요!",
+    "completedDays": "완료 일수",
+    "consistency": "⏰ 일관성",
+    "currentStreak": "현재 연속",
+    "dailyReps": "📈 담당자 진화",
+    "difficultyEvolution": "⚙️ 난이도 진화",
+    "difficultyNoData": "아직 난이도 데이터가 없습니다.",
+    "difficultyNoDataHint": "운동의 난이도를 변경하여 여기에서 운동의 진행 상황을 확인하세요.",
+    "exercisesDone": "운동 완료",
+    "filters": "필터",
+    "loadingCharts": "차트 로드 중...",
+    "maxDays": "최대 {{count}}d",
+    "monthAbbreviations": [
+      "1월",
+      "2월",
+      "3월",
+      "4월",
+      "5월",
+      "준",
+      "7월",
+      "8월",
+      "9월",
+      "10월",
+      "11월",
+      "12월"
+    ],
+    "monthlyActivity": "📅 월별 활동",
+    "muscleBalance": "🕸️ 근육 균형",
+    "notEnoughData": "📊 아직 데이터가 충분하지 않습니다.",
+    "ofYear": "올해의",
+    "overExercises": "{{count}} 운동{{plural}} · {{days}}일{{dayPlural}} 동안의 노력",
+    "overExercises_one": "{{count}} 운동 전체 · {{days}}일 노력",
+    "overExercises_other": "{{count}}번의 연습 · {{days}}일의 노력",
+    "pieLabels": {
+      "afternoon": "오후",
+      "evening": "저녁",
+      "morning": "아침"
+    },
+    "quote": "\"일관성이 완벽함을 이긴다\"",
+    "quoteSub": "매일 한걸음씩 나타나세요!",
+    "title": "통계",
+    "totalReps": "총 담당자"
+  },
+  "store": {
+    "historyDesc": "원업 거래",
+    "historyTitle": "인앱 구매",
+    "statusActive": "활동적인",
+    "statusExpired": "만료됨",
+    "statusPaid": "유급의",
+    "title": "가게"
+  },
+  "supporter": {
+    "badgeActive": "귀하의 서포터 배지가 리더보드에서 활성화됩니다.",
+    "buyButton": "원업 지원",
+    "description": "서포터가 되어보세요!",
+    "donateAgain": "또 기부하세요",
+    "explanation": "숨겨진 기능은 없습니다. 자발적인 지원입니다. 그 대가로 리더보드에 ❤️ 배지가 표시됩니다.",
+    "history": "구매 내역",
+    "historyDesc": "귀하의 지원에 감사드립니다!",
+    "historyTitle": "원업 지원 ❤️",
+    "restore": "내 구매 복원",
+    "thankYou": "귀하의 지원에 감사드립니다! ❤️",
+    "title": "개발자를 지원하세요 ❤️"
+  },
+  "timer": {
+    "remaining": "{{time}} 남음",
+    "reset": "다시 놓기",
+    "skip": "건너뛰다",
+    "tips": [
+      "물을 마시면 성능이 향상됩니다.",
+      "허리를 곧게 펴세요!",
+      "일관성이 강도를 이긴다.",
+      "노력하는 동안 숨을 잘 쉬십시오.",
+      "매일 1% 더 좋아집니다."
+    ],
+    "validated": "타이머 완료!"
+  },
+  "weight": {
+    "kg": "kg",
+    "noData": "아직 체중 데이터가 없습니다.",
+    "noDataHint": "세션 중에 체중을 설정하여 진행 상황을 확인하세요.",
+    "title": "무게의 진화"
+  },
+  "widgets": {
+    "days": "날",
+    "streak": "줄",
+    "weekdays": [
+      "중",
+      "티",
+      "여",
+      "티",
+      "에프",
+      "에스",
+      "에스"
+    ]
+  },
+  "workout": {
+    "allCompleted": "모든 운동이 완료되었습니다 💪",
+    "chooseOrder": "운동순서를 선택하세요",
+    "custom": "관습",
+    "interDashboard": "혼합 운동",
+    "interDashboardDesc": "모든 대시보드의 연습을 결합합니다.",
+    "launch": "시작({{count}} 운동{{plural}})",
+    "launch_one": "시작({{count}} 운동)",
+    "launch_other": "시작({{count}} 운동)",
+    "sessionDone": "세션이 완료되었습니다!",
+    "shuffle": "혼합"
+  }
+}
