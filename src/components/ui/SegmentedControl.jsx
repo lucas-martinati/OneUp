@@ -52,8 +52,8 @@ export function SegmentedControl({ options, value, onChange, style = {} }) {
           position: 'absolute',
           top: '3px',
           bottom: '3px',
-          left: `calc(${(activeIndex * 100) / options.length}% + ${3 - (activeIndex * 3)}px)`,
-          width: `calc(${100 / options.length}% - 6px)`,
+          left: `calc(${(activeIndex * 100) / options.length}% + ${3 - (activeIndex * 6 / options.length)}px)`,
+          width: `calc(${100 / options.length}% - ${6 / options.length}px)`,
           background: activeOption.activeBg || 'var(--gradient-glow)',
           borderRadius: 'var(--radius-full)',
           transition: 'all 0.30s cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -72,7 +72,7 @@ export function SegmentedControl({ options, value, onChange, style = {} }) {
               e.stopPropagation();
               onChange(option.id);
             }}
-            className={isActive ? 'hover-lift' : ''}
+            className=""
             style={{
               padding: '6px 16px',
               borderRadius: 'var(--radius-full)',
