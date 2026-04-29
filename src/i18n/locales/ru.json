@@ -37,7 +37,8 @@
     "bestStreak": "Лучшая серия",
     "perfectDays": "Идеальных дней",
     "repsCount": "{{count}} повторений",
-    "remaining": "Осталось {{count}}"
+    "remaining": "Осталось {{count}}",
+    "cardio": "Кардио"
   },
   "paywall": {
     "proRequired": "Требуется Pro режим",
@@ -611,7 +612,6 @@
     ]
   },
   "cardio": {
-    "title": "Кардио",
     "weeklyGoal": "Цель на неделю",
     "week": "Нед.",
     "connectTitle": "Подключенные сервисы",

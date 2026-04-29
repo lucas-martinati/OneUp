@@ -708,7 +708,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                             {CATEGORY_ORDER.map(catKey => {
                                 let title, exList;
-                                if (catKey === CATEGORIES.CARDIO) { title = t('cardio.title'); exList = CARDIO_EXERCISES; }
+                                if (catKey === CATEGORIES.CARDIO) { title = t('common.cardio'); exList = CARDIO_EXERCISES; }
                                 else if (catKey === CATEGORIES.BODYWEIGHT) { title = t('common.bodyweight'); exList = EXERCISES; }
                                 else if (catKey === CATEGORIES.WEIGHTS) { 
                                     if (!isPro) return null;

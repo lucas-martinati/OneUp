@@ -37,7 +37,8 @@
     "bestStreak": "最佳连续",
     "perfectDays": "完美天数",
     "repsCount": "{{count}} 次",
-    "remaining": "还剩 {{count}} 个"
+    "remaining": "还剩 {{count}} 个",
+    "cardio": "有氧运动"
   },
   "paywall": {
     "proRequired": "需要 Pro 模式",
@@ -611,7 +612,6 @@
     ]
   },
   "cardio": {
-    "title": "有氧运动",
     "weeklyGoal": "每周目标",
     "week": "第",
     "connectTitle": "已连接服务",

@@ -81,10 +81,10 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
     const exercises = React.useMemo(() => {
         let list = [];
-        if (activeCategories.includes('standard')) list.push(...(exercisesList.standard || []));
-        if (activeCategories.includes('weights')) list.push(...(exercisesList.weights || []));
-        if (activeCategories.includes('custom')) list.push(...(exercisesList.custom || []));
-        if (activeCategories.includes('cardio')) list.push(...(exercisesList.cardio || []));
+        if (activeCategories.includes('standard')) list.push(...(exercisesList.standard || []).map(e => ({ ...e, categoryId: CATEGORIES.BODYWEIGHT })));
+        if (activeCategories.includes('weights')) list.push(...(exercisesList.weights || []).map(e => ({ ...e, categoryId: CATEGORIES.WEIGHTS })));
+        if (activeCategories.includes('custom')) list.push(...(exercisesList.custom || []).map(e => ({ ...e, categoryId: CATEGORIES.CUSTOM })));
+        if (activeCategories.includes('cardio')) list.push(...(exercisesList.cardio || []).map(e => ({ ...e, categoryId: CATEGORIES.CARDIO })));
         return list;
     }, [activeCategories, exercisesList]);
 
@@ -103,6 +103,13 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         bestDayDate, bestDayReps, bestDayExReps,
         dailyRepsData
     } = computedStats;
+
+    const enrichedExerciseStats = React.useMemo(() => {
+        return exerciseStats.map(ex => {
+            const found = exercises.find(e => e.id === ex.id);
+            return { ...ex, categoryId: found?.categoryId || ex.categoryId };
+        }).filter(ex => ex.categoryId); // Only keep exercises that are in the active categories
+    }, [exerciseStats, exercises]);
 
     const activeData = pieData.filter(d => d.value > 0).map(d => ({
         ...d,
@@ -201,7 +208,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                     }}>
                         {CATEGORY_ORDER.map(categoryId => {
                             const config = {
-                                [CATEGORIES.CARDIO]: { id: 'cardio', label: t('cardio.title'), locked: false },
+                                [CATEGORIES.CARDIO]: { id: 'cardio', label: t('common.cardio'), locked: false },
                                 [CATEGORIES.BODYWEIGHT]: { id: 'standard', label: t('common.bodyweight'), locked: false },
                                 [CATEGORIES.WEIGHTS]: { id: 'weights', label: t('common.weights'), locked: !canAccessFeature(FEATURES.WEIGHTS, { isPro: hasProAccess }) },
                                 [CATEGORIES.CUSTOM]: { id: 'custom', label: t('common.custom'), locked: !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro: hasProAccess }) }
@@ -570,7 +577,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
             )}
 
             {/* ── Per-exercise breakdown ───────────────────────────────── */}
-            {exerciseStats.length > 0 && (
+            {enrichedExerciseStats.length > 0 && (
                 <div className="glass-premium" style={{
                     padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
                     marginBottom: 'var(--spacing-md)',
@@ -578,30 +585,52 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 }}>
                     <h3 style={sectionTitleStyle}>{t('stats.byExercise')}</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {exerciseStats.map(ex => {
+                        {CATEGORY_ORDER.map((catId, index) => {
+                            const catStats = enrichedExerciseStats.filter(ex => ex.categoryId === catId);
+                            if (catStats.length === 0) return null;
+                            const catLabel = {
+                                [CATEGORIES.BODYWEIGHT]: t('common.bodyweight'),
+                                [CATEGORIES.WEIGHTS]: t('common.weights'),
+                                [CATEGORIES.CUSTOM]: t('common.custom'),
+                                [CATEGORIES.CARDIO]: t('common.cardio')
+                            }[catId];
+                            
                             return (
-                                <div key={ex.id} style={{
-                                    padding: '10px 12px', borderRadius: 'var(--radius-md)',
-                                    background: `${ex.color}10`,
-                                    border: `1px solid ${ex.color}25`
-                                }}>
-                                    {/* Top row: icon, label, badges */}
-                                    <div style={{
-                                        display: 'flex', alignItems: 'center',
-                                        gap: '10px', marginBottom: '6px'
+                                <React.Fragment key={catId}>
+                                    <div style={{ 
+                                        display: 'flex', alignItems: 'center', gap: '8px', 
+                                        marginTop: index > 0 ? '12px' : '4px', marginBottom: '4px',
+                                        opacity: 0.8
                                     }}>
-                                        <div style={{
-                                            width: '32px', height: '32px', borderRadius: '50%',
-                                            background: `${ex.color}20`, display: 'flex',
-                                            alignItems: 'center', justifyContent: 'center', flexShrink: 0
-                                        }}>
-                                            <DynamicIcon icon={ex.icon} size={16} color={ex.color} />
+                                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: CATEGORY_COLORS[catId], textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                            {catLabel}
                                         </div>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{
-                                                display: 'flex', alignItems: 'center',
-                                                justifyContent: 'space-between'
+                                        <div style={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${CATEGORY_COLORS[catId]}40, transparent)` }}></div>
+                                    </div>
+                                    {catStats.map(ex => {
+                                        return (
+                                            <div key={ex.id} style={{
+                                                padding: '10px 12px', borderRadius: 'var(--radius-md)',
+                                                background: `${ex.color}10`,
+                                                border: `1px solid ${ex.color}25`
                                             }}>
+                                                {/* Top row: icon, label, badges */}
+                                                <div style={{
+                                                    display: 'flex', alignItems: 'center',
+                                                    gap: '10px', marginBottom: '6px'
+                                                }}>
+                                                    <div style={{
+                                                        width: '32px', height: '32px', borderRadius: '50%',
+                                                        background: `${ex.color}20`, display: 'flex',
+                                                        alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                                                    }}>
+                                                        <DynamicIcon icon={ex.icon} size={16} color={ex.color} />
+                                                    </div>
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{
+                                                            display: 'flex', alignItems: 'center',
+                                                            justifyContent: 'space-between'
+                                                        }}>
                                                 <span style={{
                                                     fontSize: '0.85rem', fontWeight: '700',
                                                     color: ex.color
@@ -688,6 +717,8 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                 </div>
                             );
                         })}
+                        </React.Fragment>
+                        )})}
                     </div>
                 </div>
             )}

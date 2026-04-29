@@ -37,7 +37,8 @@
     "bestStreak": "Mejor Racha",
     "perfectDays": "Días Perfectos",
     "repsCount": "{{count}} repeticiones",
-    "remaining": "{{count}} restantes"
+    "remaining": "{{count}} restantes",
+    "cardio": "Cardio"
   },
   "paywall": {
     "proRequired": "Modo Pro Requerido",
@@ -611,7 +612,6 @@
     ]
   },
   "cardio": {
-    "title": "Cardio",
     "weeklyGoal": "Objetivo semanal",
     "week": "Sem.",
     "connectTitle": "Servicios conectados",

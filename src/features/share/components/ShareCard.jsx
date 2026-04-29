@@ -6,7 +6,7 @@ import {
 } from '../../../utils/icons';
 import { getExerciseLabel, getExerciseColor, isCustomExercise } from '../../../utils/exerciseLabel';
 import { sumExerciseReps } from '../../../utils/stats';
-import { CATEGORIES, CATEGORY_COLORS } from '../../../config/categories';
+import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '../../../config/categories';
 import { EXERCISES, CARDIO_EXERCISES, getDailyGoal } from '../../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../../config/weights';
 import { formatDuration, getLocalDateStr, getCurrentWeekNumber } from '../../../utils/dateUtils';
@@ -253,12 +253,20 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
     : allExercises;
   const weightExercises = allExercises.filter(isWeightEx);
   const customExercises = allExercises.filter(isCustomEx);
-  const categories = [
-    bodyweightExercises.length > 0 && { key: CATEGORIES.BODYWEIGHT, exercises: bodyweightExercises, label: t('common.bodyweight'), color: CATEGORY_COLORS[CATEGORIES.BODYWEIGHT] },
-    weightExercises.length > 0 && { key: CATEGORIES.WEIGHTS, exercises: weightExercises, label: t('common.weights'), color: CATEGORY_COLORS[CATEGORIES.WEIGHTS] },
-    customExercises.length > 0 && { key: CATEGORIES.CUSTOM, exercises: customExercises, label: t('common.custom'), color: CATEGORY_COLORS[CATEGORIES.CUSTOM] },
-    allExercises.filter(isCardioEx).length > 0 && { key: CATEGORIES.CARDIO, exercises: allExercises.filter(isCardioEx), label: t('cardio.title'), color: CATEGORY_COLORS[CATEGORIES.CARDIO] },
-  ].filter(Boolean);
+  const categories = CATEGORY_ORDER.map(key => {
+    let exList = [];
+    if (key === CATEGORIES.BODYWEIGHT) exList = bodyweightExercises;
+    if (key === CATEGORIES.WEIGHTS) exList = weightExercises;
+    if (key === CATEGORIES.CUSTOM) exList = customExercises;
+    if (key === CATEGORIES.CARDIO) exList = allExercises.filter(isCardioEx);
+    if (exList.length === 0) return null;
+    return { 
+      key, 
+      exercises: exList, 
+      label: t(`common.${key}`), 
+      color: CATEGORY_COLORS[key] 
+    };
+  }).filter(Boolean);
   const showSections = showCategoriesSeparately && categories.length > 1;
 
   const selectedCats = isGlobal
@@ -282,12 +290,23 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
   const dailyWeight = shouldSeparateDaily ? filteredDailyExercises.filter(isWeightEx) : [];
   const dailyCustom = shouldSeparateDaily ? filteredDailyExercises.filter(isCustomEx) : [];
   const dailyCardio = shouldSeparateDaily ? filteredDailyExercises.filter(isCardioEx) : [];
-  const dailyCategories = [
-    dailyBodyweight.length > 0 && { key: CATEGORIES.BODYWEIGHT, exercises: dailyBodyweight, label: t('common.bodyweight'), color: CATEGORY_COLORS[CATEGORIES.BODYWEIGHT], isPerfect: dailyStandardDone },
-    dailyWeight.length > 0 && { key: CATEGORIES.WEIGHTS, exercises: dailyWeight, label: t('common.weights'), color: CATEGORY_COLORS[CATEGORIES.WEIGHTS], isPerfect: dailyWeightsDone },
-    dailyCustom.length > 0 && { key: CATEGORIES.CUSTOM, exercises: dailyCustom, label: t('common.custom'), color: CATEGORY_COLORS[CATEGORIES.CUSTOM], isPerfect: false },
-    dailyCardio.length > 0 && { key: CATEGORIES.CARDIO, exercises: dailyCardio, label: t('cardio.title'), color: CATEGORY_COLORS[CATEGORIES.CARDIO], isPerfect: false },
-  ].filter(Boolean);
+  const dailyCategories = CATEGORY_ORDER.map(key => {
+    let exList = [];
+    let isPerfect = false;
+    if (key === CATEGORIES.BODYWEIGHT) { exList = dailyBodyweight; isPerfect = dailyStandardDone; }
+    if (key === CATEGORIES.WEIGHTS) { exList = dailyWeight; isPerfect = dailyWeightsDone; }
+    if (key === CATEGORIES.CUSTOM) exList = dailyCustom;
+    if (key === CATEGORIES.CARDIO) exList = dailyCardio;
+    
+    if (exList.length === 0) return null;
+    return {
+      key,
+      exercises: exList,
+      label: t(`common.${key}`),
+      color: CATEGORY_COLORS[key],
+      isPerfect
+    };
+  }).filter(Boolean);
   const showDailySections = shouldSeparateDaily && dailyCategories.length > 1;
 
   // For global mode, recompute stats for top section
@@ -492,7 +511,8 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
                 {t('share.globalStats')}
               </div>
               {(() => {
-                const cats = options.statsCategories || Object.values(CATEGORIES);
+                const catsRaw = options.statsCategories || CATEGORY_ORDER;
+                const cats = CATEGORY_ORDER.filter(c => catsRaw.includes(c));
                 const allSelected = cats.length === 4;
                 if (allSelected) return null;
                 const catColors = CATEGORY_COLORS;

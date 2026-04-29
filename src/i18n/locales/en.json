@@ -37,7 +37,8 @@
     "bestStreak": "Best Streak",
     "perfectDays": "Perfect Days",
     "repsCount": "{{count}} reps",
-    "remaining": "{{count}} left"
+    "remaining": "{{count}} left",
+    "cardio": "Cardio"
   },
   "paywall": {
     "proRequired": "Pro Mode Required",
@@ -611,7 +612,6 @@
     ]
   },
   "cardio": {
-    "title": "Cardio",
     "weeklyGoal": "Weekly goal",
     "week": "Wk",
     "connectTitle": "Connected Services",

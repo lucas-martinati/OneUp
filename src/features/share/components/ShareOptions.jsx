@@ -210,7 +210,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  {catKey === CATEGORIES.CARDIO ? t('cardio.title') : t(`common.${catKey}`)}
+                  {t(`common.${catKey}`)}
                 </button>
               );
             })}

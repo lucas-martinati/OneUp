@@ -140,7 +140,7 @@ export function CardioModule() {
             margin: 0,
             letterSpacing: '-0.01em'
           }}>
-            {t('cardio.title')}
+            {t('common.cardio')}
           </h2>
 
           <SegmentedControl 
