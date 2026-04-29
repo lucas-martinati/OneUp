@@ -7,6 +7,15 @@ export const DashboardActions = React.memo(({
 }) => {
     const { t } = useTranslation();
 
+    const buttonStyle = {
+        flex: 1, padding: 'clamp(12px, 1.8vh, 18px)', borderRadius: 'var(--radius-lg)',
+        color: 'var(--text-primary)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        gap: '8px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
+        background: `linear-gradient(135deg, ${activeCategoryColor || selectedExercise.color}28, ${activeCategoryColor || (selectedExercise.gradient && selectedExercise.gradient[0]) || selectedExercise.color}28)`,
+        boxShadow: 'var(--shadow-md)'
+    };
+
     return (
         <div className={isDay100 ? 'day100-actions' : ''} style={{
             display: 'flex', gap: '8px', width: '100%',
@@ -16,14 +25,7 @@ export const DashboardActions = React.memo(({
             <button
                 onClick={() => setShowCalendar(true)}
                 className="hover-lift gradient-button"
-                style={{
-                    flex: 1, padding: 'clamp(12px, 1.8vh, 18px)', borderRadius: 'var(--radius-lg)',
-                    color: 'var(--text-primary)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    gap: '8px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
-                    background: `linear-gradient(135deg, ${activeCategoryColor || selectedExercise.color}28, ${activeCategoryColor || selectedExercise.gradient[0]}28)`,
-                    boxShadow: 'var(--shadow-md)'
-                }}
+                style={buttonStyle}
             >
                 <CalendarIcon size={18} />
                 {t('dashboard.calendar')}
@@ -33,13 +35,7 @@ export const DashboardActions = React.memo(({
             <button
                 onClick={() => { setShowSession(true); pauseCloudSync?.(); }}
                 className="hover-lift gradient-button"
-                style={{
-                    flex: 1, padding: 'clamp(12px, 1.8vh, 18px)', borderRadius: 'var(--radius-lg)',
-                    color: 'var(--text-primary)',
-                    gap: '8px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
-                    background: `linear-gradient(135deg, ${activeCategoryColor || selectedExercise.color}28, ${activeCategoryColor || selectedExercise.gradient[0]}28)`,
-                    boxShadow: 'var(--shadow-md)'
-                }}
+                style={buttonStyle}
             >
                 <Play size={18} />
                 {t('dashboard.session')}
