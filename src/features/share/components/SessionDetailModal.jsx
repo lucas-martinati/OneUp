@@ -59,6 +59,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
       <div className="modal-content">
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        marginBottom: '8px', 
       }}>
         <h2 className="panel-title" style={{
           margin: 0,
