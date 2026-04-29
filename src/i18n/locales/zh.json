@@ -1,456 +1,197 @@
 {
-  "app": {
-    "initializing": "正在初始化..."
-  },
-  "dashboard": {
-    "calendar": "日历",
-    "session": "训练",
-    "noExercisesConfigured": "您尚未在此处配置任何练习。",
-    "configure": "配置",
-    "day": "天",
-    "doneAt": "完成于 {{time}}",
-    "waiting": "⏳ 等待中",
-    "challengeStarts": "你的挑战开始于"
-  },
-  "common": {
-    "weights": "负重",
-    "custom": "自定义",
-    "close": "关闭",
-    "bodyweight": "自重",
-    "cancel": "取消",
-    "global": "全球",
-    "poke": "给你发了一个戳！",
-    "you": "你",
-    "daysAbbr": "天",
-    "reps": "次",
-    "anonymous": "匿名",
-    "member": "一位成员",
-    "confirm": "确认",
-    "next": "下一个",
-    "save": "保存",
-    "delete": "删除",
-    "loading": "加载中...",
-    "completed": "已完成",
-    "share": "分享",
-    "yourPseudo": "你的名字...",
-    "difficulty": "难度",
-    "bestStreak": "最佳连续",
-    "perfectDays": "完美天数",
-    "repsCount": "{{count}} 次",
-    "remaining": "还剩 {{count}} 个",
-    "cardio": "有氧运动"
-  },
-  "paywall": {
-    "proRequired": "需要 Pro 模式",
-    "proRequiredDesc": "访问力量训练面板并创建你自己的自定义练习。",
-    "viewStore": "查看商店"
-  },
-  "counter": {
-    "validated": "{{exercise}} 完成！",
-    "reset": "重置",
-    "completeAll": "全部完成",
-    "tips": [
-      "喝水能提升表现。",
-      "保持背部挺直！",
-      "坚持胜过强度。",
-      "运动后好好呼吸。",
-      "每天进步1%。"
-    ]
-  },
-  "customExercises": {
-    "errorNameRequired": "名称为必填项",
-    "errorLimit": "已达到练习限制或出现错误。",
-    "title": "自定义练习",
-    "empty": "您还没有创建任何自定义练习。",
-    "typeTimer": "计时器",
-    "typeCounter": "计数器",
-    "multiplierShort": "倍率",
-    "create": "创建练习",
-    "limitReached_one": "已达到 {{count}} 个练习的限制。",
-    "limitReached_other": "已达到 {{count}} 个练习的限制。",
-    "nameLabel": "练习名称",
-    "namePlaceholder": "例如：椅子平板支撑、跳绳...",
-    "colorLabel": "主题颜色",
-    "iconLabel": "图标",
-    "typeLabel": "追踪类型",
-    "typeReps": "次数",
-    "typeTime": "时间",
-    "multiplierLabel": "目标倍率",
-    "deleteTitle": "删除练习？",
-    "deleteConfirm": "删除 {{name}}？",
-    "deleteWarning": "注意：您将从全球总数中丢失 {{count}} {{unit}}。",
-    "seconds": "秒",
-    "repetitions": "次",
-    "multiplierHint": "目标：第X天乘以 {{value}} {{unit}}。"
-  },
-  "pro": {
-    "title": "Pro 订阅",
-    "activeTitle": "Pro 会员",
-    "activeDesc": "你可以创建自定义计划。",
-    "description": "自定义训练计划",
-    "explanation": "创建你自己的训练计划：选择你的运动，设定每日进度，并通过连续天数和日历跟踪你的专属统计数据。",
-    "features": {
-      "customExercises": "100%自定义练习",
-      "weightDashboard": "力量训练面板",
-      "exclusiveLeaderboards": "专属排行榜",
-      "shareThemes": "专属分享主题"
-    },
-    "buyButton": "升级 Pro",
-    "price": "€1.99/月",
-    "historyDesc": "自动续订",
-    "promotionalDesc": "OneUp 团队赠送",
-    "lifetimeDesc": "永久访问",
-    "oneTimeDesc": "一次性支付"
-  },
-  "workout": {
-    "sessionDone": "训练完成！",
-    "allCompleted": "所有运动已完成 💪",
-    "interDashboard": "混合运动",
-    "interDashboardDesc": "合并所有仪表板的运动。",
-    "chooseOrder": "选择运动顺序",
-    "shuffle": "随机排序",
-    "custom": "自定义",
-    "launch_one": "开始 ({{count}} 项运动)",
-    "launch_other": "开始 ({{count}} 项运动)",
-    "launch": "开始 ({{count}} 项运动)"
-  },
-  "timer": {
-    "validated": "计时器完成！",
-    "remaining": "还需保持 {{time}}",
-    "reset": "重置",
-    "skip": "跳过",
-    "tips": [
-      "喝水能提升表现。",
-      "保持背部挺直！",
-      "坚持胜过强度。",
-      "运动中好好呼吸。",
-      "每天进步1%。"
-    ]
-  },
-  "achievements": {
-    "badges": {
-      "secret": "秘密",
-      "first_blood": {
-        "title": "第一步",
-        "desc": "完成你的第一次锻炼"
-      },
-      "consistent": {
-        "title": "坚持",
-        "desc": "连续锻炼3天"
-      },
-      "week_warrior": {
-        "title": "周战士",
-        "desc": "连续7天"
-      },
-      "two_weeks": {
-        "title": "坚韧",
-        "desc": "连续14天"
-      },
-      "month_warrior": {
-        "title": "月战士",
-        "desc": "连续30天"
-      },
-      "two_months": {
-        "title": "铁律",
-        "desc": "连续60天"
-      },
-      "quarter_year": {
-        "title": "季度王",
-        "desc": "连续90天"
-      },
-      "half_year": {
-        "title": "半年",
-        "desc": "连续180天"
-      },
-      "year_beast": {
-        "title": "竞技之兽",
-        "desc": "连续365天"
-      },
-      "ten_sessions": {
-        "title": "前十",
-        "desc": "共10次锻炼"
-      },
-      "fifty_sessions": {
-        "title": "五十",
-        "desc": "共50次锻炼"
-      },
-      "hundred_sessions": {
-        "title": "百夫长",
-        "desc": "共100次锻炼"
-      },
-      "two_hundred_sessions": {
-        "title": "传奇",
-        "desc": "共200次锻炼"
-      },
-      "five_hundred_sessions": {
-        "title": "神话",
-        "desc": "共500次锻炼"
-      },
-      "rep_500": {
-        "title": "500次",
-        "desc": "共500次"
-      },
-      "rep_1000": {
-        "title": "千次",
-        "desc": "共1,000次"
-      },
-      "rep_5000": {
-        "title": "五千",
-        "desc": "共5,000次"
-      },
-      "rep_10000": {
-        "title": "万次",
-        "desc": "共10,000次"
-      },
-      "rep_50000": {
-        "title": "收割者",
-        "desc": "共50,000次"
-      },
-      "perfect_one": {
-        "title": "首个完美日",
-        "desc": "一个完美天（所有运动）"
-      },
-      "perfect_five": {
-        "title": "卓越",
-        "desc": "5个完美天"
-      },
-      "perfect_fifty": {
-        "title": "大师",
-        "desc": "50个完美天"
-      },
-      "perfect_hundred": {
-        "title": "完美主义者",
-        "desc": "100个完美天"
-      },
-      "all_exercises": {
-        "title": "全能",
-        "desc": "每项运动至少做一次"
-      },
-      "weekday_warrior": {
-        "title": "工作日",
-        "desc": "25次工作日锻炼"
-      },
-      "weekend_warrior": {
-        "title": "周末",
-        "desc": "25次周末锻炼"
-      },
-      "balanced": {
-        "title": "均衡",
-        "desc": "工作日和周末锻炼次数相等"
-      },
-      "morning_5": {
-        "title": "早起鸟",
-        "desc": "5次晨练"
-      },
-      "morning_10": {
-        "title": "晨型人",
-        "desc": "10次晨练"
-      },
-      "morning_25": {
-        "title": "黎明",
-        "desc": "25次晨练"
-      },
-      "afternoon_5": {
-        "title": "下午起步",
-        "desc": "5次下午锻炼"
-      },
-      "afternoon_10": {
-        "title": "午后",
-        "desc": "10次下午锻炼"
-      },
-      "afternoon_25": {
-        "title": "节奏",
-        "desc": "25次下午锻炼"
-      },
-      "evening_5": {
-        "title": "夜猫子",
-        "desc": "5次晚间锻炼"
-      },
-      "evening_10": {
-        "title": "夜行者",
-        "desc": "10次晚间锻炼"
-      },
-      "evening_25": {
-        "title": "月光",
-        "desc": "25次晚间锻炼"
-      },
-      "first_share": {
-        "title": "社交达人",
-        "desc": "首次分享您的统计数据"
-      },
-      "ghost": {
-        "title": "幽灵",
-        "desc": "在凌晨3点到4点之间锻炼"
-      },
-      "perfectionist": {
-        "title": "势不可挡",
-        "desc": "连续30个完美天"
-      },
-      "beast": {
-        "title": "猛兽",
-        "desc": "共100,000次"
-      }
-    },
-    "validated": "完成",
-    "badgesUnlocked": "已解锁徽章",
-    "categories": {
-      "streak": "连续",
-      "quantity": "数量",
-      "volume": "总量",
-      "perfection": "完美",
-      "horaires": "时间段",
-      "secrets": "秘密",
-      "social": "社交"
-    }
-  },
   "achievementToast": {
     "title": "成就解锁！"
   },
-  "cloud": {
-    "restore": "恢复",
-    "restoreDesc": "从云端获取我的数据",
-    "areYouSure": "您确定吗？",
-    "cannotBeUndone": "您的本地数据和云端数据将被合并。",
-    "cloudBackup": "云端备份",
-    "connectedGooglePlay": "已连接 Google Play",
-    "notConnected": "未连接",
-    "user": "用户",
-    "dataConflict": "数据冲突",
-    "resolving": "解决中...",
-    "autoSyncEnabled": "自动同步已启用",
-    "signOut": "退出登录",
-    "deleteAccount": "删除我的账户",
-    "deleteWarning": "此操作<1>不可逆</1>。你的所有数据将被永久删除，包括你的进度和设置。",
-    "deleteCannotUndo": "此操作无法撤销",
-    "deleting": "删除中...",
-    "promoText": "用你的 Google 账户登录，将你的进度保存到云端并在设备间同步。",
-    "autoBackup": "自动备份",
-    "multiDevice": "多设备同步",
-    "neverLose": "永不丢失你的进度",
-    "signInWithGoogle": "用 Google 登录",
-    "anonymousMergeTitle": "检测到本地进度",
-    "anonymousMergeDesc": "您在未登录时完成了练习。是否要将其与您的账户合并？",
-    "merge": "合并",
-    "mergeDesc": "合并本地和云端数据"
+  "achievements": {
+    "badges": {
+      "afternoon_10": {
+        "desc": "10次下午锻炼",
+        "title": "午后"
+      },
+      "afternoon_25": {
+        "desc": "25次下午锻炼",
+        "title": "节奏"
+      },
+      "afternoon_5": {
+        "desc": "5次下午锻炼",
+        "title": "下午起步"
+      },
+      "all_exercises": {
+        "desc": "每项运动至少做一次",
+        "title": "全能"
+      },
+      "balanced": {
+        "desc": "工作日和周末锻炼次数相等",
+        "title": "均衡"
+      },
+      "beast": {
+        "desc": "共100,000次",
+        "title": "猛兽"
+      },
+      "consistent": {
+        "desc": "连续锻炼3天",
+        "title": "坚持"
+      },
+      "evening_10": {
+        "desc": "10次晚间锻炼",
+        "title": "夜行者"
+      },
+      "evening_25": {
+        "desc": "25次晚间锻炼",
+        "title": "月光"
+      },
+      "evening_5": {
+        "desc": "5次晚间锻炼",
+        "title": "夜猫子"
+      },
+      "fifty_sessions": {
+        "desc": "共50次锻炼",
+        "title": "五十"
+      },
+      "first_blood": {
+        "desc": "完成你的第一次锻炼",
+        "title": "第一步"
+      },
+      "first_share": {
+        "desc": "首次分享您的统计数据",
+        "title": "社交达人"
+      },
+      "five_hundred_sessions": {
+        "desc": "共500次锻炼",
+        "title": "神话"
+      },
+      "ghost": {
+        "desc": "在凌晨3点到4点之间锻炼",
+        "title": "幽灵"
+      },
+      "half_year": {
+        "desc": "连续180天",
+        "title": "半年"
+      },
+      "hundred_sessions": {
+        "desc": "共100次锻炼",
+        "title": "百夫长"
+      },
+      "month_warrior": {
+        "desc": "连续30天",
+        "title": "月战士"
+      },
+      "morning_10": {
+        "desc": "10次晨练",
+        "title": "晨型人"
+      },
+      "morning_25": {
+        "desc": "25次晨练",
+        "title": "黎明"
+      },
+      "morning_5": {
+        "desc": "5次晨练",
+        "title": "早起鸟"
+      },
+      "perfect_fifty": {
+        "desc": "50个完美天",
+        "title": "大师"
+      },
+      "perfect_five": {
+        "desc": "5个完美天",
+        "title": "卓越"
+      },
+      "perfect_hundred": {
+        "desc": "100个完美天",
+        "title": "完美主义者"
+      },
+      "perfect_one": {
+        "desc": "一个完美天（所有运动）",
+        "title": "首个完美日"
+      },
+      "perfectionist": {
+        "desc": "连续30个完美天",
+        "title": "势不可挡"
+      },
+      "quarter_year": {
+        "desc": "连续90天",
+        "title": "季度王"
+      },
+      "rep_1000": {
+        "desc": "共1,000次",
+        "title": "千次"
+      },
+      "rep_10000": {
+        "desc": "共10,000次",
+        "title": "万次"
+      },
+      "rep_500": {
+        "desc": "共500次",
+        "title": "500次"
+      },
+      "rep_5000": {
+        "desc": "共5,000次",
+        "title": "五千"
+      },
+      "rep_50000": {
+        "desc": "共50,000次",
+        "title": "收割者"
+      },
+      "secret": "秘密",
+      "ten_sessions": {
+        "desc": "共10次锻炼",
+        "title": "前十"
+      },
+      "two_hundred_sessions": {
+        "desc": "共200次锻炼",
+        "title": "传奇"
+      },
+      "two_months": {
+        "desc": "连续60天",
+        "title": "铁律"
+      },
+      "two_weeks": {
+        "desc": "连续14天",
+        "title": "坚韧"
+      },
+      "week_warrior": {
+        "desc": "连续7天",
+        "title": "周战士"
+      },
+      "weekday_warrior": {
+        "desc": "25次工作日锻炼",
+        "title": "工作日"
+      },
+      "weekend_warrior": {
+        "desc": "25次周末锻炼",
+        "title": "周末"
+      },
+      "year_beast": {
+        "desc": "连续365天",
+        "title": "竞技之兽"
+      }
+    },
+    "badgesUnlocked": "已解锁徽章",
+    "categories": {
+      "horaires": "时间段",
+      "perfection": "完美",
+      "quantity": "数量",
+      "secrets": "秘密",
+      "social": "社交",
+      "streak": "连续",
+      "volume": "总量"
+    },
+    "validated": "完成"
   },
-  "onboarding": {
-    "concept": "概念",
-    "yourJourney": "你的旅程",
-    "yourExercises": "你的运动",
-    "day1": "第1天",
-    "day1Desc": "= 1 个俯卧撑",
-    "day365": "第365天",
-    "day365Desc": "= 365 个俯卧撑",
-    "discipline": "通过每日进步，建立<1>坚不可摧的自律</1>。",
-    "consistencySuperpower": "💪 坚持是你的超能力。",
-    "letsGo": "开始吧！",
-    "whenStarted": "📅 你什么时候开始的？",
-    "backfillDesc": "我们会为你补填之前的日子",
-    "limitedTo": "(限于 {{year}})",
-    "back": "返回",
-    "next": "下一步",
-    "startChallenge": "开始挑战",
-    "whichExercises": "🎯 计算哪些运动？",
-    "selectPastExercises": "选择要补做的运动",
-    "chooseAtLeast": "(至少选一个)"
+  "announcement": {
+    "badge": "新功能",
+    "cardio": {
+      "body": "连接 Strava 以自动同步您的跑步和骑行。追踪您的每周目标、连续纪录，并查看您的 GPS 轨迹。有氧运动现在计入您的总连续纪录。",
+      "cta": "太棒了！",
+      "title": "全新有氧运动模块！🏃🚴"
+    }
   },
-  "store": {
-    "title": "商店",
-    "historyTitle": "应用内购买",
-    "historyDesc": "OneUp 交易",
-    "statusActive": "有效",
-    "statusExpired": "已过期",
-    "statusPaid": "已支付"
-  },
-  "settings": {
-    "title": "设置",
-    "preferences": "偏好",
-    "notifications": "通知",
-    "reminder": "锻炼提醒",
-    "reminderTime": "提醒时间",
-    "soundEffects": "音效",
-    "soundsDescription": "操作音效",
-    "language": "语言",
-    "languageDesc": "更改应用语言",
-    "french": "Français",
-    "english": "English",
-    "spanish": "Español",
-    "chinese": "中文",
-    "russian": "Русский",
-    "performance": "性能",
-    "graphicsMode": "图形模式",
-    "reducedEffects": "减少视觉效果",
-    "allEffects": "所有效果已启用",
-    "eco": "节能",
-    "max": "最高",
-    "community": "社区",
-    "leaderboardDesc": "在公开排行榜中显示",
-    "displayName": "显示名称",
-    "maxChars": "最多20个字符 · 将使用你的Google头像",
-    "dataCloud": "数据与云端",
-    "sensitiveParam": "敏感设置",
-    "sensitiveWarning": "更改此设置将修改你的每日目标。设为0.5会将目标减半。",
-    "unlockSettings": "解锁设置",
-    "multiplier": "倍率（最高1.0）",
-    "lock": "锁定",
-    "disable": "禁用",
-    "enable": "启用",
-    "appTheme": "应用主题"
-  },
-  "supporter": {
-    "title": "支持开发者 ❤️",
-    "thankYou": "感谢你的支持！❤️",
-    "badgeActive": "你的支持者徽章已在排行榜中激活。",
-    "description": "成为支持者！",
-    "explanation": "没有隐藏功能——这是自愿支持。作为回报，你将获得一个在排行榜中可见的 ❤️ 徽章。",
-    "donateAgain": "再次捐赠",
-    "buyButton": "支持 OneUp",
-    "restore": "恢复购买",
-    "history": "购买历史",
-    "historyTitle": "支持 OneUp ❤️",
-    "historyDesc": "感谢你的支持！"
-  },
-  "leaderboard": {
-    "inviteCode": "邀请码",
-    "copied": "已复制",
-    "copy": "复制",
-    "title": "排行榜",
-    "empty": "还没有人",
-    "signInToAppear": "用Google登录以出现在排行榜中！",
-    "enableToAppear": "在设置中启用排行榜以显示！",
-    "leaveClan": "离开部落",
-    "leaveClanConfirm": "离开部落？",
-    "leaveClanWarning": "你确定要离开 <1>{{name}}</1> 吗？你的个人数据是安全的，但你将不再出现在他们的排行榜中。",
-    "activeDays": "活跃天数",
-    "currentStreak": "当前连续",
-    "achievements": "成就"
-  },
-  "clan": {
-    "pseudoRequired": "需要一个名字",
-    "nameRequired": "需要部落名称",
-    "createError": "发生错误",
-    "codeRequired": "需要6位代码",
-    "invalidCode": "无效代码",
-    "title": "部落",
-    "signInRequired": "用Google登录以创建或加入部落！",
-    "signIn": "登录",
-    "yourClans_one": "你的部落 ({{count}})",
-    "joinFriends": "加入你的朋友，比较努力，互相激励！",
-    "joinClan": "加入部落",
-    "createClan": "创建部落",
-    "choosePseudo": "选择一个名字显示在你的部落中：",
-    "clanNamePrompt": "给你的部落起一个霸气的名字：",
-    "enterCode": "输入6位代码：",
-    "clanNamePlaceholder": "部落名称...",
-    "createButton": "创建部落",
-    "join": "加入",
-    "alreadyMember": "您已经在这个公会中",
-    "joinError": "加入公会时出错",
-    "missingId": "缺少公会ID",
-    "leaveError": "离开公会时出错",
-    "yourClans": "你的部落 ({{count}})"
+  "app": {
+    "initializing": "正在初始化..."
   },
   "calendar": {
+    "completed": "已完成",
+    "day": "第{{num}}天",
     "months": [
       "一月",
       "二月",
@@ -465,7 +206,7 @@
       "十一月",
       "十二月"
     ],
-    "completed": "已完成",
+    "repsCount": "{{done}} / {{goal}} 次",
     "success": "成功",
     "weekdays": [
       "日",
@@ -475,11 +216,355 @@
       "四",
       "五",
       "六"
+    ]
+  },
+  "cardio": {
+    "avgSpeed": "平均速度",
+    "connectTitle": "已连接服务",
+    "difficultyMismatchDesc": "难度已更改 ({{saved}}x → {{current}}x)。您想继续使用此新设置吗？",
+    "difficultyModified": "难度已修改",
+    "distance": "距离",
+    "duration": "用时",
+    "elevation": "爬升+",
+    "finish": "终点",
+    "goalReached": "目标达成！",
+    "googleWallDesc": "使用您的 Google 账户登录以访问有氧模块并同步数据。",
+    "googleWallStep1": "Google 登录",
+    "googleWallStep2": "连接 Strava",
+    "googleWallStep3": "自动同步",
+    "googleWallTitle": "需要账户",
+    "gpsTrack": "GPS 路线",
+    "history": "有氧历史",
+    "lastSession": "上次训练",
+    "loading": "正在加载有氧运动数据...",
+    "noGpsTrack": "无 GPS 轨迹",
+    "noSessions": "暂无训练记录",
+    "overSessions": "共 {{count}} 次训练",
+    "pace": "配速",
+    "revalidate": "继续",
+    "sessionsCount_one": "{{count}} 次训练",
+    "sessionsCount_other": "{{count}} 次训练",
+    "speed": "速度",
+    "start": "起点",
+    "stravaWallDesc": "自动同步您的跑步和骑行活动，以提升您的全球连胜记录。",
+    "stravaWallTitle": "连接 Strava",
+    "streak": "连续",
+    "streakWeeks": "周",
+    "tap": "轻触",
+    "totalDistance": "总距离 ({{unit}})",
+    "units": {
+      "km": "公里",
+      "kmh": "公里/小时",
+      "m": "米",
+      "minKm": "/公里"
+    },
+    "viewHistory": "查看历史",
+    "week": "第",
+    "weeklyGoal": "每周目标"
+  },
+  "clan": {
+    "alreadyMember": "您已经在这个公会中",
+    "choosePseudo": "选择一个名字显示在你的部落中：",
+    "clanNamePlaceholder": "部落名称...",
+    "clanNamePrompt": "给你的部落起一个霸气的名字：",
+    "codeRequired": "需要6位代码",
+    "createButton": "创建部落",
+    "createClan": "创建部落",
+    "createError": "发生错误",
+    "enterCode": "输入6位代码：",
+    "invalidCode": "无效代码",
+    "join": "加入",
+    "joinClan": "加入部落",
+    "joinError": "加入公会时出错",
+    "joinFriends": "加入你的朋友，比较努力，互相激励！",
+    "leaveError": "离开公会时出错",
+    "missingId": "缺少公会ID",
+    "nameRequired": "需要部落名称",
+    "pseudoRequired": "需要一个名字",
+    "signIn": "登录",
+    "signInRequired": "用Google登录以创建或加入部落！",
+    "title": "部落",
+    "yourClans": "你的部落 ({{count}})",
+    "yourClans_one": "你的部落 ({{count}})"
+  },
+  "cloud": {
+    "anonymousMergeDesc": "您在未登录时完成了练习。是否要将其与您的账户合并？",
+    "anonymousMergeTitle": "检测到本地进度",
+    "areYouSure": "您确定吗？",
+    "autoBackup": "自动备份",
+    "autoSyncEnabled": "自动同步已启用",
+    "cannotBeUndone": "您的本地数据和云端数据将被合并。",
+    "cloudBackup": "云端备份",
+    "connectedGooglePlay": "已连接 Google Play",
+    "dataConflict": "数据冲突",
+    "deleteAccount": "删除我的账户",
+    "deleteCannotUndo": "此操作无法撤销",
+    "deleteWarning": "此操作<1>不可逆</1>。你的所有数据将被永久删除，包括你的进度和设置。",
+    "deleting": "删除中...",
+    "merge": "合并",
+    "mergeDesc": "合并本地和云端数据",
+    "multiDevice": "多设备同步",
+    "neverLose": "永不丢失你的进度",
+    "notConnected": "未连接",
+    "promoText": "用你的 Google 账户登录，将你的进度保存到云端并在设备间同步。",
+    "resolving": "解决中...",
+    "restore": "恢复",
+    "restoreDesc": "从云端获取我的数据",
+    "signInWithGoogle": "用 Google 登录",
+    "signOut": "退出登录",
+    "user": "用户"
+  },
+  "common": {
+    "anonymous": "匿名",
+    "bestStreak": "最佳连续",
+    "bodyweight": "自重",
+    "cancel": "取消",
+    "cardio": "有氧运动",
+    "close": "关闭",
+    "completed": "已完成",
+    "confirm": "确认",
+    "custom": "自定义",
+    "daysAbbr": "天",
+    "delete": "删除",
+    "difficulty": "难度",
+    "global": "全球",
+    "loading": "加载中...",
+    "member": "一位成员",
+    "next": "下一个",
+    "perfectDays": "完美天数",
+    "poke": "给你发了一个戳！",
+    "remaining": "还剩 {{count}} 个",
+    "reps": "次",
+    "repsCount": "{{count}} 次",
+    "save": "保存",
+    "share": "分享",
+    "weights": "负重",
+    "you": "你",
+    "yourPseudo": "你的名字..."
+  },
+  "counter": {
+    "completeAll": "全部完成",
+    "reset": "重置",
+    "tips": [
+      "喝水能提升表现。",
+      "保持背部挺直！",
+      "坚持胜过强度。",
+      "运动后好好呼吸。",
+      "每天进步1%。"
     ],
-    "day": "第{{num}}天",
-    "repsCount": "{{done}} / {{goal}} 次"
+    "validated": "{{exercise}} 完成！"
+  },
+  "customExercises": {
+    "colorLabel": "主题颜色",
+    "create": "创建练习",
+    "deleteConfirm": "删除 {{name}}？",
+    "deleteTitle": "删除练习？",
+    "deleteWarning": "注意：您将从全球总数中丢失 {{count}} {{unit}}。",
+    "empty": "您还没有创建任何自定义练习。",
+    "errorLimit": "已达到练习限制或出现错误。",
+    "errorNameRequired": "名称为必填项",
+    "iconLabel": "图标",
+    "limitReached_one": "已达到 {{count}} 个练习的限制。",
+    "limitReached_other": "已达到 {{count}} 个练习的限制。",
+    "multiplierHint": "目标：第X天乘以 {{value}} {{unit}}。",
+    "multiplierLabel": "目标倍率",
+    "multiplierShort": "倍率",
+    "nameLabel": "练习名称",
+    "namePlaceholder": "例如：椅子平板支撑、跳绳...",
+    "repetitions": "次",
+    "seconds": "秒",
+    "title": "自定义练习",
+    "typeCounter": "计数器",
+    "typeLabel": "追踪类型",
+    "typeReps": "次数",
+    "typeTime": "时间",
+    "typeTimer": "计时器"
+  },
+  "dashboard": {
+    "calendar": "日历",
+    "challengeStarts": "你的挑战开始于",
+    "configure": "配置",
+    "day": "天",
+    "doneAt": "完成于 {{time}}",
+    "noExercisesConfigured": "您尚未在此处配置任何练习。",
+    "session": "训练",
+    "waiting": "⏳ 等待中"
+  },
+  "exercises": {
+    "abs": "腹肌",
+    "barbell_row": "杠铃划船",
+    "bench_press": "卧推",
+    "biceps_curl": "二头弯举",
+    "burpees": "波比跳",
+    "cycling": "骑行",
+    "deadlift": "硬拉",
+    "dips": "双杠臂屈伸",
+    "hammer_curl": "锤式弯举",
+    "jumpingjacks": "开合跳",
+    "lunges": "弓步",
+    "mountain": "登山者",
+    "overhead_press": "推举",
+    "planche": "平板支撑 (秒)",
+    "pullups": "引体向上",
+    "pushups": "俯卧撑",
+    "running": "跑步",
+    "squat_weights": "负重深蹲",
+    "squats": "深蹲"
+  },
+  "leaderboard": {
+    "achievements": "成就",
+    "activeDays": "活跃天数",
+    "copied": "已复制",
+    "copy": "复制",
+    "currentStreak": "当前连续",
+    "empty": "还没有人",
+    "enableToAppear": "在设置中启用排行榜以显示！",
+    "inviteCode": "邀请码",
+    "leaveClan": "离开部落",
+    "leaveClanConfirm": "离开部落？",
+    "leaveClanWarning": "你确定要离开 <1>{{name}}</1> 吗？你的个人数据是安全的，但你将不再出现在他们的排行榜中。",
+    "signInToAppear": "用Google登录以出现在排行榜中！",
+    "title": "排行榜"
+  },
+  "notifications": {
+    "body1": "🎯 第{{day}}天 — 运动在等你！💪",
+    "body2": "💥 挑战：保持你的连续！🔥",
+    "body3": "⚡ 今天锻炼，保持正轨！✨",
+    "body4": "🚀 {{day}}次保持火焰！🏆",
+    "title": "💪 OneUp — 每日挑战！"
+  },
+  "onboarding": {
+    "back": "返回",
+    "backfillDesc": "我们会为你补填之前的日子",
+    "chooseAtLeast": "(至少选一个)",
+    "concept": "概念",
+    "consistencySuperpower": "💪 坚持是你的超能力。",
+    "day1": "第1天",
+    "day1Desc": "= 1 个俯卧撑",
+    "day365": "第365天",
+    "day365Desc": "= 365 个俯卧撑",
+    "discipline": "通过每日进步，建立<1>坚不可摧的自律</1>。",
+    "letsGo": "开始吧！",
+    "limitedTo": "(限于 {{year}})",
+    "next": "下一步",
+    "selectPastExercises": "选择要补做的运动",
+    "startChallenge": "开始挑战",
+    "whenStarted": "📅 你什么时候开始的？",
+    "whichExercises": "🎯 计算哪些运动？",
+    "yourExercises": "你的运动",
+    "yourJourney": "你的旅程"
+  },
+  "paywall": {
+    "proRequired": "需要 Pro 模式",
+    "proRequiredDesc": "访问力量训练面板并创建你自己的自定义练习。",
+    "viewStore": "查看商店"
+  },
+  "pro": {
+    "activeDesc": "你可以创建自定义计划。",
+    "activeTitle": "Pro 会员",
+    "buyButton": "升级 Pro",
+    "description": "自定义训练计划",
+    "explanation": "创建你自己的训练计划：选择你的运动，设定每日进度，并通过连续天数和日历跟踪你的专属统计数据。",
+    "features": {
+      "customExercises": "100%自定义练习",
+      "exclusiveLeaderboards": "专属排行榜",
+      "shareThemes": "专属分享主题",
+      "weightDashboard": "力量训练面板"
+    },
+    "historyDesc": "自动续订",
+    "lifetimeDesc": "永久访问",
+    "oneTimeDesc": "一次性支付",
+    "price": "€1.99/月",
+    "promotionalDesc": "OneUp 团队赠送",
+    "title": "Pro 订阅"
+  },
+  "routines": {
+    "empty": "没有保存的训练计划",
+    "load": "加载",
+    "namePlaceholder": "训练计划名称",
+    "title": "我的训练计划"
+  },
+  "settings": {
+    "allEffects": "所有效果已启用",
+    "appTheme": "应用主题",
+    "chinese": "中文",
+    "community": "社区",
+    "dataCloud": "数据与云端",
+    "disable": "禁用",
+    "displayName": "显示名称",
+    "eco": "节能",
+    "enable": "启用",
+    "english": "English",
+    "french": "Français",
+    "graphicsMode": "图形模式",
+    "language": "语言",
+    "languageDesc": "更改应用语言",
+    "leaderboardDesc": "在公开排行榜中显示",
+    "lock": "锁定",
+    "max": "最高",
+    "maxChars": "最多20个字符 · 将使用你的Google头像",
+    "multiplier": "倍率（最高1.0）",
+    "notifications": "通知",
+    "performance": "性能",
+    "preferences": "偏好",
+    "reducedEffects": "减少视觉效果",
+    "reminder": "锻炼提醒",
+    "reminderTime": "提醒时间",
+    "russian": "Русский",
+    "sensitiveParam": "敏感设置",
+    "sensitiveWarning": "更改此设置将修改你的每日目标。设为0.5会将目标减半。",
+    "soundEffects": "音效",
+    "soundsDescription": "操作音效",
+    "spanish": "Español",
+    "title": "设置",
+    "unlockSettings": "解锁设置"
+  },
+  "share": {
+    "backgroundImage": "背景图片",
+    "categoryFilter": "类别",
+    "cropImage": "裁剪图片",
+    "download": "下载",
+    "duration": "时长",
+    "exercises": "练习",
+    "exercisesCompleted": "已完成的练习",
+    "globalStats": "全局统计",
+    "imageSelected": "图片已选择",
+    "metrics": "显示的指标",
+    "recentSessions": "最近的训练",
+    "recropImage": "重新裁剪",
+    "sessionDetail": "训练详情",
+    "sessionNamePlaceholder": "训练名称（可选）",
+    "shareCard": "分享我的统计",
+    "showDailyExercises": "每日例行运动",
+    "showHistory": "训练历史",
+    "showWeights": "按类别分开",
+    "takePhoto": "拍摄照片",
+    "theme": "主题",
+    "theme.dark": "深色",
+    "theme.forest": "森林",
+    "theme.ocean": "海洋",
+    "theme.purple": "紫色",
+    "theme.sunset": "日落",
+    "uploadGallery": "相册"
   },
   "stats": {
+    "basedOnManual": "基于{{count}}个手动记录的天数",
+    "basedOnManual_one": "基于{{count}}个手动记录的天数",
+    "basedOnManual_other": "基于{{count}}个手动记录的天数",
+    "byExercise": "按运动",
+    "champion": "冠军",
+    "completeForHabits": "完成每日运动以查看<br />你的习惯！",
+    "completedDays": "完成天数",
+    "consistency": "⏰ 坚持度",
+    "currentStreak": "当前连续",
+    "dailyReps": "📈 每日次数趋势",
+    "difficultyEvolution": "⚙️ 难度变化",
+    "difficultyNoData": "暂无难度数据",
+    "difficultyNoDataHint": "更改练习的难度即可在此处查看其变化",
+    "exercisesDone": "已完成运动",
+    "filters": "筛选",
+    "loadingCharts": "加载图表中...",
+    "maxDays": "最多{{count}}天",
     "monthAbbreviations": [
       "1月",
       "2月",
@@ -494,113 +579,66 @@
       "11月",
       "12月"
     ],
-    "title": "统计",
-    "filters": "筛选",
-    "totalReps": "总次数",
+    "monthlyActivity": "📅 月度活动",
+    "muscleBalance": "🕸️ 肌肉平衡",
+    "notEnoughData": "📊 数据不足",
+    "ofYear": "本年度",
+    "overExercises": "共{{count}}项运动 · {{days}}天努力",
     "overExercises_one": "共{{count}}项运动 · {{days}}天努力",
     "overExercises_other": "共{{count}}项运动 · {{days}}天努力",
-    "currentStreak": "当前连续",
-    "completedDays": "完成天数",
-    "ofYear": "本年度",
-    "exercisesDone": "已完成运动",
-    "champion": "冠军",
-    "monthlyActivity": "📅 月度活动",
-    "loadingCharts": "加载图表中...",
-    "dailyReps": "📈 每日次数趋势",
-    "difficultyEvolution": "⚙️ 难度变化",
-    "difficultyNoData": "暂无难度数据",
-    "difficultyNoDataHint": "更改练习的难度即可在此处查看其变化",
-    "muscleBalance": "🕸️ 肌肉平衡",
-    "consistency": "⏰ 坚持度",
-    "basedOnManual_one": "基于{{count}}个手动记录的天数",
-    "basedOnManual_other": "基于{{count}}个手动记录的天数",
-    "notEnoughData": "📊 数据不足",
-    "completeForHabits": "完成每日运动以查看<br />你的习惯！",
-    "byExercise": "按运动",
+    "pieLabels": {
+      "afternoon": "下午",
+      "evening": "晚上",
+      "morning": "上午"
+    },
     "quote": "\"坚持胜过完美\"",
     "quoteSub": "每天出现，一步一个脚印！",
-    "overExercises": "共{{count}}项运动 · {{days}}天努力",
-    "basedOnManual": "基于{{count}}个手动记录的天数",
-    "maxDays": "最多{{count}}天",
-    "pieLabels": {
-      "morning": "上午",
-      "afternoon": "下午",
-      "evening": "晚上"
-    }
+    "title": "统计",
+    "totalReps": "总次数"
   },
-  "notifications": {
-    "body1": "🎯 第{{day}}天 — 运动在等你！💪",
-    "body2": "💥 挑战：保持你的连续！🔥",
-    "body3": "⚡ 今天锻炼，保持正轨！✨",
-    "body4": "🚀 {{day}}次保持火焰！🏆",
-    "title": "💪 OneUp — 每日挑战！"
+  "store": {
+    "historyDesc": "OneUp 交易",
+    "historyTitle": "应用内购买",
+    "statusActive": "有效",
+    "statusExpired": "已过期",
+    "statusPaid": "已支付",
+    "title": "商店"
   },
-  "exercises": {
-    "pushups": "俯卧撑",
-    "squats": "深蹲",
-    "pullups": "引体向上",
-    "abs": "腹肌",
-    "jumpingjacks": "开合跳",
-    "lunges": "弓步",
-    "burpees": "波比跳",
-    "planche": "平板支撑 (秒)",
-    "dips": "双杠臂屈伸",
-    "mountain": "登山者",
-    "biceps_curl": "二头弯举",
-    "hammer_curl": "锤式弯举",
-    "bench_press": "卧推",
-    "overhead_press": "推举",
-    "squat_weights": "负重深蹲",
-    "deadlift": "硬拉",
-    "barbell_row": "杠铃划船",
-    "running": "跑步",
-    "cycling": "骑行"
+  "supporter": {
+    "badgeActive": "你的支持者徽章已在排行榜中激活。",
+    "buyButton": "支持 OneUp",
+    "description": "成为支持者！",
+    "donateAgain": "再次捐赠",
+    "explanation": "没有隐藏功能——这是自愿支持。作为回报，你将获得一个在排行榜中可见的 ❤️ 徽章。",
+    "history": "购买历史",
+    "historyDesc": "感谢你的支持！",
+    "historyTitle": "支持 OneUp ❤️",
+    "restore": "恢复购买",
+    "thankYou": "感谢你的支持！❤️",
+    "title": "支持开发者 ❤️"
   },
-  "share": {
-    "duration": "时长",
-    "exercises": "练习",
-    "exercisesCompleted": "已完成的练习",
-    "showHistory": "训练历史",
-    "recentSessions": "最近的训练",
-    "metrics": "显示的指标",
-    "download": "下载",
-    "shareCard": "分享我的统计",
-    "globalStats": "全局统计",
-    "sessionDetail": "训练详情",
-    "showWeights": "按类别分开",
-    "sessionNamePlaceholder": "训练名称（可选）",
-    "categoryFilter": "类别",
-    "theme": "主题",
-    "theme.dark": "深色",
-    "theme.ocean": "海洋",
-    "theme.sunset": "日落",
-    "theme.forest": "森林",
-    "theme.purple": "紫色",
-    "backgroundImage": "背景图片",
-    "cropImage": "裁剪图片",
-    "showDailyExercises": "每日例行运动",
-    "imageSelected": "图片已选择",
-    "recropImage": "重新裁剪",
-    "takePhoto": "拍摄照片",
-    "uploadGallery": "相册"
+  "timer": {
+    "remaining": "还需保持 {{time}}",
+    "reset": "重置",
+    "skip": "跳过",
+    "tips": [
+      "喝水能提升表现。",
+      "保持背部挺直！",
+      "坚持胜过强度。",
+      "运动中好好呼吸。",
+      "每天进步1%。"
+    ],
+    "validated": "计时器完成！"
   },
   "weight": {
-    "title": "负重演变",
     "kg": "kg",
     "noData": "尚无数据",
-    "noDataHint": "在训练期间设置负重以查看进度"
-  },
-  "announcement": {
-    "badge": "新功能",
-    "cardio": {
-      "title": "全新有氧运动模块！🏃🚴",
-      "body": "连接 Strava 以自动同步您的跑步和骑行。追踪您的每周目标、连续纪录，并查看您的 GPS 轨迹。有氧运动现在计入您的总连续纪录。",
-      "cta": "太棒了！"
-    }
+    "noDataHint": "在训练期间设置负重以查看进度",
+    "title": "负重演变"
   },
   "widgets": {
-    "streak": "连续天数",
     "days": "天",
+    "streak": "连续天数",
     "weekdays": [
       "一",
       "二",
@@ -611,54 +649,16 @@
       "日"
     ]
   },
-  "cardio": {
-    "weeklyGoal": "每周目标",
-    "week": "第",
-    "connectTitle": "已连接服务",
-    "lastSession": "上次训练",
-    "duration": "用时",
-    "distance": "距离",
-    "elevation": "爬升+",
-    "avgSpeed": "平均速度",
-    "pace": "配速",
-    "streak": "连续",
-    "streakWeeks": "周",
-    "viewHistory": "查看历史",
-    "noSessions": "暂无训练记录",
-    "history": "有氧历史",
-    "goalReached": "目标达成！",
-    "totalDistance": "总距离 ({{unit}})",
-    "overSessions": "共 {{count}} 次训练",
-    "sessionsCount_one": "{{count}} 次训练",
-    "sessionsCount_other": "{{count}} 次训练",
-    "loading": "正在加载有氧运动数据...",
-    "speed": "速度",
-    "noGpsTrack": "无 GPS 轨迹",
-    "gpsTrack": "GPS 路线",
-    "start": "起点",
-    "finish": "终点",
-    "tap": "轻触",
-    "stravaWallTitle": "连接 Strava",
-    "stravaWallDesc": "自动同步您的跑步和骑行活动，以提升您的全球连胜记录。",
-    "googleWallTitle": "需要账户",
-    "googleWallDesc": "使用您的 Google 账户登录以访问有氧模块并同步数据。",
-    "googleWallStep1": "Google 登录",
-    "googleWallStep2": "连接 Strava",
-    "googleWallStep3": "自动同步",
-    "difficultyModified": "难度已修改",
-    "difficultyMismatchDesc": "难度已更改 ({{saved}}x → {{current}}x)。您想继续使用此新设置吗？",
-    "revalidate": "继续",
-    "units": {
-      "km": "公里",
-      "m": "米",
-      "kmh": "公里/小时",
-      "minKm": "/公里"
-    }
-  },
-  "routines": {
-    "title": "我的训练计划",
-    "empty": "没有保存的训练计划",
-    "load": "加载",
-    "namePlaceholder": "训练计划名称"
+  "workout": {
+    "allCompleted": "所有运动已完成 💪",
+    "chooseOrder": "选择运动顺序",
+    "custom": "自定义",
+    "interDashboard": "混合运动",
+    "interDashboardDesc": "合并所有仪表板的运动。",
+    "launch": "开始 ({{count}} 项运动)",
+    "launch_one": "开始 ({{count}} 项运动)",
+    "launch_other": "开始 ({{count}} 项运动)",
+    "sessionDone": "训练完成！",
+    "shuffle": "随机排序"
   }
 }

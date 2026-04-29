@@ -1,456 +1,197 @@
 {
-  "app": {
-    "initializing": "Initializing..."
-  },
-  "dashboard": {
-    "calendar": "Calendar",
-    "session": "Session",
-    "noExercisesConfigured": "You haven't configured any exercises here yet.",
-    "configure": "Configure",
-    "day": "Day",
-    "doneAt": "Done at {{time}}",
-    "waiting": "⏳ Waiting",
-    "challengeStarts": "Your challenge starts on"
-  },
-  "common": {
-    "weights": "Weights",
-    "custom": "Custom",
-    "close": "Close",
-    "bodyweight": "Bodyweight",
-    "cancel": "Cancel",
-    "global": "Global",
-    "poke": "sent you a poke!",
-    "you": "you",
-    "daysAbbr": "d",
-    "reps": "reps",
-    "anonymous": "Anonymous",
-    "member": "A member",
-    "confirm": "Confirm",
-    "next": "Next",
-    "save": "Save",
-    "delete": "Delete",
-    "loading": "Loading...",
-    "completed": "Completed",
-    "share": "Share",
-    "yourPseudo": "Your name...",
-    "difficulty": "Difficulty",
-    "bestStreak": "Best Streak",
-    "perfectDays": "Perfect Days",
-    "repsCount": "{{count}} reps",
-    "remaining": "{{count}} left",
-    "cardio": "Cardio"
-  },
-  "paywall": {
-    "proRequired": "Pro Mode Required",
-    "proRequiredDesc": "Access weight training dashboards and create your own custom exercises.",
-    "viewStore": "View Store"
-  },
-  "counter": {
-    "validated": "{{exercise}} Complete!",
-    "reset": "Reset",
-    "completeAll": "Complete All",
-    "tips": [
-      "Drinking water boosts performance.",
-      "Keep your back straight!",
-      "Consistency beats intensity.",
-      "Breathe well after the effort.",
-      "1% better every day."
-    ]
-  },
-  "customExercises": {
-    "errorNameRequired": "Name is required",
-    "errorLimit": "Exercise limit reached or error.",
-    "title": "Custom Exercises",
-    "empty": "You haven't created any custom exercises yet.",
-    "typeTimer": "Timer",
-    "typeCounter": "Counter",
-    "multiplierShort": "Multiplier",
-    "create": "Create an exercise",
-    "limitReached_one": "Limit of {{count}} exercise reached.",
-    "limitReached_other": "Limit of {{count}} exercises reached.",
-    "nameLabel": "Exercise name",
-    "namePlaceholder": "Ex: Chair plank, Jump rope...",
-    "colorLabel": "Theme color",
-    "iconLabel": "Icon",
-    "typeLabel": "Tracking type",
-    "typeReps": "Reps",
-    "typeTime": "Time",
-    "multiplierLabel": "Goal multiplier",
-    "deleteTitle": "Delete exercise?",
-    "deleteConfirm": "Delete {{name}}?",
-    "deleteWarning": "Warning: you will lose {{count}} {{unit}} from your global total.",
-    "seconds": "seconds",
-    "repetitions": "repetitions",
-    "multiplierHint": "Target goal: Day #X multiplied by {{value}} {{unit}}."
-  },
-  "pro": {
-    "title": "Pro Subscription",
-    "activeTitle": "Pro Member",
-    "activeDesc": "You can create custom programs.",
-    "description": "Custom programs",
-    "explanation": "Create your own workout programs: choose your exercises, set your daily progression, and track your dedicated stats with streaks and calendar.",
-    "features": {
-      "customExercises": "100% Custom Exercises",
-      "weightDashboard": "Weight Training Dashboard",
-      "exclusiveLeaderboards": "Exclusive Leaderboards",
-      "shareThemes": "Exclusive share themes"
-    },
-    "buyButton": "Go Pro",
-    "price": "€1.99/month",
-    "historyDesc": "Auto-renewal",
-    "promotionalDesc": "Gifted by OneUp Team",
-    "lifetimeDesc": "Lifetime Access",
-    "oneTimeDesc": "One-time payment"
-  },
-  "workout": {
-    "sessionDone": "Session Complete!",
-    "allCompleted": "All exercises completed 💪",
-    "interDashboard": "Mix exercises",
-    "interDashboardDesc": "Combine exercises from all dashboards.",
-    "chooseOrder": "Choose exercise order",
-    "shuffle": "Shuffle",
-    "custom": "Custom",
-    "launch_one": "Start ({{count}} exercise)",
-    "launch_other": "Start ({{count}} exercises)",
-    "launch": "Start ({{count}} exercise{{plural}})"
-  },
-  "timer": {
-    "validated": "Timer Complete!",
-    "remaining": "{{time}} left to hold",
-    "reset": "Reset",
-    "skip": "Skip",
-    "tips": [
-      "Drinking water boosts performance.",
-      "Keep your back straight!",
-      "Consistency beats intensity.",
-      "Breathe well during the effort.",
-      "1% better every day."
-    ]
-  },
-  "achievements": {
-    "badges": {
-      "secret": "Secret",
-      "first_blood": {
-        "title": "First Step",
-        "desc": "Complete your first workout"
-      },
-      "consistent": {
-        "title": "Consistency",
-        "desc": "Work out 3 days in a row"
-      },
-      "week_warrior": {
-        "title": "Week Warrior",
-        "desc": "7 days in a row"
-      },
-      "two_weeks": {
-        "title": "Tenacity",
-        "desc": "14 days in a row"
-      },
-      "month_warrior": {
-        "title": "Month Soldier",
-        "desc": "30 days in a row"
-      },
-      "two_months": {
-        "title": "Iron Discipline",
-        "desc": "60 days in a row"
-      },
-      "quarter_year": {
-        "title": "Quarterback",
-        "desc": "90 days in a row"
-      },
-      "half_year": {
-        "title": "Half Year",
-        "desc": "180 days in a row"
-      },
-      "year_beast": {
-        "title": "Competition Beast",
-        "desc": "365 days in a row"
-      },
-      "ten_sessions": {
-        "title": "Top Ten",
-        "desc": "10 workouts total"
-      },
-      "fifty_sessions": {
-        "title": "Fifty",
-        "desc": "50 workouts total"
-      },
-      "hundred_sessions": {
-        "title": "Centurion",
-        "desc": "100 workouts total"
-      },
-      "two_hundred_sessions": {
-        "title": "Legend",
-        "desc": "200 workouts total"
-      },
-      "five_hundred_sessions": {
-        "title": "Mythical",
-        "desc": "500 workouts total"
-      },
-      "rep_500": {
-        "title": "500 Reps",
-        "desc": "500 total reps"
-      },
-      "rep_1000": {
-        "title": "Thousand",
-        "desc": "1,000 total reps"
-      },
-      "rep_5000": {
-        "title": "Five Thousand",
-        "desc": "5,000 total reps"
-      },
-      "rep_10000": {
-        "title": "Counter",
-        "desc": "10,000 total reps"
-      },
-      "rep_50000": {
-        "title": "Slaughterer",
-        "desc": "50,000 total reps"
-      },
-      "perfect_one": {
-        "title": "First Perfect Day",
-        "desc": "One perfect day (all exercises)"
-      },
-      "perfect_five": {
-        "title": "Excellence",
-        "desc": "5 perfect days"
-      },
-      "perfect_fifty": {
-        "title": "Mastery",
-        "desc": "50 perfect days"
-      },
-      "perfect_hundred": {
-        "title": "Perfectionist",
-        "desc": "100 perfect days"
-      },
-      "all_exercises": {
-        "title": "All-Rounder",
-        "desc": "Do every exercise at least once"
-      },
-      "weekday_warrior": {
-        "title": "Monday to Friday",
-        "desc": "25 weekday workouts"
-      },
-      "weekend_warrior": {
-        "title": "Weekend",
-        "desc": "25 weekend workouts"
-      },
-      "balanced": {
-        "title": "Balanced",
-        "desc": "Equal weekday and weekend workouts"
-      },
-      "morning_5": {
-        "title": "Early Bird",
-        "desc": "5 morning workouts"
-      },
-      "morning_10": {
-        "title": "Morning Person",
-        "desc": "10 morning workouts"
-      },
-      "morning_25": {
-        "title": "Dawn",
-        "desc": "25 morning workouts"
-      },
-      "afternoon_5": {
-        "title": "Kickstart",
-        "desc": "5 afternoon workouts"
-      },
-      "afternoon_10": {
-        "title": "Afternoon",
-        "desc": "10 afternoon workouts"
-      },
-      "afternoon_25": {
-        "title": "Rhythm",
-        "desc": "25 afternoon workouts"
-      },
-      "evening_5": {
-        "title": "Night Owl",
-        "desc": "5 evening workouts"
-      },
-      "evening_10": {
-        "title": "Nocturnal",
-        "desc": "10 evening workouts"
-      },
-      "evening_25": {
-        "title": "Moon",
-        "desc": "25 evening workouts"
-      },
-      "first_share": {
-        "title": "Social Butterfly",
-        "desc": "Share your stats for the first time"
-      },
-      "ghost": {
-        "title": "Ghost",
-        "desc": "Workout between 3am and 4am"
-      },
-      "perfectionist": {
-        "title": "Unstoppable",
-        "desc": "30 consecutive perfect days"
-      },
-      "beast": {
-        "title": "Beast",
-        "desc": "100,000 total reps"
-      }
-    },
-    "validated": "Done",
-    "badgesUnlocked": "Badges Unlocked",
-    "categories": {
-      "streak": "Streak",
-      "quantity": "Quantity",
-      "volume": "Volume",
-      "perfection": "Perfection",
-      "horaires": "Time of Day",
-      "secrets": "Secrets",
-      "social": "Social"
-    }
-  },
   "achievementToast": {
     "title": "Achievement Unlocked!"
   },
-  "cloud": {
-    "restore": "Restore",
-    "restoreDesc": "Get my data from the cloud",
-    "areYouSure": "Are you sure?",
-    "cannotBeUndone": "Your local and cloud data will be merged.",
-    "cloudBackup": "Cloud Backup",
-    "connectedGooglePlay": "Connected with Google Play",
-    "notConnected": "Not connected",
-    "user": "User",
-    "dataConflict": "Data Conflict",
-    "resolving": "Resolving...",
-    "autoSyncEnabled": "Auto-sync enabled",
-    "signOut": "Sign Out",
-    "deleteAccount": "Delete My Account",
-    "deleteWarning": "This action is <1>irreversible</1>. All your data will be permanently deleted, including your progress and settings.",
-    "deleteCannotUndo": "This action cannot be undone",
-    "deleting": "Deleting...",
-    "promoText": "Sign in with your Google account to save your progress to the cloud and sync across devices.",
-    "autoBackup": "Automatic backup",
-    "multiDevice": "Multi-device sync",
-    "neverLose": "Never lose your progress",
-    "signInWithGoogle": "Sign in with Google",
-    "anonymousMergeTitle": "Local progress detected",
-    "anonymousMergeDesc": "You completed exercises while signed out. Would you like to merge them with your account?",
-    "merge": "Merge",
-    "mergeDesc": "Combine local + cloud data"
+  "achievements": {
+    "badges": {
+      "afternoon_10": {
+        "desc": "10 afternoon workouts",
+        "title": "Afternoon"
+      },
+      "afternoon_25": {
+        "desc": "25 afternoon workouts",
+        "title": "Rhythm"
+      },
+      "afternoon_5": {
+        "desc": "5 afternoon workouts",
+        "title": "Kickstart"
+      },
+      "all_exercises": {
+        "desc": "Do every exercise at least once",
+        "title": "All-Rounder"
+      },
+      "balanced": {
+        "desc": "Equal weekday and weekend workouts",
+        "title": "Balanced"
+      },
+      "beast": {
+        "desc": "100,000 total reps",
+        "title": "Beast"
+      },
+      "consistent": {
+        "desc": "Work out 3 days in a row",
+        "title": "Consistency"
+      },
+      "evening_10": {
+        "desc": "10 evening workouts",
+        "title": "Nocturnal"
+      },
+      "evening_25": {
+        "desc": "25 evening workouts",
+        "title": "Moon"
+      },
+      "evening_5": {
+        "desc": "5 evening workouts",
+        "title": "Night Owl"
+      },
+      "fifty_sessions": {
+        "desc": "50 workouts total",
+        "title": "Fifty"
+      },
+      "first_blood": {
+        "desc": "Complete your first workout",
+        "title": "First Step"
+      },
+      "first_share": {
+        "desc": "Share your stats for the first time",
+        "title": "Social Butterfly"
+      },
+      "five_hundred_sessions": {
+        "desc": "500 workouts total",
+        "title": "Mythical"
+      },
+      "ghost": {
+        "desc": "Workout between 3am and 4am",
+        "title": "Ghost"
+      },
+      "half_year": {
+        "desc": "180 days in a row",
+        "title": "Half Year"
+      },
+      "hundred_sessions": {
+        "desc": "100 workouts total",
+        "title": "Centurion"
+      },
+      "month_warrior": {
+        "desc": "30 days in a row",
+        "title": "Month Soldier"
+      },
+      "morning_10": {
+        "desc": "10 morning workouts",
+        "title": "Morning Person"
+      },
+      "morning_25": {
+        "desc": "25 morning workouts",
+        "title": "Dawn"
+      },
+      "morning_5": {
+        "desc": "5 morning workouts",
+        "title": "Early Bird"
+      },
+      "perfect_fifty": {
+        "desc": "50 perfect days",
+        "title": "Mastery"
+      },
+      "perfect_five": {
+        "desc": "5 perfect days",
+        "title": "Excellence"
+      },
+      "perfect_hundred": {
+        "desc": "100 perfect days",
+        "title": "Perfectionist"
+      },
+      "perfect_one": {
+        "desc": "One perfect day (all exercises)",
+        "title": "First Perfect Day"
+      },
+      "perfectionist": {
+        "desc": "30 consecutive perfect days",
+        "title": "Unstoppable"
+      },
+      "quarter_year": {
+        "desc": "90 days in a row",
+        "title": "Quarterback"
+      },
+      "rep_1000": {
+        "desc": "1,000 total reps",
+        "title": "Thousand"
+      },
+      "rep_10000": {
+        "desc": "10,000 total reps",
+        "title": "Counter"
+      },
+      "rep_500": {
+        "desc": "500 total reps",
+        "title": "500 Reps"
+      },
+      "rep_5000": {
+        "desc": "5,000 total reps",
+        "title": "Five Thousand"
+      },
+      "rep_50000": {
+        "desc": "50,000 total reps",
+        "title": "Slaughterer"
+      },
+      "secret": "Secret",
+      "ten_sessions": {
+        "desc": "10 workouts total",
+        "title": "Top Ten"
+      },
+      "two_hundred_sessions": {
+        "desc": "200 workouts total",
+        "title": "Legend"
+      },
+      "two_months": {
+        "desc": "60 days in a row",
+        "title": "Iron Discipline"
+      },
+      "two_weeks": {
+        "desc": "14 days in a row",
+        "title": "Tenacity"
+      },
+      "week_warrior": {
+        "desc": "7 days in a row",
+        "title": "Week Warrior"
+      },
+      "weekday_warrior": {
+        "desc": "25 weekday workouts",
+        "title": "Monday to Friday"
+      },
+      "weekend_warrior": {
+        "desc": "25 weekend workouts",
+        "title": "Weekend"
+      },
+      "year_beast": {
+        "desc": "365 days in a row",
+        "title": "Competition Beast"
+      }
+    },
+    "badgesUnlocked": "Badges Unlocked",
+    "categories": {
+      "horaires": "Time of Day",
+      "perfection": "Perfection",
+      "quantity": "Quantity",
+      "secrets": "Secrets",
+      "social": "Social",
+      "streak": "Streak",
+      "volume": "Volume"
+    },
+    "validated": "Done"
   },
-  "onboarding": {
-    "concept": "The Concept",
-    "yourJourney": "Your Journey",
-    "yourExercises": "Your Exercises",
-    "day1": "Day 1",
-    "day1Desc": "= 1 Push-up",
-    "day365": "Day 365",
-    "day365Desc": "= 365 Push-ups",
-    "discipline": "Build an <1>unshakable discipline</1> with daily progression.",
-    "consistencySuperpower": "💪 Consistency is your superpower.",
-    "letsGo": "Let's go!",
-    "whenStarted": "📅 When did you start?",
-    "backfillDesc": "We'll fill in the previous days for you",
-    "limitedTo": "(limited to {{year}})",
-    "back": "Back",
-    "next": "Next",
-    "startChallenge": "Start Challenge",
-    "whichExercises": "🎯 Which exercises to count?",
-    "selectPastExercises": "Select exercises to complete for past days",
-    "chooseAtLeast": "(choose at least one)"
+  "announcement": {
+    "badge": "New",
+    "cardio": {
+      "body": "Connect Strava to automatically sync your runs and bike rides. Track your weekly goals, your streak, and view your GPS tracks. Cardio now contributes to your global streak.",
+      "cta": "Awesome!",
+      "title": "New Cardio Module! 🏃🚴"
+    }
   },
-  "store": {
-    "title": "Store",
-    "historyTitle": "In-App Purchase",
-    "historyDesc": "OneUp Transaction",
-    "statusActive": "Active",
-    "statusExpired": "Expired",
-    "statusPaid": "Paid"
-  },
-  "settings": {
-    "title": "Settings",
-    "preferences": "Preferences",
-    "notifications": "Notifications",
-    "reminder": "Workout reminder",
-    "reminderTime": "REMINDER TIME",
-    "soundEffects": "Sound Effects",
-    "soundsDescription": "Sounds on actions",
-    "language": "Language",
-    "languageDesc": "Change the application language",
-    "french": "Français",
-    "english": "English",
-    "spanish": "Español",
-    "chinese": "中文",
-    "russian": "Русский",
-    "performance": "Performance",
-    "graphicsMode": "Graphics Mode",
-    "reducedEffects": "Reduced visual effects",
-    "allEffects": "All effects enabled",
-    "eco": "Eco",
-    "max": "Max",
-    "community": "Community",
-    "leaderboardDesc": "Appear in the public leaderboard",
-    "displayName": "Display Name",
-    "maxChars": "Max 20 characters · Your Google photo will be used",
-    "dataCloud": "Data & Cloud",
-    "sensitiveParam": "SENSITIVE SETTING",
-    "sensitiveWarning": "Changing this will modify your daily rep targets. A setting of 0.5 halves your targets.",
-    "unlockSettings": "UNLOCK SETTINGS",
-    "multiplier": "Multiplier (Max 1.0)",
-    "lock": "Lock",
-    "disable": "Disable",
-    "enable": "Enable",
-    "appTheme": "App Theme"
-  },
-  "supporter": {
-    "title": "Support the developer ❤️",
-    "thankYou": "Thank you for your support! ❤️",
-    "badgeActive": "Your Supporter badge is active in the leaderboard.",
-    "description": "Become a Supporter!",
-    "explanation": "No hidden features — it's a voluntary support. In return, you get a ❤️ badge visible in the leaderboard.",
-    "donateAgain": "Make another donation",
-    "buyButton": "Support OneUp",
-    "restore": "Restore my purchases",
-    "history": "Purchase history",
-    "historyTitle": "OneUp Support ❤️",
-    "historyDesc": "Thank you for your support!"
-  },
-  "leaderboard": {
-    "inviteCode": "Invite Code",
-    "copied": "Copied",
-    "copy": "Copy",
-    "title": "Leaderboard",
-    "empty": "No one here yet",
-    "signInToAppear": "Sign in with Google to appear in the leaderboard!",
-    "enableToAppear": "Enable the leaderboard in settings to appear!",
-    "leaveClan": "Leave Clan",
-    "leaveClanConfirm": "Leave Clan?",
-    "leaveClanWarning": "Are you sure you want to leave <1>{{name}}</1>? Your personal stats are safe, but you won't appear in their leaderboard anymore.",
-    "activeDays": "Active Days",
-    "currentStreak": "Current Streak",
-    "achievements": "Achievements"
-  },
-  "clan": {
-    "pseudoRequired": "A name is required",
-    "nameRequired": "Clan name is required",
-    "createError": "An error occurred",
-    "codeRequired": "6-character code required",
-    "invalidCode": "Invalid code",
-    "title": "Clan",
-    "signInRequired": "Sign in with Google to create or join a clan!",
-    "signIn": "Sign In",
-    "yourClans_one": "Your Clan ({{count}})",
-    "joinFriends": "Join your friends, compare your efforts and motivate each other!",
-    "joinClan": "Join a Clan",
-    "createClan": "Create a Clan",
-    "choosePseudo": "Choose a name to appear in your clan:",
-    "clanNamePrompt": "Give your clan an epic name:",
-    "enterCode": "Enter the 6-character code:",
-    "clanNamePlaceholder": "Clan name...",
-    "createButton": "Create Clan",
-    "join": "Join",
-    "alreadyMember": "You are already in this clan",
-    "joinError": "Error joining clan",
-    "missingId": "Missing clan ID",
-    "leaveError": "Error leaving clan",
-    "yourClans": "Your Clans ({{count}})"
+  "app": {
+    "initializing": "Initializing..."
   },
   "calendar": {
+    "completed": "Completed",
+    "day": "Day {{num}}",
     "months": [
       "January",
       "February",
@@ -465,7 +206,7 @@
       "November",
       "December"
     ],
-    "completed": "Completed",
+    "repsCount": "{{done}} / {{goal}} reps",
     "success": "Success",
     "weekdays": [
       "Sun",
@@ -475,11 +216,355 @@
       "Thu",
       "Fri",
       "Sat"
+    ]
+  },
+  "cardio": {
+    "avgSpeed": "Avg speed",
+    "connectTitle": "Connected Services",
+    "difficultyMismatchDesc": "Difficulty has changed ({{saved}}x → {{current}}x). Do you want to continue with this new setting?",
+    "difficultyModified": "Difficulty Modified",
+    "distance": "Distance",
+    "duration": "Time",
+    "elevation": "Elevation+",
+    "finish": "Finish",
+    "goalReached": "Goal reached!",
+    "googleWallDesc": "Sign in with your Google account to access the Cardio module and sync your data.",
+    "googleWallStep1": "Google Sign-in",
+    "googleWallStep2": "Link Strava",
+    "googleWallStep3": "Auto Sync",
+    "googleWallTitle": "Account Required",
+    "gpsTrack": "GPS Track",
+    "history": "Cardio History",
+    "lastSession": "Last session",
+    "loading": "Loading cardio data...",
+    "noGpsTrack": "No GPS track",
+    "noSessions": "No sessions recorded",
+    "overSessions": "Across {{count}} sessions",
+    "pace": "Pace",
+    "revalidate": "Continue",
+    "sessionsCount_one": "{{count}} session",
+    "sessionsCount_other": "{{count}} sessions",
+    "speed": "Speed",
+    "start": "Start",
+    "stravaWallDesc": "Automatically sync your running and cycling sessions to progress your global streak.",
+    "stravaWallTitle": "Connect Strava",
+    "streak": "Streak",
+    "streakWeeks": "wks",
+    "tap": "Tap",
+    "totalDistance": "Total Distance ({{unit}})",
+    "units": {
+      "km": "km",
+      "kmh": "km/h",
+      "m": "m",
+      "minKm": "/km"
+    },
+    "viewHistory": "View history",
+    "week": "Wk",
+    "weeklyGoal": "Weekly goal"
+  },
+  "clan": {
+    "alreadyMember": "You are already in this clan",
+    "choosePseudo": "Choose a name to appear in your clan:",
+    "clanNamePlaceholder": "Clan name...",
+    "clanNamePrompt": "Give your clan an epic name:",
+    "codeRequired": "6-character code required",
+    "createButton": "Create Clan",
+    "createClan": "Create a Clan",
+    "createError": "An error occurred",
+    "enterCode": "Enter the 6-character code:",
+    "invalidCode": "Invalid code",
+    "join": "Join",
+    "joinClan": "Join a Clan",
+    "joinError": "Error joining clan",
+    "joinFriends": "Join your friends, compare your efforts and motivate each other!",
+    "leaveError": "Error leaving clan",
+    "missingId": "Missing clan ID",
+    "nameRequired": "Clan name is required",
+    "pseudoRequired": "A name is required",
+    "signIn": "Sign In",
+    "signInRequired": "Sign in with Google to create or join a clan!",
+    "title": "Clan",
+    "yourClans": "Your Clans ({{count}})",
+    "yourClans_one": "Your Clan ({{count}})"
+  },
+  "cloud": {
+    "anonymousMergeDesc": "You completed exercises while signed out. Would you like to merge them with your account?",
+    "anonymousMergeTitle": "Local progress detected",
+    "areYouSure": "Are you sure?",
+    "autoBackup": "Automatic backup",
+    "autoSyncEnabled": "Auto-sync enabled",
+    "cannotBeUndone": "Your local and cloud data will be merged.",
+    "cloudBackup": "Cloud Backup",
+    "connectedGooglePlay": "Connected with Google Play",
+    "dataConflict": "Data Conflict",
+    "deleteAccount": "Delete My Account",
+    "deleteCannotUndo": "This action cannot be undone",
+    "deleteWarning": "This action is <1>irreversible</1>. All your data will be permanently deleted, including your progress and settings.",
+    "deleting": "Deleting...",
+    "merge": "Merge",
+    "mergeDesc": "Combine local + cloud data",
+    "multiDevice": "Multi-device sync",
+    "neverLose": "Never lose your progress",
+    "notConnected": "Not connected",
+    "promoText": "Sign in with your Google account to save your progress to the cloud and sync across devices.",
+    "resolving": "Resolving...",
+    "restore": "Restore",
+    "restoreDesc": "Get my data from the cloud",
+    "signInWithGoogle": "Sign in with Google",
+    "signOut": "Sign Out",
+    "user": "User"
+  },
+  "common": {
+    "anonymous": "Anonymous",
+    "bestStreak": "Best Streak",
+    "bodyweight": "Bodyweight",
+    "cancel": "Cancel",
+    "cardio": "Cardio",
+    "close": "Close",
+    "completed": "Completed",
+    "confirm": "Confirm",
+    "custom": "Custom",
+    "daysAbbr": "d",
+    "delete": "Delete",
+    "difficulty": "Difficulty",
+    "global": "Global",
+    "loading": "Loading...",
+    "member": "A member",
+    "next": "Next",
+    "perfectDays": "Perfect Days",
+    "poke": "sent you a poke!",
+    "remaining": "{{count}} left",
+    "reps": "reps",
+    "repsCount": "{{count}} reps",
+    "save": "Save",
+    "share": "Share",
+    "weights": "Weights",
+    "you": "you",
+    "yourPseudo": "Your name..."
+  },
+  "counter": {
+    "completeAll": "Complete All",
+    "reset": "Reset",
+    "tips": [
+      "Drinking water boosts performance.",
+      "Keep your back straight!",
+      "Consistency beats intensity.",
+      "Breathe well after the effort.",
+      "1% better every day."
     ],
-    "day": "Day {{num}}",
-    "repsCount": "{{done}} / {{goal}} reps"
+    "validated": "{{exercise}} Complete!"
+  },
+  "customExercises": {
+    "colorLabel": "Theme color",
+    "create": "Create an exercise",
+    "deleteConfirm": "Delete {{name}}?",
+    "deleteTitle": "Delete exercise?",
+    "deleteWarning": "Warning: you will lose {{count}} {{unit}} from your global total.",
+    "empty": "You haven't created any custom exercises yet.",
+    "errorLimit": "Exercise limit reached or error.",
+    "errorNameRequired": "Name is required",
+    "iconLabel": "Icon",
+    "limitReached_one": "Limit of {{count}} exercise reached.",
+    "limitReached_other": "Limit of {{count}} exercises reached.",
+    "multiplierHint": "Target goal: Day #X multiplied by {{value}} {{unit}}.",
+    "multiplierLabel": "Goal multiplier",
+    "multiplierShort": "Multiplier",
+    "nameLabel": "Exercise name",
+    "namePlaceholder": "Ex: Chair plank, Jump rope...",
+    "repetitions": "repetitions",
+    "seconds": "seconds",
+    "title": "Custom Exercises",
+    "typeCounter": "Counter",
+    "typeLabel": "Tracking type",
+    "typeReps": "Reps",
+    "typeTime": "Time",
+    "typeTimer": "Timer"
+  },
+  "dashboard": {
+    "calendar": "Calendar",
+    "challengeStarts": "Your challenge starts on",
+    "configure": "Configure",
+    "day": "Day",
+    "doneAt": "Done at {{time}}",
+    "noExercisesConfigured": "You haven't configured any exercises here yet.",
+    "session": "Session",
+    "waiting": "⏳ Waiting"
+  },
+  "exercises": {
+    "abs": "Abs",
+    "barbell_row": "Barbell Row",
+    "bench_press": "Bench Press",
+    "biceps_curl": "Biceps Curls",
+    "burpees": "Burpees",
+    "cycling": "Cycling",
+    "deadlift": "Deadlift",
+    "dips": "Dips",
+    "hammer_curl": "Hammer Curls",
+    "jumpingjacks": "Jumping Jacks",
+    "lunges": "Lunges",
+    "mountain": "Mountain Climbers",
+    "overhead_press": "Overhead Press",
+    "planche": "Plank (s)",
+    "pullups": "Pull-ups",
+    "pushups": "Push-ups",
+    "running": "Running",
+    "squat_weights": "Weighted Squat",
+    "squats": "Squats"
+  },
+  "leaderboard": {
+    "achievements": "Achievements",
+    "activeDays": "Active Days",
+    "copied": "Copied",
+    "copy": "Copy",
+    "currentStreak": "Current Streak",
+    "empty": "No one here yet",
+    "enableToAppear": "Enable the leaderboard in settings to appear!",
+    "inviteCode": "Invite Code",
+    "leaveClan": "Leave Clan",
+    "leaveClanConfirm": "Leave Clan?",
+    "leaveClanWarning": "Are you sure you want to leave <1>{{name}}</1>? Your personal stats are safe, but you won't appear in their leaderboard anymore.",
+    "signInToAppear": "Sign in with Google to appear in the leaderboard!",
+    "title": "Leaderboard"
+  },
+  "notifications": {
+    "body1": "🎯 Day {{day}} — Exercises await! 💪",
+    "body2": "💥 Challenge: keep your streak! 🔥",
+    "body3": "⚡ Train today and stay on track! ✨",
+    "body4": "🚀 {{day}} reps to keep the flame! 🏆",
+    "title": "💪 OneUp — Daily Challenge!"
+  },
+  "onboarding": {
+    "back": "Back",
+    "backfillDesc": "We'll fill in the previous days for you",
+    "chooseAtLeast": "(choose at least one)",
+    "concept": "The Concept",
+    "consistencySuperpower": "💪 Consistency is your superpower.",
+    "day1": "Day 1",
+    "day1Desc": "= 1 Push-up",
+    "day365": "Day 365",
+    "day365Desc": "= 365 Push-ups",
+    "discipline": "Build an <1>unshakable discipline</1> with daily progression.",
+    "letsGo": "Let's go!",
+    "limitedTo": "(limited to {{year}})",
+    "next": "Next",
+    "selectPastExercises": "Select exercises to complete for past days",
+    "startChallenge": "Start Challenge",
+    "whenStarted": "📅 When did you start?",
+    "whichExercises": "🎯 Which exercises to count?",
+    "yourExercises": "Your Exercises",
+    "yourJourney": "Your Journey"
+  },
+  "paywall": {
+    "proRequired": "Pro Mode Required",
+    "proRequiredDesc": "Access weight training dashboards and create your own custom exercises.",
+    "viewStore": "View Store"
+  },
+  "pro": {
+    "activeDesc": "You can create custom programs.",
+    "activeTitle": "Pro Member",
+    "buyButton": "Go Pro",
+    "description": "Custom programs",
+    "explanation": "Create your own workout programs: choose your exercises, set your daily progression, and track your dedicated stats with streaks and calendar.",
+    "features": {
+      "customExercises": "100% Custom Exercises",
+      "exclusiveLeaderboards": "Exclusive Leaderboards",
+      "shareThemes": "Exclusive share themes",
+      "weightDashboard": "Weight Training Dashboard"
+    },
+    "historyDesc": "Auto-renewal",
+    "lifetimeDesc": "Lifetime Access",
+    "oneTimeDesc": "One-time payment",
+    "price": "€1.99/month",
+    "promotionalDesc": "Gifted by OneUp Team",
+    "title": "Pro Subscription"
+  },
+  "routines": {
+    "empty": "No routine saved",
+    "load": "Load",
+    "namePlaceholder": "Routine name",
+    "title": "My Routines"
+  },
+  "settings": {
+    "allEffects": "All effects enabled",
+    "appTheme": "App Theme",
+    "chinese": "中文",
+    "community": "Community",
+    "dataCloud": "Data & Cloud",
+    "disable": "Disable",
+    "displayName": "Display Name",
+    "eco": "Eco",
+    "enable": "Enable",
+    "english": "English",
+    "french": "Français",
+    "graphicsMode": "Graphics Mode",
+    "language": "Language",
+    "languageDesc": "Change the application language",
+    "leaderboardDesc": "Appear in the public leaderboard",
+    "lock": "Lock",
+    "max": "Max",
+    "maxChars": "Max 20 characters · Your Google photo will be used",
+    "multiplier": "Multiplier (Max 1.0)",
+    "notifications": "Notifications",
+    "performance": "Performance",
+    "preferences": "Preferences",
+    "reducedEffects": "Reduced visual effects",
+    "reminder": "Workout reminder",
+    "reminderTime": "REMINDER TIME",
+    "russian": "Русский",
+    "sensitiveParam": "SENSITIVE SETTING",
+    "sensitiveWarning": "Changing this will modify your daily rep targets. A setting of 0.5 halves your targets.",
+    "soundEffects": "Sound Effects",
+    "soundsDescription": "Sounds on actions",
+    "spanish": "Español",
+    "title": "Settings",
+    "unlockSettings": "UNLOCK SETTINGS"
+  },
+  "share": {
+    "backgroundImage": "Background image",
+    "categoryFilter": "Category",
+    "cropImage": "Crop Image",
+    "download": "Download",
+    "duration": "Duration",
+    "exercises": "Exercises",
+    "exercisesCompleted": "Exercises completed",
+    "globalStats": "Global stats",
+    "imageSelected": "Image selected",
+    "metrics": "Displayed metrics",
+    "recentSessions": "Recent sessions",
+    "recropImage": "Recrop",
+    "sessionDetail": "Session details",
+    "sessionNamePlaceholder": "Session name (optional)",
+    "shareCard": "Share my stats",
+    "showDailyExercises": "Daily Routine",
+    "showHistory": "Session history",
+    "showWeights": "Separate by category",
+    "takePhoto": "Take Photo",
+    "theme": "Theme",
+    "theme.dark": "Dark",
+    "theme.forest": "Forest",
+    "theme.ocean": "Ocean",
+    "theme.purple": "Purple",
+    "theme.sunset": "Sunset",
+    "uploadGallery": "Gallery"
   },
   "stats": {
+    "basedOnManual": "Based on {{count}} manual day{{plural}}",
+    "basedOnManual_one": "Based on {{count}} manual day",
+    "basedOnManual_other": "Based on {{count}} manual days",
+    "byExercise": "By Exercise",
+    "champion": "Champion",
+    "completeForHabits": "Complete your daily exercises to see<br />your habits here!",
+    "completedDays": "Days Completed",
+    "consistency": "⏰ Consistency",
+    "currentStreak": "Current Streak",
+    "dailyReps": "📈 Reps Evolution",
+    "difficultyEvolution": "⚙️ Difficulty Evolution",
+    "difficultyNoData": "No difficulty data yet",
+    "difficultyNoDataHint": "Change the difficulty of an exercise to see its evolution here",
+    "exercisesDone": "Exercises Done",
+    "filters": "Filters",
+    "loadingCharts": "Loading charts...",
+    "maxDays": "max {{count}}d",
     "monthAbbreviations": [
       "Jan",
       "Feb",
@@ -494,113 +579,66 @@
       "Nov",
       "Dec"
     ],
-    "title": "Statistics",
-    "filters": "Filters",
-    "totalReps": "Total Reps",
+    "monthlyActivity": "📅 Monthly Activity",
+    "muscleBalance": "🕸️ Muscle Balance",
+    "notEnoughData": "📊 Not enough data yet",
+    "ofYear": "Of the year",
+    "overExercises": "across {{count}} exercise{{plural}} · {{days}} day{{dayPlural}} of effort",
     "overExercises_one": "across {{count}} exercise · {{days}} day of effort",
     "overExercises_other": "across {{count}} exercises · {{days}} days of effort",
-    "currentStreak": "Current Streak",
-    "completedDays": "Days Completed",
-    "ofYear": "Of the year",
-    "exercisesDone": "Exercises Done",
-    "champion": "Champion",
-    "monthlyActivity": "📅 Monthly Activity",
-    "loadingCharts": "Loading charts...",
-    "dailyReps": "📈 Reps Evolution",
-    "difficultyEvolution": "⚙️ Difficulty Evolution",
-    "difficultyNoData": "No difficulty data yet",
-    "difficultyNoDataHint": "Change the difficulty of an exercise to see its evolution here",
-    "muscleBalance": "🕸️ Muscle Balance",
-    "consistency": "⏰ Consistency",
-    "basedOnManual_one": "Based on {{count}} manual day",
-    "basedOnManual_other": "Based on {{count}} manual days",
-    "notEnoughData": "📊 Not enough data yet",
-    "completeForHabits": "Complete your daily exercises to see<br />your habits here!",
-    "byExercise": "By Exercise",
+    "pieLabels": {
+      "afternoon": "Afternoon",
+      "evening": "Evening",
+      "morning": "Morning"
+    },
     "quote": "\"Consistency beats perfection\"",
     "quoteSub": "Show up every day, one step at a time!",
-    "overExercises": "across {{count}} exercise{{plural}} · {{days}} day{{dayPlural}} of effort",
-    "basedOnManual": "Based on {{count}} manual day{{plural}}",
-    "maxDays": "max {{count}}d",
-    "pieLabels": {
-      "morning": "Morning",
-      "afternoon": "Afternoon",
-      "evening": "Evening"
-    }
+    "title": "Statistics",
+    "totalReps": "Total Reps"
   },
-  "notifications": {
-    "body1": "🎯 Day {{day}} — Exercises await! 💪",
-    "body2": "💥 Challenge: keep your streak! 🔥",
-    "body3": "⚡ Train today and stay on track! ✨",
-    "body4": "🚀 {{day}} reps to keep the flame! 🏆",
-    "title": "💪 OneUp — Daily Challenge!"
+  "store": {
+    "historyDesc": "OneUp Transaction",
+    "historyTitle": "In-App Purchase",
+    "statusActive": "Active",
+    "statusExpired": "Expired",
+    "statusPaid": "Paid",
+    "title": "Store"
   },
-  "share": {
-    "duration": "Duration",
-    "exercises": "Exercises",
-    "exercisesCompleted": "Exercises completed",
-    "showHistory": "Session history",
-    "recentSessions": "Recent sessions",
-    "metrics": "Displayed metrics",
-    "download": "Download",
-    "shareCard": "Share my stats",
-    "globalStats": "Global stats",
-    "sessionDetail": "Session details",
-    "showWeights": "Separate by category",
-    "sessionNamePlaceholder": "Session name (optional)",
-    "categoryFilter": "Category",
-    "theme": "Theme",
-    "theme.dark": "Dark",
-    "theme.ocean": "Ocean",
-    "theme.sunset": "Sunset",
-    "theme.forest": "Forest",
-    "theme.purple": "Purple",
-    "backgroundImage": "Background image",
-    "cropImage": "Crop Image",
-    "showDailyExercises": "Daily Routine",
-    "imageSelected": "Image selected",
-    "recropImage": "Recrop",
-    "takePhoto": "Take Photo",
-    "uploadGallery": "Gallery"
+  "supporter": {
+    "badgeActive": "Your Supporter badge is active in the leaderboard.",
+    "buyButton": "Support OneUp",
+    "description": "Become a Supporter!",
+    "donateAgain": "Make another donation",
+    "explanation": "No hidden features — it's a voluntary support. In return, you get a ❤️ badge visible in the leaderboard.",
+    "history": "Purchase history",
+    "historyDesc": "Thank you for your support!",
+    "historyTitle": "OneUp Support ❤️",
+    "restore": "Restore my purchases",
+    "thankYou": "Thank you for your support! ❤️",
+    "title": "Support the developer ❤️"
   },
-  "exercises": {
-    "pushups": "Push-ups",
-    "squats": "Squats",
-    "pullups": "Pull-ups",
-    "abs": "Abs",
-    "jumpingjacks": "Jumping Jacks",
-    "lunges": "Lunges",
-    "burpees": "Burpees",
-    "planche": "Plank (s)",
-    "dips": "Dips",
-    "mountain": "Mountain Climbers",
-    "biceps_curl": "Biceps Curls",
-    "hammer_curl": "Hammer Curls",
-    "bench_press": "Bench Press",
-    "overhead_press": "Overhead Press",
-    "squat_weights": "Weighted Squat",
-    "deadlift": "Deadlift",
-    "barbell_row": "Barbell Row",
-    "running": "Running",
-    "cycling": "Cycling"
+  "timer": {
+    "remaining": "{{time}} left to hold",
+    "reset": "Reset",
+    "skip": "Skip",
+    "tips": [
+      "Drinking water boosts performance.",
+      "Keep your back straight!",
+      "Consistency beats intensity.",
+      "Breathe well during the effort.",
+      "1% better every day."
+    ],
+    "validated": "Timer Complete!"
   },
   "weight": {
-    "title": "Weight Evolution",
     "kg": "kg",
     "noData": "No weight data yet",
-    "noDataHint": "Set your weights during a session to see progression"
-  },
-  "announcement": {
-    "badge": "New",
-    "cardio": {
-      "title": "New Cardio Module! 🏃🚴",
-      "body": "Connect Strava to automatically sync your runs and bike rides. Track your weekly goals, your streak, and view your GPS tracks. Cardio now contributes to your global streak.",
-      "cta": "Awesome!"
-    }
+    "noDataHint": "Set your weights during a session to see progression",
+    "title": "Weight Evolution"
   },
   "widgets": {
-    "streak": "STREAK",
     "days": "DAYS",
+    "streak": "STREAK",
     "weekdays": [
       "M",
       "T",
@@ -611,54 +649,16 @@
       "S"
     ]
   },
-  "cardio": {
-    "weeklyGoal": "Weekly goal",
-    "week": "Wk",
-    "connectTitle": "Connected Services",
-    "noSessions": "No sessions recorded",
-    "lastSession": "Last session",
-    "duration": "Time",
-    "distance": "Distance",
-    "elevation": "Elevation+",
-    "avgSpeed": "Avg speed",
-    "pace": "Pace",
-    "streak": "Streak",
-    "streakWeeks": "wks",
-    "viewHistory": "View history",
-    "history": "Cardio History",
-    "goalReached": "Goal reached!",
-    "totalDistance": "Total Distance ({{unit}})",
-    "overSessions": "Across {{count}} sessions",
-    "sessionsCount_one": "{{count}} session",
-    "sessionsCount_other": "{{count}} sessions",
-    "loading": "Loading cardio data...",
-    "speed": "Speed",
-    "noGpsTrack": "No GPS track",
-    "gpsTrack": "GPS Track",
-    "start": "Start",
-    "finish": "Finish",
-    "tap": "Tap",
-    "stravaWallTitle": "Connect Strava",
-    "stravaWallDesc": "Automatically sync your running and cycling sessions to progress your global streak.",
-    "googleWallTitle": "Account Required",
-    "googleWallDesc": "Sign in with your Google account to access the Cardio module and sync your data.",
-    "googleWallStep1": "Google Sign-in",
-    "googleWallStep2": "Link Strava",
-    "googleWallStep3": "Auto Sync",
-    "difficultyModified": "Difficulty Modified",
-    "difficultyMismatchDesc": "Difficulty has changed ({{saved}}x → {{current}}x). Do you want to continue with this new setting?",
-    "revalidate": "Continue",
-    "units": {
-      "km": "km",
-      "m": "m",
-      "kmh": "km/h",
-      "minKm": "/km"
-    }
-  },
-  "routines": {
-    "title": "My Routines",
-    "empty": "No routine saved",
-    "load": "Load",
-    "namePlaceholder": "Routine name"
+  "workout": {
+    "allCompleted": "All exercises completed 💪",
+    "chooseOrder": "Choose exercise order",
+    "custom": "Custom",
+    "interDashboard": "Mix exercises",
+    "interDashboardDesc": "Combine exercises from all dashboards.",
+    "launch": "Start ({{count}} exercise{{plural}})",
+    "launch_one": "Start ({{count}} exercise)",
+    "launch_other": "Start ({{count}} exercises)",
+    "sessionDone": "Session Complete!",
+    "shuffle": "Shuffle"
   }
 }
