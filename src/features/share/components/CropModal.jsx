@@ -91,6 +91,7 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
       {/* Header — frosted glass nav bar */}
       <div style={{
         padding: '14px 16px',
+        paddingTop: 'calc(14px + env(safe-area-inset-top))',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         background: 'rgba(15, 15, 25, 0.85)',
         backdropFilter: 'blur(20px)',
@@ -144,6 +145,7 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
       <div style={{
         position: 'relative', flex: 1, overflow: 'hidden',
         margin: '12px',
+        marginBottom: 'calc(12px + env(safe-area-inset-bottom))',
         borderRadius: '20px',
         border: '1px solid rgba(255,255,255,0.06)',
         boxShadow: 'inset 0 0 60px rgba(0,0,0,0.4)',
