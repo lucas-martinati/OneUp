@@ -92,7 +92,8 @@ export function SegmentedControl({ options, value, onChange, style = {} }) {
               minHeight: 'unset',
               flex: 1,
               position: 'relative',
-              zIndex: 1
+              zIndex: 1,
+              whiteSpace: 'nowrap'
             }}
           >
             {option.icon && <span>{option.icon}</span>}
