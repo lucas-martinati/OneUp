@@ -1153,6 +1153,7 @@ button:focus:not(:focus-visible) {
   outline: none;
   cursor: pointer;
   touch-action: pan-y;
+  pointer-events: none;
 }
 
 .premium-slider::-webkit-slider-thumb {
@@ -1166,6 +1167,7 @@ button:focus:not(:focus-visible) {
   box-shadow: 0 0 10px var(--slider-color, var(--accent));
   border: 2px solid var(--bg-color);
   transition: transform 0.15s ease;
+  pointer-events: auto;
 }
 
 .premium-slider::-webkit-slider-thumb:hover {
@@ -1181,6 +1183,7 @@ button:focus:not(:focus-visible) {
   cursor: pointer;
   box-shadow: 0 0 10px var(--slider-color, var(--accent));
   transition: transform 0.15s ease;
+  pointer-events: auto;
 }
 
 .premium-slider::-moz-range-thumb:hover {
