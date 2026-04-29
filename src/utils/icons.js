@@ -32,7 +32,7 @@ import {
 // ============ INDIVIDUAL EXPORTS ============
 export {
   Dumbbell, Zap, Footprints,
-  Flame, Activity, Square,
+  Flame, Activity,
   X, Check, CheckCheck, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Plus, Minus,
   Play, Pause, RotateCcw, Save, Trash2, Edit2,
   FolderOpen, GripVertical, Shuffle, ArrowLeft, ArrowRight,
@@ -45,11 +45,7 @@ export {
   History, Weight, Filter, Loader2,
   Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
   RefreshCw, Heart, Sparkles, Link, Link2, Calendar, TrendingUp,
-  Gem, Ghost, Moon, Rocket, Sun,
-  Bike, Mountain, Droplets, Navigation, MapPin, Compass, 
-  Anchor, Coffee, Music, Hexagon, Circle, Triangle,
-  Scissors, Hammer, Wrench, Thermometer, Wind, Umbrella, Snowflake,
-  Smile, Battery, BatteryFull
+  Gem, Ghost, Moon, Rocket, Sun
 };
 
 // ============ ALIASES ============
@@ -100,9 +96,11 @@ const CATEGORY_ICONS = {
   CUSTOM: Star,
 };
 
-export const NEW_CUSTOM_ICONS = {
-  Bike, Mountain, Droplets, Navigation, MapPin, Compass, 
-  Anchor, Coffee, Music, Hexagon, Circle, Triangle,
+export const CUSTOM_EXERCISE_ICONS = {
+  Dumbbell, Activity, Flame, Heart, Zap, Star, Target, Trophy, Swords,
+  Footprints, Crown, Medal, Award, Shield, Bike, Mountain, Droplets,
+  Ghost, Moon, Sun, Rocket, Gem, Sparkles, Navigation, MapPin, Compass, 
+  Anchor, Coffee, Music, Hexagon, Circle, Triangle, Square,
   Scissors, Hammer, Wrench, Thermometer, Wind, Umbrella, Snowflake,
   Smile, Battery, BatteryFull
 };
@@ -116,7 +114,7 @@ const ICON_MAP = {
   ...SHARE_ICONS,
   ...CLOUD_ICONS,
   ...MISC_ICONS,
-  ...NEW_CUSTOM_ICONS,
+  ...CUSTOM_EXERCISE_ICONS,
   Settings2,
 };
 

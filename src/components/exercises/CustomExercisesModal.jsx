@@ -1,27 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  X, Plus, Settings2, Trash2, Edit2, Swords
+  X, Plus, Settings2, Trash2, Edit2, Swords, Star,
+  Dumbbell, Activity, CUSTOM_EXERCISE_ICONS
 } from '../../utils/icons';
-import {
-  Dumbbell, Activity, Flame, Heart, Zap, Star, Target, Trophy,
-  Footprints, Crown, Medal, Award, Shield, Bike, Mountain, Droplets,
-  Ghost, Moon, Sun, Rocket, Gem, Sparkles, Navigation, MapPin, Compass, 
-  Anchor, Coffee, Music, Hexagon, Circle, Triangle, Square,
-  Scissors, Hammer, Wrench, Thermometer, Wind, Umbrella, Snowflake,
-  Smile, Zap as Flash, Battery, BatteryFull
-} from 'lucide-react';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { Z_INDEX } from '../../utils/zIndex';
-
-const ICONS = {
-  Dumbbell, Activity, Flame, Heart, Zap, Star, Target, Trophy, Swords,
-  Footprints, Crown, Medal, Award, Shield, Bike, Mountain, Droplets,
-  Ghost, Moon, Sun, Rocket, Gem, Sparkles, Navigation, MapPin, Compass,
-  Anchor, Coffee, Music, Hexagon, Circle, Triangle, Square,
-  Scissors, Hammer, Wrench, Thermometer, Wind, Umbrella, Snowflake,
-  Smile, Battery, BatteryFull
-};
 
 const PRESET_COLORS = [
   '#ef4444', '#f97316', '#f59e0b', '#10b981', 
@@ -153,7 +137,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
                 {customExercises.map(ex => {
-                  const IconComponent = ICONS[ex.icon] || Star;
+                  const IconComponent = CUSTOM_EXERCISE_ICONS[ex.icon] || Star;
                   return (
                     <div key={ex.id} style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -199,7 +183,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
               <button onClick={() => {
                 setEditingId(null);
                 setLabel('');
-                const iconKeys = Object.keys(ICONS);
+                const iconKeys = Object.keys(CUSTOM_EXERCISE_ICONS);
                 setIconName(iconKeys[Math.floor(Math.random() * iconKeys.length)]);
                 setColor(PRESET_COLORS[Math.floor(Math.random() * PRESET_COLORS.length)]);
                 setType('counter');
@@ -231,7 +215,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
               </label>
               <div style={{ position: 'relative' }}>
                 <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: color }}>
-                  {(() => { const SelectedIcon = ICONS[iconName] || Star; return <SelectedIcon size={20} />; })()}
+                  {(() => { const SelectedIcon = CUSTOM_EXERCISE_ICONS[iconName] || Star; return <SelectedIcon size={20} />; })()}
                 </div>
                 <input
                   type="text"
@@ -274,8 +258,8 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
                 {t('customExercises.iconLabel')}
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', maxHeight: '240px', overflowY: 'auto', padding: '4px', paddingRight: '8px' }}>
-                {Object.keys(ICONS).map(name => {
-                  const IconComp = ICONS[name];
+                {Object.keys(CUSTOM_EXERCISE_ICONS).map(name => {
+                  const IconComp = CUSTOM_EXERCISE_ICONS[name];
                   const isSelected = iconName === name;
                   return (
                     <button key={name} onClick={() => setIconName(name)} className={isSelected ? 'hover-lift' : ''} style={{
