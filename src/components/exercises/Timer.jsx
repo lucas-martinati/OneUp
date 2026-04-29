@@ -4,7 +4,7 @@ import { useWakeLock } from '../../hooks/useWakeLock';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import {
     X, Check, CheckCheck, RotateCcw, Play, Pause,
-    Square, ChevronRight
+    ChevronRight, DynamicIcon
 } from '../../utils/icons';
 import { sounds } from '../../utils/soundManager';
 import { formatTime } from '../../utils/dateUtils';
@@ -89,8 +89,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
 
     const activeColor = exerciseConfig?.color || '#8b5cf6';
     const [gradStart, gradEnd] = exerciseConfig?.gradient || ['#7c3aed', '#8b5cf6'];
-    const ExIcon = Square;
-        const exerciseLabel = getExerciseLabel(exerciseConfig);
+    const exerciseLabel = getExerciseLabel(exerciseConfig);
     const gradientId = `timerGrad-${exerciseConfig?.id || 'timer'}`;
 
     return (
@@ -155,7 +154,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                         background: `${activeColor}22`, border: `1.5px solid ${activeColor}55`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
-                        <ExIcon size={20} color={activeColor} />
+                        <DynamicIcon icon={exerciseConfig?.icon} size={20} color={activeColor} />
                     </div>
                     <h2 className="panel-title" style={{ color: activeColor, margin: 0 }}>
                         {exerciseLabel}

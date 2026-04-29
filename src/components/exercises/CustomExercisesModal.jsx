@@ -1,14 +1,26 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  X, Plus, Settings2, Trash2, Edit2,
-  Dumbbell, Activity, Flame, Heart, Zap, Star, Target, Trophy, Swords
+  X, Plus, Settings2, Trash2, Edit2, Swords
 } from '../../utils/icons';
+import {
+  Dumbbell, Activity, Flame, Heart, Zap, Star, Target, Trophy,
+  Footprints, Crown, Medal, Award, Shield, Bike, Mountain, Droplets,
+  Ghost, Moon, Sun, Rocket, Gem, Sparkles, Navigation, MapPin, Compass, 
+  Anchor, Coffee, Music, Hexagon, Circle, Triangle, Square,
+  Scissors, Hammer, Wrench, Thermometer, Wind, Umbrella, Snowflake,
+  Smile, Zap as Flash, Battery, BatteryFull
+} from 'lucide-react';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { Z_INDEX } from '../../utils/zIndex';
 
 const ICONS = {
-  Dumbbell, Activity, Flame, Heart, Zap, Star, Target, Trophy, Swords
+  Dumbbell, Activity, Flame, Heart, Zap, Star, Target, Trophy, Swords,
+  Footprints, Crown, Medal, Award, Shield, Bike, Mountain, Droplets,
+  Ghost, Moon, Sun, Rocket, Gem, Sparkles, Navigation, MapPin, Compass,
+  Anchor, Coffee, Music, Hexagon, Circle, Triangle, Square,
+  Scissors, Hammer, Wrench, Thermometer, Wind, Umbrella, Snowflake,
+  Smile, Battery, BatteryFull
 };
 
 const PRESET_COLORS = [
@@ -261,7 +273,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
                 {t('customExercises.iconLabel')}
               </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', maxHeight: '240px', overflowY: 'auto', padding: '4px', paddingRight: '8px' }}>
                 {Object.keys(ICONS).map(name => {
                   const IconComp = ICONS[name];
                   const isSelected = iconName === name;

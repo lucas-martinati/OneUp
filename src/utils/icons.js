@@ -22,6 +22,11 @@ import {
   // Misc
   RefreshCw, Heart, Sparkles, Link, Link2, Calendar, TrendingUp, BarChart3,
   Gem, Ghost, Moon, Rocket, Sun,
+  // New Custom Icons
+  Bike, Mountain, Droplets, Navigation, MapPin, Compass, 
+  Anchor, Coffee, Music, Hexagon, Circle, Triangle,
+  Scissors, Hammer, Wrench, Thermometer, Wind, Umbrella, Snowflake,
+  Smile, Battery, BatteryFull
 } from 'lucide-react';
 
 // ============ INDIVIDUAL EXPORTS ============
@@ -40,7 +45,11 @@ export {
   History, Weight, Filter, Loader2,
   Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
   RefreshCw, Heart, Sparkles, Link, Link2, Calendar, TrendingUp,
-  Gem, Ghost, Moon, Rocket, Sun
+  Gem, Ghost, Moon, Rocket, Sun,
+  Bike, Mountain, Droplets, Navigation, MapPin, Compass, 
+  Anchor, Coffee, Music, Hexagon, Circle, Triangle,
+  Scissors, Hammer, Wrench, Thermometer, Wind, Umbrella, Snowflake,
+  Smile, Battery, BatteryFull
 };
 
 // ============ ALIASES ============
@@ -91,6 +100,13 @@ const CATEGORY_ICONS = {
   CUSTOM: Star,
 };
 
+export const NEW_CUSTOM_ICONS = {
+  Bike, Mountain, Droplets, Navigation, MapPin, Compass, 
+  Anchor, Coffee, Music, Hexagon, Circle, Triangle,
+  Scissors, Hammer, Wrench, Thermometer, Wind, Umbrella, Snowflake,
+  Smile, Battery, BatteryFull
+};
+
 // ============ MERGED MAP ============
 const ICON_MAP = {
   ...EXERCISE_ICONS,
@@ -100,6 +116,7 @@ const ICON_MAP = {
   ...SHARE_ICONS,
   ...CLOUD_ICONS,
   ...MISC_ICONS,
+  ...NEW_CUSTOM_ICONS,
   Settings2,
 };
 
