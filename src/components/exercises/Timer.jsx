@@ -101,53 +101,10 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
         />
         <div className="fade-in modal-overlay" style={{
             zIndex: Z_INDEX.TOAST,
-            padding: 'var(--spacing-sm)',
-            paddingTop: 'calc(var(--spacing-sm) + env(safe-area-inset-top))',
-            paddingBottom: 'calc(var(--spacing-sm) + env(safe-area-inset-bottom))'
         }}>
-            {/* Top-right buttons */}
-            <div style={{
-                position: 'fixed',
-                top: 'calc(var(--spacing-sm) + env(safe-area-inset-top))',
-                right: 'var(--spacing-sm)',
-                display: 'flex', alignItems: 'center', gap: '8px',
-                zIndex: Z_INDEX.TIMER_OVERLAY
-            }}>
-                {/* Session: Next button */}
-                {onNext && (
-                    <button
-                        onClick={onNext}
-                        className="hover-lift"
-                        style={{
-                            padding: '8px 16px', borderRadius: '20px',
-                            background: `${activeColor}20`,
-                            border: `1px solid ${activeColor}40`,
-                            color: activeColor,
-                            fontSize: '0.85rem', fontWeight: '600',
-                            display: 'flex', alignItems: 'center', gap: '4px',
-                            cursor: 'pointer',
-                            minHeight: 'var(--touch-min)'
-                        }}
-                    >
-                        {t('common.next')} <ChevronRight size={16} />
-                    </button>
-                )}
-                <button
-                    onClick={onClose}
-                    className="glass hover-lift"
-                    style={{
-                        width: 'var(--touch-min)', height: 'var(--touch-min)', borderRadius: '50%',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'rgba(255,255,255,0.08)', border: 'none',
-                        color: 'var(--text-secondary)', cursor: 'pointer'
-                    }}
-                >
-                    <X size={20} />
-                </button>
-            </div>
-
+            <div className="modal-content">
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 'var(--spacing-lg)', paddingRight: 'calc(var(--touch-min) + var(--spacing-sm))' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--spacing-lg)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{
                         width: 'var(--touch-min)', height: 'var(--touch-min)', borderRadius: '50%',
@@ -159,6 +116,43 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                     <h2 className="panel-title" style={{ color: activeColor, margin: 0 }}>
                         {exerciseLabel}
                     </h2>
+                </div>
+
+                {/* Top-right buttons */}
+                <div style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                }}>
+                    {/* Session: Next button */}
+                    {onNext && (
+                        <button
+                            onClick={onNext}
+                            className="hover-lift"
+                            style={{
+                                padding: '8px 16px', borderRadius: '20px',
+                                background: `${activeColor}20`,
+                                border: `1px solid ${activeColor}40`,
+                                color: activeColor,
+                                fontSize: '0.85rem', fontWeight: '600',
+                                display: 'flex', alignItems: 'center', gap: '4px',
+                                cursor: 'pointer',
+                                minHeight: 'var(--touch-min)'
+                            }}
+                        >
+                            {t('common.next')} <ChevronRight size={16} />
+                        </button>
+                    )}
+                    <button
+                        onClick={onClose}
+                        className="glass hover-lift"
+                        style={{
+                            width: 'var(--touch-min)', height: 'var(--touch-min)', borderRadius: '50%',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: 'rgba(255,255,255,0.08)', border: 'none',
+                            color: 'var(--text-secondary)', cursor: 'pointer'
+                        }}
+                    >
+                        <X size={20} />
+                    </button>
                 </div>
             </div>
 
@@ -310,6 +304,7 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
             }}>
                 💡 {t('timer.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
             </div>
+        </div>
         </div>
         </>
     );

@@ -194,12 +194,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
             onTouchEnd={handleTouchEnd}
             style={{ zIndex: 100, touchAction: 'pan-y', overflowX: 'hidden' }}
         >
-            <div className="modal-content" style={{
-                maxWidth: '640px', width: '100%', margin: '0 auto',
-                padding: 'var(--spacing-md)',
-                paddingTop: 'calc(var(--spacing-md) + env(safe-area-inset-top))',
-                paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))'
-            }}>
+            <div className="modal-content">
             {/* Header */}
             <div style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',

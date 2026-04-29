@@ -86,12 +86,8 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
   };
 
   return (
-    <div className="fade-in" style={{
-      position: 'fixed', inset: 0,
-      background: '#0a0a0f',
-      zIndex: Z_INDEX.MODAL + 100,
-      display: 'flex', flexDirection: 'column',
-    }}>
+    <div className="fade-in modal-overlay" style={{ background: '#0a0a0f', zIndex: Z_INDEX.MODAL + 100 }}>
+      <div className="modal-content" style={{ padding: 0 }}>
       {/* Header — frosted glass nav bar */}
       <div style={{
         padding: '14px 16px',
@@ -183,6 +179,7 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
         />
       </div>
 
+      </div>
     </div>
   );
 }

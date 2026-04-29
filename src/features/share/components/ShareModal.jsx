@@ -37,22 +37,12 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
   };
 
   return (
-    <div className="fade-in" style={{
-      position: 'fixed', inset: 0,
-      background: 'rgba(5,5,5,0.97)',
-      zIndex: Z_INDEX.TOAST,
-      display: 'flex', flexDirection: 'column',
-      alignItems: 'center',
-      overflowY: 'auto',
-      WebkitOverflowScrolling: 'touch',
-      paddingTop: 'env(safe-area-inset-top)',
-      paddingBottom: 'env(safe-area-inset-bottom)',
-    }}>
+    <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
+      <div className="modal-content">
       {/* Header */}
       <div style={{
-        width: '100%', maxWidth: '400px',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '16px 20px 8px',
+        padding: '8px 0 8px',
       }}>
         <h2 className="panel-title" style={{
           margin: 0,
@@ -74,10 +64,8 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
 
       {/* Card preview */}
       <div style={{
-        width: '100%', maxWidth: '400px',
-        padding: '0 20px 12px',
+        padding: '0 0 12px', display: 'flex', justifyContent: 'center',
       }}>
-        <div style={{ width: '100%' }}>
           <ShareCard
             cardRef={cardRef}
             sessionData={sessionData}
@@ -89,13 +77,11 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
             options={options}
             mode={mode}
           />
-        </div>
       </div>
 
       {/* Options */}
       <div style={{
-        width: '100%', maxWidth: '400px',
-        padding: '8px 20px',
+        padding: '8px 0',
       }}>
         <ShareOptions
           options={options}
@@ -126,8 +112,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
 
       {/* Action buttons */}
       <div style={{
-        width: '100%', maxWidth: '400px',
-        padding: '8px 20px 24px',
+        padding: '8px 0 24px',
         display: 'flex', gap: '10px',
       }}>
         <button
@@ -172,6 +157,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .spin { animation: spin 1s linear infinite; }
       `}</style>
+      </div>
     </div>
   );
 }

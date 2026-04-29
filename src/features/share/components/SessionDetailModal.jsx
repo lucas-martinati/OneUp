@@ -55,19 +55,9 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   };
 
   return (
-    <div className="fade-in" style={{
-      position: 'fixed', inset: 0,
-      background: 'rgba(5,5,5,0.97)',
-      zIndex: Z_INDEX.TOAST + 1,
-      display: 'flex', flexDirection: 'column',
-      alignItems: 'center',
-      overflowY: 'auto',
-      paddingTop: 'env(safe-area-inset-top)',
-      paddingBottom: 'env(safe-area-inset-bottom)',
-    }}>
+    <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST + 1 }}>
+      <div className="modal-content">
       <div style={{
-        width: '100%', maxWidth: '400px',
-        padding: '16px 20px',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
         <h2 className="panel-title" style={{
@@ -89,8 +79,6 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
       </div>
 
       <div style={{
-        width: '100%', maxWidth: '400px',
-        padding: '0 20px 24px',
         display: 'flex', flexDirection: 'column', gap: '16px',
       }}>
         {/* Date & name */}
@@ -316,6 +304,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
             </button>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

@@ -108,13 +108,9 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
   };
 
   return (
-    <div className="fade-in" style={{
-      position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.92)',
-      zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
-      paddingTop: 'env(safe-area-inset-top)',
-      paddingBottom: 'env(safe-area-inset-bottom)'
-    }}>
-      <div style={{ padding: 'var(--spacing-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
+      <div className="modal-content">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-md)' }}>
         <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
           {t('customExercises.title')}
         </h2>
@@ -125,7 +121,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
         }}><X size={20} /></button>
       </div>
 
-      <div style={{ flex: 1, overflow: 'auto', padding: '0 var(--spacing-md) var(--spacing-md)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         
         {view === 'list' && (
           <div style={{ width: '100%', maxWidth: '400px' }}>
@@ -420,6 +416,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

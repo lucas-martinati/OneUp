@@ -62,14 +62,11 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
     };
 
     return (
-        <div className="fade-in" style={{
-            position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.97)',
-            zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            padding: 'var(--spacing-lg)', gap: '20px',
-            paddingTop: 'env(safe-area-inset-top)',
-            paddingBottom: 'env(safe-area-inset-bottom)'
-        }}>
+        <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
+            <div className="modal-content" style={{ 
+                alignItems: 'center', justifyContent: 'center', gap: '20px',
+                height: '100%' 
+            }}>
             <CSSConfetti
                 active={!confettiDone}
                 colors={['#818cf8', '#fbbf24', '#10b981', '#ec4899', '#22d3ee']}
@@ -213,6 +210,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                     stats={stats}
                     variant="large"
                 />
+            </div>
             </div>
         </div>
     );

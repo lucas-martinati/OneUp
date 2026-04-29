@@ -161,21 +161,14 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
 
     return (
         <div 
-            className="fade-in" 
+            className="fade-in modal-overlay" 
             {...swipeHandlers}
-            style={{
-            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'var(--overlay-bg)', zIndex: Z_INDEX.MODAL,
-            display: 'flex', flexDirection: 'column',
-            paddingTop: 'env(safe-area-inset-top)',
-            paddingBottom: 'env(safe-area-inset-bottom)',
-            overscrollBehavior: 'none',
-            touchAction: 'auto'
-        }}>
-            {/* Header with Switch */}
+            style={{ zIndex: Z_INDEX.MODAL }}
+        >
+            <div className="modal-content">
+                {/* Header with Switch */}
             <div style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: 'var(--spacing-md) var(--spacing-md) 0'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <h2 className="panel-title" style={{
@@ -212,7 +205,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
 
             {/* Back button and Clan Name when viewing a specific clan */}
             {communityContext !== 'global' && communityContext !== 'manage' && (
-                <div className="fade-in" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '16px var(--spacing-md) 0' }}>
+                <div className="fade-in" style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '16px' }}>
                     <button onClick={() => setCommunityContext('manage')} className="hover-lift" style={{
                         background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '20px',
                         padding: '6px 12px', color: 'white', fontWeight: '700', fontSize: '0.8rem',
@@ -247,7 +240,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
 
             {/* Content - exercise tabs + users list scroll together */}
             <div style={{
-                flex: 1, overflowY: 'auto', padding: '0 var(--spacing-md) var(--spacing-md)',
+                flex: 1, overflowY: 'auto',
                 display: 'flex', flexDirection: 'column', gap: '6px'
             }}>
                 <LeaderboardTabs 
@@ -314,7 +307,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
 
             {/* Footer */}
             {clanData && communityContext !== 'manage' && (
-                <div style={{ padding: 'var(--spacing-md)' }}>
+                <div style={{ paddingTop: 'var(--spacing-sm)' }}>
                     <button onClick={() => setShowLeaveConfirm(true)} style={{
                         width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
                         background: 'transparent', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444',
@@ -383,6 +376,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                     cloudSync={cloudSync}
                 />
             )}
+            </div>
         </div>
     );
 }

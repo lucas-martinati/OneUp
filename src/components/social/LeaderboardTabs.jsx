@@ -18,7 +18,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
             {/* ── Domain Filter ── */}
             {showDomainFilter && (
             <div style={{
-                display: 'flex', gap: '8px', padding: '12px var(--spacing-md) 16px',
+                display: 'flex', gap: '8px', padding: '12px 0 16px',
                 background: 'transparent',
                 marginBottom: '4px'
             }}>
@@ -54,7 +54,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
             {showExerciseTabs && (
             <div style={{
                 display: 'flex', flexWrap: 'wrap', gap: '6px',
-                padding: showDomainFilter ? 'var(--spacing-md)' : '0 0 var(--spacing-sm) 0'
+                padding: showDomainFilter ? '0' : '0 0 var(--spacing-sm) 0'
             }}>
                 {/* Always show Global tabs */}
                 {globalTabs.map(tab => {

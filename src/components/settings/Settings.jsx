@@ -106,12 +106,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
 
     return (
         <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.MODAL }}>
-            <div className="modal-content" style={{
-                maxWidth: '600px', width: '100%', margin: '0 auto',
-                padding: 'var(--spacing-md)',
-                paddingTop: 'calc(var(--spacing-md) + env(safe-area-inset-top))',
-                paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))'
-            }}>
+            <div className="modal-content">
             {/* ── Header ──────────────────────────────────────────────── */}
             <div style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',

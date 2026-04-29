@@ -161,7 +161,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
   return (
     <>
       <div className="modal-overlay" style={{ zIndex: 200 }}>
-        <div className="modal-content" style={{ maxWidth: '600px', width: '100%', margin: '0 auto' }}>
+        <div className="modal-content">
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             marginBottom: 'var(--spacing-md)',

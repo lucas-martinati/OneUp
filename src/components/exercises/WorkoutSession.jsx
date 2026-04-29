@@ -408,16 +408,12 @@ export function WorkoutSession({
     // ── CONFIG PHASE ────────────────────────────────────────────
     if (phase === 'config') {
         return (
-            <div className="fade-in" style={{
-                position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.97)',
-                zIndex: Z_INDEX.TOAST, display: 'flex', flexDirection: 'column',
-                paddingTop: 'env(safe-area-inset-top)',
-                paddingBottom: 'env(safe-area-inset-bottom)'
-            }}>
+            <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
+                <div className="modal-content">
                 {/* Header */}
                 <div style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: 'var(--spacing-md)'
+                    marginBottom: 'var(--spacing-sm)',
                 }}>
                     <h2 className="panel-title" style={{ 
                         margin: 0, 
@@ -458,7 +454,7 @@ export function WorkoutSession({
                 </div>
 
                 <div style={{
-                    flex: 1, overflowY: 'auto', padding: '0 var(--spacing-md)',
+                    flex: 1, overflowY: 'auto',
                     display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)'
                 }}>
                     {/* ── Routine list (collapsible) ── */}
@@ -804,7 +800,7 @@ export function WorkoutSession({
 
                 {/* Bottom buttons */}
                 <div style={{
-                    padding: 'var(--spacing-md)', display: 'flex', gap: '8px'
+                    display: 'flex', gap: '8px', paddingTop: 'var(--spacing-sm)'
                 }}>
                     {/* Save as routine */}
                     {!showSaveRoutine && queue.length >= 1 && (
@@ -853,6 +849,7 @@ export function WorkoutSession({
                         <Play size={20} />
                         {t('workout.launch', { count: queue.length, plural: queue.length > 1 ? 's' : '' })}
                     </button>
+                </div>
                 </div>
             </div>
         );
