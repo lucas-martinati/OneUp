@@ -109,7 +109,7 @@ export function Dashboard() {
         if (effectiveSlide === 1) return EXERCISES_MAP[globalSelectedId] || EXERCISES[0];
         if (effectiveSlide === 2) return WEIGHT_EXERCISES_MAP[globalSelectedId] || WEIGHT_EXERCISES[0];
         return customExercisesMap[globalSelectedId] || customExercises[0] || { id: 'custom_placeholder', color: '#8b5cf6', gradient: ['#8b5cf6', '#7c3aed'], icon: 'Star', name: 'Exercice Perso' };
-    }, [effectiveSlide, globalSelectedId, customExercises, customExercisesMap]);
+    }, [effectiveSlide, globalSelectedId, customExercises, customExercisesMap, t]);
 
     useEffect(() => {
         setSoundSettingsGetter(() => settings);
