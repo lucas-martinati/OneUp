@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Calendar as CalendarIcon, Play } from '../../utils/icons';
 
 export const DashboardActions = React.memo(({
-    setShowCalendar, setShowSession, pauseCloudSync, selectedExercise, isDay100
+    setShowCalendar, setShowSession, pauseCloudSync, selectedExercise, activeCategoryColor, isDay100
 }) => {
     const { t } = useTranslation();
 
@@ -21,7 +21,7 @@ export const DashboardActions = React.memo(({
                     color: 'var(--text-primary)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     gap: '8px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
-                    background: `linear-gradient(135deg, ${selectedExercise.color}28, ${selectedExercise.gradient[0]}28)`,
+                    background: `linear-gradient(135deg, ${activeCategoryColor || selectedExercise.color}28, ${activeCategoryColor || selectedExercise.gradient[0]}28)`,
                     boxShadow: 'var(--shadow-md)'
                 }}
             >
@@ -36,9 +36,8 @@ export const DashboardActions = React.memo(({
                 style={{
                     flex: 1, padding: 'clamp(12px, 1.8vh, 18px)', borderRadius: 'var(--radius-lg)',
                     color: 'var(--text-primary)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                     gap: '8px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)', fontWeight: '600', border: 'none', cursor: 'pointer',
-                    background: `linear-gradient(135deg, ${selectedExercise.color}28, ${selectedExercise.gradient[0]}28)`,
+                    background: `linear-gradient(135deg, ${activeCategoryColor || selectedExercise.color}28, ${activeCategoryColor || selectedExercise.gradient[0]}28)`,
                     boxShadow: 'var(--shadow-md)'
                 }}
             >

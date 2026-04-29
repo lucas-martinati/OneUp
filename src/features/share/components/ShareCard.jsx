@@ -6,7 +6,7 @@ import {
 } from '../../../utils/icons';
 import { getExerciseLabel, getExerciseColor, isCustomExercise } from '../../../utils/exerciseLabel';
 import { sumExerciseReps } from '../../../utils/stats';
-import { CATEGORIES } from '../../../config/categories';
+import { CATEGORIES, CATEGORY_COLORS } from '../../../config/categories';
 import { EXERCISES, CARDIO_EXERCISES, getDailyGoal } from '../../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../../config/weights';
 import { formatDuration, getLocalDateStr, getCurrentWeekNumber } from '../../../utils/dateUtils';
@@ -254,10 +254,10 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
   const weightExercises = allExercises.filter(isWeightEx);
   const customExercises = allExercises.filter(isCustomEx);
   const categories = [
-    bodyweightExercises.length > 0 && { key: CATEGORIES.BODYWEIGHT, exercises: bodyweightExercises, label: t('common.bodyweight'), color: '#34d399' },
-    weightExercises.length > 0 && { key: CATEGORIES.WEIGHTS, exercises: weightExercises, label: t('common.weights'), color: '#f97316' },
-    customExercises.length > 0 && { key: CATEGORIES.CUSTOM, exercises: customExercises, label: t('common.custom'), color: '#8b5cf6' },
-    allExercises.filter(isCardioEx).length > 0 && { key: CATEGORIES.CARDIO, exercises: allExercises.filter(isCardioEx), label: t('cardio.title'), color: '#ef4444' },
+    bodyweightExercises.length > 0 && { key: CATEGORIES.BODYWEIGHT, exercises: bodyweightExercises, label: t('common.bodyweight'), color: CATEGORY_COLORS[CATEGORIES.BODYWEIGHT] },
+    weightExercises.length > 0 && { key: CATEGORIES.WEIGHTS, exercises: weightExercises, label: t('common.weights'), color: CATEGORY_COLORS[CATEGORIES.WEIGHTS] },
+    customExercises.length > 0 && { key: CATEGORIES.CUSTOM, exercises: customExercises, label: t('common.custom'), color: CATEGORY_COLORS[CATEGORIES.CUSTOM] },
+    allExercises.filter(isCardioEx).length > 0 && { key: CATEGORIES.CARDIO, exercises: allExercises.filter(isCardioEx), label: t('cardio.title'), color: CATEGORY_COLORS[CATEGORIES.CARDIO] },
   ].filter(Boolean);
   const showSections = showCategoriesSeparately && categories.length > 1;
 
@@ -283,10 +283,10 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
   const dailyCustom = shouldSeparateDaily ? filteredDailyExercises.filter(isCustomEx) : [];
   const dailyCardio = shouldSeparateDaily ? filteredDailyExercises.filter(isCardioEx) : [];
   const dailyCategories = [
-    dailyBodyweight.length > 0 && { key: CATEGORIES.BODYWEIGHT, exercises: dailyBodyweight, label: t('common.bodyweight'), color: '#34d399', isPerfect: dailyStandardDone },
-    dailyWeight.length > 0 && { key: CATEGORIES.WEIGHTS, exercises: dailyWeight, label: t('common.weights'), color: '#f97316', isPerfect: dailyWeightsDone },
-    dailyCustom.length > 0 && { key: CATEGORIES.CUSTOM, exercises: dailyCustom, label: t('common.custom'), color: '#8b5cf6', isPerfect: false },
-    dailyCardio.length > 0 && { key: CATEGORIES.CARDIO, exercises: dailyCardio, label: t('cardio.title'), color: '#ef4444', isPerfect: false },
+    dailyBodyweight.length > 0 && { key: CATEGORIES.BODYWEIGHT, exercises: dailyBodyweight, label: t('common.bodyweight'), color: CATEGORY_COLORS[CATEGORIES.BODYWEIGHT], isPerfect: dailyStandardDone },
+    dailyWeight.length > 0 && { key: CATEGORIES.WEIGHTS, exercises: dailyWeight, label: t('common.weights'), color: CATEGORY_COLORS[CATEGORIES.WEIGHTS], isPerfect: dailyWeightsDone },
+    dailyCustom.length > 0 && { key: CATEGORIES.CUSTOM, exercises: dailyCustom, label: t('common.custom'), color: CATEGORY_COLORS[CATEGORIES.CUSTOM], isPerfect: false },
+    dailyCardio.length > 0 && { key: CATEGORIES.CARDIO, exercises: dailyCardio, label: t('cardio.title'), color: CATEGORY_COLORS[CATEGORIES.CARDIO], isPerfect: false },
   ].filter(Boolean);
   const showDailySections = shouldSeparateDaily && dailyCategories.length > 1;
 
@@ -495,7 +495,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
                 const cats = options.statsCategories || Object.values(CATEGORIES);
                 const allSelected = cats.length === 4;
                 if (allSelected) return null;
-                const catColors = { bodyweight: '#34d399', weights: '#f97316', custom: '#8b5cf6', cardio: '#ef4444' };
+                const catColors = CATEGORY_COLORS;
                 return (
                   <div style={{
                     display: 'flex', flexWrap: 'wrap', marginTop: '6px',

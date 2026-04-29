@@ -38,19 +38,12 @@ function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
   );
 }
 
-import { CATEGORIES } from '../../../config/categories';
-
-const CATEGORIES_CONFIG = [
-  { key: CATEGORIES.BODYWEIGHT, color: '#34d399' },
-  { key: CATEGORIES.WEIGHTS, color: '#f97316' },
-  { key: CATEGORIES.CUSTOM, color: '#8b5cf6' },
-  { key: CATEGORIES.CARDIO, color: '#ef4444' },
-];
+import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '../../../config/categories';
 
 export function ShareOptions({ options, toggleOption, setOption, toggleCategory, clearBackgroundImage, originalImage, openCropModal, mode = 'session', isPro = false, sessionData }) {
   const { t } = useTranslation();
   const isGlobal = mode === 'global';
-  const selectedCategories = options.statsCategories || [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM, CATEGORIES.CARDIO];
+  const selectedCategories = options.statsCategories || CATEGORY_ORDER;
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
@@ -199,24 +192,25 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
             {t('share.categoryFilter')}
           </div>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {CATEGORIES_CONFIG.map(cat => {
-              const isSelected = selectedCategories.includes(cat.key);
+            {CATEGORY_ORDER.map(catKey => {
+              const isSelected = selectedCategories.includes(catKey);
+              const color = CATEGORY_COLORS[catKey];
               return (
                 <button
-                  key={cat.key}
-                  onClick={() => toggleCategory(cat.key)}
+                  key={catKey}
+                  onClick={() => toggleCategory(catKey)}
                   style={{
                     padding: '6px 12px', borderRadius: '8px',
-                    border: isSelected ? `1px solid ${cat.color}40` : '1px solid rgba(255,255,255,0.06)',
+                    border: isSelected ? `1px solid ${color}40` : '1px solid rgba(255,255,255,0.06)',
                     background: isSelected
-                      ? `${cat.color}18`
+                      ? `${color}18`
                       : 'rgba(255,255,255,0.03)',
-                    color: isSelected ? cat.color : 'var(--text-secondary)',
+                    color: isSelected ? color : 'var(--text-secondary)',
                     fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer',
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  {cat.key === CATEGORIES.CARDIO ? t('cardio.title') : t(`common.${cat.key}`)}
+                  {catKey === CATEGORIES.CARDIO ? t('cardio.title') : t(`common.${catKey}`)}
                 </button>
               );
             })}

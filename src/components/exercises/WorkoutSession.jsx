@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle } from '../../utils/icons';
 import { EXERCISES, getDailyGoal } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
-import { CATEGORIES } from '../../config/categories';
+import { CATEGORIES, CATEGORY_ORDER } from '../../config/categories';
 import { Counter } from './Counter';
 import { Z_INDEX } from '../../utils/zIndex';
 import { Timer } from './Timer';
@@ -128,9 +128,10 @@ export function WorkoutSession({
     }, true);
 
     const localExercises = useMemo(() => {
-        if (activeSlide === 0) return EXERCISES;
-        if (activeSlide === 1) return WEIGHT_EXERCISES;
-        if (activeSlide === 2) return customExercises;
+        const currentCatKey = CATEGORY_ORDER[activeSlide];
+        if (currentCatKey === CATEGORIES.BODYWEIGHT) return EXERCISES;
+        if (currentCatKey === CATEGORIES.WEIGHTS) return WEIGHT_EXERCISES;
+        if (currentCatKey === CATEGORIES.CUSTOM) return customExercises;
         return EXERCISES;
     }, [activeSlide, customExercises]);
 
@@ -172,7 +173,8 @@ export function WorkoutSession({
             if (cat !== 'bodyweight' && !isPro) return prev;
 
             // If exercise is from a different category, auto-enable showAll
-            const currentCat = activeSlide === 0 ? 'bodyweight' : activeSlide === 1 ? 'weights' : 'custom';
+            const currentCatKey = CATEGORY_ORDER[activeSlide];
+            const currentCat = currentCatKey === CATEGORIES.BODYWEIGHT ? 'bodyweight' : currentCatKey === CATEGORIES.WEIGHTS ? 'weights' : 'custom';
             if (cat !== currentCat && canMixDashboards && !showAll) {
                 setShowAll(true);
             }
@@ -206,7 +208,7 @@ export function WorkoutSession({
         const weightIds = WEIGHT_EXERCISES.map(e => e.id);
         
         // Get current category based on activeSlide
-        const currentCat = activeSlide === 0 ? CATEGORIES.BODYWEIGHT : activeSlide === 1 ? CATEGORIES.WEIGHTS : CATEGORIES.CUSTOM;
+        const currentCat = CATEGORY_ORDER[activeSlide];
         
         // Filter exercises: keep only accessible ones (bodyweight always, weights/custom only if Pro)
         const routineExercises = routine.exerciseIds
@@ -396,7 +398,7 @@ export function WorkoutSession({
             date: new Date().toISOString(),
             duration,
             name: detectedName,
-            type: activeSlide === 1 ? 'weights' : activeSlide === 2 ? 'custom' : 'bodyweight',
+            type: CATEGORY_ORDER[activeSlide] === CATEGORIES.WEIGHTS ? 'weights' : CATEGORY_ORDER[activeSlide] === CATEGORIES.CUSTOM ? 'custom' : CATEGORY_ORDER[activeSlide] === CATEGORIES.CARDIO ? 'cardio' : 'bodyweight',
             exercises: completedExercises,
         });
         setSavedSession(session);
@@ -894,11 +896,12 @@ export function WorkoutSession({
                 exerciseInfo={exerciseInfo}
                 onClose={onClose}
                 sessionData={savedSession || {
+                    id: crypto.randomUUID(),
                     date: new Date().toISOString(),
                     exercises: completedExercises,
                     duration: sessionDuration,
                     name: sessionName,
-                    type: activeSlide === 1 ? 'weights' : activeSlide === 2 ? 'custom' : 'bodyweight',
+                    type: CATEGORY_ORDER[activeSlide] === CATEGORIES.WEIGHTS ? 'weights' : CATEGORY_ORDER[activeSlide] === CATEGORIES.CUSTOM ? 'custom' : CATEGORY_ORDER[activeSlide] === CATEGORIES.CARDIO ? 'cardio' : 'bodyweight',
                 }}
                 stats={computedStats}
                 sessionHistory={getSessionHistory()}

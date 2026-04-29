@@ -15,6 +15,7 @@ import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
 import { useCardio } from '../../features/cardio/useCardio';
+import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '../../config/categories';
 
 // Lazy load Recharts components
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
@@ -198,19 +199,22 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         border: '1px solid rgba(255,255,255,0.06)', borderRadius: 'var(--radius-lg)',
                         display: 'flex', flexWrap: 'wrap', gap: '8px'
                     }}>
-                        {[
-                            { id: 'cardio', label: t('cardio.title'), locked: false },
-                            { id: 'standard', label: t('common.bodyweight'), locked: false },
-                            { id: 'weights', label: t('common.weights'), locked: !canAccessFeature(FEATURES.WEIGHTS, { isPro: hasProAccess }) },
-                            { id: 'custom', label: t('common.custom'), locked: !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro: hasProAccess }) }
-                        ].map(cat => (
-                            <label key={cat.id} style={{
+                        {CATEGORY_ORDER.map(categoryId => {
+                            const config = {
+                                [CATEGORIES.CARDIO]: { id: 'cardio', label: t('cardio.title'), locked: false },
+                                [CATEGORIES.BODYWEIGHT]: { id: 'standard', label: t('common.bodyweight'), locked: false },
+                                [CATEGORIES.WEIGHTS]: { id: 'weights', label: t('common.weights'), locked: !canAccessFeature(FEATURES.WEIGHTS, { isPro: hasProAccess }) },
+                                [CATEGORIES.CUSTOM]: { id: 'custom', label: t('common.custom'), locked: !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro: hasProAccess }) }
+                            }[categoryId];
+                            const cat = { ...config, color: CATEGORY_COLORS[categoryId] };
+                            return (
+                                <label key={cat.id} style={{
                                 display: 'flex', alignItems: 'center', gap: '6px',
-                                background: activeCategories.includes(cat.id) ? 'linear-gradient(135deg, #8b5cf6, #6366f1)' : 'rgba(255,255,255,0.05)',
-                                color: activeCategories.includes(cat.id) ? '#ffffff' : (cat.locked ? 'var(--text-disabled)' : 'var(--text-secondary)'),
-                                border: activeCategories.includes(cat.id) ? '1px solid rgba(139, 92, 246, 0.4)' : '1px solid transparent',
+                                background: activeCategories.includes(cat.id) ? `linear-gradient(135deg, ${cat.color}, ${cat.color}cc)` : 'rgba(255,255,255,0.05)',
+                                color: activeCategories.includes(cat.id) ? '#ffffff' : (cat.locked ? 'var(--text-disabled)' : cat.color),
+                                border: activeCategories.includes(cat.id) ? `1px solid ${cat.color}88` : `1px solid ${cat.color}33`,
                                 padding: '8px 16px', borderRadius: 'var(--radius-full)',
-                                fontSize: '0.8rem', fontWeight: '600', cursor: cat.locked ? 'pointer' : 'pointer',
+                                fontSize: '0.8rem', fontWeight: '700', cursor: cat.locked ? 'pointer' : 'pointer',
                                 transition: 'all 0.2s',
                                 opacity: cat.locked ? 0.6 : 1
                             }}>
@@ -238,7 +242,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                     </>
                                 )}
                             </label>
-                        ))}
+                        )})}
                     </div>
                 )}
             </div>

@@ -12,7 +12,7 @@ import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
 export const DashboardSlide = React.memo(({
     isFuture, effectiveStart, dayNumber, today, getExerciseCount, completions, computedStats,
     isCounterTransitioning, prevDayNumber, pauseCloudSync, setShowCounter,
-    activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, onManageCustom, isDay100, getConfig
+    activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, categoryColor, onManageCustom, isDay100, getConfig
 }) => {
     const { t, i18n } = useTranslation();
     const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
@@ -77,7 +77,7 @@ export const DashboardSlide = React.memo(({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{
                         fontSize: '0.8rem', fontWeight: '800', 
-                        color: isDayPerfect ? '#ffdf00' : 'var(--text-secondary)', 
+                        color: isDayPerfect ? '#ffdf00' : (categoryColor || 'var(--text-secondary)'), 
                         textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8,
                         textShadow: isDayPerfect ? '0 0 10px rgba(255,223,0,0.5)' : 'none'
                     }}>

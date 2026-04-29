@@ -9,6 +9,7 @@ import { DashboardActions } from './dashboard/DashboardActions';
 import { Day100Overlay, Day100HackModal, Day100UnhackAnimation, useDay100Logic } from '../features/events/Day100Event';
 import { useAchievementToast } from '../hooks/useAchievementToast';
 import { ProPaywall } from './dashboard/ProPaywall';
+import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '../config/categories';
 import { useBackHandler } from '../hooks/useBackHandler';
 import { useModalManager } from '../hooks/useModalManager';
 import { useNewAchievement } from '../hooks/useNewAchievement';
@@ -102,14 +103,20 @@ export function Dashboard() {
         }
     }, []);
 
-    const effectiveSlide = isPro ? activeSlide : 1;
-    const globalSelectedId = effectiveSlide === 0 ? 'cardio' : effectiveSlide === 1 ? classicSelected : effectiveSlide === 2 ? weightsSelected : customSelected;
+    const effectiveSlide = isPro ? activeSlide : 0;
+    const currentCatKey = CATEGORY_ORDER[effectiveSlide];
+    
+    const globalSelectedId = currentCatKey === CATEGORIES.CARDIO ? 'cardio' 
+        : currentCatKey === CATEGORIES.BODYWEIGHT ? classicSelected 
+        : currentCatKey === CATEGORIES.WEIGHTS ? weightsSelected 
+        : customSelected;
+        
     const selectedExercise = useMemo(() => {
-        if (effectiveSlide === 0) return { id: 'cardio', color: '#ef4444', gradient: ['#ef4444', '#dc2626'], icon: 'Heart', name: t('cardio.title') };
-        if (effectiveSlide === 1) return EXERCISES_MAP[globalSelectedId] || EXERCISES[0];
-        if (effectiveSlide === 2) return WEIGHT_EXERCISES_MAP[globalSelectedId] || WEIGHT_EXERCISES[0];
+        if (currentCatKey === CATEGORIES.CARDIO) return { id: 'cardio', color: '#ef4444', gradient: ['#ef4444', '#dc2626'], icon: 'Heart', name: t('cardio.title') };
+        if (currentCatKey === CATEGORIES.BODYWEIGHT) return EXERCISES_MAP[globalSelectedId] || EXERCISES[0];
+        if (currentCatKey === CATEGORIES.WEIGHTS) return WEIGHT_EXERCISES_MAP[globalSelectedId] || WEIGHT_EXERCISES[0];
         return customExercisesMap[globalSelectedId] || customExercises[0] || { id: 'custom_placeholder', color: '#8b5cf6', gradient: ['#8b5cf6', '#7c3aed'], icon: 'Star', name: 'Exercice Perso' };
-    }, [effectiveSlide, globalSelectedId, customExercises, customExercisesMap, t]);
+    }, [currentCatKey, globalSelectedId, customExercises, customExercisesMap, t]);
 
     useEffect(() => {
         setSoundSettingsGetter(() => settings);
@@ -143,7 +150,7 @@ export function Dashboard() {
     const dailyGoal = getDailyGoal(selectedExercise, dayNumber, currentDiff) || 1;
     
     // For Cardio slide, use the cardioTotalReps from settings, else use computedStats
-    const totalReps = effectiveSlide === 0 
+    const totalReps = currentCatKey === CATEGORIES.CARDIO 
         ? (settings.cardioTotalReps || 0) 
         : (computedStats.exerciseReps[globalSelectedId] || 0);
 
@@ -175,9 +182,9 @@ export function Dashboard() {
     const streakActive = computedStats.streakActive;
 
     const handleSelectExercise = (id) => {
-        if (effectiveSlide === 1) setClassicSelected(id);
-        else if (effectiveSlide === 2) setWeightsSelected(id);
-        else if (effectiveSlide === 3) setCustomSelected(id);
+        if (currentCatKey === CATEGORIES.BODYWEIGHT) setClassicSelected(id);
+        else if (currentCatKey === CATEGORIES.WEIGHTS) setWeightsSelected(id);
+        else if (currentCatKey === CATEGORIES.CUSTOM) setCustomSelected(id);
     };
 
     useEffect(() => {
@@ -280,67 +287,89 @@ export function Dashboard() {
                             }
                         }}></button>
 
-                        <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
-                            <Suspense fallback={null}>
-                                <CardioModule />
-                            </Suspense>
-                        </div>
+                        {CATEGORY_ORDER.map(catKey => {
+                            if (catKey === CATEGORIES.CARDIO) {
+                                return (
+                                    <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                                        <Suspense fallback={null}>
+                                            <CardioModule />
+                                        </Suspense>
+                                    </div>
+                                );
+                            }
 
-                        <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
-                            <DashboardSlide
-                                isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
-                                getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
-                                isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
-                                pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
-                                activeExerciseId={classicSelected} onSelectExercise={handleSelectExercise}
-                                exercisesList={EXERCISES} exercisesMap={EXERCISES_MAP}
-                                isDay100={isDay100}
-                                getConfig={getConfig}
-                            />
-                        </div>
+                            if (catKey === CATEGORIES.BODYWEIGHT) {
+                                return (
+                                    <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                                        <DashboardSlide
+                                            isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
+                                            getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
+                                            isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
+                                            pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
+                                            activeExerciseId={classicSelected} onSelectExercise={handleSelectExercise}
+                                            exercisesList={EXERCISES} exercisesMap={EXERCISES_MAP}
+                                            isDay100={isDay100}
+                                            getConfig={getConfig}
+                                        />
+                                    </div>
+                                );
+                            }
 
-                        <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
-                            {canAccessFeature(FEATURES.WEIGHTS, { isPro }) ? (
-                                <DashboardSlide
-                                    title={t('common.weights')}
-                                    isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
-                                    getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
-                                    isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
-                                    pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
-                                    activeExerciseId={weightsSelected} onSelectExercise={handleSelectExercise}
-                                    exercisesList={WEIGHT_EXERCISES} exercisesMap={WEIGHT_EXERCISES_MAP}
-                                    isDay100={hackActive}
-                                    getConfig={getConfig}
-                                />
-                            ) : (
-                                <ProPaywall
-                                    title={t('common.weights')}
-                                    onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
-                                />
-                            )}
-                        </div>
+                            if (catKey === CATEGORIES.WEIGHTS) {
+                                return (
+                                    <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                                        {canAccessFeature(FEATURES.WEIGHTS, { isPro }) ? (
+                                            <DashboardSlide
+                                                title={t('common.weights')}
+                                                categoryColor={CATEGORY_COLORS[CATEGORIES.WEIGHTS]}
+                                                isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
+                                                getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
+                                                isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
+                                                pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
+                                                activeExerciseId={weightsSelected} onSelectExercise={handleSelectExercise}
+                                                exercisesList={WEIGHT_EXERCISES} exercisesMap={WEIGHT_EXERCISES_MAP}
+                                                isDay100={hackActive}
+                                                getConfig={getConfig}
+                                            />
+                                        ) : (
+                                            <ProPaywall
+                                                title={t('common.weights')}
+                                                onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
+                                            />
+                                        )}
+                                    </div>
+                                );
+                            }
 
-                        <div style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
-                            {canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) ? (
-                                <DashboardSlide
-                                    title={t('common.custom')}
-                                    isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
-                                    getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
-                                    isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
-                                    pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
-                                    activeExerciseId={customExercisesMap[customSelected] ? customSelected : (customExercises[0]?.id || null)} onSelectExercise={handleSelectExercise}
-                                    exercisesList={customExercises} exercisesMap={customExercisesMap}
-                                    onManageCustom={() => { setShowCustomExercisesModal(true); pauseCloudSync?.(); }}
-                                    isDay100={hackActive}
-                                    getConfig={getConfig}
-                                />
-                            ) : (
-                                <ProPaywall
-                                    title={t('common.custom')}
-                                    onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
-                                />
-                            )}
-                        </div>
+                            if (catKey === CATEGORIES.CUSTOM) {
+                                return (
+                                    <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                                        {canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) ? (
+                                            <DashboardSlide
+                                                title={t('common.custom')}
+                                                categoryColor={CATEGORY_COLORS[CATEGORIES.CUSTOM]}
+                                                isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
+                                                getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
+                                                isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
+                                                pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
+                                                activeExerciseId={customExercisesMap[customSelected] ? customSelected : (customExercises[0]?.id || null)} onSelectExercise={handleSelectExercise}
+                                                exercisesList={customExercises} exercisesMap={customExercisesMap}
+                                                onManageCustom={() => { setShowCustomExercisesModal(true); pauseCloudSync?.(); }}
+                                                isDay100={hackActive}
+                                                getConfig={getConfig}
+                                            />
+                                        ) : (
+                                            <ProPaywall
+                                                title={t('common.custom')}
+                                                onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
+                                            />
+                                        )}
+                                    </div>
+                                );
+                            }
+
+                            return null;
+                        })}
                     </div>
 
                     <div style={{
@@ -348,7 +377,7 @@ export function Dashboard() {
                         display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10,
                         pointerEvents: 'none'
                     }}>
-                        {[0, 1, 2, 3].map(i => (
+                        {CATEGORY_ORDER.map((_, i) => (
                             <div key={i} style={{
                                 width: '4px', height: activeSlide === i ? '24px' : '6px',
                                 borderRadius: '4px',
@@ -365,6 +394,7 @@ export function Dashboard() {
                     setShowSession={setShowSession}
                     pauseCloudSync={pauseCloudSync}
                     selectedExercise={selectedExercise}
+                    activeCategoryColor={CATEGORY_COLORS[CATEGORY_ORDER[effectiveSlide]]}
                     isDay100={hackActive}
                 />
 
@@ -374,8 +404,13 @@ export function Dashboard() {
                             <Calendar
                                 startDate={startDate}
                                 completions={completions}
-                                exercises={effectiveSlide === 0 ? CARDIO_EXERCISES : effectiveSlide === 1 ? EXERCISES : effectiveSlide === 2 ? WEIGHT_EXERCISES : customExercises}
-                                isCustom={effectiveSlide === 3}
+                                exercises={{
+                                    [CATEGORIES.BODYWEIGHT]: EXERCISES,
+                                    [CATEGORIES.WEIGHTS]: WEIGHT_EXERCISES,
+                                    [CATEGORIES.CARDIO]: CARDIO_EXERCISES,
+                                    [CATEGORIES.CUSTOM]: customExercises
+                                }[CATEGORY_ORDER[effectiveSlide]]}
+                                isCustom={CATEGORY_ORDER[effectiveSlide] === CATEGORIES.CUSTOM}
                                 getDayNumber={getDayNumber}
                                 onClose={() => setShowCalendar(false)}
                                 settings={settings}
@@ -386,7 +421,12 @@ export function Dashboard() {
                     {showStats && (
                         <Suspense fallback={null}>
                             <Stats
-                                initialCategory={effectiveSlide === 0 ? 'cardio' : effectiveSlide === 1 ? 'standard' : effectiveSlide === 2 ? 'weights' : 'custom'}
+                                initialCategory={{
+                                    [CATEGORIES.BODYWEIGHT]: 'standard',
+                                    [CATEGORIES.WEIGHTS]: 'weights',
+                                    [CATEGORIES.CARDIO]: 'cardio',
+                                    [CATEGORIES.CUSTOM]: 'custom'
+                                }[CATEGORY_ORDER[effectiveSlide]]}
                                 onClose={() => setShowStats(false)}
                                 onOpenAchievements={() => { setShowAchievements(true); }}
                                 onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}

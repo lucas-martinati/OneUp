@@ -16,6 +16,7 @@ import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
+import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '../../config/categories';
 
 function CategorySeparator({ label, color }) {
     return (
@@ -705,14 +706,24 @@ export function Settings({ defaultShowStore = false, onClose }) {
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                            {/* Cardio Exercises */}
-                            {CARDIO_EXERCISES && CARDIO_EXERCISES.length > 0 && (
-                                <>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                        <CategorySeparator label={t('cardio.title')} color="#f97316" />
-                                        {CARDIO_EXERCISES.map(ex => {
+                            {CATEGORY_ORDER.map(catKey => {
+                                let title, exList;
+                                if (catKey === CATEGORIES.CARDIO) { title = t('cardio.title'); exList = CARDIO_EXERCISES; }
+                                else if (catKey === CATEGORIES.BODYWEIGHT) { title = t('common.bodyweight'); exList = EXERCISES; }
+                                else if (catKey === CATEGORIES.WEIGHTS) { 
+                                    if (!isPro) return null;
+                                    title = t('common.weights'); exList = WEIGHT_EXERCISES; 
+                                }
+                                else return null;
+
+                                if (!exList || exList.length === 0) return null;
+
+                                return (
+                                    <div key={catKey} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                        <CategorySeparator label={title} color={CATEGORY_COLORS[catKey]} />
+                                        {exList.map(ex => {
                                             const val = getConfig(ex.id).difficulty;
-                                            const exColor = ex.color || '#f97316';
+                                            const exColor = ex.color || CATEGORY_COLORS[catKey];
                                             const percentage = ((val - 0.1) / 0.9) * 100;
                                             return (
                                                 <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -742,84 +753,8 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                             );
                                         })}
                                     </div>
-                                </>
-                            )}
-
-                            {/* Bodyweight Exercises */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                <CategorySeparator label={t('common.bodyweight')} color="#ef4444" />
-                                {EXERCISES.map(ex => {
-                                    const val = getConfig(ex.id).difficulty;
-                                    const exColor = ex.color || '#ef4444';
-                                    const percentage = ((val - 0.1) / 0.9) * 100;
-                                    return (
-                                        <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: '600' }}>
-                                                    {getExerciseLabel(ex, t)}
-                                                </span>
-                                                <span style={{ fontSize: '0.8rem', color: exColor, fontWeight: '700', background: `${exColor}25`, padding: '2px 8px', borderRadius: '10px' }}>
-                                                    x{val.toFixed(1)}
-                                                </span>
-                                            </div>
-                                            <input
-                                                type="range"
-                                                className="premium-slider"
-                                                min="0.1" max="1" step="0.1"
-                                                value={val}
-                                                onChange={(e) => {
-                                                    const newVal = Math.min(1.0, Math.max(0.1, parseFloat(e.target.value)));
-                                                    updateConfig(ex.id, { difficulty: newVal });
-                                                }}
-                                                style={{
-                                                    '--slider-color': exColor,
-                                                    background: `linear-gradient(to right, ${exColor} ${percentage}%, var(--surface-muted) ${percentage}%)`
-                                                }}
-                                            />
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            {/* Weights Exercises */}
-                            {isPro && WEIGHT_EXERCISES && WEIGHT_EXERCISES.length > 0 && (
-                                <>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                        <CategorySeparator label={t('common.weights')} color="#8b5cf6" />
-                                        {WEIGHT_EXERCISES.map(ex => {
-                                            const val = getConfig(ex.id).difficulty;
-                                            const exColor = ex.color || '#ef4444';
-                                            const percentage = ((val - 0.1) / 0.9) * 100;
-                                            return (
-                                                <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                        <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: '600' }}>
-                                                            {getExerciseLabel(ex, t)}
-                                                        </span>
-                                                        <span style={{ fontSize: '0.8rem', color: exColor, fontWeight: '700', background: `${exColor}25`, padding: '2px 8px', borderRadius: '10px' }}>
-                                                            x{val.toFixed(1)}
-                                                        </span>
-                                                    </div>
-                                                    <input
-                                                        type="range"
-                                                        className="premium-slider"
-                                                        min="0.1" max="1.0" step="0.1"
-                                                        value={val}
-                                                        onChange={(e) => {
-                                                            const newVal = Math.min(1.0, Math.max(0.1, parseFloat(e.target.value)));
-                                                            updateConfig(ex.id, { difficulty: newVal });
-                                                        }}
-                                                        style={{
-                                                            '--slider-color': exColor,
-                                                            background: `linear-gradient(to right, ${exColor} ${percentage}%, var(--surface-muted) ${percentage}%)`
-                                                        }}
-                                                    />
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </>
-                            )}
+                                );
+                            })}
                         </div>
                     </div>
                 )}
