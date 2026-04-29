@@ -4,57 +4,10 @@ import { stravaService } from '../../services/stravaService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProgressContext } from '../../contexts/ProgressContext';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
-import { getLocalDateStr } from '../../utils/dateUtils';
+import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '../../utils/dateUtils';
+import { getWeeklyGoalKm } from '../../config/exercises';
 
-/**
- * Weekly increment in METERS per activity type.
- * Running: +100 m/week cumulative (week N → N × 100 m)
- * Cycling: +210 m/week cumulative (week N → N × 210 m)
- */
-const WEEKLY_INCREMENT = {
-  running: 450,   // meters
-  cycling: 750,   // meters
-};
 
-/**
- * Returns the ISO week boundaries (Monday 00:00 → Sunday 23:59) for a given date.
- */
-function getWeekBounds(date = new Date()) {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
-  const monday = new Date(d.getFullYear(), d.getMonth(), diff);
-  monday.setHours(0, 0, 0, 0);
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-  sunday.setHours(23, 59, 59, 999);
-  return { start: monday.getTime(), end: sunday.getTime() };
-}
-
-/**
- * Compute the current ISO week number relative to the challenge start date.
- * Week 1 = the first Monday-Sunday period that includes or follows startDate.
- * Optional param targetDate allows computing the week number for a specific past date.
- */
-function getCurrentWeekNumber(startDate, targetDate = new Date()) {
-  if (!startDate) return 1;
-  const start = new Date(startDate);
-  start.setHours(0, 0, 0, 0);
-  const target = new Date(targetDate);
-  target.setHours(0, 0, 0, 0);
-  const diffMs = target.getTime() - start.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  return Math.max(1, Math.floor(diffDays / 7) + 1);
-}
-
-/**
- * Compute the weekly goal for the current week.
- * Formula: weekNumber × increment (in km)
- */
-function getWeeklyGoalKm(mode, weekNumber) {
-  const incrementM = WEEKLY_INCREMENT[mode];
-  return (weekNumber * incrementM) / 1000;
-}
 
 /**
  * Compute the cardio streak: number of consecutive weeks (ending at current)

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp } from '../utils/dateUtils';
+import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, getCurrentWeekNumber, isDayDoneFromCompletions } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal, CARDIO_EXERCISES } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
@@ -165,11 +165,42 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
             const ex = allExercises.find(e => e.id === exId);
             if (ex) {
                 const diffToUse = getConfig ? getConfig(exId, dateStr).difficulty : difficultyMultiplier;
-                const reps = getDailyGoal(ex, dayNum, diffToUse);
-                exerciseReps[exId] = (exerciseReps[exId] || 0) + reps;
+                
+                let reps = 0;
+                if (exId === 'running' || exId === 'cycling') {
+                    // Cardio reps = weekNumber * 7 (matches dashboard points)
+                    // We only count it ONCE per week for Stats
+                    const { start } = getWeekBounds(dateObj);
+                    const mondayStr = getLocalDateStr(new Date(start));
+                    
+                    // Is this the first day of the week we see this cardio as completed?
+                    let firstDay = true;
+                    let loop = new Date(start);
+                    while (loop < dateObj) {
+                        const dStr = getLocalDateStr(loop);
+                        if (completions[dStr]?.[exId]?.isCompleted) {
+                            firstDay = false;
+                            break;
+                        }
+                        loop.setDate(loop.getDate() + 1);
+                    }
+                    
+                    if (firstDay) {
+                        const startDate = settings?.startDate || firstActiveDate; // Fallback
+                        const weekNum = getCurrentWeekNumber(startDate, dateObj);
+                        reps = getDailyGoal(ex, weekNum, diffToUse, true);
+                    }
+                } else {
+                    reps = getDailyGoal(ex, dayNum, diffToUse);
+                }
+
+                if (reps > 0) {
+                    exerciseReps[exId] = (exerciseReps[exId] || 0) + reps;
+                    dayReps += reps;
+                    currentDayExReps[exId] = reps;
+                }
+                
                 exerciseDays[exId] = (exerciseDays[exId] || 0) + 1;
-                dayReps += reps;
-                currentDayExReps[exId] = reps;
 
                 // Monthly by exercise
                 const exIndex = allExercises.findIndex(e => e.id === exId);
@@ -276,24 +307,68 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     const exerciseYesterdayStreaks = {};
     const exerciseDoneToday = {};
 
-    for (const ex of allExercises) {
-        exerciseCurrentStreaks[ex.id] = calculateExerciseStreak(completions, todayStr, ex.id);
-        exerciseYesterdayStreaks[ex.id] = calculateExerciseStreak(completions, getLocalDateStr(yesterdayDate), ex.id);
-        exerciseDoneToday[ex.id] = !!completions[todayStr]?.[ex.id]?.isCompleted;
-
-        // Max streak
-        let maxExStreak = 0, tempExStreak = 0;
-        for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
-            const d = new Date(today);
-            d.setDate(d.getDate() - i);
-            if (completions[getLocalDateStr(d)]?.[ex.id]?.isCompleted) {
-                tempExStreak++;
-                if (tempExStreak > maxExStreak) maxExStreak = tempExStreak;
-            } else {
-                tempExStreak = 0;
-            }
+    function getWeeklyCompletion(comps, mode, date) {
+        const { start, end } = getWeekBounds(date);
+        let loop = new Date(start);
+        while (loop <= end) {
+            if (comps[getLocalDateStr(loop)]?.[mode]?.isCompleted) return true;
+            loop.setDate(loop.getDate() + 1);
         }
-        exerciseMaxStreaks[ex.id] = maxExStreak;
+        return false;
+    }
+
+    for (const ex of allExercises) {
+        if (ex.id === 'running' || ex.id === 'cycling') {
+            // Cardio Streak: consecutive WEEKS
+            let exStreak = 0;
+            for (let w = 0; w < 52; w++) {
+                const ref = new Date(today);
+                ref.setDate(ref.getDate() - w * 7);
+                if (getWeeklyCompletion(completions, ex.id, ref)) {
+                    exStreak++;
+                } else if (w > 0) {
+                    break;
+                }
+            }
+            exerciseCurrentStreaks[ex.id] = exStreak;
+            exerciseDoneToday[ex.id] = isDayDoneFromCompletions(completions, todayStr) && !!getWeeklyCompletion(completions, ex.id, today);
+            
+            // Max Streak for cardio
+            let maxExStreak = 0, tempExStreak = 0;
+            const startD = new Date(firstActiveDate || sortedDates[0] || todayStr);
+            const { start: firstWeekStart } = getWeekBounds(startD);
+            const { start: currentWeekStart } = getWeekBounds(today);
+            
+            let loopWeek = new Date(firstWeekStart);
+            while (loopWeek <= currentWeekStart) {
+                if (getWeeklyCompletion(completions, ex.id, loopWeek)) {
+                    tempExStreak++;
+                    if (tempExStreak > maxExStreak) maxExStreak = tempExStreak;
+                } else {
+                    tempExStreak = 0;
+                }
+                loopWeek.setDate(loopWeek.getDate() + 7);
+            }
+            exerciseMaxStreaks[ex.id] = maxExStreak;
+        } else {
+            exerciseCurrentStreaks[ex.id] = calculateExerciseStreak(completions, todayStr, ex.id);
+            exerciseYesterdayStreaks[ex.id] = calculateExerciseStreak(completions, getLocalDateStr(yesterdayDate), ex.id);
+            exerciseDoneToday[ex.id] = !!completions[todayStr]?.[ex.id]?.isCompleted;
+
+            // Max streak
+            let maxExStreak = 0, tempExStreak = 0;
+            for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                if (completions[getLocalDateStr(d)]?.[ex.id]?.isCompleted) {
+                    tempExStreak++;
+                    if (tempExStreak > maxExStreak) maxExStreak = tempExStreak;
+                } else {
+                    tempExStreak = 0;
+                }
+            }
+            exerciseMaxStreaks[ex.id] = maxExStreak;
+        }
     }
 
     // ─── Derived values ──────────────────────────────────────────────────

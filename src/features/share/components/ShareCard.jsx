@@ -7,9 +7,9 @@ import {
 import { getExerciseLabel, getExerciseColor, isCustomExercise } from '../../../utils/exerciseLabel';
 import { sumExerciseReps } from '../../../utils/stats';
 import { CATEGORIES } from '../../../config/categories';
-import { EXERCISES, getDailyGoal } from '../../../config/exercises';
+import { EXERCISES, CARDIO_EXERCISES, getDailyGoal } from '../../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../../config/weights';
-import { formatDuration } from '../../../utils/dateUtils';
+import { formatDuration, getLocalDateStr, getCurrentWeekNumber } from '../../../utils/dateUtils';
 import { useExerciseConfig } from '../../../hooks/useExerciseConfig';
 import { DifficultyBadge } from '../../../components/ui/DifficultyBadge';
 
@@ -147,7 +147,7 @@ function ExerciseList({ exercises, t }) {
  *   - 'session': current workout session data
  *   - 'global': global stats from Stats screen
  */
-export function ShareCard({ cardRef, sessionData, stats, sessionHistory, completions, getDayNumber, options, mode = 'session' }) {
+export function ShareCard({ cardRef, sessionData, stats, sessionHistory, completions, getDayNumber, settings, options, mode = 'session' }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const { getConfig } = useExerciseConfig();
@@ -179,11 +179,11 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
     const dayNum = getDayNumber ? getDayNumber(targetDate) : 1;
     const dayData = completions[targetDate];
     if (dayData) {
-      const allKnownExercises = [...EXERCISES, ...WEIGHT_EXERCISES, ...(stats?.customExercises || [])];
+      const allKnownExercises = [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES, ...(stats?.customExercises || [])];
       for (const [exId, exStats] of Object.entries(dayData)) {
         if (exStats?.isCompleted) {
           const knownEx = allKnownExercises.find(e => e.id === exId);
-          if (knownEx) {
+          if (knownEx && !CARDIO_EXERCISES.some(c => c.id === exId)) {
              const conf = getConfig(exId, targetDate);
              dailyExercises.push({
                ...knownEx,
@@ -192,6 +192,40 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
                difficulty: conf.difficulty
              });
           }
+        }
+      }
+
+      // Special handling for Cardio: if done anytime in the week, show it as done
+      for (const cardio of CARDIO_EXERCISES) {
+        let isDoneInWeek = false;
+        let weekStats = null;
+        let weekDate = null;
+        
+        // Look back until previous Monday to find if done in CURRENT week
+        const targetD = new Date(targetDate);
+        const dayOfWeek = targetD.getDay(); // 0 is Sunday
+        const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        
+        for (let i = 0; i <= daysSinceMonday; i++) {
+          const checkDate = new Date(targetDate);
+          checkDate.setDate(checkDate.getDate() - i);
+          const dateStr = getLocalDateStr(checkDate);
+          if (completions[dateStr]?.[cardio.id]?.isCompleted) {
+            isDoneInWeek = true;
+            weekStats = completions[dateStr][cardio.id];
+            weekDate = dateStr;
+            break;
+          }
+        }
+        
+        if (isDoneInWeek) {
+          const conf = getConfig(cardio.id, weekDate);
+          const weekNum = getCurrentWeekNumber(settings?.startDate || stats?.firstActiveDate, new Date(targetDate));
+          dailyExercises.push({
+            ...cardio,
+            reps: getDailyGoal(cardio, weekNum, conf.difficulty, true),
+            difficulty: conf.difficulty
+          });
         }
       }
 
@@ -210,9 +244,11 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
   // Categorize exercises
   const isWeightEx = (ex) => weightIds.includes(ex.id);
   const isCustomEx = (ex) => isCustomExercise(ex.id) || (!weightIds.includes(ex.id) && sessionType === CATEGORIES.CUSTOM);
+  const isCardioEx = (ex) => ex.id === 'running' || ex.id === 'cycling';
   const hasWeightEx = allExercises.some(isWeightEx);
   const hasCustomEx = allExercises.some(isCustomEx);
-  const showCategoriesSeparately = options.showWeights && (hasWeightEx || hasCustomEx);
+  const hasCardioEx = allExercises.some(isCardioEx);
+  const showCategoriesSeparately = options.showWeights && (hasWeightEx || hasCustomEx || hasCardioEx);
 
   const bodyweightExercises = showCategoriesSeparately
     ? allExercises.filter(ex => !isWeightEx(ex) && !isCustomEx(ex))
@@ -223,6 +259,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
     bodyweightExercises.length > 0 && { key: CATEGORIES.BODYWEIGHT, exercises: bodyweightExercises, label: t('common.bodyweight'), color: '#34d399' },
     weightExercises.length > 0 && { key: CATEGORIES.WEIGHTS, exercises: weightExercises, label: t('common.weights'), color: '#f97316' },
     customExercises.length > 0 && { key: CATEGORIES.CUSTOM, exercises: customExercises, label: t('common.custom'), color: '#8b5cf6' },
+    allExercises.filter(isCardioEx).length > 0 && { key: CATEGORIES.CARDIO, exercises: allExercises.filter(isCardioEx), label: t('cardio.title'), color: '#ef4444' },
   ].filter(Boolean);
   const showSections = showCategoriesSeparately && categories.length > 1;
 
@@ -233,21 +270,25 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
   const filteredDailyExercises = isGlobal ? dailyExercises.filter(ex => {
     if (isCustomEx(ex)) return selectedCats.includes(CATEGORIES.CUSTOM);
     if (isWeightEx(ex)) return selectedCats.includes(CATEGORIES.WEIGHTS);
+    if (isCardioEx(ex)) return selectedCats.includes(CATEGORIES.CARDIO);
     return selectedCats.includes(CATEGORIES.BODYWEIGHT);
   }) : dailyExercises;
 
   // Categorize daily exercises (for global mode)
   const hasDailyWeightEx = filteredDailyExercises.some(isWeightEx);
   const hasDailyCustomEx = filteredDailyExercises.some(isCustomEx);
-  const shouldSeparateDaily = hasDailyWeightEx || hasDailyCustomEx;
+  const hasDailyCardioEx = filteredDailyExercises.some(isCardioEx);
+  const shouldSeparateDaily = hasDailyWeightEx || hasDailyCustomEx || hasDailyCardioEx;
 
-  const dailyBodyweight = shouldSeparateDaily ? filteredDailyExercises.filter(ex => !isWeightEx(ex) && !isCustomEx(ex)) : filteredDailyExercises;
+  const dailyBodyweight = shouldSeparateDaily ? filteredDailyExercises.filter(ex => !isWeightEx(ex) && !isCustomEx(ex) && !isCardioEx(ex)) : filteredDailyExercises;
   const dailyWeight = shouldSeparateDaily ? filteredDailyExercises.filter(isWeightEx) : [];
   const dailyCustom = shouldSeparateDaily ? filteredDailyExercises.filter(isCustomEx) : [];
+  const dailyCardio = shouldSeparateDaily ? filteredDailyExercises.filter(isCardioEx) : [];
   const dailyCategories = [
     dailyBodyweight.length > 0 && { key: CATEGORIES.BODYWEIGHT, exercises: dailyBodyweight, label: t('common.bodyweight'), color: '#34d399', isPerfect: dailyStandardDone },
     dailyWeight.length > 0 && { key: CATEGORIES.WEIGHTS, exercises: dailyWeight, label: t('common.weights'), color: '#f97316', isPerfect: dailyWeightsDone },
     dailyCustom.length > 0 && { key: CATEGORIES.CUSTOM, exercises: dailyCustom, label: t('common.custom'), color: '#8b5cf6', isPerfect: false },
+    dailyCardio.length > 0 && { key: CATEGORIES.CARDIO, exercises: dailyCardio, label: t('cardio.title'), color: '#ef4444', isPerfect: false },
   ].filter(Boolean);
   const showDailySections = shouldSeparateDaily && dailyCategories.length > 1;
 
@@ -263,6 +304,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
         if (ex.totalReps > 0 && ex.id) {
           let cat = CATEGORIES.BODYWEIGHT;
           if (isWeightEx(ex)) cat = CATEGORIES.WEIGHTS;
+          else if (isCardioEx(ex)) cat = CATEGORIES.CARDIO;
           else if (isCustomEx(ex)) cat = CATEGORIES.CUSTOM;
           
           if (selectedCats.includes(cat)) {
@@ -273,6 +315,9 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
             }
           }
         }
+      }
+      if (selectedCats.includes(CATEGORIES.CARDIO)) {
+        totalReps += (settings?.cardioTotalReps || 0);
       }
     } else if (stats?.globalTotalReps) {
       totalReps = stats.globalTotalReps;
@@ -450,9 +495,9 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
               </div>
               {(() => {
                 const cats = options.statsCategories || Object.values(CATEGORIES);
-                const allSelected = cats.length === 3;
+                const allSelected = cats.length === 4;
                 if (allSelected) return null;
-                const catColors = { bodyweight: '#34d399', weights: '#f97316', custom: '#8b5cf6' };
+                const catColors = { bodyweight: '#34d399', weights: '#f97316', custom: '#8b5cf6', cardio: '#ef4444' };
                 return (
                   <div style={{
                     display: 'flex', flexWrap: 'wrap', marginTop: '6px',

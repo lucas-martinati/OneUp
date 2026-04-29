@@ -9,7 +9,7 @@ const DEFAULT_OPTIONS = {
   showStreak: false,
   showSessionHistory: false,
   showWeights: true,
-  statsCategories: [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM],
+  statsCategories: [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM, CATEGORIES.CARDIO],
   format: 'png',
   theme: 'dark',
   taggedUsers: [],

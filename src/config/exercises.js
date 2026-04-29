@@ -130,11 +130,34 @@ export const CARDIO_EXERCISES = [
     }
 ];
 
+/**
+ * Weekly increment in METERS per activity type.
+ * Running: +450 m/week cumulative
+ * Cycling: +750 m/week cumulative
+ */
+export const WEEKLY_INCREMENT = {
+    running: 450,
+    cycling: 750,
+};
+
+/**
+ * Compute the weekly goal for the current week.
+ * Formula: weekNumber × increment (in km)
+ */
+export function getWeeklyGoalKm(mode, weekNumber) {
+    const incrementM = WEEKLY_INCREMENT[mode];
+    if (!incrementM) return 0;
+    return (weekNumber * incrementM) / 1000;
+}
+
 /** Quick lookup by exercise id */
 export const EXERCISES_MAP = Object.fromEntries(EXERCISES.map(e => [e.id, e]));
 
-export const getDailyGoal = (exercise, dayNumber, userMultiplier = 1.0) => {
+export const getDailyGoal = (exercise, dayNumber, userMultiplier = 1.0, isWeekly = false) => {
     if (!exercise) return 1;
+    if (isWeekly) {
+        return Math.max(1, Math.ceil(dayNumber * 7));
+    }
     const mult = exercise.multiplier !== undefined ? exercise.multiplier : 1;
     return Math.max(1, Math.ceil(dayNumber * mult * userMultiplier));
 };

@@ -35,6 +35,7 @@ export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 
       standard: CATEGORIES.BODYWEIGHT,
       weights: CATEGORIES.WEIGHTS,
       custom: CATEGORIES.CUSTOM,
+      cardio: CATEGORIES.CARDIO,
   };
   const initialCategories = activeCategories
       .map(cat => categoryMap[cat])
@@ -45,7 +46,7 @@ export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 
       stats,
       sessionHistory: getSessionHistory(),
       mode,
-      initialCategories: initialCategories.length > 0 ? initialCategories : [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM],
+      initialCategories: initialCategories.length > 0 ? initialCategories : [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM, CATEGORIES.CARDIO],
   });
 
   const isCompact = variant === 'compact';

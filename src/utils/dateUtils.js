@@ -6,6 +6,36 @@
 export const MAX_STREAK_WINDOW = 365;
 
 /**
+ * Compute the current ISO week number relative to the challenge start date.
+ * Week 1 = the first Monday-Sunday period that includes or follows startDate.
+ */
+export function getCurrentWeekNumber(startDate, targetDate = new Date()) {
+    if (!startDate) return 1;
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    const target = new Date(targetDate);
+    target.setHours(0, 0, 0, 0);
+    const diffMs = target.getTime() - start.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    return Math.max(1, Math.floor(diffDays / 7) + 1);
+}
+
+/**
+ * Returns the ISO week boundaries (Monday 00:00 → Sunday 23:59) for a given date.
+ */
+export function getWeekBounds(date = new Date()) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
+    const monday = new Date(d.getFullYear(), d.getMonth(), diff);
+    monday.setHours(0, 0, 0, 0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+    return { start: monday.getTime(), end: sunday.getTime() };
+}
+
+/**
  * Format a Date object as YYYY-MM-DD in local time.
  * @param {Date} d
  * @returns {string}
@@ -72,8 +102,30 @@ export function calculateExerciseStreak(completions, todayStr, exerciseId) {
  */
 export function isDayDoneFromCompletions(completions, dateStr) {
     const day = completions[dateStr];
-    if (!day) return false;
-    return Object.values(day).some(ex => ex?.isCompleted === true);
+    
+    // 1. Direct completion on this day (Standard, Weights, Custom, or Cardio done TODAY)
+    if (day && Object.values(day).some(ex => ex?.isCompleted === true)) {
+        return true;
+    }
+
+    // 2. Week-wide completion for Cardio
+    // If running or cycling was completed anytime between last Monday and dateStr, this day is "done"
+    const { start } = getWeekBounds(new Date(dateStr));
+    const monday = new Date(start);
+    const current = new Date(dateStr);
+    
+    // Check each day from Monday to current
+    let loop = new Date(monday);
+    while (loop <= current) {
+        const dStr = getLocalDateStr(loop);
+        const dData = completions[dStr];
+        if (dData && (dData.running?.isCompleted || dData.cycling?.isCompleted)) {
+            return true;
+        }
+        loop.setDate(loop.getDate() + 1);
+    }
+
+    return false;
 }
 
 /**

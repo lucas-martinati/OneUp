@@ -44,12 +44,13 @@ const CATEGORIES_CONFIG = [
   { key: CATEGORIES.BODYWEIGHT, color: '#34d399' },
   { key: CATEGORIES.WEIGHTS, color: '#f97316' },
   { key: CATEGORIES.CUSTOM, color: '#8b5cf6' },
+  { key: CATEGORIES.CARDIO, color: '#ef4444' },
 ];
 
 export function ShareOptions({ options, toggleOption, setOption, toggleCategory, clearBackgroundImage, originalImage, openCropModal, mode = 'session', isPro = false, sessionData }) {
   const { t } = useTranslation();
   const isGlobal = mode === 'global';
-  const selectedCategories = options.statsCategories || [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM];
+  const selectedCategories = options.statsCategories || [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM, CATEGORIES.CARDIO];
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
@@ -184,8 +185,8 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
         />
       )}
 
-      {/* Category filter for global stats (pro only, multi-select) */}
-      {isGlobal && isPro && (
+      {/* Category filter for global stats (multi-select) */}
+      {isGlobal && (
         <>
           <div style={{ height: '4px' }} />
           <div style={{
@@ -215,7 +216,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  {t(`common.${cat.key}`)}
+                  {cat.key === CATEGORIES.CARDIO ? t('cardio.title') : t(`common.${cat.key}`)}
                 </button>
               );
             })}
