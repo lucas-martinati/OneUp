@@ -198,7 +198,6 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
       // Special handling for Cardio: if done anytime in the week, show it as done
       for (const cardio of CARDIO_EXERCISES) {
         let isDoneInWeek = false;
-        let weekStats = null;
         let weekDate = null;
         
         // Look back until previous Monday to find if done in CURRENT week

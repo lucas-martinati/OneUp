@@ -171,7 +171,6 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
                     // Cardio reps = weekNumber * 7 (matches dashboard points)
                     // We only count it ONCE per week for Stats
                     const { start } = getWeekBounds(dateObj);
-                    const mondayStr = getLocalDateStr(new Date(start));
                     
                     // Is this the first day of the week we see this cardio as completed?
                     let firstDay = true;
