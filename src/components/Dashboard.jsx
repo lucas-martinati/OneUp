@@ -82,7 +82,8 @@ export function Dashboard() {
     const showAchievements = modals.achievements;
     const showSession = modals.session;
     const showCustomExercisesModal = modals.customExercises;
-    const [activeSlide, setActiveSlide] = useState(1);
+    const defaultSlide = CATEGORY_ORDER.indexOf(CATEGORIES.BODYWEIGHT);
+    const [activeSlide, setActiveSlide] = useState(defaultSlide);
 
     const [classicSelected, setClassicSelected] = useState('pushups');
     const [weightsSelected, setWeightsSelected] = useState('biceps_curl');
@@ -93,17 +94,21 @@ export function Dashboard() {
     const [openStoreDirectly, setOpenStoreDirectly] = useState(false);
     const scrollContainerRef = useRef(null);
 
-    // Scroll to default slide (bodyweight = slide 1) on mount
+    // Scroll to default slide (bodyweight) on mount
     useEffect(() => {
         const el = scrollContainerRef.current;
         if (el) {
             requestAnimationFrame(() => {
-                el.scrollTo({ top: el.clientHeight, behavior: 'instant' });
+                el.scrollTo({ top: el.clientHeight * defaultSlide, behavior: 'instant' });
             });
         }
-    }, []);
+    }, [defaultSlide]);
 
-    const effectiveSlide = isPro ? activeSlide : 0;
+    // Non-pro users can use Cardio and Bodyweight freely.
+    // If they scroll to a Pro-only slide (Weights, Custom), fall back to Bodyweight.
+    const bodyweightSlide = CATEGORY_ORDER.indexOf(CATEGORIES.BODYWEIGHT);
+    const currentCatFree = CATEGORY_ORDER[activeSlide] === CATEGORIES.CARDIO || CATEGORY_ORDER[activeSlide] === CATEGORIES.BODYWEIGHT;
+    const effectiveSlide = isPro ? activeSlide : (currentCatFree ? activeSlide : bodyweightSlide);
     const currentCatKey = CATEGORY_ORDER[effectiveSlide];
     
     const globalSelectedId = currentCatKey === CATEGORIES.CARDIO ? 'cardio' 
