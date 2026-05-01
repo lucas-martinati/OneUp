@@ -39,7 +39,18 @@ export function ProgressProvider({ children }) {
     saveToCloud, loadFromCloud, syncWithCloud, startCloudListener, deleteExerciseHistory,
     setHasShared, hasShared, achievements, lastCompletionChange,
     mergeWithAnonymousData, clearAnonymousData, hasGuestData,
+    cardio, updateCardioSessions,
   } = progress;
+
+  const cardioReps = useMemo(() => {
+    const sessions = Object.values(cardio?.sessions || {});
+    const runningKm = sessions.filter(s => s.type === 'running').reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
+    const cyclingKm = sessions.filter(s => s.type === 'cycling').reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
+    return {
+      running: Math.floor(runningKm * 15),
+      cycling: Math.floor(cyclingKm * 15)
+    };
+  }, [cardio]);
 
   const userDetailsCache = useUserDetailsCache(cloudSync);
   const getDifficulty = useCallback((exId, dateStr = null) => {
@@ -83,7 +94,7 @@ export function ProgressProvider({ children }) {
     weight: null,
   }), [getDifficulty]);
 
-  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesForStats, hasShared, achievements, internalGetConfig);
+  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesForStats, hasShared, achievements, internalGetConfig, cardioReps);
 
   // ── Leaderboard publishing ──────────────────────────────────────────
   const publishLeaderboardNow = useCallback(async () => {
@@ -218,6 +229,9 @@ export function ProgressProvider({ children }) {
               delete cleanedCloud.hasSharedFirstTime;
               delete cleanedCloud.runningStreak;
               delete cleanedCloud.cyclingStreak;
+              delete cleanedCloud.cardioTotalReps;
+              delete cleanedCloud.runningReps;
+              delete cleanedCloud.cyclingReps;
               
               const safeSettings = {
                 ...cleanedCloud,
@@ -466,6 +480,7 @@ export function ProgressProvider({ children }) {
     publishLeaderboardNow,
     syncError,
     isInitialSyncDone,
+    updateCardioSessions,
   }), [
     startDate, completions, isSetup, userStartDate, hasShared, achievements,
     startChallenge, toggleCompletion, getDayNumber, getTotalReps, isDayDone,
@@ -476,7 +491,7 @@ export function ProgressProvider({ children }) {
     userClans, refreshUserClans,
     cloudSyncAPI, conflictData, handleResolveConflict,
     pauseCloudSync, resumeCloudSync, publishLeaderboardNow,
-    syncError, isInitialSyncDone,
+    syncError, isInitialSyncDone, updateCardioSessions,
   ]);
 
   return (

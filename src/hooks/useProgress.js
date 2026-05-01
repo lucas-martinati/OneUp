@@ -105,6 +105,7 @@ function validateProgressData(data) {
       return ach;
     })(),
     lastCompletionChange: data.lastCompletionChange || null,
+    cardio: data.cardio || {},
   };
 }
 
@@ -602,10 +603,27 @@ export function useProgress(userId) {
     });
   }, [setState, userId]);
 
+  const updateCardioSessions = useCallback((sessions) => {
+    setState(prev => {
+      const sessionMap = {};
+      if (Array.isArray(sessions)) {
+        sessions.forEach(s => { if (s.id) sessionMap[s.id] = s; });
+      } else if (sessions && typeof sessions === 'object') {
+        Object.entries(sessions).forEach(([id, s]) => { sessionMap[id] = s; });
+      }
+
+      const nextCardio = { ...prev.cardio, sessions: sessionMap };
+      if (JSON.stringify(nextCardio) === JSON.stringify(prev.cardio)) return prev;
+
+      return { ...prev, cardio: nextCardio };
+    });
+  }, [setState]);
+
   return {
     startDate: state.startDate,
     completions: state.completions,
     achievements: state.achievements,
+    cardio: state.cardio || {},
     hasShared: !!state.achievements?.first_share,
     lastCompletionChange: state.lastCompletionChange,
     startChallenge,
@@ -627,6 +645,7 @@ export function useProgress(userId) {
     syncWithCloud,
     startCloudListener,
     setHasShared,
+    updateCardioSessions,
     mergeWithAnonymousData,
     clearAnonymousData,
     hasGuestData,

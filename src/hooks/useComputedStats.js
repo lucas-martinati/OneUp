@@ -19,18 +19,18 @@ import { isGlobalPerfectDay } from '../utils/statUtils';
  */
 const EMPTY_ARRAY = [];
 
-export function useComputedStats(completions, settings, getDayNumber, customExercises = EMPTY_ARRAY, hasShared = false, achievements = {}, getConfig = null) {
+export function useComputedStats(completions, settings, getDayNumber, customExercises = EMPTY_ARRAY, hasShared = false, achievements = {}, getConfig = null, cardioReps = null) {
     const allExercises = useMemo(() => [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES, ...customExercises], [customExercises]);
     return useMemo(() => {
-        return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, achievements, getConfig);
-    }, [completions, settings, getDayNumber, allExercises, hasShared, achievements, getConfig]);
+        return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, achievements, getConfig, cardioReps);
+    }, [completions, settings, getDayNumber, allExercises, hasShared, achievements, getConfig, cardioReps]);
 }
 
 /**
  * Pure function that computes all stats in a single pass.
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
  */
-export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, achievements = {}, getConfig = null) {
+export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, achievements = {}, getConfig = null, cardioReps = null) {
     // Keep global fallback for things not tied to a specific exercise
     const difficultyMultiplier = settings?.difficultyMultiplier ?? 1.0;
     const todayStr = getLocalDateStr(new Date());
@@ -352,9 +352,12 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         }
     }
 
-    // Inject cardio reps from settings (computed in useCardio.js as distance * 15)
-    if (settings?.runningReps) exerciseReps['running'] = settings.runningReps;
-    if (settings?.cyclingReps) exerciseReps['cycling'] = settings.cyclingReps;
+    // Inject cardio reps (either from argument or fallback to settings for backward compatibility/leaderboard)
+    const runningReps = cardioReps?.running ?? settings?.runningReps;
+    const cyclingReps = cardioReps?.cycling ?? settings?.cyclingReps;
+
+    if (runningReps) exerciseReps['running'] = runningReps;
+    if (cyclingReps) exerciseReps['cycling'] = cyclingReps;
 
     // ─── Derived values ──────────────────────────────────────────────────
     const globalTotalReps = Object.values(exerciseReps).reduce((sum, r) => sum + r, 0) ;

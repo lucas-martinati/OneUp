@@ -66,9 +66,15 @@ function computeStreak(sessions, mode, challengeStartDate, currentDifficulty, co
  */
 export function useCardio() {
   const auth = useAuth();
-  const { startDate, updateSettings } = useProgressContext();
+  const { 
+    completions, updateExerciseCount, updateCardioSessions, cardio, 
+    startDate 
+  } = useProgressContext();
   const { getConfig } = useExerciseConfig();
-  const [sessions, setSessions] = useState([]);
+  const [sessions, setSessions] = useState(() => {
+    // Initialize from context if available to avoid flicker/wiping during initial load
+    return Object.values(cardio?.sessions || {}).sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
+  });
   const [loading, setLoading] = useState(true);
   const [activeMode, setActiveMode] = useState('running');
 
@@ -138,7 +144,7 @@ export function useCardio() {
     fetchSessions();
   }, [fetchSessions]);
 
-  const { completions, updateExerciseCount } = useProgressContext();
+
 
   // Compute total cardio reps: kilometers * 15
   const cardioReps = useMemo(() => {
@@ -153,24 +159,14 @@ export function useCardio() {
     return { running, cycling, total: running + cycling };
   }, [sessions]);
 
-  // Sync to settings so global stats can access it without loading sessions
+  // Sync to global progress state for cloud persistence
   useEffect(() => {
-    if (updateSettings && !loading) {
-      updateSettings(prev => {
-        if (prev.cardioTotalReps === cardioReps.total && 
-            prev.runningReps === cardioReps.running && 
-            prev.cyclingReps === cardioReps.cycling) {
-          return prev;
-        }
-        return { 
-          ...prev, 
-          cardioTotalReps: cardioReps.total,
-          runningReps: cardioReps.running,
-          cyclingReps: cardioReps.cycling
-        };
-      });
+    if (updateCardioSessions && !loading) {
+      updateCardioSessions(sessions);
     }
-  }, [cardioReps, updateSettings, loading]);
+  }, [sessions, updateCardioSessions, loading]);
+
+
 
   // Helper to find if a week has a completion and return its data.
   // Uses a ref to avoid the sync effect below re-triggering on every completions change.

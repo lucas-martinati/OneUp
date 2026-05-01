@@ -24,6 +24,9 @@ export function useSettings(userId) {
       delete cleaned.hasSharedFirstTime;
       delete cleaned.runningStreak;
       delete cleaned.cyclingStreak;
+      delete cleaned.cardioTotalReps;
+      delete cleaned.runningReps;
+      delete cleaned.cyclingReps;
       return { ...defaultSettings, ...cleaned };
     }
   );
