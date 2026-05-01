@@ -164,6 +164,10 @@
       "year_beast": {
         "desc": "连续365天",
         "title": "竞技之兽"
+      },
+      "white_hat": {
+        "title": "White Hat",
+        "desc": "您报告了一个重大错误并帮助改进了 OneUp。"
       }
     },
     "badgesUnlocked": "已解锁徽章",

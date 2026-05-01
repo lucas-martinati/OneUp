@@ -60,7 +60,8 @@ export const BADGE_DEFINITIONS = [
   { id: 'evening_25',     icon: 'Moon',   color: '#4338ca', category: 'horaires',  test: s => s.eveningWorkouts >= 25 },
 
   // ── Social ───────────────────────────────────────────────────────────
-  { id: 'first_share',    icon: 'Share2', color: '#3b82f6', category: 'social', test: s => !!s.hasShared },
+  { id: 'first_share',    icon: 'Share2', color: '#3b82f6', category: 'social', test: () => false },
+  { id: 'white_hat',      icon: 'Award',  color: '#ffffff', category: 'social', test: () => false },
 
   // ── Secrets ──────────────────────────────────────────────────────────
   { id: 'ghost',         icon: 'Ghost',  color: '#6b7280', category: 'secrets', secret: true, test: s => s.ghostWorkout },
@@ -73,10 +74,13 @@ export function getBadgeIconFromDef(def) {
   return BADGE_ICONS[def.icon] || Star;
 }
 
-// Test if a badge is unlocked (supports manual override via manualBadges)
-export function isBadgeUnlocked(badgeId, stats, manualBadges = {}) {
-  if (manualBadges[badgeId] === true) return true;
-  if (manualBadges[badgeId] === false) return false;
+// Test if a badge is unlocked (supports manual override via achievements)
+export function isBadgeUnlocked(badgeId, stats, achievements = {}) {
+  const val = achievements[badgeId];
+
+  if (val === true || val === 'true') return true;
+  if (val === false || val === 'false') return false;
+  
   const def = BADGE_DEFINITIONS.find(b => b.id === badgeId);
   return def ? def.test(stats) : false;
 }

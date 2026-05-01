@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, getCurrentWeekNumber, isDayDoneFromCompletions } from '../utils/dateUtils';
+import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal, CARDIO_EXERCISES } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
@@ -15,22 +15,22 @@ import { isGlobalPerfectDay } from '../utils/statUtils';
  * @param {Function} getDayNumber - (dateStr) => number
  * @param {Array} customExercises - User defined exercises
  * @param {boolean} hasShared - Whether user has shared at least once
- * @param {Object} manualBadges - { [badgeId]: true|false } for manual badge overrides
+ * @param {Object} achievements - { [badgeId]: true|false } for manual badge overrides
  */
 const EMPTY_ARRAY = [];
 
-export function useComputedStats(completions, settings, getDayNumber, customExercises = EMPTY_ARRAY, hasShared = false, manualBadges = {}, getConfig = null) {
+export function useComputedStats(completions, settings, getDayNumber, customExercises = EMPTY_ARRAY, hasShared = false, achievements = {}, getConfig = null) {
     const allExercises = useMemo(() => [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES, ...customExercises], [customExercises]);
     return useMemo(() => {
-        return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, manualBadges, getConfig);
-    }, [completions, settings, getDayNumber, allExercises, hasShared, manualBadges, getConfig]);
+        return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, achievements, getConfig);
+    }, [completions, settings, getDayNumber, allExercises, hasShared, achievements, getConfig]);
 }
 
 /**
  * Pure function that computes all stats in a single pass.
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
  */
-export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, manualBadges = {}, getConfig = null) {
+export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, achievements = {}, getConfig = null) {
     // Keep global fallback for things not tied to a specific exercise
     const difficultyMultiplier = settings?.difficultyMultiplier ?? 1.0;
     const todayStr = getLocalDateStr(new Date());
@@ -168,27 +168,9 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
                 
                 let reps = 0;
                 if (exId === 'running' || exId === 'cycling') {
-                    // Cardio reps = weekNumber * 7 (matches dashboard points)
-                    // We only count it ONCE per week for Stats
-                    const { start } = getWeekBounds(dateObj);
-                    
-                    // Is this the first day of the week we see this cardio as completed?
-                    let firstDay = true;
-                    let loop = new Date(start);
-                    while (loop < dateObj) {
-                        const dStr = getLocalDateStr(loop);
-                        if (completions[dStr]?.[exId]?.isCompleted) {
-                            firstDay = false;
-                            break;
-                        }
-                        loop.setDate(loop.getDate() + 1);
-                    }
-                    
-                    if (firstDay) {
-                        const startDate = settings?.startDate || firstActiveDate; // Fallback
-                        const weekNum = getCurrentWeekNumber(startDate, dateObj);
-                        reps = getDailyGoal(ex, weekNum, diffToUse, true);
-                    }
+                    // Cardio reps are now computed from distance * 15 in useCardio.js
+                    // We don't add daily reps for cardio here to avoid double counting
+                    reps = 0;
                 } else {
                     reps = getDailyGoal(ex, dayNum, diffToUse);
                 }
@@ -370,8 +352,12 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         }
     }
 
+    // Inject cardio reps from settings (computed in useCardio.js as distance * 15)
+    if (settings?.runningReps) exerciseReps['running'] = settings.runningReps;
+    if (settings?.cyclingReps) exerciseReps['cycling'] = settings.cyclingReps;
+
     // ─── Derived values ──────────────────────────────────────────────────
-    const globalTotalReps = Object.values(exerciseReps).reduce((sum, r) => sum + r, 0) + (settings?.cardioTotalReps || 0);
+    const globalTotalReps = Object.values(exerciseReps).reduce((sum, r) => sum + r, 0) ;
     const successRate = totalDays > 0 ? Math.round((totalDays / MAX_STREAK_WINDOW) * 100) : 0;
     const hasCompletedAllExercisesOnce = EXERCISES.every(ex => completedExIds.has(ex.id));
     const todayDone = isDayDoneLocal(todayStr);
@@ -417,7 +403,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     };
 
     // Badge count (supports manual overrides)
-    const badgeCount = BADGE_DEFINITIONS.filter(b => isBadgeUnlocked(b.id, statsSnapshot, manualBadges)).length;
+    const badgeCount = BADGE_DEFINITIONS.filter(b => isBadgeUnlocked(b.id, statsSnapshot, achievements)).length;
 
     // ─── Return everything ───────────────────────────────────────────────
     return {
@@ -460,7 +446,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         ghostWorkout,
         perfectStreak: maxPerfectStreak,
         hasShared,
-        manualBadges,
+        achievements,
         badgeCount,
         totalRepsAll: globalTotalReps,
         totalExerciseReps: exerciseReps,

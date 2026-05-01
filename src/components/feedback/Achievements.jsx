@@ -182,7 +182,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
         totalDays, maxStreak, totalRepsAll, perfectDays,
         hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts,
         morningWorkouts, afternoonWorkouts, eveningWorkouts,
-        ghostWorkout, perfectStreak, hasShared
+        ghostWorkout, perfectStreak, hasShared, achievements
     } = computedStats;
 
     // Memoize the badge list from the single source of truth
@@ -190,8 +190,8 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
         totalDays, maxStreak, totalRepsAll, perfectDays,
         hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts,
         morningWorkouts, afternoonWorkouts, eveningWorkouts,
-        ghostWorkout, perfectStreak, hasShared
-    }), [totalDays, maxStreak, totalRepsAll, perfectDays, hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts, morningWorkouts, afternoonWorkouts, eveningWorkouts, ghostWorkout, perfectStreak, hasShared]);
+        ghostWorkout, perfectStreak, hasShared, achievements
+    }), [totalDays, maxStreak, totalRepsAll, perfectDays, hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts, morningWorkouts, afternoonWorkouts, eveningWorkouts, ghostWorkout, perfectStreak, hasShared, achievements]);
 
     const badges = useMemo(() => BADGE_DEFINITIONS.map(def => {
         const IconComp = getBadgeIconFromDef(def);
@@ -201,9 +201,9 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
             color: def.color,
             category: def.category,
             secret: def.secret || false,
-            titleKey: def.secret && !isBadgeUnlocked(def.id, statsSnapshot) ? null : `achievements.badges.${def.id}.title`,
-            descKey: def.secret && !isBadgeUnlocked(def.id, statsSnapshot) ? null : `achievements.badges.${def.id}.desc`,
-            unlocked: isBadgeUnlocked(def.id, statsSnapshot),
+            titleKey: def.secret && !isBadgeUnlocked(def.id, statsSnapshot, statsSnapshot.achievements) ? null : `achievements.badges.${def.id}.title`,
+            descKey: def.secret && !isBadgeUnlocked(def.id, statsSnapshot, statsSnapshot.achievements) ? null : `achievements.badges.${def.id}.desc`,
+            unlocked: isBadgeUnlocked(def.id, statsSnapshot, statsSnapshot.achievements),
         };
     }), [statsSnapshot]);
 

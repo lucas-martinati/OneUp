@@ -1,4 +1,4 @@
-import { ref, set, get, onValue, serverTimestamp } from 'firebase/database';
+import { ref, get, onValue, serverTimestamp, update } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
 
@@ -23,7 +23,10 @@ export function sanitizeForCloud(data) {
     });
     sanitizedCompletions[dateStr] = sanitizedDay;
   });
-  return { ...data, completions: sanitizedCompletions };
+  
+  // Remove achievements and hasShared from progress sync (they are handled independently or deprecated)
+  const { achievements: _a, hasShared: _h, ...restOfData } = data;
+  return { ...restOfData, completions: sanitizedCompletions };
 }
 
 export async function saveToCloud(data) {
@@ -34,7 +37,7 @@ export async function saveToCloud(data) {
   const cleanData = sanitizeForCloud(data);
   
   try {
-    await set(ref(database, `users/${userId}/progress`), { 
+    await update(ref(database, `users/${userId}/progress`), { 
       ...cleanData, 
       lastCompletionChange: data.lastCompletionChange || serverTimestamp() 
     });
@@ -130,8 +133,6 @@ export function mergeData(localData, cloudData) {
     userStartDate: localData.userStartDate || cloudData.userStartDate,
     completions: mergedCompletions,
     isSetup: localData.isSetup || cloudData.isSetup,
-    hasShared: localData.hasShared || cloudData.hasShared || false,
-    manualBadges: { ...cloudData.manualBadges, ...localData.manualBadges },
     lastCompletionChange: finalLCC
   };
 

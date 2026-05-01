@@ -115,25 +115,27 @@ export async function loadProgramCompletionsFromCloud(programId) {
   return null;
 }
 
-// ── Manual badges (achievements) ─────────────────────────────────────────
+// ── Achievements (manual & social) ───────────────────────────────────────
 
-export async function saveManualBadgesToCloud(manualBadges) {
+export async function saveAchievementsToCloud(achievements, userId = null) {
   const auth = getAuthInstance();
   const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return false;
+  const uid = userId || auth?.currentUser?.uid;
+  if (!uid || !database) return false;
 
-  await set(ref(database, `users/${auth.currentUser.uid}/manualBadges`), manualBadges || {});
-  logger.success('Manual badges synced to cloud');
+  await set(ref(database, `users/${uid}/achievements`), achievements || {});
+  logger.success('Achievements synced to cloud');
   return true;
 }
 
-export async function loadManualBadgesFromCloud() {
+export async function loadAchievementsFromCloud(userId = null) {
   const auth = getAuthInstance();
   const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return null;
+  const uid = userId || auth?.currentUser?.uid;
+  if (!uid || !database) return null;
 
-  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/manualBadges`));
-  if (snapshot.exists()) { logger.success('Manual badges loaded from cloud'); return snapshot.val(); }
+  const snapshot = await get(ref(database, `users/${uid}/achievements`));
+  if (snapshot.exists()) { logger.success('Achievements loaded from cloud'); return snapshot.val(); }
   return null;
 }
 

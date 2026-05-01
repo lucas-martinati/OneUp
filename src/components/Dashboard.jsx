@@ -154,10 +154,10 @@ export function Dashboard() {
     const currentDiff = getConfig(selectedExerciseId, today).difficulty;
     const dailyGoal = getDailyGoal(selectedExercise, dayNumber, currentDiff) || 1;
     
-    // For Cardio slide, use the cardioTotalReps from settings, else use computedStats
+    // For Cardio slide, compute total from running and cycling stats, else use computedStats
     const totalReps = currentCatKey === CATEGORIES.CARDIO 
-        ? (settings.cardioTotalReps || 0) 
-        : (computedStats.exerciseReps[globalSelectedId] || 0);
+        ? ((computedStats.exerciseReps?.['running'] || 0) + (computedStats.exerciseReps?.['cycling'] || 0)) 
+        : (computedStats.exerciseReps?.[globalSelectedId] || 0);
 
     const effectiveStart = userStartDate || startDate;
     const isFuture = today < effectiveStart;

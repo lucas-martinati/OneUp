@@ -164,6 +164,10 @@
       "year_beast": {
         "desc": "365 Tage am Stück",
         "title": "Wettkampf-Biest"
+      },
+      "white_hat": {
+        "title": "White Hat",
+        "desc": "Du hast einen schweren Fehler gemeldet und geholfen, OneUp zu verbessern."
       }
     },
     "badgesUnlocked": "Abzeichen freigeschaltet",

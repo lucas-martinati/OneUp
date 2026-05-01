@@ -164,6 +164,10 @@
       "year_beast": {
         "desc": "365 jours d'affilée",
         "title": "Bête de Compétition"
+      },
+      "white_hat": {
+        "title": "White Hat",
+        "desc": "Vous avez signalé un bug majeur et aidé à améliorer OneUp."
       }
     },
     "badgesUnlocked": "Badges Débloqués",

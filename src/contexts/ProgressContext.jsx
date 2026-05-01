@@ -6,7 +6,7 @@ import { useComputedStats } from '../hooks/useComputedStats';
 import { useUserDetailsCache } from '../hooks/useUserDetailsCache';
 import { useCloudAutoSave } from '../hooks/useCloudAutoSave';
 import { cloudSync } from '../services/cloudSync';
-import { EXERCISES } from '../config/exercises';
+import { EXERCISES, CARDIO_EXERCISES } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
 import { createLogger } from '../utils/logger';
 import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';
@@ -37,7 +37,7 @@ export function ProgressProvider({ children }) {
     scheduleNotification, requestNotificationPermission,
     getExerciseCount, updateExerciseCount, getExerciseDone,
     saveToCloud, loadFromCloud, syncWithCloud, startCloudListener, deleteExerciseHistory,
-    setHasShared, hasShared, manualBadges, lastCompletionChange,
+    setHasShared, hasShared, achievements, lastCompletionChange,
     mergeWithAnonymousData, clearAnonymousData, hasGuestData,
   } = progress;
 
@@ -83,7 +83,7 @@ export function ProgressProvider({ children }) {
     weight: null,
   }), [getDifficulty]);
 
-  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesForStats, hasShared, manualBadges, internalGetConfig);
+  const computedStats = useComputedStats(completions, settings, getDayNumber, customExercisesForStats, hasShared, achievements, internalGetConfig);
 
   // ── Leaderboard publishing ──────────────────────────────────────────
   const publishLeaderboardNow = useCallback(async () => {
@@ -91,6 +91,7 @@ export function ProgressProvider({ children }) {
       if (!auth.isSignedIn) return;
       const classicTotalReps = EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
       const weightsTotalReps = WEIGHT_EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
+      const computedCardioReps = CARDIO_EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
       const todayStr = getLocalDateStr(new Date());
       const lastActiveDay = isDayDoneFromCompletions(completions, todayStr)
         ? todayStr
@@ -98,9 +99,9 @@ export function ProgressProvider({ children }) {
 
       await cloudSync.publishToLeaderboard({
         pseudo: settings.leaderboardPseudo || auth.user?.displayName || 'Anonyme',
-        totalReps: classicTotalReps + (settings.cardioTotalReps || 0),
+        totalReps: classicTotalReps + computedCardioReps,
         weightsTotalReps,
-        cardioTotalReps: settings.cardioTotalReps || 0,
+        cardioTotalReps: computedCardioReps,
         exerciseReps: computedStats.exerciseReps,
         exerciseDifficulties: settings.exerciseDifficulties,
         achievements: computedStats.badgeCount,
@@ -213,6 +214,10 @@ export function ProgressProvider({ children }) {
             updateSettings(prev => {
               const cleanedCloud = { ...cloudSettings };
               delete cleanedCloud.difficultyHistory;
+              delete cleanedCloud.difficultyMultiplier;
+              delete cleanedCloud.hasSharedFirstTime;
+              delete cleanedCloud.runningStreak;
+              delete cleanedCloud.cyclingStreak;
               
               const safeSettings = {
                 ...cleanedCloud,
@@ -439,7 +444,7 @@ export function ProgressProvider({ children }) {
   const value = useMemo(() => ({
     // Progress data
     startDate, completions, isSetup, userStartDate,
-    hasShared, manualBadges,
+    hasShared, achievements,
     // Progress actions
     startChallenge: (userStart, selected) => startChallenge(userStart, selected, settings?.exerciseDifficulties || {}),
     toggleCompletion: (dateStr) => toggleCompletion(dateStr, settings?.exerciseDifficulties || {}),
@@ -462,7 +467,7 @@ export function ProgressProvider({ children }) {
     syncError,
     isInitialSyncDone,
   }), [
-    startDate, completions, isSetup, userStartDate, hasShared, manualBadges,
+    startDate, completions, isSetup, userStartDate, hasShared, achievements,
     startChallenge, toggleCompletion, getDayNumber, getTotalReps, isDayDone,
     getExerciseCount, updateExerciseCount, getExerciseDone,
     deleteExerciseHistory, saveToCloud, setHasShared, scheduleNotification,

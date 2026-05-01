@@ -164,6 +164,10 @@
       "year_beast": {
         "desc": "365일 연속",
         "title": "경쟁의 짐승"
+      },
+      "white_hat": {
+        "title": "White Hat",
+        "desc": "중대한 버그를 신고하여 OneUp 개선에 기여했습니다."
       }
     },
     "badgesUnlocked": "배지 잠금 해제",

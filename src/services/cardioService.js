@@ -11,7 +11,7 @@ export async function saveCardioSession(session) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return null;
 
-  const sessionsRef = ref(database, `users/${auth.currentUser.uid}/cardio/sessions`);
+  const sessionsRef = ref(database, `users/${auth.currentUser.uid}/progress/cardio/sessions`);
   const newRef = push(sessionsRef);
   const payload = {
     ...session,
@@ -31,7 +31,7 @@ export async function loadCardioSessions() {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return [];
 
-  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/cardio/sessions`));
+  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/progress/cardio/sessions`));
   if (snapshot.exists()) {
     const data = snapshot.val();
     const sessions = Object.values(data).sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
@@ -48,7 +48,7 @@ export async function deleteCardioSession(sessionId) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  await remove(ref(database, `users/${auth.currentUser.uid}/cardio/sessions/${sessionId}`));
+  await remove(ref(database, `users/${auth.currentUser.uid}/progress/cardio/sessions/${sessionId}`));
   logger.success('Cardio session deleted');
   return true;
 }

@@ -164,6 +164,10 @@
       "year_beast": {
         "desc": "365日連続",
         "title": "競争の獣"
+      },
+      "white_hat": {
+        "title": "White Hat",
+        "desc": "重大なバグを報告し、OneUpの改善に貢献しました。"
       }
     },
     "badgesUnlocked": "バッジのロックが解除されました",

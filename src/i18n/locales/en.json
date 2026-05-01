@@ -164,6 +164,10 @@
       "year_beast": {
         "desc": "365 days in a row",
         "title": "Competition Beast"
+      },
+      "white_hat": {
+        "title": "White Hat",
+        "desc": "You reported a major bug and helped improve OneUp."
       }
     },
     "badgesUnlocked": "Badges Unlocked",

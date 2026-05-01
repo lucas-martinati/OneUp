@@ -66,7 +66,7 @@ function computeStreak(sessions, mode, challengeStartDate, currentDifficulty, co
  */
 export function useCardio() {
   const auth = useAuth();
-  const { startDate } = useProgressContext();
+  const { startDate, updateSettings } = useProgressContext();
   const { getConfig } = useExerciseConfig();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -138,23 +138,39 @@ export function useCardio() {
     fetchSessions();
   }, [fetchSessions]);
 
-  const { settings, updateSettings, completions, updateExerciseCount } = useProgressContext();
+  const { completions, updateExerciseCount } = useProgressContext();
 
-  // Compute total cardio reps: each valid session gives (its weekNumber * 7) reps
-  const cardioTotalReps = settings?.cardioTotalReps;
-  useEffect(() => {
-    if (!sessions.length || !startDate) return;
+  // Compute total cardio reps: kilometers * 15
+  const cardioReps = useMemo(() => {
+    if (!sessions.length) return { running: 0, cycling: 0, total: 0 };
     
-    let totalReps = 0;
-    sessions.forEach(s => {
-      const weekNum = getCurrentWeekNumber(startDate, new Date(s.startTime));
-      totalReps += (weekNum * 7);
-    });
+    const runningKm = sessions.filter(s => s.type === 'running').reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
+    const cyclingKm = sessions.filter(s => s.type === 'cycling').reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
+    
+    const running = Math.floor(runningKm * 15);
+    const cycling = Math.floor(cyclingKm * 15);
+    
+    return { running, cycling, total: running + cycling };
+  }, [sessions]);
 
-    if (cardioTotalReps !== totalReps) {
-      updateSettings({ cardioTotalReps: totalReps });
+  // Sync to settings so global stats can access it without loading sessions
+  useEffect(() => {
+    if (updateSettings && !loading) {
+      updateSettings(prev => {
+        if (prev.cardioTotalReps === cardioReps.total && 
+            prev.runningReps === cardioReps.running && 
+            prev.cyclingReps === cardioReps.cycling) {
+          return prev;
+        }
+        return { 
+          ...prev, 
+          cardioTotalReps: cardioReps.total,
+          runningReps: cardioReps.running,
+          cyclingReps: cardioReps.cycling
+        };
+      });
     }
-  }, [sessions, startDate, cardioTotalReps, updateSettings]);
+  }, [cardioReps, updateSettings, loading]);
 
   // Helper to find if a week has a completion and return its data.
   // Uses a ref to avoid the sync effect below re-triggering on every completions change.
@@ -277,6 +293,7 @@ export function useCardio() {
     streak,
     sessions: modeSessions,
     allSessions: sessions,
+    totalReps: cardioReps.total,
     loading,
     refresh: fetchSessions,
     isDifficultyMismatch: !!existingWeeklyComp && existingWeeklyComp.difficulty !== undefined && existingWeeklyComp.difficulty !== (activeMode === 'running' ? runningMultiplier : cyclingMultiplier),

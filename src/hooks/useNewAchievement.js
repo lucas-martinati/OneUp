@@ -39,7 +39,7 @@ export function useNewAchievement(computedStats, t) {
             hasShared: computedStats.hasShared,
         };
 
-        const currentManual = computedStats.manualBadges || {};
+        const currentManual = computedStats.achievements || {};
         
         // Calculate current set of unlocked IDs
         const currentUnlockedIds = new Set();
@@ -80,7 +80,7 @@ export function useNewAchievement(computedStats, t) {
         computedStats.perfectDays, computedStats.hasCompletedAllExercisesOnce, computedStats.weekdayWorkouts,
         computedStats.weekendWorkouts, computedStats.morningWorkouts, computedStats.afternoonWorkouts,
         computedStats.eveningWorkouts, computedStats.ghostWorkout, computedStats.perfectStreak,
-        computedStats.hasShared, computedStats.manualBadges, t, isReady
+        computedStats.hasShared, computedStats.achievements, t, isReady
     ]);
 
     // Callback pour fermer le toast

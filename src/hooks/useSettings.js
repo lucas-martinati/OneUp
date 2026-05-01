@@ -21,6 +21,9 @@ export function useSettings(userId) {
       const cleaned = { ...parsed };
       delete cleaned.difficultyMultiplier;
       delete cleaned.difficultyHistory;
+      delete cleaned.hasSharedFirstTime;
+      delete cleaned.runningStreak;
+      delete cleaned.cyclingStreak;
       return { ...defaultSettings, ...cleaned };
     }
   );

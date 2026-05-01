@@ -4,7 +4,7 @@ import { useLocalStorageScoped } from './useLocalStorageScoped';
 import { cloudSync } from '../services/cloudSync';
 import { getLocalDateStr } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
-import { saveManualBadgesToCloud, loadManualBadgesFromCloud } from '../services/userDataService';
+import { saveAchievementsToCloud, loadAchievementsFromCloud } from '../services/userDataService';
 import { serverTimestamp } from '../services/firebase';
 import i18n from '../i18n';
 
@@ -19,8 +19,8 @@ function getDefaultState() {
     userStartDate: `${currentYear}-01-01`,
     completions: {},
     isSetup: false,
-    hasShared: false,
-    manualBadges: {},
+    
+    achievements: {},
   };
 }
 
@@ -96,8 +96,14 @@ function validateProgressData(data) {
         : data.startDate || `${new Date().getFullYear()}-01-01`,
     completions,
     isSetup: typeof data.isSetup === 'boolean' ? data.isSetup : false,
-    hasShared: typeof data.hasShared === 'boolean' ? data.hasShared : false,
-    manualBadges: typeof data.manualBadges === 'object' && data.manualBadges !== null ? data.manualBadges : {},
+    achievements: (() => {
+      let ach = typeof data.achievements === 'object' && data.achievements !== null ? data.achievements : {};
+      if (typeof data.manualBadges === 'object' && data.manualBadges !== null) {
+        ach = { ...data.manualBadges, ...ach };
+      }
+      if (data.hasShared === true) ach.first_share = true;
+      return ach;
+    })(),
     lastCompletionChange: data.lastCompletionChange || null,
   };
 }
@@ -114,8 +120,7 @@ function parseProgressData(parsed) {
   if (validated.startDate !== fixedStartDate) {
     return {
       ...getDefaultState(),
-      hasShared: validated.hasShared ?? false,
-      manualBadges: validated.manualBadges ?? {},
+      achievements: validated.achievements ?? {},
       lastCompletionChange: lastChange
     };
   }
@@ -123,8 +128,7 @@ function parseProgressData(parsed) {
   return { 
     ...validated, 
     lastCompletionChange: lastChange, 
-    hasShared: validated.hasShared ?? false, 
-    manualBadges: validated.manualBadges ?? {} 
+    achievements: validated.achievements ?? {} 
   };
 }
 
@@ -151,24 +155,37 @@ export function useProgress(userId) {
     STORAGE_KEY_BASE, userId, getDefaultState(), parseProgressData
   );
 
-  // Sync manual badges to cloud when they change
-  useEffect(() => {
-    if (state.manualBadges && Object.keys(state.manualBadges).length > 0) {
-      saveManualBadgesToCloud(state.manualBadges).catch(() => {});
-    }
-  }, [state.manualBadges]);
+  const achievementsLoadedRef = useRef(false);
 
   // Load manual badges from cloud on init (for logged-in users)
   useEffect(() => {
-    loadManualBadgesFromCloud().then(cloudBadges => {
-      if (cloudBadges && Object.keys(cloudBadges).length > 0) {
+    if (userId) {
+      loadAchievementsFromCloud(userId).then(cloudAch => {
+        achievementsLoadedRef.current = true;
+        
+        const finalAch = cloudAch || {};
+        let changed = false;
+        
+        // Initialize critical manual badges to false if they don't exist in cloud
+        if (finalAch.first_share === undefined) { finalAch.first_share = false; changed = true; }
+        if (finalAch.white_hat === undefined) { finalAch.white_hat = false; changed = true; }
+
+        if (changed) {
+          saveAchievementsToCloud(finalAch, userId).catch(() => {});
+        }
+
         setState(prev => ({
           ...prev,
-          manualBadges: { ...prev.manualBadges, ...cloudBadges }
+          achievements: finalAch
         }));
-      }
-    }).catch(() => {});
-  }, [setState]);
+      }).catch(err => {
+        achievementsLoadedRef.current = true;
+        console.error('[Progress] Failed to load achievements:', err);
+      });
+    } else {
+      achievementsLoadedRef.current = false;
+    }
+  }, [setState, userId]);
 
   // ─── Challenge Setup ──────────────────────────────────────────────────────
 
@@ -423,15 +440,14 @@ export function useProgress(userId) {
     try {
       const cloudData = await cloudSync.loadFromCloud();
       if (cloudData) {
-        setState(() => {
+        setState(prev => {
           const validated = validateProgressData(cloudData);
           return {
+            ...prev,
             startDate: validated.startDate,
             userStartDate: validated.userStartDate,
             completions: validated.completions || {},
             isSetup: validated.isSetup,
-            hasShared: validated.hasShared ?? false,
-            manualBadges: validated.manualBadges ?? {},
           };
         });
         return { success: true, data: cloudData };
@@ -446,7 +462,17 @@ export function useProgress(userId) {
   const syncWithCloud = useCallback(async () => {
     try {
       const mergedData = await cloudSync.syncData(stateRef.current);
-      setState(validateProgressData(mergedData) || mergedData);
+      if (mergedData) {
+        setState(prev => {
+          const validated = validateProgressData(mergedData);
+          return {
+            ...prev,
+            ...validated,
+            // Explicitly preserve local-only state that isn't in the progress node
+            achievements: prev.achievements
+          };
+        });
+      }
       return { success: true, data: mergedData };
     } catch (error) {
       console.error('Failed to sync with cloud:', error);
@@ -475,8 +501,6 @@ export function useProgress(userId) {
           userStartDate: merged.userStartDate || prev.userStartDate,
           completions: merged.completions || prev.completions,
           isSetup: merged.isSetup || prev.isSetup,
-          hasShared: merged.hasShared || prev.hasShared,
-          manualBadges: { ...prev.manualBadges, ...merged.manualBadges },
           lastCompletionChange: serverTimestamp(),
         };
       });
@@ -557,12 +581,11 @@ export function useProgress(userId) {
         // Important: we use the merged result which now contains the best
         // lastCompletionChange (either local placeholder or cloud timestamp).
         return {
+          ...prev,
           startDate: merged.startDate || prev.startDate,
           userStartDate: merged.userStartDate || prev.userStartDate,
           completions: merged.completions || prev.completions,
           isSetup: merged.isSetup ?? prev.isSetup,
-          hasShared: merged.hasShared ?? prev.hasShared,
-          manualBadges: merged.manualBadges || prev.manualBadges,
           lastCompletionChange: merged.lastCompletionChange,
         };
       });
@@ -572,14 +595,18 @@ export function useProgress(userId) {
   // ─── Return ───────────────────────────────────────────────────────────────
 
   const setHasShared = useCallback(() => {
-    setState(prev => ({ ...prev, hasShared: true }));
-  }, [setState]);
+    setState(prev => {
+      const newAch = { ...prev.achievements, first_share: true };
+      if (userId) saveAchievementsToCloud(newAch, userId).catch(() => {});
+      return { ...prev, achievements: newAch };
+    });
+  }, [setState, userId]);
 
   return {
     startDate: state.startDate,
     completions: state.completions,
-    hasShared: state.hasShared,
-    manualBadges: state.manualBadges,
+    achievements: state.achievements,
+    hasShared: !!state.achievements?.first_share,
     lastCompletionChange: state.lastCompletionChange,
     startChallenge,
     toggleCompletion,
@@ -604,13 +631,25 @@ export function useProgress(userId) {
     clearAnonymousData,
     hasGuestData,
     setManualBadge: (badgeId, value) => {
-      setState(prev => ({ ...prev, manualBadges: { ...prev.manualBadges, [badgeId]: value } }));
+      setState(prev => {
+        const newAch = { ...prev.achievements, [badgeId]: value };
+        if (userId) saveAchievementsToCloud(newAch, userId).catch(() => {});
+        return { ...prev, achievements: newAch };
+      });
     },
     validateBadge: (badgeId) => {
-      setState(prev => ({ ...prev, manualBadges: { ...prev.manualBadges, [badgeId]: true } }));
+      setState(prev => {
+        const newAch = { ...prev.achievements, [badgeId]: true };
+        if (userId) saveAchievementsToCloud(newAch, userId).catch(() => {});
+        return { ...prev, achievements: newAch };
+      });
     },
     invalidateBadge: (badgeId) => {
-      setState(prev => ({ ...prev, manualBadges: { ...prev.manualBadges, [badgeId]: false } }));
+      setState(prev => {
+        const newAch = { ...prev.achievements, [badgeId]: false };
+        if (userId) saveAchievementsToCloud(newAch, userId).catch(() => {});
+        return { ...prev, achievements: newAch };
+      });
     },
   };
 }

@@ -334,7 +334,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
         }
       }
       if (selectedCats.includes(CATEGORIES.CARDIO)) {
-        totalReps += (settings?.cardioTotalReps || 0);
+        totalReps += ((stats?.exerciseReps?.['running'] || 0) + (stats?.exerciseReps?.['cycling'] || 0));
       }
     } else if (stats?.globalTotalReps) {
       totalReps = stats.globalTotalReps;
