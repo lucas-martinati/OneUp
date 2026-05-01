@@ -462,6 +462,8 @@
   "pro": {
     "activeDesc": "Tu as l'accès total au summum de l'application.",
     "activeTitle": "Membre Pro",
+    "billingMonthly": "Mensuel",
+    "billingYearly": "Annuel",
     "buyButton": "Devenir Pro",
     "description": "L'Expérience Ultime",
     "explanation": "Atteins tes objectifs plus rapidement. Débloque le mode Musculation, crée des programmes 100% sur-mesure combinant chronomètres et répétitions, et analyse chaque détail de ta progression avec des statistiques de classe mondiale.",
@@ -475,8 +477,10 @@
     "lifetimeDesc": "Accès Permanent",
     "oneTimeDesc": "Paiement unique",
     "price": "1,99€/mois",
+    "priceYearly": "19,99€/an",
     "promotionalDesc": "Offert par l'équipe OneUp",
-    "title": "Abonnement Pro"
+    "title": "Abonnement Pro",
+    "yearlySavings": "-17%"
   },
   "routines": {
     "empty": "Aucune routine enregistrée",

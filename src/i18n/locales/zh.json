@@ -462,6 +462,8 @@
   "pro": {
     "activeDesc": "你可以创建自定义计划。",
     "activeTitle": "Pro 会员",
+    "billingMonthly": "月付",
+    "billingYearly": "年付",
     "buyButton": "升级 Pro",
     "description": "自定义训练计划",
     "explanation": "创建你自己的训练计划：选择你的运动，设定每日进度，并通过连续天数和日历跟踪你的专属统计数据。",
@@ -475,8 +477,10 @@
     "lifetimeDesc": "永久访问",
     "oneTimeDesc": "一次性支付",
     "price": "€1.99/月",
+    "priceYearly": "€19.99/年",
     "promotionalDesc": "OneUp 团队赠送",
-    "title": "Pro 订阅"
+    "title": "Pro 订阅",
+    "yearlySavings": "-17%"
   },
   "routines": {
     "empty": "没有保存的训练计划",

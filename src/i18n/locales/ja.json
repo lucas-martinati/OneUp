@@ -462,6 +462,8 @@
   "pro": {
     "activeDesc": "カスタムプログラムを作成できます。",
     "activeTitle": "プロ会員",
+    "billingMonthly": "月額",
+    "billingYearly": "年額",
     "buyButton": "ゴープロ",
     "description": "カスタムプログラム",
     "explanation": "独自のワークアウト プログラムを作成します。エクササイズを選択し、毎日の進行状況を設定し、連続記録やカレンダーで専用の統計を追跡します。",
@@ -475,8 +477,10 @@
     "lifetimeDesc": "生涯アクセス",
     "oneTimeDesc": "1回払い",
     "price": "€1.99/月",
+    "priceYearly": "€19.99/年",
     "promotionalDesc": "OneUp チームからの贈り物",
-    "title": "プロのサブスクリプション"
+    "title": "プロのサブスクリプション",
+    "yearlySavings": "-17%"
   },
   "routines": {
     "empty": "ルーチンは保存されていません",

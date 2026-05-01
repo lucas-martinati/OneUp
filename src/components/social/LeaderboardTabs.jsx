@@ -38,9 +38,9 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                     onClick={() => { setDomain('weights'); setActiveTab('weights'); setShowAll(false); }}
                     style={{
                         flex: 1, padding: '10px', borderRadius: 'var(--radius-md)',
-                        background: domain === 'weights' ? 'linear-gradient(135deg, #8b5cf6, #6366f1)' : 'rgba(255,255,255,0.05)',
+                        background: domain === 'weights' ? 'linear-gradient(135deg, #f97316, #ea580c)' : 'rgba(255,255,255,0.05)',
                         color: domain === 'weights' ? '#ffffff' : 'var(--text-secondary)',
-                        border: domain === 'weights' ? '1px solid rgba(139,92,246,0.4)' : '1px solid transparent',
+                        border: domain === 'weights' ? '1px solid rgba(249,115,22,0.4)' : '1px solid transparent',
                         fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
                     }}

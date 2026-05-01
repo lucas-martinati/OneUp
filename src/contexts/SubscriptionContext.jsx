@@ -3,7 +3,7 @@ import { useAuth } from './AuthContext';
 import { cloudSync } from '../services/cloudSync';
 import {
   initPurchases, checkSupporterStatus, purchaseSupporter, restorePurchases,
-  checkProStatus, purchasePro
+  checkProStatus, purchasePro, purchaseProYearly
 } from '../services/purchaseService';
 import {
   loadCachedEntitlements, saveCachedEntitlements, clearCachedEntitlements, resolveEntitlements
@@ -127,6 +127,16 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
     return result;
   }, [saveAndPublish]);
 
+  const handlePurchaseProYearly = useCallback(async () => {
+    const result = await purchaseProYearly();
+    if (result.success || result.isActive) {
+      setIsPro(true);
+      setHadPro(true);
+      await saveAndPublish({ isSupporter: isSupporterRef.current, isPro: true, hadPro: true });
+    }
+    return result;
+  }, [saveAndPublish]);
+
   const handleRestorePurchases = useCallback(async () => {
     const result = await restorePurchases();
     let resolved = resolveEntitlements(
@@ -164,8 +174,9 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
     rawHadPro: hadPro,
     purchaseSupporter: handlePurchaseSupporter,
     purchasePro: handlePurchasePro,
+    purchaseProYearly: handlePurchaseProYearly,
     restorePurchases: handleRestorePurchases,
-  }), [auth.isSignedIn, isSupporter, isPro, hadPro, isSubscriptionLoading, handlePurchaseSupporter, handlePurchasePro, handleRestorePurchases]);
+  }), [auth.isSignedIn, isSupporter, isPro, hadPro, isSubscriptionLoading, handlePurchaseSupporter, handlePurchasePro, handlePurchaseProYearly, handleRestorePurchases]);
 
   return (
     <SubscriptionContext.Provider value={value}>

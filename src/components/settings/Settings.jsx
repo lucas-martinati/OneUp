@@ -41,7 +41,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
     const cloudAuth = useAuth();
     const { settings, updateSettings, cloudSyncAPI: cloudSync, conflictData, scheduleNotification } = useProgressContext();
     const { getConfig, updateConfig } = useExerciseConfig();
-    const { isSupporter, isPro, purchaseSupporter: onPurchaseSupporter, purchasePro: onPurchasePro, restorePurchases: onRestorePurchases } = useSubscription();
+    const { isSupporter, isPro, purchaseSupporter: onPurchaseSupporter, purchasePro: onPurchasePro, purchaseProYearly: onPurchaseProYearly, restorePurchases: onRestorePurchases } = useSubscription();
 
     const onSave = (newSettings) => {
         updateSettings(newSettings);
@@ -198,6 +198,19 @@ export function Settings({ defaultShowStore = false, onClose }) {
                         buyButtonText={`${t('pro.buyButton')} — ${t('pro.price')}`}
                         onPurchase={onPurchasePro}
                         cloudAuth={cloudAuth}
+                        yearlyBilling={{
+                            label: {
+                                monthly: t('pro.billingMonthly'),
+                                yearly: t('pro.billingYearly'),
+                            },
+                            price: {
+                                monthly: t('pro.price'),
+                                yearly: t('pro.priceYearly'),
+                            },
+                            savings: t('pro.yearlySavings'),
+                            buyButtonText: `${t('pro.buyButton')} — ${t('pro.priceYearly')}`,
+                            onPurchaseYearly: onPurchaseProYearly,
+                        }}
                     />
 
                     {/* Restore purchases button (shared for all tiers) */}

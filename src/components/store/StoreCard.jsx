@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { SegmentedControl } from '../ui/SegmentedControl';
+
 export function StoreCard({
     isActive,
     title,
@@ -14,8 +17,20 @@ export function StoreCard({
     buyButtonText,
     onPurchase,
     cloudAuth,
-    allowMultiplePurchases = false
+    allowMultiplePurchases = false,
+    // ── Yearly billing (optional) ──
+    yearlyBilling
+    // yearlyBilling shape:
+    // {
+    //   label: { monthly: 'Monthly', yearly: 'Yearly' },
+    //   price: { monthly: '1,99€/mo', yearly: '19,99€/yr' },
+    //   savings: '-17%',
+    //   buyButtonText: 'Go Pro — 19,99€/year',
+    //   onPurchaseYearly: async () => {},
+    // }
 }) {
+    const [billingPeriod, setBillingPeriod] = useState('monthly');
+
     const sectionTitleStyle = {
         marginBottom: 'var(--spacing-md)', fontSize: '0.85rem', fontWeight: '700',
         textTransform: 'uppercase', letterSpacing: '1px',
@@ -27,8 +42,16 @@ export function StoreCard({
             cloudAuth?.signIn?.();
             return;
         }
-        await onPurchase?.();
+        if (yearlyBilling && billingPeriod === 'yearly') {
+            await yearlyBilling.onPurchaseYearly?.();
+        } else {
+            await onPurchase?.();
+        }
     };
+
+    const currentBuyText = yearlyBilling && billingPeriod === 'yearly'
+        ? yearlyBilling.buyButtonText
+        : buyButtonText;
 
     return (
         <div className="glass-premium" style={{
@@ -98,23 +121,82 @@ export function StoreCard({
                             )}
                         </div>
                     )}
+
+                    {/* ── Billing period toggle (monthly / yearly) ── */}
+                    {yearlyBilling && !isActive && (
+                        <div style={{
+                            display: 'flex', flexDirection: 'column', alignItems: 'center',
+                            gap: '8px', marginBottom: '12px'
+                        }}>
+                            <SegmentedControl
+                                value={billingPeriod}
+                                onChange={setBillingPeriod}
+                                style={{ width: '100%' }}
+                                options={[
+                                    {
+                                        id: 'monthly',
+                                        label: yearlyBilling.label.monthly,
+                                        activeBg: `linear-gradient(135deg, ${colorGradientStart}, ${colorGradientEnd})`,
+                                    },
+                                    {
+                                        id: 'yearly',
+                                        label: yearlyBilling.label.yearly,
+                                        activeBg: `linear-gradient(135deg, ${colorGradientStart}, ${colorGradientEnd})`,
+                                    },
+                                ]}
+                            />
+
+                            {/* Price display with savings badge */}
+                            <div style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                gap: '8px', minHeight: '28px'
+                            }}>
+                                <span style={{
+                                    fontSize: '1.1rem', fontWeight: '800',
+                                    color: billingPeriod === 'yearly' ? '#10b981' : colorMain,
+                                    transition: 'color 0.3s ease'
+                                }}>
+                                    {billingPeriod === 'yearly'
+                                        ? yearlyBilling.price.yearly
+                                        : yearlyBilling.price.monthly}
+                                </span>
+                                {billingPeriod === 'yearly' && yearlyBilling.savings && (
+                                    <span className="scale-in" style={{
+                                        padding: '2px 8px', borderRadius: '20px',
+                                        fontSize: '0.7rem', fontWeight: '800',
+                                        background: 'rgba(16, 185, 129, 0.15)',
+                                        color: '#10b981',
+                                        border: '1px solid rgba(16, 185, 129, 0.3)'
+                                    }}>
+                                        {yearlyBilling.savings}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     <button
                         onClick={handlePurchase}
                         className="hover-lift"
                         style={{
                             width: '100%', padding: '16px',
                             borderRadius: 'var(--radius-lg)',
-                            background: `linear-gradient(135deg, ${colorGradientStart}, ${colorGradientEnd})`,
+                            background: billingPeriod === 'yearly' && yearlyBilling
+                                ? 'linear-gradient(135deg, #10b981, #059669)'
+                                : `linear-gradient(135deg, ${colorGradientStart}, ${colorGradientEnd})`,
                             border: 'none', color: 'white',
                             fontWeight: '800', fontSize: '1rem',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             gap: '8px', cursor: 'pointer',
-                            boxShadow: `0 4px 16px rgba(${colorRGB},0.3)`,
-                            marginBottom: '8px'
+                            boxShadow: billingPeriod === 'yearly' && yearlyBilling
+                                ? '0 4px 16px rgba(16, 185, 129, 0.3)'
+                                : `0 4px 16px rgba(${colorRGB},0.3)`,
+                            marginBottom: '8px',
+                            transition: 'all 0.3s ease'
                         }}
                     >
                         <IconComponent size={20} fill={allowMultiplePurchases ? "white" : "none"} />
-                        {buyButtonText}
+                        {currentBuyText}
                     </button>
                 </div>
             )}

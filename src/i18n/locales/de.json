@@ -462,6 +462,8 @@
   "pro": {
     "activeDesc": "Sie können benutzerdefinierte Programme erstellen.",
     "activeTitle": "Pro-Mitglied",
+    "billingMonthly": "Monatlich",
+    "billingYearly": "Jährlich",
     "buyButton": "Gehen Sie zum Profi",
     "description": "Benutzerdefinierte Programme",
     "explanation": "Erstellen Sie Ihre eigenen Trainingsprogramme: Wählen Sie Ihre Übungen, legen Sie Ihren täglichen Fortschritt fest und verfolgen Sie Ihre speziellen Statistiken mit Streaks und Kalender.",
@@ -475,8 +477,10 @@
     "lifetimeDesc": "Lebenslanger Zugriff",
     "oneTimeDesc": "Einmalige Zahlung",
     "price": "1,99 €/Monat",
+    "priceYearly": "19,99 €/Jahr",
     "promotionalDesc": "Geschenkt vom OneUp-Team",
-    "title": "Pro-Abonnement"
+    "title": "Pro-Abonnement",
+    "yearlySavings": "-17%"
   },
   "routines": {
     "empty": "Keine Routine gespeichert",

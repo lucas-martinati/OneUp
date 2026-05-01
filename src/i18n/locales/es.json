@@ -462,6 +462,8 @@
   "pro": {
     "activeDesc": "Puedes crear programas personalizados.",
     "activeTitle": "Miembro Pro",
+    "billingMonthly": "Mensual",
+    "billingYearly": "Anual",
     "buyButton": "Hazte Pro",
     "description": "Programas personalizados",
     "explanation": "Crea tus propios programas de entrenamiento: elige tus ejercicios, define tu progresión diaria y sigue tus estadísticas dedicadas con racha y calendario.",
@@ -475,8 +477,10 @@
     "lifetimeDesc": "Acceso Permanente",
     "oneTimeDesc": "Pago único",
     "price": "6,99€/mes",
+    "priceYearly": "69,99€/año",
     "promotionalDesc": "Regalo del equipo OneUp",
-    "title": "Suscripción Pro"
+    "title": "Suscripción Pro",
+    "yearlySavings": "-17%"
   },
   "routines": {
     "empty": "No hay rutina guardada",

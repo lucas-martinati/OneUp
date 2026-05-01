@@ -462,6 +462,8 @@
   "pro": {
     "activeDesc": "You can create custom programs.",
     "activeTitle": "Pro Member",
+    "billingMonthly": "Monthly",
+    "billingYearly": "Yearly",
     "buyButton": "Go Pro",
     "description": "Custom programs",
     "explanation": "Create your own workout programs: choose your exercises, set your daily progression, and track your dedicated stats with streaks and calendar.",
@@ -475,8 +477,10 @@
     "lifetimeDesc": "Lifetime Access",
     "oneTimeDesc": "One-time payment",
     "price": "€1.99/month",
+    "priceYearly": "€19.99/year",
     "promotionalDesc": "Gifted by OneUp Team",
-    "title": "Pro Subscription"
+    "title": "Pro Subscription",
+    "yearlySavings": "-17%"
   },
   "routines": {
     "empty": "No routine saved",

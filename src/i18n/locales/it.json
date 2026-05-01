@@ -462,6 +462,8 @@
   "pro": {
     "activeDesc": "È possibile creare programmi personalizzati.",
     "activeTitle": "Membro professionista",
+    "billingMonthly": "Mensile",
+    "billingYearly": "Annuale",
     "buyButton": "Diventa professionista",
     "description": "Programmi personalizzati",
     "explanation": "Crea i tuoi programmi di allenamento: scegli i tuoi esercizi, imposta la tua progressione giornaliera e monitora le tue statistiche dedicate con serie e calendario.",
@@ -475,8 +477,10 @@
     "lifetimeDesc": "Accesso a vita",
     "oneTimeDesc": "Pagamento una tantum",
     "price": "€ 1,99/mese",
+    "priceYearly": "€ 19,99/anno",
     "promotionalDesc": "Donato dal team OneUp",
-    "title": "Abbonamento Pro"
+    "title": "Abbonamento Pro",
+    "yearlySavings": "-17%"
   },
   "routines": {
     "empty": "Nessuna routine salvata",

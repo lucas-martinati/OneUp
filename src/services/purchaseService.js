@@ -2,8 +2,9 @@
  * Purchase Service — RevenueCat wrapper for OneUp subscriptions
  *
  * Tiers:
- *   supporter — one-time ~2-5€ — ❤️ badge on leaderboard
- *   pro       — 1.99€/mo  — custom programs, dedicated panel
+ *   supporter  — one-time ~2-5€ — ❤️ badge on leaderboard
+ *   pro        — 1.99€/mo  — custom programs, dedicated panel
+ *   proYearly  — 19.99€/yr — same as pro, billed annually (save ~17%)
  *
  * Entitlements (configured in RevenueCat dashboard):
  *   "supporter" — non-consumable
@@ -26,11 +27,19 @@ const isNative = Capacitor.isNativePlatform();
 const PRODUCTS = {
   supporter: {
     productId: 'supporter',
+    packageId: '$rc_lifetime',
     entitlementId: 'supporter',
     localStorageKey: 'oneup_supporter',
   },
   pro: {
     productId: 'oneup_pro_monthly',
+    packageId: '$rc_monthly',
+    entitlementId: 'pro',
+    localStorageKey: 'oneup_pro',
+  },
+  proYearly: {
+    productId: 'oneup_pro_yearly',
+    packageId: '$rc_annual',
     entitlementId: 'pro',
     localStorageKey: 'oneup_pro',
   },
@@ -124,14 +133,22 @@ async function _getOffering(tier) {
       return null;
     }
 
-    const pkg =
-      current.availablePackages?.find(
-        (p) => {
-          // Native uses product.identifier, Web uses webBillingProduct.identifier
-          const identifier = p.product?.identifier || p.webBillingProduct?.identifier;
-          return identifier === cfg.productId;
-        }
-      ) || current.availablePackages?.[0];
+    const pkg = current.availablePackages?.find((p) => {
+      if (cfg.packageId && p.identifier === cfg.packageId) return true;
+      const identifier = p.product?.identifier || p.webBillingProduct?.identifier;
+      if (!identifier) return false;
+      return identifier === cfg.productId || identifier.startsWith(`${cfg.productId}:`);
+    });
+
+    if (!pkg) {
+      logger.error(`No package found for tier ${tier}. Available packages:`, 
+        current.availablePackages?.map(p => ({
+          pkgId: p.identifier,
+          productId: p.product?.identifier || p.webBillingProduct?.identifier
+        }))
+      );
+      return null;
+    }
 
     if (!pkg) return null;
 
@@ -227,6 +244,10 @@ export async function checkProStatus() {
 
 export async function purchasePro() {
   return _purchase('pro');
+}
+
+export async function purchaseProYearly() {
+  return _purchase('proYearly');
 }
 
 // ── Restore ────────────────────────────────────────────────────────────
