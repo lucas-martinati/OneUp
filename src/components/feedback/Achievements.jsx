@@ -219,15 +219,19 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
     }, [badges]);
 
     return (
-        <>
+        <div className="modal-overlay" style={{
+            background: 'transparent', zIndex: 199,
+            overflow: 'hidden', pointerEvents: 'none'
+        }}>
             <div 
                 ref={overlayRef}
                 onClick={handleClose} 
                 style={{
-                    position: 'fixed', inset: 0, zIndex: 199,
+                    position: 'fixed', inset: 0,
                     background: 'rgba(0,0,0,0.5)',
                     opacity: isClosing ? 0 : (isVisible ? 1 : 0),
-                    transition: isClosing ? 'opacity 0.3s ease' : 'opacity 0.4s ease'
+                    transition: isClosing ? 'opacity 0.3s ease' : 'opacity 0.4s ease',
+                    pointerEvents: 'auto'
                 }} 
             />
             
@@ -244,25 +248,29 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                     position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
                     background: 'var(--sheet-bg)',
                     borderRadius: 'calc(var(--radius-xl) * 1.5) calc(var(--radius-xl) * 1.5) 0 0',
-                    padding: '24px 20px',
-                    paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))',
                     boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
                     transform: isClosing ? 'translateY(100%)' : (isVisible ? 'translateY(0%)' : 'translateY(100%)'),
                     transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     maxHeight: '90vh', display: 'flex', flexDirection: 'column',
-                    willChange: 'transform'
+                    willChange: 'transform',
+                    pointerEvents: 'auto'
                 }}>
                 
                 <div style={{
                     width: '48px', height: '5px', borderRadius: '3px',
-                    background: 'var(--sheet-handle)', margin: '0 auto 20px',
+                    background: 'var(--sheet-handle)', margin: 'var(--spacing-sm) auto',
                     cursor: 'grab', opacity: 0.7
                 }} />
 
-                <div data-scroll-content style={{ flex: 1, overflowY: 'auto' }} className="no-scrollbar">
+                <div data-scroll-content className="modal-content no-scrollbar" style={{
+                    flex: 1, overflowY: 'auto',
+                    paddingTop: 0,
+                    paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))',
+                    maxWidth: 'none'
+                }}>
                     {/* Progress Overview Section (Minimalist Eco Mode) */}
                     <div style={{
-                        padding: '24px 20px',
+                        padding: 'var(--spacing-md) var(--spacing-sm)',
                         borderRadius: 'var(--radius-xl)', 
                         textAlign: 'center',
                         marginBottom: 'var(--spacing-xl)',
@@ -303,10 +311,10 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                         if (catBadges.length === 0) return null;
                         
                         return (
-                            <div key={cat.id} style={{ marginBottom: '32px' }}>
+                            <div key={cat.id} style={{ marginBottom: 'var(--spacing-xl)' }}>
                                 <div style={{
                                     display: 'flex', alignItems: 'center', gap: '12px',
-                                    marginBottom: '16px', paddingLeft: '4px'
+                                    marginBottom: 'var(--spacing-sm)', paddingLeft: '4px'
                                 }}>
                                     <div style={{
                                         fontSize: '0.85rem', fontWeight: '800',
@@ -332,6 +340,6 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                     })}
                 </div>
             </div>
-        </>
+        </div>
     );
 }

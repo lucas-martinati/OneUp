@@ -494,6 +494,10 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
     const translateY = dragY;
 
     return (
+        <div className="modal-overlay" style={{
+            background: 'transparent', zIndex: 199,
+            overflow: 'hidden', pointerEvents: 'none'
+        }}>
         <div
             ref={sheetRef}
             onClick={(e) => e.stopPropagation()}
@@ -510,21 +514,27 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                 backdropFilter: isDragging ? 'none' : 'blur(20px)',
                 WebkitBackdropFilter: isDragging ? 'none' : 'blur(20px)',
                 borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
-                padding: '20px',
-                paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))',
                 boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
                 transform: `translateY(${isClosing ? 100 : (isVisible ? translateY : 100)}%)`,
                 transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), backdrop-filter 0.3s ease',
                 willChange: 'transform',
-                maxHeight: '80vh', display: 'flex', flexDirection: 'column'
+                maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+                pointerEvents: 'auto'
             }}>
             <div style={{
                 width: '40px', height: '4px', borderRadius: '2px',
-                background: 'var(--sheet-handle)', margin: '0 auto 16px',
+                background: 'var(--sheet-handle)', margin: 'var(--spacing-sm) auto',
                 cursor: 'grab'
             }} />
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div className="modal-content" style={{
+                flex: 1, overflowY: 'auto',
+                paddingTop: 0,
+                paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))',
+                maxWidth: 'none',
+                display: 'flex', flexDirection: 'column'
+            }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-sm)' }}>
                 <div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                         {dateString}
@@ -592,6 +602,8 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                     );
                 })}
             </div>
+            </div>
+        </div>
         </div>
     );
 }

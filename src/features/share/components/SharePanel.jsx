@@ -1,4 +1,4 @@
-import React, { useState, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 import { Share2 } from '../../../utils/icons';
 import { useTranslation } from 'react-i18next';
 import { useShareCard } from '../hooks/useShareCard';
@@ -30,24 +30,33 @@ export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 
   const hasProAccess = isPro || hadPro;
   const { completions, getDayNumber, settings } = useProgressContext();
 
-  // Map Stats categories to SharePanel categories for initial state
-  const categoryMap = {
-      standard: CATEGORIES.BODYWEIGHT,
-      weights: CATEGORIES.WEIGHTS,
-      custom: CATEGORIES.CUSTOM,
-      cardio: CATEGORIES.CARDIO,
-  };
-  const initialCategories = activeCategories
-      .map(cat => categoryMap[cat])
-      .filter(Boolean);
+  const mappedCategories = useMemo(() => {
+    const categoryMap = {
+        standard: CATEGORIES.BODYWEIGHT,
+        weights: CATEGORIES.WEIGHTS,
+        custom: CATEGORIES.CUSTOM,
+        cardio: CATEGORIES.CARDIO,
+    };
+    const mapped = activeCategories
+        .map(cat => categoryMap[cat])
+        .filter(Boolean);
+    return mapped.length > 0 ? mapped : [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM, CATEGORIES.CARDIO];
+  }, [activeCategories]);
 
   const shareHook = useShareCard({
       sessionData,
       stats,
       sessionHistory: getSessionHistory(),
       mode,
-      initialCategories: initialCategories.length > 0 ? initialCategories : [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM, CATEGORIES.CARDIO],
+      initialCategories: mappedCategories,
   });
+
+  const { setOption } = shareHook;
+
+  // Keep share modal categories in sync with Stats filter changes
+  useEffect(() => {
+    setOption('statsCategories', mappedCategories);
+  }, [mappedCategories, setOption]);
 
   const isCompact = variant === 'compact';
   const isStats = variant === 'stats';
