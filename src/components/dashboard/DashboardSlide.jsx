@@ -19,7 +19,7 @@ export const DashboardSlide = React.memo(({
 
     if (!safeSelectedExercise) {
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '20px', textAlign: 'center' }}>
+            <div className="flex-col flex-center full-height text-center" style={{ padding: '20px' }}>
                 {title && <h2 className="panel-title">{title}</h2>}
                 <div style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>{t('dashboard.noExercisesConfigured')}</div>
                 {onManageCustom && (
@@ -43,13 +43,10 @@ export const DashboardSlide = React.memo(({
 
     return (
         <div 
-            className={isDay100 ? 'dashboard-glitch-bg' : (isDayPerfect ? 'dashboard-gold-bg' : '')}
+            className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative overflow-hidden gap-responsive ${isDay100 ? 'dashboard-glitch-bg' : (isDayPerfect ? 'dashboard-gold-bg' : '')}`}
             style={{
-                display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'space-evenly', gap: 'clamp(4px, 0.8vh, 12px)',
-                height: '100%', width: '100%', paddingTop: title ? '12px' : '0',
-                transition: 'all 0.6s ease-in-out',
-                position: 'relative', overflow: 'hidden'
+                paddingTop: title ? '12px' : '0',
+                transition: 'all 0.6s ease-in-out'
             }}
         >
             {isDayPerfect && (
@@ -74,7 +71,7 @@ export const DashboardSlide = React.memo(({
                 </>
             )}
             {title && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="flex-align-center" style={{ gap: '8px' }}>
                     <div style={{
                         fontSize: '0.8rem', fontWeight: '800', 
                         color: isDayPerfect ? '#ffdf00' : (categoryColor || 'var(--text-secondary)'), 
@@ -111,9 +108,8 @@ export const DashboardSlide = React.memo(({
                         </div>
 
                         {/* Big animated day number */}
-                        <div style={{
-                            position: 'relative', height: 'clamp(3.2rem, 9vh, 7rem)', overflow: 'hidden',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        <div className="flex-center pos-relative overflow-hidden" style={{
+                            height: 'clamp(3.2rem, 9vh, 7rem)',
                             marginBottom: 'clamp(2px, 0.5vh, 6px)',
                             filter: isDay100 ? 'drop-shadow(0 0 15px rgba(239,68,68,0.4))' : (isDayPerfect ? 'drop-shadow(0 0 15px rgba(251,191,36,0.2))' : 'none')
                         }}>
@@ -148,8 +144,7 @@ export const DashboardSlide = React.memo(({
                     </div>
 
                     {/* ── Exercise Selector ── */}
-                    <div className="exercise-grid" style={{
-                        display: 'flex', flexWrap: 'wrap', justifyContent: 'center',
+                    <div className="exercise-grid flex-row flex-wrap flex-justify-center" style={{
                         gap: 'clamp(6px, 1.2vw, 10px)', width: '100%', maxWidth: '640px',
                         padding: '2px'
                     }}>
@@ -171,15 +166,10 @@ export const DashboardSlide = React.memo(({
                     </div>
 
                     {/* ── Progress ring + Counter button + Completion status (grouped) ── */}
-                    <div style={{
-                        display: 'flex', flexDirection: 'column', alignItems: 'center',
-                        gap: 'clamp(4px, 0.8vh, 10px)'
-                    }}>
-                        <div style={{ 
-                            position: 'relative', 
+                    <div className="flex-col flex-align-center gap-responsive">
+                        <div className="flex-center pos-relative" style={{ 
                             width: 'clamp(72px, 12vh, 110px)', 
-                            height: 'clamp(72px, 12vh, 110px)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center' 
+                            height: 'clamp(72px, 12vh, 110px)'
                         }}>
                             {/* Year progress ring */}
                             <svg viewBox="0 0 100 100" className={isDay100 ? 'day100-ring' : ''} style={{

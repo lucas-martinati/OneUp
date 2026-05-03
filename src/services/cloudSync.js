@@ -1,43 +1,37 @@
 import { initializeFirebase } from './firebase';
-import {
-  setupAuthListener, signInWithGoogle, signInWithGoogleWeb,
-  signOut as authSignOut, deleteAccount as authDeleteAccount,
-  checkSignInStatus, getCurrentUserId
-} from './authService';
-import {
-  saveToCloud, loadFromCloud, listenToCloudChanges,
-  mergeData, syncData
-} from './dataSyncService';
-import {
-  publishToLeaderboard, removeFromLeaderboard,
-  loadLeaderboard, loadUserDetails
-} from './leaderboardService';
-import {
-  createClan, joinClan, leaveClan, getUserClans,
-  getClanDetails, sendClanNotification,
-  listenToNotifications, deleteNotification
-} from './clanService';
-import {
-  saveSettingsToCloud, loadSettingsFromCloud,
-  savePurchase, loadPurchase,
-  saveRoutinesToCloud, loadRoutinesFromCloud,
-  saveCustomExercisesToCloud, loadCustomExercisesFromCloud,
-  saveProgramCompletionsToCloud, loadProgramCompletionsFromCloud,
-  saveExerciseWeightsToCloud, loadExerciseWeightsFromCloud,
-  saveCustomCategoriesToCloud, loadCustomCategoriesFromCloud
-} from './userDataService';
-import {
-  saveWeightEntry, loadWeightHistory, loadAllWeightHistories, loadLatestWeights
-} from './weightHistoryService';
-import {
-  saveCardioSession, loadCardioSessions, deleteCardioSession
-} from './cardioService';
+import * as authService from './authService';
+import * as dataSyncService from './dataSyncService';
+import * as leaderboardService from './leaderboardService';
+import * as clanService from './clanService';
+import * as userDataService from './userDataService';
+import * as weightHistoryService from './weightHistoryService';
+import * as cardioService from './cardioService';
+
+const DELEGATED_SERVICES = [
+  dataSyncService,
+  leaderboardService,
+  userDataService,
+  weightHistoryService,
+  cardioService,
+  clanService,
+];
 
 class CloudSyncService {
   constructor() {
     this.listeners = new Set();
     initializeFirebase();
-    setupAuthListener(this.listeners);
+    authService.setupAuthListener(this.listeners);
+
+    for (const service of DELEGATED_SERVICES) {
+      for (const [key, method] of Object.entries(service)) {
+        if (typeof method === 'function') {
+          if (key in this) {
+            console.warn(`CloudSync: collision sur "${key}"`);
+          }
+          this[key] = method;
+        }
+      }
+    }
   }
 
   subscribe(callback) {
@@ -45,75 +39,34 @@ class CloudSyncService {
     return () => this.listeners.delete(callback);
   }
 
-  // Auth
-  async signInWithGoogle(idToken) { return signInWithGoogle(idToken, this.listeners); }
-  async signInWithGoogleWeb(accessToken, userInfo) { return signInWithGoogleWeb(accessToken, userInfo, this.listeners); }
-  async signOut() { return authSignOut(this.listeners); }
-  async deleteAccount() { return authDeleteAccount(this.listeners, (id) => leaveClan(id), () => getUserClans()); }
-  checkSignInStatus() { return checkSignInStatus(); }
-  getCurrentUserId() { return getCurrentUserId(); }
+  // Auth methods need specific handling due to 'this.listeners' injection or specific callbacks
+  async signInWithGoogle(idToken) {
+    return authService.signInWithGoogle(idToken, this.listeners);
+  }
 
-  // Data sync
-  saveToCloud(data) { return saveToCloud(data); }
-  loadFromCloud() { return loadFromCloud(); }
-  listenToCloudChanges(cb) { return listenToCloudChanges(cb); }
-  mergeData(local, cloud) { return mergeData(local, cloud); }
-  syncData(local) { return syncData(local); }
+  async signInWithGoogleWeb(accessToken, userInfo) {
+    return authService.signInWithGoogleWeb(accessToken, userInfo, this.listeners);
+  }
 
-  // Leaderboard
-  publishToLeaderboard(data) { return publishToLeaderboard(data); }
-  removeFromLeaderboard() { return removeFromLeaderboard(); }
-  loadLeaderboard() { return loadLeaderboard(); }
-  loadUserDetails(uid) { return loadUserDetails(uid); }
+  async signOut() {
+    return authService.signOut(this.listeners);
+  }
 
-  // Settings
-  saveSettingsToCloud(s) { return saveSettingsToCloud(s); }
-  loadSettingsFromCloud() { return loadSettingsFromCloud(); }
+  async deleteAccount() {
+    return authService.deleteAccount(
+      this.listeners,
+      (id) => clanService.leaveClan(id),
+      () => clanService.getUserClans()
+    );
+  }
 
-  // Purchase
-  savePurchase(p) { return savePurchase(p); }
-  loadPurchase() { return loadPurchase(); }
+  checkSignInStatus() {
+    return authService.checkSignInStatus();
+  }
 
-  // Routines
-  saveRoutinesToCloud(r) { return saveRoutinesToCloud(r); }
-  loadRoutinesFromCloud() { return loadRoutinesFromCloud(); }
-
-  // Custom exercises
-  saveCustomExercisesToCloud(e) { return saveCustomExercisesToCloud(e); }
-  loadCustomExercisesFromCloud() { return loadCustomExercisesFromCloud(); }
-
-  // Program completions
-  saveProgramCompletionsToCloud(id, c) { return saveProgramCompletionsToCloud(id, c); }
-  loadProgramCompletionsFromCloud(id) { return loadProgramCompletionsFromCloud(id); }
-
-  // Exercise weights
-  saveExerciseWeightsToCloud(w) { return saveExerciseWeightsToCloud(w); }
-  loadExerciseWeightsFromCloud() { return loadExerciseWeightsFromCloud(); }
-
-  // Custom categories
-  saveCustomCategoriesToCloud(c) { return saveCustomCategoriesToCloud(c); }
-  loadCustomCategoriesFromCloud() { return loadCustomCategoriesFromCloud(); }
-
-  // Weight history
-  saveWeightEntry(exId, date, weight) { return saveWeightEntry(exId, date, weight); }
-  loadWeightHistory(exId) { return loadWeightHistory(exId); }
-  loadAllWeightHistories() { return loadAllWeightHistories(); }
-  loadLatestWeights(uid) { return loadLatestWeights(uid); }
-
-  // Cardio sessions
-  saveCardioSession(session) { return saveCardioSession(session); }
-  loadCardioSessions() { return loadCardioSessions(); }
-  deleteCardioSession(id) { return deleteCardioSession(id); }
-
-  // Clan
-  createClan(name) { return createClan(name); }
-  joinClan(code) { return joinClan(code); }
-  leaveClan(id) { return leaveClan(id); }
-  getUserClans() { return getUserClans(); }
-  getClanDetails(id) { return getClanDetails(id); }
-  sendClanNotification(uid, type, msg) { return sendClanNotification(uid, type, msg); }
-  listenToNotifications(cb) { return listenToNotifications(cb); }
-  deleteNotification(id) { return deleteNotification(id); }
+  getCurrentUserId() {
+    return authService.getCurrentUserId();
+  }
 }
 
 export const cloudSync = new CloudSyncService();

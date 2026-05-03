@@ -93,8 +93,8 @@ export function Dashboard() {
     const defaultSlide = fullCategoryOrder.indexOf(CATEGORIES.BODYWEIGHT);
     const [activeSlide, setActiveSlide] = useState(defaultSlide);
 
-    const [classicSelected, setClassicSelected] = useState('pushups');
-    const [weightsSelected, setWeightsSelected] = useState('biceps_curl');
+    const [classicSelected, setClassicSelected] = useState(EXERCISES[0]?.id);
+    const [weightsSelected, setWeightsSelected] = useState(WEIGHT_EXERCISES[0]?.id);
     const [customSelected, setCustomSelected] = useState(customExercises[0]?.id || 'custom_placeholder');
     const [userCatSelected, setUserCatSelected] = useState({});
     const [customExModalCatId, setCustomExModalCatId] = useState(null);
@@ -114,7 +114,15 @@ export function Dashboard() {
         }
     }, [defaultSlide]);
 
-    const effectiveSlide = (!isPro && activeSlide > 1) ? defaultSlide : activeSlide;
+    const isCatAccessible = (catKey) => {
+        if (catKey === CATEGORIES.WEIGHTS) return canAccessFeature(FEATURES.WEIGHTS, { isPro });
+        if (catKey === CATEGORIES.CUSTOM) return canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro });
+        if (isUserCategory(catKey)) return canAccessFeature(FEATURES.CUSTOM_CATEGORIES, { isPro });
+        return true; // Cardio and Bodyweight are always accessible
+    };
+
+    const requestedCatKey = fullCategoryOrder[activeSlide];
+    const effectiveSlide = isCatAccessible(requestedCatKey) ? activeSlide : defaultSlide;
     const currentCatKey = fullCategoryOrder[effectiveSlide];
     
     const globalSelectedId = currentCatKey === CATEGORIES.CARDIO ? 'cardio' 
@@ -258,9 +266,8 @@ export function Dashboard() {
             {showDay100Modal && <Day100HackModal onDismiss={handleDay100ModalDismiss} />}
             {showUnhackAnim && <Day100UnhackAnimation onComplete={handleUnhackComplete} />}
             {hackActive && <Day100Overlay />}
-            <div className={`fade-in ${hackActive ? 'day100-global day100-flicker' : ''} ${day100Unhacked ? 'day100-unhacking' : ''}`} style={{
-                display: 'flex', flexDirection: 'column', height: '100%',
-                gap: 'clamp(4px, 1vh, 10px)', paddingBottom: 'clamp(2px, 0.5vh, 8px)'
+            <div className={`flex-col full-height fade-in gap-responsive ${hackActive ? 'day100-global day100-flicker' : ''} ${day100Unhacked ? 'day100-unhacking' : ''}`} style={{
+                paddingBottom: 'clamp(2px, 0.5vh, 8px)'
             }}>
                 <DashboardHeader
                     setShowSettings={setShowSettings}
@@ -274,7 +281,7 @@ export function Dashboard() {
                     isDay100={hackActive}
                 />
 
-                <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, position: 'relative' }}>
+                <main className="flex-1 flex-col pos-relative" style={{ minHeight: 0 }}>
                     <div
                         ref={scrollContainerRef}
                         onScroll={(e) => {
@@ -423,10 +430,9 @@ export function Dashboard() {
                         })}
                     </div>
 
-                    <div style={{
-                        position: 'absolute', right: '4px', top: '50%', transform: 'translateY(-50%)',
-                        display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10,
-                        pointerEvents: 'none'
+                    <div className="flex-col pos-absolute" style={{
+                        right: '4px', top: '50%', transform: 'translateY(-50%)',
+                        gap: '8px', zIndex: 10, pointerEvents: 'none'
                     }}>
                         {fullCategoryOrder.map((catId, i) => {
                             const isUserCat = isUserCategory(catId);
