@@ -359,6 +359,7 @@
     "validated": "{{exercise}} Abgeschlossen!"
   },
   "customExercises": {
+    "categoryLabel": "Kategorie",
     "colorLabel": "Themenfarbe",
     "create": "Erstellen Sie eine Übung",
     "deleteConfirm": "{{name}} löschen?",
@@ -665,19 +666,19 @@
     "shuffle": "Shuffle"
   },
   "customCategories": {
-    "colorLabel": "Category color",
-    "create": "Create a category",
-    "deleteConfirm": "Delete {{name}}?",
-    "deleteTitle": "Delete category?",
-    "empty": "No custom categories yet.",
-    "errorNameRequired": "Name is required",
-    "limitReached": "Limit of {{count}} categories reached.",
-    "nameLabel": "Category name",
-    "namePlaceholder": "Ex: Upper body, Stretching...",
-    "preview": "Preview",
-    "title": "Custom Categories",
-    "deleteSelectExercises": "Select exercises to keep",
-    "deleteSummaryKeep": "{{keep}} exercise(s) moved, {{del}} deleted",
-    "deleteSummaryAll": "{{count}} exercise(s) will be deleted"
+    "colorLabel": "Kategoriefarbe",
+    "create": "Kategorie erstellen",
+    "deleteConfirm": "{{name}} löschen?",
+    "deleteSelectExercises": "Zu behaltende Übungen auswählen",
+    "deleteSummaryKeep": "{{keep}} Übung(en) verschoben, {{del}} gelöscht",
+    "deleteSummaryAll": "{{count}} Übung(en) werden gelöscht",
+    "deleteTitle": "Kategorie löschen?",
+    "empty": "Noch keine benutzerdefinierten Kategorien.",
+    "errorNameRequired": "Ein Name ist erforderlich",
+    "limitReached": "Limit von {{count}} Kategorien erreicht.",
+    "nameLabel": "Kategoriename",
+    "namePlaceholder": "Z.B. Oberkörper, Dehnen...",
+    "preview": "Vorschau",
+    "title": "Benutzerdefinierte Kategorien"
   }
 }

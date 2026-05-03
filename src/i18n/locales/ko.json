@@ -359,6 +359,7 @@
     "validated": "{{exercise}} 완료되었습니다!"
   },
   "customExercises": {
+    "categoryLabel": "카테고리",
     "colorLabel": "테마 색상",
     "create": "운동 만들기",
     "deleteConfirm": "{{name}}을(를) 삭제하시겠습니까?",
@@ -665,19 +666,19 @@
     "shuffle": "혼합"
   },
   "customCategories": {
-    "colorLabel": "Category color",
-    "create": "Create a category",
-    "deleteConfirm": "Delete {{name}}?",
-    "deleteTitle": "Delete category?",
-    "empty": "No custom categories yet.",
-    "errorNameRequired": "Name is required",
-    "limitReached": "Limit of {{count}} categories reached.",
-    "nameLabel": "Category name",
-    "namePlaceholder": "Ex: Upper body, Stretching...",
-    "preview": "Preview",
-    "title": "Custom Categories",
-    "deleteSelectExercises": "Select exercises to keep",
-    "deleteSummaryKeep": "{{keep}} exercise(s) moved, {{del}} deleted",
-    "deleteSummaryAll": "{{count}} exercise(s) will be deleted"
+    "colorLabel": "카테고리 색상",
+    "create": "카테고리 생성",
+    "deleteConfirm": "{{name}}을(를) 삭제하시겠습니까?",
+    "deleteSelectExercises": "유지할 운동 선택",
+    "deleteSummaryKeep": "{{keep}}개 이동됨, {{del}}개 삭제됨",
+    "deleteSummaryAll": "{{count}}개의 운동이 삭제됩니다",
+    "deleteTitle": "카테고리를 삭제하시겠습니까?",
+    "empty": "커스텀 카테고리가 없습니다.",
+    "errorNameRequired": "이름을 입력하세요",
+    "limitReached": "카테고리는 최대 {{count}}개까지 가능합니다.",
+    "nameLabel": "카테고리 이름",
+    "namePlaceholder": "예: 상체, 스트레칭...",
+    "preview": "미리보기",
+    "title": "커스텀 카테고리"
   }
 }

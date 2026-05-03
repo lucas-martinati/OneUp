@@ -359,6 +359,7 @@
     "validated": "{{exercise}} 完了しました!"
   },
   "customExercises": {
+    "categoryLabel": "カテゴリー",
     "colorLabel": "テーマカラー",
     "create": "演習を作成する",
     "deleteConfirm": "{{name}} を削除しますか?",
@@ -665,19 +666,19 @@
     "shuffle": "シャッフル"
   },
   "customCategories": {
-    "colorLabel": "Category color",
-    "create": "Create a category",
-    "deleteConfirm": "Delete {{name}}?",
-    "deleteTitle": "Delete category?",
-    "empty": "No custom categories yet.",
-    "errorNameRequired": "Name is required",
-    "limitReached": "Limit of {{count}} categories reached.",
-    "nameLabel": "Category name",
-    "namePlaceholder": "Ex: Upper body, Stretching...",
-    "preview": "Preview",
-    "title": "Custom Categories",
-    "deleteSelectExercises": "Select exercises to keep",
-    "deleteSummaryKeep": "{{keep}} exercise(s) moved, {{del}} deleted",
-    "deleteSummaryAll": "{{count}} exercise(s) will be deleted"
+    "colorLabel": "カテゴリーの色",
+    "create": "カテゴリーを作成",
+    "deleteConfirm": "{{name}}を削除しますか？",
+    "deleteSelectExercises": "残すエクササイズを選択",
+    "deleteSummaryKeep": "{{keep}}個を移動、{{del}}個を削除",
+    "deleteSummaryAll": "{{count}}個のエクササイズが削除されます",
+    "deleteTitle": "カテゴリーを削除しますか？",
+    "empty": "カスタムカテゴリーはまだありません。",
+    "errorNameRequired": "名前を入力してください",
+    "limitReached": "カテゴリー数は{{count}}個までです。",
+    "nameLabel": "カテゴリー名",
+    "namePlaceholder": "例：上半身、ストレッチ...",
+    "preview": "プレビュー",
+    "title": "カスタムカテゴリー"
   }
 }

@@ -114,7 +114,7 @@ export function Dashboard() {
         }
     }, [defaultSlide]);
 
-    const effectiveSlide = activeSlide;
+    const effectiveSlide = (!isPro && activeSlide > 1) ? defaultSlide : activeSlide;
     const currentCatKey = fullCategoryOrder[effectiveSlide];
     
     const globalSelectedId = currentCatKey === CATEGORIES.CARDIO ? 'cardio' 

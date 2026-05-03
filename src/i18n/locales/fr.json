@@ -367,7 +367,7 @@
     "deleteSummaryAll": "{{count}} exercice(s) seront supprimés",
     "deleteTitle": "Supprimer la catégorie ?",
     "empty": "Aucune catégorie personnalisée.",
-    "errorNameRequired": "Le nom est requis",
+    "errorNameRequired": "Un nom est requis",
     "limitReached": "Limite de {{count}} catégories atteinte.",
     "nameLabel": "Nom de la catégorie",
     "namePlaceholder": "Ex: Haut du corps, Étirements...",

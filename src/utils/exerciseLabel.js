@@ -34,16 +34,6 @@ export function getExerciseColor(ex, fallback = DEFAULT_EXERCISE_COLOR) {
 }
 
 /**
- * Get the category of an exercise by its ID.
- * Returns 'bodyweight' | 'weights' | 'custom'
- */
-export function getExerciseCategory(id) {
-  if (WEIGHT_ID_SET.has(id)) return CATEGORIES.WEIGHTS;
-  if (BW_ID_SET.has(id)) return CATEGORIES.BODYWEIGHT;
-  return CATEGORIES.CUSTOM;
-}
-
-/**
  * Check if an exercise ID is a custom exercise.
  * @param {string} id - Exercise ID
  * @returns {boolean}
