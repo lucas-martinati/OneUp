@@ -1082,7 +1082,7 @@ button:focus:not(:focus-visible) {
   width: 100%;
   max-width: 640px; /* Centralized width for all panels */
   margin: 0 auto;
-  padding: 0 var(--spacing-sm);
+  padding: 0;
 }
 
 @media (min-width: 600px) {

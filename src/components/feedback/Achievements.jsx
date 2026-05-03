@@ -265,11 +265,12 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                 <div data-scroll-content className="modal-content no-scrollbar" style={{
                     flex: 1, overflowY: 'auto',
                     paddingTop: 0,
-                    paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))'
+                    paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))',
+                    maxWidth: 'none'
                 }}>
                     {/* Progress Overview Section (Minimalist Eco Mode) */}
                     <div style={{
-                        padding: 'var(--spacing-md) 0',
+                        padding: 'var(--spacing-md) var(--spacing-sm)',
                         borderRadius: 'var(--radius-xl)', 
                         textAlign: 'center',
                         marginBottom: 'var(--spacing-xl)',
