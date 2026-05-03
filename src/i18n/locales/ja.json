@@ -344,7 +344,9 @@
     "share": "共有",
     "weights": "重み",
     "you": "あなた",
-    "yourPseudo": "あなたの名前..."
+    "yourPseudo": "あなたの名前...",
+    "exerciseCount_one": "{{count}} エクササイズ",
+    "exerciseCount_other": "{{count}} エクササイズ"
   },
   "counter": {
     "completeAll": "すべて完了",

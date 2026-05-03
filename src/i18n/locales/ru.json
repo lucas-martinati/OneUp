@@ -344,7 +344,9 @@
     "share": "Поделиться",
     "weights": "Отягощения",
     "you": "вы",
-    "yourPseudo": "Ваше имя..."
+    "yourPseudo": "Ваше имя...",
+    "exerciseCount_one": "{{count}} упражнение",
+    "exerciseCount_other": "{{count}} упражнения"
   },
   "counter": {
     "completeAll": "Выполнить всё",

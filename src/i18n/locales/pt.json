@@ -344,7 +344,9 @@
     "share": "Compartilhar",
     "weights": "Pesos",
     "you": "você",
-    "yourPseudo": "Seu nome..."
+    "yourPseudo": "Seu nome...",
+    "exerciseCount_one": "{{count}} exercício",
+    "exerciseCount_other": "{{count}} exercícios"
   },
   "counter": {
     "completeAll": "Concluir tudo",

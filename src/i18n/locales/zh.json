@@ -344,7 +344,9 @@
     "share": "分享",
     "weights": "负重",
     "you": "你",
-    "yourPseudo": "你的名字..."
+    "yourPseudo": "你的名字...",
+    "exerciseCount_one": "{{count}} 练习",
+    "exerciseCount_other": "{{count}} 练习"
   },
   "counter": {
     "completeAll": "全部完成",

@@ -344,7 +344,9 @@
     "share": "공유하다",
     "weights": "가중치",
     "you": "너",
-    "yourPseudo": "당신의 이름은..."
+    "yourPseudo": "당신의 이름은...",
+    "exerciseCount_one": "{{count}} 운동",
+    "exerciseCount_other": "{{count}} 운동"
   },
   "counter": {
     "completeAll": "모두 완료",

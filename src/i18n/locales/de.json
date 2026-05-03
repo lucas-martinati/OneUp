@@ -344,7 +344,9 @@
     "share": "Aktie",
     "weights": "Gewichte",
     "you": "Du",
-    "yourPseudo": "Ihr Name..."
+    "yourPseudo": "Ihr Name...",
+    "exerciseCount_one": "{{count}} Übung",
+    "exerciseCount_other": "{{count}} Übungen"
   },
   "counter": {
     "completeAll": "Schließe „Alle“ ab",

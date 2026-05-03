@@ -127,7 +127,7 @@ export function Dashboard() {
         if (currentCatKey === CATEGORIES.CARDIO) return { id: 'cardio', color: '#ef4444', gradient: ['#ef4444', '#dc2626'], icon: 'Heart', name: t('common.cardio') };
         if (currentCatKey === CATEGORIES.BODYWEIGHT) return EXERCISES_MAP[globalSelectedId] || EXERCISES[0];
         if (currentCatKey === CATEGORIES.WEIGHTS) return WEIGHT_EXERCISES_MAP[globalSelectedId] || WEIGHT_EXERCISES[0];
-        return customExercisesMap[globalSelectedId] || customExercises[0] || { id: 'custom_placeholder', color: '#8b5cf6', gradient: ['#8b5cf6', '#7c3aed'], icon: 'Star', name: 'Exercice Perso' };
+        return customExercisesMap[globalSelectedId] || customExercises[0] || { id: 'custom_placeholder', color: '#8b5cf6', gradient: ['#8b5cf6', '#7c3aed'], icon: 'Star', name: t('common.custom') };
     }, [currentCatKey, globalSelectedId, customExercises, customExercisesMap, t]);
 
     useEffect(() => {

@@ -344,7 +344,9 @@
     "share": "Partager",
     "weights": "Musculation",
     "you": "toi",
-    "yourPseudo": "Ton pseudo..."
+    "yourPseudo": "Ton pseudo...",
+    "exerciseCount_one": "{{count}} exercice",
+    "exerciseCount_other": "{{count}} exercices"
   },
   "counter": {
     "completeAll": "Tout compléter",

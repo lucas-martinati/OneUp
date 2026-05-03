@@ -100,7 +100,8 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
   }, true);
 
   const handleSave = () => {
-    if (!name.trim()) {
+    // Allow empty name for built-in 'custom' category (it will fallback to default translation)
+    if (!name.trim() && editingId !== 'custom') {
       setError(t('customCategories.errorNameRequired'));
       return;
     }
@@ -266,9 +267,9 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                           }} />
                         </div>
                         <div>
-                          <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{cat.name}</div>
+                          <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{cat.name || (isBuiltIn ? t('common.custom') : '')}</div>
                           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                            {exerciseCount} {exerciseCount === 1 ? 'exercice' : 'exercices'}
+                            {t('common.exerciseCount', { count: exerciseCount })}
                           </div>
                         </div>
                       </div>

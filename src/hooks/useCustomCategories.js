@@ -12,23 +12,20 @@ export function useCustomCategories(userId) {
   const [customCategories, setCustomCategories] = useLocalStorageScoped(STORAGE_KEY, userId, []);
 
   const addCategory = useCallback((name, color) => {
-    if (!name?.trim()) return null;
+    if (!name?.trim()) return false;
+    if (customCategories.length >= MAX_CUSTOM_CATEGORIES) return false;
 
-    let created = false;
     setCustomCategories((prev) => {
       if (prev.length >= MAX_CUSTOM_CATEGORIES) return prev;
-
-      created = true;
-      const newCategory = {
+      return [...prev, {
         id: `cat_${crypto.randomUUID()}`,
         name: name.trim(),
         color: color || '#8b5cf6',
         createdAt: Date.now(),
-      };
-      return [...prev, newCategory];
+      }];
     });
-    return created;
-  }, [setCustomCategories]);
+    return true;
+  }, [customCategories, setCustomCategories]);
 
   const updateCategory = useCallback((id, updates) => {
     setCustomCategories((prev) => {

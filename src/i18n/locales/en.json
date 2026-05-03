@@ -344,7 +344,9 @@
     "share": "Share",
     "weights": "Weights",
     "you": "you",
-    "yourPseudo": "Your name..."
+    "yourPseudo": "Your name...",
+    "exerciseCount_one": "{{count}} exercise",
+    "exerciseCount_other": "{{count}} exercises"
   },
   "counter": {
     "completeAll": "Complete All",
@@ -370,7 +372,7 @@
     "errorNameRequired": "A name is required",
     "limitReached": "Limit of {{count}} categories reached.",
     "nameLabel": "Category name",
-      "namePlaceholder": "Ex: Upper body, Stretching...",
+    "namePlaceholder": "Ex: Upper body, Stretching...",
     "preview": "Preview",
     "title": "Custom Categories"
   },
