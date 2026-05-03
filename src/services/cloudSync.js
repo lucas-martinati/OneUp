@@ -39,7 +39,7 @@ class CloudSyncService {
     return () => this.listeners.delete(callback);
   }
 
-  // Auth methods need specific handling due to 'this.listeners' injection or specific callbacks
+  // Auth methods need specific handling due to `this.listeners` injection or specific callbacks
   async signInWithGoogle(idToken) {
     return authService.signInWithGoogle(idToken, this.listeners);
   }
