@@ -1022,6 +1022,9 @@ button:focus:not(:focus-visible) {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;
   touch-action: auto;
+  padding: var(--spacing-sm);
+  padding-top: calc(var(--spacing-md) + env(safe-area-inset-top));
+  padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom));
 }
 
 .modal-overlay .modal-content {
@@ -1031,20 +1034,13 @@ button:focus:not(:focus-visible) {
   width: 100%;
   max-width: 640px; /* Centralized width for all panels */
   margin: 0 auto;
-  padding: var(--spacing-sm);
-  padding-top: calc(var(--spacing-md) + env(safe-area-inset-top));
-  padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom));
+  padding: 0;
 }
 
 @media (min-width: 600px) {
   .modal-overlay {
     align-items: center;
     justify-content: flex-start;
-    padding: var(--spacing-lg); /* Padding between window edge and content */
-  }
-
-  .modal-overlay .modal-content {
-    padding: 0; /* Prevent double padding on desktop */
   }
 }
 
