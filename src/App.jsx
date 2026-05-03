@@ -26,7 +26,7 @@ function AppContent() {
   const auth = useAuth();
   const { isPro, isSubscriptionLoading } = useSubscription();
   const { settings, updateSettings, isSetup, startChallenge, setCustomExercisesForStats, isInitialSyncDone } = useProgressContext();
-  const { customExercises, routines, setRoutinesFromCloud, customExercisesHook } = useExercises();
+  const { customExercises, customCategories, routines, setRoutinesFromCloud, customExercisesHook, customCategoriesHook } = useExercises();
   const { resumeCloudSync } = useProgressContext();
 
   // Initialize global hardware back button listener
@@ -53,7 +53,6 @@ function AppContent() {
     { delay: 2000 }
   );
 
-  // Cloud auto-save for custom exercises (Pro feature)
   useCloudAutoSave(
     auth.isSignedIn && !auth.loading && isSetup && isInitialSyncDone,
     customExercises,
@@ -61,21 +60,34 @@ function AppContent() {
     { delay: 2000 }
   );
 
-  // Sync routines + custom exercises from cloud on sign-in
+  // Cloud auto-save for custom categories (Pro feature)
+  useCloudAutoSave(
+    auth.isSignedIn && !auth.loading && isSetup && isInitialSyncDone,
+    customCategories,
+    cloudSync.saveCustomCategoriesToCloud,
+    { delay: 2000 }
+  );
+
+  // Sync routines + custom exercises + categories from cloud on sign-in
   const { setCustomExercisesFromCloud } = customExercisesHook;
+  const { setCategoriesFromCloud } = customCategoriesHook;
   useEffect(() => {
     if (auth.isSignedIn && !auth.loading && auth.user?.uid) {
       const loadData = async () => {
         try {
           const cloudRoutines = await cloudSync.loadRoutinesFromCloud();
           if (cloudRoutines && Array.isArray(cloudRoutines)) setRoutinesFromCloud(cloudRoutines);
+          
           const cloudExercises = await cloudSync.loadCustomExercisesFromCloud();
           if (cloudExercises && Array.isArray(cloudExercises)) setCustomExercisesFromCloud(cloudExercises);
+
+          const cloudCategories = await cloudSync.loadCustomCategoriesFromCloud();
+          if (cloudCategories && Array.isArray(cloudCategories)) setCategoriesFromCloud(cloudCategories);
         } catch { /* silent */ }
       };
       loadData();
     }
-  }, [auth.isSignedIn, auth.loading, auth.user?.uid, setCustomExercisesFromCloud, setRoutinesFromCloud]);
+  }, [auth.isSignedIn, auth.loading, auth.user?.uid, setCustomExercisesFromCloud, setRoutinesFromCloud, setCategoriesFromCloud]);
 
   // Show loading only when: auth is loading, OR user is signed in with no local data
   // (waiting for cloud). If local data exists, show it immediately and sync in background.

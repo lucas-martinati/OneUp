@@ -23,7 +23,8 @@ import {
   saveRoutinesToCloud, loadRoutinesFromCloud,
   saveCustomExercisesToCloud, loadCustomExercisesFromCloud,
   saveProgramCompletionsToCloud, loadProgramCompletionsFromCloud,
-  saveExerciseWeightsToCloud, loadExerciseWeightsFromCloud
+  saveExerciseWeightsToCloud, loadExerciseWeightsFromCloud,
+  saveCustomCategoriesToCloud, loadCustomCategoriesFromCloud
 } from './userDataService';
 import {
   saveWeightEntry, loadWeightHistory, loadAllWeightHistories, loadLatestWeights
@@ -88,6 +89,10 @@ class CloudSyncService {
   // Exercise weights
   saveExerciseWeightsToCloud(w) { return saveExerciseWeightsToCloud(w); }
   loadExerciseWeightsFromCloud() { return loadExerciseWeightsFromCloud(); }
+
+  // Custom categories
+  saveCustomCategoriesToCloud(c) { return saveCustomCategoriesToCloud(c); }
+  loadCustomCategoriesFromCloud() { return loadCustomCategoriesFromCloud(); }
 
   // Weight history
   saveWeightEntry(exId, date, weight) { return saveWeightEntry(exId, date, weight); }

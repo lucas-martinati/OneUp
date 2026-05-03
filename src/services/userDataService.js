@@ -160,4 +160,23 @@ export async function loadExerciseWeightsFromCloud() {
   if (snapshot.exists()) { logger.success('Exercise weights loaded from cloud'); return snapshot.val(); }
   return null;
 }
+// ── Custom categories ───────────────────────────────────────────────────
+export async function saveCustomCategoriesToCloud(categories) {
+  const auth = getAuthInstance();
+  const database = getDatabaseInstance();
+  if (!auth?.currentUser || !database) return false;
 
+  await set(ref(database, `users/${auth.currentUser.uid}/customCategories`), categories || []);
+  logger.success('Custom categories synced to cloud');
+  return true;
+}
+
+export async function loadCustomCategoriesFromCloud() {
+  const auth = getAuthInstance();
+  const database = getDatabaseInstance();
+  if (!auth?.currentUser || !database) return null;
+
+  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/customCategories`));
+  if (snapshot.exists()) { logger.success('Custom categories loaded from cloud'); return snapshot.val(); }
+  return null;
+}
