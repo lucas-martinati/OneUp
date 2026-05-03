@@ -358,7 +358,24 @@
     ],
     "validated": "{{exercise}} Validé !"
   },
+  "customCategories": {
+    "colorLabel": "Couleur de la catégorie",
+    "create": "Créer une catégorie",
+    "deleteConfirm": "Supprimer {{name}} ?",
+    "deleteSelectExercises": "Sélectionnez les exercices à conserver",
+    "deleteSummaryKeep": "{{keep}} exercice(s) déplacé(s), {{del}} supprimé(s)",
+    "deleteSummaryAll": "{{count}} exercice(s) seront supprimés",
+    "deleteTitle": "Supprimer la catégorie ?",
+    "empty": "Aucune catégorie personnalisée.",
+    "errorNameRequired": "Le nom est requis",
+    "limitReached": "Limite de {{count}} catégories atteinte.",
+    "nameLabel": "Nom de la catégorie",
+    "namePlaceholder": "Ex: Haut du corps, Étirements...",
+    "preview": "Aperçu",
+    "title": "Catégories Personnalisées"
+  },
   "customExercises": {
+    "categoryLabel": "Catégorie",
     "colorLabel": "Couleur de thème",
     "create": "Créer un exercice",
     "deleteConfirm": "Supprimer {{name}} ?",

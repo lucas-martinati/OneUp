@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  X, Plus, Settings2, Trash2, Edit2, Swords, Star,
-  Dumbbell, Activity, CUSTOM_EXERCISE_ICONS
-} from '../../utils/icons';
+import { X, Plus, Settings2, Trash2, Edit2, Swords, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, ChevronDown, Check, Target } from '../../utils/icons';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { Z_INDEX } from '../../utils/zIndex';
+import { MAX_EXERCISES_PER_CATEGORY } from '../../hooks/useCustomExercises';
 
 const PRESET_COLORS = [
   '#ef4444', '#f97316', '#f59e0b', '#10b981', 
@@ -13,9 +11,21 @@ const PRESET_COLORS = [
   '#f43f5e', '#6366f1', '#14b8a6', '#64748b'
 ];
 
-export function CustomExercisesModal({ onClose, customExercisesHook, computedStats }) {
+export function CustomExercisesModal({ onClose, customExercisesHook, customCategoriesHook, computedStats, categoryId }) {
   const { t, i18n } = useTranslation();
-  const { customExercises, saveCustomExercise, updateCustomExercise, deleteCustomExercise, maxCustomExercises } = customExercisesHook;
+  const { 
+    customExercises: allCustomExercises, 
+    saveCustomExercise, 
+    updateCustomExercise, 
+    deleteCustomExercise, 
+    maxCustomExercises 
+  } = customExercisesHook;
+
+  const { customCategories } = customCategoriesHook;
+
+  // Filter exercises by categoryId — if categoryId is provided, show only that category's exercises
+  const effectiveCatId = categoryId || 'custom';
+  const customExercises = allCustomExercises.filter(ex => (ex.categoryId || 'custom') === effectiveCatId);
   
   const [editingId, setEditingId] = useState(null);
   const [confirmDeleteEx, setConfirmDeleteEx] = useState(null);
@@ -25,6 +35,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
   const [color, setColor] = useState('#8b5cf6');
   const [type, setType] = useState('counter');
   const [multiplier, setMultiplier] = useState(1);
+  const [selectedCatId, setSelectedCatId] = useState(effectiveCatId);
   const [error, setError] = useState('');
 
   // Handle back button to switch view or close modal
@@ -36,6 +47,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
     if (view === 'create') {
       setView('list');
       setEditingId(null);
+      setSelectedCatId(effectiveCatId);
       return true;
     }
     onClose();
@@ -51,14 +63,26 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
     // Auto-generate gradient based on selected color (simplified)
     const gradient = [color, color]; // We could use a slightly darker shade for the first one
     
+    // Check capacity if moving to a different category
+    const targetCatCount = allCustomExercises.filter(ex => (ex.categoryId || 'custom') === selectedCatId).length;
+    
     if (editingId) {
+      const currentEx = allCustomExercises.find(ex => ex.id === editingId);
+      const isChangingCat = (currentEx.categoryId || 'custom') !== selectedCatId;
+      
+      if (isChangingCat && targetCatCount >= MAX_EXERCISES_PER_CATEGORY) {
+        setError(t('customExercises.errorLimit'));
+        return;
+      }
+
       updateCustomExercise(editingId, {
         label: label.trim(),
         icon: iconName,
         color,
         type,
         gradient,
-        multiplier
+        multiplier,
+        categoryId: selectedCatId
       });
       setLabel('');
       setIconName('Star');
@@ -69,13 +93,19 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
       setEditingId(null);
       setView('list');
     } else {
+      if (targetCatCount >= MAX_EXERCISES_PER_CATEGORY) {
+        setError(t('customExercises.errorLimit'));
+        return;
+      }
+
       const success = saveCustomExercise({
         label: label.trim(),
         icon: iconName,
         color,
         type,
         gradient,
-        multiplier
+        multiplier,
+        categoryId: selectedCatId
       });
 
       if (success) {
@@ -97,8 +127,9 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
     setLabel(ex.label);
     setIconName(ex.icon);
     setColor(ex.color);
-    setType(ex.type || 'counter');
-    setMultiplier(ex.multiplier || 1.0);
+    setType(ex.type);
+    setMultiplier(ex.multiplier);
+    setSelectedCatId(ex.categoryId || 'custom');
     setError('');
     setView('create');
   };
@@ -121,7 +152,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
         }}><X size={20} /></button>
       </div>
 
-      <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ flex: 1, overflow: confirmDeleteEx ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         
         {view === 'list' && (
           <div style={{ width: '100%', maxWidth: '400px' }}>
@@ -203,7 +234,46 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
         )}
 
         {view === 'create' && (
-          <div className="fade-in" style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div className="fade-in" style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* CATEGORY SELECTOR */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                {t('customExercises.categoryLabel')}
+              </label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {[
+                  { id: 'custom', name: customCategories.find(c => c.id === 'custom')?.name || t('common.custom'), color: customCategories.find(c => c.id === 'custom')?.color || '#34d399' },
+                  ...customCategories.filter(c => c.id !== 'custom')
+                ].map(cat => {
+                  const isSelected = selectedCatId === cat.id;
+                  const catExs = allCustomExercises.filter(ex => 
+                    (ex.categoryId || 'custom') === cat.id && ex.id !== editingId
+                  );
+                  const isFull = catExs.length >= MAX_EXERCISES_PER_CATEGORY;
+                  
+                  return (
+                    <button
+                      key={cat.id}
+                      disabled={isFull}
+                      onClick={() => setSelectedCatId(cat.id)}
+                      style={{
+                        padding: '8px 12px', borderRadius: '12px',
+                        background: isSelected ? `${cat.color}20` : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${isSelected ? cat.color : isFull ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)'}`,
+                        color: isSelected ? cat.color : isFull ? 'var(--text-secondary)' : 'white',
+                        fontSize: '0.85rem', fontWeight: '700', cursor: isFull ? 'default' : 'pointer',
+                        display: 'flex', alignItems: 'center', gap: '6px', opacity: isFull ? 0.4 : 1,
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: cat.color }} />
+                      {cat.name}
+                      {isSelected && <Check size={14} />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             {/* NAME */}
             <div style={{ position: 'relative' }}>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
@@ -358,10 +428,13 @@ export function CustomExercisesModal({ onClose, customExercisesHook, computedSta
       {/* Delete Confirmation Modal */}
       {confirmDeleteEx && (
         <div className="fade-in" style={{
-          position: 'absolute', inset: 0, background: 'rgba(5,5,5,0.92)',
-          zIndex: 1010, display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', padding: 'var(--spacing-md)'
-        }}>
+          position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.94)',
+          zIndex: Z_INDEX.DELETE_MODAL, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', padding: 'var(--spacing-md)',
+          overflow: 'hidden', touchAction: 'none', overscrollBehavior: 'none'
+        }}
+          onTouchMove={(e) => e.preventDefault()}
+        >
           <div style={{
             background: 'var(--surface-primary)', border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-lg)', padding: '24px', width: '100%', maxWidth: '340px',

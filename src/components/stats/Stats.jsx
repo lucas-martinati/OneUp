@@ -15,7 +15,7 @@ import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
 import { useCardio } from '../../features/cardio/useCardio';
-import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '../../config/categories';
+import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../../config/categories';
 
 // Lazy load Recharts components
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
@@ -33,7 +33,9 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
     const { isPro, hadPro } = useSubscription();
     // For stats viewing, previously having pro is enough
     const hasProAccess = isPro || hadPro;
-    const { exercisesByCategory: exercisesList } = useExercises();
+    const { exercisesByCategory: exercisesList, customCategories, exercisesByUserCategory } = useExercises();
+    const fullCategoryOrder = buildFullCategoryOrder(customCategories);
+    const fullCategoryColors = buildFullCategoryColors(customCategories);
     const { getConfig } = useExerciseConfig();
     const { t, i18n } = useTranslation();
     const [chartsReady, setChartsReady] = useState(false);
@@ -41,6 +43,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
     const [activeCategories, setActiveCategories] = useState(() => {
         if (initialCategory === 'global') return ['standard', 'weights', 'custom'];
         if (initialCategory === 'cardio') return ['cardio'];
+        if (isUserCategory(initialCategory)) return [initialCategory];
         return [initialCategory || 'standard'];
     });
     const [showFilters, setShowFilters] = useState(false);
@@ -85,8 +88,14 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         if (activeCategories.includes('weights')) list.push(...(exercisesList.weights || []).map(e => ({ ...e, categoryId: CATEGORIES.WEIGHTS })));
         if (activeCategories.includes('custom')) list.push(...(exercisesList.custom || []).map(e => ({ ...e, categoryId: CATEGORIES.CUSTOM })));
         if (activeCategories.includes('cardio')) list.push(...(exercisesList.cardio || []).map(e => ({ ...e, categoryId: CATEGORIES.CARDIO })));
+        // User-created categories
+        customCategories.forEach(cat => {
+            if (activeCategories.includes(cat.id)) {
+                list.push(...(exercisesByUserCategory[cat.id] || []).map(e => ({ ...e, categoryId: cat.id })));
+            }
+        });
         return list;
-    }, [activeCategories, exercisesList]);
+    }, [activeCategories, exercisesList, customCategories, exercisesByUserCategory]);
 
     const computedStats = React.useMemo(() => {
         if (canAccessFeature(FEATURES.MERGED_STATS, { isPro: hasProAccess }) && activeCategories.length === 4) return globalStats;
@@ -201,14 +210,22 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         border: '1px solid rgba(255,255,255,0.06)', borderRadius: 'var(--radius-lg)',
                         display: 'flex', flexWrap: 'wrap', gap: '8px'
                     }}>
-                        {CATEGORY_ORDER.map(categoryId => {
-                            const config = {
-                                [CATEGORIES.CARDIO]: { id: 'cardio', label: t('common.cardio'), locked: false },
-                                [CATEGORIES.BODYWEIGHT]: { id: 'standard', label: t('common.bodyweight'), locked: false },
-                                [CATEGORIES.WEIGHTS]: { id: 'weights', label: t('common.weights'), locked: !canAccessFeature(FEATURES.WEIGHTS, { isPro: hasProAccess }) },
-                                [CATEGORIES.CUSTOM]: { id: 'custom', label: t('common.custom'), locked: !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro: hasProAccess }) }
-                            }[categoryId];
-                            const cat = { ...config, color: CATEGORY_COLORS[categoryId] };
+                        {fullCategoryOrder.map(categoryId => {
+                            let config;
+                            if (isUserCategory(categoryId)) {
+                                const catDef = customCategories.find(c => c.id === categoryId);
+                                if (!catDef) return null;
+                                config = { id: categoryId, label: catDef.name, locked: !canAccessFeature(FEATURES.CUSTOM_CATEGORIES, { isPro: hasProAccess }) };
+                            } else {
+                                config = {
+                                    [CATEGORIES.CARDIO]: { id: 'cardio', label: t('common.cardio'), locked: false },
+                                    [CATEGORIES.BODYWEIGHT]: { id: 'standard', label: t('common.bodyweight'), locked: false },
+                                    [CATEGORIES.WEIGHTS]: { id: 'weights', label: t('common.weights'), locked: !canAccessFeature(FEATURES.WEIGHTS, { isPro: hasProAccess }) },
+                                    [CATEGORIES.CUSTOM]: { id: 'custom', label: customCategories.find(c => c.id === 'custom')?.name || t('common.custom'), locked: !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro: hasProAccess }) }
+                                }[categoryId];
+                            }
+                            if (!config) return null;
+                            const cat = { ...config, color: fullCategoryColors[categoryId] };
                             return (
                                 <label key={cat.id} style={{
                                 display: 'flex', alignItems: 'center', gap: '6px',
@@ -580,15 +597,22 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 }}>
                     <h3 style={sectionTitleStyle}>{t('stats.byExercise')}</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {CATEGORY_ORDER.map((catId, index) => {
+                        {fullCategoryOrder.map((catId, index) => {
                             const catStats = enrichedExerciseStats.filter(ex => ex.categoryId === catId);
                             if (catStats.length === 0) return null;
-                            const catLabel = {
-                                [CATEGORIES.BODYWEIGHT]: t('common.bodyweight'),
-                                [CATEGORIES.WEIGHTS]: t('common.weights'),
-                                [CATEGORIES.CUSTOM]: t('common.custom'),
-                                [CATEGORIES.CARDIO]: t('common.cardio')
-                            }[catId];
+                            let catLabel;
+                            if (isUserCategory(catId)) {
+                                const catDef = customCategories.find(c => c.id === catId);
+                                catLabel = catDef?.name || catId;
+                            } else {
+                                catLabel = {
+                                    [CATEGORIES.BODYWEIGHT]: t('common.bodyweight'),
+                                    [CATEGORIES.WEIGHTS]: t('common.weights'),
+                                    [CATEGORIES.CUSTOM]: t('common.custom'),
+                                    [CATEGORIES.CARDIO]: t('common.cardio')
+                                }[catId];
+                            }
+                            const catColor = fullCategoryColors[catId] || '#8b5cf6';
                             
                             return (
                                 <React.Fragment key={catId}>
@@ -597,10 +621,10 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                         marginTop: index > 0 ? '12px' : '4px', marginBottom: '4px',
                                         opacity: 0.8
                                     }}>
-                                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: CATEGORY_COLORS[catId], textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: catColor, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                             {catLabel}
                                         </div>
-                                        <div style={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${CATEGORY_COLORS[catId]}40, transparent)` }}></div>
+                                        <div style={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${catColor}40, transparent)` }}></div>
                                     </div>
                                     {catStats.map(ex => {
                                         return (

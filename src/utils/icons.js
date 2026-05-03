@@ -6,7 +6,7 @@ import {
   // UI icons
   X, Check, CheckCheck, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Plus, Minus, 
   Play, Pause, RotateCcw, Save, Trash2, Edit3, Edit2,
-  FolderOpen, GripVertical, Shuffle, ArrowLeft, ArrowRight,
+  FolderOpen, FolderPlus, GripVertical, Shuffle, ArrowLeft, ArrowRight,
   // Social & gamification
   Trophy, Medal, Award, Star, Crown,
   Users, User, LogIn, UserPlus, Shield, HeartHandshake,
@@ -35,7 +35,7 @@ export {
   Flame, Activity,
   X, Check, CheckCheck, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Plus, Minus,
   Play, Pause, RotateCcw, Save, Trash2, Edit2,
-  FolderOpen, GripVertical, Shuffle, ArrowLeft, ArrowRight,
+  FolderOpen, FolderPlus, GripVertical, Shuffle, ArrowLeft, ArrowRight,
   Trophy, Medal, Award, Star, Crown,
   Users, User, LogIn, UserPlus, Shield, HeartHandshake,
   LogOut, Hash, Swords,

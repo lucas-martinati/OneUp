@@ -321,8 +321,8 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
             {/* Leave Clan Confirmation */}
             {showLeaveConfirm && (
                 <div className="fade-in" style={{
-                    position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.85)',
-                    zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
+                    zIndex: Z_INDEX.DELETE_MODAL, display: 'flex', alignItems: 'center', justifyContent: 'center',
                     padding: 'var(--spacing-lg)'
                 }}>
                     <div className="scale-in" style={{

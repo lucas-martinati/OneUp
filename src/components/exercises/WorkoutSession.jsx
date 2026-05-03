@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle } from '../../utils/icons';
 import { EXERCISES, getDailyGoal } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
-import { CATEGORIES, CATEGORY_ORDER } from '../../config/categories';
+import { CATEGORIES, CATEGORY_ORDER, buildFullCategoryOrder, isUserCategory, buildFullCategoryColors } from '../../config/categories';
 import { Counter } from './Counter';
 import { Z_INDEX } from '../../utils/zIndex';
 import { Timer } from './Timer';
@@ -12,7 +12,7 @@ import { useBackHandler } from '../../hooks/useBackHandler';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { DynamicIcon } from '../../utils/icons';
 import { addSession, getSessionHistory } from '../../features/share/services/sessionHistoryService';
-import { getExerciseLabel, getExerciseCategory, isCustomExercise } from '../../utils/exerciseLabel';
+import { getExerciseLabel, isCustomExercise } from '../../utils/exerciseLabel';
 import { useProgressContext } from '../../contexts/ProgressContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
@@ -85,7 +85,13 @@ export function WorkoutSession({
     const { getExerciseCount, updateExerciseCount, completions, computedStats } = useProgressContext();
     const { getConfig } = useExerciseConfig();
     const { isPro } = useSubscription();
-    const { routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, customExercises } = useExercises();
+    const { 
+        routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines, 
+        customExercises, customCategories,
+        exercisesByUserCategory, defaultCustomExercises
+    } = useExercises();
+    const fullCategoryOrder = useMemo(() => buildFullCategoryOrder(customCategories), [customCategories]);
+    const fullCategoryColors = useMemo(() => buildFullCategoryColors(customCategories), [customCategories]);
     const { t } = useTranslation();
     const [phase, setPhase] = useState('config'); // 'config' | 'running' | 'done'
     const [queue, setQueue] = useState([]); // ordered list of exercise IDs
@@ -128,12 +134,13 @@ export function WorkoutSession({
     }, true);
 
     const localExercises = useMemo(() => {
-        const currentCatKey = CATEGORY_ORDER[activeSlide];
+        const currentCatKey = fullCategoryOrder[activeSlide];
         if (currentCatKey === CATEGORIES.BODYWEIGHT) return EXERCISES;
         if (currentCatKey === CATEGORIES.WEIGHTS) return WEIGHT_EXERCISES;
-        if (currentCatKey === CATEGORIES.CUSTOM) return customExercises;
+        if (currentCatKey === CATEGORIES.CUSTOM) return defaultCustomExercises;
+        if (isUserCategory(currentCatKey)) return exercisesByUserCategory[currentCatKey] || [];
         return EXERCISES;
-    }, [activeSlide, customExercises]);
+    }, [activeSlide, defaultCustomExercises, fullCategoryOrder, exercisesByUserCategory]);
 
     const allExercises = useMemo(() => {
         return [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises];
@@ -158,10 +165,19 @@ export function WorkoutSession({
             let category = 'custom';
             if (EXERCISES.some(e => e.id === ex.id)) category = 'bodyweight';
             else if (WEIGHT_EXERCISES.some(e => e.id === ex.id)) category = 'weights';
+            else {
+                // Check user categories
+                for (const catId in exercisesByUserCategory) {
+                    if (exercisesByUserCategory[catId].some(e => e.id === ex.id)) {
+                        category = catId;
+                        break;
+                    }
+                }
+            }
 
             return { ...ex, goal, count, done, category };
         });
-    }, [availableExercises, dayNumber, today, completions, getExerciseCount, getConfig]);
+    }, [availableExercises, dayNumber, today, completions, getExerciseCount, getConfig, exercisesByUserCategory]);
 
     // Toggle in queue
     const toggleExercise = (id) => {
@@ -169,12 +185,26 @@ export function WorkoutSession({
             if (prev.includes(id)) return prev.filter(x => x !== id);
 
             // Check pro access for non-bodyweight exercises
-            const cat = getExerciseCategory(id);
-            if (cat !== 'bodyweight' && !isPro) return prev;
+            const isBW = EXERCISES.some(e => e.id === id);
+            if (!isBW && !isPro) return prev;
+
+            // Determine category for different-dashboard detection
+            let cat = 'custom';
+            if (isBW) cat = 'bodyweight';
+            else if (WEIGHT_EXERCISES.some(e => e.id === id)) cat = 'weights';
+            else {
+                for (const catId in exercisesByUserCategory) {
+                    if (exercisesByUserCategory[catId].some(e => e.id === id)) {
+                        cat = catId;
+                        break;
+                    }
+                }
+            }
 
             // If exercise is from a different category, auto-enable showAll
-            const currentCatKey = CATEGORY_ORDER[activeSlide];
-            const currentCat = currentCatKey === CATEGORIES.BODYWEIGHT ? 'bodyweight' : currentCatKey === CATEGORIES.WEIGHTS ? 'weights' : 'custom';
+            const currentCatKey = fullCategoryOrder[activeSlide];
+            const currentCat = currentCatKey === CATEGORIES.BODYWEIGHT ? 'bodyweight' : (currentCatKey === CATEGORIES.WEIGHTS ? 'weights' : (currentCatKey === CATEGORIES.CUSTOM ? 'custom' : currentCatKey));
+            
             if (cat !== currentCat && canMixDashboards && !showAll) {
                 setShowAll(true);
             }
@@ -208,7 +238,7 @@ export function WorkoutSession({
         const weightIds = WEIGHT_EXERCISES.map(e => e.id);
         
         // Get current category based on activeSlide
-        const currentCat = CATEGORY_ORDER[activeSlide];
+        const currentCat = fullCategoryOrder[activeSlide];
         
         // Filter exercises: keep only accessible ones (bodyweight always, weights/custom only if Pro)
         const routineExercises = routine.exerciseIds
@@ -240,6 +270,10 @@ export function WorkoutSession({
         const categoriesInRoutine = new Set(validExercises.map(ex => {
             if (weightIds.includes(ex.id)) return CATEGORIES.WEIGHTS;
             if (isCustomExercise(ex.id)) return CATEGORIES.CUSTOM;
+            // Check user categories
+            for (const catId in exercisesByUserCategory) {
+                if (exercisesByUserCategory[catId].some(e => e.id === ex.id)) return catId;
+            }
             return CATEGORIES.BODYWEIGHT;
         }));
         
@@ -398,7 +432,7 @@ export function WorkoutSession({
             date: new Date().toISOString(),
             duration,
             name: detectedName,
-            type: CATEGORY_ORDER[activeSlide] === CATEGORIES.WEIGHTS ? 'weights' : CATEGORY_ORDER[activeSlide] === CATEGORIES.CUSTOM ? 'custom' : CATEGORY_ORDER[activeSlide] === CATEGORIES.CARDIO ? 'cardio' : 'bodyweight',
+            type: fullCategoryOrder[activeSlide] === CATEGORIES.WEIGHTS ? 'weights' : fullCategoryOrder[activeSlide] === CATEGORIES.CUSTOM ? 'custom' : isUserCategory(fullCategoryOrder[activeSlide]) ? fullCategoryOrder[activeSlide] : (fullCategoryOrder[activeSlide] === CATEGORIES.CARDIO ? 'cardio' : 'bodyweight'),
             exercises: completedExercises,
         });
         setSavedSession(session);
@@ -704,19 +738,28 @@ export function WorkoutSession({
                     {/* Exercise grid */}
                     {showAll ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                            {['bodyweight', 'weights', 'custom'].map(cat => {
-                                const catExercises = exerciseInfo.filter(ex => ex.category === cat);
+                            {fullCategoryOrder.map(catId => {
+                                if (catId === CATEGORIES.CARDIO) return null;
+                                const catExercises = exerciseInfo.filter(ex => ex.category === (catId === CATEGORIES.CUSTOM ? 'custom' : catId === CATEGORIES.BODYWEIGHT ? 'bodyweight' : catId === CATEGORIES.WEIGHTS ? 'weights' : catId));
                                 if (catExercises.length === 0) return null;
-                                const catTitle = cat === 'bodyweight' 
-                                    ? t('common.bodyweight')
-                                    : cat === 'weights' 
-                                        ? t('common.weights')
-                                        : t('workout.custom');
+                                
+                                let catTitle;
+                                if (isUserCategory(catId)) {
+                                    const catDef = customCategories.find(c => c.id === catId);
+                                    catTitle = catDef?.name || catId;
+                                } else {
+                                    const catDef = customCategories.find(c => c.id === catId);
+                                    catTitle = catDef?.name || (catId === CATEGORIES.BODYWEIGHT 
+                                        ? t('common.bodyweight')
+                                        : catId === CATEGORIES.WEIGHTS 
+                                            ? t('common.weights')
+                                            : t('workout.custom'));
+                                }
 
                                 return (
-                                    <div key={cat} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <div key={catId} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                         <div style={{
-                                            fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)',
+                                            fontSize: '0.8rem', fontWeight: '700', color: fullCategoryColors[catId] || 'var(--text-secondary)',
                                             textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '4px'
                                         }}>
                                             {catTitle}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Settings, Star } from '../../utils/icons';
+import { Settings, Star, FolderPlus } from '../../utils/icons';
 import { UI_ICONS, DynamicIcon } from '../../utils/icons';
 import { getDailyGoal } from '../../config/exercises';
 import { formatTime, parseTimestamp } from '../../utils/dateUtils';
@@ -12,7 +12,7 @@ import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
 export const DashboardSlide = React.memo(({
     isFuture, effectiveStart, dayNumber, today, getExerciseCount, completions, computedStats,
     isCounterTransitioning, prevDayNumber, pauseCloudSync, setShowCounter,
-    activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, categoryColor, onManageCustom, isDay100, getConfig
+    activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, categoryColor, onManageCustom, onManageCategories, isDay100, getConfig
 }) => {
     const { t, i18n } = useTranslation();
     const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
@@ -86,6 +86,11 @@ export const DashboardSlide = React.memo(({
                     {onManageCustom && (
                         <button onClick={onManageCustom} aria-label="Manage custom exercises" style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', opacity: 0.6, padding: '4px' }}>
                             <Settings size={14} />
+                        </button>
+                    )}
+                    {onManageCategories && (
+                        <button onClick={onManageCategories} aria-label="Manage categories" style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', opacity: 0.6, padding: '4px' }}>
+                            <FolderPlus size={14} />
                         </button>
                     )}
                 </div>

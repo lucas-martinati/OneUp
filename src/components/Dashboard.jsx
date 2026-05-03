@@ -9,7 +9,7 @@ import { DashboardActions } from './dashboard/DashboardActions';
 import { Day100Overlay, Day100HackModal, Day100UnhackAnimation, useDay100Logic } from '../features/events/Day100Event';
 import { useAchievementToast } from '../hooks/useAchievementToast';
 import { ProPaywall } from './dashboard/ProPaywall';
-import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '../config/categories';
+import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../config/categories';
 import { useBackHandler } from '../hooks/useBackHandler';
 import { useModalManager } from '../hooks/useModalManager';
 import { useNewAchievement } from '../hooks/useNewAchievement';
@@ -31,6 +31,7 @@ const Achievements = lazy(() => import('./feedback/Achievements').then(m => ({ d
 const Timer = lazy(() => import('./exercises/Timer').then(m => ({ default: m.Timer })));
 const WorkoutSession = lazy(() => import('./exercises/WorkoutSession').then(m => ({ default: m.WorkoutSession })));
 const CustomExercisesModal = lazy(() => import('./exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
+const CategoryManagerModal = lazy(() => import('./exercises/CategoryManagerModal').then(m => ({ default: m.CategoryManagerModal })));
 const CardioModule = lazy(() => import('../features/cardio/CardioModule').then(m => ({ default: m.CardioModule })));
 
 import { setSoundSettingsGetter } from '../utils/soundManager';
@@ -56,14 +57,17 @@ export function Dashboard() {
     const { isPro } = useSubscription();
     const {
         customExercises, customExercisesMap,
-        customExercisesHook
+        customExercisesHook,
+        customCategories, customCategoriesHook,
+        defaultCustomExercises,
+        exercisesByUserCategory, exercisesMapByUserCategory
     } = useExercises();
 
     const [today, setToday] = useState(getLocalDateStr(new Date()));
     const { showAnnouncement, announcement, dismissAnnouncement } = useAnnouncement();
 
     const { modals, openModal, closeModal, anyModalOpen, handleBack } = useModalManager(
-        { calendar: false, stats: false, settings: false, counter: false, leaderboard: false, achievements: false, session: false, customExercises: false },
+        { calendar: false, stats: false, settings: false, counter: false, leaderboard: false, achievements: false, session: false, customExercises: false, categoryManager: false },
         ['counter', 'session']
     );
     const setShowCalendar = (v) => v ? openModal('calendar') : closeModal('calendar');
@@ -74,6 +78,7 @@ export function Dashboard() {
     const setShowAchievements = (v) => v ? openModal('achievements') : closeModal('achievements');
     const setShowSession = (v) => v ? openModal('session') : closeModal('session');
     const setShowCustomExercisesModal = (v) => v ? openModal('customExercises') : closeModal('customExercises');
+    const setShowCategoryManager = (v) => v ? openModal('categoryManager') : closeModal('categoryManager');
     const showCalendar = modals.calendar;
     const showStats = modals.stats;
     const showSettings = modals.settings;
@@ -82,12 +87,17 @@ export function Dashboard() {
     const showAchievements = modals.achievements;
     const showSession = modals.session;
     const showCustomExercisesModal = modals.customExercises;
-    const defaultSlide = CATEGORY_ORDER.indexOf(CATEGORIES.BODYWEIGHT);
+    const showCategoryManager = modals.categoryManager;
+    const fullCategoryOrder = useMemo(() => buildFullCategoryOrder(customCategories), [customCategories]);
+    const fullCategoryColors = useMemo(() => buildFullCategoryColors(customCategories), [customCategories]);
+    const defaultSlide = fullCategoryOrder.indexOf(CATEGORIES.BODYWEIGHT);
     const [activeSlide, setActiveSlide] = useState(defaultSlide);
 
     const [classicSelected, setClassicSelected] = useState('pushups');
     const [weightsSelected, setWeightsSelected] = useState('biceps_curl');
     const [customSelected, setCustomSelected] = useState(customExercises[0]?.id || 'custom_placeholder');
+    const [userCatSelected, setUserCatSelected] = useState({});
+    const [customExModalCatId, setCustomExModalCatId] = useState(null);
     const [isCounterTransitioning, setIsCounterTransitioning] = useState(false);
     const [prevDayNumber, setPrevDayNumber] = useState(null);
     const [showDayConfetti, setShowDayConfetti] = useState(false);
@@ -104,16 +114,13 @@ export function Dashboard() {
         }
     }, [defaultSlide]);
 
-    // Non-pro users can use Cardio and Bodyweight freely.
-    // If they scroll to a Pro-only slide (Weights, Custom), fall back to Bodyweight.
-    const bodyweightSlide = CATEGORY_ORDER.indexOf(CATEGORIES.BODYWEIGHT);
-    const currentCatFree = CATEGORY_ORDER[activeSlide] === CATEGORIES.CARDIO || CATEGORY_ORDER[activeSlide] === CATEGORIES.BODYWEIGHT;
-    const effectiveSlide = isPro ? activeSlide : (currentCatFree ? activeSlide : bodyweightSlide);
-    const currentCatKey = CATEGORY_ORDER[effectiveSlide];
+    const effectiveSlide = activeSlide;
+    const currentCatKey = fullCategoryOrder[effectiveSlide];
     
     const globalSelectedId = currentCatKey === CATEGORIES.CARDIO ? 'cardio' 
         : currentCatKey === CATEGORIES.BODYWEIGHT ? classicSelected 
         : currentCatKey === CATEGORIES.WEIGHTS ? weightsSelected 
+        : isUserCategory(currentCatKey) ? (userCatSelected[currentCatKey] || (exercisesByUserCategory[currentCatKey]?.[0]?.id || null))
         : customSelected;
         
     const selectedExercise = useMemo(() => {
@@ -190,6 +197,7 @@ export function Dashboard() {
         if (currentCatKey === CATEGORIES.BODYWEIGHT) setClassicSelected(id);
         else if (currentCatKey === CATEGORIES.WEIGHTS) setWeightsSelected(id);
         else if (currentCatKey === CATEGORIES.CUSTOM) setCustomSelected(id);
+        else if (isUserCategory(currentCatKey)) setUserCatSelected(prev => ({ ...prev, [currentCatKey]: id }));
     };
 
     useEffect(() => {
@@ -273,7 +281,7 @@ export function Dashboard() {
                             const slideHeight = e.target.clientHeight;
                             if (slideHeight === 0) return;
                             const newSlide = Math.round(e.target.scrollTop / slideHeight);
-                            if (newSlide >= 0 && newSlide <= 3) {
+                            if (newSlide >= 0 && newSlide < fullCategoryOrder.length) {
                                 window.__latestSlide = newSlide;
                                 document.getElementById('active-slide-updater').click();
                             }
@@ -292,7 +300,7 @@ export function Dashboard() {
                             }
                         }}></button>
 
-                        {CATEGORY_ORDER.map(catKey => {
+                        {fullCategoryOrder.map(catKey => {
                             if (catKey === CATEGORIES.CARDIO) {
                                 return (
                                     <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
@@ -347,25 +355,63 @@ export function Dashboard() {
                             }
 
                             if (catKey === CATEGORIES.CUSTOM) {
+                                const catDef = customCategories.find(c => c.id === catKey);
+                                const title = catDef?.name || t('common.custom');
+                                const color = catDef?.color || CATEGORY_COLORS[CATEGORIES.CUSTOM];
+
                                 return (
                                     <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                                         {canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) ? (
                                             <DashboardSlide
-                                                title={t('common.custom')}
-                                                categoryColor={CATEGORY_COLORS[CATEGORIES.CUSTOM]}
+                                                title={title}
+                                                categoryColor={color}
                                                 isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
                                                 getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
                                                 isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
                                                 pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
-                                                activeExerciseId={customExercisesMap[customSelected] ? customSelected : (customExercises[0]?.id || null)} onSelectExercise={handleSelectExercise}
-                                                exercisesList={customExercises} exercisesMap={customExercisesMap}
-                                                onManageCustom={() => { setShowCustomExercisesModal(true); pauseCloudSync?.(); }}
+                                                activeExerciseId={customExercisesMap[customSelected] ? customSelected : (defaultCustomExercises[0]?.id || null)} onSelectExercise={handleSelectExercise}
+                                                exercisesList={defaultCustomExercises} exercisesMap={customExercisesMap}
+                                                onManageCustom={() => { setCustomExModalCatId(null); setShowCustomExercisesModal(true); pauseCloudSync?.(); }}
+                                                onManageCategories={() => { setShowCategoryManager(true); }}
                                                 isDay100={hackActive}
                                                 getConfig={getConfig}
                                             />
                                         ) : (
                                             <ProPaywall
-                                                title={t('common.custom')}
+                                                title={title}
+                                                onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
+                                            />
+                                        )}
+                                    </div>
+                                );
+                            }
+
+                            // User-created custom categories
+                            if (isUserCategory(catKey)) {
+                                const catDef = customCategories.find(c => c.id === catKey);
+                                if (!catDef) return null;
+                                const catExercises = exercisesByUserCategory[catKey] || [];
+                                const catExMap = exercisesMapByUserCategory[catKey] || {};
+                                const selId = userCatSelected[catKey] || catExercises[0]?.id || null;
+                                return (
+                                    <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                                        {canAccessFeature(FEATURES.CUSTOM_CATEGORIES, { isPro }) ? (
+                                            <DashboardSlide
+                                                title={catDef.name}
+                                                categoryColor={catDef.color}
+                                                isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
+                                                getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
+                                                isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
+                                                pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
+                                                activeExerciseId={selId} onSelectExercise={handleSelectExercise}
+                                                exercisesList={catExercises} exercisesMap={catExMap}
+                                                onManageCustom={() => { setCustomExModalCatId(catKey); setShowCustomExercisesModal(true); pauseCloudSync?.(); }}
+                                                isDay100={hackActive}
+                                                getConfig={getConfig}
+                                            />
+                                        ) : (
+                                            <ProPaywall
+                                                title={catDef.name}
                                                 onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
                                             />
                                         )}
@@ -382,15 +428,21 @@ export function Dashboard() {
                         display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10,
                         pointerEvents: 'none'
                     }}>
-                        {CATEGORY_ORDER.map((_, i) => (
-                            <div key={i} style={{
-                                width: '4px', height: activeSlide === i ? '24px' : '6px',
-                                borderRadius: '4px',
-                                background: activeSlide === i ? 'var(--text-primary)' : 'var(--text-secondary)',
-                                opacity: activeSlide === i ? 1 : 0.4,
-                                transition: 'all 0.3s ease'
-                            }} />
-                        ))}
+                        {fullCategoryOrder.map((catId, i) => {
+                            const isUserCat = isUserCategory(catId);
+                            const isActive = activeSlide === i;
+                            return (
+                                <div key={i} style={{
+                                    width: '4px', height: isActive ? '24px' : '6px',
+                                    borderRadius: '4px',
+                                    background: isActive 
+                                        ? (isUserCat ? '#94a3b8' : 'var(--text-primary)') 
+                                        : (isUserCat ? '#475569' : 'var(--text-secondary)'),
+                                    opacity: isActive ? 1 : 0.4,
+                                    transition: 'all 0.3s ease'
+                                }} />
+                            );
+                        })}
                     </div>
                 </main>
 
@@ -399,7 +451,7 @@ export function Dashboard() {
                     setShowSession={setShowSession}
                     pauseCloudSync={pauseCloudSync}
                     selectedExercise={selectedExercise}
-                    activeCategoryColor={CATEGORY_COLORS[CATEGORY_ORDER[effectiveSlide]]}
+                    activeCategoryColor={fullCategoryColors[fullCategoryOrder[effectiveSlide]]}
                     isDay100={hackActive}
                 />
 
@@ -409,13 +461,15 @@ export function Dashboard() {
                             <Calendar
                                 startDate={startDate}
                                 completions={completions}
-                                exercises={{
-                                    [CATEGORIES.BODYWEIGHT]: EXERCISES,
-                                    [CATEGORIES.WEIGHTS]: WEIGHT_EXERCISES,
-                                    [CATEGORIES.CARDIO]: CARDIO_EXERCISES,
-                                    [CATEGORIES.CUSTOM]: customExercises
-                                }[CATEGORY_ORDER[effectiveSlide]]}
-                                isCustom={CATEGORY_ORDER[effectiveSlide] === CATEGORIES.CUSTOM}
+                                exercises={isUserCategory(currentCatKey)
+                                    ? (exercisesByUserCategory[currentCatKey] || [])
+                                    : {
+                                        [CATEGORIES.BODYWEIGHT]: EXERCISES,
+                                        [CATEGORIES.WEIGHTS]: WEIGHT_EXERCISES,
+                                        [CATEGORIES.CARDIO]: CARDIO_EXERCISES,
+                                        [CATEGORIES.CUSTOM]: defaultCustomExercises
+                                    }[currentCatKey]}
+                                isCustom={currentCatKey === CATEGORIES.CUSTOM || isUserCategory(currentCatKey)}
                                 getDayNumber={getDayNumber}
                                 onClose={() => setShowCalendar(false)}
                                 settings={settings}
@@ -426,12 +480,12 @@ export function Dashboard() {
                     {showStats && (
                         <Suspense fallback={null}>
                             <Stats
-                                initialCategory={{
+                                initialCategory={isUserCategory(currentCatKey) ? currentCatKey : {
                                     [CATEGORIES.BODYWEIGHT]: 'standard',
                                     [CATEGORIES.WEIGHTS]: 'weights',
                                     [CATEGORIES.CARDIO]: 'cardio',
                                     [CATEGORIES.CUSTOM]: 'custom'
-                                }[CATEGORY_ORDER[effectiveSlide]]}
+                                }[currentCatKey]}
                                 onClose={() => setShowStats(false)}
                                 onOpenAchievements={() => { setShowAchievements(true); }}
                                 onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
@@ -509,12 +563,24 @@ export function Dashboard() {
                             />
                         </Suspense>
                     )}
-                    {showCustomExercisesModal && (
+                    {showCustomExercisesModal && isPro && (
                         <Suspense fallback={null}>
                             <CustomExercisesModal
-                                onClose={() => { setShowCustomExercisesModal(false); resumeCloudSync?.(); }}
+                                onClose={() => { setShowCustomExercisesModal(false); setCustomExModalCatId(null); resumeCloudSync?.(); }}
                                 customExercisesHook={customExercisesHook}
+                                customCategoriesHook={customCategoriesHook}
                                 computedStats={computedStats}
+                                categoryId={customExModalCatId}
+                            />
+                        </Suspense>
+                    )}
+                    {showCategoryManager && isPro && (
+                        <Suspense fallback={null}>
+                            <CategoryManagerModal
+                                onClose={() => setShowCategoryManager(false)}
+                                customCategoriesHook={customCategoriesHook}
+                                exercisesByUserCategory={exercisesByUserCategory}
+                                defaultCustomExercises={defaultCustomExercises}
                             />
                         </Suspense>
                     )}

@@ -38,12 +38,16 @@ function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
   );
 }
 
-import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '../../../config/categories';
+import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../../../config/categories';
+import { useExercises } from '../../../contexts/ExercisesContext';
 
 export function ShareOptions({ options, toggleOption, setOption, toggleCategory, clearBackgroundImage, originalImage, openCropModal, mode = 'session', isPro = false, sessionData }) {
   const { t } = useTranslation();
   const isGlobal = mode === 'global';
-  const selectedCategories = options.statsCategories || CATEGORY_ORDER;
+  const { customCategories } = useExercises();
+  const fullCategoryOrder = buildFullCategoryOrder(customCategories);
+  const fullCategoryColors = buildFullCategoryColors(customCategories);
+  const selectedCategories = options.statsCategories || fullCategoryOrder;
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
@@ -192,25 +196,33 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
             {t('share.categoryFilter')}
           </div>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {CATEGORY_ORDER.map(catKey => {
+            {fullCategoryOrder.map(catKey => {
               const isSelected = selectedCategories.includes(catKey);
-              const color = CATEGORY_COLORS[catKey];
+              const catColor = fullCategoryColors[catKey];
+              let label;
+              if (isUserCategory(catKey)) {
+                const catDef = customCategories.find(c => c.id === catKey);
+                label = catDef?.name || catKey;
+              } else {
+                const catDef = customCategories.find(c => c.id === catKey);
+                label = catDef?.name || t(`common.${catKey}`);
+              }
               return (
                 <button
                   key={catKey}
                   onClick={() => toggleCategory(catKey)}
                   style={{
                     padding: '6px 12px', borderRadius: '8px',
-                    border: isSelected ? `1px solid ${color}40` : '1px solid rgba(255,255,255,0.06)',
+                    border: isSelected ? `1px solid ${catColor}40` : '1px solid rgba(255,255,255,0.06)',
                     background: isSelected
-                      ? `${color}18`
+                      ? `${catColor}18`
                       : 'rgba(255,255,255,0.03)',
-                    color: isSelected ? color : 'var(--text-secondary)',
+                    color: isSelected ? catColor : 'var(--text-secondary)',
                     fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer',
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  {t(`common.${catKey}`)}
+                  {label}
                 </button>
               );
             })}

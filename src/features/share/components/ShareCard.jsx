@@ -6,12 +6,13 @@ import {
 } from '../../../utils/icons';
 import { getExerciseLabel, getExerciseColor, isCustomExercise } from '../../../utils/exerciseLabel';
 import { sumExerciseReps } from '../../../utils/stats';
-import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '../../../config/categories';
+import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../../../config/categories';
 import { EXERCISES, CARDIO_EXERCISES, getDailyGoal } from '../../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../../config/weights';
 import { formatDuration, getLocalDateStr, getCurrentWeekNumber } from '../../../utils/dateUtils';
 import { useExerciseConfig } from '../../../hooks/useExerciseConfig';
 import { DifficultyBadge } from '../../../components/ui/DifficultyBadge';
+import { useExercises } from '../../../contexts/ExercisesContext';
 
 function formatDate(dateStr, lang) {
   try {
@@ -151,6 +152,9 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const { getConfig } = useExerciseConfig();
+  const { customCategories } = useExercises();
+  const fullCategoryOrder = buildFullCategoryOrder(customCategories);
+  const fullCategoryColors = buildFullCategoryColors(customCategories);
 
   const weightIds = WEIGHT_EXERCISES.map(e => e.id);
   const isGlobal = mode === 'global';
@@ -253,18 +257,26 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
     : allExercises;
   const weightExercises = allExercises.filter(isWeightEx);
   const customExercises = allExercises.filter(isCustomEx);
-  const categories = CATEGORY_ORDER.map(key => {
+  const categories = fullCategoryOrder.map(key => {
     let exList = [];
     if (key === CATEGORIES.BODYWEIGHT) exList = bodyweightExercises;
     if (key === CATEGORIES.WEIGHTS) exList = weightExercises;
     if (key === CATEGORIES.CUSTOM) exList = customExercises;
     if (key === CATEGORIES.CARDIO) exList = allExercises.filter(isCardioEx);
     if (exList.length === 0) return null;
+    let label;
+    if (isUserCategory(key)) {
+      const catDef = customCategories.find(c => c.id === key);
+      label = catDef?.name || key;
+    } else {
+      const catDef = customCategories.find(c => c.id === key);
+      label = catDef?.name || t(`common.${key}`);
+    }
     return { 
       key, 
       exercises: exList, 
-      label: t(`common.${key}`), 
-      color: CATEGORY_COLORS[key] 
+      label, 
+      color: fullCategoryColors[key] 
     };
   }).filter(Boolean);
   const showSections = showCategoriesSeparately && categories.length > 1;
@@ -290,7 +302,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
   const dailyWeight = shouldSeparateDaily ? filteredDailyExercises.filter(isWeightEx) : [];
   const dailyCustom = shouldSeparateDaily ? filteredDailyExercises.filter(isCustomEx) : [];
   const dailyCardio = shouldSeparateDaily ? filteredDailyExercises.filter(isCardioEx) : [];
-  const dailyCategories = CATEGORY_ORDER.map(key => {
+  const dailyCategories = fullCategoryOrder.map(key => {
     let exList = [];
     let isPerfect = false;
     if (key === CATEGORIES.BODYWEIGHT) { exList = dailyBodyweight; isPerfect = dailyStandardDone; }
@@ -299,11 +311,19 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
     if (key === CATEGORIES.CARDIO) exList = dailyCardio;
     
     if (exList.length === 0) return null;
+    let label;
+    if (isUserCategory(key)) {
+      const catDef = customCategories.find(c => c.id === key);
+      label = catDef?.name || key;
+    } else {
+      const catDef = customCategories.find(c => c.id === key);
+      label = catDef?.name || t(`common.${key}`);
+    }
     return {
       key,
       exercises: exList,
-      label: t(`common.${key}`),
-      color: CATEGORY_COLORS[key],
+      label,
+      color: fullCategoryColors[key],
       isPerfect
     };
   }).filter(Boolean);
@@ -511,28 +531,38 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
                 {t('share.globalStats')}
               </div>
               {(() => {
-                const catsRaw = options.statsCategories || CATEGORY_ORDER;
-                const cats = CATEGORY_ORDER.filter(c => catsRaw.includes(c));
-                const allSelected = cats.length === 4;
+                const catsRaw = options.statsCategories || fullCategoryOrder;
+                const cats = fullCategoryOrder.filter(c => catsRaw.includes(c));
+                const allSelected = cats.length === fullCategoryOrder.length;
                 if (allSelected) return null;
-                const catColors = CATEGORY_COLORS;
                 return (
                   <div style={{
                     display: 'flex', flexWrap: 'wrap', marginTop: '6px',
                   }}>
-                    {cats.map(cat => (
-                      <span key={cat} style={{
-                        fontSize: '0.5rem', fontWeight: 700,
-                        color: catColors[cat] || '#818cf8',
-                        padding: '2px 6px', borderRadius: '4px',
-                        background: `${catColors[cat] || '#818cf8'}15`,
-                        textTransform: 'uppercase', letterSpacing: '0.5px',
-                        marginRight: '6px', marginBottom: '4px', display: 'inline-block',
-                        whiteSpace: 'nowrap'
-                      }}>
-                        {t(`common.${cat}`, cat)}
-                      </span>
-                    ))}
+                    {cats.map(cat => {
+                      const catColor = fullCategoryColors[cat] || '#818cf8';
+                      let label;
+                      if (isUserCategory(cat)) {
+                        const catDef = customCategories.find(c => c.id === cat);
+                        label = catDef?.name || cat;
+                      } else {
+                        const catDef = customCategories.find(c => c.id === cat);
+                        label = catDef?.name || t(`common.${cat}`, cat);
+                      }
+                      return (
+                        <span key={cat} style={{
+                          fontSize: '0.5rem', fontWeight: 700,
+                          color: catColor,
+                          padding: '2px 6px', borderRadius: '4px',
+                          background: `${catColor}15`,
+                          textTransform: 'uppercase', letterSpacing: '0.5px',
+                          marginRight: '6px', marginBottom: '4px', display: 'inline-block',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {label}
+                        </span>
+                      );
+                    })}
                   </div>
                 );
               })()}

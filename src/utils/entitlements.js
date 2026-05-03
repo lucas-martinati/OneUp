@@ -10,6 +10,7 @@ export const FEATURES = Object.freeze({
   WEIGHTS: 'weights',
   CUSTOM_EXERCISES: 'customExercises',
   CUSTOM_PROGRAMS: 'customPrograms',
+  CUSTOM_CATEGORIES: 'customCategories',
   INTER_DASHBOARD: 'interDashboard',
   MERGED_STATS: 'mergedStats',
 });
@@ -18,6 +19,7 @@ const FEATURE_TIER = Object.freeze({
   [FEATURES.WEIGHTS]: 'pro',
   [FEATURES.CUSTOM_EXERCISES]: 'pro',
   [FEATURES.CUSTOM_PROGRAMS]: 'pro',
+  [FEATURES.CUSTOM_CATEGORIES]: 'pro',
   [FEATURES.INTER_DASHBOARD]: 'pro',
   [FEATURES.MERGED_STATS]: 'pro',
 });

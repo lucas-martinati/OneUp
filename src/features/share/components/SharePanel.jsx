@@ -38,7 +38,7 @@ export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 
         cardio: CATEGORIES.CARDIO,
     };
     const mapped = activeCategories
-        .map(cat => categoryMap[cat])
+        .map(cat => categoryMap[cat] || cat) // Pass through user category IDs (cat_xxx) as-is
         .filter(Boolean);
     return mapped.length > 0 ? mapped : [CATEGORIES.BODYWEIGHT, CATEGORIES.WEIGHTS, CATEGORIES.CUSTOM, CATEGORIES.CARDIO];
   }, [activeCategories]);

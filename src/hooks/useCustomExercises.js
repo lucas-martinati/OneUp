@@ -3,7 +3,12 @@ import { useLocalStorageScoped } from './useLocalStorageScoped';
 import { serverTimestamp } from '../services/firebase';
 
 const STORAGE_KEY = 'oneup_custom_exercises';
-const MAX_CUSTOM_EXERCISES = 10;
+
+/**
+ * Maximum number of custom exercises allowed PER CATEGORY.
+ * Change this value to adjust the limit for all categories.
+ */
+export const MAX_EXERCISES_PER_CATEGORY = 12;
 
 /**
  * Hook for managing personal custom exercises (Pro feature).
@@ -16,7 +21,9 @@ export function useCustomExercises(userId) {
     if (!exerciseData?.label?.trim()) return null;
 
     setCustomExercises((prev) => {
-      if (prev.length >= MAX_CUSTOM_EXERCISES) return prev;
+      const catId = exerciseData.categoryId || 'custom';
+      const countInCategory = prev.filter(ex => (ex.categoryId || 'custom') === catId).length;
+      if (countInCategory >= MAX_EXERCISES_PER_CATEGORY) return prev;
       
       const newExercise = {
         id: `custom_${crypto.randomUUID()}`,
@@ -26,6 +33,7 @@ export function useCustomExercises(userId) {
         type: exerciseData.type || 'counter',
         gradient: exerciseData.gradient || ['#7c3aed', '#8b5cf6'],
         multiplier: parseFloat(exerciseData.multiplier) || 1.0,
+        categoryId: exerciseData.categoryId || 'custom',
         createdAt: serverTimestamp(),
       };
       return [...prev, newExercise];
@@ -57,6 +65,6 @@ export function useCustomExercises(userId) {
     updateCustomExercise,
     deleteCustomExercise,
     setCustomExercisesFromCloud,
-    maxCustomExercises: MAX_CUSTOM_EXERCISES,
+    maxCustomExercises: MAX_EXERCISES_PER_CATEGORY,
   };
 }

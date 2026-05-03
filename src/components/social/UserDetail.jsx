@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Zap, Star } from '../../utils/icons';
 import { Avatar } from '../ui/Avatar';
+import { Z_INDEX } from '../../utils/zIndex';
 import { DifficultyBadge } from '../ui/DifficultyBadge';
 import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
@@ -125,10 +126,10 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
             onClick={onClose}
             className="fade-in"
             style={{
-                position: 'absolute', inset: 0,
-                background: 'rgba(0,0,0,0.7)',
+                position: 'fixed', inset: 0,
+                background: 'rgba(0,0,0,0.82)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: 'var(--spacing-md)', zIndex: 120
+                padding: 'var(--spacing-md)', zIndex: Z_INDEX.MODAL + 10
             }}
         >
             <div
