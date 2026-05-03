@@ -5,8 +5,9 @@ import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-l
 import 'leaflet/dist/leaflet.css';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { X, Clock, Target, TrendingUp, Footprints } from '../../utils/icons';
+import { MAP_TILES } from '../../config/mapTiles';
 
-const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+const TILE_URL = MAP_TILES.dark;
 
 // Fit bounds component to handle zoom correctly
 function FullscreenFitBounds({ gpsTrack }) {

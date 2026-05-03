@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-leaflet';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { CardioFullscreenMap } from './CardioFullscreenMap';
+import { MAP_TILES } from '../../config/mapTiles';
 import 'leaflet/dist/leaflet.css';
 
 // Dark map tiles (CartoDB Dark Matter)
-const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+const TILE_URL = MAP_TILES.dark;
 
 // Fit bounds component - zoom in to fill the container
 function FitBounds({ gpsTrack }) {

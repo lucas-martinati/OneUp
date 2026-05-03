@@ -6,6 +6,17 @@ import { VitePWA } from 'vite-plugin-pwa'
 // https://vitejs.dev/config/
 export default defineConfig({
   base: process.env.GITHUB_PAGES ? '/OneUp/' : '/',
+  resolve: {
+    alias: {
+      '@components': '/src/components',
+      '@config': '/src/config',
+      '@contexts': '/src/contexts',
+      '@hooks': '/src/hooks',
+      '@features': '/src/features',
+      '@services': '/src/services',
+      '@utils': '/src/utils',
+    }
+  },
   plugins: [
     react(),
     VitePWA({

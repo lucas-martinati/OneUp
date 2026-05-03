@@ -1,5 +1,5 @@
 {
-  "ignore": ["functions/index.js", "src/services/*Service.js"],
+  "ignore": ["functions/index.js", "src/components/index.js", "src/components/*/index.js", "src/services/*Service.js"],
   "ignoreDependencies": [
     "@capacitor/android",
     "@capacitor/assets",
