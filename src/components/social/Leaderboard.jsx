@@ -133,7 +133,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     }, [loadData, communityContext]);
 
     const sorted = useMemo(() => {
-        const filteredEntries = domain === 'weights' ? entries.filter(e => e.isPro) : entries;
+        const filteredEntries = domain === 'weights' ? entries.filter(e => e.isPro || e.weightsTotalReps > 0) : entries;
         return [...filteredEntries].sort((a, b) => {
             if (activeTab === 'global_combined') return ((b.totalReps || 0) + (b.weightsTotalReps || 0)) - ((a.totalReps || 0) + (a.weightsTotalReps || 0));
             if (activeTab === 'bodyweight') return (b.totalReps || 0) - (a.totalReps || 0);

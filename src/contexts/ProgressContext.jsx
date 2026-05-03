@@ -11,6 +11,7 @@ import { WEIGHT_EXERCISES } from '../config/weights';
 import { createLogger } from '../utils/logger';
 import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';
 import { updateWidgetData } from '../utils/widgetBridge';
+import { loadCachedEntitlements } from '../utils/entitlements';
 
 const logger = createLogger('Progress');
 const ProgressContext = createContext(null);
@@ -108,6 +109,8 @@ export function ProgressProvider({ children }) {
         ? todayStr
         : computedStats.sortedDates.slice().reverse().find(d => isDayDoneFromCompletions(completions, d)) || null;
 
+      const { isPro, isSupporter } = loadCachedEntitlements();
+
       await cloudSync.publishToLeaderboard({
         pseudo: settings.leaderboardPseudo || auth.user?.displayName || 'Anonyme',
         totalReps: classicTotalReps + computedCardioReps,
@@ -119,6 +122,8 @@ export function ProgressProvider({ children }) {
         isPublic: !!settings.leaderboardEnabled,
         lastActiveDay,
         isPerfectToday: computedStats.isPerfectToday,
+        isPro,
+        isSupporter,
       });
     } catch (e) {
       logger.error('Leaderboard publish failed:', e);
