@@ -92,6 +92,25 @@ export function Dashboard() {
     const fullCategoryColors = useMemo(() => buildFullCategoryColors(customCategories), [customCategories]);
     const defaultSlide = fullCategoryOrder.indexOf(CATEGORIES.BODYWEIGHT);
     const [activeSlide, setActiveSlide] = useState(defaultSlide);
+    const [renderedSlides, setRenderedSlides] = useState(() => new Set([defaultSlide]));
+
+    useEffect(() => {
+        setRenderedSlides(prev => {
+            if (prev.has(activeSlide)) return prev;
+            return new Set(prev).add(activeSlide);
+        });
+    }, [activeSlide]);
+
+    // Defer mounting off-screen slides to improve initial load performance
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setRenderedSlides(prev => {
+                if (prev.size === fullCategoryOrder.length) return prev;
+                return new Set(fullCategoryOrder.map((_, i) => i));
+            });
+        }, 1500);
+        return () => clearTimeout(timer);
+    }, [fullCategoryOrder.length]);
 
     const [classicSelected, setClassicSelected] = useState(EXERCISES[0]?.id);
     const [weightsSelected, setWeightsSelected] = useState(WEIGHT_EXERCISES[0]?.id);
@@ -307,7 +326,12 @@ export function Dashboard() {
                             }
                         }}></button>
 
-                        {fullCategoryOrder.map(catKey => {
+                        {fullCategoryOrder.map((catKey, i) => {
+                            const isRendered = renderedSlides.has(i);
+                            if (!isRendered) {
+                                return <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}></div>;
+                            }
+
                             if (catKey === CATEGORIES.CARDIO) {
                                 return (
                                     <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
