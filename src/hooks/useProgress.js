@@ -12,10 +12,9 @@ const NOTIFICATION_ID = 1;
 
 let localNotificationsPromise = null;
 
-async function getLocalNotifications() {
+async function getLocalNotificationsModule() {
   if (!localNotificationsPromise) {
-    localNotificationsPromise = import('@capacitor/local-notifications')
-      .then(({ LocalNotifications }) => LocalNotifications);
+    localNotificationsPromise = import('@capacitor/local-notifications');
   }
 
   return localNotificationsPromise;
@@ -356,7 +355,7 @@ export function useProgress(userId) {
 
   const scheduleNotification = async (settings) => {
     try {
-      const LocalNotifications = await getLocalNotifications();
+      const { LocalNotifications } = await getLocalNotificationsModule();
       const permission = await LocalNotifications.checkPermissions();
 
       if (permission.display === 'granted') {
@@ -416,7 +415,7 @@ export function useProgress(userId) {
 
   const requestNotificationPermission = async () => {
     try {
-      const LocalNotifications = await getLocalNotifications();
+      const { LocalNotifications } = await getLocalNotificationsModule();
       const permission = await LocalNotifications.checkPermissions();
       if (permission.display === 'prompt' || permission.display === 'prompt-with-rationale') {
         await LocalNotifications.requestPermissions();

@@ -20,7 +20,7 @@ function webStorageKey(key) {
 
 async function getNativePreferences() {
   if (!nativePreferencesPromise) {
-    nativePreferencesPromise = import('@capacitor/preferences').then(({ Preferences }) => Preferences);
+    nativePreferencesPromise = import('@capacitor/preferences');
   }
 
   return nativePreferencesPromise;
@@ -29,7 +29,7 @@ async function getNativePreferences() {
 export const Preferences = {
   async get({ key }) {
     if (isNativePlatform()) {
-      const NativePreferences = await getNativePreferences();
+      const { Preferences: NativePreferences } = await getNativePreferences();
       return NativePreferences.get({ key });
     }
 
@@ -38,7 +38,7 @@ export const Preferences = {
 
   async set({ key, value }) {
     if (isNativePlatform()) {
-      const NativePreferences = await getNativePreferences();
+      const { Preferences: NativePreferences } = await getNativePreferences();
       return NativePreferences.set({ key, value });
     }
 
@@ -48,7 +48,7 @@ export const Preferences = {
 
   async remove({ key }) {
     if (isNativePlatform()) {
-      const NativePreferences = await getNativePreferences();
+      const { Preferences: NativePreferences } = await getNativePreferences();
       return NativePreferences.remove({ key });
     }
 

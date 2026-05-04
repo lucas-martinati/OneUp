@@ -12,24 +12,21 @@ import { isAndroidPlatform } from './platform';
  * SharedPreferences file: "CapacitorStorage" (default for @capacitor/preferences)
  */
 
-let widgetBridgePromise = null;
-let nativePreferencesPromise = null;
+let coreModulePromise = null;
+let preferencesModulePromise = null;
 
-async function getWidgetBridge() {
-  if (!widgetBridgePromise) {
-    widgetBridgePromise = import('@capacitor/core')
-      .then(({ registerPlugin }) => registerPlugin('WidgetBridge'));
+async function getCoreModule() {
+  if (!coreModulePromise) {
+    coreModulePromise = import('@capacitor/core');
   }
-
-  return widgetBridgePromise;
+  return coreModulePromise;
 }
 
-async function getNativePreferences() {
-  if (!nativePreferencesPromise) {
-    nativePreferencesPromise = import('@capacitor/preferences').then(({ Preferences }) => Preferences);
+async function getPreferencesModule() {
+  if (!preferencesModulePromise) {
+    preferencesModulePromise = import('@capacitor/preferences');
   }
-
-  return nativePreferencesPromise;
+  return preferencesModulePromise;
 }
 
 /**
@@ -79,10 +76,11 @@ export async function updateWidgetData(computedStats, completions) {
   if (!isAndroidPlatform()) return;
 
   try {
-    const [Preferences, WidgetBridge] = await Promise.all([
-      getNativePreferences(),
-      getWidgetBridge(),
+    const [{ registerPlugin }, { Preferences }] = await Promise.all([
+      getCoreModule(),
+      getPreferencesModule(),
     ]);
+    const WidgetBridge = registerPlugin('WidgetBridge');
 
     const widgetData = {
       // Show the ongoing streak even if today isn't done yet.
