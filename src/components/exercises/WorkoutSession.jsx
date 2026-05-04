@@ -4,10 +4,9 @@ import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle
 import { EXERCISES, getDailyGoal } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { CATEGORIES, CATEGORY_ORDER, buildFullCategoryOrder, isUserCategory, buildFullCategoryColors } from '../../config/categories';
-import { Counter } from './Counter';
 import { Z_INDEX } from '../../utils/zIndex';
-import { Timer } from './Timer';
 import { SessionSummary } from './SessionSummary';
+import { ExercisePanel } from './ExercisePanel';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { DynamicIcon } from '../../utils/icons';
@@ -391,6 +390,20 @@ export function WorkoutSession({
     const currentGoal = currentEx ? getDailyGoal(currentEx, dayNumber, currentDifficulty) : 0;
     const currentCount = currentEx ? getExerciseCount(today, currentExId) : 0;
     const currentDone = currentEx ? (completions[today]?.[currentExId]?.isCompleted || currentCount >= currentGoal) : false;
+    const hasNextAvailableExercise = useMemo(() => {
+        return queue.some((id, idx) => {
+            if (idx === currentIdx) return false;
+
+            const ex = allExercises.find(item => item.id === id);
+            if (!ex) return false;
+
+            const difficulty = getConfig(ex.id, today).difficulty;
+            const goal = getDailyGoal(ex, dayNumber, difficulty);
+            const count = getExerciseCount(today, id);
+
+            return !(completions[today]?.[id]?.isCompleted || count >= goal);
+        });
+    }, [allExercises, completions, currentIdx, dayNumber, getConfig, getExerciseCount, queue, today]);
 
     useEffect(() => {
         if (phase !== 'running' || !currentEx || hasAnimatedFirstPanel) return undefined;
@@ -912,14 +925,11 @@ export function WorkoutSession({
         );
     }
 
-    // ── RUNNING PHASE = render Counter or Timer ─────────────────
+    // ── RUNNING PHASE = render current exercise panel ─────────────────
     if (phase === 'running' && currentEx) {
-        const isTimer = currentEx.type === 'timer';
-        const Component = isTimer ? Timer : Counter;
-
         return (
             <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
-                <Component
+                <ExercisePanel
                     exerciseConfig={currentEx}
                     onClose={onClose}
                     dailyGoal={currentGoal}
@@ -930,7 +940,7 @@ export function WorkoutSession({
                     }}
                     isCompleted={currentDone}
                     dayNumber={dayNumber}
-                    onNext={advanceToNext}
+                    onNext={hasNextAvailableExercise ? advanceToNext : undefined}
                     isSession={true}
                     fadeIn={!hasAnimatedFirstPanel}
                 />

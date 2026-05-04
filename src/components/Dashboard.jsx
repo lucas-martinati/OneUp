@@ -25,10 +25,9 @@ import { useExerciseConfig } from '../hooks/useExerciseConfig';
 const Calendar = lazy(() => import('./stats/Calendar').then(m => ({ default: m.Calendar })));
 const Stats = lazy(() => import('./stats/Stats').then(m => ({ default: m.Stats })));
 const Settings = lazy(() => import('./settings/Settings').then(m => ({ default: m.Settings })));
-const Counter = lazy(() => import('./exercises/Counter').then(m => ({ default: m.Counter })));
+const ExercisePanel = lazy(() => import('./exercises/ExercisePanel').then(m => ({ default: m.ExercisePanel })));
 const Leaderboard = lazy(() => import('./social/Leaderboard').then(m => ({ default: m.Leaderboard })));
 const Achievements = lazy(() => import('./feedback/Achievements').then(m => ({ default: m.Achievements })));
-const Timer = lazy(() => import('./exercises/Timer').then(m => ({ default: m.Timer })));
 const WorkoutSession = lazy(() => import('./exercises/WorkoutSession').then(m => ({ default: m.WorkoutSession })));
 const CustomExercisesModal = lazy(() => import('./exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
 const CategoryManagerModal = lazy(() => import('./exercises/CategoryManagerModal').then(m => ({ default: m.CategoryManagerModal })));
@@ -95,9 +94,11 @@ export function Dashboard() {
     const [renderedSlides, setRenderedSlides] = useState(() => new Set([defaultSlide]));
 
     useEffect(() => {
-        setRenderedSlides(prev => {
-            if (prev.has(activeSlide)) return prev;
-            return new Set(prev).add(activeSlide);
+        queueMicrotask(() => {
+            setRenderedSlides(prev => {
+                if (prev.has(activeSlide)) return prev;
+                return new Set(prev).add(activeSlide);
+            });
         });
     }, [activeSlide]);
 
@@ -110,7 +111,7 @@ export function Dashboard() {
             });
         }, 1500);
         return () => clearTimeout(timer);
-    }, [fullCategoryOrder.length]);
+    }, [fullCategoryOrder]);
 
     const [classicSelected, setClassicSelected] = useState(EXERCISES[0]?.id);
     const [weightsSelected, setWeightsSelected] = useState(WEIGHT_EXERCISES[0]?.id);
@@ -530,25 +531,9 @@ export function Dashboard() {
                             />
                         </Suspense>
                     )}
-                    {showCounter && selectedExercise?.type !== 'timer' && (
+                    {showCounter && selectedExercise && (
                         <Suspense fallback={null}>
-                            <Counter
-                                exerciseConfig={selectedExercise}
-                                onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
-                                dailyGoal={dailyGoal}
-                                currentCount={currentCount}
-                                onUpdateCount={(newCount) => {
-                                    const { weight } = getConfig(selectedExerciseId);
-                                    updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight, currentDiff);
-                                }}
-                                isCompleted={isExerciseDone}
-                                dayNumber={dayNumber}
-                            />
-                        </Suspense>
-                    )}
-                    {showCounter && selectedExercise?.type === 'timer' && (
-                        <Suspense fallback={null}>
-                            <Timer
+                            <ExercisePanel
                                 exerciseConfig={selectedExercise}
                                 onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
                                 dailyGoal={dailyGoal}
