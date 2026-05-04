@@ -166,6 +166,10 @@ walkDir(SRC_DIR, (filepath) => {
 console.log(`Static keys found in code : ${usedStaticKeys.size}`);
 console.log(`Dynamic prefixes found    : ${usedPrefixes.size}\n`);
 
+// ─── 2.5 Manual Whitelists ────────────────────────────────────────────────────
+usedPrefixes.add('sessionNames');
+usedPrefixes.add('shareTexts');
+
 // ─── 3. Special Case: Badge Definitions ──────────────────────────────────────
 const badgeDefPath = path.join(SRC_DIR, 'config/badgeDefinitions.js');
 if (fs.existsSync(badgeDefPath)) {

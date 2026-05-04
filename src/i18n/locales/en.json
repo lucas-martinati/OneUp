@@ -682,5 +682,40 @@
     "launch_other": "Start ({{count}} exercises)",
     "sessionDone": "Session Complete!",
     "shuffle": "Shuffle"
+  },
+  "sessionNames": {
+    "light": {
+      "morning": ["Easy morning warmup ☀️", "Quick morning routine", "Light morning session"],
+      "noon": ["Quick midday break", "Lunchtime express 🕐", "Short noon session"],
+      "evening": ["Light evening session", "Evening routine 🌙", "Quick wind-down"],
+      "night": ["Late night session 🌃", "Night training", "Midnight workout"]
+    },
+    "moderate": {
+      "morning": ["Solid morning session 💪", "Morning training", "AM workout"],
+      "noon": ["Midday training", "Lunch break workout", "Productive noon session"],
+      "evening": ["Evening workout 🔥", "After-work session", "PM training"],
+      "night": ["Solid night session", "Productive night 🌙", "Late training"]
+    },
+    "intense": {
+      "morning": ["Intense morning grind 🔥", "Champion's wake-up", "Morning power session 💪"],
+      "noon": ["Intense midday blast 💥", "Heavy noon session", "Explosive lunch workout"],
+      "evening": ["Heavy evening session 💪", "Intense PM workout", "Tough training"],
+      "night": ["Warrior's night 🌙", "Intense night session", "Night grind 🔥"]
+    },
+    "epic": {
+      "morning": ["Legendary morning session 🏆", "Epic dawn workout", "Morning beast mode 🔥"],
+      "noon": ["Historic noon session 🔥", "Monster midday workout", "Insane lunch grind 💥"],
+      "evening": ["Epic evening session 🏆", "Monumental workout", "Evening beast mode 🔥"],
+      "night": ["Legendary night 🌙🔥", "Epic night session", "Night champion mode 🏆"]
+    },
+    "perfectDay": ["Perfect day 🌟", "Flawless ✨", "All exercises done 💎", "100% complete 🏆", "Nothing left 👑"]
+  },
+  "shareTexts": {
+    "light": ["Quick session done on OneUp! 💪", "Light training complete 🏃", "A few reps in, staying consistent! 🎯"],
+    "moderate": ["Good session done on OneUp! 💪🔥", "Solid training today!", "Making progress, one day at a time 🚀"],
+    "intense": ["Huge session on OneUp! 🔥💪", "Intense workout done! Getting stronger 💥", "Massive effort today! 🏆"],
+    "epic": ["Legendary session on OneUp! 🏆🔥", "Epic performance complete! 💪", "Insane workout crushed! 🚀💥"],
+    "perfectDay": ["Perfect day on OneUp! All exercises done 🌟", "Flawless day! Nothing can stop me 💎✨", "100% completed today on OneUp! 👑🔥"],
+    "global": ["Check out my stats on OneUp! 🔥", "My OneUp progress speaks for itself 📈", "Always reaching higher with OneUp! 🚀"]
   }
 }

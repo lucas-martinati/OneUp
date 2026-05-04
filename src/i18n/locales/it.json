@@ -682,5 +682,134 @@
     "namePlaceholder": "Es: Parte superiore, Stretching...",
     "preview": "Anteprima",
     "title": "Categorie Personalizzate"
+  },
+  "sessionNames": {
+    "light": {
+      "morning": [
+        "Risveglio dolce ☀️",
+        "Breve routine mattutina",
+        "Riscaldamento mattutino"
+      ],
+      "noon": [
+        "Pausa attiva",
+        "Sessione express 🕐",
+        "Breve allenamento a pranzo"
+      ],
+      "evening": [
+        "Sessione serale leggera",
+        "Routine serale 🌙",
+        "Rilassamento attivo"
+      ],
+      "night": [
+        "Sessione notturna 🌃",
+        "Allenamento notturno",
+        "Sessione tarda"
+      ]
+    },
+    "moderate": {
+      "morning": [
+        "Buona sessione mattutina 💪",
+        "Allenamento mattutino",
+        "Risveglio muscolare"
+      ],
+      "noon": [
+        "Sessione di mezzogiorno",
+        "Allenamento in pausa",
+        "Sessione produttiva"
+      ],
+      "evening": [
+        "Sessione serale 🔥",
+        "Allenamento serale",
+        "Sessione post-lavoro"
+      ],
+      "night": [
+        "Sessione notturna solida",
+        "Notte produttiva 🌙",
+        "Allenamento tardivo"
+      ]
+    },
+    "intense": {
+      "morning": [
+        "Grande sessione mattutina 🔥",
+        "Risveglio da campione",
+        "Grind mattutino 💪"
+      ],
+      "noon": [
+        "Sessione intensa a pranzo 💥",
+        "Grande allenamento a pranzo",
+        "Mezzogiorno esplosivo"
+      ],
+      "evening": [
+        "Grande sessione serale 💪",
+        "Serata intensa",
+        "Allenamento tosto"
+      ],
+      "night": [
+        "Notte da guerriero 🌙",
+        "Sessione notturna intensa",
+        "Sforzo notturno 🔥"
+      ]
+    },
+    "epic": {
+      "morning": [
+        "Sessione leggendaria mattutina 🏆",
+        "Mattinata epica",
+        "Performance mattutina 🔥"
+      ],
+      "noon": [
+        "Mezzogiorno storico 🔥",
+        "Sessione mostruosa a pranzo",
+        "Mezzogiorno di follia 💥"
+      ],
+      "evening": [
+        "Serata epica 🏆",
+        "Sessione monumentale",
+        "Performance serale 🔥"
+      ],
+      "night": [
+        "Notte leggendaria 🌙🔥",
+        "Sessione epica notturna",
+        "Notte da campione 🏆"
+      ]
+    },
+    "perfectDay": [
+      "Giornata perfetta 🌟",
+      "Senza errori ✨",
+      "Perfect day 💎",
+      "100% completato 🏆",
+      "Nient'altro da aggiungere 👑"
+    ]
+  },
+  "shareTexts": {
+    "light": [
+      "Breve sessione completata su OneUp! 💪",
+      "Allenamento veloce terminato 🏃",
+      "Un po' di ripetizioni, manteniamo la costanza! 🎯"
+    ],
+    "moderate": [
+      "Buona sessione terminata su OneUp! 💪🔥",
+      "Allenamento solido oggi!",
+      "Progrediamo, un giorno alla volta 🚀"
+    ],
+    "intense": [
+      "Grande sessione su OneUp! 🔥💪",
+      "Sessione intensa terminata! Sempre più forti 💥",
+      "Sforzo enorme oggi! 🏆"
+    ],
+    "epic": [
+      "Sessione leggendaria su OneUp! 🏆🔥",
+      "Performance enorme terminata! 💪",
+      "Sessione pazzesca completata! 🚀💥"
+    ],
+    "perfectDay": [
+      "Giornata perfetta su OneUp! Tutti gli esercizi validati 🌟",
+      "Perfect day! Niente mi ferma 💎✨",
+      "100% completato oggi su OneUp! 👑🔥"
+    ],
+    "global": [
+      "Scopri le mie statistiche su OneUp! 🔥",
+      "I miei progressi su OneUp parlano da soli 📈",
+      "Sempre più in alto con OneUp! 🚀"
+    ]
   }
 }

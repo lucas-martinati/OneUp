@@ -682,5 +682,134 @@
     "namePlaceholder": "Z.B. Oberkörper, Dehnen...",
     "preview": "Vorschau",
     "title": "Benutzerdefinierte Kategorien"
+  },
+  "sessionNames": {
+    "light": {
+      "morning": [
+        "Sanftes Aufwachen ☀️",
+        "Kurze Morgenroutine",
+        "Morgen-Aufwärmen"
+      ],
+      "noon": [
+        "Aktive Pause",
+        "Express-Session 🕐",
+        "Kurzes Mittagstraining"
+      ],
+      "evening": [
+        "Leichte Abendsession",
+        "Abendroutine 🌙",
+        "Aktive Entspannung"
+      ],
+      "night": [
+        "Nacht-Session 🌃",
+        "Nachttraining",
+        "Späte Session"
+      ]
+    },
+    "moderate": {
+      "morning": [
+        "Gute Morgensession 💪",
+        "Morgentraining",
+        "Muskelerwachen"
+      ],
+      "noon": [
+        "Mittagssession",
+        "Pausentraining",
+        "Produktive Session"
+      ],
+      "evening": [
+        "Abendsession 🔥",
+        "Abendtraining",
+        "After-Work Session"
+      ],
+      "night": [
+        "Solide Nacht-Session",
+        "Produktive Nacht 🌙",
+        "Spätes Training"
+      ]
+    },
+    "intense": {
+      "morning": [
+        "Starke Morgensession 🔥",
+        "Champion-Aufwachen",
+        "Morgen-Grind 💪"
+      ],
+      "noon": [
+        "Intensive Mittagssession 💥",
+        "Großes Mittagstraining",
+        "Explosiver Mittag"
+      ],
+      "evening": [
+        "Große Abendsession 💪",
+        "Intensiver Abend",
+        "Hartes Training"
+      ],
+      "night": [
+        "Kriegernacht 🌙",
+        "Intensive Nacht-Session",
+        "Nachteinsatz 🔥"
+      ]
+    },
+    "epic": {
+      "morning": [
+        "Legendäre Morgensession 🏆",
+        "Epischer Morgen",
+        "Morgenleistung 🔥"
+      ],
+      "noon": [
+        "Historischer Mittag 🔥",
+        "Monster-Mittagssession",
+        "Wahnsinnsmittag 💥"
+      ],
+      "evening": [
+        "Epischer Abend 🏆",
+        "Monumentale Session",
+        "Abendleistung 🔥"
+      ],
+      "night": [
+        "Legendäre Nacht 🌙🔥",
+        "Epische Nacht-Session",
+        "Champion-Nacht 🏆"
+      ]
+    },
+    "perfectDay": [
+      "Perfekter Tag 🌟",
+      "Fehlerlos ✨",
+      "Perfect Day 💎",
+      "100% abgeschlossen 🏆",
+      "Nichts hinzuzufügen 👑"
+    ]
+  },
+  "shareTexts": {
+    "light": [
+      "Kurze Session auf OneUp beendet! 💪",
+      "Schnelles Training fertig 🏃",
+      "Ein paar Reps, wir bleiben dran! 🎯"
+    ],
+    "moderate": [
+      "Gute Session auf OneUp beendet! 💪🔥",
+      "Solides Training heute!",
+      "Fortschritt, Tag für Tag 🚀"
+    ],
+    "intense": [
+      "Starke Session auf OneUp! 🔥💪",
+      "Intensive Session beendet! Immer stärker 💥",
+      "Enorme Leistung heute! 🏆"
+    ],
+    "epic": [
+      "Legendäre Session auf OneUp! 🏆🔥",
+      "Enorme Leistung beendet! 💪",
+      "Wahnsinns-Session abgeschlossen! 🚀💥"
+    ],
+    "perfectDay": [
+      "Perfekter Tag auf OneUp! Alle Übungen validiert 🌟",
+      "Perfect Day! Nichts hält mich auf 💎✨",
+      "100% heute auf OneUp abgeschlossen! 👑🔥"
+    ],
+    "global": [
+      "Entdecke meine Statistiken auf OneUp! 🔥",
+      "Mein Fortschritt auf OneUp spricht für sich 📈",
+      "Immer höher mit OneUp! 🚀"
+    ]
   }
 }

@@ -22,6 +22,7 @@ export function ExercisePanel({
     exerciseConfig,
     dayNumber,
     onNext,
+    hideNextButton = false,
     isSession = false,
     fadeIn = true
 }) {
@@ -163,6 +164,7 @@ export function ExercisePanel({
                 exerciseLabel={exerciseLabel}
                 onClose={onClose}
                 onNext={onNext}
+                hideNextButton={hideNextButton}
                 t={t}
             />
 
@@ -280,7 +282,9 @@ export function ExercisePanel({
     );
 }
 
-function Header({ activeColor, exerciseConfig, exerciseLabel, onClose, onNext, t }) {
+function Header({ activeColor, exerciseConfig, exerciseLabel, onClose, onNext, hideNextButton, t }) {
+    const showNextButton = onNext && !hideNextButton;
+
     return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--spacing-lg)', gap: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
@@ -314,7 +318,7 @@ function Header({ activeColor, exerciseConfig, exerciseLabel, onClose, onNext, t
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                {onNext && (
+                {showNextButton && (
                     <button
                         onClick={onNext}
                         className="hover-lift"

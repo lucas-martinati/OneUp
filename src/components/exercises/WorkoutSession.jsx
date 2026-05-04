@@ -18,6 +18,7 @@ import { useExercises } from '../../contexts/ExercisesContext';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
 import { getLocalDateStr } from '../../utils/dateUtils';
+import { generateSessionName } from '../../utils/sessionNameGenerator';
 
 // ── Exercise grid item ──────────────────────────────────────────────────
 function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
@@ -228,6 +229,21 @@ export function WorkoutSession({
     // Start session
     const startSession = () => {
         if (queue.length < 1) return;
+        
+        // Filter out already completed exercises
+        const filteredQueue = queue.filter(id => {
+            const ex = allExercises.find(e => e.id === id);
+            if (!ex) return false;
+            const currentDiff = getConfig(ex.id, today).difficulty;
+            const goal = getDailyGoal(ex, dayNumber, currentDiff);
+            const count = getExerciseCount(today, id);
+            const done = completions[today]?.[id]?.isCompleted || count >= goal;
+            return !done;
+        });
+        
+        if (filteredQueue.length < 1) return;
+        
+        setQueue(filteredQueue);
         setCurrentIdx(0);
         setHasAnimatedFirstPanel(false);
         sessionStartTime.current = Date.now();
@@ -390,17 +406,15 @@ export function WorkoutSession({
     const currentGoal = currentEx ? getDailyGoal(currentEx, dayNumber, currentDifficulty) : 0;
     const currentCount = currentEx ? getExerciseCount(today, currentExId) : 0;
     const currentDone = currentEx ? (completions[today]?.[currentExId]?.isCompleted || currentCount >= currentGoal) : false;
+
     const hasNextAvailableExercise = useMemo(() => {
         return queue.some((id, idx) => {
             if (idx === currentIdx) return false;
-
             const ex = allExercises.find(item => item.id === id);
             if (!ex) return false;
-
             const difficulty = getConfig(ex.id, today).difficulty;
             const goal = getDailyGoal(ex, dayNumber, difficulty);
             const count = getExerciseCount(today, id);
-
             return !(completions[today]?.[id]?.isCompleted || count >= goal);
         });
     }, [allExercises, completions, currentIdx, dayNumber, getConfig, getExerciseCount, queue, today]);
@@ -453,6 +467,16 @@ export function WorkoutSession({
                     break;
                 }
             }
+        }
+
+        if (!detectedName) {
+            const totalReps = completedExercises.reduce((sum, ex) => sum + (ex.reps || 0), 0);
+            detectedName = generateSessionName(t, {
+                date: new Date().toISOString(),
+                totalReps,
+                exerciseCount: completedExercises.length,
+                isPerfectDay: false
+            });
         }
 
         const session = addSession({
@@ -940,7 +964,8 @@ export function WorkoutSession({
                     }}
                     isCompleted={currentDone}
                     dayNumber={dayNumber}
-                    onNext={hasNextAvailableExercise ? advanceToNext : undefined}
+                    onNext={advanceToNext}
+                    hideNextButton={!hasNextAvailableExercise}
                     isSession={true}
                     fadeIn={!hasAnimatedFirstPanel}
                 />
@@ -974,7 +999,7 @@ export function WorkoutSession({
                 stats={computedStats}
                 sessionHistory={getSessionHistory()}
                 isPro={isPro}
-                defaultSessionName={sessionName}
+                defaultSessionName={savedSession?.name || sessionName}
 
             />
         );

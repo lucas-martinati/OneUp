@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback } from 'react';
 import { captureElement, shareImage, downloadImage } from '../services/shareService';
 import { CATEGORIES } from '../../../config/categories';
+import { useTranslation } from 'react-i18next';
+import { generateShareTextFromSession } from '../../../utils/sessionNameGenerator';
 
 const DEFAULT_OPTIONS = {
   showDuration: true,
@@ -43,6 +45,7 @@ function loadSavedOptions() {
  * @returns {Object} { cardRef, options, setOption, toggleOption, exportCard, shareCard, isExporting, mode }
  */
 export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mode = 'session', initialCategories } = {}) {
+  const { t } = useTranslation();
   const cardRef = useRef(null);
   
   // Apply initial categories only once on mount (when modal opens)
@@ -169,9 +172,8 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
 
   const shareCard = useCallback(async () => {
     const dataUrl = await captureCard();
-    const shareText = mode === 'global' 
-      ? `Découvrez mes statistiques et ma régularité sur OneUp ! 🔥`
-      : `Je viens de terminer une énorme séance sur OneUp ! 💪 Toujours plus haut, toujours plus fort.`;
+    const isPerfectDay = stats?.isPerfectToday || false;
+    const shareText = generateShareTextFromSession(t, sessionData, mode, isPerfectDay);
     const result = await shareImage(dataUrl, { title: 'OneUp', text: shareText });
 
     if (!result.success && !result.canceled) {
@@ -179,7 +181,7 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
       return { success: true, method: 'download-fallback' };
     }
     return result;
-  }, [captureCard, mode]);
+  }, [captureCard, mode, sessionData, stats?.isPerfectToday, t]);
 
   return {
     cardRef,
