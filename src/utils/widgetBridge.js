@@ -14,6 +14,7 @@ import { isAndroidPlatform } from './platform';
 
 let coreModulePromise = null;
 let preferencesModulePromise = null;
+let widgetBridgeInstance = null;
 
 async function getCoreModule() {
   if (!coreModulePromise) {
@@ -76,11 +77,11 @@ export async function updateWidgetData(computedStats, completions) {
   if (!isAndroidPlatform()) return;
 
   try {
-    const [{ registerPlugin }, { Preferences }] = await Promise.all([
-      getCoreModule(),
-      getPreferencesModule(),
-    ]);
-    const WidgetBridge = registerPlugin('WidgetBridge');
+    if (!widgetBridgeInstance) {
+      const { registerPlugin } = await getCoreModule();
+      widgetBridgeInstance = registerPlugin('WidgetBridge');
+    }
+    const { Preferences } = await getPreferencesModule();
 
     const widgetData = {
       // Show the ongoing streak even if today isn't done yet.
@@ -106,8 +107,8 @@ export async function updateWidgetData(computedStats, completions) {
     });
 
     // Send broadcast to refresh all widgets immediately
-    if (WidgetBridge) {
-      await WidgetBridge.refreshWidgets();
+    if (widgetBridgeInstance) {
+      await widgetBridgeInstance.refreshWidgets();
     }
   } catch (error) {
     // Silently fail — widget data is non-critical

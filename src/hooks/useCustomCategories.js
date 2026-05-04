@@ -47,7 +47,10 @@ export function useCustomCategories(userId) {
 
   const setCategoriesFromCloud = useCallback((cloudData) => {
     if (Array.isArray(cloudData)) {
-      setCustomCategories(cloudData);
+      setCustomCategories(prev => {
+        if (JSON.stringify(prev) === JSON.stringify(cloudData)) return prev;
+        return cloudData;
+      });
     }
   }, [setCustomCategories]);
 

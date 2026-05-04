@@ -1,9 +1,12 @@
+import { ref, set, get } from 'firebase/database';
+import { getAuthInstance, getDatabaseInstance } from '../../../services/firebase';
+
 const STORAGE_KEY = 'oneup_session_history';
-const MAX_SESSIONS = 10;
+const MAX_SESSIONS = 20;
 
 /**
  * Session History Service
- * Stores the last 10 workout sessions in localStorage.
+ * Stores the last 20 workout sessions in localStorage and syncs to Firebase.
  * Each session: { id, date, duration, name, type, exercises: [{ id, label, reps, color }] }
  */
 
@@ -26,9 +29,80 @@ export function getSessionHistory() {
   }
 }
 
+async function saveSessionHistoryToCloud(history) {
+  try {
+    const auth = getAuthInstance();
+    const database = getDatabaseInstance();
+    if (!auth?.currentUser || !database) return false;
+    
+    await set(ref(database, `users/${auth.currentUser.uid}/progress/sessionHistory`), history);
+    return true;
+  } catch (error) {
+    console.error('Failed to save session history to cloud', error);
+    return false;
+  }
+}
+
+async function loadSessionHistoryFromCloud() {
+  try {
+    const auth = getAuthInstance();
+    const database = getDatabaseInstance();
+    if (!auth?.currentUser || !database) return [];
+
+    const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/progress/sessionHistory`));
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      return Array.isArray(data) ? data : [];
+    }
+
+    // Migration fallback
+    const oldSnapshot = await get(ref(database, `users/${auth.currentUser.uid}/sessionHistory`));
+    if (oldSnapshot.exists()) {
+      const data = oldSnapshot.val();
+      const parsedData = Array.isArray(data) ? data : [];
+      await set(ref(database, `users/${auth.currentUser.uid}/progress/sessionHistory`), parsedData);
+      await set(ref(database, `users/${auth.currentUser.uid}/sessionHistory`), null);
+      return parsedData;
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Failed to load session history from cloud', error);
+    return [];
+  }
+}
+
 export function saveSessionHistory(sessions) {
   const trimmed = sessions.slice(0, MAX_SESSIONS);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+  // Async cloud sync
+  saveSessionHistoryToCloud(trimmed).catch(() => {});
+}
+
+export async function syncSessionHistory() {
+  const local = getSessionHistory();
+  const cloud = await loadSessionHistoryFromCloud();
+  
+  if (!cloud || cloud.length === 0) {
+    if (local.length > 0) saveSessionHistoryToCloud(local);
+    return local;
+  }
+
+  // Merge local and cloud by unique ID, then sort by date descending
+  const map = new Map();
+  cloud.forEach(s => map.set(s.id, s));
+  local.forEach(s => {
+    if (!map.has(s.id)) map.set(s.id, s);
+    else if (new Date(s.date) > new Date(map.get(s.id).date)) map.set(s.id, s);
+  });
+
+  const merged = Array.from(map.values())
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, MAX_SESSIONS);
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+  saveSessionHistoryToCloud(merged).catch(() => {});
+  return merged;
 }
 
 export function addSession({ date, duration, name, type, exercises }) {

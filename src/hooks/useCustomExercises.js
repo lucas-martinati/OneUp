@@ -55,7 +55,10 @@ export function useCustomExercises(userId) {
 
   const setCustomExercisesFromCloud = useCallback((cloudData) => {
     if (Array.isArray(cloudData)) {
-      setCustomExercises(cloudData);
+      setCustomExercises(prev => {
+        if (JSON.stringify(prev) === JSON.stringify(cloudData)) return prev;
+        return cloudData;
+      });
     }
   }, [setCustomExercises]);
 

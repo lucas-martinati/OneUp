@@ -1,4 +1,4 @@
-import { ref, set, get } from 'firebase/database';
+import { ref, set, get, onValue } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
 
@@ -79,7 +79,7 @@ export async function saveCustomExercisesToCloud(exercises) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  await set(ref(database, `users/${auth.currentUser.uid}/customExercises`), exercises || []);
+  await set(ref(database, `users/${auth.currentUser.uid}/custom/exercises`), exercises || []);
   logger.success('Custom exercises synced to cloud');
   return true;
 }
@@ -89,9 +89,19 @@ export async function loadCustomExercisesFromCloud() {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return null;
 
-  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/customExercises`));
+  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/custom/exercises`));
   if (snapshot.exists()) { logger.success('Custom exercises loaded from cloud'); return snapshot.val(); }
   return null;
+}
+
+export function listenToCustomExercisesFromCloud(callback) {
+  const auth = getAuthInstance();
+  const database = getDatabaseInstance();
+  if (!auth?.currentUser || !database) return () => {};
+
+  return onValue(ref(database, `users/${auth.currentUser.uid}/custom/exercises`), (snapshot) => {
+    callback(snapshot.exists() ? snapshot.val() : []);
+  });
 }
 
 // ── Program completions ─────────────────────────────────────────────────
@@ -166,7 +176,7 @@ export async function saveCustomCategoriesToCloud(categories) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  await set(ref(database, `users/${auth.currentUser.uid}/customCategories`), categories || []);
+  await set(ref(database, `users/${auth.currentUser.uid}/custom/categories`), categories || []);
   logger.success('Custom categories synced to cloud');
   return true;
 }
@@ -176,7 +186,17 @@ export async function loadCustomCategoriesFromCloud() {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return null;
 
-  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/customCategories`));
+  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/custom/categories`));
   if (snapshot.exists()) { logger.success('Custom categories loaded from cloud'); return snapshot.val(); }
   return null;
+}
+
+export function listenToCustomCategoriesFromCloud(callback) {
+  const auth = getAuthInstance();
+  const database = getDatabaseInstance();
+  if (!auth?.currentUser || !database) return () => {};
+
+  return onValue(ref(database, `users/${auth.currentUser.uid}/custom/categories`), (snapshot) => {
+    callback(snapshot.exists() ? snapshot.val() : []);
+  });
 }

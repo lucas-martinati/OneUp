@@ -52,11 +52,11 @@ function getPlatformMode() {
 async function getPurchasesRuntime() {
   if (isNativePlatform()) {
     if (!nativePurchasesPromise) {
-      nativePurchasesPromise = import('@revenuecat/purchases-capacitor')
-        .then(({ Purchases }) => Purchases);
+      nativePurchasesPromise = import('@revenuecat/purchases-capacitor');
     }
 
-    return { Purchases: await nativePurchasesPromise, mode: 'native' };
+    const { Purchases } = await nativePurchasesPromise;
+    return { Purchases, mode: 'native' };
   }
 
   if (!webPurchasesPromise) {

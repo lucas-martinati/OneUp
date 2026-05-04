@@ -7,8 +7,8 @@ import { cloudSync } from '@services/cloudSync';
 
 export function useCloudSyncOrchestration(enabled, routines, customExercises, customCategories) {
   const auth = useAuth();
-  const { resumeCloudSync, setRoutinesFromCloud } = useProgressContext();
-  const { customExercisesHook, customCategoriesHook } = useExercises();
+  const { resumeCloudSync } = useProgressContext();
+  const { customExercisesHook, customCategoriesHook, setRoutinesFromCloud } = useExercises();
   
   const { setCustomExercisesFromCloud } = customExercisesHook;
   const { setCategoriesFromCloud } = customCategoriesHook;
@@ -37,20 +37,30 @@ export function useCloudSyncOrchestration(enabled, routines, customExercises, cu
   useEffect(() => {
     if (!auth.isSignedIn || auth.loading || !auth.user?.uid) return;
     
+    let unsubExercises = null;
+    let unsubCategories = null;
+
     const loadData = async () => {
       try {
         const cloudRoutines = await cloudSync.loadRoutinesFromCloud();
         if (cloudRoutines && Array.isArray(cloudRoutines)) setRoutinesFromCloud(cloudRoutines);
-        
-        const cloudExercises = await cloudSync.loadCustomExercisesFromCloud();
-        if (cloudExercises && Array.isArray(cloudExercises)) setCustomExercisesFromCloud(cloudExercises);
-
-        const cloudCategories = await cloudSync.loadCustomCategoriesFromCloud();
-        if (cloudCategories && Array.isArray(cloudCategories)) setCategoriesFromCloud(cloudCategories);
       } catch { /* silent */ }
     };
     loadData();
-  }, [auth.isSignedIn, auth.loading, auth.user?.uid, setCustomExercisesFromCloud, setRoutinesFromCloud, setCategoriesFromCloud]);
+
+    // Setup realtime listeners
+    if (enabled && cloudSync.listenToCustomExercisesFromCloud) {
+      unsubExercises = cloudSync.listenToCustomExercisesFromCloud(setCustomExercisesFromCloud);
+    }
+    if (enabled && cloudSync.listenToCustomCategoriesFromCloud) {
+      unsubCategories = cloudSync.listenToCustomCategoriesFromCloud(setCategoriesFromCloud);
+    }
+
+    return () => {
+      if (unsubExercises) unsubExercises();
+      if (unsubCategories) unsubCategories();
+    };
+  }, [auth.isSignedIn, auth.loading, auth.user?.uid, enabled, setCustomExercisesFromCloud, setRoutinesFromCloud, setCategoriesFromCloud]);
 
   return { resumeCloudSync };
 }

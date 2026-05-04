@@ -1,6 +1,7 @@
 import { ref, get, onValue, serverTimestamp, update } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
+import { syncSessionHistory } from '../features/share/services/sessionHistoryService';
 
 const logger = createLogger('DataSync');
 
@@ -142,6 +143,10 @@ export function mergeData(localData, cloudData) {
 
 export async function syncData(localData) {
   logger.info('Starting full data synchronization...');
+  
+  // Sync session history concurrently
+  syncSessionHistory().catch(err => logger.error('Failed to sync session history:', err));
+
   const cloudData = await loadFromCloud();
   const mergedData = mergeData(localData, cloudData);
   await saveToCloud(mergedData);
