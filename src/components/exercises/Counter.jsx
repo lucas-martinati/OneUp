@@ -12,7 +12,7 @@ import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 
 
 
-export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext }) {
+export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext, isSession = false, fadeIn = true }) {
     useWakeLock();
     const { t } = useTranslation();
     const { getConfig, updateConfig } = useExerciseConfig();
@@ -126,17 +126,13 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     // Unique SVG gradient id per exercise to avoid conflicts
     const gradientId = `counterGrad-${exerciseConfig?.id || 'default'}`;
 
-    return (
-        <>
-        <CSSConfetti
-            active={showConfetti}
-            colors={exerciseConfig?.confettiColors || ['#10b981', '#34d399', '#6ee7b7', '#ffffff']}
-            onDone={() => setShowConfetti(false)}
-        />
-        <div className="fade-in modal-overlay" style={{
-            zIndex: Z_INDEX.TOAST,
-        }}>
-            <div className="modal-content" role="dialog" aria-modal="true" aria-label={exerciseLabel}>
+    const content = (
+        <div
+            className={`modal-content ${isSession && fadeIn ? 'fade-in' : ''}`}
+            role="dialog"
+            aria-modal="true"
+            aria-label={exerciseLabel}
+        >
             {/* Header */}
             <div style={{
                 display: 'flex',
@@ -492,7 +488,20 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                 💡 {t('counter.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
             </div>
         </div>
-        </div>
+    );
+
+    return (
+        <>
+            <CSSConfetti
+                active={showConfetti}
+                colors={exerciseConfig?.confettiColors || ['#10b981', '#34d399', '#6ee7b7', '#ffffff']}
+                onDone={() => setShowConfetti(false)}
+            />
+            {isSession ? content : (
+                <div className={`modal-overlay ${fadeIn ? 'fade-in' : ''}`} style={{ zIndex: Z_INDEX.TOAST }}>
+                    {content}
+                </div>
+            )}
         </>
     );
 }

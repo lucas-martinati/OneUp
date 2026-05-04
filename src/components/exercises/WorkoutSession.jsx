@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle } from '../../utils/icons';
 import { EXERCISES, getDailyGoal } from '../../config/exercises';
@@ -115,6 +115,7 @@ export function WorkoutSession({
     const [sessionDuration, setSessionDuration] = useState(0);
     const [savedSession, setSavedSession] = useState(null);
     const [sessionName, setSessionName] = useState('');
+    const [hasAnimatedFirstPanel, setHasAnimatedFirstPanel] = useState(false);
 
     useBackHandler(() => {
         if (showSaveRoutine) {
@@ -229,6 +230,7 @@ export function WorkoutSession({
     const startSession = () => {
         if (queue.length < 1) return;
         setCurrentIdx(0);
+        setHasAnimatedFirstPanel(false);
         sessionStartTime.current = Date.now();
         setPhase('running');
     };
@@ -390,7 +392,19 @@ export function WorkoutSession({
     const currentCount = currentEx ? getExerciseCount(today, currentExId) : 0;
     const currentDone = currentEx ? (completions[today]?.[currentExId]?.isCompleted || currentCount >= currentGoal) : false;
 
+    useEffect(() => {
+        if (phase !== 'running' || !currentEx || hasAnimatedFirstPanel) return undefined;
+
+        const timer = setTimeout(() => {
+            setHasAnimatedFirstPanel(true);
+        }, 550);
+
+        return () => clearTimeout(timer);
+    }, [phase, currentEx, hasAnimatedFirstPanel]);
+
     const advanceToNext = () => {
+        setHasAnimatedFirstPanel(true);
+
         for (let offset = 1; offset <= queue.length; offset++) {
             const nextIdx = (currentIdx + offset) % queue.length;
             const nextId = queue[nextIdx];
@@ -904,19 +918,23 @@ export function WorkoutSession({
         const Component = isTimer ? Timer : Counter;
 
         return (
-            <Component
-                exerciseConfig={currentEx}
-                onClose={onClose}
-                dailyGoal={currentGoal}
-                currentCount={currentCount}
-                onUpdateCount={(newCount) => {
-                    const { weight } = getConfig(currentExId);
-                    updateExerciseCount(today, currentExId, newCount, currentGoal, weight, currentDifficulty);
-                }}
-                isCompleted={currentDone}
-                dayNumber={dayNumber}
-                onNext={advanceToNext}
-            />
+            <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
+                <Component
+                    exerciseConfig={currentEx}
+                    onClose={onClose}
+                    dailyGoal={currentGoal}
+                    currentCount={currentCount}
+                    onUpdateCount={(newCount) => {
+                        const { weight } = getConfig(currentExId);
+                        updateExerciseCount(today, currentExId, newCount, currentGoal, weight, currentDifficulty);
+                    }}
+                    isCompleted={currentDone}
+                    dayNumber={dayNumber}
+                    onNext={advanceToNext}
+                    isSession={true}
+                    fadeIn={!hasAnimatedFirstPanel}
+                />
+            </div>
         );
     }
 

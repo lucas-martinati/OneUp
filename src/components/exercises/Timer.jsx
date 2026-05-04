@@ -11,7 +11,7 @@ import { formatTime } from '../../utils/dateUtils';
 import { Z_INDEX } from '../../utils/zIndex';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
-export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext }) {
+export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompleted, exerciseConfig, dayNumber, onNext, isSession = false, fadeIn = true }) {
     useWakeLock();
     const { t } = useTranslation();
     const [isRunning, setIsRunning] = useState(false);
@@ -92,17 +92,13 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
     const exerciseLabel = getExerciseLabel(exerciseConfig);
     const gradientId = `timerGrad-${exerciseConfig?.id || 'timer'}`;
 
-    return (
-        <>
-        <CSSConfetti
-            active={showConfetti}
-            colors={exerciseConfig?.confettiColors || ['#8b5cf6', '#a78bfa', '#ffffff']}
-            onDone={() => setShowConfetti(false)}
-        />
-        <div className="fade-in modal-overlay" style={{
-            zIndex: Z_INDEX.TOAST,
-        }}>
-            <div className="modal-content">
+    const content = (
+        <div
+            className={`modal-content ${isSession && fadeIn ? 'fade-in' : ''}`}
+            role="dialog"
+            aria-modal="true"
+            aria-label={exerciseLabel}
+        >
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--spacing-lg)', gap: '8px' }}>
                 <div style={{ 
@@ -325,7 +321,20 @@ export function Timer({ onClose, dailyGoal, currentCount, onUpdateCount, isCompl
                 💡 {t('timer.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
             </div>
         </div>
-        </div>
+    );
+
+    return (
+        <>
+            <CSSConfetti
+                active={showConfetti}
+                colors={exerciseConfig?.confettiColors || ['#10b981', '#34d399', '#6ee7b7', '#ffffff']}
+                onDone={() => setShowConfetti(false)}
+            />
+            {isSession ? content : (
+                <div className={`modal-overlay ${fadeIn ? 'fade-in' : ''}`} style={{ zIndex: Z_INDEX.TOAST }}>
+                    {content}
+                </div>
+            )}
         </>
     );
 }
