@@ -72,6 +72,16 @@ export async function loadRoutinesFromCloud() {
   return null;
 }
 
+export function listenToRoutinesFromCloud(callback) {
+  const auth = getAuthInstance();
+  const database = getDatabaseInstance();
+  if (!auth?.currentUser || !database) return () => {};
+
+  return onValue(ref(database, `users/${auth.currentUser.uid}/routines`), (snapshot) => {
+    callback(snapshot.exists() ? snapshot.val() : []);
+  });
+}
+
 // ── Custom exercises ────────────────────────────────────────────────────
 
 export async function saveCustomExercisesToCloud(exercises) {

@@ -92,8 +92,17 @@ export async function syncSessionHistory() {
   const map = new Map();
   cloud.forEach(s => map.set(s.id, s));
   local.forEach(s => {
-    if (!map.has(s.id)) map.set(s.id, s);
-    else if (new Date(s.date) > new Date(map.get(s.id).date)) map.set(s.id, s);
+    if (!map.has(s.id)) {
+      map.set(s.id, s);
+    } else {
+      const existing = map.get(s.id);
+      const localUpdated = s.updatedAt || s.date;
+      const cloudUpdated = existing.updatedAt || existing.date;
+      
+      if (new Date(localUpdated) > new Date(cloudUpdated)) {
+        map.set(s.id, s);
+      }
+    }
   });
 
   const merged = Array.from(map.values())
@@ -109,6 +118,7 @@ export function addSession({ date, duration, name, type, exercises }) {
   const session = {
     id: generateId(),
     date: date || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     duration: duration || 0,
     name: name || '',
     type: type || 'bodyweight',
@@ -140,6 +150,7 @@ export function updateSessionName(sessionId, name) {
   const session = history.find(s => s.id === sessionId);
   if (session) {
     session.name = name;
+    session.updatedAt = new Date().toISOString();
     saveSessionHistory(history);
   }
   return history;

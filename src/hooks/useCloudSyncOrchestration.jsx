@@ -39,26 +39,25 @@ export function useCloudSyncOrchestration(enabled, routines, customExercises, cu
     
     let unsubExercises = null;
     let unsubCategories = null;
-
-    const loadData = async () => {
-      try {
-        const cloudRoutines = await cloudSync.loadRoutinesFromCloud();
-        if (cloudRoutines && Array.isArray(cloudRoutines)) setRoutinesFromCloud(cloudRoutines);
-      } catch { /* silent */ }
-    };
-    loadData();
+    let unsubRoutines = null;
 
     // Setup realtime listeners
-    if (enabled && cloudSync.listenToCustomExercisesFromCloud) {
-      unsubExercises = cloudSync.listenToCustomExercisesFromCloud(setCustomExercisesFromCloud);
-    }
-    if (enabled && cloudSync.listenToCustomCategoriesFromCloud) {
-      unsubCategories = cloudSync.listenToCustomCategoriesFromCloud(setCategoriesFromCloud);
+    if (enabled) {
+      if (cloudSync.listenToCustomExercisesFromCloud) {
+        unsubExercises = cloudSync.listenToCustomExercisesFromCloud(setCustomExercisesFromCloud);
+      }
+      if (cloudSync.listenToCustomCategoriesFromCloud) {
+        unsubCategories = cloudSync.listenToCustomCategoriesFromCloud(setCategoriesFromCloud);
+      }
+      if (cloudSync.listenToRoutinesFromCloud) {
+        unsubRoutines = cloudSync.listenToRoutinesFromCloud(setRoutinesFromCloud);
+      }
     }
 
     return () => {
       if (unsubExercises) unsubExercises();
       if (unsubCategories) unsubCategories();
+      if (unsubRoutines) unsubRoutines();
     };
   }, [auth.isSignedIn, auth.loading, auth.user?.uid, enabled, setCustomExercisesFromCloud, setRoutinesFromCloud, setCategoriesFromCloud]);
 

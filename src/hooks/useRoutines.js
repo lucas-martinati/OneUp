@@ -50,7 +50,10 @@ export function useRoutines(userId) {
    */
   const setRoutinesFromCloud = useCallback((cloudRoutines) => {
     if (Array.isArray(cloudRoutines)) {
-      setRoutines(cloudRoutines);
+      setRoutines(prev => {
+        if (JSON.stringify(prev) === JSON.stringify(cloudRoutines)) return prev;
+        return cloudRoutines;
+      });
     }
   }, [setRoutines]);
 
