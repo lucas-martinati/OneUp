@@ -14,6 +14,11 @@
   /* Touch targets */
   --touch-min: 40px;
 
+  /* Motion */
+  --ease-panel-in: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-fast: 180ms;
+  --motion-panel: 240ms;
+
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --gradient-accent: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -528,18 +533,44 @@ button:active {
 
 /* Animations */
 .fade-in {
-  animation: fadeIn 0.5s ease-out;
+  animation: fadeIn var(--motion-panel) var(--ease-panel-in);
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translate3d(0, 8px, 0) scale(0.99);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes modalOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes panelEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.985);
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
@@ -1083,6 +1114,15 @@ button:focus:not(:focus-visible) {
   max-width: 640px; /* Centralized width for all panels */
   margin: 0 auto;
   padding: 0 var(--spacing-sm);
+}
+
+.modal-overlay.fade-in {
+  animation: modalOverlayFadeIn var(--motion-fast) ease-out;
+}
+
+.modal-overlay.fade-in > .modal-content {
+  animation: panelEnter var(--motion-panel) var(--ease-panel-in);
+  transform-origin: top center;
 }
 
 @media (min-width: 600px) {
