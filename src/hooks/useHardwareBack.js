@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { App as CapacitorApp } from '@capacitor/app';
 import { runBackHandler } from '../utils/backHandler';
+import { isNativePlatform } from '../utils/platform';
 
 /**
  * useHardwareBack Hook
@@ -13,24 +13,33 @@ import { runBackHandler } from '../utils/backHandler';
  */
 export function useHardwareBack(onResumeSync) {
     useEffect(() => {
-        const handleBackButton = () => {
-            // Priority 1: Check the global back handler stack (modals, panels, etc)
-            if (runBackHandler()) {
-                if (onResumeSync) onResumeSync();
-                return;
-            }
-            
-            // Fallback: Exit the app
-            CapacitorApp.exitApp();
-        };
+        if (!isNativePlatform()) return undefined;
 
-        const listenerPromise = CapacitorApp.addListener('backButton', handleBackButton)
+        let cancelled = false;
+
+        const listenerPromise = import('@capacitor/app')
+            .then(({ App: CapacitorApp }) => {
+                const handleBackButton = () => {
+                    // Priority 1: Check the global back handler stack (modals, panels, etc)
+                    if (runBackHandler()) {
+                        if (onResumeSync) onResumeSync();
+                        return;
+                    }
+
+                    // Fallback: Exit the app
+                    CapacitorApp.exitApp();
+                };
+
+                if (cancelled) return null;
+                return CapacitorApp.addListener('backButton', handleBackButton);
+            })
             .catch(err => {
                 console.warn('Capacitor App plugin error:', err);
                 return null;
             });
 
         return () => {
+            cancelled = true;
             listenerPromise.then(listener => {
                 if (listener && listener.remove) {
                     listener.remove();

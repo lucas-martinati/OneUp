@@ -6,8 +6,8 @@ import {
   deleteUser
 } from 'firebase/auth';
 import { ref, remove } from 'firebase/database';
-import { Preferences } from '@capacitor/preferences';
 import { createLogger } from '../utils/logger';
+import { Preferences } from '../utils/preferences';
 import { getAuthInstance, getDatabaseInstance, initializeFirebase } from './firebase';
 
 const logger = createLogger('Auth');

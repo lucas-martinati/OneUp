@@ -1,5 +1,4 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { LocalNotifications } from '@capacitor/local-notifications';
 import { useLocalStorageScoped } from './useLocalStorageScoped';
 import { cloudSync } from '../services/cloudSync';
 import { getLocalDateStr } from '../utils/dateUtils';
@@ -10,6 +9,17 @@ import i18n from '../i18n';
 
 const STORAGE_KEY_BASE = 'pushup_challenge_data';
 const NOTIFICATION_ID = 1;
+
+let localNotificationsPromise = null;
+
+async function getLocalNotifications() {
+  if (!localNotificationsPromise) {
+    localNotificationsPromise = import('@capacitor/local-notifications')
+      .then(({ LocalNotifications }) => LocalNotifications);
+  }
+
+  return localNotificationsPromise;
+}
 
 /** Default empty state for signed-out or new users */
 function getDefaultState() {
@@ -346,6 +356,7 @@ export function useProgress(userId) {
 
   const scheduleNotification = async (settings) => {
     try {
+      const LocalNotifications = await getLocalNotifications();
       const permission = await LocalNotifications.checkPermissions();
 
       if (permission.display === 'granted') {
@@ -405,6 +416,7 @@ export function useProgress(userId) {
 
   const requestNotificationPermission = async () => {
     try {
+      const LocalNotifications = await getLocalNotifications();
       const permission = await LocalNotifications.checkPermissions();
       if (permission.display === 'prompt' || permission.display === 'prompt-with-rationale') {
         await LocalNotifications.requestPermissions();

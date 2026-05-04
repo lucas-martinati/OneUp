@@ -1,9 +1,31 @@
 import { test, expect } from '@playwright/test';
 
+async function completeOnboardingIfNeeded(page) {
+  const letsGoButton = page.getByRole('button', { name: /let's go/i });
+  if (!(await letsGoButton.isVisible().catch(() => false))) return;
+
+  await letsGoButton.click();
+
+  const startChallengeButton = page.getByRole('button', { name: /start challenge/i });
+  await expect(startChallengeButton).toBeVisible();
+  await startChallengeButton.click();
+
+  await expect(page.locator('button[aria-label$="counter"]').first()).toBeVisible();
+}
+
+async function dismissAnnouncementIfVisible(page) {
+  const dismissButton = page.getByRole('button', { name: /awesome/i });
+  await dismissButton.waitFor({ state: 'visible', timeout: 1500 })
+    .then(() => dismissButton.click())
+    .catch(() => {});
+}
+
 test.describe('Main Pages Loading', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+    await completeOnboardingIfNeeded(page);
+    await dismissAnnouncementIfVisible(page);
   });
 
   test('Dashboard page loads', async ({ page }) => {
@@ -29,18 +51,11 @@ test.describe('Main Pages Loading', () => {
   });
 
   test('Counter starts workout', async ({ page }) => {
-    const counterButtons = page.locator('button').all();
-    let counterFound = false;
-    
-    for (const button of await counterButtons) {
-      const text = await button.textContent();
-      if (text && text.toLowerCase().includes('start')) {
-        await button.click();
-        await page.waitForTimeout(500);
-        counterFound = true;
-        break;
-      }
-    }
-    expect(counterFound).toBe(true);
+    const counterButton = page.locator('button[aria-label$="counter"]').first();
+    await expect(counterButton).toBeVisible();
+
+    await counterButton.click();
+
+    await expect(page.getByRole('dialog')).toBeVisible();
   });
 });

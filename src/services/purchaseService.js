@@ -14,14 +14,10 @@
  * (@revenuecat/purchases-js) on web for Stripe-based Web Billing.
  */
 
-import { Capacitor } from '@capacitor/core';
-import { Purchases as PurchasesNative } from '@revenuecat/purchases-capacitor';
-import { Purchases as PurchasesWeb } from '@revenuecat/purchases-js';
 import { createLogger } from '../utils/logger';
+import { isNativePlatform } from '../utils/platform';
 
 const logger = createLogger('Purchases');
-
-const isNative = Capacitor.isNativePlatform();
 
 // Product identifiers configured in RevenueCat dashboard
 const PRODUCTS = {
@@ -46,6 +42,30 @@ const PRODUCTS = {
 };
 
 let isInitialized = false;
+let nativePurchasesPromise = null;
+let webPurchasesPromise = null;
+
+function getPlatformMode() {
+  return isNativePlatform() ? 'native' : 'web';
+}
+
+async function getPurchasesRuntime() {
+  if (isNativePlatform()) {
+    if (!nativePurchasesPromise) {
+      nativePurchasesPromise = import('@revenuecat/purchases-capacitor')
+        .then(({ Purchases }) => Purchases);
+    }
+
+    return { Purchases: await nativePurchasesPromise, mode: 'native' };
+  }
+
+  if (!webPurchasesPromise) {
+    webPurchasesPromise = import('@revenuecat/purchases-js')
+      .then(({ Purchases }) => Purchases);
+  }
+
+  return { Purchases: await webPurchasesPromise, mode: 'web' };
+}
 
 // ── Initialization ─────────────────────────────────────────────────────
 
@@ -55,24 +75,29 @@ let isInitialized = false;
  */
 export async function initPurchases(userId) {
   try {
-    if (isNative) {
+    const mode = getPlatformMode();
+
+    if (mode === 'web' && !import.meta.env.VITE_REVENUECAT_WEB_API_KEY) {
+      logger.warn('No Web Billing API key configured, skipping web init');
+      return false;
+    }
+
+    const { Purchases } = await getPurchasesRuntime();
+
+    if (mode === 'native') {
       // Native (Android / iOS) — Capacitor SDK
-      await PurchasesNative.configure({
+      await Purchases.configure({
         apiKey: import.meta.env.VITE_REVENUECAT_API_KEY,
         appUserID: userId || null,
       });
     } else {
       // Web — purchases-js SDK (Stripe / Web Billing)
       const webKey = import.meta.env.VITE_REVENUECAT_WEB_API_KEY;
-      if (!webKey) {
-        logger.warn('No Web Billing API key configured, skipping web init');
-        return false;
-      }
-      PurchasesWeb.configure(webKey, userId || 'anonymous');
+      Purchases.configure(webKey, userId || 'anonymous');
     }
 
     isInitialized = true;
-    logger.success(`RevenueCat initialized (${isNative ? 'native' : 'web'})`);
+    logger.success(`RevenueCat initialized (${mode})`);
     return true;
   } catch (error) {
     logger.error('RevenueCat init failed:', error);
@@ -89,11 +114,14 @@ function hasActiveEntitlement(customerInfo, entitlementId) {
 }
 
 async function _getCustomerInfo() {
-  if (isNative) {
-    const { customerInfo } = await PurchasesNative.getCustomerInfo();
+  const { Purchases, mode } = await getPurchasesRuntime();
+
+  if (mode === 'native') {
+    const { customerInfo } = await Purchases.getCustomerInfo();
     return customerInfo;
   }
-  return await PurchasesWeb.getSharedInstance().getCustomerInfo();
+
+  return await Purchases.getSharedInstance().getCustomerInfo();
 }
 
 async function _checkEntitlement(tier) {
@@ -120,11 +148,12 @@ async function _getOffering(tier) {
   if (!isInitialized) return null;
 
   try {
+    const { Purchases, mode } = await getPurchasesRuntime();
     let offerings;
-    if (isNative) {
-      offerings = await PurchasesNative.getOfferings();
+    if (mode === 'native') {
+      offerings = await Purchases.getOfferings();
     } else {
-      offerings = await PurchasesWeb.getSharedInstance().getOfferings();
+      offerings = await Purchases.getSharedInstance().getOfferings();
     }
 
     const current = offerings?.current;
@@ -185,15 +214,17 @@ async function _purchase(tier) {
 
     let customerInfo;
 
-    if (isNative) {
+    const { Purchases, mode } = await getPurchasesRuntime();
+
+    if (mode === 'native') {
       // Native: Capacitor SDK
-      const result = await PurchasesNative.purchasePackage({
+      const result = await Purchases.purchasePackage({
         aPackage: offering.product,
       });
       customerInfo = result.customerInfo;
     } else {
       // Web: purchases-js SDK — opens Stripe checkout
-      const result = await PurchasesWeb.getSharedInstance().purchase({
+      const result = await Purchases.getSharedInstance().purchase({
         rcPackage: offering.product,
       });
       customerInfo = result.customerInfo;
@@ -263,14 +294,15 @@ export async function restorePurchases() {
   }
 
   try {
+    const { Purchases, mode } = await getPurchasesRuntime();
     let customerInfo;
 
-    if (isNative) {
-      const result = await PurchasesNative.restorePurchases();
+    if (mode === 'native') {
+      const result = await Purchases.restorePurchases();
       customerInfo = result.customerInfo;
     } else {
       // Web SDK: no restorePurchases — just re-fetch customer info
-      customerInfo = await PurchasesWeb.getSharedInstance().getCustomerInfo();
+      customerInfo = await Purchases.getSharedInstance().getCustomerInfo();
     }
 
     const supporter = hasActiveEntitlement(customerInfo, PRODUCTS.supporter.entitlementId);
@@ -295,6 +327,7 @@ export async function getPurchaseHistory() {
 
   try {
     const customerInfo = await _getCustomerInfo();
+    const isNative = isNativePlatform();
     const history = [];
 
     const getProductDetails = (identifier) => {

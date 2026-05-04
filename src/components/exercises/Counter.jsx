@@ -27,7 +27,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
     // Weight exercise support
     const isWeightExercise = !!WEIGHT_EXERCISES_MAP[exerciseConfig?.id];
     const currentWeight = isWeightExercise ? getConfig(exerciseConfig?.id).weight : null;
-    
+
     const [localWeightStr, setLocalWeightStr] = useState('');
     // Reset localWeightStr carefully
     useEffect(() => {
@@ -136,7 +136,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
         <div className="fade-in modal-overlay" style={{
             zIndex: Z_INDEX.TOAST,
         }}>
-            <div className="modal-content">
+            <div className="modal-content" role="dialog" aria-modal="true" aria-label={exerciseLabel}>
             {/* Header */}
             <div style={{
                 display: 'flex',
@@ -145,9 +145,9 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                 marginBottom: 'var(--spacing-lg)',
                 gap: '8px'
             }}>
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: '10px',
                     flex: 1,
                     minWidth: 0
@@ -161,8 +161,8 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
                     }}>
                         <DynamicIcon icon={exerciseConfig?.icon} size={20} color={activeColor} />
                     </div>
-                    <h2 className="panel-title" style={{ 
-                        color: activeColor, 
+                    <h2 className="panel-title" style={{
+                        color: activeColor,
                         margin: 0,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -483,7 +483,7 @@ export function Counter({ onClose, dailyGoal, currentCount, onUpdateCount, isCom
 
             {/* Daily Tip Footer */}
             <div style={{
-                marginTop: 'auto', marginBottom: '8px', 
+                marginTop: 'auto', marginBottom: '8px',
                 padding: '8px 16px', borderRadius: '12px',
                 background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)',
                 fontSize: '0.8rem', textAlign: 'center', alignSelf: 'center', width: '90%', maxWidth: '300px',

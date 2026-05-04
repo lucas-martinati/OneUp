@@ -6,6 +6,33 @@ import { VitePWA } from 'vite-plugin-pwa'
 // https://vitejs.dev/config/
 export default defineConfig({
   base: process.env.GITHUB_PAGES ? '/OneUp/' : '/',
+  build: {
+    modulePreload: {
+      resolveDependencies(_filename, deps) {
+        return deps.filter(dep => !dep.includes('map-vendor') && !dep.includes('capacitor-vendor'));
+      }
+    },
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        hoistTransitiveImports: false,
+        manualChunks(id) {
+          if (id.includes('vite/preload-helper')) return 'preload-helper';
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('scheduler')) return 'react-vendor';
+            if (id.includes('firebase')) return 'firebase-vendor';
+            if (id.includes('@revenuecat/purchases-js')) return 'revenuecat-web-vendor';
+            if (id.includes('@revenuecat/purchases-capacitor')) return 'revenuecat-native-vendor';
+            if (id.includes('@capacitor')) return 'capacitor-vendor';
+            if (id.includes('recharts') || id.includes('d3')) return 'charts-vendor';
+            if (id.includes('lucide-react')) return 'ui-vendor';
+            if (id.includes('leaflet') || id.includes('react-leaflet')) return 'map-vendor';
+          }
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  },
   resolve: {
     alias: {
       '@components': '/src/components',
@@ -61,24 +88,6 @@ export default defineConfig({
         '**/node_modules/**',
       ]
     }
-  },
-  build: {
-    cssCodeSplit: true,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('scheduler')) return 'react-vendor';
-            if (id.includes('firebase')) return 'firebase-vendor';
-            if (id.includes('@capacitor') || id.includes('@revenuecat')) return 'capacitor-vendor';
-            if (id.includes('recharts') || id.includes('d3')) return 'charts-vendor';
-            if (id.includes('lucide-react')) return 'ui-vendor';
-            if (id.includes('leaflet') || id.includes('react-leaflet')) return 'map-vendor';
-          }
-        }
-      }
-    },
-    chunkSizeWarningLimit: 1000
   },
   test: {
     environment: 'jsdom',

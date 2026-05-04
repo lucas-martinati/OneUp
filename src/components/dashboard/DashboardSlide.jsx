@@ -42,7 +42,7 @@ export const DashboardSlide = React.memo(({
     const isDayPerfect = isPerfectDay(completions[today], exercisesList);
 
     return (
-        <div 
+        <div
             className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative overflow-hidden gap-responsive ${isDay100 ? 'dashboard-glitch-bg' : (isDayPerfect ? 'dashboard-gold-bg' : '')}`}
             style={{
                 paddingTop: title ? '12px' : '0',
@@ -57,7 +57,7 @@ export const DashboardSlide = React.memo(({
                         { bottom: '15%', left: '10%', size: 10, delay: '2s' },
                         { bottom: '25%', right: '15%', size: 7, delay: '3.5s' }
                     ].map((s, idx) => (
-                        <Star 
+                        <Star
                             key={idx}
                             className="sparkle-icon"
                             size={s.size}
@@ -73,8 +73,8 @@ export const DashboardSlide = React.memo(({
             {title && (
                 <div className="flex-align-center" style={{ gap: '8px' }}>
                     <div style={{
-                        fontSize: '0.8rem', fontWeight: '800', 
-                        color: isDayPerfect ? '#ffdf00' : (categoryColor || 'var(--text-secondary)'), 
+                        fontSize: '0.8rem', fontWeight: '800',
+                        color: isDayPerfect ? '#ffdf00' : (categoryColor || 'var(--text-secondary)'),
                         textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8,
                         textShadow: isDayPerfect ? '0 0 10px rgba(255,223,0,0.5)' : 'none'
                     }}>
@@ -97,7 +97,7 @@ export const DashboardSlide = React.memo(({
                     {/* Day & Goal Hero Section */}
                     <div style={{ textAlign: 'center', position: 'relative' }}>
                         <div style={{
-                            fontSize: 'clamp(0.75rem, 1.6vh, 1rem)', 
+                            fontSize: 'clamp(0.75rem, 1.6vh, 1rem)',
                             color: isDay100 ? '#ef4444' : (isDayPerfect ? '#ffdf00' : 'var(--text-secondary)'),
                             textTransform: 'uppercase', letterSpacing: '4px',
                             marginBottom: '2px', fontWeight: '700',
@@ -116,9 +116,9 @@ export const DashboardSlide = React.memo(({
                             {isCounterTransitioning && prevDayNumber && (
                                 <div className={isDay100 ? 'glitch-text' : (isDayPerfect ? 'gold-text' : 'rainbow-gradient')} style={{
                                     position: 'absolute', fontSize: 'clamp(3rem, 8.5vh, 6.5rem)', fontWeight: '800', lineHeight: 1,
-                                    animation: isDay100 
+                                    animation: isDay100
                                         ? 'textGlitch 0.6s infinite, counterSlideDown 1s ease-out forwards'
-                                        : (isDayPerfect 
+                                        : (isDayPerfect
                                             ? 'gradientShift 4s ease infinite, counterSlideDown 1s ease-out forwards'
                                             : 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards')
                                 }}>
@@ -167,8 +167,8 @@ export const DashboardSlide = React.memo(({
 
                     {/* ── Progress ring + Counter button + Completion status (grouped) ── */}
                     <div className="flex-col flex-align-center gap-responsive">
-                        <div className="flex-center pos-relative" style={{ 
-                            width: 'clamp(72px, 12vh, 110px)', 
+                        <div className="flex-center pos-relative" style={{
+                            width: 'clamp(72px, 12vh, 110px)',
                             height: 'clamp(72px, 12vh, 110px)'
                         }}>
                             {/* Year progress ring */}
@@ -200,6 +200,7 @@ export const DashboardSlide = React.memo(({
 
                             {/* Counter open button */}
                             <button
+                                aria-label={`${getExerciseLabel(safeSelectedExercise)} counter`}
                                 onClick={() => { pauseCloudSync?.(); setShowCounter(true); }}
                                 className={`ripple ${isDay100 ? 'hacked-button' : ''}`}
                                 style={{

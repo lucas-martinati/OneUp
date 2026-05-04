@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
-import { Capacitor } from '@capacitor/core';
-import { Preferences } from '@capacitor/preferences';
-import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import { cloudSync } from '../services/cloudSync';
 import { createLogger } from '../utils/logger';
+import { isNativePlatform } from '../utils/platform';
+import { Preferences } from '../utils/preferences';
 
 const logger = createLogger('GoogleAuth');
 
@@ -20,7 +19,7 @@ export function useGoogleAuth() {
     syncStatus: 'idle' // idle, syncing, synced, error
   });
 
-  const isNative = Capacitor.isNativePlatform();
+  const isNative = isNativePlatform();
 
   // Web sign-in handler using GIS (always call the hook to satisfy rules-of-hooks)
   const webSignInHandler = useGoogleLogin({
@@ -65,15 +64,30 @@ export function useGoogleAuth() {
 
   // Initialize Capacitor Google Auth for native platforms
   useEffect(() => {
-    if (isNative) {
-      GoogleAuth.initialize({
-        clientId: GOOGLE_CLIENT_ID,
-        scopes: ['profile', 'email'],
-      });
-      logger.info('Capacitor Google Auth initialized for native platform');
-    } else {
+    let cancelled = false;
+
+    if (!isNative) {
       logger.info('Using GIS for web platform');
+      return undefined;
     }
+
+    import('@codetrix-studio/capacitor-google-auth')
+      .then(({ GoogleAuth }) => {
+        if (cancelled) return;
+
+        GoogleAuth.initialize({
+          clientId: GOOGLE_CLIENT_ID,
+          scopes: ['profile', 'email'],
+        });
+        logger.info('Capacitor Google Auth initialized for native platform');
+      })
+      .catch((error) => {
+        logger.error('Capacitor Google Auth initialization failed:', error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [isNative]);
 
   // Check auth status on mount
@@ -129,6 +143,7 @@ export function useGoogleAuth() {
     try {
       setAuthState(prev => ({ ...prev, loading: true, error: null }));
 
+      const { GoogleAuth } = await import('@codetrix-studio/capacitor-google-auth');
       const googleUser = await GoogleAuth.signIn();
       logger.success('Capacitor Google Sign-In successful:', googleUser.email);
 
@@ -175,6 +190,7 @@ export function useGoogleAuth() {
 
       // Sign out from both Google and Firebase
       if (isNative) {
+        const { GoogleAuth } = await import('@codetrix-studio/capacitor-google-auth');
         await GoogleAuth.signOut();
       }
       // For web GIS, there's no explicit logout needed, just Firebase

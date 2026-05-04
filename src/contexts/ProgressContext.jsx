@@ -62,8 +62,8 @@ export function ProgressProvider({ children }) {
       const savedDiff = completions[dateStr][exId].difficulty;
       // If we have a saved difficulty for this specific workout, use it.
       if (savedDiff !== undefined) return savedDiff;
-      
-      // If NO saved difficulty exists on a completed day, it's old data from 
+
+      // If NO saved difficulty exists on a completed day, it's old data from
       // before the per-exercise difficulty system. Fallback to 1.0.
       return 1.0;
     }
@@ -89,7 +89,7 @@ export function ProgressProvider({ children }) {
   // that gets set by ExercisesProvider after mount. For now, use empty array.
   const [customExercisesForStats, setCustomExercisesForStats] = useState([]);
   const [userClans, setUserClans] = useState([]);
-  
+
   const internalGetConfig = useCallback((exId, dateStr) => ({
     difficulty: getDifficulty(exId, dateStr),
     weight: null,
@@ -154,11 +154,9 @@ export function ProgressProvider({ children }) {
 
   // ── Notification permission + scheduling ───────────────────────────
   useEffect(() => {
-    if (isSetup) {
+    if (isSetup && settings.notificationsEnabled) {
       requestNotificationPermission();
-      if (settings.notificationsEnabled) {
-        scheduleNotification(settings);
-      }
+      scheduleNotification(settings);
     }
   }, [isSetup, settings.notificationsEnabled, requestNotificationPermission, scheduleNotification, settings]);
 
@@ -181,11 +179,11 @@ export function ProgressProvider({ children }) {
   useEffect(() => {
     if (auth.isSignedIn && !auth.loading && !conflictData && conflictCheckDone && isInitialSyncDone) {
       const doSave = async () => {
-        try { 
-          await saveToCloud(); 
+        try {
+          await saveToCloud();
           setSyncError(null);
-        } catch (error) { 
-          logger.error('Auto-save failed:', error); 
+        } catch (error) {
+          logger.error('Auto-save failed:', error);
           setSyncError(error.message);
         }
       };
@@ -237,7 +235,7 @@ export function ProgressProvider({ children }) {
               delete cleanedCloud.cardioTotalReps;
               delete cleanedCloud.runningReps;
               delete cleanedCloud.cyclingReps;
-              
+
               const safeSettings = {
                 ...cleanedCloud,
                 notificationTime: cloudSettings.notificationTime || { hour: 9, minute: 0 },
@@ -257,8 +255,8 @@ export function ProgressProvider({ children }) {
             // No cloud data found — safe to assume local is the truth
             setTimeout(() => setSettingsInitialSyncDone(true), 0);
           }
-        } catch (error) { 
-          logger.error('Settings sync error:', error); 
+        } catch (error) {
+          logger.error('Settings sync error:', error);
           // Don't set initialSyncDone to true on error to avoid overwriting cloud with empty local
         }
       };
@@ -385,11 +383,11 @@ export function ProgressProvider({ children }) {
             try {
               const parsed = JSON.parse(guestSettings);
               if (parsed.exerciseDifficulties) {
-                updateSettings(prev => ({ 
-                    exerciseDifficulties: { 
-                        ...parsed.exerciseDifficulties, 
-                        ...(prev.exerciseDifficulties || {}) 
-                    } 
+                updateSettings(prev => ({
+                    exerciseDifficulties: {
+                        ...parsed.exerciseDifficulties,
+                        ...(prev.exerciseDifficulties || {})
+                    }
                 }));
               }
             } catch { /* ignore */ }

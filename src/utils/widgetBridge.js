@@ -1,7 +1,6 @@
-import { Capacitor, registerPlugin } from '@capacitor/core';
-import { Preferences } from '@capacitor/preferences';
 import i18n from '../i18n';
 import { getLocalDateStr } from './dateUtils';
+import { isAndroidPlatform } from './platform';
 
 /**
  * Bridge between the web app and native Android widgets.
@@ -13,10 +12,25 @@ import { getLocalDateStr } from './dateUtils';
  * SharedPreferences file: "CapacitorStorage" (default for @capacitor/preferences)
  */
 
-// Register the native WidgetBridge plugin (Android only)
-const WidgetBridge = Capacitor.getPlatform() === 'android'
-  ? registerPlugin('WidgetBridge')
-  : null;
+let widgetBridgePromise = null;
+let nativePreferencesPromise = null;
+
+async function getWidgetBridge() {
+  if (!widgetBridgePromise) {
+    widgetBridgePromise = import('@capacitor/core')
+      .then(({ registerPlugin }) => registerPlugin('WidgetBridge'));
+  }
+
+  return widgetBridgePromise;
+}
+
+async function getNativePreferences() {
+  if (!nativePreferencesPromise) {
+    nativePreferencesPromise = import('@capacitor/preferences').then(({ Preferences }) => Preferences);
+  }
+
+  return nativePreferencesPromise;
+}
 
 /**
  * Compute the week days status (Mon→Sun) for the current week.
@@ -62,9 +76,14 @@ function getTodayIndex() {
  */
 export async function updateWidgetData(computedStats, completions) {
   // Only run on native Android
-  if (Capacitor.getPlatform() !== 'android') return;
+  if (!isAndroidPlatform()) return;
 
   try {
+    const [Preferences, WidgetBridge] = await Promise.all([
+      getNativePreferences(),
+      getWidgetBridge(),
+    ]);
+
     const widgetData = {
       // Show the ongoing streak even if today isn't done yet.
       // displayStreak = 0 when today isn't done and yesterday isn't done either,
