@@ -97,10 +97,20 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         return list;
     }, [activeCategories, exercisesList, customCategories, exercisesByUserCategory]);
 
+    const localCardioReps = React.useMemo(() => {
+        const sessions = cardioData?.allSessions || [];
+        const runningKm = sessions.filter(s => s.type === 'running').reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
+        const cyclingKm = sessions.filter(s => s.type === 'cycling').reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
+        return {
+            running: Math.floor(runningKm * 15),
+            cycling: Math.floor(cyclingKm * 15)
+        };
+    }, [cardioData.allSessions]);
+
     const computedStats = React.useMemo(() => {
         if (canAccessFeature(FEATURES.MERGED_STATS, { isPro: hasProAccess }) && activeCategories.length === 4) return globalStats;
-        return computeAllStats(completions, settings, getDayNumber, exercises, false, {}, getConfig);
-    }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess, getConfig]);
+        return computeAllStats(completions, settings, getDayNumber, exercises, false, {}, getConfig, localCardioReps);
+    }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess, getConfig, localCardioReps]);
 
     // All values come from computedStats
     const {

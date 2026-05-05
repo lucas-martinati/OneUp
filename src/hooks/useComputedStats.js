@@ -157,13 +157,13 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         for (const [exId, exData] of Object.entries(day)) {
             if (!exData?.isCompleted) continue;
 
-            totalExerciseCompletions++;
-            dayExCount++;
-            completedExIds.add(exId);
-
             // Exercise reps
             const ex = allExercises.find(e => e.id === exId);
             if (ex) {
+                totalExerciseCompletions++;
+                dayExCount++;
+                completedExIds.add(exId);
+
                 const diffToUse = getConfig ? getConfig(exId, dateStr).difficulty : difficultyMultiplier;
                 
                 let reps = 0;
@@ -356,8 +356,8 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     const runningReps = cardioReps?.running ?? settings?.runningReps;
     const cyclingReps = cardioReps?.cycling ?? settings?.cyclingReps;
 
-    if (runningReps) exerciseReps['running'] = runningReps;
-    if (cyclingReps) exerciseReps['cycling'] = cyclingReps;
+    if (runningReps && allExercises.some(e => e.id === 'running')) exerciseReps['running'] = runningReps;
+    if (cyclingReps && allExercises.some(e => e.id === 'cycling')) exerciseReps['cycling'] = cyclingReps;
 
     // ─── Derived values ──────────────────────────────────────────────────
     const globalTotalReps = Object.values(exerciseReps).reduce((sum, r) => sum + r, 0) ;
