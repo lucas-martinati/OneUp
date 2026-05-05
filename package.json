@@ -14,7 +14,7 @@
     "build:apk:dev": "npm run build && npx cap copy android && cd android && ./gradlew assembleDevRelease",
     "deploy:android": "npm run build && npx cap sync android && npx cap run android --flavor dev",
     "deploy:android:prod": "npm run build && npx cap sync android && npx cap run android --flavor prod",
-    "lint": "eslint . && knip && node scripts/check-i18n-keys.cjs && node scripts/check-i18n-consistency.cjs",
+    "lint": "eslint . && knip --no-config-hints && node scripts/check-i18n-keys.cjs && node scripts/check-i18n-consistency.cjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "preview": "vite preview",

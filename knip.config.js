@@ -8,6 +8,7 @@ const config = {
   ],
   ignoreDependencies: [
     "@capacitor/android", // Indispensable pour GitHub Actions
+    "googleapis", // Installé à la volée dans GitHub Actions
     "@capacitor/assets",
     "@testing-library/react",
     "i18next-parser",
