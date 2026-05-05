@@ -18,6 +18,10 @@ on:
         description: 'Release notes (EN) — leave empty for no notes'
         required: false
         default: ''
+      version_code_offset:
+        description: 'Incrémentation forcée du numéro de version (défaut: 1)'
+        required: false
+        default: '1'
 
 jobs:
   build-and-deploy:
@@ -35,15 +39,46 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      # ── Node.js 22 ───────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      # ── Get latest versionCode from Play Store ──────────────────
+      - name: Get latest versionCode from Play Store
+        id: play_store_version
+        env:
+          SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          PACKAGE_NAME: com.lucasm548.oneup
+        run: |
+          npm install googleapis --no-save
+          MAX_CODE=$(node scripts/android/get-play-store-version.js)
+          echo "max_code=$MAX_CODE" >> $GITHUB_OUTPUT
+
       # ── Auto-increment versionCode ─────────────────────────────
       - name: Bump versionCode in build.gradle
         run: |
           GRADLE_FILE="android/app/build.gradle"
-          # Read current versionCode
-          CURRENT_CODE=$(grep -oP 'versionCode \K[0-9]+' "$GRADLE_FILE")
-          NEW_CODE=$((CURRENT_CODE + 1))
+          # Read current local versionCode
+          LOCAL_CODE=$(grep -oP 'versionCode \K[0-9]+' "$GRADLE_FILE")
+          # Get play store version from previous step
+          STORE_CODE=${{ steps.play_store_version.outputs.max_code || 0 }}
+          # Get manual offset
+          OFFSET=${{ github.event.inputs.version_code_offset || 1 }}
+          
+          # Compute new code: max(LOCAL_CODE, STORE_CODE) + OFFSET
+          MAX_BASE=$LOCAL_CODE
+          if [ "$STORE_CODE" -gt "$LOCAL_CODE" ]; then
+            MAX_BASE=$STORE_CODE
+            echo "🚀 Play Store has higher version ($STORE_CODE) than local ($LOCAL_CODE)"
+          fi
+          NEW_CODE=$((MAX_BASE + OFFSET))
+          
           # Update versionCode
-          sed -i "s/versionCode $CURRENT_CODE/versionCode $NEW_CODE/" "$GRADLE_FILE"
+          sed -i "s/versionCode $LOCAL_CODE/versionCode $NEW_CODE/" "$GRADLE_FILE"
+          
           # Update versionName: input > tag > keep current
           INPUT_VERSION="${{ github.event.inputs.version_name }}"
           if [[ -n "$INPUT_VERSION" ]]; then
@@ -54,7 +89,8 @@ jobs:
             sed -i "s/versionName \"[^\"]*\"/versionName \"$TAG_VERSION\"/" "$GRADLE_FILE"
             echo "✅ versionName → $TAG_VERSION (from tag)"
           fi
-          echo "✅ versionCode: $CURRENT_CODE → $NEW_CODE"
+          
+          echo "✅ versionCode: $LOCAL_CODE → $NEW_CODE"
           VERSION_NAME=$(grep -oP 'versionName "\K[^"]+' "$GRADLE_FILE")
           echo "VERSION_CODE=$NEW_CODE" >> $GITHUB_ENV
           echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
@@ -65,13 +101,6 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-
-      # ── Node.js 20 ───────────────────────────────────────────
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
