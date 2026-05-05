@@ -122,7 +122,24 @@ export function Dashboard() {
     const [prevDayNumber, setPrevDayNumber] = useState(null);
     const [showDayConfetti, setShowDayConfetti] = useState(false);
     const [openStoreDirectly, setOpenStoreDirectly] = useState(false);
+    const [isNavExpanded, setIsNavExpanded] = useState(false);
+    const [dragIndex, setDragIndex] = useState(null);
+    const navInteractionRef = useRef({ timer: null, startY: 0, startX: 0, isLongPress: false });
     const scrollContainerRef = useRef(null);
+    const navContainerRef = useRef(null);
+
+    // Prevent native scrolling on mobile when actively dragging the category nav
+    useEffect(() => {
+        const navEl = navContainerRef.current;
+        if (!navEl) return;
+        const handleTouchMove = (e) => {
+            if (navInteractionRef.current.isLongPress) {
+                e.preventDefault();
+            }
+        };
+        navEl.addEventListener('touchmove', handleTouchMove, { passive: false });
+        return () => navEl.removeEventListener('touchmove', handleTouchMove);
+    }, []);
 
     // Scroll to default slide (bodyweight) on mount
     useEffect(() => {
@@ -455,23 +472,127 @@ export function Dashboard() {
                         })}
                     </div>
 
-                    <div className="flex-col pos-absolute" style={{
-                        right: '4px', top: '50%', transform: 'translateY(-50%)',
-                        gap: '8px', zIndex: 10, pointerEvents: 'none'
-                    }}>
+                    <div 
+                        ref={navContainerRef}
+                        className={`category-nav-container ${isNavExpanded ? 'expanded' : ''}`}
+                        onPointerDown={(e) => {
+                            const y = e.clientY;
+                            const x = e.clientX;
+                            const target = e.currentTarget;
+                            
+                            navInteractionRef.current.startY = y;
+                            navInteractionRef.current.startX = x;
+                            navInteractionRef.current.isLongPress = false;
+                            
+                            navInteractionRef.current.timer = setTimeout(() => {
+                                navInteractionRef.current.isLongPress = true;
+                                setIsNavExpanded(true);
+                                target.setPointerCapture(e.pointerId);
+                                if (window.navigator.vibrate) window.navigator.vibrate(10);
+                            }, 300); // 300ms long press delay
+                        }}
+                        onPointerUp={(e) => {
+                            clearTimeout(navInteractionRef.current.timer);
+                            if (navInteractionRef.current.isLongPress) {
+                                setIsNavExpanded(false);
+                                setDragIndex(null);
+                                e.currentTarget.releasePointerCapture(e.pointerId);
+                                navInteractionRef.current.isLongPress = false;
+                            } else {
+                                // Short tap - pass click through!
+                                const target = e.target;
+                                if (target.closest('.category-nav-dot')) {
+                                    return; // Tapped directly on a dot, let its onClick fire
+                                }
+                                
+                                const x = e.clientX;
+                                const y = e.clientY;
+                                const navContainer = e.currentTarget;
+                                
+                                navContainer.style.pointerEvents = 'none';
+                                const elementBelow = document.elementFromPoint(x, y);
+                                navContainer.style.pointerEvents = 'auto';
+                                
+                                if (elementBelow) {
+                                    if (typeof elementBelow.click === 'function') {
+                                        elementBelow.click();
+                                    } else {
+                                        elementBelow.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+                                    }
+                                }
+                            }
+                        }}
+                        onPointerMove={(e) => {
+                            if (!navInteractionRef.current.isLongPress) {
+                                const dy = Math.abs(e.clientY - navInteractionRef.current.startY);
+                                const dx = Math.abs(e.clientX - navInteractionRef.current.startX);
+                                if (dy > 10 || dx > 10) {
+                                    clearTimeout(navInteractionRef.current.timer);
+                                }
+                                return;
+                            }
+                            
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const relativeY = e.clientY - rect.top;
+                            const totalHeight = rect.height;
+                            const index = Math.max(0, Math.min(fullCategoryOrder.length - 1, Math.floor((relativeY / totalHeight) * fullCategoryOrder.length)));
+                            
+                            if (index !== dragIndex) {
+                                setDragIndex(index);
+                                const el = scrollContainerRef.current;
+                                if (el) {
+                                    el.scrollTo({ top: el.clientHeight * index, behavior: 'smooth' });
+                                }
+                                if (window.navigator.vibrate) window.navigator.vibrate(5);
+                            }
+                        }}
+                        onPointerCancel={() => {
+                            clearTimeout(navInteractionRef.current.timer);
+                            if (navInteractionRef.current.isLongPress) {
+                                setIsNavExpanded(false);
+                                setDragIndex(null);
+                                navInteractionRef.current.isLongPress = false;
+                            }
+                        }}
+                        onContextMenu={(e) => {
+                            if (navInteractionRef.current.isLongPress) e.preventDefault();
+                        }}
+                        style={{ pointerEvents: anyModalOpen ? 'none' : 'auto' }}
+                    >
                         {fullCategoryOrder.map((catId, i) => {
                             const isUserCat = isUserCategory(catId);
                             const isActive = activeSlide === i;
+                            const isDragOver = dragIndex === i;
+                            
+                            const getCategoryName = (id) => {
+                                if (id === CATEGORIES.BODYWEIGHT) return t('common.bodyweight');
+                                if (id === CATEGORIES.WEIGHTS) return t('common.weights');
+                                if (id === CATEGORIES.CARDIO) return t('common.cardio');
+                                if (id === CATEGORIES.CUSTOM) return t('common.custom');
+                                return customCategories.find(c => c.id === id)?.name || id;
+                            };
+
+                            const dotColor = isActive 
+                                ? (isUserCat ? '#94a3b8' : 'var(--text-primary)') 
+                                : (isUserCat ? '#475569' : 'var(--text-secondary)');
+
                             return (
-                                <div key={i} style={{
-                                    width: '4px', height: isActive ? '24px' : '6px',
-                                    borderRadius: '4px',
-                                    background: isActive 
-                                        ? (isUserCat ? '#94a3b8' : 'var(--text-primary)') 
-                                        : (isUserCat ? '#475569' : 'var(--text-secondary)'),
-                                    opacity: isActive ? 1 : 0.4,
-                                    transition: 'all 0.3s ease'
-                                }} />
+                                <div 
+                                    key={i} 
+                                    className={`category-nav-dot ${isActive ? 'active' : ''} ${isDragOver ? 'drag-over' : ''}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const el = scrollContainerRef.current;
+                                        if (el) {
+                                            el.scrollTo({ top: el.clientHeight * i, behavior: 'smooth' });
+                                        }
+                                    }}
+                                    style={{ background: dotColor }}
+                                >
+                                    <span className="category-nav-label">
+                                        {getCategoryName(catId)}
+                                    </span>
+                                </div>
                             );
                         })}
                     </div>
