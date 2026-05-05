@@ -92,9 +92,9 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
     setOptions(prev => {
       if (prev[key] === value) return prev;
       
-      // Special handling for arrays (like statsCategories)
+      // Special handling for arrays (like statsCategories) - Order insensitive comparison
       if (Array.isArray(value) && Array.isArray(prev[key])) {
-        if (value.length === prev[key].length && value.every((v, i) => v === prev[key][i])) {
+        if (new Set(value).size === new Set(prev[key]).size && value.every(v => prev[key].includes(v))) {
           return prev;
         }
       }

@@ -54,7 +54,7 @@ jobs:
           PACKAGE_NAME: com.lucasm548.oneup
         run: |
           npm install googleapis --no-save
-          MAX_CODE=$(node scripts/android/get-play-store-version.js)
+          MAX_CODE=$(node scripts/android/get-play-store-version.cjs)
           echo "max_code=$MAX_CODE" >> $GITHUB_OUTPUT
 
       # ── Auto-increment versionCode ─────────────────────────────
@@ -64,9 +64,9 @@ jobs:
           # Read current local versionCode
           LOCAL_CODE=$(grep -oP 'versionCode \K[0-9]+' "$GRADLE_FILE")
           # Get play store version from previous step
-          STORE_CODE=${{ steps.play_store_version.outputs.max_code || 0 }}
+          STORE_CODE="${{ steps.play_store_version.outputs.max_code || '0' }}"
           # Get manual offset
-          OFFSET=${{ github.event.inputs.version_code_offset || 1 }}
+          OFFSET="${{ github.event.inputs.version_code_offset || '1' }}"
           
           # Compute new code: max(LOCAL_CODE, STORE_CODE) + OFFSET
           MAX_BASE=$LOCAL_CODE

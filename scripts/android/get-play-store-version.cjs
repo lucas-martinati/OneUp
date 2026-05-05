@@ -1,4 +1,4 @@
-import { google } from 'googleapis';
+const { google } = require('googleapis');
 
 /**
  * Fetches the highest versionCode currently uploaded to any track on Google Play.
@@ -20,16 +20,17 @@ async function getLatestVersion() {
     scopes: ['https://www.googleapis.com/auth/androidpublisher'],
   });
 
-  try {
-    const authClient = await auth.getClient();
-    const publisher = google.androidpublisher({
-      version: 'v3',
-      auth: authClient,
-    });
+  let editId = null;
+  const authClient = await auth.getClient();
+  const publisher = google.androidpublisher({
+    version: 'v3',
+    auth: authClient,
+  });
 
+  try {
     // We need to create an "edit" to list tracks
     const edit = await publisher.edits.insert({ packageName });
-    const editId = edit.data.id;
+    editId = edit.data.id;
 
     const tracksRes = await publisher.edits.tracks.list({
       packageName,
@@ -52,16 +53,17 @@ async function getLatestVersion() {
       }
     }
 
-    // Cleanup: delete the temporary edit
-    await publisher.edits.delete({ packageName, editId });
-
     // Output the max code to stdout so the workflow can capture it
     console.log(maxCode);
   } catch (err) {
     console.error('❌ Error fetching version from Play Store:', err.message);
-    // If we can't reach the store, we'll exit with 0 but print 0 to allow the workflow to fallback
-    // Actually, exiting with 1 is safer to let the workflow know there's a real issue
     process.exit(1);
+  } finally {
+    if (editId) {
+      await publisher.edits.delete({ packageName, editId }).catch(() => {
+        // Silently ignore deletion errors in finally
+      });
+    }
   }
 }
 

@@ -64,10 +64,12 @@ export function SharePanel({
 
   // Keep share modal categories in sync with Stats filter changes
   useEffect(() => {
-    // Only update if we are in global/stats mode or if categories are explicitly passed
-    // To avoid redundant updates in session mode where mappedCategories might be the default
-    setOption('statsCategories', mappedCategories);
-  }, [mappedCategories, setOption]);
+    // Only sync if in global mode or if categories were explicitly provided (not using defaults)
+    // This avoids redundant updates in session mode where we prefer the local session context
+    if (mode === 'global' || activeCategories !== DEFAULT_ACTIVE_CATEGORIES) {
+      setOption('statsCategories', mappedCategories);
+    }
+  }, [mappedCategories, setOption, mode, activeCategories]);
 
   const isCompact = variant === 'compact';
   const isStats = variant === 'stats';
