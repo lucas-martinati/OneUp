@@ -10,6 +10,8 @@ import { CATEGORIES } from '../../../config/categories';
 
 const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
 
+const DEFAULT_ACTIVE_CATEGORIES = ['standard', 'weights', 'custom'];
+
 /**
  * SharePanel — shared share button + modal for session or global stats sharing.
  * Used in SessionSummary, SessionDetailModal, and Stats.
@@ -23,7 +25,14 @@ const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.Sha
  * @param {string} params.mode - 'session' | 'global'
  * @param {Array} params.activeCategories - ['standard', 'weights', 'custom'] from Stats filters
  */
-export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 'session', label, activeCategories = ['standard', 'weights', 'custom'] }) {
+export function SharePanel({ 
+    sessionData, 
+    stats = {}, 
+    variant = 'large', 
+    mode = 'session', 
+    label, 
+    activeCategories = DEFAULT_ACTIVE_CATEGORIES 
+}) {
   const [showShare, setShowShare] = useState(false);
   const { t } = useTranslation();
   const { isPro, hadPro } = useSubscription();
@@ -55,6 +64,8 @@ export function SharePanel({ sessionData, stats = {}, variant = 'large', mode = 
 
   // Keep share modal categories in sync with Stats filter changes
   useEffect(() => {
+    // Only update if we are in global/stats mode or if categories are explicitly passed
+    // To avoid redundant updates in session mode where mappedCategories might be the default
     setOption('statsCategories', mappedCategories);
   }, [mappedCategories, setOption]);
 

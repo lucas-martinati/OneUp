@@ -90,6 +90,15 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
 
   const setOption = useCallback((key, value) => {
     setOptions(prev => {
+      if (prev[key] === value) return prev;
+      
+      // Special handling for arrays (like statsCategories)
+      if (Array.isArray(value) && Array.isArray(prev[key])) {
+        if (value.length === prev[key].length && value.every((v, i) => v === prev[key][i])) {
+          return prev;
+        }
+      }
+
       const next = { ...prev, [key]: value };
       saveOptionsToStorage(next);
       return next;
@@ -112,6 +121,12 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
         : [...cats, cat];
       // Don't allow empty selection
       if (next.length === 0) return prev;
+      
+      // Check if logically the same
+      if (next.length === cats.length && next.every((v, i) => v === cats[i])) {
+        return prev;
+      }
+
       const updated = { ...prev, statsCategories: next };
       saveOptionsToStorage(updated);
       return updated;

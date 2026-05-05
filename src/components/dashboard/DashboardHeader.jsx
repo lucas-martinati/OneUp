@@ -54,11 +54,15 @@ export const DashboardHeader = React.memo(({
         
         const observer = new ResizeObserver(() => {
             if (headerRef.current && rightSideRef.current) {
-                // Get the total header width and the width taken by the right side (badges + buttons)
                 const headerWidth = headerRef.current.getBoundingClientRect().width;
                 const rightWidth = rightSideRef.current.getBoundingClientRect().width;
-                // padding-left is clamp(12px, 3vw, 20px), we leave a 20px margin of safety
-                setAvailableSpace(headerWidth - rightWidth - 40); 
+                const newSpace = headerWidth - rightWidth - 40;
+                
+                setAvailableSpace(prev => {
+                    // Only update if difference is more than 2px to avoid micro-loops
+                    if (Math.abs(prev - newSpace) < 2) return prev;
+                    return newSpace;
+                });
             }
         });
 
