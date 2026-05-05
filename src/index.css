@@ -241,7 +241,10 @@ input[type="number"] {
 
 html {
   overscroll-behavior: none;
-  background: var(--bg-color); /* To prevent black flashes behind the app */
+  background: var(--bg-color);
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -249,13 +252,17 @@ body {
   background: var(--body-bg);
   color: var(--text-primary);
   line-height: 1.5;
-  overflow-x: hidden;
+  overflow: hidden;
   overscroll-behavior: none;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  position: relative;
+  position: fixed; /* Essential for iOS to prevent elastic bounce on the whole app */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   transition: background 0.5s ease;
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
