@@ -57,15 +57,15 @@ describe('sessionHistoryService', () => {
       );
     });
 
-    it('trims to MAX_SESSIONS (10)', () => {
-      const sessions = Array.from({ length: 15 }, (_, i) => ({
+    it('trims to MAX_SESSIONS (20)', () => {
+      const sessions = Array.from({ length: 25 }, (_, i) => ({
         id: String(i), date: '2025-01-01', duration: 300, name: `S${i}`, exercises: [],
       }));
       saveSessionHistory(sessions);
       const saved = JSON.parse(store['oneup_session_history']);
-      expect(saved).toHaveLength(10);
+      expect(saved).toHaveLength(20);
       expect(saved[0].id).toBe('0');
-      expect(saved[9].id).toBe('9');
+      expect(saved[19].id).toBe('19');
     });
   });
 
