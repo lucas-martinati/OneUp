@@ -22,6 +22,10 @@ let isInitialized = false;
 
 export function initializeFirebase() {
   if (!isInitialized) {
+    if (!firebaseConfig.apiKey) {
+      logger.warn('Firebase configuration missing in .env. Skipping initialization.');
+      return;
+    }
     try {
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);

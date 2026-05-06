@@ -1480,3 +1480,45 @@ button:focus:not(:focus-visible) {
     transform: translateX(0) scale(1);
   }
 }
+
+/* ── Large Screen Optimizations (PC/Tablet) ── */
+@media (min-width: 768px) {
+  .category-nav-container {
+    right: 24px;
+    padding: 16px 10px;
+    gap: 16px;
+    border-radius: 24px;
+  }
+  
+  .category-nav-container::before {
+    /* Larger hit area on desktop, but doesn't overlap center content */
+    left: -30px; 
+    right: -30px;
+  }
+  
+  .category-nav-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .category-nav-dot.active {
+    height: 28px;
+    width: 6px;
+  }
+  
+  .category-nav-container.expanded .category-nav-dot,
+  .category-nav-container:hover .category-nav-dot {
+    width: 18px;
+  }
+  
+  .category-nav-container.expanded .category-nav-dot.active,
+  .category-nav-container:hover .category-nav-dot.active {
+    width: 26px;
+    height: 30px;
+  }
+  
+  .category-nav-dot.drag-over,
+  .category-nav-dot:hover {
+    width: 32px !important;
+  }
+}
