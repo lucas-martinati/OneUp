@@ -863,7 +863,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         onClose={() => setSelectedSession(null)}
                         onDelete={handleDeleteSession}
                         onNameChange={handleSessionNameChange}
-                        stats={computedStats}
+                        stats={globalStats}
                         isPro={hasProAccess}
                     />
                 )}
