@@ -310,8 +310,7 @@ export function Dashboard() {
                             if (slideHeight === 0) return;
                             const newSlide = Math.round(e.target.scrollTop / slideHeight);
                             if (newSlide >= 0 && newSlide < fullCategoryOrder.length) {
-                                window.__latestSlide = newSlide;
-                                document.getElementById('active-slide-updater').click();
+                                setActiveSlide(prev => prev !== newSlide ? newSlide : prev);
                             }
                         }}
                         style={{
@@ -321,12 +320,6 @@ export function Dashboard() {
                             scrollbarWidth: 'none', msOverflowStyle: 'none'
                         }}
                     >
-
-                        <button id="active-slide-updater" style={{display:'none'}} onClick={() => {
-                            if (window.__latestSlide !== undefined && window.__latestSlide !== activeSlide) {
-                                setActiveSlide(window.__latestSlide);
-                            }
-                        }}></button>
 
                         {fullCategoryOrder.map((catKey, i) => {
                             const isRendered = renderedSlides.has(i);
