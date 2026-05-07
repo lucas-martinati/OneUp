@@ -125,8 +125,6 @@ export function Dashboard() {
     const [openStoreDirectly, setOpenStoreDirectly] = useState(false);
     const scrollContainerRef = useRef(null);
 
-
-
     // Scroll to default slide (bodyweight) on mount
     useEffect(() => {
         const el = scrollContainerRef.current;

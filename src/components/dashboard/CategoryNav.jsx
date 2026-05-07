@@ -135,7 +135,7 @@ export const CategoryNav = ({
                     return prevIndex;
                 });
             }}
-            onPointerCancel={(e) => {
+            onPointerCancel={() => {
                 clearTimeout(navInteractionRef.current.timer);
                 if (navInteractionRef.current.isLongPress) {
                     setIsNavExpanded(false);
