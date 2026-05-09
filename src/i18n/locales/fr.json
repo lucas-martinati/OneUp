@@ -521,6 +521,8 @@
     "eco": "Éco",
     "enable": "Activer",
     "graphicsMode": "Mode graphique",
+    "keepScreenOn": "Garder l'écran allumé",
+    "keepScreenOnDesc": "Empêcher la mise en veille pendant l'exercice",
     "language": "Langue",
     "languageDesc": "Changer la langue de l'application",
     "leaderboardDesc": "Apparaître dans le classement public",
@@ -685,37 +687,131 @@
   },
   "sessionNames": {
     "light": {
-      "morning": ["Réveil en douceur ☀️", "Petite routine matinale", "Échauffement du matin"],
-      "noon": ["Pause active du midi", "Session express 🕐", "Petit training de midi"],
-      "evening": ["Petite séance du soir", "Routine du soir 🌙", "Détente active"],
-      "night": ["Session nocturne 🌃", "Training de nuit", "Séance tardive"]
+      "morning": [
+        "Réveil en douceur ☀️",
+        "Petite routine matinale",
+        "Échauffement du matin"
+      ],
+      "noon": [
+        "Pause active du midi",
+        "Session express 🕐",
+        "Petit training de midi"
+      ],
+      "evening": [
+        "Petite séance du soir",
+        "Routine du soir 🌙",
+        "Détente active"
+      ],
+      "night": [
+        "Session nocturne 🌃",
+        "Training de nuit",
+        "Séance tardive"
+      ]
     },
     "moderate": {
-      "morning": ["Bonne séance matinale 💪", "Training du matin", "Réveil musculaire"],
-      "noon": ["Séance du midi", "Training de la pause", "Session productive"],
-      "evening": ["Séance du soir 🔥", "Entraînement du soir", "Session after-work"],
-      "night": ["Séance nocturne solide", "Nuit productive 🌙", "Training tardif"]
+      "morning": [
+        "Bonne séance matinale 💪",
+        "Training du matin",
+        "Réveil musculaire"
+      ],
+      "noon": [
+        "Séance du midi",
+        "Training de la pause",
+        "Session productive"
+      ],
+      "evening": [
+        "Séance du soir 🔥",
+        "Entraînement du soir",
+        "Session after-work"
+      ],
+      "night": [
+        "Séance nocturne solide",
+        "Nuit productive 🌙",
+        "Training tardif"
+      ]
     },
     "intense": {
-      "morning": ["Grosse séance matinale 🔥", "Réveil de champion", "Morning grind 💪"],
-      "noon": ["Séance intense du midi 💥", "Gros training de midi", "Midi explosif"],
-      "evening": ["Grosse session du soir 💪", "Soirée intense", "Training costaud"],
-      "night": ["Nuit de warrior 🌙", "Session nocturne intense", "Effort de nuit 🔥"]
+      "morning": [
+        "Grosse séance matinale 🔥",
+        "Réveil de champion",
+        "Morning grind 💪"
+      ],
+      "noon": [
+        "Séance intense du midi 💥",
+        "Gros training de midi",
+        "Midi explosif"
+      ],
+      "evening": [
+        "Grosse session du soir 💪",
+        "Soirée intense",
+        "Training costaud"
+      ],
+      "night": [
+        "Nuit de warrior 🌙",
+        "Session nocturne intense",
+        "Effort de nuit 🔥"
+      ]
     },
     "epic": {
-      "morning": ["Séance légendaire du matin 🏆", "Matin d'anthologie", "Performance matinale 🔥"],
-      "noon": ["Midi historique 🔥", "Séance monstre du midi", "Midi de folie 💥"],
-      "evening": ["Soirée d'anthologie 🏆", "Session monumentale", "Performance du soir 🔥"],
-      "night": ["Nuit légendaire 🌙🔥", "Session épique nocturne", "Nuit de champion 🏆"]
+      "morning": [
+        "Séance légendaire du matin 🏆",
+        "Matin d'anthologie",
+        "Performance matinale 🔥"
+      ],
+      "noon": [
+        "Midi historique 🔥",
+        "Séance monstre du midi",
+        "Midi de folie 💥"
+      ],
+      "evening": [
+        "Soirée d'anthologie 🏆",
+        "Session monumentale",
+        "Performance du soir 🔥"
+      ],
+      "night": [
+        "Nuit légendaire 🌙🔥",
+        "Session épique nocturne",
+        "Nuit de champion 🏆"
+      ]
     },
-    "perfectDay": ["Journée parfaite 🌟", "Sans faute ✨", "Perfect day 💎", "100% complété 🏆", "Rien à ajouter 👑"]
+    "perfectDay": [
+      "Journée parfaite 🌟",
+      "Sans faute ✨",
+      "Perfect day 💎",
+      "100% complété 🏆",
+      "Rien à ajouter 👑"
+    ]
   },
   "shareTexts": {
-    "light": ["Petite séance bouclée sur OneUp ! 💪", "Training rapide terminé 🏃", "Quelques reps de faites, on reste régulier ! 🎯"],
-    "moderate": ["Bonne séance terminée sur OneUp ! 💪🔥", "Training solide aujourd'hui !", "On progresse, un jour à la fois 🚀"],
-    "intense": ["Grosse séance sur OneUp ! 🔥💪", "Session intense terminée ! Toujours plus fort 💥", "Énorme effort aujourd'hui ! 🏆"],
-    "epic": ["Séance légendaire sur OneUp ! 🏆🔥", "Performance énorme terminée ! 💪", "Session de folie bouclée ! 🚀💥"],
-    "perfectDay": ["Journée parfaite sur OneUp ! Tous les exercices validés 🌟", "Perfect day ! Rien ne m'arrête 💎✨", "100% complété aujourd'hui sur OneUp ! 👑🔥"],
-    "global": ["Découvrez mes statistiques sur OneUp ! 🔥", "Ma progression sur OneUp parle d'elle-même 📈", "Toujours plus haut avec OneUp ! 🚀"]
+    "light": [
+      "Petite séance bouclée sur OneUp ! 💪",
+      "Training rapide terminé 🏃",
+      "Quelques reps de faites, on reste régulier ! 🎯"
+    ],
+    "moderate": [
+      "Bonne séance terminée sur OneUp ! 💪🔥",
+      "Training solide aujourd'hui !",
+      "On progresse, un jour à la fois 🚀"
+    ],
+    "intense": [
+      "Grosse séance sur OneUp ! 🔥💪",
+      "Session intense terminée ! Toujours plus fort 💥",
+      "Énorme effort aujourd'hui ! 🏆"
+    ],
+    "epic": [
+      "Séance légendaire sur OneUp ! 🏆🔥",
+      "Performance énorme terminée ! 💪",
+      "Session de folie bouclée ! 🚀💥"
+    ],
+    "perfectDay": [
+      "Journée parfaite sur OneUp ! Tous les exercices validés 🌟",
+      "Perfect day ! Rien ne m'arrête 💎✨",
+      "100% complété aujourd'hui sur OneUp ! 👑🔥"
+    ],
+    "global": [
+      "Découvrez mes statistiques sur OneUp ! 🔥",
+      "Ma progression sur OneUp parle d'elle-même 📈",
+      "Toujours plus haut avec OneUp ! 🚀"
+    ]
   }
 }

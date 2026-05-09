@@ -505,6 +505,8 @@
     "eco": "Эко",
     "enable": "Включить",
     "graphicsMode": "Графический режим",
+    "keepScreenOn": "Keep screen on",
+    "keepScreenOnDesc": "Prevent screen from sleeping during exercise",
     "language": "Язык",
     "languageDesc": "Изменить язык приложения",
     "leaderboardDesc": "Показываться в публичной таблице",

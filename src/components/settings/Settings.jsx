@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Z_INDEX } from '../../utils/zIndex';
-import { X, Bell, Volume2, Clock, Users, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Sparkles } from '../../utils/icons';
+import { X, Bell, Volume2, Clock, Users, Lock, Unlock, Gauge, Globe, Heart, RotateCcw, ShoppingBag, ArrowLeft, Sparkles, Smartphone } from '../../utils/icons';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { Capacitor } from '@capacitor/core';
 import { getPurchaseHistory } from '../../services/purchaseService';
@@ -79,6 +79,11 @@ export function Settings({ defaultShowStore = false, onClose }) {
 
     const handleToggleSounds = () => {
         const newSettings = { ...settings, soundsEnabled: !settings.soundsEnabled };
+        onSave(newSettings);
+    };
+
+    const handleToggleScreenOn = () => {
+        const newSettings = { ...settings, keepScreenOn: !settings.keepScreenOn };
         onSave(newSettings);
     };
 
@@ -382,12 +387,26 @@ export function Settings({ defaultShowStore = false, onClose }) {
                     title={t('settings.soundEffects')}
                     description={t('settings.soundsDescription')}
                     color="#0ea5e9"
-                    isLast={true}
+                    isLast={false}
                 >
                     <ToggleSwitch
                         enabled={settings.soundsEnabled}
                         onClick={handleToggleSounds}
                         activeGradient="linear-gradient(135deg, #0ea5e9, #0284c7)"
+                    />
+                </SettingRow>
+
+                <SettingRow
+                    icon={Smartphone}
+                    title={t('settings.keepScreenOn')}
+                    description={t('settings.keepScreenOnDesc')}
+                    color="#f59e0b"
+                    isLast={true}
+                >
+                    <ToggleSwitch
+                        enabled={settings.keepScreenOn ?? true}
+                        onClick={handleToggleScreenOn}
+                        activeGradient="linear-gradient(135deg, #f59e0b, #d97706)"
                     />
                 </SettingRow>
             </div>

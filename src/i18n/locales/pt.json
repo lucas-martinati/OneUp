@@ -505,6 +505,8 @@
     "eco": "Ecológico",
     "enable": "Habilitar",
     "graphicsMode": "Modo gráfico",
+    "keepScreenOn": "Keep screen on",
+    "keepScreenOnDesc": "Prevent screen from sleeping during exercise",
     "language": "Linguagem",
     "languageDesc": "Alterar o idioma do aplicativo",
     "leaderboardDesc": "Aparecer na tabela de classificação pública",

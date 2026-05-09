@@ -42,7 +42,7 @@ export {
   Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
   Globe, Gauge, ShoppingBag, PieChart,
   Share2, Download, Image, Palette, Target,
-  History, Weight, Filter, Loader2,
+  History, Weight, Filter, Loader2, Smartphone,
   Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
   RefreshCw, Heart, Sparkles, Link, Link2, Calendar, TrendingUp,
   Gem, Ghost, Moon, Rocket, Sun

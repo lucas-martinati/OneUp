@@ -505,6 +505,8 @@
     "eco": "节能",
     "enable": "启用",
     "graphicsMode": "图形模式",
+    "keepScreenOn": "Keep screen on",
+    "keepScreenOnDesc": "Prevent screen from sleeping during exercise",
     "language": "语言",
     "languageDesc": "更改应用语言",
     "leaderboardDesc": "在公开排行榜中显示",

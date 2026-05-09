@@ -505,6 +505,8 @@
     "eco": "エコ",
     "enable": "有効にする",
     "graphicsMode": "グラフィックモード",
+    "keepScreenOn": "Keep screen on",
+    "keepScreenOnDesc": "Prevent screen from sleeping during exercise",
     "language": "言語",
     "languageDesc": "アプリケーション言語を変更する",
     "leaderboardDesc": "公開リーダーボードに表示される",

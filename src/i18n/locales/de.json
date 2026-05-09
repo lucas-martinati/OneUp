@@ -505,6 +505,8 @@
     "eco": "Öko",
     "enable": "Aktivieren",
     "graphicsMode": "Grafikmodus",
+    "keepScreenOn": "Keep screen on",
+    "keepScreenOnDesc": "Prevent screen from sleeping during exercise",
     "language": "Sprache",
     "languageDesc": "Ändern Sie die Anwendungssprache",
     "leaderboardDesc": "Erscheinen Sie in der öffentlichen Bestenliste",

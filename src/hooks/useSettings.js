@@ -10,7 +10,8 @@ const defaultSettings = {
   leaderboardEnabled: false,
   leaderboardPseudo: '',
   performanceMode: 'high', // 'low' | 'high'
-  exerciseDifficulties: {}
+  exerciseDifficulties: {},
+  keepScreenOn: true
 };
 
 export function useSettings(userId) {

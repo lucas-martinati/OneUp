@@ -12,6 +12,7 @@ import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 import { useWakeLock } from '../../hooks/useWakeLock';
 import { Z_INDEX } from '../../utils/zIndex';
+import { useProgressContext } from '../../contexts/ProgressContext';
 
 export function ExercisePanel({
     onClose,
@@ -26,7 +27,10 @@ export function ExercisePanel({
     isSession = false,
     fadeIn = true
 }) {
-    useWakeLock();
+    const { settings } = useProgressContext();
+    const keepScreenOn = settings?.keepScreenOn ?? true;
+    useWakeLock(keepScreenOn);
+    
     const { t } = useTranslation();
     const { getConfig, updateConfig } = useExerciseConfig();
     const isTimer = exerciseConfig?.type === 'timer';
