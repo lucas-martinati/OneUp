@@ -56,6 +56,8 @@ function migrateLegacyEntry(entry) {
         isCompleted: entry.isCompleted || entry.done || false,
         timestamp: entry.timestamp || null,
         timeOfDay: entry.timeOfDay || null,
+        ...(entry.pushupCount !== undefined ? { count: entry.pushupCount } : {}),
+        ...(entry.count !== undefined ? { count: entry.count } : {}),
         ...(entry.difficulty !== undefined ? { difficulty: entry.difficulty } : {})
       };
     }
@@ -69,6 +71,7 @@ function migrateLegacyEntry(entry) {
       migrated[key] = {
         isCompleted: val.isCompleted !== undefined ? val.isCompleted : (val.done || false),
         timestamp: val.timestamp || null,
+        ...(val.count !== undefined ? { count: val.count } : {}),
         ...(val.weight !== undefined ? { weight: val.weight } : {}),
         ...(val.difficulty !== undefined ? { difficulty: val.difficulty } : {})
       };
