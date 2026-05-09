@@ -37,12 +37,12 @@ export function DashboardSlideRenderer({
     return fullCategoryOrder.map((catKey, i) => {
         const isRendered = renderedSlides.has(i);
         if (!isRendered) {
-            return <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}></div>;
+            return <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}></div>;
         }
 
         if (catKey === CATEGORIES.CARDIO) {
             return (
-                <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                     <Suspense fallback={null}>
                         <CardioModule />
                     </Suspense>
@@ -52,7 +52,7 @@ export function DashboardSlideRenderer({
 
         if (catKey === CATEGORIES.BODYWEIGHT) {
             return (
-                <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                     <DashboardSlide
                         isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
                         getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
@@ -69,7 +69,7 @@ export function DashboardSlideRenderer({
 
         if (catKey === CATEGORIES.WEIGHTS) {
             return (
-                <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                     {canAccessFeature(FEATURES.WEIGHTS, { isPro }) ? (
                         <DashboardSlide
                             title={t('common.weights')}
@@ -99,7 +99,7 @@ export function DashboardSlideRenderer({
             const color = catDef?.color || CATEGORY_COLORS[CATEGORIES.CUSTOM];
 
             return (
-                <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                     {canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) ? (
                         <DashboardSlide
                             title={title}
@@ -133,7 +133,7 @@ export function DashboardSlideRenderer({
             const catExMap = exercisesMapByUserCategory[catKey] || {};
             const selId = userCatSelected[catKey] || catExercises[0]?.id || null;
             return (
-                <div key={catKey} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                     {canAccessFeature(FEATURES.CUSTOM_CATEGORIES, { isPro }) ? (
                         <DashboardSlide
                             title={catDef.name}

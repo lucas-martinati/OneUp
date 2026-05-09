@@ -87,6 +87,37 @@ export function Dashboard() {
         return () => clearTimeout(timer);
     }, [fullCategoryOrder]);
 
+    // Use IntersectionObserver to track the active slide (more performant than onScroll)
+    useEffect(() => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const slideIndex = parseInt(entry.target.getAttribute('data-slide-index'), 10);
+                    if (!isNaN(slideIndex)) {
+                        setActiveSlide(prev => prev !== slideIndex ? slideIndex : prev);
+                    }
+                }
+            });
+        }, {
+            root: container,
+            threshold: 0.5
+        });
+
+        const observeChildren = () => {
+            Array.from(container.children).forEach(child => {
+                if (child.classList.contains('dashboard-slide-container')) {
+                    observer.observe(child);
+                }
+            });
+        };
+
+        observeChildren();
+        return () => observer.disconnect();
+    }, [fullCategoryOrder, renderedSlides]);
+
     // Scroll to default slide (bodyweight) on mount
     useEffect(() => {
         const el = scrollContainerRef.current;
@@ -218,14 +249,6 @@ export function Dashboard() {
                 <main className="flex-1 flex-col pos-relative" style={{ minHeight: 0 }}>
                     <div
                         ref={scrollContainerRef}
-                        onScroll={(e) => {
-                            const slideHeight = e.target.clientHeight;
-                            if (slideHeight === 0) return;
-                            const newSlide = Math.round(e.target.scrollTop / slideHeight);
-                            if (newSlide >= 0 && newSlide < fullCategoryOrder.length) {
-                                setActiveSlide(prev => prev !== newSlide ? newSlide : prev);
-                            }
-                        }}
                         style={{
                             flex: 1, overflowY: anyModalOpen ? 'hidden' : 'auto', overflowX: 'hidden',
                             scrollSnapType: 'y mandatory',

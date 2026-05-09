@@ -1,149 +1,12 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useLocalStorageScoped } from './useLocalStorageScoped';
-import { cloudSync } from '../services/cloudSync';
 import { getLocalDateStr } from '../utils/dateUtils';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { saveAchievementsToCloud, loadAchievementsFromCloud } from '../services/userDataService';
 import { serverTimestamp } from '../services/firebase';
-import i18n from '../i18n';
-
-const STORAGE_KEY_BASE = 'pushup_challenge_data';
-const NOTIFICATION_ID = 1;
-
-let localNotificationsPromise = null;
-
-async function getLocalNotificationsModule() {
-  if (!localNotificationsPromise) {
-    localNotificationsPromise = import('@capacitor/local-notifications');
-  }
-
-  return localNotificationsPromise;
-}
-
-/** Default empty state for signed-out or new users */
-function getDefaultState() {
-  const currentYear = new Date().getFullYear();
-  return {
-    startDate: `${currentYear}-01-01`,
-    userStartDate: `${currentYear}-01-01`,
-    completions: {},
-    isSetup: false,
-    
-    achievements: {},
-  };
-}
-
-/**
- * Migrate legacy flat completions entry to the new per-exercise structure.
- * Old format 1: completions[dateStr] = { done, pushupCount, timestamp, timeOfDay }
- * Old format 2: completions[dateStr][exerciseId] = { count, done, timestamp, timeOfDay }
- * New: completions[dateStr][exerciseId] = { isCompleted, timestamp, timeOfDay }
- */
-function migrateLegacyEntry(entry) {
-  // Detect new per-exercise format by checking if ANY value is a nested object
-  // with exercise-like properties. This handles bodyweight, weighted, AND custom exercises
-  // without needing to hardcode exercise IDs.
-  const hasExerciseEntry = Object.values(entry).some(
-    val => val && typeof val === 'object' && !Array.isArray(val) &&
-      ('isCompleted' in val || 'done' in val || 'count' in val)
-  );
-
-  if (!hasExerciseEntry) {
-    // Legacy flat entry — migrate pushupCount into pushups exercise
-    const migrated = {};
-    if (entry.done !== undefined || entry.pushupCount !== undefined || entry.isCompleted !== undefined) {
-      migrated.pushups = {
-        isCompleted: entry.isCompleted || entry.done || false,
-        timestamp: entry.timestamp || null,
-        timeOfDay: entry.timeOfDay || null,
-        ...(entry.pushupCount !== undefined ? { count: entry.pushupCount } : {}),
-        ...(entry.count !== undefined ? { count: entry.count } : {}),
-        ...(entry.difficulty !== undefined ? { difficulty: entry.difficulty } : {})
-      };
-    }
-    return migrated;
-  }
-
-  // Has exercise keys — migrate each from {count, done} to {isCompleted}
-  const migrated = {};
-  for (const [key, val] of Object.entries(entry)) {
-    if (val && typeof val === 'object') {
-      migrated[key] = {
-        isCompleted: val.isCompleted !== undefined ? val.isCompleted : (val.done || false),
-        timestamp: val.timestamp || null,
-        ...(val.count !== undefined ? { count: val.count } : {}),
-        ...(val.weight !== undefined ? { weight: val.weight } : {}),
-        ...(val.difficulty !== undefined ? { difficulty: val.difficulty } : {})
-      };
-    }
-  }
-  return migrated;
-}
-
-/**
- * Validate and sanitize progress data loaded from localStorage.
- * Protects against corrupted or partial data, and migrates legacy entries.
- */
-function validateProgressData(data) {
-  if (!data || typeof data !== 'object') return null;
-
-  const rawCompletions =
-    data.completions && typeof data.completions === 'object' && !Array.isArray(data.completions)
-      ? data.completions
-      : {};
-
-  // Migrate legacy flat entries
-  const completions = {};
-  for (const [dateStr, entry] of Object.entries(rawCompletions)) {
-    if (entry && typeof entry === 'object') {
-      completions[dateStr] = migrateLegacyEntry(entry);
-    }
-  }
-
-  return {
-    startDate: typeof data.startDate === 'string' ? data.startDate : `${new Date().getFullYear()}-01-01`,
-    userStartDate:
-      typeof data.userStartDate === 'string'
-        ? data.userStartDate
-        : data.startDate || `${new Date().getFullYear()}-01-01`,
-    completions,
-    isSetup: typeof data.isSetup === 'boolean' ? data.isSetup : false,
-    achievements: (() => {
-      let ach = typeof data.achievements === 'object' && data.achievements !== null ? data.achievements : {};
-      if (typeof data.manualBadges === 'object' && data.manualBadges !== null) {
-        ach = { ...data.manualBadges, ...ach };
-      }
-      if (data.hasShared === true) ach.first_share = true;
-      return ach;
-    })(),
-    lastCompletionChange: data.lastCompletionChange || null,
-    cardio: data.cardio || {},
-  };
-}
-
-/** Custom parser for progress data — handles year validation and legacy migration */
-function parseProgressData(parsed) {
-  const validated = validateProgressData(parsed);
-  if (!validated) return null;
-
-  const currentYear = new Date().getFullYear();
-  const fixedStartDate = `${currentYear}-01-01`;
-  const lastChange = parsed?.lastCompletionChange || null;
-
-  if (validated.startDate !== fixedStartDate) {
-    return {
-      ...getDefaultState(),
-      achievements: validated.achievements ?? {},
-      lastCompletionChange: lastChange
-    };
-  }
-
-  return { 
-    ...validated, 
-    lastCompletionChange: lastChange, 
-    achievements: validated.achievements ?? {} 
-  };
-}
+import { useNotificationManager } from './useNotificationManager';
+import { useProgressSync } from './useProgressSync';
+import { STORAGE_KEY_BASE, getDefaultState, parseProgressData } from './useProgressStorage';
 
 /** Build a "day done" object for all exercises (used in backfill) */
 function makeAllDone(selectedExercises = null, difficulties = {}, includeTimestamp = true) {
@@ -355,205 +218,12 @@ export function useProgress(userId) {
   };
 
   // ─── Notifications ────────────────────────────────────────────────────────
+  
+  const { scheduleNotification, requestNotificationPermission } = useNotificationManager({
+    isDayDone,
+    getDayNumber
+  });
 
-  const scheduleNotification = async (settings) => {
-    try {
-      const { LocalNotifications } = await getLocalNotificationsModule();
-      const permission = await LocalNotifications.checkPermissions();
-
-      if (permission.display === 'granted') {
-        await LocalNotifications.cancel({ notifications: [{ id: NOTIFICATION_ID }] });
-
-        if (settings?.notificationsEnabled) {
-          const { hour, minute } = settings.notificationTime;
-
-          const now = new Date();
-          let notificationTime = new Date();
-          notificationTime.setHours(hour, minute, 0, 0);
-
-          if (notificationTime <= now) {
-            notificationTime.setDate(notificationTime.getDate() + 1);
-          }
-
-          let notificationDateStr = getLocalDateStr(notificationTime);
-          let safetyCounter = 0;
-
-          // Skip already-done days
-          while (isDayDone(notificationDateStr) && safetyCounter < 365) {
-            notificationTime.setDate(notificationTime.getDate() + 1);
-            notificationDateStr = getLocalDateStr(notificationTime);
-            safetyCounter++;
-          }
-
-          const dayNum = getDayNumber(notificationDateStr);
-
-          const messages = [
-            i18n.t('notifications.body1', { day: dayNum }),
-            i18n.t('notifications.body2'),
-            i18n.t('notifications.body3'),
-            i18n.t('notifications.body4', { day: dayNum }),
-          ];
-          const selectedMessage = messages[Math.floor(Math.random() * messages.length)];
-
-          await LocalNotifications.schedule({
-            notifications: [
-              {
-                id: NOTIFICATION_ID,
-                title: i18n.t('notifications.title'),
-                body: selectedMessage,
-                schedule: { at: notificationTime, repeats: true, every: 'day' },
-                sound: null,
-                attachments: null,
-                actionTypeId: '',
-                extra: null,
-              },
-            ],
-          });
-        }
-      }
-    } catch (error) {
-      console.debug('Notification scheduling failed:', error);
-    }
-  };
-
-  const requestNotificationPermission = async () => {
-    try {
-      const { LocalNotifications } = await getLocalNotificationsModule();
-      const permission = await LocalNotifications.checkPermissions();
-      if (permission.display === 'prompt' || permission.display === 'prompt-with-rationale') {
-        await LocalNotifications.requestPermissions();
-      }
-    } catch (error) {
-      console.debug('Permission request failed:', error);
-    }
-  };
-
-  // ─── Cloud Sync ───────────────────────────────────────────────────────────
-
-  // Guard: skip incoming cloud updates triggered by our own writes
-  // Ref to always have the latest state without re-creating callbacks
-  const stateRef = useRef(state);
-  useEffect(() => { stateRef.current = state; }, [state]);
-  // Guard against concurrent saves
-  const isSavingRef = useRef(false);
-
-  const saveToCloud = useCallback(async () => {
-    if (isSavingRef.current) return { success: false, error: 'Save in progress' };
-    isSavingRef.current = true;
-    try {
-      await cloudSync.saveToCloud(stateRef.current);
-      return { success: true };
-    } catch (error) {
-      console.error('Failed to save to cloud:', error);
-      return { success: false, error: error.message };
-    } finally {
-      isSavingRef.current = false;
-    }
-  }, []);
-
-  const loadFromCloud = useCallback(async () => {
-    try {
-      const cloudData = await cloudSync.loadFromCloud();
-      if (cloudData) {
-        setState(prev => {
-          const validated = validateProgressData(cloudData);
-          return {
-            ...prev,
-            startDate: validated.startDate,
-            userStartDate: validated.userStartDate,
-            completions: validated.completions || {},
-            isSetup: validated.isSetup,
-          };
-        });
-        return { success: true, data: cloudData };
-      }
-      return { success: false, error: 'No cloud data found' };
-    } catch (error) {
-      console.error('Failed to load from cloud:', error);
-      return { success: false, error: error.message };
-    }
-  }, [setState]);
-
-  const syncWithCloud = useCallback(async () => {
-    try {
-      const mergedData = await cloudSync.syncData(stateRef.current);
-      if (mergedData) {
-        setState(prev => {
-          const validated = validateProgressData(mergedData);
-          return {
-            ...prev,
-            ...validated,
-            // Explicitly preserve local-only state that isn't in the progress node
-            achievements: prev.achievements
-          };
-        });
-      }
-      return { success: true, data: mergedData };
-    } catch (error) {
-      console.error('Failed to sync with cloud:', error);
-      return { success: false, error: error.message };
-    }
-  }, [setState]);
-
-  /**
-   * Merges data from the guest (anonymous) account into the current user's state.
-   * Useful when a user performs exercises before signing in.
-   */
-  const mergeWithAnonymousData = useCallback(async () => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_BASE);
-      if (!saved) return { success: false, error: 'No guest data found' };
-      
-      const guestData = JSON.parse(saved);
-      const validated = validateProgressData(guestData);
-      if (!validated) return { success: false, error: 'Invalid guest data' };
-
-      setState(prev => {
-        const merged = cloudSync.mergeData(prev, validated);
-        return {
-          ...prev,
-          startDate: merged.startDate || prev.startDate,
-          userStartDate: merged.userStartDate || prev.userStartDate,
-          completions: merged.completions || prev.completions,
-          isSetup: merged.isSetup || prev.isSetup,
-          lastCompletionChange: serverTimestamp(),
-        };
-      });
-      
-      return { success: true };
-    } catch (error) {
-      console.error('Failed to merge guest data:', error);
-      return { success: false, error: error.message };
-    }
-  }, [setState]);
-
-  /** 
-   * Clears the guest (anonymous) data from localStorage.
-   * Should be called after a successful merge or when the user chooses to discard guest data.
-   */
-  const clearAnonymousData = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY_BASE);
-  }, []);
-
-  /**
-   * Check if there is significant guest data (e.g. at least one completion).
-   */
-  const hasGuestData = useCallback(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_BASE);
-      if (!saved) return false;
-      const data = JSON.parse(saved);
-      return data?.completions && Object.keys(data.completions).length > 0;
-    } catch {
-      return false;
-    }
-  }, []);
-
-  /**
-   * Start listening to real-time cloud changes (Firebase onValue).
-   * When another device writes, this callback fires and merges the incoming data.
-   * Returns an unsubscribe function.
-   */
   // ─── Delete Exercise Data (Full Purgation) ──────────────────────────────
   const deleteExerciseHistory = useCallback((exId) => {
     let newStateToSync = null;
@@ -579,33 +249,17 @@ export function useProgress(userId) {
     return newStateToSync;
   }, [setState]);
 
-  const startCloudListener = useCallback(() => {
-    return cloudSync.listenToCloudChanges((cloudData) => {
-      if (!cloudData || !cloudData.completions) return;
+  // ─── Cloud Sync ───────────────────────────────────────────────────────────
 
-      setState(prev => {
-        const validated = validateProgressData(cloudData);
-        // Only update if cloud data actually differs
-        const cloudJSON = JSON.stringify(validated.completions);
-        const localJSON = JSON.stringify(prev.completions);
-        if (cloudJSON === localJSON) return prev;
-
-        console.debug('[Real-time sync] Incoming cloud update applied');
-        const merged = cloudSync.mergeData(prev, validated);
-
-        // Important: we use the merged result which now contains the best
-        // lastCompletionChange (either local placeholder or cloud timestamp).
-        return {
-          ...prev,
-          startDate: merged.startDate || prev.startDate,
-          userStartDate: merged.userStartDate || prev.userStartDate,
-          completions: merged.completions || prev.completions,
-          isSetup: merged.isSetup ?? prev.isSetup,
-          lastCompletionChange: merged.lastCompletionChange,
-        };
-      });
-    });
-  }, [setState]);
+  const {
+    saveToCloud,
+    loadFromCloud,
+    syncWithCloud,
+    mergeWithAnonymousData,
+    clearAnonymousData,
+    hasGuestData,
+    startCloudListener
+  } = useProgressSync(state, setState);
 
   // ─── Return ───────────────────────────────────────────────────────────────
 
