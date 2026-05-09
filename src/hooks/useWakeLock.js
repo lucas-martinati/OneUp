@@ -38,7 +38,7 @@ export function useWakeLock(enabled = true) {
 
     // Re-request wake lock if visibility changes (e.g. app comes back from background)
     const handleVisibilityChange = () => {
-      if (enabled && wakeLock.current !== null && document.visibilityState === 'visible') {
+      if (enabled && document.visibilityState === 'visible') {
         requestWakeLock();
       }
     };
