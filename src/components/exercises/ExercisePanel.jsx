@@ -45,6 +45,12 @@ export function ExercisePanel({
     const currentWeight = isWeightExercise ? getConfig(exerciseConfig?.id).weight : null;
     const [localWeightStr, setLocalWeightStr] = useState('');
 
+    // Pause background animations to save battery when screen is kept on
+    useEffect(() => {
+        document.body.classList.add('exercise-panel-active');
+        return () => document.body.classList.remove('exercise-panel-active');
+    }, []);
+
     useEffect(() => {
         if (currentWeight !== null) {
             queueMicrotask(() => setLocalWeightStr(currentWeight.toString()));

@@ -1522,3 +1522,14 @@ button:focus:not(:focus-visible) {
     width: 32px !important;
   }
 }
+
+/* ── Performance Optimization for Exercise Panel ── */
+/* When the Exercise Panel is open (and keeping the screen on),
+   we completely hide the full-screen animated background.
+   This prevents the GPU from constantly compositing the background
+   with the semi-transparent modal overlay, solving battery drain and heat.
+   We use display: none instead of animation-play-state: paused to avoid
+   forcing main-thread repaints which cause input delays. */
+body.exercise-panel-active::before {
+  display: none !important;
+}
