@@ -697,6 +697,11 @@
         "Session express 🕐",
         "Petit training de midi"
       ],
+      "afternoon": [
+        "Petite séance de l'après-midi ☀️",
+        "Routine d'après-midi",
+        "Échauffement d'après-midi"
+      ],
       "evening": [
         "Petite séance du soir",
         "Routine du soir 🌙",
@@ -718,6 +723,11 @@
         "Séance du midi",
         "Training de la pause",
         "Session productive"
+      ],
+      "afternoon": [
+        "Séance de l'après-midi 💪",
+        "Training d'après-midi",
+        "Session de l'après-midi"
       ],
       "evening": [
         "Séance du soir 🔥",
@@ -741,6 +751,11 @@
         "Gros training de midi",
         "Midi explosif"
       ],
+      "afternoon": [
+        "Grosse séance d'après-midi 🔥",
+        "Training intense d'après-midi",
+        "Après-midi explosif"
+      ],
       "evening": [
         "Grosse session du soir 💪",
         "Soirée intense",
@@ -762,6 +777,11 @@
         "Midi historique 🔥",
         "Séance monstre du midi",
         "Midi de folie 💥"
+      ],
+      "afternoon": [
+        "Après-midi de champion 🏆",
+        "Séance monstre d'après-midi",
+        "Après-midi de folie 💥"
       ],
       "evening": [
         "Soirée d'anthologie 🏆",

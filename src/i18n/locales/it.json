@@ -697,6 +697,11 @@
         "Sessione express 🕐",
         "Breve allenamento a pranzo"
       ],
+      "afternoon": [
+        "Sessione pomeridiana leggera ☀️",
+        "Routine pomeridiana",
+        "Riscaldamento pomeridiano"
+      ],
       "evening": [
         "Sessione serale leggera",
         "Routine serale 🌙",
@@ -718,6 +723,11 @@
         "Sessione di mezzogiorno",
         "Allenamento in pausa",
         "Sessione produttiva"
+      ],
+      "afternoon": [
+        "Solida sessione pomeridiana 💪",
+        "Allenamento pomeridiano",
+        "Workout pomeridiano"
       ],
       "evening": [
         "Sessione serale 🔥",
@@ -741,6 +751,11 @@
         "Grande allenamento a pranzo",
         "Mezzogiorno esplosivo"
       ],
+      "afternoon": [
+        "Pomeriggio intenso 🔥",
+        "Forte sessione pomeridiana",
+        "Sessione pomeridiana di potenza 💪"
+      ],
       "evening": [
         "Grande sessione serale 💪",
         "Serata intensa",
@@ -762,6 +777,11 @@
         "Mezzogiorno storico 🔥",
         "Sessione mostruosa a pranzo",
         "Mezzogiorno di follia 💥"
+      ],
+      "afternoon": [
+        "Sessione epica pomeridiana 🏆",
+        "Allenamento mostruoso",
+        "Pomeriggio leggendario 🔥"
       ],
       "evening": [
         "Serata epica 🏆",

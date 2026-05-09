@@ -697,6 +697,11 @@
         "Lunchtime express 🕐",
         "Short noon session"
       ],
+      "afternoon": [
+        "Light afternoon session ☀️",
+        "Afternoon routine",
+        "Quick afternoon warmup"
+      ],
       "evening": [
         "Light evening session",
         "Evening routine 🌙",
@@ -718,6 +723,11 @@
         "Midday training",
         "Lunch break workout",
         "Productive noon session"
+      ],
+      "afternoon": [
+        "Solid afternoon session 💪",
+        "Afternoon training",
+        "PM workout"
       ],
       "evening": [
         "Evening workout 🔥",
@@ -741,6 +751,11 @@
         "Heavy noon session",
         "Explosive lunch workout"
       ],
+      "afternoon": [
+        "Intense afternoon grind 🔥",
+        "Heavy afternoon session",
+        "Afternoon power session 💪"
+      ],
       "evening": [
         "Heavy evening session 💪",
         "Intense PM workout",
@@ -762,6 +777,11 @@
         "Historic noon session 🔥",
         "Monster midday workout",
         "Insane lunch grind 💥"
+      ],
+      "afternoon": [
+        "Epic afternoon session 🏆",
+        "Monster afternoon workout",
+        "Legendary afternoon 🔥"
       ],
       "evening": [
         "Epic evening session 🏆",

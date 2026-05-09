@@ -697,6 +697,11 @@
         "Express-Session 🕐",
         "Kurzes Mittagstraining"
       ],
+      "afternoon": [
+        "Leichte Nachmittagssitzung ☀️",
+        "Nachmittagsroutine",
+        "Kurzes Nachmittags-Warmup"
+      ],
       "evening": [
         "Leichte Abendsession",
         "Abendroutine 🌙",
@@ -718,6 +723,11 @@
         "Mittagssession",
         "Pausentraining",
         "Produktive Session"
+      ],
+      "afternoon": [
+        "Solide Nachmittagssitzung 💪",
+        "Nachmittagstraining",
+        "PM Workout"
       ],
       "evening": [
         "Abendsession 🔥",
@@ -741,6 +751,11 @@
         "Großes Mittagstraining",
         "Explosiver Mittag"
       ],
+      "afternoon": [
+        "Intensiver Nachmittag 🔥",
+        "Schwere Nachmittagssitzung",
+        "Power-Nachmittag 💪"
+      ],
       "evening": [
         "Große Abendsession 💪",
         "Intensiver Abend",
@@ -762,6 +777,11 @@
         "Historischer Mittag 🔥",
         "Monster-Mittagssession",
         "Wahnsinnsmittag 💥"
+      ],
+      "afternoon": [
+        "Epische Nachmittagssitzung 🏆",
+        "Monster Nachmittagstraining",
+        "Legendärer Nachmittag 🔥"
       ],
       "evening": [
         "Epischer Abend 🏆",

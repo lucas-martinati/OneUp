@@ -697,6 +697,11 @@
         "Sessão expresso 🕐",
         "Treino curto ao meio-dia"
       ],
+      "afternoon": [
+        "Sessão leve à tarde ☀️",
+        "Rotina da tarde",
+        "Aquecimento rápido à tarde"
+      ],
       "evening": [
         "Sessão ligeira à tarde",
         "Rotina de fim de tarde 🌙",
@@ -718,6 +723,11 @@
         "Sessão de meio-dia",
         "Treino de pausa",
         "Sessão produtiva"
+      ],
+      "afternoon": [
+        "Boa sessão à tarde 💪",
+        "Treino da tarde",
+        "Sessão PM"
       ],
       "evening": [
         "Sessão de tarde 🔥",
@@ -741,6 +751,11 @@
         "Grande treino de almoço",
         "Meio-dia explosivo"
       ],
+      "afternoon": [
+        "Tarde intensa 🔥",
+        "Sessão pesada à tarde",
+        "Sessão de força à tarde 💪"
+      ],
       "evening": [
         "Grande sessão de tarde 💪",
         "Tarde intensa",
@@ -762,6 +777,11 @@
         "Meio-dia histórico 🔥",
         "Sessão monstruosa",
         "Meio-dia de loucura 💥"
+      ],
+      "afternoon": [
+        "Sessão épica à tarde 🏆",
+        "Treino monstro à tarde",
+        "Tarde lendária 🔥"
       ],
       "evening": [
         "Tarde épica 🏆",
