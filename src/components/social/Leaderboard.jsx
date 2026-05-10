@@ -13,12 +13,12 @@ import { getIcon } from '../../utils/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useCloudSyncStore } from '../../store/useCloudSyncStore';
-import { useComputedStatsFromStore } from '../../hooks/useComputedStatsFromStore';
 import { cloudSync } from '../../services/cloudSync';
 import { useSwipe } from '../../hooks/useSwipe';
 import { ClanManager } from './ClanManager';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { SegmentedControl } from '../ui/SegmentedControl';
+import { useComputedStatsStore } from '../../store/useComputedStatsStore';
 
 export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, onLeaveClan }) {
 
@@ -26,7 +26,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     const cloudAuth = useAuth();
     const settings = useSettingsStore(s => s.settings);
     const refreshUserClans = useCloudSyncStore(s => s.refreshUserClans);
-    const computedStats = useComputedStatsFromStore();
+    const computedStats = useComputedStatsStore(s => s.stats);
     const { t } = useTranslation();
 
     const [domain, setDomain] = useState(activeSlide === 2 ? 'weights' : 'bodyweight');

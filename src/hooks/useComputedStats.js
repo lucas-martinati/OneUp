@@ -1,36 +1,14 @@
-import { useMemo } from 'react';
-import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions } from '../utils/dateUtils';
-import { EXERCISES, getDailyGoal, CARDIO_EXERCISES } from '../config/exercises';
+import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions, getCurrentWeekNumber } from '../utils/dateUtils';
+import { EXERCISES, getDailyGoal, CARDIO_EXERCISES, getWeeklyGoalKm } from '../config/exercises';
 import { WEIGHT_EXERCISES } from '../config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
 import { isGlobalPerfectDay } from '../utils/statUtils';
 
 /**
- * Centralized computation hook.
- * Performs a SINGLE pass over completions to compute ALL stats, achievements,
- * streaks, and chart data. Memoized so it only recalculates when data changes.
- *
- * @param {Object} completions - { [dateStr]: { [exerciseId]: { isCompleted, timestamp, timeOfDay, count } } }
- * @param {Object} settings - { difficultyMultiplier, ... }
- * @param {Function} getDayNumber - (dateStr) => number
- * @param {Array} customExercises - User defined exercises
- * @param {boolean} hasShared - Whether user has shared at least once
- * @param {Object} achievements - { [badgeId]: true|false } for manual badge overrides
- */
-const EMPTY_ARRAY = [];
-
-export function useComputedStats(completions, settings, getDayNumber, customExercises = EMPTY_ARRAY, hasShared = false, achievements = {}, getConfig = null, cardioReps = null) {
-    const allExercises = useMemo(() => [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES, ...customExercises], [customExercises]);
-    return useMemo(() => {
-        return computeAllStats(completions, settings, getDayNumber, allExercises, hasShared, achievements, getConfig, cardioReps);
-    }, [completions, settings, getDayNumber, allExercises, hasShared, achievements, getConfig, cardioReps]);
-}
-
-/**
  * Pure function that computes all stats in a single pass.
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
  */
-export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, achievements = {}, getConfig = null, cardioReps = null) {
+export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, achievements = {}, getConfig = null, cardioReps = null, userStartDateStr = null) {
     // Keep global fallback for things not tied to a specific exercise
     const difficultyMultiplier = settings?.difficultyMultiplier ?? 1.0;
     const todayStr = getLocalDateStr(new Date());
@@ -298,39 +276,103 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         return false;
     }
 
-    for (const ex of allExercises) {
-        if (ex.id === 'running' || ex.id === 'cycling') {
-            // Cardio Streak: consecutive WEEKS
-            let exStreak = 0;
-            for (let w = 0; w < 52; w++) {
-                const ref = new Date(today);
-                ref.setDate(ref.getDate() - w * 7);
-                if (getWeeklyCompletion(completions, ex.id, ref)) {
-                    exStreak++;
-                } else if (w > 0) {
+    // Import computeCardioStreak logic locally or implement it
+    function computeCardioMaxStreak(sessions, mode, challengeStartDate, currentDifficulty, completions) {
+        if (!sessions.length) return 0;
+        let maxStreak = 0;
+        let streak = 0;
+        
+        // Match computeStreak from useCardio.js (walk backwards 52 weeks)
+        // But for maxStreak, we do NOT break early if weekNum < 1, because old sessions
+        // from Strava might exist before challengeStartDate.
+        for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
+            const ref = new Date();
+            ref.setDate(ref.getDate() - weekOffset * 7);
+            const { start, end } = getWeekBounds(ref);
+            
+            const weekNum = getCurrentWeekNumber(challengeStartDate) - weekOffset;
+            if (weekNum < 1) {
+                // Strava sessions could exist before userStartDate. We must continue checking them,
+                // but we assume weekNum = 1 for goal calculation to be safe, or just use 1.
+            }
+            const effectiveWeekNum = Math.max(1, weekNum);
+
+            let weekDifficulty = currentDifficulty;
+            const loop = new Date(start);
+            while (loop <= end) {
+                const dateStr = getLocalDateStr(loop);
+                const comp = completions[dateStr]?.[mode];
+                if (comp?.isCompleted && comp.difficulty !== undefined) {
+                    weekDifficulty = comp.difficulty;
                     break;
                 }
+                loop.setDate(loop.getDate() + 1);
             }
-            exerciseCurrentStreaks[ex.id] = exStreak;
-            exerciseDoneToday[ex.id] = isDayDoneFromCompletions(completions, todayStr) && !!getWeeklyCompletion(completions, ex.id, today);
+
+            const goalKm = getWeeklyGoalKm(mode, effectiveWeekNum) * weekDifficulty;
+            const weekSessions = sessions.filter(
+                s => s.type === mode && s.startTime >= start && s.startTime <= end
+            );
+            const weekDistanceKm = weekSessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
+
+            if (weekDistanceKm >= goalKm - 0.01) {
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+            } else if (weekOffset > 0) {
+                // Reset streak if we missed a week (but continue walking backwards to find older max streaks)
+                streak = 0;
+            }
+        }
+        return maxStreak;
+    }
+
+    function computeCardioCurrentStreak(sessions, mode, challengeStartDate, currentDifficulty, completions) {
+        if (!sessions.length) return 0;
+        let streak = 0;
+        for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
+            const ref = new Date();
+            ref.setDate(ref.getDate() - weekOffset * 7);
+            const { start, end } = getWeekBounds(ref);
             
-            // Max Streak for cardio
-            let maxExStreak = 0, tempExStreak = 0;
-            const startD = new Date(firstActiveDate || sortedDates[0] || todayStr);
-            const { start: firstWeekStart } = getWeekBounds(startD);
-            const { start: currentWeekStart } = getWeekBounds(today);
-            
-            let loopWeek = new Date(firstWeekStart);
-            while (loopWeek <= currentWeekStart) {
-                if (getWeeklyCompletion(completions, ex.id, loopWeek)) {
-                    tempExStreak++;
-                    if (tempExStreak > maxExStreak) maxExStreak = tempExStreak;
-                } else {
-                    tempExStreak = 0;
+            const weekNum = getCurrentWeekNumber(challengeStartDate) - weekOffset;
+            const effectiveWeekNum = Math.max(1, weekNum); // Don't break on weekNum < 1
+
+            let weekDifficulty = currentDifficulty;
+            const loop = new Date(start);
+            while (loop <= end) {
+                const dateStr = getLocalDateStr(loop);
+                const comp = completions[dateStr]?.[mode];
+                if (comp?.isCompleted && comp.difficulty !== undefined) {
+                    weekDifficulty = comp.difficulty;
+                    break;
                 }
-                loopWeek.setDate(loopWeek.getDate() + 7);
+                loop.setDate(loop.getDate() + 1);
             }
-            exerciseMaxStreaks[ex.id] = maxExStreak;
+
+            const goalKm = getWeeklyGoalKm(mode, effectiveWeekNum) * weekDifficulty;
+            const weekSessions = sessions.filter(
+                s => s.type === mode && s.startTime >= start && s.startTime <= end
+            );
+            const weekDistanceKm = weekSessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
+
+            if (weekDistanceKm >= goalKm - 0.01) {
+                streak++;
+            } else if (weekOffset > 0) {
+                break;
+            }
+        }
+        return streak;
+    }
+
+    for (const ex of allExercises) {
+        if (ex.id === 'running' || ex.id === 'cycling') {
+            const cardioSessions = cardioReps?.allSessions || [];
+            const userStartDate = userStartDateStr || firstActiveDate || sortedDates[0] || todayStr;
+            const currentDifficulty = settings?.exerciseDifficulties?.[ex.id] ?? 1.0;
+            
+            exerciseCurrentStreaks[ex.id] = computeCardioCurrentStreak(cardioSessions, ex.id, userStartDate, currentDifficulty, completions);
+            exerciseMaxStreaks[ex.id] = computeCardioMaxStreak(cardioSessions, ex.id, userStartDate, currentDifficulty, completions);
+            exerciseDoneToday[ex.id] = isDayDoneFromCompletions(completions, todayStr) && !!getWeeklyCompletion(completions, ex.id, today);
         } else {
             exerciseCurrentStreaks[ex.id] = calculateExerciseStreak(completions, todayStr, ex.id);
             exerciseYesterdayStreaks[ex.id] = calculateExerciseStreak(completions, getLocalDateStr(yesterdayDate), ex.id);
@@ -364,8 +406,21 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     const successRate = totalDays > 0 ? Math.round((totalDays / MAX_STREAK_WINDOW) * 100) : 0;
     const hasCompletedAllExercisesOnce = EXERCISES.every(ex => completedExIds.has(ex.id));
     const todayDone = isDayDoneLocal(todayStr);
-    const displayStreak = todayDone ? currentStreak : yesterdayStreak;
-    const streakActive = todayDone;
+    
+    let finalMaxStreak = maxStreak;
+    let finalDisplayStreak = todayDone ? currentStreak : yesterdayStreak;
+    let finalCurrentStreak = currentStreak;
+
+    // If filtering by cardio only, daily consecutive streaks don't make sense.
+    // Return the max weekly streak instead.
+    const isOnlyCardio = allExercises.length > 0 && allExercises.every(ex => ex.id === 'running' || ex.id === 'cycling');
+    if (isOnlyCardio) {
+        finalMaxStreak = Math.max(0, ...Object.values(exerciseMaxStreaks));
+        finalDisplayStreak = Math.max(0, ...Object.values(exerciseCurrentStreaks));
+        finalCurrentStreak = finalDisplayStreak;
+    }
+
+    const streakActive = todayDone || (isOnlyCardio && finalCurrentStreak > 0);
 
     // Exercise stats array (for Stats.jsx)
     const exerciseStats = allExercises.map(ex => {
@@ -399,7 +454,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
 
     // Stats snapshot for badge testing
     const statsSnapshot = {
-        totalDays, maxStreak, totalRepsAll: globalTotalReps, perfectDays,
+        totalDays, maxStreak: finalMaxStreak, totalRepsAll: globalTotalReps, perfectDays,
         hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts,
         morningWorkouts, afternoonWorkouts, eveningWorkouts,
         ghostWorkout, perfectStreak: maxPerfectStreak, hasShared,
@@ -412,10 +467,10 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     return {
         // Global stats
         totalDays,
-        maxStreak,
-        currentStreak,
+        maxStreak: finalMaxStreak,
+        currentStreak: finalCurrentStreak,
         yesterdayStreak,
-        displayStreak,
+        displayStreak: finalDisplayStreak,
         streakActive,
         todayDone,
         globalTotalReps,

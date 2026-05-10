@@ -6,7 +6,7 @@ import { WEIGHT_EXERCISES } from '../../config/weights';
 import { useProgressStore } from '../../store/useProgressStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useCloudSyncStore } from '../../store/useCloudSyncStore';
-import { useComputedStatsFromStore } from '../../hooks/useComputedStatsFromStore';
+import { useComputedStatsStore } from '../../store/useComputedStatsStore';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
@@ -43,7 +43,7 @@ export function DashboardModals({
     const updateExerciseCount = useProgressStore(s => s.updateExerciseCount);
     const settings = useSettingsStore(s => s.settings);
     const resumeCloudSync = useCloudSyncStore(s => s.resumeCloudSync);
-    const computedStats = useComputedStatsFromStore();
+    const computedStats = useComputedStatsStore(s => s.stats);
     const { getConfig } = useExerciseConfig();
     const { isPro } = useSubscription();
     const {

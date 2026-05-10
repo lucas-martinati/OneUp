@@ -7,7 +7,7 @@ import { canAccessFeature, FEATURES } from '../utils/entitlements';
 import { addSession } from '../features/share/services/sessionHistoryService';
 import { getExerciseLabel, isCustomExercise } from '../utils/exerciseLabel';
 import { useProgressStore } from '../store/useProgressStore';
-import { useComputedStatsFromStore } from './useComputedStatsFromStore';
+import { useComputedStatsStore } from '../store/useComputedStatsStore';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { useExercises } from '../contexts/ExercisesContext';
 import { useExerciseConfig } from './useExerciseConfig';
@@ -24,7 +24,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide }) {
     const getExerciseCount = useProgressStore(s => s.getExerciseCount);
     const updateExerciseCount = useProgressStore(s => s.updateExerciseCount);
     const completions = useProgressStore(s => s.completions);
-    const computedStats = useComputedStatsFromStore();
+    const computedStats = useComputedStatsStore(s => s.stats);
     const { getConfig } = useExerciseConfig();
     const { isPro } = useSubscription();
     const {

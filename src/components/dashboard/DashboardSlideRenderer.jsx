@@ -10,7 +10,7 @@ import { ProPaywall } from './ProPaywall';
 
 import { useProgressStore } from '../../store/useProgressStore';
 import { useCloudSyncStore } from '../../store/useCloudSyncStore';
-import { useComputedStatsFromStore } from '../../hooks/useComputedStatsFromStore';
+import { useComputedStatsStore } from '../../store/useComputedStatsStore';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
@@ -31,7 +31,7 @@ export function DashboardSlideRenderer({
     const getExerciseCount = useProgressStore(s => s.getExerciseCount);
     const completions = useProgressStore(s => s.completions);
     const pauseCloudSync = useCloudSyncStore(s => s.pauseCloudSync);
-    const computedStats = useComputedStatsFromStore();
+    const computedStats = useComputedStatsStore(s => s.stats);
     const { getConfig } = useExerciseConfig();
     const { isPro } = useSubscription();
     const {

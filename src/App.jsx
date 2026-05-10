@@ -6,7 +6,8 @@ import { ExercisesProvider, useExercises } from './contexts/ExercisesContext';
 import { useProgressStore } from './store/useProgressStore';
 import { useSettingsStore } from './store/useSettingsStore';
 import { useCloudSyncStore } from './store/useCloudSyncStore';
-import { useComputedStatsFromStore } from './hooks/useComputedStatsFromStore';
+import { ComputedStatsSynchronizer } from './components/core/ComputedStatsSynchronizer';
+import { useComputedStatsStore } from './store/useComputedStatsStore';
 import { AppOrchestrator } from './components/core/AppOrchestrator';
 import { PWAReloadHandler } from './components/core/PWAReloadHandler';
 import { useHardwareBack } from './hooks/useHardwareBack';
@@ -38,8 +39,8 @@ function AppContent() {
   const isInitialSyncDone = useCloudSyncStore(s => s.isInitialSyncDone);
   const resumeCloudSync = useCloudSyncStore(s => s.resumeCloudSync);
 
-  // ── Computed stats (for orchestrator) ──
-  const computedStats = useComputedStatsFromStore();
+  // ── Computed stats (from centralized store) ──
+  const computedStats = useComputedStatsStore(s => s.stats);
 
   // ── Exercises context ──
   const { customExercises, customCategories, routines } = useExercises();
@@ -71,6 +72,7 @@ function AppContent() {
         {t('app.initializing')}
       </div>
     }>
+      <ComputedStatsSynchronizer />
       <AppOrchestrator computedStats={computedStats} />
       {isInitializing ? (
         <div style={{

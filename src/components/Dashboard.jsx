@@ -25,7 +25,7 @@ import { DashboardModals } from './dashboard/DashboardModals';
 import { useProgressStore } from '../store/useProgressStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useCloudSyncStore } from '../store/useCloudSyncStore';
-import { useComputedStatsFromStore } from '../hooks/useComputedStatsFromStore';
+import { useComputedStatsStore } from '../store/useComputedStatsStore';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { useExercises } from '../contexts/ExercisesContext';
 import { useExerciseConfig } from '../hooks/useExerciseConfig';
@@ -53,7 +53,7 @@ export function Dashboard() {
     const pauseCloudSync = useCloudSyncStore(s => s.pauseCloudSync);
     const conflictData = useCloudSyncStore(s => s.conflictData);
     const rawResolveConflict = useCloudSyncStore(s => s.onResolveConflict);
-    const computedStats = useComputedStatsFromStore();
+    const computedStats = useComputedStatsStore(s => s.stats);
     const { getConfig } = useExerciseConfig();
     const { isPro } = useSubscription();
     const { customExercises, customExercisesMap, customCategories, exercisesByUserCategory } = useExercises();

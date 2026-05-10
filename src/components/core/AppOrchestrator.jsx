@@ -18,7 +18,7 @@ const logger = createLogger('Orchestrator');
  * This component renders nothing — it only runs useEffect hooks.
  *
  * @param {Object} props
- * @param {Object} props.computedStats - Computed stats from useComputedStatsFromStore
+ * @param {Object} props.computedStats - Computed stats from useComputedStatsStore(s => s.stats)
  */
 export function AppOrchestrator({ computedStats }) {
   const auth = useAuth();
