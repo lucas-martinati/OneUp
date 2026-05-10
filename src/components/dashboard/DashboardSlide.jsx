@@ -8,6 +8,7 @@ import { isPerfectDay } from '../../utils/statUtils';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
+import styles from './DashboardSlide.module.css';
 
 export const DashboardSlide = React.memo(({
     isFuture, effectiveStart, dayNumber, today, getExerciseCount, completions, computedStats,
@@ -43,7 +44,7 @@ export const DashboardSlide = React.memo(({
 
     return (
         <div
-            className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative overflow-hidden gap-responsive ${isDay100 ? 'dashboard-glitch-bg' : (isDayPerfect ? 'dashboard-gold-bg' : '')}`}
+            className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative overflow-hidden gap-responsive ${isDay100 ? 'dashboard-glitch-bg' : (isDayPerfect ? styles.goldBg : '')}`}
             style={{
                 paddingTop: title ? '12px' : '0',
                 transition: 'all 0.6s ease-in-out'

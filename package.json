@@ -47,7 +47,8 @@
     "react-i18next": "^16.6.2",
     "react-is": "^19.2.3",
     "react-leaflet": "^5.0.0",
-    "recharts": "^3.6.0"
+    "recharts": "^3.6.0",
+    "zustand": "^5.0.13"
   },
   "overrides": {
     "@codetrix-studio/capacitor-google-auth": {
