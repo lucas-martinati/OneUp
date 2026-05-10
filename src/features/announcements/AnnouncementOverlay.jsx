@@ -195,34 +195,6 @@ export function AnnouncementOverlay({ announcement, onDismiss }) {
           {cta}
         </button>
       </div>
-
-      {/* Animations */}
-      <style>{`
-        @keyframes ann-fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes ann-fade-out {
-          from { opacity: 1; }
-          to { opacity: 0; }
-        }
-        @keyframes ann-card-in {
-          from { opacity: 0; transform: scale(0.85) translateY(30px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        @keyframes ann-card-out {
-          from { opacity: 1; transform: scale(1) translateY(0); }
-          to { opacity: 0; transform: scale(0.9) translateY(20px); }
-        }
-        @keyframes ann-emoji-bounce {
-          from { opacity: 0; transform: scale(0) rotate(-15deg); }
-          to { opacity: 1; transform: scale(1) rotate(0deg); }
-        }
-        @keyframes ann-text-in {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

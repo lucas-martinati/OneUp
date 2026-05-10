@@ -442,46 +442,6 @@ export function CardioModule() {
             </button>
           </div>
         )}
-
-        {/* Login wall animations */}
-        {isDemo && (
-          <style>{`
-            .cardio-wall-particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-            .cardio-particle {
-              position: absolute; border-radius: 50%; opacity: 0.4;
-            }
-            .cardio-p1 {
-              width: 120px; height: 120px; top: -30px; right: -20px;
-              background: radial-gradient(circle, rgba(252, 76, 2, 0.2) 0%, transparent 70%);
-              animation: cardioGlowFloat 7s ease-in-out infinite;
-            }
-            .cardio-p2 {
-              width: 80px; height: 80px; bottom: 20px; left: -10px;
-              background: radial-gradient(circle, rgba(252, 140, 2, 0.15) 0%, transparent 70%);
-              animation: cardioGlowFloat 9s ease-in-out infinite reverse;
-            }
-            .cardio-p3 {
-              width: 60px; height: 60px; top: 40%; left: 60%;
-              background: radial-gradient(circle, rgba(252, 76, 2, 0.1) 0%, transparent 70%);
-              animation: cardioGlowFloat 5s ease-in-out infinite 1s;
-            }
-            .cardio-strava-icon-wrap { position: relative; margin-bottom: 4px; }
-            .cardio-strava-icon-pulse {
-              position: absolute; inset: -10px; border-radius: 26px;
-              background: radial-gradient(circle, rgba(252, 76, 2, 0.25) 0%, transparent 70%);
-              animation: cardioPulse 2.5s ease-in-out infinite;
-            }
-            @keyframes cardioPulse {
-              0%, 100% { transform: scale(1); opacity: 0.5; }
-              50% { transform: scale(1.15); opacity: 0.2; }
-            }
-            @keyframes cardioGlowFloat {
-              0%, 100% { transform: translate(0, 0); }
-              50% { transform: translate(12px, 8px); }
-            }
-            .cardio-strava-btn:active { transform: scale(0.97) !important; }
-          `}</style>
-        )}
       </div>
 
       {/* History Modal */}

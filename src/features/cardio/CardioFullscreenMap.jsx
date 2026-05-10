@@ -289,11 +289,6 @@ export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
           </div>
         )}
       </div>
-
-      {/* Hide Leaflet default controls styling */}
-      <style>{`
-        .cardio-fs-map .leaflet-control-zoom { display: none; }
-      `}</style>
     </div>,
     document.body
   );
