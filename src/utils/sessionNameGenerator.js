@@ -8,6 +8,9 @@ import { sumExerciseReps } from './stats';
 function getTimeOfDay(dateStr) {
   try {
     const hour = new Date(dateStr).getHours();
+    
+    if (Number.isNaN(hour)) return 'evening'; // Fallback for invalid dates
+    
     if (hour >= 5 && hour < 11) return 'morning';
     if (hour >= 11 && hour < 14) return 'noon';
     if (hour >= 14 && hour < 18) return 'afternoon';
@@ -73,7 +76,8 @@ function pickFromPool(t, key, seed) {
  * @returns {string}
  */
 export function generateSessionName(t, { date, totalReps = 0, exerciseCount = 0, isPerfectDay = false }) {
-  const dateStr = date || new Date().toISOString();
+  // Ensure dateStr is always a string, even if a Date object is accidentally passed
+  const dateStr = date ? (typeof date === 'string' ? date : date.toISOString()) : new Date().toISOString();
   const seed = dateStr.slice(0, 10) + String(totalReps) + String(exerciseCount);
 
   if (isPerfectDay) {
@@ -98,7 +102,8 @@ export function generateSessionName(t, { date, totalReps = 0, exerciseCount = 0,
  * @returns {string}
  */
 function generateShareText(t, { date, totalReps = 0, exerciseCount = 0, isPerfectDay = false, mode = 'session' }) {
-  const dateStr = date || new Date().toISOString();
+  // Ensure dateStr is always a string
+  const dateStr = date ? (typeof date === 'string' ? date : date.toISOString()) : new Date().toISOString();
   const seed = dateStr.slice(0, 10) + 'share' + String(totalReps);
 
   if (mode === 'global') {
