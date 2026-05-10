@@ -671,8 +671,8 @@ export function Settings({ defaultShowStore = false, onClose }) {
                     <h3 style={sectionTitleStyle}>{t('settings.dataCloud')}</h3>
                     <CloudSyncPanel
                         authState={cloudAuth}
-                        onSignIn={() => cloudSync.signIn()}
-                        onSignOut={() => cloudSync.signOut()}
+                        onSignIn={() => cloudAuth.signIn()}
+                        onSignOut={() => cloudAuth.signOut()}
                         onDeleteAccount={async () => {
                             await cloudSync.deleteAccount();
                             onClose();
