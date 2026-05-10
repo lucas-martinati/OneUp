@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 import { useAuth } from '@contexts/AuthContext';
-import { useProgressContext } from '@contexts/ProgressContext';
+import { useCloudSyncStore } from '../store/useCloudSyncStore';
 import { useExercises } from '@contexts/ExercisesContext';
 import { useCloudAutoSave } from '@hooks/useCloudAutoSave';
 import { cloudSync } from '@services/cloudSync';
 
 export function useCloudSyncOrchestration(enabled, routines, customExercises, customCategories) {
   const auth = useAuth();
-  const { resumeCloudSync } = useProgressContext();
+  const resumeCloudSync = useCloudSyncStore(s => s.resumeCloudSync);
   const { customExercisesHook, customCategoriesHook, setRoutinesFromCloud } = useExercises();
   
   const { setCustomExercisesFromCloud } = customExercisesHook;

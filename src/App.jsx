@@ -1,9 +1,13 @@
 import { useEffect, Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { ProgressProvider, useProgressContext } from './contexts/ProgressContext';
 import { SubscriptionProvider, useSubscription } from './contexts/SubscriptionContext';
 import { ExercisesProvider, useExercises } from './contexts/ExercisesContext';
+import { useProgressStore } from './store/useProgressStore';
+import { useSettingsStore } from './store/useSettingsStore';
+import { useCloudSyncStore } from './store/useCloudSyncStore';
+import { useComputedStatsFromStore } from './hooks/useComputedStatsFromStore';
+import { AppOrchestrator } from './components/core/AppOrchestrator';
 import { PWAReloadHandler } from './components/core/PWAReloadHandler';
 import { useHardwareBack } from './hooks/useHardwareBack';
 import { useCloudSyncOrchestration } from './hooks/useCloudSyncOrchestration';
@@ -25,9 +29,20 @@ function AppContent() {
   const { t } = useTranslation();
   const auth = useAuth();
   const { isPro, isSubscriptionLoading } = useSubscription();
-  const { settings, updateSettings, isSetup, startChallenge, setCustomExercisesForStats, isInitialSyncDone } = useProgressContext();
+
+  // ── Zustand stores ──
+  const settings = useSettingsStore(s => s.settings);
+  const updateSettings = useSettingsStore(s => s.updateSettings);
+  const isSetup = useProgressStore(s => s.isSetup);
+  const startChallenge = useProgressStore(s => s.startChallenge);
+  const isInitialSyncDone = useCloudSyncStore(s => s.isInitialSyncDone);
+  const resumeCloudSync = useCloudSyncStore(s => s.resumeCloudSync);
+
+  // ── Computed stats (for orchestrator) ──
+  const computedStats = useComputedStatsFromStore();
+
+  // ── Exercises context ──
   const { customExercises, customCategories, routines } = useExercises();
-  const { resumeCloudSync } = useProgressContext();
 
   const cloudSyncEnabled = auth.isSignedIn && !auth.loading && isSetup && isInitialSyncDone;
   useCloudSyncOrchestration(cloudSyncEnabled, routines, customExercises, customCategories);
@@ -41,11 +56,6 @@ function AppContent() {
       updateSettings(prev => ({ ...prev, appTheme: 'dark' }));
     }
   }, [isPro, isSubscriptionLoading, settings.appTheme, updateSettings]);
-
-  // Keep computedStats up-to-date with custom exercises
-  useEffect(() => {
-    setCustomExercisesForStats(customExercises);
-  }, [customExercises, setCustomExercisesForStats]);
 
   // Show loading only when: auth is loading, OR user is signed in with no local data
   // (waiting for cloud). If local data exists, show it immediately and sync in background.
@@ -61,6 +71,7 @@ function AppContent() {
         {t('app.initializing')}
       </div>
     }>
+      <AppOrchestrator computedStats={computedStats} />
       {isInitializing ? (
         <div style={{
           position: 'fixed', inset: 0, background: '#050505',
@@ -80,41 +91,18 @@ function AppContent() {
 
 /**
  * Root App — composes all providers.
- * App.jsx is now ~110 lines instead of ~500.
+ * No more ProgressProvider needed!
  */
 function App() {
   return (
     <AuthProvider>
-      <ProgressProviderWithSubscription />
+      <SubscriptionProvider>
+        <PWAReloadHandler />
+        <ExercisesProvider>
+          <AppContent />
+        </ExercisesProvider>
+      </SubscriptionProvider>
     </AuthProvider>
-  );
-}
-
-/**
- * Intermediate component to wire ProgressProvider's publishLeaderboardNow
- * into SubscriptionProvider (which needs it for purchase callbacks).
- */
-function ProgressProviderWithSubscription() {
-  return (
-    <ProgressProvider>
-      <SubscriptionAndExercises />
-    </ProgressProvider>
-  );
-}
-
-function SubscriptionAndExercises() {
-  const { publishLeaderboardNow, deleteExerciseHistory, saveToCloud } = useProgressContext();
-
-  return (
-    <SubscriptionProvider publishLeaderboardNow={publishLeaderboardNow}>
-      <PWAReloadHandler />
-      <ExercisesProvider
-        onDeleteExerciseHistory={deleteExerciseHistory}
-        onSaveToCloud={saveToCloud}
-      >
-        <AppContent />
-      </ExercisesProvider>
-    </SubscriptionProvider>
   );
 }
 

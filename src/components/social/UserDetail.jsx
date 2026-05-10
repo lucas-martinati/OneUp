@@ -11,8 +11,9 @@ import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '../../utils/ent
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
+import { cloudSync } from '../../services/cloudSync';
 
-export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
+export function UserDetail({ entry, rank, isMe, onClose }) {
     const { t } = useTranslation();
     const rankColors = { 1: '#fbbf24', 2: '#c0c0c0', 3: '#cd7f32' };
     const todayStr = getLocalDateStr(new Date());
@@ -32,7 +33,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
         const load = async () => {
             setLoadingDetails(true);
             try {
-                const data = await cloudSync.loadUserDetails(entry.uid);
+                const data = await cloudSync.loadUserDetailsWithCache(entry.uid);
                 if (!cancelled) setDetails(data);
             } catch (e) {
                 console.error('Failed to load user details', e);
@@ -41,7 +42,7 @@ export function UserDetail({ entry, rank, isMe, onClose, cloudSync }) {
         };
         load();
         return () => { cancelled = true; };
-    }, [entry.uid, cloudSync]);
+    }, [entry.uid]);
 
     const stats = computeStats(details);
 

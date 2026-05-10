@@ -3,11 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { Users, LogIn, Plus, Shield } from '../../utils/icons';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import { useAuth } from '../../contexts/AuthContext';
-import { useProgressContext } from '../../contexts/ProgressContext';
+import { useSettingsStore } from '../../store/useSettingsStore';
+import { useCloudSyncStore } from '../../store/useCloudSyncStore';
+import { cloudSync } from '../../services/cloudSync';
 
 export function ClanManager({ onClanJoined }) {
     const cloudAuth = useAuth();
-    const { settings, updateSettings, cloudSyncAPI: cloudSync, userClans, refreshUserClans } = useProgressContext();
+    const settings = useSettingsStore(s => s.settings);
+    const updateSettings = useSettingsStore(s => s.updateSettings);
+    const userClans = useCloudSyncStore(s => s.userClans);
+    const refreshUserClans = useCloudSyncStore(s => s.refreshUserClans);
     const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [view, setView] = useState('menu'); // 'menu' | 'create' | 'join'

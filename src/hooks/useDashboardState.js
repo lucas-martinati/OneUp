@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getLocalDateStr } from '../utils/dateUtils';
-import { useProgressContext } from '../contexts/ProgressContext';
+import { useProgressStore } from '../store/useProgressStore';
+import { useSettingsStore } from '../store/useSettingsStore';
+import { useNotificationManager } from './useNotificationManager';
 
 export function useDashboardState() {
-    const { getDayNumber, settings, scheduleNotification } = useProgressContext();
+    const getDayNumber = useProgressStore(s => s.getDayNumber);
+    const isDayDone = useProgressStore(s => s.isDayDone);
+    const settings = useSettingsStore(s => s.settings);
+    const { scheduleNotification } = useNotificationManager({ isDayDone, getDayNumber });
 
     const [today, setToday] = useState(getLocalDateStr(new Date()));
     const [isCounterTransitioning, setIsCounterTransitioning] = useState(false);

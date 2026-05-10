@@ -16,9 +16,12 @@ const DELEGATED_SERVICES = [
   clanService,
 ];
 
+const USER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 class CloudSyncService {
   constructor() {
     this.listeners = new Set();
+    this._userDetailsCache = new Map();
     initializeFirebase();
     authService.setupAuthListener(this.listeners);
 
@@ -39,6 +42,20 @@ class CloudSyncService {
     return () => this.listeners.delete(callback);
   }
 
+  /**
+   * Load user details with built-in caching (5 min TTL).
+   */
+  async loadUserDetailsWithCache(uid) {
+    const cached = this._userDetailsCache.get(uid);
+    const now = Date.now();
+    if (cached && (now - cached.timestamp) < USER_CACHE_TTL) {
+      return cached.data;
+    }
+    const data = await this.loadUserDetails(uid);
+    this._userDetailsCache.set(uid, { data, timestamp: now });
+    return data;
+  }
+
   // Auth methods need specific handling due to `this.listeners` injection or specific callbacks
   async signInWithGoogle(idToken) {
     return authService.signInWithGoogle(idToken, this.listeners);
@@ -49,10 +66,12 @@ class CloudSyncService {
   }
 
   async signOut() {
+    this._userDetailsCache.clear();
     return authService.signOut(this.listeners);
   }
 
   async deleteAccount() {
+    this._userDetailsCache.clear();
     return authService.deleteAccount(
       this.listeners,
       (id) => clanService.leaveClan(id),

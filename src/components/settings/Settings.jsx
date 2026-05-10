@@ -9,7 +9,11 @@ import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { SettingRow } from '../ui/SettingRow';
 import { StoreCard } from '../store/StoreCard';
 import { useAuth } from '../../contexts/AuthContext';
-import { useProgressContext } from '../../contexts/ProgressContext';
+import { useSettingsStore } from '../../store/useSettingsStore';
+import { useCloudSyncStore } from '../../store/useCloudSyncStore';
+import { useProgressStore } from '../../store/useProgressStore';
+import { cloudSync } from '../../services/cloudSync';
+import { useNotificationManager } from '../../hooks/useNotificationManager';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
@@ -37,9 +41,14 @@ function CategorySeparator({ label, color }) {
 
 export function Settings({ defaultShowStore = false, onClose }) {
 
-    // ── Context consumption (replaces 11 props) ──
+    // ── Store consumption ──
     const cloudAuth = useAuth();
-    const { settings, updateSettings, cloudSyncAPI: cloudSync, conflictData, scheduleNotification } = useProgressContext();
+    const settings = useSettingsStore(s => s.settings);
+    const updateSettings = useSettingsStore(s => s.updateSettings);
+    const conflictData = useCloudSyncStore(s => s.conflictData);
+    const isDayDone = useProgressStore(s => s.isDayDone);
+    const getDayNumber = useProgressStore(s => s.getDayNumber);
+    const { scheduleNotification } = useNotificationManager({ isDayDone, getDayNumber });
     const { getConfig, updateConfig } = useExerciseConfig();
     const { isSupporter, isPro, purchaseSupporter: onPurchaseSupporter, purchasePro: onPurchasePro, purchaseProYearly: onPurchaseProYearly, restorePurchases: onRestorePurchases } = useSubscription();
 

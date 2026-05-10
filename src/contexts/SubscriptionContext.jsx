@@ -17,7 +17,7 @@ const SubscriptionContext = createContext(null);
  * Manages all subscription/entitlement logic (RevenueCat + Firebase fallback).
  * Extracted from App.jsx to decouple subscription concerns from the root component.
  */
-export function SubscriptionProvider({ children, publishLeaderboardNow }) {
+export function SubscriptionProvider({ children }) {
   const auth = useAuth();
 
   const [isSupporter, setIsSupporter] = useState(() => loadCachedEntitlements().isSupporter);
@@ -40,8 +40,7 @@ export function SubscriptionProvider({ children, publishLeaderboardNow }) {
     }
     saveCachedEntitlements({ isSupporter: sup, isPro: pr, hadPro: finalHadPro });
     await cloudSync.savePurchase({ isSupporter: sup, isPro: pr, hadPro: finalHadPro });
-    if (publishLeaderboardNow) await publishLeaderboardNow();
-  }, [publishLeaderboardNow]);
+  }, []);
 
   // Reset when user signs out
   useEffect(() => {

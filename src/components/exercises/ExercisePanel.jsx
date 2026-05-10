@@ -12,7 +12,7 @@ import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 import { useWakeLock } from '../../hooks/useWakeLock';
 import { Z_INDEX } from '../../utils/zIndex';
-import { useProgressContext } from '../../contexts/ProgressContext';
+import { useSettingsStore } from '../../store/useSettingsStore';
 
 export function ExercisePanel({
     onClose,
@@ -27,7 +27,7 @@ export function ExercisePanel({
     isSession = false,
     fadeIn = true
 }) {
-    const { settings } = useProgressContext();
+    const settings = useSettingsStore(s => s.settings);
     const keepScreenOn = settings?.keepScreenOn ?? true;
     useWakeLock(keepScreenOn);
     

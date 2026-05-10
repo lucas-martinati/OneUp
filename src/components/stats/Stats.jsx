@@ -11,7 +11,9 @@ import { useBackHandler } from '../../hooks/useBackHandler';
 import { getSessionHistory, removeSession } from '../../features/share/services/sessionHistoryService';
 import { getExerciseLabel, getExerciseColor } from '../../utils/exerciseLabel';
 import { SharePanel } from '../../features/share/components/SharePanel';
-import { useProgressContext } from '../../contexts/ProgressContext';
+import { useProgressStore } from '../../store/useProgressStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
+import { useComputedStatsFromStore } from '../../hooks/useComputedStatsFromStore';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
 import { useCardio } from '../../features/cardio/useCardio';
@@ -28,8 +30,11 @@ const SessionDetailModal = lazy(() => import('../../features/share/components/Se
 
 export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStore }) {
 
-    // ── Context consumption (replaces 8 props) ──
-    const { completions, settings, getDayNumber, computedStats: globalStats } = useProgressContext();
+    // ── Store consumption ──
+    const completions = useProgressStore(s => s.completions);
+    const getDayNumber = useProgressStore(s => s.getDayNumber);
+    const settings = useSettingsStore(s => s.settings);
+    const globalStats = useComputedStatsFromStore();
     const { isPro, hadPro } = useSubscription();
     // For stats viewing, previously having pro is enough
     const hasProAccess = isPro || hadPro;

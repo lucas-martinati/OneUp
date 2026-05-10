@@ -12,7 +12,8 @@ import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { DynamicIcon } from '../../utils/icons';
 import { addSession, getSessionHistory } from '../../features/share/services/sessionHistoryService';
 import { getExerciseLabel, isCustomExercise } from '../../utils/exerciseLabel';
-import { useProgressContext } from '../../contexts/ProgressContext';
+import { useProgressStore } from '../../store/useProgressStore';
+import { useComputedStatsFromStore } from '../../hooks/useComputedStatsFromStore';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
@@ -81,8 +82,11 @@ export function WorkoutSession({
     onClose, today, dayNumber, activeSlide
 }) {
 
-    // ── Context consumption (replaces 12 props) ──
-    const { getExerciseCount, updateExerciseCount, completions, computedStats } = useProgressContext();
+    // ── Store consumption (replaces context) ──
+    const getExerciseCount = useProgressStore(s => s.getExerciseCount);
+    const updateExerciseCount = useProgressStore(s => s.updateExerciseCount);
+    const completions = useProgressStore(s => s.completions);
+    const computedStats = useComputedStatsFromStore();
     const { getConfig } = useExerciseConfig();
     const { isPro } = useSubscription();
     const { 

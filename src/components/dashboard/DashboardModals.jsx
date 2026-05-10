@@ -3,7 +3,10 @@ import { CATEGORIES, isUserCategory } from '../../config/categories';
 import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 
-import { useProgressContext } from '../../contexts/ProgressContext';
+import { useProgressStore } from '../../store/useProgressStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
+import { useCloudSyncStore } from '../../store/useCloudSyncStore';
+import { useComputedStatsFromStore } from '../../hooks/useComputedStatsFromStore';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
@@ -34,7 +37,13 @@ export function DashboardModals({
     dayNumber, today,
     customExModalCatId, setCustomExModalCatId
 }) {
-    const { startDate, completions, getDayNumber, settings, computedStats, updateExerciseCount, resumeCloudSync } = useProgressContext();
+    const startDate = useProgressStore(s => s.startDate);
+    const completions = useProgressStore(s => s.completions);
+    const getDayNumber = useProgressStore(s => s.getDayNumber);
+    const updateExerciseCount = useProgressStore(s => s.updateExerciseCount);
+    const settings = useSettingsStore(s => s.settings);
+    const resumeCloudSync = useCloudSyncStore(s => s.resumeCloudSync);
+    const computedStats = useComputedStatsFromStore();
     const { getConfig } = useExerciseConfig();
     const { isPro } = useSubscription();
     const {

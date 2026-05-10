@@ -6,11 +6,12 @@ import { ShareCard } from './ShareCard';
 import { ShareOptions } from './ShareOptions';
 import { CropModal } from './CropModal';
 import { canShareNatively } from '../services/shareService';
-import { useProgressContext } from '../../../contexts/ProgressContext';
+import { useProgressStore } from '../../../store/useProgressStore';
 
 export function ShareModal({ shareHook, onClose, isPro = false, completions = {}, getDayNumber, settings }) {
   const { t } = useTranslation();
-  const { hasShared, setHasShared } = useProgressContext();
+  const hasShared = useProgressStore(s => s.hasShared);
+  const setHasShared = useProgressStore(s => s.setHasShared);
   const {
     cardRef, options, toggleOption, setOption, toggleCategory,
     setBackgroundImage, clearBackgroundImage,

@@ -4,6 +4,7 @@ import { useRoutines } from '../hooks/useRoutines';
 import { useCustomExercises } from '../hooks/useCustomExercises';
 import { useCustomCategories } from '../hooks/useCustomCategories';
 import { useExerciseWeights } from '../hooks/useExerciseWeights';
+import { useProgressStore } from '../store/useProgressStore';
 import { EXERCISES, EXERCISES_MAP, CARDIO_EXERCISES } from '../config/exercises';
 import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
 
@@ -15,9 +16,11 @@ const EMPTY_ARRAY = [];
  * Replaces the duplicated [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises]
  * pattern found in 5+ files.
  */
-export function ExercisesProvider({ children, onDeleteExerciseHistory, onSaveToCloud }) {
+export function ExercisesProvider({ children }) {
   const auth = useAuth();
   const userId = auth.user?.uid;
+  const deleteExerciseHistory = useProgressStore(s => s.deleteExerciseHistory);
+  const saveToCloud = useProgressStore(s => s.saveToCloud);
   const routinesHook = useRoutines(userId);
   const customExercisesHook = useCustomExercises(userId);
   const customCategoriesHook = useCustomCategories(userId);
@@ -92,12 +95,9 @@ export function ExercisesProvider({ children, onDeleteExerciseHistory, onSaveToC
     rawDeleteCustomExercise(id);
 
     // Erase from completion history
-    if (onDeleteExerciseHistory) {
-      const newState = onDeleteExerciseHistory(id);
-      if (newState && onSaveToCloud) {
-        await onSaveToCloud(newState);
-      }
-    }
+    deleteExerciseHistory(id);
+    // Trigger cloud save after deletion
+    saveToCloud().catch(() => {});
 
     // Remove from all routines and delete routine if empty
     routines.forEach(r => {
@@ -110,7 +110,7 @@ export function ExercisesProvider({ children, onDeleteExerciseHistory, onSaveToC
         }
       }
     });
-  }, [rawDeleteCustomExercise, onDeleteExerciseHistory, onSaveToCloud, routines, deleteRoutine, updateRoutine]);
+  }, [rawDeleteCustomExercise, deleteExerciseHistory, saveToCloud, routines, deleteRoutine, updateRoutine]);
 
   /**
    * Delete a user-created category with selective exercise handling.

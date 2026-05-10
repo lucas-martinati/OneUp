@@ -1,16 +1,40 @@
 import { useCallback } from 'react';
-import { useProgressContext } from '../contexts/ProgressContext';
+import { useProgressStore } from '../store/useProgressStore';
+import { useSettingsStore } from '../store/useSettingsStore';
 import { useExercises } from '../contexts/ExercisesContext';
 
 /**
  * Unifies the configuration aspects of exercises (difficulty and weight).
- * Internally delegates reading from and writing to ProgressContext (for difficulty)
+ * Internally delegates reading from and writing to stores (for difficulty)
  * and ExercisesContext (for weight). Also pulls historical data from completions
  * if an exercise was finished on a specific date.
  */
 export function useExerciseConfig() {
-  const { getDifficulty: getGlobalDifficulty, updateDifficulty, completions } = useProgressContext();
+  const completions = useProgressStore(s => s.completions);
+  const settings = useSettingsStore(s => s.settings);
+  const updateSettings = useSettingsStore(s => s.updateSettings);
   const { getWeight: getGlobalWeight, setWeight } = useExercises();
+
+  // Inline getDifficulty (previously from ProgressContext)
+  const getGlobalDifficulty = useCallback((exId, dateStr = null) => {
+    if (dateStr && completions?.[dateStr]?.[exId]?.isCompleted) {
+      const savedDiff = completions[dateStr][exId].difficulty;
+      if (savedDiff !== undefined) return savedDiff;
+      return 1.0;
+    }
+    const currentPrefs = settings?.exerciseDifficulties || {};
+    if (currentPrefs[exId] !== undefined) return currentPrefs[exId];
+    return 1.0;
+  }, [completions, settings?.exerciseDifficulties]);
+
+  const updateDifficulty = useCallback((exId, value) => {
+    updateSettings(prev => ({
+      exerciseDifficulties: {
+        ...(prev.exerciseDifficulties || {}),
+        [exId]: value,
+      },
+    }));
+  }, [updateSettings]);
 
   /**
    * Retrieves the combined config (weight and difficulty) for a given exercise.

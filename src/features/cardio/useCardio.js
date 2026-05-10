@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { loadCardioSessions, saveCardioSession } from '../../services/cardioService';
 import { stravaService } from '../../services/stravaService';
 import { useAuth } from '../../contexts/AuthContext';
-import { useProgressContext } from '../../contexts/ProgressContext';
+import { useProgressStore } from '../../store/useProgressStore';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '../../utils/dateUtils';
 import { getWeeklyGoalKm } from '../../config/exercises';
@@ -66,10 +66,11 @@ function computeStreak(sessions, mode, challengeStartDate, currentDifficulty, co
  */
 export function useCardio() {
   const auth = useAuth();
-  const { 
-    completions, updateExerciseCount, updateCardioSessions, cardio, 
-    startDate 
-  } = useProgressContext();
+  const completions = useProgressStore(s => s.completions);
+  const updateExerciseCount = useProgressStore(s => s.updateExerciseCount);
+  const updateCardioSessions = useProgressStore(s => s.updateCardioSessions);
+  const cardio = useProgressStore(s => s.cardio);
+  const startDate = useProgressStore(s => s.startDate);
   const { getConfig } = useExerciseConfig();
   const [sessions, setSessions] = useState(() => {
     // Initialize from context if available to avoid flicker/wiping during initial load

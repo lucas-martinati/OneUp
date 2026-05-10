@@ -11,7 +11,10 @@ import { Z_INDEX } from '../../utils/zIndex';
 import { UserDetail } from './UserDetail';
 import { getIcon } from '../../utils/icons';
 import { useAuth } from '../../contexts/AuthContext';
-import { useProgressContext } from '../../contexts/ProgressContext';
+import { useSettingsStore } from '../../store/useSettingsStore';
+import { useCloudSyncStore } from '../../store/useCloudSyncStore';
+import { useComputedStatsFromStore } from '../../hooks/useComputedStatsFromStore';
+import { cloudSync } from '../../services/cloudSync';
 import { useSwipe } from '../../hooks/useSwipe';
 import { ClanManager } from './ClanManager';
 import { useBackHandler } from '../../hooks/useBackHandler';
@@ -19,9 +22,11 @@ import { SegmentedControl } from '../ui/SegmentedControl';
 
 export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, onLeaveClan }) {
 
-    // ── Context consumption ──
+    // ── Store consumption ──
     const cloudAuth = useAuth();
-    const { cloudSyncAPI: cloudSync, computedStats, settings } = useProgressContext();
+    const settings = useSettingsStore(s => s.settings);
+    const refreshUserClans = useCloudSyncStore(s => s.refreshUserClans);
+    const computedStats = useComputedStatsFromStore();
     const { t } = useTranslation();
 
     const [domain, setDomain] = useState(activeSlide === 2 ? 'weights' : 'bodyweight');
@@ -81,7 +86,6 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
         onClose();
         return true;
     }, true);
-    const {refreshUserClans } = useProgressContext();
     const [clanData, setClanData] = useState(initialClanData);
 
     // Swipe gesture handling
@@ -121,7 +125,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
             console.error('Failed to load leaderboard', e);
         }
         setLoading(false);
-    }, [communityContext, cloudSync]);
+    }, [communityContext]);
 
     useEffect(() => {
         if (communityContext !== 'manage') {
@@ -373,7 +377,6 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                     rank={getRank(sorted.findIndex(e => e.uid === selectedUser.uid))}
                     isMe={selectedUser.uid === currentUid}
                     onClose={() => setSelectedUser(null)}
-                    cloudSync={cloudSync}
                 />
             )}
             </div>

@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { HeartHandshake, X } from '../../utils/icons';
 import { sounds } from '../../utils/soundManager';
-import { useProgressContext } from '../../contexts/ProgressContext';
+import { cloudSync } from '../../services/cloudSync';
 import { Avatar } from '../ui/Avatar';
 import { Z_INDEX } from '../../utils/zIndex';
 
 export function NotificationManager() {
-    const { cloudSyncAPI: cloudSync } = useProgressContext();
     const [, setNotifications] = useState([]);
     const [activeToasts, setActiveToasts] = useState([]);
 
@@ -71,7 +70,7 @@ export function NotificationManager() {
             if (unsubscribe) unsubscribe();
             authUnsub();
         };
-    }, [cloudSync]);
+    }, []);
 
     const dismissToast = (id) => {
         cloudSync.deleteNotification(id);

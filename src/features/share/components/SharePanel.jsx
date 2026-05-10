@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useShareCard } from '../hooks/useShareCard';
 import { getSessionHistory } from '../services/sessionHistoryService';
 import { useSubscription } from '../../../contexts/SubscriptionContext';
-import { useProgressContext } from '../../../contexts/ProgressContext';
+import { useProgressStore } from '../../../store/useProgressStore';
+import { useSettingsStore } from '../../../store/useSettingsStore';
 import { useBackHandler } from '../../../hooks/useBackHandler';
 import { CATEGORIES } from '../../../config/categories';
 
@@ -37,7 +38,9 @@ export function SharePanel({
   const { t } = useTranslation();
   const { isPro, hadPro } = useSubscription();
   const hasProAccess = isPro || hadPro;
-  const { completions, getDayNumber, settings } = useProgressContext();
+  const completions = useProgressStore(s => s.completions);
+  const getDayNumber = useProgressStore(s => s.getDayNumber);
+  const settings = useSettingsStore(s => s.settings);
 
   const mappedCategories = useMemo(() => {
     const categoryMap = {

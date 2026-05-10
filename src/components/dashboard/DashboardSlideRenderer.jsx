@@ -8,7 +8,9 @@ import { canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { DashboardSlide } from './DashboardSlide';
 import { ProPaywall } from './ProPaywall';
 
-import { useProgressContext } from '../../contexts/ProgressContext';
+import { useProgressStore } from '../../store/useProgressStore';
+import { useCloudSyncStore } from '../../store/useCloudSyncStore';
+import { useComputedStatsFromStore } from '../../hooks/useComputedStatsFromStore';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
@@ -26,7 +28,10 @@ export function DashboardSlideRenderer({
     customCategories
 }) {
     const { t } = useTranslation();
-    const { getExerciseCount, completions, computedStats, pauseCloudSync } = useProgressContext();
+    const getExerciseCount = useProgressStore(s => s.getExerciseCount);
+    const completions = useProgressStore(s => s.completions);
+    const pauseCloudSync = useCloudSyncStore(s => s.pauseCloudSync);
+    const computedStats = useComputedStatsFromStore();
     const { getConfig } = useExerciseConfig();
     const { isPro } = useSubscription();
     const {

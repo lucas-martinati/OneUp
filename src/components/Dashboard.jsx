@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from './feedback/CSSConfetti';
 import { NotificationManager } from './social/NotificationManager';
@@ -22,7 +22,10 @@ import { DashboardSlideRenderer } from './dashboard/DashboardSlideRenderer';
 import { DashboardModals } from './dashboard/DashboardModals';
 
 // Contexts
-import { useProgressContext } from '../contexts/ProgressContext';
+import { useProgressStore } from '../store/useProgressStore';
+import { useSettingsStore } from '../store/useSettingsStore';
+import { useCloudSyncStore } from '../store/useCloudSyncStore';
+import { useComputedStatsFromStore } from '../hooks/useComputedStatsFromStore';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { useExercises } from '../contexts/ExercisesContext';
 import { useExerciseConfig } from '../hooks/useExerciseConfig';
@@ -34,16 +37,30 @@ import { canAccessFeature, FEATURES } from '../utils/entitlements';
 export function Dashboard() {
     const { t } = useTranslation();
 
-    // ── Contexts ──
-    const {
-        getDayNumber, completions, startDate, userStartDate,
-        settings, getExerciseCount,
-        pauseCloudSync, computedStats,
-        conflictData, onResolveConflict
-    } = useProgressContext();
+    // ── Stores ──
+    const getDayNumber = useProgressStore(s => s.getDayNumber);
+    const completions = useProgressStore(s => s.completions);
+    const startDate = useProgressStore(s => s.startDate);
+    const userStartDate = useProgressStore(s => s.userStartDate);
+    const getExerciseCount = useProgressStore(s => s.getExerciseCount);
+    const loadFromCloud = useProgressStore(s => s.loadFromCloud);
+    const syncWithCloud = useProgressStore(s => s.syncWithCloud);
+    const hasGuestData = useProgressStore(s => s.hasGuestData);
+    const clearAnonymousData = useProgressStore(s => s.clearAnonymousData);
+    const mergeWithAnonymousData = useProgressStore(s => s.mergeWithAnonymousData);
+    const settings = useSettingsStore(s => s.settings);
+    const updateSettings = useSettingsStore(s => s.updateSettings);
+    const pauseCloudSync = useCloudSyncStore(s => s.pauseCloudSync);
+    const conflictData = useCloudSyncStore(s => s.conflictData);
+    const rawResolveConflict = useCloudSyncStore(s => s.onResolveConflict);
+    const computedStats = useComputedStatsFromStore();
     const { getConfig } = useExerciseConfig();
     const { isPro } = useSubscription();
     const { customExercises, customExercisesMap, customCategories, exercisesByUserCategory } = useExercises();
+
+    const onResolveConflict = useCallback((action) => rawResolveConflict(action, {
+      loadFromCloud, syncWithCloud, hasGuestData, clearAnonymousData, mergeWithAnonymousData, updateSettings,
+    }), [rawResolveConflict, loadFromCloud, syncWithCloud, hasGuestData, clearAnonymousData, mergeWithAnonymousData, updateSettings]);
     
     const { showAnnouncement, announcement, dismissAnnouncement } = useAnnouncement();
 
