@@ -34,6 +34,16 @@ export async function saveToCloud(data) {
   const auth = getAuthInstance();
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) throw new Error('User not signed in or Firebase not initialized');
+
+  // SAFEGUARD: Never overwrite cloud data with empty completions.
+  // This prevents a race condition where a save fires after sign-out reset
+  // but before auth.isSignedIn becomes false, wiping the user's progress.
+  const completionCount = data?.completions ? Object.keys(data.completions).length : 0;
+  if (completionCount === 0 && !data?.isSetup) {
+    logger.warn('Blocked save with empty completions and no setup — possible race condition');
+    return false;
+  }
+
   const userId = auth.currentUser.uid;
   const cleanData = sanitizeForCloud(data);
   

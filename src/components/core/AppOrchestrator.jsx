@@ -193,7 +193,7 @@ export function AppOrchestrator({ computedStats }) {
         try {
           const hasGuest = hasGuestData();
           if (hasGuest) {
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 4000));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 10000));
             const cloudData = await Promise.race([cloudSync.loadFromCloud(), timeoutPromise]);
             setConflictData({
               ...cloudData,
@@ -213,7 +213,7 @@ export function AppOrchestrator({ computedStats }) {
     } else if (auth.isSignedIn && !auth.loading && !isSetup && !conflictCheckDone) {
       const tryLoadFromCloud = async () => {
         try {
-          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 4000));
+          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 10000));
           const result = await Promise.race([loadFromCloud(), timeoutPromise]);
           if (result && result.success) {
             logger.info('Cloud data restored for signed-in user with no local data');
@@ -238,7 +238,7 @@ export function AppOrchestrator({ computedStats }) {
       if (isSetup) {
         const initialSync = async () => {
           try {
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 4000));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 10000));
             await Promise.race([syncWithCloud(), timeoutPromise]);
             queueMicrotask(() => setIsInitialSyncDone(true));
           } catch (error) {
