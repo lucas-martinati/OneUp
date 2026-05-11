@@ -1,11 +1,11 @@
-import { ref, set, get, serverTimestamp } from 'firebase/database';
+import { ref, set, get, update, serverTimestamp } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance, initializeFirebase } from './firebase';
 import i18n from '../i18n';
 
 const logger = createLogger('Leaderboard');
 
-export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps, exerciseReps, exerciseWeights, exerciseDifficulties, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isSupporter, isPro, isPerfectToday }) {
+export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps, exerciseReps, exerciseWeights, exerciseDifficulties, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isPerfectToday }) {
   const auth = getAuthInstance();
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
@@ -17,14 +17,12 @@ export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps
 
   const uid = auth.currentUser.uid;
   const lbRef = ref(database, `leaderboard/${uid}`);
-  const existing = await get(lbRef);
-  const existingData = existing.exists() ? existing.val() : {};
 
   const sanitizedDifficulties = Object.fromEntries(
     Object.entries(exerciseDifficulties || {}).filter(([, v]) => typeof v === 'number')
   );
 
-  await set(lbRef, {
+  await update(lbRef, {
     pseudo: pseudo || auth.currentUser.displayName || i18n.t('common.anonymous'),
     photoURL: auth.currentUser.photoURL || null,
     totalReps: totalReps || 0,
@@ -36,8 +34,6 @@ export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps
     lastActiveDay,
     difficultyMultiplier: difficultyMultiplier || 1,
     isPublic: isPublic !== false,
-    isSupporter: isSupporter !== undefined ? isSupporter : (existingData.isSupporter || false),
-    isPro: isPro !== undefined ? isPro : (existingData.isPro || false),
     isPerfectToday: !!isPerfectToday,
     lastUpdated: serverTimestamp()
   });

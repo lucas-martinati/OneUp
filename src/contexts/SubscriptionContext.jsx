@@ -6,7 +6,7 @@ import {
   checkProStatus, purchasePro, purchaseProYearly
 } from '../services/purchaseService';
 import {
-  loadCachedEntitlements, saveCachedEntitlements, clearCachedEntitlements, resolveEntitlements
+  loadCachedEntitlements, saveCachedEntitlements, clearCachedEntitlements
 } from '../utils/entitlements';
 import { createLogger } from '../utils/logger';
 
@@ -39,7 +39,7 @@ export function SubscriptionProvider({ children }) {
       setHadPro(true);
     }
     saveCachedEntitlements({ isSupporter: sup, isPro: pr, hadPro: finalHadPro });
-    await cloudSync.savePurchase({ isSupporter: sup, isPro: pr, hadPro: finalHadPro });
+    // Note: cloudSync.savePurchase() a été retiré, Firebase est mis à jour UNIQUEMENT par le Webhook RevenueCat.
   }, []);
 
   // Reset when user signs out
@@ -79,19 +79,15 @@ export function SubscriptionProvider({ children }) {
 
           let fbEntitlements = { isSupporter: false, isPro: false, hadPro: false };
           const cloudPurchase = await cloudSync.loadPurchase();
-          let fbLoaded = false;
           if (cloudPurchase) {
-            fbLoaded = true;
             fbEntitlements = { isSupporter: !!cloudPurchase.isSupporter, isPro: !!cloudPurchase.isPro, hadPro: !!cloudPurchase.hadPro };
             if (fbEntitlements.isSupporter || fbEntitlements.isPro || fbEntitlements.hadPro) logger.info('Loaded purchase from Firebase');
           }
 
-          // Resolve Entitlements: Si RevenueCat n'est pas vérifié (ex: version Web sans paiement ou erreur),
-          // on utilise les données de Firebase comme source de vérité absolue pour ne pas ramener à la vie
-          // un vieil abonnement annulé stocké dans le localStorage (rcEntitlements partiel).
+          // Resolve Entitlements: RevenueCat est TOUJOURS la source de vérité pour le statut actif
           let resolved = {
-            isSupporter: rcEntitlements.verified ? rcEntitlements.isSupporter : (fbLoaded ? fbEntitlements.isSupporter : rcEntitlements.isSupporter),
-            isPro: rcEntitlements.verified ? rcEntitlements.isPro : (fbLoaded ? fbEntitlements.isPro : rcEntitlements.isPro),
+            isSupporter: rcEntitlements.isSupporter,
+            isPro: rcEntitlements.isPro,
             hadPro: rcEntitlements.isPro || fbEntitlements.hadPro || rcEntitlements.hadPro,
           };
           resolved.hasAnyEntitlement = resolved.isSupporter || resolved.hadPro;
@@ -152,21 +148,22 @@ export function SubscriptionProvider({ children }) {
 
   const handleRestorePurchases = useCallback(async () => {
     const result = await restorePurchases();
-    let resolved = resolveEntitlements(
-      { isSupporter: result.supporter || result.isSupporter || false, isPro: result.pro || false },
-      { isSupporter: false, isPro: false, hadPro: false }
-    );
+    // RevenueCat est la source de vérité pour le Restore aussi
+    let resolved = {
+      isSupporter: result.supporter || result.isSupporter || false,
+      isPro: result.pro || false,
+      hadPro: false
+    };
 
-    if (!resolved.hasAnyEntitlement) {
-      const cloudPurchase = await cloudSync.loadPurchase();
-      if (cloudPurchase) {
-        resolved = resolveEntitlements(resolved, {
-          isSupporter: !!cloudPurchase.isSupporter,
-          isPro: !!cloudPurchase.isPro,
-          hadPro: !!cloudPurchase.hadPro,
-        });
-      }
+    // On utilise néanmoins Firebase pour récupérer le "hadPro" car RC ne le donne pas
+    const cloudPurchase = await cloudSync.loadPurchase();
+    if (cloudPurchase) {
+       resolved.hadPro = resolved.isPro || !!cloudPurchase.hadPro || !!cloudPurchase.isPro;
+    } else {
+       resolved.hadPro = resolved.isPro;
     }
+
+    resolved.hasAnyEntitlement = resolved.isSupporter || resolved.hadPro;
 
     setIsSupporter(resolved.isSupporter);
     setIsPro(resolved.isPro);

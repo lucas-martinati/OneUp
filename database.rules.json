@@ -3,13 +3,21 @@
     "users": {
       "$uid": {
         ".read": "auth != null",
-        ".write": "$uid === auth.uid"
+        "$topic": {
+          ".write": "$uid === auth.uid && $topic !== 'purchase'"
+        }
       }
     },
     "leaderboard": {
       ".read": "auth != null",
       "$uid": {
-        ".write": "$uid === auth.uid"
+        ".write": "$uid === auth.uid",
+        "isPro": {
+          ".validate": "newData.val() === data.val()"
+        },
+        "isSupporter": {
+          ".validate": "newData.val() === data.val()"
+        }
       }
     },
     "clans": {
