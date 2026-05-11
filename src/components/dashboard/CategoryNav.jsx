@@ -64,6 +64,8 @@ export const CategoryNav = ({
                     navInteractionRef.current.isLongPress = true;
                     setIsNavExpanded(true);
                     target.setPointerCapture(e.pointerId);
+                    // Block scroll during drag
+                    target.style.touchAction = 'none';
                     if (window.navigator.vibrate && navigator.userActivation?.hasBeenActive) {
                         window.navigator.vibrate(isMouse ? 2 : 10);
                     }
@@ -83,6 +85,7 @@ export const CategoryNav = ({
                     setIsNavExpanded(false);
                     setDragIndex(null);
                     e.currentTarget.releasePointerCapture(e.pointerId);
+                    e.currentTarget.style.touchAction = 'pan-y';
                     navInteractionRef.current.isLongPress = false;
                 } else {
                     // Pass-through click for short taps
@@ -135,11 +138,12 @@ export const CategoryNav = ({
                     return prevIndex;
                 });
             }}
-            onPointerCancel={() => {
+            onPointerCancel={(e) => {
                 clearTimeout(navInteractionRef.current.timer);
                 if (navInteractionRef.current.isLongPress) {
                     setIsNavExpanded(false);
                     setDragIndex(null);
+                    e.currentTarget.style.touchAction = 'pan-y';
                     navInteractionRef.current.isLongPress = false;
                 }
             }}

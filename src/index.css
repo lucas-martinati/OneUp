@@ -1329,19 +1329,22 @@ button:focus:not(:focus-visible) {
   pointer-events: auto;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: none;
+  touch-action: pan-y;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .category-nav-container::before {
-  /* Invisible extended hit area to catch drags easier */
+  /* Invisible extended hit area — pointer-events: none so it doesn't block
+     vertical scroll on the page. The actual scrubber drag uses setPointerCapture
+     which tracks the pointer regardless of position once activated. */
   content: '';
   position: absolute;
   top: -20px;
   bottom: -20px;
-  left: -40px;
+  left: -20px;
   right: -20px;
+  pointer-events: none;
 }
 
 .category-nav-container.expanded {
