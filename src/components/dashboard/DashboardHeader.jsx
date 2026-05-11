@@ -86,7 +86,7 @@ export const DashboardHeader = React.memo(({
                 {showLogo && (
                     <img
                         onClick={() => window.location.reload()}
-                        src={`${import.meta.env.BASE_URL}pwa-192x192.webp`} alt="OneUp Logo"
+                        src={`${import.meta.env.BASE_URL}logo-64x64.webp`} alt="OneUp Logo"
                         className="bounce-on-hover"
                         style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', objectFit: 'cover', cursor: 'pointer', transition: 'transform 0.3s ease' }}
                     />

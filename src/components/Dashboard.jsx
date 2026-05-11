@@ -87,22 +87,14 @@ export function Dashboard() {
     const fullCategoryColors = useMemo(() => buildFullCategoryColors(customCategories), [customCategories]);
     const defaultSlide = fullCategoryOrder.indexOf(CATEGORIES.BODYWEIGHT);
     const [activeSlide, setActiveSlide] = useState(defaultSlide);
-    const [renderedSlides, setRenderedSlides] = useState(() => new Set([defaultSlide]));
+    const renderedSlides = useMemo(() => {
+        const set = new Set();
+        set.add(activeSlide);
+        if (activeSlide > 0) set.add(activeSlide - 1);
+        if (activeSlide < fullCategoryOrder.length - 1) set.add(activeSlide + 1);
+        return set;
+    }, [activeSlide, fullCategoryOrder.length]);
     const scrollContainerRef = useRef(null);
-
-    useEffect(() => {
-        queueMicrotask(() => {
-            setRenderedSlides(prev => prev.has(activeSlide) ? prev : new Set(prev).add(activeSlide));
-        });
-    }, [activeSlide]);
-
-    // Defer mounting off-screen slides to improve initial load performance
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setRenderedSlides(prev => prev.size === fullCategoryOrder.length ? prev : new Set(fullCategoryOrder.map((_, i) => i)));
-        }, 1500);
-        return () => clearTimeout(timer);
-    }, [fullCategoryOrder]);
 
     // Use IntersectionObserver to track the active slide (more performant than onScroll)
     useEffect(() => {
@@ -247,7 +239,7 @@ export function Dashboard() {
             {showDay100Modal && <Day100HackModal onDismiss={handleDay100ModalDismiss} />}
             {showUnhackAnim && <Day100UnhackAnimation onComplete={handleUnhackComplete} />}
             {hackActive && <Day100Overlay />}
-            
+
             <div className={`flex-col full-height fade-in gap-responsive ${hackActive ? 'day100-global day100-flicker' : ''} ${day100Unhacked ? 'day100-unhacking' : ''}`} style={{
                 paddingBottom: 'clamp(2px, 0.5vh, 8px)'
             }}>
