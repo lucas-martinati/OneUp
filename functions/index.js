@@ -70,7 +70,9 @@ exports.onRevenueCatWebhook = onRequest({ secrets: ["REVENUECAT_WEBHOOK_SECRET"]
     // Determine target boolean status:
     let isActive = false;
     if (["INITIAL_PURCHASE", "RENEWAL", "UNCANCELLATION", "TRANSFER", "NON_RENEWING_PURCHASE"].includes(type)) {
-      isActive = true;
+      // Even for grants, ensure it hasn't technically already expired (in case of delayed webhook)
+      const now = event.event_timestamp_ms || Date.now();
+      isActive = !(event.expiration_at_ms && event.expiration_at_ms <= now);
     } else if (type === "CANCELLATION") {
       // For cancellations, we keep isActive = true ONLY if the expiration date is still in the future.
       const now = event.event_timestamp_ms || Date.now();
@@ -83,8 +85,16 @@ exports.onRevenueCatWebhook = onRequest({ secrets: ["REVENUECAT_WEBHOOK_SECRET"]
     const updatePayload = {};
 
     // Map RevenueCat custom Entitlements back to OneUp database fields
-    if (entitlement_ids && entitlement_ids.length > 0) {
-      entitlement_ids.forEach((entId) => {
+    let ents = entitlement_ids;
+    // Fallback based on product_id if entitlement_ids is missing (happens for some promotional/sandbox events)
+    if ((!ents || ents.length === 0) && event.product_id) {
+       ents = [];
+       if (event.product_id.includes('pro')) ents.push('pro');
+       if (event.product_id.includes('supporter')) ents.push('supporter');
+    }
+
+    if (ents && ents.length > 0) {
+      ents.forEach((entId) => {
         const key = entId.toLowerCase();
         if (key === "pro") {
           updatePayload.isPro = isActive;

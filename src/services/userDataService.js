@@ -1,4 +1,4 @@
-import { ref, set, get, onValue } from 'firebase/database';
+import { ref, set, get, onValue, update } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
 
@@ -36,7 +36,20 @@ export async function savePurchase({ isSupporter, isPro, hadPro }) {
   const payload = { isSupporter: !!isSupporter, isPro: !!isPro };
   if (hadPro !== undefined) payload.hadPro = !!hadPro;
 
-  await set(ref(database, `users/${auth.currentUser.uid}/purchase`), payload);
+  const uid = auth.currentUser.uid;
+  await set(ref(database, `users/${uid}/purchase`), payload);
+  
+  // Sync to leaderboard if the user entry already exists
+  try {
+    const lbRef = ref(database, `leaderboard/${uid}`);
+    const snapshot = await get(lbRef);
+    if (snapshot.exists()) {
+       await update(lbRef, payload);
+    }
+  } catch (err) {
+    logger.error('Failed to sync purchase to leaderboard', err);
+  }
+
   return true;
 }
 

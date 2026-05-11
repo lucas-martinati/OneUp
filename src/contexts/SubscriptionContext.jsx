@@ -79,15 +79,19 @@ export function SubscriptionProvider({ children }) {
 
           let fbEntitlements = { isSupporter: false, isPro: false, hadPro: false };
           const cloudPurchase = await cloudSync.loadPurchase();
+          let fbLoaded = false;
           if (cloudPurchase) {
+            fbLoaded = true;
             fbEntitlements = { isSupporter: !!cloudPurchase.isSupporter, isPro: !!cloudPurchase.isPro, hadPro: !!cloudPurchase.hadPro };
             if (fbEntitlements.isSupporter || fbEntitlements.isPro || fbEntitlements.hadPro) logger.info('Loaded purchase from Firebase');
           }
 
-          // Resolve Entitlements handling verified override
+          // Resolve Entitlements: Si RevenueCat n'est pas vérifié (ex: version Web sans paiement ou erreur),
+          // on utilise les données de Firebase comme source de vérité absolue pour ne pas ramener à la vie
+          // un vieil abonnement annulé stocké dans le localStorage (rcEntitlements partiel).
           let resolved = {
-            isSupporter: rcEntitlements.verified ? rcEntitlements.isSupporter : (rcEntitlements.isSupporter || fbEntitlements.isSupporter),
-            isPro: rcEntitlements.verified ? rcEntitlements.isPro : (rcEntitlements.isPro || fbEntitlements.isPro),
+            isSupporter: rcEntitlements.verified ? rcEntitlements.isSupporter : (fbLoaded ? fbEntitlements.isSupporter : rcEntitlements.isSupporter),
+            isPro: rcEntitlements.verified ? rcEntitlements.isPro : (fbLoaded ? fbEntitlements.isPro : rcEntitlements.isPro),
             hadPro: rcEntitlements.isPro || fbEntitlements.hadPro || rcEntitlements.hadPro,
           };
           resolved.hasAnyEntitlement = resolved.isSupporter || resolved.hadPro;
