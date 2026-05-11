@@ -84,23 +84,24 @@ export function SubscriptionProvider({ children }) {
             if (fbEntitlements.isSupporter || fbEntitlements.isPro || fbEntitlements.hadPro) logger.info('Loaded purchase from Firebase');
           }
 
-          // Resolve Entitlements: RevenueCat est TOUJOURS la source de vérité pour le statut actif
+          // Resolve Entitlements: Si RevenueCat est vérifié, c'est la source de vérité absolue.
+          // S'il ne l'est pas (App Web sans paiement, Mode hors-ligne, Erreur), Firebase est la meilleure
+          // source de secours puisqu'il est mis à jour par le webhook RevenueCat.
+          // IMPORTANT: On ne fait JAMAIS confiance au cache local (localStorage) comme fallback final,
+          // car il peut contenir des valeurs périmées qui ne seraient jamais corrigées.
           let resolved = {
-            isSupporter: rcEntitlements.isSupporter,
-            isPro: rcEntitlements.isPro,
-            hadPro: rcEntitlements.isPro || fbEntitlements.hadPro || rcEntitlements.hadPro,
+            isSupporter: rcEntitlements.verified ? rcEntitlements.isSupporter : fbEntitlements.isSupporter,
+            isPro: rcEntitlements.verified ? rcEntitlements.isPro : fbEntitlements.isPro,
           };
+          resolved.hadPro = resolved.isPro || fbEntitlements.hadPro || (rcEntitlements.verified ? rcEntitlements.hadPro : false);
           resolved.hasAnyEntitlement = resolved.isSupporter || resolved.hadPro;
 
           setIsSupporter(resolved.isSupporter);
           setIsPro(resolved.isPro);
           setHadPro(resolved.hadPro);
 
-          // We publish to DB if there's any mismatch internally or if we have entitlements, 
-          // to make sure DB is updated when Pro expires!
-          if (resolved.hasAnyEntitlement || fbEntitlements.isPro !== resolved.isPro) {
-            await saveAndPublish(resolved);
-          }
+          // Always update cache to correct any stale localStorage entries
+          await saveAndPublish(resolved);
         } catch (error) {
           logger.error('Purchase init error:', error);
         } finally {
