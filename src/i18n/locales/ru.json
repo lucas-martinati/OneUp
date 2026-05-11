@@ -677,7 +677,6 @@
     "deleteSummaryKeep": "{{keep}} упр. перемещено, {{del}} удалено",
     "deleteSummaryAll": "Будет удалено {{count}} упр.",
     "deleteTitle": "Удалить категорию?",
-    "empty": "Пока нет пользовательских категорий.",
     "errorNameRequired": "Требуется имя",
     "limitReached": "Лимит в {{count}} категорий достигнут.",
     "nameLabel": "Название категории",

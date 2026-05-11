@@ -677,7 +677,6 @@
     "deleteSummaryKeep": "{{keep}} esercizio/i spostato/i, {{del}} eliminato/i",
     "deleteSummaryAll": "{{count}} esercizio/i sarà/saranno eliminato/i",
     "deleteTitle": "Eliminare la categoria?",
-    "empty": "Nessuna categoria personalizzata.",
     "errorNameRequired": "È richiesto un nome",
     "limitReached": "Limite di {{count}} categorie raggiunto.",
     "nameLabel": "Nome della categoria",

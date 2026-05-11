@@ -677,7 +677,6 @@
     "deleteSummaryKeep": "{{keep}}個を移動、{{del}}個を削除",
     "deleteSummaryAll": "{{count}}個のエクササイズが削除されます",
     "deleteTitle": "カテゴリーを削除しますか？",
-    "empty": "カスタムカテゴリーはまだありません。",
     "errorNameRequired": "名前を入力してください",
     "limitReached": "カテゴリー数は{{count}}個までです。",
     "nameLabel": "カテゴリー名",

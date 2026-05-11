@@ -368,7 +368,6 @@
     "deleteSummaryKeep": "{{keep}} exercise(s) moved, {{del}} deleted",
     "deleteSummaryAll": "{{count}} exercise(s) will be deleted",
     "deleteTitle": "Delete category?",
-    "empty": "No custom categories yet.",
     "errorNameRequired": "A name is required",
     "limitReached": "Limit of {{count}} categories reached.",
     "nameLabel": "Category name",

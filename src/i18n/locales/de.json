@@ -677,7 +677,6 @@
     "deleteSummaryKeep": "{{keep}} Übung(en) verschoben, {{del}} gelöscht",
     "deleteSummaryAll": "{{count}} Übung(en) werden gelöscht",
     "deleteTitle": "Kategorie löschen?",
-    "empty": "Noch keine benutzerdefinierten Kategorien.",
     "errorNameRequired": "Ein Name ist erforderlich",
     "limitReached": "Limit von {{count}} Kategorien erreicht.",
     "nameLabel": "Kategoriename",

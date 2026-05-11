@@ -677,7 +677,6 @@
     "deleteSummaryKeep": "已移动 {{keep}} 个练习，已删除 {{del}} 个",
     "deleteSummaryAll": "将删除 {{count}} 个练习",
     "deleteTitle": "删除类别？",
-    "empty": "暂无自定义类别。",
     "errorNameRequired": "需要一个名称",
     "limitReached": "已达到 {{count}} 个类别的限制。",
     "nameLabel": "类别名称",

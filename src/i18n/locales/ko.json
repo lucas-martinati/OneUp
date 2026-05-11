@@ -677,7 +677,6 @@
     "deleteSummaryKeep": "{{keep}}개 이동됨, {{del}}개 삭제됨",
     "deleteSummaryAll": "{{count}}개의 운동이 삭제됩니다",
     "deleteTitle": "카테고리를 삭제하시겠습니까?",
-    "empty": "커스텀 카테고리가 없습니다.",
     "errorNameRequired": "이름을 입력하세요",
     "limitReached": "카테고리는 최대 {{count}}개까지 가능합니다.",
     "nameLabel": "카테고리 이름",
