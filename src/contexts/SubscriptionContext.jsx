@@ -6,7 +6,7 @@ import {
   checkProStatus, purchasePro, purchaseProYearly
 } from '../services/purchaseService';
 import {
-  loadCachedEntitlements, saveCachedEntitlements, clearCachedEntitlements
+  saveCachedEntitlements, clearCachedEntitlements
 } from '../utils/entitlements';
 import { createLogger } from '../utils/logger';
 
@@ -20,9 +20,13 @@ const SubscriptionContext = createContext(null);
 export function SubscriptionProvider({ children }) {
   const auth = useAuth();
 
-  const [isSupporter, setIsSupporter] = useState(() => loadCachedEntitlements().isSupporter);
-  const [isPro, setIsPro] = useState(() => loadCachedEntitlements().isPro);
-  const [hadPro, setHadPro] = useState(() => loadCachedEntitlements().hadPro);
+  // IMPORTANT: Initialize to false, NOT from localStorage cache.
+  // The cache can contain stale values (e.g. Pro removed from Firebase but still cached).
+  // The real values are set by initAndCheck() which runs on sign-in.
+  // This ensures features are locked until verification completes.
+  const [isSupporter, setIsSupporter] = useState(false);
+  const [isPro, setIsPro] = useState(false);
+  const [hadPro, setHadPro] = useState(false);
   const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true);
 
   const isSupporterRef = useRef(isSupporter);
