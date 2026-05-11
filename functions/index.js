@@ -71,15 +71,13 @@ exports.onRevenueCatWebhook = onRequest({ secrets: ["REVENUECAT_WEBHOOK_SECRET"]
     let isActive = false;
     if (["INITIAL_PURCHASE", "RENEWAL", "UNCANCELLATION", "TRANSFER", "NON_RENEWING_PURCHASE"].includes(type)) {
       isActive = true;
-    } else if (["EXPIRATION", "CANCELLATION"].includes(type)) {
-      // For cancellations, sometimes they are immediate (like test refunds or billing errors).
-      // We keep isActive = true ONLY if the expiration date is still in the future.
+    } else if (type === "CANCELLATION") {
+      // For cancellations, we keep isActive = true ONLY if the expiration date is still in the future.
       const now = event.event_timestamp_ms || Date.now();
-      if (event.expiration_at_ms && event.expiration_at_ms > now) {
-        isActive = true;
-      } else {
-        isActive = false;
-      }
+      isActive = event.expiration_at_ms && event.expiration_at_ms > now;
+    } else if (type === "EXPIRATION") {
+      // If it's an expiration event, the entitlement is by definition no longer active.
+      isActive = false;
     }
 
     const updatePayload = {};
