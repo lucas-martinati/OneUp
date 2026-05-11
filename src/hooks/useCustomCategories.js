@@ -13,10 +13,10 @@ export function useCustomCategories(userId) {
 
   const addCategory = useCallback((name, color) => {
     if (!name?.trim()) return false;
-    if (customCategories.length >= MAX_CUSTOM_CATEGORIES) return false;
-
+    
     setCustomCategories((prev) => {
-      if (prev.length >= MAX_CUSTOM_CATEGORIES) return prev;
+      const userCats = prev.filter(c => c.id !== 'custom');
+      if (userCats.length >= MAX_CUSTOM_CATEGORIES) return prev;
       return [...prev, {
         id: `cat_${crypto.randomUUID()}`,
         name: name.trim(),
@@ -25,7 +25,7 @@ export function useCustomCategories(userId) {
       }];
     });
     return true;
-  }, [customCategories, setCustomCategories]);
+  }, [setCustomCategories]);
 
   const updateCategory = useCallback((id, updates) => {
     setCustomCategories((prev) => {

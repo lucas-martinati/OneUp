@@ -126,20 +126,20 @@ async function _getCustomerInfo() {
 
 async function _checkEntitlement(tier) {
   const cfg = PRODUCTS[tier];
-  if (!cfg) return false;
+  if (!cfg) return { active: false, verified: false };
 
   if (!isInitialized) {
-    return localStorage.getItem(cfg.localStorageKey) === 'true';
+    return { active: localStorage.getItem(cfg.localStorageKey) === 'true', verified: false };
   }
 
   try {
     const customerInfo = await _getCustomerInfo();
     const active = hasActiveEntitlement(customerInfo, cfg.entitlementId);
     localStorage.setItem(cfg.localStorageKey, active ? 'true' : 'false');
-    return active;
+    return { active, verified: true };
   } catch (error) {
     logger.error(`Error checking ${tier} status:`, error);
-    return localStorage.getItem(cfg.localStorageKey) === 'true';
+    return { active: localStorage.getItem(cfg.localStorageKey) === 'true', verified: false };
   }
 }
 

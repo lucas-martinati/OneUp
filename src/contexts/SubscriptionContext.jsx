@@ -63,32 +63,42 @@ export function SubscriptionProvider({ children }) {
         try {
           await initPurchases(cloudSync.getCurrentUserId());
 
-          let rcEntitlements = { isSupporter: false, isPro: false, hadPro: false };
+          let rcEntitlements = { isSupporter: false, isPro: false, hadPro: false, verified: false };
           try {
+            const supStatus = await checkSupporterStatus();
+            const proStatus = await checkProStatus();
             rcEntitlements = {
-              isSupporter: await checkSupporterStatus(),
-              isPro: await checkProStatus(),
+              isSupporter: supStatus.active,
+              isPro: proStatus.active,
               hadPro: false, // RevenueCat doesn't persistently track hadPro unless we query past receipts, we rely on FB for hadPro
+              verified: supStatus.verified || proStatus.verified,
             };
           } catch (rcErr) {
             logger.warn('RevenueCat check failed:', rcErr);
           }
 
           let fbEntitlements = { isSupporter: false, isPro: false, hadPro: false };
-          if (!rcEntitlements.isSupporter && !rcEntitlements.isPro) {
-            const cloudPurchase = await cloudSync.loadPurchase();
-            if (cloudPurchase) {
-              fbEntitlements = { isSupporter: !!cloudPurchase.isSupporter, isPro: !!cloudPurchase.isPro, hadPro: !!cloudPurchase.hadPro };
-              if (fbEntitlements.isSupporter || fbEntitlements.isPro || fbEntitlements.hadPro) logger.info('Loaded purchase from Firebase');
-            }
+          const cloudPurchase = await cloudSync.loadPurchase();
+          if (cloudPurchase) {
+            fbEntitlements = { isSupporter: !!cloudPurchase.isSupporter, isPro: !!cloudPurchase.isPro, hadPro: !!cloudPurchase.hadPro };
+            if (fbEntitlements.isSupporter || fbEntitlements.isPro || fbEntitlements.hadPro) logger.info('Loaded purchase from Firebase');
           }
 
-          const resolved = resolveEntitlements(rcEntitlements, fbEntitlements);
+          // Resolve Entitlements handling verified override
+          let resolved = {
+            isSupporter: rcEntitlements.verified ? rcEntitlements.isSupporter : (rcEntitlements.isSupporter || fbEntitlements.isSupporter),
+            isPro: rcEntitlements.verified ? rcEntitlements.isPro : (rcEntitlements.isPro || fbEntitlements.isPro),
+            hadPro: rcEntitlements.isPro || fbEntitlements.hadPro || rcEntitlements.hadPro,
+          };
+          resolved.hasAnyEntitlement = resolved.isSupporter || resolved.hadPro;
+
           setIsSupporter(resolved.isSupporter);
           setIsPro(resolved.isPro);
           setHadPro(resolved.hadPro);
 
-          if (resolved.hasAnyEntitlement) {
+          // We publish to DB if there's any mismatch internally or if we have entitlements, 
+          // to make sure DB is updated when Pro expires!
+          if (resolved.hasAnyEntitlement || fbEntitlements.isPro !== resolved.isPro) {
             await saveAndPublish(resolved);
           }
         } catch (error) {

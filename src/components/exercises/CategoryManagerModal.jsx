@@ -235,12 +235,6 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
           {/* ═══════ LIST VIEW ═══════ */}
           {view === 'list' && (
             <div style={{ width: '100%', maxWidth: '400px' }}>
-              {customCategories.length === 0 ? (
-                <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 20px' }}>
-                  <FolderPlus size={48} style={{ opacity: 0.5, marginBottom: '16px' }} />
-                  <p>{t('customCategories.empty')}</p>
-                </div>
-              ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
                 {[
                   { id: 'custom', name: t('common.custom'), color: '#34d399', ...customCategories.find(c => c.id === 'custom') },
@@ -327,9 +321,8 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                   );
                 })}
               </div>
-              )}
 
-              {customCategories.length < maxCustomCategories && (
+              {customCategories.filter(c => c.id !== 'custom').length < maxCustomCategories && (
                 <button onClick={() => {
                   setEditingId(null);
                   setName('');
@@ -344,7 +337,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                   <Plus size={20} /> {t('customCategories.create')}
                 </button>
               )}
-              {customCategories.length >= maxCustomCategories && (
+              {customCategories.filter(c => c.id !== 'custom').length >= maxCustomCategories && (
                 <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                   {t('customCategories.limitReached', { count: maxCustomCategories })}
                 </p>
