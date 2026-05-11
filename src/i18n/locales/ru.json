@@ -609,6 +609,9 @@
     "historyTitle": "Покупка в приложении",
     "statusActive": "Активно",
     "statusExpired": "Истекло",
+    "purchaseDate": "Покупка",
+    "expiresOn": "Истекает",
+    "expiredOn": "Истёк",
     "statusPaid": "Оплачено",
     "title": "Магазин"
   },

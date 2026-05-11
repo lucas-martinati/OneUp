@@ -609,6 +609,9 @@
     "historyTitle": "In-App-Kauf",
     "statusActive": "Aktiv",
     "statusExpired": "Abgelaufen",
+    "purchaseDate": "Kauf",
+    "expiresOn": "Läuft ab am",
+    "expiredOn": "Abgelaufen am",
     "statusPaid": "Bezahlt",
     "title": "Speichern"
   },

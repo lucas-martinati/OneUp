@@ -609,6 +609,9 @@
     "historyTitle": "Acquisto in-app",
     "statusActive": "Attivo",
     "statusExpired": "Scaduto",
+    "purchaseDate": "Acquisto",
+    "expiresOn": "Scade il",
+    "expiredOn": "Scaduto il",
     "statusPaid": "Pagato",
     "title": "Negozio"
   },

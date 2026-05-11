@@ -609,6 +609,9 @@
     "historyTitle": "アプリ内購入",
     "statusActive": "アクティブ",
     "statusExpired": "期限切れ",
+    "purchaseDate": "購入",
+    "expiresOn": "有効期限",
+    "expiredOn": "期限切れ",
     "statusPaid": "有料",
     "title": "店"
   },

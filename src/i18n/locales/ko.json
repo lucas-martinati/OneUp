@@ -609,6 +609,9 @@
     "historyTitle": "인앱 구매",
     "statusActive": "활동적인",
     "statusExpired": "만료됨",
+    "purchaseDate": "구매",
+    "expiresOn": "만료 예정",
+    "expiredOn": "만료됨",
     "statusPaid": "유급의",
     "title": "가게"
   },

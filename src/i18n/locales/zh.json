@@ -609,6 +609,9 @@
     "historyTitle": "应用内购买",
     "statusActive": "有效",
     "statusExpired": "已过期",
+    "purchaseDate": "购买",
+    "expiresOn": "到期",
+    "expiredOn": "已过期",
     "statusPaid": "已支付",
     "title": "商店"
   },

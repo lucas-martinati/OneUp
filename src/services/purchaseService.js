@@ -358,12 +358,29 @@ export async function getPurchaseHistory() {
             descKey = 'pro.oneTimeDesc';
           }
         }
-        
+
+        // If originalPurchaseDate and latestPurchaseDate differ, there were multiple grants.
+        // Show the older one as a separate expired entry so the user sees the full history.
+        const original = ent.originalPurchaseDate;
+        const latest = ent.latestPurchaseDate;
+        if (original && latest && original !== latest) {
+          history.push({
+            id: rawId.replace(/^\$/, ''),
+            titleKey: details.titleKey,
+            descKey: descKey,
+            date: original,
+            expirationDate: latest, // expired when the new grant started
+            priceKey: 'store.statusExpired',
+            isActive: false
+          });
+        }
+
+        // Current / latest grant
         history.push({
           id: rawId.replace(/^\$/, ''),
           titleKey: details.titleKey,
           descKey: descKey,
-          date: ent.latestPurchaseDate || ent.originalPurchaseDate,
+          date: latest || original,
           expirationDate: ent.expirationDate || null,
           priceKey: ent.isActive ? 'store.statusActive' : 'store.statusExpired',
           isActive: ent.isActive
@@ -389,8 +406,12 @@ export async function getPurchaseHistory() {
       }
     }
 
-    // Newest first
-    return history.sort((a, b) => new Date(b.date) - new Date(a.date));
+    // Newest first, active before expired at same date
+    return history.sort((a, b) => {
+      const diff = new Date(b.date) - new Date(a.date);
+      if (diff !== 0) return diff;
+      return (b.isActive ? 1 : 0) - (a.isActive ? 1 : 0);
+    });
   } catch (error) {
     logger.error('Failed to parse active purchase history from RC:', error);
     return [];
