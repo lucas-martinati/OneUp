@@ -263,36 +263,76 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                 {displayHistory.map((receipt, index) => (
                                     <div key={index} style={{
                                         display: 'flex', flexDirection: 'column',
-                                        padding: '12px', borderRadius: 'var(--radius-md)',
-                                        background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)'
+                                        padding: '14px', borderRadius: 'var(--radius-md)',
+                                        background: 'var(--surface-muted)', 
+                                        border: `1px solid ${receipt.isActive ? 'rgba(16, 185, 129, 0.2)' : 'var(--border-subtle)'}`,
                                     }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                                             <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
                                                 {t(receipt.titleKey)}
                                             </div>
                                             <div style={{ 
-                                                fontWeight: '800', fontSize: '0.9rem', 
-                                                color: receipt.isActive ? '#10b981' : 'var(--text-secondary)'
+                                                fontWeight: '800', fontSize: '0.75rem', 
+                                                color: receipt.isActive ? '#10b981' : 'var(--text-secondary)',
+                                                background: receipt.isActive ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.05)',
+                                                padding: '3px 10px', borderRadius: '20px',
+                                                border: `1px solid ${receipt.isActive ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.08)'}`,
+                                                letterSpacing: '0.5px', textTransform: 'uppercase'
                                             }}>
                                                 {t(receipt.priceKey)}
                                             </div>
                                         </div>
                                         
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '10px' }}>
                                             {t(receipt.descKey)}
                                         </div>
 
+                                        {/* Dates row */}
                                         <div style={{ 
-                                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                            fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', borderTop: '1px dashed rgba(255,255,255,0.05)',
-                                            paddingTop: '8px', opacity: 0.8
+                                            display: 'flex', gap: '12px', flexWrap: 'wrap',
+                                            borderTop: '1px solid rgba(255,255,255,0.05)',
+                                            paddingTop: '10px'
                                         }}>
-                                            <span style={{ fontFamily: 'monospace', letterSpacing: '0.5px' }}>
-                                                ID: {receipt.id || 'N/A'}
-                                            </span>
-                                            <span>
-                                                {receipt.date ? new Date(receipt.date).toLocaleDateString() : ''}
-                                            </span>
+                                            {receipt.date && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem' }}>
+                                                    <span style={{ 
+                                                        color: 'rgba(255,255,255,0.35)', fontWeight: '600',
+                                                        textTransform: 'uppercase', letterSpacing: '0.5px'
+                                                    }}>
+                                                        {t('store.purchaseDate', 'Achat')}
+                                                    </span>
+                                                    <span style={{ color: 'var(--text-secondary)', fontWeight: '700' }}>
+                                                        {new Date(receipt.date).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {receipt.expirationDate && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem' }}>
+                                                    <span style={{ 
+                                                        color: 'rgba(255,255,255,0.35)', fontWeight: '600',
+                                                        textTransform: 'uppercase', letterSpacing: '0.5px'
+                                                    }}>
+                                                        {receipt.isActive 
+                                                            ? t('store.expiresOn', 'Fin') 
+                                                            : t('store.expiredOn', 'Expiré le')}
+                                                    </span>
+                                                    <span style={{ 
+                                                        color: receipt.isActive ? '#10b981' : '#ef4444', 
+                                                        fontWeight: '700'
+                                                    }}>
+                                                        {new Date(receipt.expirationDate).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* ID */}
+                                        <div style={{ 
+                                            fontSize: '0.6rem', color: 'rgba(255,255,255,0.2)', 
+                                            fontFamily: 'monospace', letterSpacing: '0.5px',
+                                            marginTop: '6px'
+                                        }}>
+                                            {receipt.id || 'N/A'}
                                         </div>
                                     </div>
                                 ))}

@@ -622,6 +622,9 @@
   "store": {
     "historyDesc": "OneUp Transaction",
     "historyTitle": "In-App Purchase",
+    "purchaseDate": "Purchased",
+    "expiresOn": "Expires",
+    "expiredOn": "Expired",
     "statusActive": "Active",
     "statusExpired": "Expired",
     "statusPaid": "Paid",

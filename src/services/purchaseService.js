@@ -364,6 +364,7 @@ export async function getPurchaseHistory() {
           titleKey: details.titleKey,
           descKey: descKey,
           date: ent.latestPurchaseDate || ent.originalPurchaseDate,
+          expirationDate: ent.expirationDate || null,
           priceKey: ent.isActive ? 'store.statusActive' : 'store.statusExpired',
           isActive: ent.isActive
         });
