@@ -108,9 +108,10 @@ export function mergeData(localData, cloudData) {
           const localTs = localIsPlaceholder ? 0 : (localEx?.timestamp ? new Date(localEx.timestamp).getTime() : 0);
           const cloudTs = cloudIsPlaceholder ? 0 : (cloudEx?.timestamp ? new Date(cloudEx.timestamp).getTime() : 0);
           
-          const cloudIsNewer = cloudTs > localTs;
+          const cloudIsNewer = !localIsPlaceholder && cloudTs > localTs;
           const localHasNoTimestamp = (cloudEx?.timestamp && !localEx?.timestamp);
-          const cloudReplacesPlaceholder = localIsPlaceholder && !cloudIsPlaceholder && cloudEx?.timestamp;
+          const valuesMatch = localEx?.isCompleted === cloudEx?.isCompleted && localEx?.count === cloudEx?.count;
+          const cloudReplacesPlaceholder = localIsPlaceholder && !cloudIsPlaceholder && cloudEx?.timestamp && valuesMatch;
 
           if (!localEx || cloudIsNewer || localHasNoTimestamp || cloudReplacesPlaceholder) {
             merged[exId] = { ...localEx, ...cloudEx };

@@ -435,12 +435,23 @@ export const useProgressStore = create((set, get) => ({
       if (!validated) return { success: false, error: 'Invalid guest data' };
 
       set((state) => {
-        const merged = cloudSync.mergeData(state, validated);
+        const mergedCompletions = { ...state.completions };
+        Object.keys(validated.completions || {}).forEach(dateStr => {
+          if (!mergedCompletions[dateStr]) {
+            mergedCompletions[dateStr] = { ...validated.completions[dateStr] };
+          } else {
+            mergedCompletions[dateStr] = {
+              ...mergedCompletions[dateStr],
+              ...validated.completions[dateStr]
+            };
+          }
+        });
+
         return {
-          startDate: merged.startDate || state.startDate,
-          userStartDate: merged.userStartDate || state.userStartDate,
-          completions: merged.completions || state.completions,
-          isSetup: merged.isSetup || state.isSetup,
+          startDate: validated.startDate || state.startDate,
+          userStartDate: validated.userStartDate || state.userStartDate,
+          completions: mergedCompletions,
+          isSetup: validated.isSetup || state.isSetup,
           lastCompletionChange: serverTimestamp(),
         };
       });
