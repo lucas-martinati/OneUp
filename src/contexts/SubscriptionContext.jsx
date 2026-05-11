@@ -153,7 +153,15 @@ export function SubscriptionProvider({ children }) {
 
   const handleRestorePurchases = useCallback(async () => {
     const result = await restorePurchases();
-    // RevenueCat est la source de vérité pour le Restore aussi
+    
+    // Si l'opération de restauration échoue (erreur réseau, annulation),
+    // on ne doit SURTOUT PAS retirer les droits actuels de l'utilisateur.
+    if (!result.success) {
+      logger.warn('Restore operation failed or was cancelled, keeping current entitlements.');
+      return result;
+    }
+
+    // RevenueCat est la source de vérité pour le Restore réussi
     let resolved = {
       isSupporter: result.supporter || result.isSupporter || false,
       isPro: result.pro || false,
@@ -168,15 +176,24 @@ export function SubscriptionProvider({ children }) {
        resolved.hadPro = resolved.isPro;
     }
 
+    // Sécurité additionnelle : Si Firebase dit qu'on est Pro mais RC dit non, 
+    // on garde le Pro de Firebase pour éviter de pénaliser les utilisateurs
+    // qui ont reçu le Pro manuellement via Firebase avant RevenueCat.
+    if (!resolved.isPro && cloudPurchase?.isPro) {
+      resolved.isPro = true;
+    }
+    if (!resolved.isSupporter && cloudPurchase?.isSupporter) {
+      resolved.isSupporter = true;
+    }
+
     resolved.hasAnyEntitlement = resolved.isSupporter || resolved.hadPro;
 
     setIsSupporter(resolved.isSupporter);
     setIsPro(resolved.isPro);
     setHadPro(resolved.hadPro);
 
-    if (resolved.hasAnyEntitlement) {
-      await saveAndPublish(resolved);
-    }
+    await saveAndPublish(resolved);
+    return result;
   }, [saveAndPublish]);
 
   const value = useMemo(() => ({

@@ -320,15 +320,24 @@ export async function restorePurchases() {
 }
 
 /**
- * Fetch formatted purchase history directly from RevenueCat securely.
+ * Fetch formatted purchase history directly from RevenueCat.
+ *
+ * Uses `subscriptionsByProductIdentifier` for subscriptions (accurate per-product
+ * data with real purchaseDate, expiresDate, isActive) and `nonSubscriptionTransactions`
+ * for one-time purchases (supporter donations).
  */
 export async function getPurchaseHistory() {
   if (!isInitialized) return [];
 
   try {
     const customerInfo = await _getCustomerInfo();
-    const isNative = isNativePlatform();
     const history = [];
+
+    // Normalize date → ISO string (web SDK returns Date objects, native returns strings)
+    const toISO = (d) => {
+      if (!d) return null;
+      return d instanceof Date ? d.toISOString() : String(d);
+    };
 
     const getProductDetails = (identifier) => {
       if (identifier?.includes('supporter')) return { titleKey: 'supporter.historyTitle', descKey: 'supporter.historyDesc' };
@@ -336,73 +345,109 @@ export async function getPurchaseHistory() {
       return { titleKey: 'store.historyTitle', descKey: 'store.historyDesc' };
     };
 
-    // 1. Active & Expired Entitlements
+    // ── 1. Subscriptions (Pro monthly / yearly) ────────────────────────
+    const subs = customerInfo?.subscriptionsByProductIdentifier;
+    if (subs) {
+      for (const [productId, sub] of Object.entries(subs)) {
+        const details = getProductDetails(productId);
+
+        let descKey = details.descKey;
+        const isPromotional = sub.periodType === 'PROMOTIONAL' || productId.toLowerCase().includes('promo');
+        const isLifetime = productId.toLowerCase().includes('lifetime');
+
+        if (productId.includes('pro')) {
+          if (isPromotional) {
+            descKey = 'pro.promotionalDesc';
+          } else if (isLifetime) {
+            descKey = 'pro.lifetimeDesc';
+          } else if (!sub.willRenew && !productId.includes('monthly') && !productId.includes('yearly')) {
+            descKey = 'pro.oneTimeDesc';
+          } else {
+            descKey = 'pro.historyDesc'; // Regular sub, whether active or cancelled
+          }
+        }
+
+        const purchaseDate = toISO(sub.purchaseDate);
+        const originalDate = toISO(sub.originalPurchaseDate);
+        let expiresDate = toISO(sub.expiresDate ?? sub.expirationDate);
+        const isActive = sub.isActive ?? false;
+
+        // Hide expiration for lifetime grants (often year 2226 or similar)
+        if (isLifetime || (expiresDate && expiresDate.startsWith('22'))) {
+          expiresDate = null;
+        }
+
+        history.push({
+          id: productId.replace(/^\$/, ''),
+          titleKey: details.titleKey,
+          descKey,
+          date: originalDate || purchaseDate,
+          expirationDate: expiresDate,
+          priceKey: isActive ? 'store.statusActive' : 'store.statusExpired',
+          isActive,
+          willRenew: sub.willRenew ?? false,
+        });
+      }
+    }
+
+    // ── 2. Non-subscription purchases (Supporter, one-time) ────────────
+    if (customerInfo?.nonSubscriptionTransactions?.length > 0) {
+      for (const tx of customerInfo.nonSubscriptionTransactions) {
+        const details = getProductDetails(tx.productIdentifier);
+        const txId = tx.transactionIdentifier || tx.productIdentifier;
+        history.push({
+          id: txId.replace(/^\$/, ''),
+          titleKey: details.titleKey,
+          descKey: details.descKey,
+          date: toISO(tx.purchaseDate),
+          expirationDate: null,
+          priceKey: 'store.statusPaid',
+          isActive: true,
+        });
+      }
+    }
+
+    // ── 3. Fallback: entitlements not covered above ────────────────────
     if (customerInfo?.entitlements?.all) {
+      const coveredProducts = new Set(history.map(h => h.id));
+
       for (const [key, ent] of Object.entries(customerInfo.entitlements.all)) {
-        const rawId = ent.productIdentifier || key;
+        const rawId = (ent.productIdentifier || key).replace(/^\$/, '');
+        if (coveredProducts.has(rawId)) continue;
+
         const details = getProductDetails(rawId);
+        let descKey = details.descKey;
         
-        // Refined detection for history display
         const isPromotional = ent.periodType === 'PROMOTIONAL' || rawId.toLowerCase().includes('promo');
         const isLifetime = rawId.toLowerCase().includes('lifetime');
         const isOneTime = ent.willRenew === false;
 
-        let descKey = details.descKey; // Default: 'pro.historyDesc' (Auto-renewal)
-        
         if (rawId.includes('pro')) {
           if (isPromotional) {
             descKey = 'pro.promotionalDesc';
           } else if (isLifetime) {
             descKey = 'pro.lifetimeDesc';
-          } else if (isOneTime) {
+          } else if (isOneTime && !rawId.includes('monthly') && !rawId.includes('yearly')) {
             descKey = 'pro.oneTimeDesc';
+          } else {
+             descKey = 'pro.historyDesc';
           }
         }
 
-        // If originalPurchaseDate and latestPurchaseDate differ, there were multiple grants.
-        // Show the older one as a separate expired entry so the user sees the full history.
-        const original = ent.originalPurchaseDate;
-        const latest = ent.latestPurchaseDate;
-        if (original && latest && original !== latest) {
-          history.push({
-            id: rawId.replace(/^\$/, ''),
-            titleKey: details.titleKey,
-            descKey: descKey,
-            date: original,
-            expirationDate: latest, // expired when the new grant started
-            priceKey: 'store.statusExpired',
-            isActive: false
-          });
+        let expiresDate = toISO(ent.expirationDate);
+        if (isLifetime || (expiresDate && expiresDate.startsWith('22'))) {
+          expiresDate = null;
         }
 
-        // Current / latest grant
         history.push({
-          id: rawId.replace(/^\$/, ''),
+          id: rawId,
           titleKey: details.titleKey,
-          descKey: descKey,
-          date: latest || original,
-          expirationDate: ent.expirationDate || null,
+          descKey,
+          date: toISO(ent.latestPurchaseDate) || toISO(ent.originalPurchaseDate),
+          expirationDate: expiresDate,
           priceKey: ent.isActive ? 'store.statusActive' : 'store.statusExpired',
-          isActive: ent.isActive
+          isActive: ent.isActive ?? false,
         });
-      }
-    }
-
-    // 2. Hard Purchases (One-Time) — native only (nonSubscriptionTransactions)
-    if (isNative && customerInfo?.nonSubscriptionTransactions?.length > 0) {
-      for (const tx of customerInfo.nonSubscriptionTransactions) {
-        if (!history.some(h => h.id === tx.productIdentifier)) {
-          const details = getProductDetails(tx.productIdentifier);
-          const rawId = tx.transactionIdentifier || tx.productIdentifier;
-          history.push({
-            id: rawId.replace(/^\$/, ''),
-            titleKey: details.titleKey,
-            descKey: details.descKey,
-            date: tx.purchaseDate,
-            priceKey: 'store.statusPaid',
-            isActive: true
-          });
-        }
       }
     }
 
@@ -413,7 +458,7 @@ export async function getPurchaseHistory() {
       return (b.isActive ? 1 : 0) - (a.isActive ? 1 : 0);
     });
   } catch (error) {
-    logger.error('Failed to parse active purchase history from RC:', error);
+    logger.error('Failed to parse purchase history from RC:', error);
     return [];
   }
 }
