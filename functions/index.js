@@ -73,7 +73,7 @@ function getDayNumber(startDate, dateStr) {
 // Core: recompute leaderboard entry from source of truth
 // ══════════════════════════════════════════════════════════════════════════════
 
-async function recomputeLeaderboardEntry(uid, progress) {
+async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   if (!progress) return;
 
   // ── Read auxiliary data in parallel ─────────────────────────────────────
@@ -204,19 +204,32 @@ async function recomputeLeaderboardEntry(uid, progress) {
   const isPublic = settings.leaderboardEnabled !== false;
 
   // ── Compute shield status server-side ────────────────────────────────────
-  // Green: lastActiveDay matches server "today" (UTC, +1 day tolerance for UTC+ timezones)
-  // Orange: lastActiveDay is clearly in the past (user backdated)
-  // This is immune to client clock manipulation.
   const serverNow = new Date();
   const serverTodayUTC = `${serverNow.getUTCFullYear()}-${String(serverNow.getUTCMonth() + 1).padStart(2, '0')}-${String(serverNow.getUTCDate()).padStart(2, '0')}`;
   const tomorrow = new Date(serverNow.getTime() + 24 * 60 * 60 * 1000);
   const serverTomorrowUTC = `${tomorrow.getUTCFullYear()}-${String(tomorrow.getUTCMonth() + 1).padStart(2, '0')}-${String(tomorrow.getUTCDate()).padStart(2, '0')}`;
 
-  let shieldStatus = 'none';
-  if (lastActiveDay === serverTodayUTC || lastActiveDay === serverTomorrowUTC) {
-    shieldStatus = 'green'; // Today (or ahead due to positive UTC offset)
-  } else if (lastActiveDay) {
-    shieldStatus = 'orange'; // Past day — user backdated
+  // 🟢 Green: lastActiveDay is today (or tomorrow for UTC+ timezone edge)
+  const shieldGreen = lastActiveDay === serverTodayUTC || lastActiveDay === serverTomorrowUTC;
+
+  // 🟠 Orange: user modified a PAST day's completions (sticky within the same day)
+  let shieldOrange = false;
+  // Preserve the flag if already set today (sticky within the day)
+  if (existing.shieldDate === serverTodayUTC) {
+    shieldOrange = !!existing.shieldOrange;
+  }
+  // Detect backdating: compare before/after completions
+  if (!shieldOrange && beforeProgress) {
+    const beforeCompletions = beforeProgress.completions || {};
+    const afterCompletions = progress.completions || {};
+    for (const dateStr of Object.keys(afterCompletions)) {
+      if (JSON.stringify(afterCompletions[dateStr]) !== JSON.stringify(beforeCompletions[dateStr])) {
+        if (dateStr !== serverTodayUTC && dateStr !== serverTomorrowUTC) {
+          shieldOrange = true;
+          break;
+        }
+      }
+    }
   }
 
   // ── Write to leaderboard ───────────────────────────────────────────────
@@ -233,7 +246,8 @@ async function recomputeLeaderboardEntry(uid, progress) {
     difficultyMultiplier: difficultyMultiplier || 1,
     isPublic,
     isPerfectToday,
-    shieldStatus,
+    shieldGreen,
+    shieldOrange,
     shieldDate: serverTodayUTC,
     isPro: !!purchase.isPro,
     isSupporter: !!purchase.isSupporter,
@@ -253,10 +267,11 @@ async function recomputeLeaderboardEntry(uid, progress) {
 exports.onProgressChange = onValueWritten("users/{uid}/progress", async (event) => {
   const uid = event.params.uid;
   const progress = event.data.after.val();
-  if (!progress) return; // Progress was deleted
+  const beforeProgress = event.data.before.val();
+  if (!progress) return;
 
   try {
-    await recomputeLeaderboardEntry(uid, progress);
+    await recomputeLeaderboardEntry(uid, progress, beforeProgress);
   } catch (error) {
     console.error(`[Leaderboard] Error recomputing for ${uid}:`, error);
   }

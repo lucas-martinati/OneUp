@@ -142,7 +142,8 @@ export async function getClanDetails(clanId) {
       lastUpdated: lbData.lastUpdated || null,
       isSupporter: !!lbData.isSupporter, isPro: !!lbData.isPro,
       isPerfectToday: !!lbData.isPerfectToday,
-      shieldStatus: lbData.shieldStatus || 'none',
+      shieldGreen: !!lbData.shieldGreen,
+      shieldOrange: !!lbData.shieldOrange,
       shieldDate: lbData.shieldDate || null,
       isCurrentUser: memberUid === uid
     };

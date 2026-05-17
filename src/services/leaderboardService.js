@@ -46,7 +46,8 @@ export async function loadLeaderboard() {
       isSupporter: !!entry.isSupporter,
       isPro: !!entry.isPro,
       isPerfectToday: !!entry.isPerfectToday,
-      shieldStatus: entry.shieldStatus || 'none',
+      shieldGreen: !!entry.shieldGreen,
+      shieldOrange: !!entry.shieldOrange,
       shieldDate: entry.shieldDate || null
     }));
 

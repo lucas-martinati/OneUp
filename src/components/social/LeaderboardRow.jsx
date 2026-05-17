@@ -32,10 +32,10 @@ export function LeaderboardRow({
     const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
 
     // Shield logic: server-computed (immune to client clock manipulation)
-    // shieldStatus: 'green' | 'orange' | 'none' — set by Cloud Function
-    // shieldDate: server UTC date — used for daily reset (shield expires next day)
-    const showVerifiedShield = entry.shieldStatus === 'green' && entry.shieldDate === todayStr;
-    const showSuspiciousShield = entry.shieldStatus === 'orange' && entry.shieldDate === todayStr;
+    // Both shields are independent and can show simultaneously
+    const shieldFresh = entry.shieldDate === todayStr; // daily reset
+    const showVerifiedShield = !!entry.shieldGreen && shieldFresh;
+    const showSuspiciousShield = !!entry.shieldOrange && shieldFresh;
     const bg = rankBgColors[rank] || (isPerfect
         ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(212, 175, 55, 0.08))'
         : isMe
