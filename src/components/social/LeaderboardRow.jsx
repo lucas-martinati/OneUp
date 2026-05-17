@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Shield, HeartHandshake, Check, Star } from '../../utils/icons';
+import { ChevronRight, Shield, ShieldAlert, HeartHandshake, Check, Star } from '../../utils/icons';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '../ui/Avatar';
 import { getTierBadgeConfigs } from '../../utils/entitlements';
@@ -30,6 +30,18 @@ export function LeaderboardRow({
     };
 
     const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
+
+    // Shield logic: two independent indicators that can both show simultaneously
+    // 🟢 Green shield: genuinely active today (verified by server timestamp)
+    const showVerifiedShield = (() => {
+        if (entry.lastActiveDay !== todayStr) return false;
+        if (!entry.lastUpdated) return false;
+        const serverDate = new Date(entry.lastUpdated);
+        const serverDateStr = `${serverDate.getFullYear()}-${String(serverDate.getMonth() + 1).padStart(2, '0')}-${String(serverDate.getDate()).padStart(2, '0')}`;
+        return serverDateStr === todayStr;
+    })();
+    // 🟠 Orange shield: clock manipulation detected at some point (sticky flag)
+    const showSuspiciousShield = !!entry.hadTimeTampering;
     const bg = rankBgColors[rank] || (isPerfect
         ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(212, 175, 55, 0.08))'
         : isMe
@@ -114,7 +126,8 @@ export function LeaderboardRow({
                             style={{ filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.5))' }} 
                         />
                     )}
-                    {entry.lastActiveDay === todayStr && <Shield size={12} color="#10b981" />}
+                    {showVerifiedShield && <Shield size={12} color="#10b981" />}
+                    {showSuspiciousShield && <ShieldAlert size={12} color="#f59e0b" />}
                 </div>
             </div>
 

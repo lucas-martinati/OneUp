@@ -100,6 +100,9 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
 
     const currentUid = cloudSync.getCurrentUserId();
     const todayStr = getLocalDateStr(new Date());
+    // Parse as local midnight (not UTC) to avoid ±1 day shift in positive UTC offsets
+    const [y, m, d] = todayStr.split('-').map(Number);
+    const nowTimestamp = new Date(y, m - 1, d).getTime();
 
     const handleNudge = async (e, uid) => {
         e.stopPropagation();
@@ -290,7 +293,9 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                                 entry={entry.uid === currentUid ? { 
                                     ...entry, 
                                     isPerfectToday: computedStats.isPerfectToday, 
-                                    lastActiveDay: computedStats.todayDone ? todayStr : entry.lastActiveDay,
+                                    lastActiveDay: computedStats.todayDone ? todayStr 
+                                        : (entry.lastActiveDay === todayStr ? null : entry.lastActiveDay),
+                                    lastUpdated: computedStats.todayDone ? nowTimestamp : entry.lastUpdated,
                                     exerciseDifficulties: settings.exerciseDifficulties
                                 } : entry}
                                 rank={getRank(i)}

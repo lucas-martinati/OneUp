@@ -5,7 +5,7 @@ import i18n from '../i18n';
 
 const logger = createLogger('Leaderboard');
 
-export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps, exerciseReps, exerciseWeights, exerciseDifficulties, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isPerfectToday }) {
+export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps, exerciseReps, exerciseWeights, exerciseDifficulties, achievements, isPublic = true, lastActiveDay = null, difficultyMultiplier = 1, isPerfectToday, localPublishDate = null }) {
   const auth = getAuthInstance();
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
@@ -22,6 +22,34 @@ export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps
     Object.entries(exerciseDifficulties || {}).filter(([, v]) => typeof v === 'number')
   );
 
+  // ── Soft tampering detection (heuristic, not a security gate) ──────────
+  // Compares localPublishDate (client-provided) vs lastUpdated (server timestamp)
+  // to detect clock manipulation. This is bypassable by a savvy client who forges
+  // localPublishDate — intentionally a soft signal, not a hard block.
+  // The orange shield (hadTimeTampering) is purely cosmetic: no score penalty,
+  // no leaderboard exclusion. It serves as gentle social signaling.
+  // NOTE: get() + update() is non-atomic (race condition possible between reads),
+  // but acceptable here since only the entry owner writes to their own leaderboard node.
+  let hadTimeTampering = false;
+  try {
+    const currentSnapshot = await get(lbRef);
+    if (currentSnapshot.exists()) {
+      const current = currentSnapshot.val();
+      // Preserve sticky flag — once set, never unset
+      if (current.hadTimeTampering) hadTimeTampering = true;
+      // Detect mismatch from previous publish
+      if (!hadTimeTampering && current.localPublishDate && current.lastUpdated) {
+        const serverDate = new Date(current.lastUpdated);
+        const serverDateStr = `${serverDate.getFullYear()}-${String(serverDate.getMonth() + 1).padStart(2, '0')}-${String(serverDate.getDate()).padStart(2, '0')}`;
+        if (current.localPublishDate !== serverDateStr) {
+          hadTimeTampering = true;
+        }
+      }
+    }
+  } catch (e) {
+    logger.debug('Skip tampering check:', e);
+  }
+
   await update(lbRef, {
     pseudo: pseudo || auth.currentUser.displayName || i18n.t('common.anonymous'),
     photoURL: auth.currentUser.photoURL || null,
@@ -35,6 +63,8 @@ export async function publishToLeaderboard({ pseudo, totalReps, weightsTotalReps
     difficultyMultiplier: difficultyMultiplier || 1,
     isPublic: isPublic !== false,
     isPerfectToday: !!isPerfectToday,
+    localPublishDate: localPublishDate || null,
+    hadTimeTampering,
     lastUpdated: serverTimestamp()
   });
 
@@ -74,6 +104,7 @@ export async function loadLeaderboard() {
       lastActiveDay: entry.lastActiveDay || null,
       difficultyMultiplier: entry.difficultyMultiplier || 1,
       lastUpdated: entry.lastUpdated || null,
+      hadTimeTampering: !!entry.hadTimeTampering,
       isSupporter: !!entry.isSupporter,
       isPro: !!entry.isPro,
       isPerfectToday: !!entry.isPerfectToday

@@ -558,7 +558,7 @@ export const useProgressStore = create((set, get) => ({
       const weightsTotalReps = WEIGHT_EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
       const computedCardioReps = CARDIO_EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
       const todayStr = getLocalDateStr(new Date());
-      const lastActiveDay = isDayDoneFromCompletions(completions, todayStr)
+      const lastActiveDay = computedStats.todayDone
         ? todayStr
         : computedStats.sortedDates.slice().reverse().find(d => isDayDoneFromCompletions(completions, d)) || null;
 
@@ -575,6 +575,7 @@ export const useProgressStore = create((set, get) => ({
         isPublic: !!settings.leaderboardEnabled,
         lastActiveDay,
         isPerfectToday: computedStats.isPerfectToday,
+        localPublishDate: todayStr,
         isPro,
         isSupporter,
       });

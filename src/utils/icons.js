@@ -9,7 +9,7 @@ import {
   FolderOpen, FolderPlus, GripVertical, Shuffle, ArrowLeft, ArrowRight,
   // Social & gamification
   Trophy, Medal, Award, Star, Crown,
-  Users, User, LogIn, UserPlus, Shield, HeartHandshake,
+  Users, User, LogIn, UserPlus, Shield, ShieldAlert, HeartHandshake,
   LogOut, Hash, Swords,
   // Navigation & settings
   Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
@@ -37,7 +37,7 @@ export {
   Play, Pause, RotateCcw, Save, Trash2, Edit2,
   FolderOpen, FolderPlus, GripVertical, Shuffle, ArrowLeft, ArrowRight,
   Trophy, Medal, Award, Star, Crown,
-  Users, User, LogIn, UserPlus, Shield, HeartHandshake,
+  Users, User, LogIn, UserPlus, Shield, ShieldAlert, HeartHandshake,
   LogOut, Hash, Swords,
   Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
   Globe, Gauge, ShoppingBag, PieChart,
@@ -68,7 +68,7 @@ export const UI_ICONS = {
 
 export const SOCIAL_ICONS = {
   Trophy, Medal, Award, Star, Crown, FireStreak: Flame,
-  Users, User, LogIn, UserPlus, Shield, HeartHandshake,
+  Users, User, LogIn, UserPlus, Shield, ShieldAlert, HeartHandshake,
   LogOut, Activity, Hash, Swords,
 };
 
