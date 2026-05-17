@@ -45,7 +45,9 @@ export async function loadLeaderboard() {
       lastUpdated: entry.lastUpdated || null,
       isSupporter: !!entry.isSupporter,
       isPro: !!entry.isPro,
-      isPerfectToday: !!entry.isPerfectToday
+      isPerfectToday: !!entry.isPerfectToday,
+      shieldStatus: entry.shieldStatus || 'none',
+      shieldDate: entry.shieldDate || null
     }));
 
   entries.sort((a, b) => b.totalReps - a.totalReps);

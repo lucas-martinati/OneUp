@@ -31,16 +31,11 @@ export function LeaderboardRow({
 
     const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
 
-    // Shield logic: computed from lastActiveDay + lastUpdated, resets daily
-    const serverDateStr = (() => {
-        if (!entry.lastUpdated) return null;
-        const d = new Date(entry.lastUpdated);
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    })();
-    // 🟢 Green shield: validated TODAY, confirmed by server timestamp
-    const showVerifiedShield = entry.lastActiveDay === todayStr && serverDateStr === todayStr;
-    // 🟠 Orange shield: synced today but latest activity is for a PAST day (backdating)
-    const showSuspiciousShield = entry.lastActiveDay !== todayStr && serverDateStr === todayStr;
+    // Shield logic: server-computed (immune to client clock manipulation)
+    // shieldStatus: 'green' | 'orange' | 'none' — set by Cloud Function
+    // shieldDate: server UTC date — used for daily reset (shield expires next day)
+    const showVerifiedShield = entry.shieldStatus === 'green' && entry.shieldDate === todayStr;
+    const showSuspiciousShield = entry.shieldStatus === 'orange' && entry.shieldDate === todayStr;
     const bg = rankBgColors[rank] || (isPerfect
         ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(212, 175, 55, 0.08))'
         : isMe

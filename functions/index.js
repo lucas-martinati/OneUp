@@ -203,6 +203,22 @@ async function recomputeLeaderboardEntry(uid, progress) {
   const photoURL = userRecord?.photoURL || existing.photoURL || null;
   const isPublic = settings.leaderboardEnabled !== false;
 
+  // ── Compute shield status server-side ────────────────────────────────────
+  // Green: lastActiveDay matches server "today" (UTC, +1 day tolerance for UTC+ timezones)
+  // Orange: lastActiveDay is clearly in the past (user backdated)
+  // This is immune to client clock manipulation.
+  const serverNow = new Date();
+  const serverTodayUTC = `${serverNow.getUTCFullYear()}-${String(serverNow.getUTCMonth() + 1).padStart(2, '0')}-${String(serverNow.getUTCDate()).padStart(2, '0')}`;
+  const tomorrow = new Date(serverNow.getTime() + 24 * 60 * 60 * 1000);
+  const serverTomorrowUTC = `${tomorrow.getUTCFullYear()}-${String(tomorrow.getUTCMonth() + 1).padStart(2, '0')}-${String(tomorrow.getUTCDate()).padStart(2, '0')}`;
+
+  let shieldStatus = 'none';
+  if (lastActiveDay === serverTodayUTC || lastActiveDay === serverTomorrowUTC) {
+    shieldStatus = 'green'; // Today (or ahead due to positive UTC offset)
+  } else if (lastActiveDay) {
+    shieldStatus = 'orange'; // Past day — user backdated
+  }
+
   // ── Write to leaderboard ───────────────────────────────────────────────
   await db.ref(`leaderboard/${uid}`).update({
     pseudo,
@@ -217,6 +233,8 @@ async function recomputeLeaderboardEntry(uid, progress) {
     difficultyMultiplier: difficultyMultiplier || 1,
     isPublic,
     isPerfectToday,
+    shieldStatus,
+    shieldDate: serverTodayUTC,
     isPro: !!purchase.isPro,
     isSupporter: !!purchase.isSupporter,
     lastUpdated: admin.database.ServerValue.TIMESTAMP,
