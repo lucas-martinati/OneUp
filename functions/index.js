@@ -69,10 +69,6 @@ function getDayNumber(startDate, dateStr) {
   return Math.floor((utcCurrent - utcStart) / (1000 * 60 * 60 * 24)) + 1;
 }
 
-function formatDateUTC(date) {
-  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
-}
-
 // ══════════════════════════════════════════════════════════════════════════════
 // Core: recompute leaderboard entry from source of truth
 // ══════════════════════════════════════════════════════════════════════════════
@@ -114,7 +110,6 @@ async function recomputeLeaderboardEntry(uid, progress) {
   let totalClassicReps = 0;
   let weightsTotalReps = 0;
   let lastActiveDay = null;
-  let hadTimeTampering = !!existing.hadTimeTampering; // Preserve sticky flag
 
   const sortedDates = Object.keys(completions).sort();
 
@@ -151,19 +146,7 @@ async function recomputeLeaderboardEntry(uid, progress) {
         weightsTotalReps += reps;
       }
 
-      // ── Tampering detection ──────────────────────────────────────────
-      // Check if the completion timestamp matches the date key (±2 days tolerance for timezone)
-      if (!hadTimeTampering && exData.timestamp && typeof exData.timestamp === 'number') {
-        const tsDate = new Date(exData.timestamp);
-        const tsDayUTC = formatDateUTC(tsDate);
-        const dateParsed = new Date(dateStr + 'T12:00:00Z'); // Noon UTC to avoid timezone edge
-        const tsParsed = new Date(tsDayUTC + 'T12:00:00Z');
-        const diffMs = Math.abs(dateParsed.getTime() - tsParsed.getTime());
-        // More than 2 days difference = suspicious
-        if (diffMs > 2 * 24 * 60 * 60 * 1000) {
-          hadTimeTampering = true;
-        }
-      }
+
     }
 
     // Also check for custom exercises (exercises not in standard/weight/cardio lists)
@@ -234,13 +217,12 @@ async function recomputeLeaderboardEntry(uid, progress) {
     difficultyMultiplier: difficultyMultiplier || 1,
     isPublic,
     isPerfectToday,
-    hadTimeTampering,
     isPro: !!purchase.isPro,
     isSupporter: !!purchase.isSupporter,
     lastUpdated: admin.database.ServerValue.TIMESTAMP,
   });
 
-  console.log(`[Leaderboard] Recomputed for ${uid}: ${totalClassicReps + cardioTotalReps} reps, last=${lastActiveDay}, perfect=${isPerfectToday}, tamper=${hadTimeTampering}`);
+  console.log(`[Leaderboard] Recomputed for ${uid}: ${totalClassicReps + cardioTotalReps} reps, last=${lastActiveDay}, perfect=${isPerfectToday}`);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

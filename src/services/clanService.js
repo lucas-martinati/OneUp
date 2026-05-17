@@ -140,7 +140,6 @@ export async function getClanDetails(clanId) {
       exerciseReps: lbData.exerciseReps || {}, achievements: lbData.achievements || 0,
       lastActiveDay: lbData.lastActiveDay || null, difficultyMultiplier: lbData.difficultyMultiplier || 1,
       lastUpdated: lbData.lastUpdated || null,
-      hadTimeTampering: !!lbData.hadTimeTampering,
       isSupporter: !!lbData.isSupporter, isPro: !!lbData.isPro,
       isPerfectToday: !!lbData.isPerfectToday,
       isCurrentUser: memberUid === uid

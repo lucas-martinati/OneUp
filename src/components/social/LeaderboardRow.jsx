@@ -31,17 +31,16 @@ export function LeaderboardRow({
 
     const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
 
-    // Shield logic: two independent indicators that can both show simultaneously
-    // 🟢 Green shield: genuinely active today (verified by server timestamp)
-    const showVerifiedShield = (() => {
-        if (entry.lastActiveDay !== todayStr) return false;
-        if (!entry.lastUpdated) return false;
-        const serverDate = new Date(entry.lastUpdated);
-        const serverDateStr = `${serverDate.getFullYear()}-${String(serverDate.getMonth() + 1).padStart(2, '0')}-${String(serverDate.getDate()).padStart(2, '0')}`;
-        return serverDateStr === todayStr;
+    // Shield logic: computed from lastActiveDay + lastUpdated, resets daily
+    const serverDateStr = (() => {
+        if (!entry.lastUpdated) return null;
+        const d = new Date(entry.lastUpdated);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     })();
-    // 🟠 Orange shield: clock manipulation detected at some point (sticky flag)
-    const showSuspiciousShield = !!entry.hadTimeTampering;
+    // 🟢 Green shield: validated TODAY, confirmed by server timestamp
+    const showVerifiedShield = entry.lastActiveDay === todayStr && serverDateStr === todayStr;
+    // 🟠 Orange shield: synced today but latest activity is for a PAST day (backdating)
+    const showSuspiciousShield = entry.lastActiveDay !== todayStr && serverDateStr === todayStr;
     const bg = rankBgColors[rank] || (isPerfect
         ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(212, 175, 55, 0.08))'
         : isMe

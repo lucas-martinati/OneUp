@@ -43,7 +43,6 @@ export async function loadLeaderboard() {
       lastActiveDay: entry.lastActiveDay || null,
       difficultyMultiplier: entry.difficultyMultiplier || 1,
       lastUpdated: entry.lastUpdated || null,
-      hadTimeTampering: !!entry.hadTimeTampering,
       isSupporter: !!entry.isSupporter,
       isPro: !!entry.isPro,
       isPerfectToday: !!entry.isPerfectToday
