@@ -35,7 +35,6 @@ export function AppOrchestrator({ computedStats }) {
   const isDayDone = useProgressStore(s => s.isDayDone);
   const getDayNumber = useProgressStore(s => s.getDayNumber);
   const initProgressForUser = useProgressStore(s => s.initForUser);
-  const publishLeaderboardNow = useProgressStore(s => s.publishLeaderboardNow);
 
   // ── Settings Store ──────────────────────────────────────────────────
   const settings = useSettingsStore(s => s.settings);
@@ -261,16 +260,6 @@ export function AppOrchestrator({ computedStats }) {
     }
   }, [auth.isSignedIn, auth.loading, conflictCheckDone, isInitialSyncDone, isSyncPaused, conflictData, startCloudListener]);
 
-  // ── Auto-publish leaderboard when completions change ───────────────
-  useEffect(() => {
-    if (!auth.isSignedIn || auth.loading || !isSetup || !isInitialSyncDone) return;
-    const timer = setTimeout(() => publishLeaderboardNow({ auth, computedStats, settings }), 2000);
-    return () => clearTimeout(timer);
-  }, [
-    completions, settings.leaderboardEnabled, settings.leaderboardPseudo, settings.exerciseDifficulties,
-    auth.isSignedIn, auth.loading, isSetup, isInitialSyncDone, computedStats, publishLeaderboardNow,
-    auth, settings,
-  ]);
 
   // ── Pre-load user clans ────────────────────────────────────────────
   useEffect(() => {

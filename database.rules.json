@@ -11,13 +11,7 @@
     "leaderboard": {
       ".read": "auth != null",
       "$uid": {
-        ".write": "$uid === auth.uid",
-        "isPro": {
-          ".validate": "newData.val() === data.val()"
-        },
-        "isSupporter": {
-          ".validate": "newData.val() === data.val()"
-        }
+        ".write": false
       }
     },
     "clans": {

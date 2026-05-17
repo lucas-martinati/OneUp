@@ -1,9 +1,307 @@
 const { onRequest } = require("firebase-functions/v2/https");
+const { onValueWritten } = require("firebase-functions/v2/database");
 const admin = require("firebase-admin");
 
 // Initialize Firebase Admin SDK using Default Compute Service Account
 admin.initializeApp();
 const db = admin.database();
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Exercise definitions — DUPLICATED from client-side config.
+// Source of truth lives in TWO places that MUST stay in sync:
+//   • Client:  src/config/exercises.js  (EXERCISES, getDailyGoal)
+//   •          src/config/weights.js    (WEIGHT_EXERCISES)
+//   • Server:  functions/index.js       (this file)
+// Long-term: extract into a shared package (e.g. /shared/exercises.js)
+// to eliminate duplication risk.
+// ══════════════════════════════════════════════════════════════════════════════
+
+const EXERCISES = [
+  { id: 'pushups', multiplier: 1 },
+  { id: 'squats', multiplier: 1 },
+  { id: 'pullups', multiplier: 0.4 },
+  { id: 'abs', multiplier: 1 },
+  { id: 'jumpingjacks', multiplier: 1.5 },
+  { id: 'lunges', multiplier: 1 },
+  { id: 'burpees', multiplier: 0.5 },
+  { id: 'planche', multiplier: 2 },
+  { id: 'dips', multiplier: 1 },
+  { id: 'mountain', multiplier: 2 },
+];
+
+const WEIGHT_EXERCISES = [
+  { id: 'biceps_curl', multiplier: 0.5 },
+  { id: 'hammer_curl', multiplier: 0.5 },
+  { id: 'bench_press', multiplier: 0.5 },
+  { id: 'overhead_press', multiplier: 0.4 },
+  { id: 'squat_weights', multiplier: 0.5 },
+  { id: 'deadlift', multiplier: 0.4 },
+  { id: 'barbell_row', multiplier: 0.5 },
+];
+
+const CARDIO_EXERCISES = [
+  { id: 'running' },
+  { id: 'cycling' },
+];
+
+const ALL_STANDARD_IDS = new Set(EXERCISES.map(e => e.id));
+const ALL_WEIGHT_IDS = new Set(WEIGHT_EXERCISES.map(e => e.id));
+const ALL_EXERCISE_IDS = new Set([
+  ...EXERCISES.map(e => e.id),
+  ...WEIGHT_EXERCISES.map(e => e.id),
+  ...CARDIO_EXERCISES.map(e => e.id),
+]);
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Helper functions
+// ══════════════════════════════════════════════════════════════════════════════
+
+function getDailyGoal(exercise, dayNumber, userMultiplier = 1.0) {
+  const mult = exercise.multiplier !== undefined ? exercise.multiplier : 1;
+  return Math.max(1, Math.ceil(dayNumber * mult * userMultiplier));
+}
+
+function getDayNumber(startDate, dateStr) {
+  const start = new Date(startDate);
+  const current = new Date(dateStr);
+  const utcStart = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+  const utcCurrent = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
+  return Math.floor((utcCurrent - utcStart) / (1000 * 60 * 60 * 24)) + 1;
+}
+
+function formatDateUTC(date) {
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Core: recompute leaderboard entry from source of truth
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function recomputeLeaderboardEntry(uid, progress) {
+  if (!progress) return;
+
+  // ── Read auxiliary data in parallel ─────────────────────────────────────
+  const [settingsSnap, purchaseSnap, existingSnap, achievementsSnap] = await Promise.all([
+    db.ref(`users/${uid}/settings`).once('value'),
+    db.ref(`users/${uid}/purchase`).once('value'),
+    db.ref(`leaderboard/${uid}`).once('value'),
+    db.ref(`users/${uid}/achievements`).once('value'),
+  ]);
+
+  const settings = settingsSnap.val() || {};
+  const purchase = purchaseSnap.val() || {};
+  const existing = existingSnap.val() || {};
+  const achievements = achievementsSnap.val() || {};
+
+  // ── Get user auth info (displayName, photoURL) ─────────────────────────
+  let userRecord = null;
+  try {
+    userRecord = await admin.auth().getUser(uid);
+  } catch {
+    // User may have been deleted — silently ignore
+  }
+
+  // ── Extract data ───────────────────────────────────────────────────────
+  const completions = progress.completions || {};
+  const startDate = progress.startDate;
+  if (!startDate) return; // No start date means no challenge started
+
+  const exerciseDifficulties = settings.exerciseDifficulties || {};
+  const difficultyMultiplier = settings.difficultyMultiplier ?? 1.0;
+
+  // ── Compute per-exercise reps ──────────────────────────────────────────
+  const exerciseReps = {};
+  let totalClassicReps = 0;
+  let weightsTotalReps = 0;
+  let lastActiveDay = null;
+  let hadTimeTampering = !!existing.hadTimeTampering; // Preserve sticky flag
+
+  const sortedDates = Object.keys(completions).sort();
+
+  for (const dateStr of sortedDates) {
+    const day = completions[dateStr];
+    if (!day || typeof day !== 'object') continue;
+    if (dateStr < startDate) continue; // Skip dates before challenge start
+
+    const dayNum = getDayNumber(startDate, dateStr);
+    if (dayNum < 1) continue;
+
+    let anyDone = false;
+
+    for (const [exId, exData] of Object.entries(day)) {
+      if (!exData?.isCompleted) continue;
+      if (!ALL_EXERCISE_IDS.has(exId)) continue; // Skip unknown exercises (custom exercises use their own IDs)
+
+      anyDone = true;
+
+      // Skip cardio — reps computed from distance below
+      if (exId === 'running' || exId === 'cycling') continue;
+
+      const exercise = EXERCISES.find(e => e.id === exId) || WEIGHT_EXERCISES.find(e => e.id === exId);
+      if (!exercise) continue;
+
+      const diff = exerciseDifficulties[exId] ?? difficultyMultiplier;
+      const reps = getDailyGoal(exercise, dayNum, diff);
+
+      exerciseReps[exId] = (exerciseReps[exId] || 0) + reps;
+
+      if (ALL_STANDARD_IDS.has(exId)) {
+        totalClassicReps += reps;
+      } else if (ALL_WEIGHT_IDS.has(exId)) {
+        weightsTotalReps += reps;
+      }
+
+      // ── Tampering detection ──────────────────────────────────────────
+      // Check if the completion timestamp matches the date key (±2 days tolerance for timezone)
+      if (!hadTimeTampering && exData.timestamp && typeof exData.timestamp === 'number') {
+        const tsDate = new Date(exData.timestamp);
+        const tsDayUTC = formatDateUTC(tsDate);
+        const dateParsed = new Date(dateStr + 'T12:00:00Z'); // Noon UTC to avoid timezone edge
+        const tsParsed = new Date(tsDayUTC + 'T12:00:00Z');
+        const diffMs = Math.abs(dateParsed.getTime() - tsParsed.getTime());
+        // More than 2 days difference = suspicious
+        if (diffMs > 2 * 24 * 60 * 60 * 1000) {
+          hadTimeTampering = true;
+        }
+      }
+    }
+
+    // Also check for custom exercises (exercises not in standard/weight/cardio lists)
+    for (const [exId, exData] of Object.entries(day)) {
+      if (!exData?.isCompleted) continue;
+      if (ALL_EXERCISE_IDS.has(exId)) continue; // Already processed above
+      anyDone = true; // Custom exercises count as activity
+    }
+
+    if (anyDone) {
+      lastActiveDay = dateStr; // sortedDates is chronological, so last wins
+    }
+  }
+
+  // ── Cardio reps from Strava sessions ───────────────────────────────────
+  const cardioSessions = progress.cardio?.sessions || {};
+  let runningDistanceM = 0;
+  let cyclingDistanceM = 0;
+
+  for (const session of Object.values(cardioSessions)) {
+    if (session.type === 'running' || session.type === 'Run') {
+      runningDistanceM += session.distance || 0;
+    } else if (session.type === 'cycling' || session.type === 'Ride') {
+      cyclingDistanceM += session.distance || 0;
+    }
+  }
+
+  const runningReps = Math.floor((runningDistanceM / 1000) * 15);
+  const cyclingReps = Math.floor((cyclingDistanceM / 1000) * 15);
+  if (runningReps > 0) exerciseReps['running'] = runningReps;
+  if (cyclingReps > 0) exerciseReps['cycling'] = cyclingReps;
+  const cardioTotalReps = runningReps + cyclingReps;
+
+  // ── isPerfectToday ─────────────────────────────────────────────────────
+  // Check if lastActiveDay has all standard OR all weight exercises completed
+  let isPerfectToday = false;
+  if (lastActiveDay && completions[lastActiveDay]) {
+    const dayData = completions[lastActiveDay];
+    const isStandardPerfect = EXERCISES.length > 0 &&
+      EXERCISES.every(ex => dayData[ex.id]?.isCompleted);
+    const isWeightsPerfect = WEIGHT_EXERCISES.length > 0 &&
+      WEIGHT_EXERCISES.every(ex => dayData[ex.id]?.isCompleted);
+    isPerfectToday = isStandardPerfect || isWeightsPerfect;
+  }
+
+  // ── Badge count from achievements node ─────────────────────────────────
+  const badgeCount = Object.values(achievements).filter(v => v === true).length;
+
+  // ── Determine pseudo and visibility ────────────────────────────────────
+  const pseudo = settings.leaderboardPseudo
+    || userRecord?.displayName
+    || existing.pseudo
+    || 'Anonyme';
+  const photoURL = userRecord?.photoURL || existing.photoURL || null;
+  const isPublic = settings.leaderboardEnabled !== false;
+
+  // ── Write to leaderboard ───────────────────────────────────────────────
+  await db.ref(`leaderboard/${uid}`).update({
+    pseudo,
+    photoURL,
+    totalReps: totalClassicReps + cardioTotalReps,
+    weightsTotalReps,
+    exerciseReps,
+    exerciseDifficulties: exerciseDifficulties || {},
+    exerciseWeights: settings.exerciseWeights || existing.exerciseWeights || {},
+    achievements: badgeCount,
+    lastActiveDay,
+    difficultyMultiplier: difficultyMultiplier || 1,
+    isPublic,
+    isPerfectToday,
+    hadTimeTampering,
+    isPro: !!purchase.isPro,
+    isSupporter: !!purchase.isSupporter,
+    lastUpdated: admin.database.ServerValue.TIMESTAMP,
+  });
+
+  console.log(`[Leaderboard] Recomputed for ${uid}: ${totalClassicReps + cardioTotalReps} reps, last=${lastActiveDay}, perfect=${isPerfectToday}, tamper=${hadTimeTampering}`);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Cloud Function triggers
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Triggered when users/{uid}/progress changes (exercise completions, cardio, etc.)
+ */
+exports.onProgressChange = onValueWritten("users/{uid}/progress", async (event) => {
+  const uid = event.params.uid;
+  const progress = event.data.after.val();
+  if (!progress) return; // Progress was deleted
+
+  try {
+    await recomputeLeaderboardEntry(uid, progress);
+  } catch (error) {
+    console.error(`[Leaderboard] Error recomputing for ${uid}:`, error);
+  }
+});
+
+/**
+ * Triggered when users/{uid}/settings changes (pseudo, difficulty, visibility, etc.)
+ */
+exports.onSettingsChange = onValueWritten("users/{uid}/settings", async (event) => {
+  const uid = event.params.uid;
+
+  try {
+    // Read progress separately since this trigger is on settings
+    const progressSnap = await db.ref(`users/${uid}/progress`).once('value');
+    const progress = progressSnap.val();
+    if (!progress) return;
+
+    await recomputeLeaderboardEntry(uid, progress);
+  } catch (error) {
+    console.error(`[Leaderboard] Error recomputing for ${uid} (settings change):`, error);
+  }
+});
+
+/**
+ * Triggered when users/{uid}/purchase changes (Pro/Supporter status via RevenueCat).
+ * Ensures the leaderboard reflects updated entitlements immediately,
+ * without waiting for the next progress or settings write.
+ */
+exports.onPurchaseChange = onValueWritten("users/{uid}/purchase", async (event) => {
+  const uid = event.params.uid;
+
+  try {
+    const progressSnap = await db.ref(`users/${uid}/progress`).once('value');
+    const progress = progressSnap.val();
+    if (!progress) return;
+
+    await recomputeLeaderboardEntry(uid, progress);
+  } catch (error) {
+    console.error(`[Leaderboard] Error recomputing for ${uid} (purchase change):`, error);
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// RevenueCat Webhook (existing)
+// ══════════════════════════════════════════════════════════════════════════════
 
 /**
  * onRevenueCatWebhook

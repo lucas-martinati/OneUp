@@ -1,11 +1,9 @@
 import { create } from 'zustand';
 import { serverTimestamp } from '../services/firebase';
-import { EXERCISES, getDailyGoal, CARDIO_EXERCISES } from '../config/exercises';
-import { WEIGHT_EXERCISES } from '../config/weights';
+import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { saveAchievementsToCloud, loadAchievementsFromCloud } from '../services/userDataService';
 import { createLogger } from '../utils/logger';
-import { getLocalDateStr, isDayDoneFromCompletions } from '../utils/dateUtils';
-import { loadCachedEntitlements } from '../utils/entitlements';
+import { getLocalDateStr } from '../utils/dateUtils';
 import { STORAGE_KEY_BASE, getDefaultState, parseProgressData, validateProgressData } from '../hooks/useProgressStorage';
 import { cloudSync } from '../services/cloudSync';
 
@@ -543,44 +541,4 @@ export const useProgressStore = create((set, get) => ({
     });
   },
 
-  // ── Leaderboard Publishing ──────────────────────────────────────────
-
-  /**
-   * Publish current stats to the leaderboard.
-   * @param {Object} deps - { auth, computedStats, settings }
-   */
-  publishLeaderboardNow: async (deps) => {
-    const { auth, computedStats, settings } = deps;
-    try {
-      if (!auth.isSignedIn) return;
-      const { completions } = get();
-      const classicTotalReps = EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
-      const weightsTotalReps = WEIGHT_EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
-      const computedCardioReps = CARDIO_EXERCISES.reduce((sum, ex) => sum + (computedStats.exerciseReps[ex.id] || 0), 0);
-      const todayStr = getLocalDateStr(new Date());
-      const lastActiveDay = computedStats.todayDone
-        ? todayStr
-        : computedStats.sortedDates.slice().reverse().find(d => isDayDoneFromCompletions(completions, d)) || null;
-
-      const { isPro, isSupporter } = loadCachedEntitlements();
-
-      await cloudSync.publishToLeaderboard({
-        pseudo: settings.leaderboardPseudo || auth.user?.displayName || 'Anonyme',
-        totalReps: classicTotalReps + computedCardioReps,
-        weightsTotalReps,
-        cardioTotalReps: computedCardioReps,
-        exerciseReps: computedStats.exerciseReps,
-        exerciseDifficulties: settings.exerciseDifficulties,
-        achievements: computedStats.badgeCount,
-        isPublic: !!settings.leaderboardEnabled,
-        lastActiveDay,
-        isPerfectToday: computedStats.isPerfectToday,
-        localPublishDate: todayStr,
-        isPro,
-        isSupporter,
-      });
-    } catch (e) {
-      logger.error('Leaderboard publish failed:', e);
-    }
-  },
 }));
