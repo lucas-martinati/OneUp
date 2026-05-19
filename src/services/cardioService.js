@@ -12,14 +12,15 @@ export async function saveCardioSession(session) {
   if (!auth?.currentUser || !database) return null;
 
   const sessionsRef = ref(database, `users/${auth.currentUser.uid}/progress/cardio/sessions`);
-  const newRef = push(sessionsRef);
+  const id = session.id || push(sessionsRef).key;
+  const sessionRef = ref(database, `users/${auth.currentUser.uid}/progress/cardio/sessions/${id}`);
   const payload = {
     ...session,
-    id: session.id || newRef.key, // Use provided ID (Strava ID) or Firebase key
+    id,
     createdAt: serverTimestamp(),
   };
 
-  await set(newRef, payload);
+  await set(sessionRef, payload);
   logger.success('Cardio session saved');
   return payload;
 }

@@ -403,6 +403,7 @@ export const useProgressStore = create((set, get) => ({
       userStartDate: validated.userStartDate,
       completions: validated.completions || {},
       isSetup: validated.isSetup,
+      cardio: validated.cardio || {},
     }));
     get()._persist();
   },
@@ -420,12 +421,16 @@ export const useProgressStore = create((set, get) => ({
 
   /** Apply incoming real-time cloud data. */
   applyRealtimeUpdate: (cloudData) => {
-    if (!cloudData?.completions) return;
+    if (!cloudData) return;
     const validated = validateProgressData(cloudData);
     set((state) => {
       const cloudJSON = JSON.stringify(validated.completions);
       const localJSON = JSON.stringify(state.completions);
-      if (cloudJSON === localJSON) return state;
+      
+      const nextSessions = { ...(state.cardio?.sessions || {}), ...(validated.cardio?.sessions || {}) };
+      const cardioChanged = JSON.stringify(state.cardio?.sessions) !== JSON.stringify(nextSessions);
+      
+      if (cloudJSON === localJSON && !cardioChanged) return state;
 
       logger.info('[Real-time sync] Incoming cloud update applied');
       const merged = cloudSync.mergeData(state, validated);
@@ -435,6 +440,7 @@ export const useProgressStore = create((set, get) => ({
         completions: merged.completions || state.completions,
         isSetup: merged.isSetup ?? state.isSetup,
         lastCompletionChange: merged.lastCompletionChange,
+        cardio: { ...state.cardio, sessions: nextSessions },
       };
     });
     get()._persist();

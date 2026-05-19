@@ -3,11 +3,10 @@ import { loadCardioSessions, saveCardioSession } from '../../services/cardioServ
 import { stravaService } from '../../services/stravaService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProgressStore } from '../../store/useProgressStore';
+import { useCloudSyncStore } from '../../store/useCloudSyncStore';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '../../utils/dateUtils';
 import { getWeeklyGoalKm } from '../../config/exercises';
-
-
 
 /**
  * Compute the cardio streak: number of consecutive weeks (ending at current)
@@ -71,6 +70,17 @@ export function useCardio() {
   const updateCardioSessions = useProgressStore(s => s.updateCardioSessions);
   const cardio = useProgressStore(s => s.cardio);
   const startDate = useProgressStore(s => s.startDate);
+  const isStoreInitialized = useProgressStore(s => s.isStoreInitialized);
+  const isInitialSyncDone = useCloudSyncStore(s => s.isInitialSyncDone);
+
+  // We are ready only when the auth loading has finished AND
+  // (for signed-in users, when the initial cloud sync is complete; for guests, when the local store is initialized)
+  const isReady = !auth.loading && (
+    auth.isSignedIn 
+      ? (isStoreInitialized && isInitialSyncDone) 
+      : isStoreInitialized
+  );
+
   const { getConfig } = useExerciseConfig();
   const [sessions, setSessions] = useState(() => {
     // Initialize from context if available to avoid flicker/wiping during initial load
@@ -79,12 +89,24 @@ export function useCardio() {
   const [loading, setLoading] = useState(true);
   const [activeMode, setActiveMode] = useState('running');
 
+  // Sync sessions state with store's sessions once the store & sync are fully initialized
+  const hasInitializedFromStore = useRef(false);
+  useEffect(() => {
+    if (isReady && !hasInitializedFromStore.current) {
+      const storeSessions = Object.values(cardio?.sessions || {}).sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
+      setSessions(storeSessions);
+      hasInitializedFromStore.current = true;
+      setLoading(false);
+    }
+  }, [isReady, cardio?.sessions]);
+
   // Get difficulty multipliers for cardio exercises
   const runningMultiplier = getConfig('running')?.difficulty || 1;
   const cyclingMultiplier = getConfig('cycling')?.difficulty || 1;
 
   // Fetch sessions from Firebase and Strava, save new Strava sessions to Firebase
   const fetchSessions = useCallback(async () => {
+    if (!isReady) return; // Wait for initialization to prevent session wiping or premature writes
     if (!auth.isSignedIn) {
       setSessions([]);
       setLoading(false);
@@ -93,24 +115,22 @@ export function useCardio() {
     try {
       setLoading(true);
       
-      // Load from Firebase and Strava in parallel
-      const [firebaseSessions, stravaActivities] = await Promise.all([
-        loadCardioSessions(),
-        stravaService.getActivities()
-      ]);
+      // Load existing sessions from Firebase
+      const firebaseSessions = await loadCardioSessions();
+      const rawFirebase = firebaseSessions || [];
+
+      // Determine the latest session start time to fetch only new Strava activities
+      let afterTimestamp = 0;
+      if (rawFirebase.length > 0) {
+        afterTimestamp = rawFirebase.reduce((max, s) => Math.max(max, s.startTime || 0), 0);
+      }
+
+      // Fetch new activities from Strava
+      const stravaActivities = await stravaService.getActivities(afterTimestamp);
 
       // Merge and deduplicate (by ID)
-      const rawFirebase = firebaseSessions || [];
-      const all = [];
-      const existingIds = new Set();
-      
-      // First, filter out any duplicates already present in Firebase
-      rawFirebase.forEach(s => {
-        if (!existingIds.has(s.id)) {
-          all.push(s);
-          existingIds.add(s.id);
-        }
-      });
+      const all = [...rawFirebase];
+      const existingIds = new Set(rawFirebase.map(s => s.id));
 
       // Save new Strava activities to Firebase (with difficulty at time of save)
       const newSessions = [];
@@ -139,13 +159,13 @@ export function useCardio() {
     } finally {
       setLoading(false);
     }
-  }, [auth.isSignedIn, runningMultiplier, cyclingMultiplier]);
+  }, [auth.isSignedIn, isReady, runningMultiplier, cyclingMultiplier]);
 
   useEffect(() => {
-    fetchSessions();
-  }, [fetchSessions]);
-
-
+    if (isReady) {
+      fetchSessions();
+    }
+  }, [fetchSessions, isReady]);
 
   // Compute total cardio reps: kilometers * 15
   const cardioReps = useMemo(() => {
@@ -162,12 +182,10 @@ export function useCardio() {
 
   // Sync to global progress state for cloud persistence
   useEffect(() => {
-    if (updateCardioSessions && !loading) {
+    if (updateCardioSessions && !loading && isReady) {
       updateCardioSessions(sessions);
     }
-  }, [sessions, updateCardioSessions, loading]);
-
-
+  }, [sessions, updateCardioSessions, loading, isReady]);
 
   // Helper to find if a week has a completion and return its data.
   // Uses a ref to avoid the sync effect below re-triggering on every completions change.
@@ -192,7 +210,7 @@ export function useCardio() {
   // an infinite loop (this effect calls updateExerciseCount which modifies completions).
   // We read completions via completionsRef instead.
   useEffect(() => {
-    if (!sessions.length || !updateExerciseCount) return;
+    if (!isReady || !sessions.length || !updateExerciseCount) return;
 
     // Group sessions by week to validate the goal only once per week
     const sessionsByWeek = {};
@@ -228,7 +246,7 @@ export function useCardio() {
         updateExerciseCount(existingComp.dateStr, activeMode, 0, 1, null, goalDifficulty);
       }
     });
-  }, [sessions, updateExerciseCount, activeMode, startDate, runningMultiplier, cyclingMultiplier, getWeeklyCompletion]);
+  }, [sessions, updateExerciseCount, activeMode, startDate, runningMultiplier, cyclingMultiplier, getWeeklyCompletion, isReady]);
 
   // Current week number
   const weekNumber = useMemo(

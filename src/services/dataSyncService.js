@@ -110,7 +110,8 @@ export function mergeData(localData, cloudData) {
           
           const cloudIsNewer = !localIsPlaceholder && cloudTs > localTs;
           const localHasNoTimestamp = (cloudEx?.timestamp && !localEx?.timestamp);
-          const valuesMatch = localEx?.isCompleted === cloudEx?.isCompleted && localEx?.count === cloudEx?.count;
+          const valuesMatch = localEx?.isCompleted === cloudEx?.isCompleted &&
+            (localEx?.count === undefined || cloudEx?.count === undefined || localEx?.count === cloudEx?.count);
           const cloudReplacesPlaceholder = localIsPlaceholder && !cloudIsPlaceholder && cloudEx?.timestamp && valuesMatch;
 
           if (!localEx || cloudIsNewer || localHasNoTimestamp || cloudReplacesPlaceholder) {
@@ -140,12 +141,22 @@ export function mergeData(localData, cloudData) {
     ? cloudLCC 
     : localLCC;
 
+  const mergedSessions = { 
+    ...(localData.cardio?.sessions || {}), 
+    ...(cloudData.cardio?.sessions || {}) 
+  };
+
   const result = {
     startDate: localData.startDate || cloudData.startDate,
     userStartDate: localData.userStartDate || cloudData.userStartDate,
     completions: mergedCompletions,
     isSetup: localData.isSetup || cloudData.isSetup,
-    lastCompletionChange: finalLCC
+    lastCompletionChange: finalLCC,
+    cardio: {
+      ...localData.cardio,
+      ...cloudData.cardio,
+      sessions: mergedSessions
+    }
   };
 
   logger.debug(`Merge complete. Final completion days: ${Object.keys(result.completions).length}`);

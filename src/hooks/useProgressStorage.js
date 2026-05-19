@@ -9,6 +9,7 @@ export function getDefaultState() {
     completions: {},
     isSetup: false,
     achievements: {},
+    cardio: {},
   };
 }
 
