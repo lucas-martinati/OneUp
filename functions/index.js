@@ -105,6 +105,12 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   const exerciseDifficulties = settings.exerciseDifficulties || {};
   const difficultyMultiplier = settings.difficultyMultiplier ?? 1.0;
 
+  // ── Compute server dates ───────────────────────────────────────────────
+  const serverNow = new Date();
+  const serverTodayUTC = `${serverNow.getUTCFullYear()}-${String(serverNow.getUTCMonth() + 1).padStart(2, '0')}-${String(serverNow.getUTCDate()).padStart(2, '0')}`;
+  const tomorrow = new Date(serverNow.getTime() + 24 * 60 * 60 * 1000);
+  const serverTomorrowUTC = `${tomorrow.getUTCFullYear()}-${String(tomorrow.getUTCMonth() + 1).padStart(2, '0')}-${String(tomorrow.getUTCDate()).padStart(2, '0')}`;
+
   // ── Compute per-exercise reps ──────────────────────────────────────────
   const exerciseReps = {};
   let totalClassicReps = 0;
@@ -157,7 +163,9 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     }
 
     if (anyDone) {
-      lastActiveDay = dateStr; // sortedDates is chronological, so last wins
+      if (dateStr <= serverTomorrowUTC) {
+        lastActiveDay = dateStr; // sortedDates is chronological, so last wins
+      }
     }
   }
 
@@ -204,11 +212,6 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   const isPublic = settings.leaderboardEnabled !== false;
 
   // ── Compute shield status server-side ────────────────────────────────────
-  const serverNow = new Date();
-  const serverTodayUTC = `${serverNow.getUTCFullYear()}-${String(serverNow.getUTCMonth() + 1).padStart(2, '0')}-${String(serverNow.getUTCDate()).padStart(2, '0')}`;
-  const tomorrow = new Date(serverNow.getTime() + 24 * 60 * 60 * 1000);
-  const serverTomorrowUTC = `${tomorrow.getUTCFullYear()}-${String(tomorrow.getUTCMonth() + 1).padStart(2, '0')}-${String(tomorrow.getUTCDate()).padStart(2, '0')}`;
-
   // 🟢 Green: lastActiveDay is today (or tomorrow for UTC+ timezone edge)
   const shieldGreen = lastActiveDay === serverTodayUTC || lastActiveDay === serverTomorrowUTC;
 
@@ -218,17 +221,31 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   if (existing.shieldDate === serverTodayUTC) {
     shieldOrange = !!existing.shieldOrange;
   }
-  // Detect backdating: compare before/after completions
+  // Detect backdating: compare before/after completions by checking actual
+  // isCompleted status changes per exercise. We avoid JSON.stringify because
+  // Firebase does not guarantee consistent key ordering across snapshots,
+  // which caused false positives (unchanged dates appearing as "changed").
   if (!shieldOrange && beforeProgress) {
     const beforeCompletions = beforeProgress.completions || {};
     const afterCompletions = progress.completions || {};
-    for (const dateStr of Object.keys(afterCompletions)) {
-      if (JSON.stringify(afterCompletions[dateStr]) !== JSON.stringify(beforeCompletions[dateStr])) {
-        if (dateStr !== serverTodayUTC && dateStr !== serverTomorrowUTC) {
+    // Only today and tomorrow (for UTC+ users) are considered valid "current" dates
+    // Modifying anything older triggers the orange shield.
+    const todayDates = new Set([serverTodayUTC, serverTomorrowUTC]);
+    // Check all dates from both before and after
+    const allDates = new Set([...Object.keys(beforeCompletions), ...Object.keys(afterCompletions)]);
+    for (const dateStr of allDates) {
+      if (todayDates.has(dateStr)) continue; // Skip today (and timezone-adjacent tomorrow)
+      const beforeDay = beforeCompletions[dateStr] || {};
+      const afterDay = afterCompletions[dateStr] || {};
+      // Compare actual isCompleted status per exercise
+      const allExIds = new Set([...Object.keys(beforeDay), ...Object.keys(afterDay)]);
+      for (const exId of allExIds) {
+        if (!!beforeDay[exId]?.isCompleted !== !!afterDay[exId]?.isCompleted) {
           shieldOrange = true;
           break;
         }
       }
+      if (shieldOrange) break;
     }
   }
 
