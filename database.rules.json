@@ -4,7 +4,8 @@
       "$uid": {
         ".read": "$uid === auth.uid",
         "progress": {
-          ".read": "auth != null"
+          ".read": "auth != null",
+          ".write": "$uid === auth.uid"
         },
         "$topic": {
           ".write": "$uid === auth.uid && $topic !== 'purchase'"
