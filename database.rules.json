@@ -2,7 +2,10 @@
   "rules": {
     "users": {
       "$uid": {
-        ".read": "auth != null",
+        ".read": "$uid === auth.uid",
+        "progress": {
+          ".read": "auth != null"
+        },
         "$topic": {
           ".write": "$uid === auth.uid && $topic !== 'purchase'"
         }
