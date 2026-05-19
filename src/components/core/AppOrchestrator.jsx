@@ -24,6 +24,7 @@ export function AppOrchestrator({ computedStats }) {
   const auth = useAuth();
 
   // ── Progress Store ───────────────────────────────────────────────────
+  const isStoreInitialized = useProgressStore(s => s.isStoreInitialized);
   const isSetup = useProgressStore(s => s.isSetup);
   const completions = useProgressStore(s => s.completions);
   const lastCompletionChange = useProgressStore(s => s.lastCompletionChange);
@@ -179,7 +180,7 @@ export function AppOrchestrator({ computedStats }) {
 
   // ── Cloud auto-save for settings ───────────────────────────────────
   useCloudAutoSave(
-    auth.isSignedIn && !auth.loading && isSetup && settingsInitialSyncDone,
+    auth.isSignedIn && !auth.loading && isStoreInitialized && isSetup && settingsInitialSyncDone,
     settings,
     cloudSync.saveSettingsToCloud,
     { delay: 2000 }
@@ -187,10 +188,12 @@ export function AppOrchestrator({ computedStats }) {
 
   // ── Anonymous (Guest) Data Detection & Merging ─────────────────────
   useEffect(() => {
+    if (!isStoreInitialized) return; // Guard against uninitialized store
+
     if (auth.isSignedIn && !auth.loading && isSetup && !conflictCheckDone) {
       const checkGuestAndCloud = async () => {
         try {
-          const hasGuest = hasGuestData();
+          const hasGuest = await hasGuestData();
           if (hasGuest) {
             const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 10000));
             const cloudData = await Promise.race([cloudSync.loadFromCloud(), timeoutPromise]);
@@ -229,11 +232,11 @@ export function AppOrchestrator({ computedStats }) {
       };
       tryLoadFromCloud();
     }
-  }, [auth.isSignedIn, auth.loading, isSetup, conflictCheckDone, hasGuestData, loadFromCloud, setConflictData, setConflictCheckDone, setIsInitialSyncDone]);
+  }, [auth.isSignedIn, auth.loading, isStoreInitialized, isSetup, conflictCheckDone, hasGuestData, loadFromCloud, setConflictData, setConflictCheckDone, setIsInitialSyncDone]);
 
   // ── Full sync on startup once conflict check is resolved ───────────
   useEffect(() => {
-    if (auth.isSignedIn && !auth.loading && conflictCheckDone && !isInitialSyncDone) {
+    if (auth.isSignedIn && !auth.loading && isStoreInitialized && conflictCheckDone && !isInitialSyncDone) {
       if (isSetup) {
         const initialSync = async () => {
           try {
@@ -250,15 +253,15 @@ export function AppOrchestrator({ computedStats }) {
         queueMicrotask(() => setIsInitialSyncDone(true));
       }
     }
-  }, [conflictCheckDone, auth.isSignedIn, auth.loading, isSetup, isInitialSyncDone, syncWithCloud, setIsInitialSyncDone]);
+  }, [conflictCheckDone, auth.isSignedIn, auth.loading, isStoreInitialized, isSetup, isInitialSyncDone, syncWithCloud, setIsInitialSyncDone]);
 
   // ── Real-time cloud listener ───────────────────────────────────────
   useEffect(() => {
-    if (auth.isSignedIn && !auth.loading && conflictCheckDone && isInitialSyncDone && !isSyncPaused && !conflictData) {
+    if (auth.isSignedIn && !auth.loading && isStoreInitialized && conflictCheckDone && isInitialSyncDone && !isSyncPaused && !conflictData) {
       const unsubscribe = startCloudListener();
       return () => { if (unsubscribe) unsubscribe(); };
     }
-  }, [auth.isSignedIn, auth.loading, conflictCheckDone, isInitialSyncDone, isSyncPaused, conflictData, startCloudListener]);
+  }, [auth.isSignedIn, auth.loading, isStoreInitialized, conflictCheckDone, isInitialSyncDone, isSyncPaused, conflictData, startCloudListener]);
 
 
   // ── Pre-load user clans ────────────────────────────────────────────

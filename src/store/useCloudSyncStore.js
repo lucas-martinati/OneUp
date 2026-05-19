@@ -68,10 +68,10 @@ export const useCloudSyncStore = create((set) => ({
   onResolveConflict: async (action, deps) => {
     const { loadFromCloud, syncWithCloud, hasGuestData, clearAnonymousData, mergeWithAnonymousData, updateSettings } = deps;
     try {
-      const hasGuest = hasGuestData();
+      const hasGuest = await hasGuestData();
       if (action === 'restore') {
         if (hasGuest) {
-          clearAnonymousData();
+          await clearAnonymousData();
           localStorage.removeItem('oneup_settings');
           localStorage.removeItem('oneup_routines');
           localStorage.removeItem('oneup_custom_exercises');
@@ -93,8 +93,8 @@ export const useCloudSyncStore = create((set) => ({
               }
             } catch { /* ignore */ }
           }
-          mergeWithAnonymousData();
-          clearAnonymousData();
+          await mergeWithAnonymousData();
+          await clearAnonymousData();
           localStorage.removeItem('oneup_settings');
         }
         await syncWithCloud();

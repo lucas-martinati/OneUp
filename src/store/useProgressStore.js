@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { Preferences } from '@capacitor/preferences';
 import { serverTimestamp } from '../services/firebase';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { saveAchievementsToCloud, loadAchievementsFromCloud } from '../services/userDataService';
@@ -9,28 +10,40 @@ import { cloudSync } from '../services/cloudSync';
 
 const logger = createLogger('ProgressStore');
 
-// ── localStorage helpers ──────────────────────────────────────────────
+// ── Preferences helpers ──────────────────────────────────────────────
 
 function getStorageKey(userId) {
   return userId ? `${STORAGE_KEY_BASE}_${userId}` : STORAGE_KEY_BASE;
 }
 
-function loadFromStorage(userId) {
+async function loadFromStorage(userId) {
   try {
     const key = getStorageKey(userId);
-    const saved = localStorage.getItem(key);
-    if (!saved) return getDefaultState();
+    const { value: saved } = await Preferences.get({ key });
+    
+    if (!saved) {
+      // 🔄 Seamless migration: if not in Preferences but in localStorage, migrate!
+      const legacySaved = localStorage.getItem(key);
+      if (legacySaved) {
+        logger.info(`Migrating storage to Preferences for ${key}`);
+        await Preferences.set({ key, value: legacySaved });
+        const parsed = JSON.parse(legacySaved);
+        return parseProgressData(parsed) ?? getDefaultState();
+      }
+      return getDefaultState();
+    }
     const parsed = JSON.parse(saved);
     return parseProgressData(parsed) ?? getDefaultState();
-  } catch {
+  } catch (err) {
+    logger.error('Failed to load progress from Preferences:', err);
     return getDefaultState();
   }
 }
 
-function saveToStorage(userId, state) {
+async function saveToStorage(userId, state) {
   try {
     const key = getStorageKey(userId);
-    localStorage.setItem(key, JSON.stringify(state));
+    await Preferences.set({ key, value: JSON.stringify(state) });
   } catch (e) {
     logger.error('Failed to persist progress:', e);
   }
@@ -70,6 +83,7 @@ export const useProgressStore = create((set, get) => ({
   cardio: {},
   hasShared: false,
   lastCompletionChange: null,
+  isStoreInitialized: false,
   _userId: null,
   _achievementsLoaded: false,
   _isSaving: false,
@@ -80,8 +94,9 @@ export const useProgressStore = create((set, get) => ({
    * Initialise the store for a given user.
    * Loads progress from localStorage and achievements from cloud.
    */
-  initForUser: (userId) => {
-    const loaded = loadFromStorage(userId);
+  initForUser: async (userId) => {
+    set({ isStoreInitialized: false });
+    const loaded = await loadFromStorage(userId);
     set({
       startDate: loaded.startDate,
       userStartDate: loaded.userStartDate || loaded.startDate,
@@ -93,6 +108,7 @@ export const useProgressStore = create((set, get) => ({
       lastCompletionChange: loaded.lastCompletionChange || null,
       _userId: userId,
       _achievementsLoaded: false,
+      isStoreInitialized: true,
     });
 
     // Load achievements from cloud (async, non-blocking)
@@ -131,12 +147,13 @@ export const useProgressStore = create((set, get) => ({
       lastCompletionChange: null,
       _userId: null,
       _achievementsLoaded: false,
+      isStoreInitialized: false,
     });
   },
 
   // ── Persistence helper ──────────────────────────────────────────────
 
-  /** Persist the current state to localStorage. Called after every mutation. */
+  /** Persist the current state to Preferences. Called after every mutation. */
   _persist: () => {
     const s = get();
     saveToStorage(s._userId, {
@@ -147,7 +164,7 @@ export const useProgressStore = create((set, get) => ({
       achievements: s.achievements,
       cardio: s.cardio,
       lastCompletionChange: s.lastCompletionChange,
-    });
+    }).catch(err => logger.error('Async background persist failed:', err));
   },
 
   // ── Challenge Setup ─────────────────────────────────────────────────
@@ -424,11 +441,15 @@ export const useProgressStore = create((set, get) => ({
   },
 
   /** Merge guest (anonymous) data into the current user. */
-  mergeWithAnonymousData: () => {
+  mergeWithAnonymousData: async () => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY_BASE);
-      if (!saved) return { success: false, error: 'No guest data found' };
-      const guestData = JSON.parse(saved);
+      // Try to load guest data from Preferences, fallback to legacy localStorage
+      const { value: saved } = await Preferences.get({ key: STORAGE_KEY_BASE });
+      const legacySaved = localStorage.getItem(STORAGE_KEY_BASE);
+      const raw = saved || legacySaved;
+      
+      if (!raw) return { success: false, error: 'No guest data found' };
+      const guestData = JSON.parse(raw);
       const validated = validateProgressData(guestData);
       if (!validated) return { success: false, error: 'Invalid guest data' };
 
@@ -438,10 +459,43 @@ export const useProgressStore = create((set, get) => ({
           if (!mergedCompletions[dateStr]) {
             mergedCompletions[dateStr] = { ...validated.completions[dateStr] };
           } else {
-            mergedCompletions[dateStr] = {
-              ...mergedCompletions[dateStr],
-              ...validated.completions[dateStr]
-            };
+            const guestDay = validated.completions[dateStr] || {};
+            const userDay = { ...mergedCompletions[dateStr] };
+            
+            const allExIds = new Set([...Object.keys(guestDay), ...Object.keys(userDay)]);
+            for (const exId of allExIds) {
+              const guestEx = guestDay[exId];
+              const userEx = userDay[exId];
+              
+              if (!userEx) {
+                userDay[exId] = guestEx;
+              } else if (guestEx) {
+                // Conflict resolution:
+                // 1. Prefer completed state
+                const isCompleted = !!userEx.isCompleted || !!guestEx.isCompleted;
+                
+                // 2. Prefer higher rep count
+                const count = Math.max(userEx.count || 0, guestEx.count || 0);
+                
+                // 3. Prefer weight and difficulty if present
+                const weight = guestEx.weight !== undefined && guestEx.weight !== null ? guestEx.weight : userEx.weight;
+                const difficulty = guestEx.difficulty !== undefined && guestEx.difficulty !== null ? guestEx.difficulty : userEx.difficulty;
+                
+                // 4. Prefer newer timestamp
+                const userTs = userEx.timestamp ? (typeof userEx.timestamp === 'number' ? userEx.timestamp : new Date(userEx.timestamp).getTime()) : 0;
+                const guestTs = guestEx.timestamp ? (typeof guestEx.timestamp === 'number' ? guestEx.timestamp : new Date(guestEx.timestamp).getTime()) : 0;
+                const timestamp = guestTs > userTs ? guestEx.timestamp : userEx.timestamp;
+
+                userDay[exId] = {
+                  isCompleted,
+                  ...(count > 0 ? { count } : {}),
+                  ...(weight !== undefined && weight !== null ? { weight } : {}),
+                  ...(difficulty !== undefined && difficulty !== null ? { difficulty } : {}),
+                  ...(timestamp ? { timestamp } : {}),
+                };
+              }
+            }
+            mergedCompletions[dateStr] = userDay;
           }
         });
 
@@ -461,15 +515,22 @@ export const useProgressStore = create((set, get) => ({
     }
   },
 
-  clearAnonymousData: () => {
+  clearAnonymousData: async () => {
+    try {
+      await Preferences.remove({ key: STORAGE_KEY_BASE });
+    } catch (e) {
+      logger.error('Failed to clear guest data in Preferences:', e);
+    }
     localStorage.removeItem(STORAGE_KEY_BASE);
   },
 
-  hasGuestData: () => {
+  hasGuestData: async () => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY_BASE);
-      if (!saved) return false;
-      const data = JSON.parse(saved);
+      const { value: saved } = await Preferences.get({ key: STORAGE_KEY_BASE });
+      const legacySaved = localStorage.getItem(STORAGE_KEY_BASE);
+      const raw = saved || legacySaved;
+      if (!raw) return false;
+      const data = JSON.parse(raw);
       return data?.completions && Object.keys(data.completions).length > 0;
     } catch {
       return false;
