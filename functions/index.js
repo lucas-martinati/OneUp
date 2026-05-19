@@ -69,6 +69,72 @@ function getDayNumber(startDate, dateStr) {
   return Math.floor((utcCurrent - utcStart) / (1000 * 60 * 60 * 24)) + 1;
 }
 
+function isTimestampSuspicious(dateStr, timestamp) {
+  if (!timestamp) return false;
+  
+  const tsMs = typeof timestamp === 'number' ? timestamp : new Date(timestamp).getTime();
+  if (isNaN(tsMs)) return false;
+
+  // Parse dateStr (local date of client)
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return false;
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1; // 0-indexed in JS Date
+  const day = parseInt(parts[2], 10);
+
+  // Get UTC start of the local day
+  const localDayStartUTC = Date.UTC(year, month, day);
+
+  // Calculate the difference in hours
+  const diffHours = (tsMs - localDayStartUTC) / (1000 * 60 * 60);
+
+  // Legitimate timezone offset is between -12 and +14.
+  // We use exactly [-15, 37) to accommodate 1-hour of drift/network latency.
+  if (diffHours < -15 || diffHours >= 37) {
+    return true; // Suspicious!
+  }
+
+  return false;
+}
+
+function getUserLocalDate(completions, serverNow) {
+  const nowMs = serverNow.getTime();
+  
+  // Only check the date strings of yesterday, today, and tomorrow in UTC (O(1) complexity)
+  const datesToCheck = [];
+  for (let i = -1; i <= 1; i++) {
+    const d = new Date(nowMs + i * 24 * 60 * 60 * 1000);
+    const dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+    datesToCheck.push(dateStr);
+  }
+
+  let closestDateStr = null;
+  let minDiff = Infinity;
+
+  for (const dateStr of datesToCheck) {
+    const day = completions[dateStr];
+    if (!day || typeof day !== 'object') continue;
+    for (const [, exData] of Object.entries(day)) {
+      if (exData?.timestamp) {
+        const ts = typeof exData.timestamp === 'number' ? exData.timestamp : new Date(exData.timestamp).getTime();
+        if (!isNaN(ts)) {
+          const diff = Math.abs(nowMs - ts);
+          if (diff < minDiff && diff < 10 * 60 * 1000) { // within 10 minutes of now
+            minDiff = diff;
+            closestDateStr = dateStr;
+          }
+        }
+      }
+    }
+  }
+
+  // Fallback to serverTodayUTC if no recent write timestamp is found
+  if (!closestDateStr) {
+    closestDateStr = `${serverNow.getUTCFullYear()}-${String(serverNow.getUTCMonth() + 1).padStart(2, '0')}-${String(serverNow.getUTCDate()).padStart(2, '0')}`;
+  }
+  return closestDateStr;
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // Core: recompute leaderboard entry from source of truth
 // ══════════════════════════════════════════════════════════════════════════════
@@ -110,6 +176,8 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   const serverTodayUTC = `${serverNow.getUTCFullYear()}-${String(serverNow.getUTCMonth() + 1).padStart(2, '0')}-${String(serverNow.getUTCDate()).padStart(2, '0')}`;
   const tomorrow = new Date(serverNow.getTime() + 24 * 60 * 60 * 1000);
   const serverTomorrowUTC = `${tomorrow.getUTCFullYear()}-${String(tomorrow.getUTCMonth() + 1).padStart(2, '0')}-${String(tomorrow.getUTCDate()).padStart(2, '0')}`;
+  const yesterday = new Date(serverNow.getTime() - 24 * 60 * 60 * 1000);
+  const serverYesterdayUTC = `${yesterday.getUTCFullYear()}-${String(yesterday.getUTCMonth() + 1).padStart(2, '0')}-${String(yesterday.getUTCDate()).padStart(2, '0')}`;
 
   // ── Compute per-exercise reps ──────────────────────────────────────────
   const exerciseReps = {};
@@ -212,33 +280,128 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   const isPublic = settings.leaderboardEnabled !== false;
 
   // ── Compute shield status server-side ────────────────────────────────────
-  // 🟢 Green: lastActiveDay is today (or tomorrow for UTC+ timezone edge)
-  const shieldGreen = lastActiveDay === serverTodayUTC || lastActiveDay === serverTomorrowUTC;
+  // 🟢 Green: did they complete an exercise in the last 26 hours?
+  let hasCompletedRecently = false;
+  const nowMs = serverNow.getTime();
+  const maxElapsedMs = 26 * 60 * 60 * 1000; // 26 hours in milliseconds
 
-  // 🟠 Orange: user modified a PAST day's completions (sticky within the same day)
+  // O(1) optimization: Only scan the last 4 days (from 2 days ago to tomorrow UTC)
+  // Any legitimate completion in the last 26 hours MUST fall in this window.
+  const datesToCheckForGreen = [];
+  for (let i = -2; i <= 1; i++) {
+    const d = new Date(nowMs + i * 24 * 60 * 60 * 1000);
+    const dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+    datesToCheckForGreen.push(dateStr);
+  }
+
+  for (const dateStr of datesToCheckForGreen) {
+    const day = completions[dateStr];
+    if (!day || typeof day !== 'object') continue;
+    for (const exData of Object.values(day)) {
+      if (exData?.isCompleted && exData.timestamp) {
+        const ts = typeof exData.timestamp === 'number' ? exData.timestamp : new Date(exData.timestamp).getTime();
+        if (!isNaN(ts)) {
+          const elapsed = nowMs - ts;
+          if (elapsed >= 0 && elapsed <= maxElapsedMs) {
+            // Only count if the completion itself is not suspicious (cheated)
+            if (!isTimestampSuspicious(dateStr, ts)) {
+              hasCompletedRecently = true;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Fallback to checking date strings for timezones / legacy data / cardio
+  const shieldGreen = hasCompletedRecently || lastActiveDay === serverTodayUTC || lastActiveDay === serverTomorrowUTC;
+
+  // 🟠 Orange: user modified their phone date to complete exercises
   let shieldOrange = false;
   // Preserve the flag if already set today (sticky within the day)
   if (existing.shieldDate === serverTodayUTC) {
     shieldOrange = !!existing.shieldOrange;
   }
-  // Detect backdating: compare before/after completions by checking actual
-  // isCompleted status changes per exercise. We avoid JSON.stringify because
-  // Firebase does not guarantee consistent key ordering across snapshots,
-  // which caused false positives (unchanged dates appearing as "changed").
+
+  // Detect backdating by checking ONLY modified completions in this write
+  if (!shieldOrange) {
+    if (beforeProgress) {
+      const beforeCompletions = beforeProgress.completions || {};
+      const afterCompletions = progress.completions || {};
+      
+      // Check only days that exist in the new completions
+      for (const [dateStr, afterDay] of Object.entries(afterCompletions)) {
+        if (!afterDay || typeof afterDay !== 'object') continue;
+        const beforeDay = beforeCompletions[dateStr] || {};
+        
+        // Fast O(1)-like optimization: check if anything in this day changed before diving deeper
+        let dayChanged = false;
+        const allExIds = new Set([...Object.keys(beforeDay), ...Object.keys(afterDay)]);
+        for (const exId of allExIds) {
+          if (beforeDay[exId]?.isCompleted !== afterDay[exId]?.isCompleted || 
+              beforeDay[exId]?.timestamp !== afterDay[exId]?.timestamp) {
+            dayChanged = true;
+            break;
+          }
+        }
+        if (!dayChanged) continue;
+
+        for (const [exId, exData] of Object.entries(afterDay)) {
+          const wasCompleted = beforeDay[exId]?.isCompleted;
+          // If the exercise was newly completed or the timestamp changed in this write
+          if (exData?.isCompleted && (!wasCompleted || beforeDay[exId]?.timestamp !== exData.timestamp)) {
+            if (isTimestampSuspicious(dateStr, exData.timestamp)) {
+              shieldOrange = true;
+              break;
+            }
+          }
+        }
+        if (shieldOrange) break;
+      }
+    } else {
+      // Fallback if beforeProgress is null (e.g. first setup or settings change):
+      // Only scan completions written in the last 10 minutes (to avoid scanning historical data)
+      for (const [dateStr, day] of Object.entries(completions)) {
+        if (!day || typeof day !== 'object') continue;
+        for (const [, exData] of Object.entries(day)) {
+          if (exData?.isCompleted && exData.timestamp) {
+            const ts = typeof exData.timestamp === 'number' ? exData.timestamp : new Date(exData.timestamp).getTime();
+            if (!isNaN(ts) && Math.abs(nowMs - ts) < 10 * 60 * 1000) { // within 10 minutes
+              if (isTimestampSuspicious(dateStr, ts)) {
+                shieldOrange = true;
+                break;
+              }
+            }
+          }
+        }
+        if (shieldOrange) break;
+      }
+    }
+  }
+
+  // Fallback backdating detection if there are no timestamps (e.g. comparing before/after completions for legacy/custom/cardio)
   if (!shieldOrange && beforeProgress) {
     const beforeCompletions = beforeProgress.completions || {};
     const afterCompletions = progress.completions || {};
-    // Only today and tomorrow (for UTC+ users) are considered valid "current" dates
-    // Modifying anything older triggers the orange shield.
-    const todayDates = new Set([serverTodayUTC, serverTomorrowUTC]);
-    // Check all dates from both before and after
+    // legitimate today dates anywhere on Earth
+    const todayDates = new Set([serverYesterdayUTC, serverTodayUTC, serverTomorrowUTC]);
     const allDates = new Set([...Object.keys(beforeCompletions), ...Object.keys(afterCompletions)]);
     for (const dateStr of allDates) {
-      if (todayDates.has(dateStr)) continue; // Skip today (and timezone-adjacent tomorrow)
+      if (todayDates.has(dateStr)) continue; // Skip today, yesterday, and tomorrow
       const beforeDay = beforeCompletions[dateStr] || {};
       const afterDay = afterCompletions[dateStr] || {};
-      // Compare actual isCompleted status per exercise
+      
+      // Fast check to skip unchanged days
+      let dayChanged = false;
       const allExIds = new Set([...Object.keys(beforeDay), ...Object.keys(afterDay)]);
+      for (const exId of allExIds) {
+        if (beforeDay[exId]?.isCompleted !== afterDay[exId]?.isCompleted) {
+          dayChanged = true;
+          break;
+        }
+      }
+      if (!dayChanged) continue;
+
       for (const exId of allExIds) {
         if (!!beforeDay[exId]?.isCompleted !== !!afterDay[exId]?.isCompleted) {
           shieldOrange = true;
@@ -248,6 +411,10 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
       if (shieldOrange) break;
     }
   }
+
+  // Determine userLocalDate and shieldDate
+  const userLocalDate = getUserLocalDate(completions, serverNow);
+  const shieldDate = shieldOrange ? serverTodayUTC : userLocalDate;
 
   // ── Write to leaderboard ───────────────────────────────────────────────
   await db.ref(`leaderboard/${uid}`).update({
@@ -265,7 +432,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     isPerfectToday,
     shieldGreen,
     shieldOrange,
-    shieldDate: serverTodayUTC,
+    shieldDate,
     isPro: !!purchase.isPro,
     isSupporter: !!purchase.isSupporter,
     lastUpdated: admin.database.ServerValue.TIMESTAMP,
