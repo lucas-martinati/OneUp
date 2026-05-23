@@ -176,8 +176,6 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   const serverTodayUTC = `${serverNow.getUTCFullYear()}-${String(serverNow.getUTCMonth() + 1).padStart(2, '0')}-${String(serverNow.getUTCDate()).padStart(2, '0')}`;
   const tomorrow = new Date(serverNow.getTime() + 24 * 60 * 60 * 1000);
   const serverTomorrowUTC = `${tomorrow.getUTCFullYear()}-${String(tomorrow.getUTCMonth() + 1).padStart(2, '0')}-${String(tomorrow.getUTCDate()).padStart(2, '0')}`;
-  const yesterday = new Date(serverNow.getTime() - 24 * 60 * 60 * 1000);
-  const serverYesterdayUTC = `${yesterday.getUTCFullYear()}-${String(yesterday.getUTCMonth() + 1).padStart(2, '0')}-${String(yesterday.getUTCDate()).padStart(2, '0')}`;
 
   // ── Compute per-exercise reps ──────────────────────────────────────────
   const exerciseReps = {};
@@ -350,9 +348,15 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
           const wasCompleted = beforeDay[exId]?.isCompleted;
           // If the exercise was newly completed or the timestamp changed in this write
           if (exData?.isCompleted && (!wasCompleted || beforeDay[exId]?.timestamp !== exData.timestamp)) {
-            if (isTimestampSuspicious(dateStr, exData.timestamp)) {
-              shieldOrange = true;
-              break;
+            if (exData.timestamp) {
+              const ts = typeof exData.timestamp === 'number' ? exData.timestamp : new Date(exData.timestamp).getTime();
+              // Only check if the completion happened in this write (within the last 10 minutes)
+              if (!isNaN(ts) && Math.abs(nowMs - ts) < 10 * 60 * 1000) {
+                if (isTimestampSuspicious(dateStr, ts)) {
+                  shieldOrange = true;
+                  break;
+                }
+              }
             }
           }
         }
@@ -376,39 +380,6 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
         }
         if (shieldOrange) break;
       }
-    }
-  }
-
-  // Fallback backdating detection if there are no timestamps (e.g. comparing before/after completions for legacy/custom/cardio)
-  if (!shieldOrange && beforeProgress) {
-    const beforeCompletions = beforeProgress.completions || {};
-    const afterCompletions = progress.completions || {};
-    // legitimate today dates anywhere on Earth
-    const todayDates = new Set([serverYesterdayUTC, serverTodayUTC, serverTomorrowUTC]);
-    const allDates = new Set([...Object.keys(beforeCompletions), ...Object.keys(afterCompletions)]);
-    for (const dateStr of allDates) {
-      if (todayDates.has(dateStr)) continue; // Skip today, yesterday, and tomorrow
-      const beforeDay = beforeCompletions[dateStr] || {};
-      const afterDay = afterCompletions[dateStr] || {};
-      
-      // Fast check to skip unchanged days
-      let dayChanged = false;
-      const allExIds = new Set([...Object.keys(beforeDay), ...Object.keys(afterDay)]);
-      for (const exId of allExIds) {
-        if (beforeDay[exId]?.isCompleted !== afterDay[exId]?.isCompleted) {
-          dayChanged = true;
-          break;
-        }
-      }
-      if (!dayChanged) continue;
-
-      for (const exId of allExIds) {
-        if (!!beforeDay[exId]?.isCompleted !== !!afterDay[exId]?.isCompleted) {
-          shieldOrange = true;
-          break;
-        }
-      }
-      if (shieldOrange) break;
     }
   }
 
