@@ -194,6 +194,8 @@
     "initializing": "Inicializando..."
   },
   "calendar": {
+    "caughtUp": "Recuperado",
+    "caughtUpDayLegend": "Dia Recuperado",
     "completed": "Concluído",
     "day": "Dia {{num}}",
     "months": [
@@ -210,6 +212,7 @@
       "novembro",
       "dezembro"
     ],
+    "perfectDayLegend": "Dia Perfeito",
     "repsCount": "{{done}} / {{goal}} repetições",
     "success": "Sucesso",
     "weekdays": [

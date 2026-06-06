@@ -194,6 +194,8 @@
     "initializing": "初期化中..."
   },
   "calendar": {
+    "caughtUp": "取り戻した日",
+    "caughtUpDayLegend": "取り戻した日",
     "completed": "完了",
     "day": "{{num}} 日",
     "months": [
@@ -210,6 +212,7 @@
       "11月",
       "12月"
     ],
+    "perfectDayLegend": "完璧な日",
     "repsCount": "{{done}} / {{goal}} 担当者",
     "success": "成功",
     "weekdays": [

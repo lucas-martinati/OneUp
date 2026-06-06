@@ -194,6 +194,8 @@
     "initializing": "Инициализация..."
   },
   "calendar": {
+    "caughtUp": "Восстановлено",
+    "caughtUpDayLegend": "Восстановленный день",
     "completed": "Выполнено",
     "day": "День {{num}}",
     "months": [
@@ -210,6 +212,7 @@
       "Ноябрь",
       "Декабрь"
     ],
+    "perfectDayLegend": "Идеальный день",
     "repsCount": "{{done}} / {{goal}} повт.",
     "success": "Успех",
     "weekdays": [

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { X, ChevronLeft, ChevronRight, CheckCircle2 } from '../../utils/icons';
+import { X, ChevronLeft, ChevronRight, CheckCircle2, ShieldAlert } from '../../utils/icons';
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr, parseTimestamp } from '../../utils/dateUtils';
 import { useBackHandler } from '../../hooks/useBackHandler';
@@ -278,6 +278,23 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                     const dayCompletions = completions[dateString] || {};
                     const isPerfect = !isCustom && isPerfectDay(dayCompletions, exercises);
                     const isAnyDone = !isPerfect && Object.values(dayCompletions).some(ex => ex?.isCompleted);
+                    const completedExs = Object.values(dayCompletions).filter(ex => {
+                        if (!ex?.isCompleted || !ex?.timestamp) return false;
+                        if (typeof ex.timestamp === 'object') return false;
+                        const timeMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
+                        return !isNaN(timeMs);
+                    });
+                    const isCaughtUp = completedExs.length > 0 && completedExs.every(ex => {
+                        const tsMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
+                        const parts = dateString.split('-');
+                        if (parts.length !== 3) return false;
+                        const year = parseInt(parts[0], 10);
+                        const month = parseInt(parts[1], 10) - 1;
+                        const day = parseInt(parts[2], 10);
+                        const localDayStartUTC = Date.UTC(year, month, day);
+                        const diffHours = (tsMs - localDayStartUTC) / (1000 * 60 * 60);
+                        return diffHours < -15 || diffHours >= 37;
+                    });
                     const isMissed = !isPerfect && !isAnyDone && !isFuture && !isBeforeStart;
                     const completedCount = exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length;
                     const totalCount = completedCount + (isMissed ? 1 : 0);
@@ -288,6 +305,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                     if (isToday) bgColor = 'rgba(139, 92, 246, 0.1)';
                     if (isAnyDone) bgColor = 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.15))';
                     if (isPerfect) bgColor = 'var(--gradient-gold-trans)';
+                    if (isCaughtUp) bgColor = 'linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(217, 119, 6, 0.12))';
                     if (isMissed) bgColor = 'linear-gradient(135deg, rgba(239,68,68,0.1), rgba(220,38,38,0.1))';
 
                     const isSelected = selectedDay === dateString;
@@ -393,17 +411,41 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
             <div className="glass" style={{
                 marginTop: 'var(--spacing-md)', padding: 'var(--spacing-sm)',
                 borderRadius: 'var(--radius-lg)', display: 'flex',
-                flexWrap: 'wrap', gap: '10px', justifyContent: 'center', fontSize: '0.75rem'
+                flexDirection: 'column', gap: '8px', fontSize: '0.75rem'
             }}>
-                {exercises && exercises.map(ex => (
-                    <div key={ex.id} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+                    {exercises && exercises.map(ex => (
+                        <div key={ex.id} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <div style={{
+                                width: '8px', height: '8px', borderRadius: '50%',
+                                background: ex.color, boxShadow: `0 0 4px ${ex.color}`
+                            }} />
+                            <span style={{ color: 'var(--text-secondary)' }}>{getExerciseLabel(ex, t)}</span>
+                        </div>
+                    ))}
+                </div>
+                <div style={{
+                    width: '100%', height: '1px', background: 'var(--border-muted)',
+                    margin: '2px 0'
+                }} />
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                         <div style={{
-                            width: '8px', height: '8px', borderRadius: '50%',
-                            background: ex.color, boxShadow: `0 0 4px ${ex.color}`
+                            width: '12px', height: '12px', borderRadius: '3px',
+                            background: 'var(--gradient-gold-trans)', border: '1.5px solid rgba(255, 223, 0, 0.6)',
+                            boxShadow: 'var(--glow-gold)'
                         }} />
-                        <span style={{ color: 'var(--text-secondary)' }}>{getExerciseLabel(ex, t)}</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>{t('calendar.perfectDayLegend')}</span>
                     </div>
-                ))}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <div style={{
+                            width: '12px', height: '12px', borderRadius: '3px',
+                            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(217, 119, 6, 0.12))',
+                            border: '1.5px solid transparent'
+                        }} />
+                        <span style={{ color: 'var(--text-secondary)' }}>{t('calendar.caughtUpDayLegend')}</span>
+                    </div>
+                </div>
             </div>
             </div>
         </div>
@@ -414,6 +456,23 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, getConfig, t, startDate }) {
     const dayNum = getDayNumber(dateString);
     const dayCompletions = completions[dateString] || {};
+    const completedExs = Object.values(dayCompletions).filter(ex => {
+        if (!ex?.isCompleted || !ex?.timestamp) return false;
+        if (typeof ex.timestamp === 'object') return false;
+        const timeMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
+        return !isNaN(timeMs);
+    });
+    const isCaughtUp = completedExs.length > 0 && completedExs.every(ex => {
+        const tsMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
+        const parts = dateString.split('-');
+        if (parts.length !== 3) return false;
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        const localDayStartUTC = Date.UTC(year, month, day);
+        const diffHours = (tsMs - localDayStartUTC) / (1000 * 60 * 60);
+        return diffHours < -15 || diffHours >= 37;
+    });
     const [dragY, setDragY] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
@@ -539,7 +598,20 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                         {dateString}
                     </div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: '700' }}>{t('calendar.day', { num: dayNum })}</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {t('calendar.day', { num: dayNum })}
+                        {isCaughtUp && (
+                            <span style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '3px',
+                                background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b',
+                                border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px',
+                                padding: '1px 8px', fontSize: '0.7rem', fontWeight: '600', textTransform: 'none'
+                            }}>
+                                <ShieldAlert size={10} color="#f59e0b" />
+                                {t('calendar.caughtUp')}
+                            </span>
+                        )}
+                    </div>
                     {(() => {
                         const timestamps = Object.values(dayCompletions)
                             .filter(ex => ex?.timestamp)

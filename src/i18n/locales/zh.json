@@ -194,6 +194,8 @@
     "initializing": "正在初始化..."
   },
   "calendar": {
+    "caughtUp": "补签",
+    "caughtUpDayLegend": "补签的日期",
     "completed": "已完成",
     "day": "第{{num}}天",
     "months": [
@@ -210,6 +212,7 @@
       "十一月",
       "十二月"
     ],
+    "perfectDayLegend": "完美的一天",
     "repsCount": "{{done}} / {{goal}} 次",
     "success": "成功",
     "weekdays": [

@@ -194,6 +194,8 @@
     "initializing": "초기화 중..."
   },
   "calendar": {
+    "caughtUp": "만회함",
+    "caughtUpDayLegend": "만회한 하루",
     "completed": "완전한",
     "day": "일 {{num}}",
     "months": [
@@ -210,6 +212,7 @@
       "십일월",
       "12월"
     ],
+    "perfectDayLegend": "완벽한 하루",
     "repsCount": "{{done}} / {{goal}} 담당자",
     "success": "성공",
     "weekdays": [
