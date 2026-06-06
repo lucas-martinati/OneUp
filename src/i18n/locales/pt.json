@@ -395,7 +395,12 @@
     "doneAt": "Feito em {{time}}",
     "noExercisesConfigured": "Você ainda não configurou nenhum exercício aqui.",
     "session": "Sessão",
-    "waiting": "⏳ Esperando"
+    "waiting": "⏳ Esperando",
+    "editSession": "Modificar a sessão",
+    "resume": "Retomar",
+    "discard": "Abandonar",
+    "inProgress": "Sessão em andamento",
+    "discardConfirm": "Deseja abandonar a sessão em andamento?"
   },
   "exercises": {
     "abs": "Abdominais",
@@ -662,15 +667,18 @@
   },
   "workout": {
     "allCompleted": "Todos os exercícios concluídos 💪",
-    "chooseOrder": "Escolha a ordem dos exercícios",
+    "clearAll": "Limpar tudo",
     "custom": "Personalizado",
     "interDashboard": "Misture exercícios",
     "interDashboardDesc": "Combine exercícios de todos os painéis.",
     "launch": "Iniciar ({{count}} exercício{{plural}})",
     "launch_one": "Iniciar (exercício {{count}})",
     "launch_other": "Iniciar ({{count}} exercícios)",
+    "reorderHint": "Use as setas ou arraste para reordenar",
+    "selectExercises": "Selecionar exercícios",
     "sessionDone": "Sessão concluída!",
-    "shuffle": "Embaralhar"
+    "shuffle": "Embaralhar",
+    "yourOrder": "Sua ordem"
   },
   "customCategories": {
     "colorLabel": "Cor da categoria",

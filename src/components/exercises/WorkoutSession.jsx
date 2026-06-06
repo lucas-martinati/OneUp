@@ -1,4 +1,4 @@
-import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle, DynamicIcon } from '../../utils/icons';
+import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle, ChevronUp, ChevronDown, DynamicIcon } from '../../utils/icons';
 import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
 import { Z_INDEX } from '../../utils/zIndex';
 import { SessionSummary } from './SessionSummary';
@@ -83,6 +83,7 @@ export function WorkoutSession(props) {
         updateExerciseCount, getConfig,
         toggleExercise, shuffleQueue, startSession, loadRoutine,
         handleSaveRoutine, editRoutine, advanceToNext,
+        moveItem, clearQueue,
         handleDragStart, handleDragOver, handleDragEnd,
         handleTouchStart, handleTouchMove, handleTouchEnd,
         today, dayNumber, activeSlide, onClose,
@@ -268,115 +269,14 @@ export function WorkoutSession(props) {
                         </div>
                     )}
 
-                    {/* Exercise selection label */}
+                    {/* ── Exercise selection grid (stable position — above queue) ── */}
                     <div style={{
                         fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px',
                         color: 'var(--text-secondary)', fontWeight: '600'
                     }}>
-                        {t('workout.chooseOrder')}
+                        {t('workout.selectExercises')}
                     </div>
 
-                    {/* ── Selected order (drag & drop) ── */}
-                    {queue.length > 0 && (
-                        <>
-                            {queue.length >= 2 && (
-                                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                    <button
-                                        onClick={shuffleQueue}
-                                        className="hover-lift"
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: '5px',
-                                            padding: '6px 12px', borderRadius: '20px',
-                                            background: 'rgba(139,92,246,0.12)',
-                                            border: '1px solid rgba(139,92,246,0.25)',
-                                            color: '#a78bfa', cursor: 'pointer',
-                                            fontSize: '0.7rem', fontWeight: '600'
-                                        }}
-                                    >
-                                        <Shuffle size={13} />
-                                        {t('workout.shuffle')}
-                                    </button>
-                                </div>
-                            )}
-                        <div
-                            ref={queueListRef}
-                            style={{
-                                display: 'flex', flexDirection: 'column', gap: '4px',
-                                padding: '8px', borderRadius: 'var(--radius-md)',
-                                background: 'rgba(129,140,248,0.06)',
-                                border: '1px solid rgba(129,140,248,0.12)'
-                            }}
-                        >
-                            {queue.map((id, i) => {
-                                const ex = allExercises.find(e => e.id === id);
-                                if (!ex) return null;
-                                const isDragging = dragIdx === i;
-                                const isDragOver = dragOverIdx === i;
-                                return (
-                                    <div
-                                        key={id}
-                                        ref={el => itemRefs.current[i] = el}
-                                        draggable
-                                        onDragStart={() => handleDragStart(i)}
-                                        onDragOver={(e) => { e.preventDefault(); handleDragOver(i); }}
-                                        onDragEnd={handleDragEnd}
-                                        onTouchStart={(e) => handleTouchStart(e, i)}
-                                        onTouchMove={handleTouchMove}
-                                        onTouchEnd={handleTouchEnd}
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: '8px',
-                                            padding: '8px 10px', borderRadius: '12px',
-                                            background: isDragging ? `${ex.color}20` : isDragOver ? 'rgba(129,140,248,0.15)' : `${ex.color}08`,
-                                            border: isDragOver ? '1.5px dashed rgba(129,140,248,0.4)' : `1px solid ${ex.color}20`,
-                                            cursor: 'grab', userSelect: 'none',
-                                            opacity: isDragging ? 0.6 : 1,
-                                            transition: isDragging ? 'none' : 'all 0.15s ease',
-                                            touchAction: 'none'
-                                        }}
-                                    >
-                                        <GripVertical size={14} color="var(--text-secondary)" style={{ opacity: 0.4, flexShrink: 0 }} />
-                                        <span style={{
-                                            fontSize: '0.65rem', fontWeight: '800', color: ex.color,
-                                            width: '16px', textAlign: 'center', flexShrink: 0
-                                        }}>{i + 1}</span>
-                                        <DynamicIcon icon={ex.icon} size={14} color={ex.color} />
-                                        <span style={{
-                                            fontSize: '0.75rem', fontWeight: '600', color: ex.color, flex: 1
-                                        }}>{getExerciseLabel(ex, t)}</span>
-                                        {WEIGHT_EXERCISES_MAP[id] && (
-                                            <span style={{
-                                                fontSize: '0.65rem', fontWeight: '600',
-                                                color: 'var(--text-secondary)',
-                                                background: `${ex.color}12`,
-                                                padding: '2px 8px', borderRadius: '10px',
-                                                border: `1px solid ${ex.color}20`
-                                            }}>
-                                                {getConfig(id)?.weight || 0} {t('weight.kg')}
-                                            </span>
-                                        )}
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
-                                            style={{
-                                                width: '22px', height: '22px', borderRadius: '50%',
-                                                background: 'rgba(255,255,255,0.06)', border: 'none',
-                                                color: 'var(--text-secondary)', cursor: 'pointer',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                flexShrink: 0
-                                            }}
-                                        >
-                                            <X size={10} />
-                                        </button>
-                                    </div>
-                                );
-                            })
-                            // If an exercise from another dashboard is queued but we are not showing all, still render it!
-                            // (Because allExercises always contains all).
-                            }
-                        </div>
-                        </>
-                    )}
-
-                    {/* Exercise grid */}
                     {showAll ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             {fullCategoryOrder.map(catId => {
@@ -429,6 +329,202 @@ export function WorkoutSession(props) {
                                 return <ExerciseGridItem key={ex.id} ex={ex} selected={selected} orderNum={orderNum} onToggle={toggleExercise} t={t} />;
                             })}
                         </div>
+                    )}
+
+                    {/* ── Selected order (drag & drop) — below grid ── */}
+                    {queue.length > 0 && (
+                        <>
+                            <div style={{
+                                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                            }}>
+                                <div style={{
+                                    fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px',
+                                    color: 'var(--text-secondary)', fontWeight: '600'
+                                }}>
+                                    {t('workout.yourOrder')} ({queue.length})
+                                </div>
+                                <div style={{ display: 'flex', gap: '6px' }}>
+                                    {queue.length >= 2 && (
+                                        <button
+                                            onClick={shuffleQueue}
+                                            className="hover-lift"
+                                            style={{
+                                                display: 'flex', alignItems: 'center', gap: '5px',
+                                                padding: '6px 12px', borderRadius: '20px',
+                                                background: 'rgba(139,92,246,0.12)',
+                                                border: '1px solid rgba(139,92,246,0.25)',
+                                                color: '#a78bfa', cursor: 'pointer',
+                                                fontSize: '0.7rem', fontWeight: '600'
+                                            }}
+                                        >
+                                            <Shuffle size={13} />
+                                            {t('workout.shuffle')}
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={clearQueue}
+                                        className="hover-lift"
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '5px',
+                                            padding: '6px 12px', borderRadius: '20px',
+                                            background: 'rgba(239,68,68,0.08)',
+                                            border: '1px solid rgba(239,68,68,0.2)',
+                                            color: '#f87171', cursor: 'pointer',
+                                            fontSize: '0.7rem', fontWeight: '600'
+                                        }}
+                                    >
+                                        <Trash2 size={12} />
+                                        {t('workout.clearAll')}
+                                    </button>
+                                </div>
+                            </div>
+                        <div
+                            ref={queueListRef}
+                            style={{
+                                display: 'flex', flexDirection: 'column', gap: '5px',
+                                padding: '10px', borderRadius: '16px',
+                                background: 'linear-gradient(180deg, rgba(129,140,248,0.06), rgba(139,92,246,0.04))',
+                                border: '1px solid rgba(129,140,248,0.12)'
+                            }}
+                        >
+                            {queue.map((id, i) => {
+                                const ex = allExercises.find(e => e.id === id);
+                                if (!ex) return null;
+                                const isDragging = dragIdx === i;
+                                const isDragOver = dragOverIdx === i;
+                                const isFirst = i === 0;
+                                const isLast = i === queue.length - 1;
+                                return (
+                                    <div
+                                        key={id}
+                                        ref={el => itemRefs.current[i] = el}
+                                        draggable
+                                        onDragStart={() => handleDragStart(i)}
+                                        onDragOver={(e) => { e.preventDefault(); handleDragOver(i); }}
+                                        onDragEnd={handleDragEnd}
+                                        onTouchStart={(e) => handleTouchStart(e, i)}
+                                        onTouchMove={handleTouchMove}
+                                        onTouchEnd={handleTouchEnd}
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '6px',
+                                            padding: '10px 8px', borderRadius: '14px',
+                                            background: isDragging
+                                                ? `${ex.color}20`
+                                                : isDragOver
+                                                    ? 'rgba(129,140,248,0.18)'
+                                                    : `linear-gradient(135deg, ${ex.color}0a, ${ex.color}05)`,
+                                            border: isDragOver
+                                                ? '1.5px dashed rgba(129,140,248,0.5)'
+                                                : `1px solid ${ex.color}18`,
+                                            cursor: 'grab', userSelect: 'none',
+                                            opacity: isDragging ? 0.5 : 1,
+                                            transform: isDragging ? 'scale(0.97)' : 'scale(1)',
+                                            transition: isDragging ? 'none' : 'all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                                            touchAction: 'none'
+                                        }}
+                                    >
+                                        {/* Drag handle */}
+                                        <GripVertical size={14} color="var(--text-secondary)" style={{ opacity: 0.3, flexShrink: 0 }} />
+
+                                        {/* Number badge */}
+                                        <div style={{
+                                            width: '22px', height: '22px', borderRadius: '50%',
+                                            background: `linear-gradient(135deg, ${ex.color}, ${ex.color}cc)`,
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            fontSize: '0.6rem', fontWeight: '800', color: 'white',
+                                            flexShrink: 0,
+                                            boxShadow: `0 2px 6px ${ex.color}40`
+                                        }}>
+                                            {i + 1}
+                                        </div>
+
+                                        {/* Icon + name */}
+                                        <DynamicIcon icon={ex.icon} size={16} color={ex.color} />
+                                        <span style={{
+                                            fontSize: '0.78rem', fontWeight: '600', color: ex.color, flex: 1,
+                                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+                                        }}>{getExerciseLabel(ex, t)}</span>
+
+                                        {/* Weight badge */}
+                                        {WEIGHT_EXERCISES_MAP[id] && (
+                                            <span style={{
+                                                fontSize: '0.6rem', fontWeight: '700',
+                                                color: 'var(--text-secondary)',
+                                                background: `${ex.color}12`,
+                                                padding: '2px 7px', borderRadius: '10px',
+                                                border: `1px solid ${ex.color}18`
+                                            }}>
+                                                {getConfig(id)?.weight || 0} {t('weight.kg')}
+                                            </span>
+                                        )}
+
+                                        {/* Arrow buttons for reorder */}
+                                        <div style={{
+                                            display: 'flex', flexDirection: 'column', gap: '1px', flexShrink: 0
+                                        }}>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); moveItem(i, i - 1); }}
+                                                disabled={isFirst}
+                                                aria-label="Move up"
+                                                style={{
+                                                    width: '20px', height: '16px', borderRadius: '6px 6px 2px 2px',
+                                                    background: isFirst ? 'transparent' : 'rgba(255,255,255,0.06)',
+                                                    border: 'none',
+                                                    color: isFirst ? 'rgba(255,255,255,0.1)' : 'var(--text-secondary)',
+                                                    cursor: isFirst ? 'default' : 'pointer',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    padding: 0, transition: 'all 0.15s'
+                                                }}
+                                            >
+                                                <ChevronUp size={12} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); moveItem(i, i + 1); }}
+                                                disabled={isLast}
+                                                aria-label="Move down"
+                                                style={{
+                                                    width: '20px', height: '16px', borderRadius: '2px 2px 6px 6px',
+                                                    background: isLast ? 'transparent' : 'rgba(255,255,255,0.06)',
+                                                    border: 'none',
+                                                    color: isLast ? 'rgba(255,255,255,0.1)' : 'var(--text-secondary)',
+                                                    cursor: isLast ? 'default' : 'pointer',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    padding: 0, transition: 'all 0.15s'
+                                                }}
+                                            >
+                                                <ChevronDown size={12} />
+                                            </button>
+                                        </div>
+
+                                        {/* Remove button */}
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
+                                            style={{
+                                                width: '22px', height: '22px', borderRadius: '50%',
+                                                background: 'rgba(239,68,68,0.08)', border: 'none',
+                                                color: '#f87171', cursor: 'pointer',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                flexShrink: 0, transition: 'all 0.15s'
+                                            }}
+                                        >
+                                            <X size={10} />
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Reorder hint */}
+                        {queue.length >= 2 && (
+                            <div style={{
+                                textAlign: 'center', fontSize: '0.65rem',
+                                color: 'var(--text-secondary)', opacity: 0.5,
+                                fontStyle: 'italic'
+                            }}>
+                                {t('workout.reorderHint')}
+                            </div>
+                        )}
+                        </>
                     )}
                 </div>
 

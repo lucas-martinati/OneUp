@@ -410,7 +410,12 @@
     "doneAt": "Fait à {{time}}",
     "noExercisesConfigured": "Tu n'as pas encore configuré d'exercices ici.",
     "session": "Séance",
-    "waiting": "⏳ En attente"
+    "waiting": "⏳ En attente",
+    "editSession": "Modifier la séance",
+    "resume": "Reprendre",
+    "discard": "Abandonner",
+    "inProgress": "Séance en cours",
+    "discardConfirm": "Voulez-vous abandonner la séance en cours ?"
   },
   "exercises": {
     "abs": "Abdos",
@@ -677,15 +682,18 @@
   },
   "workout": {
     "allCompleted": "Tous les exercices sont complétés 💪",
-    "chooseOrder": "Choisis l'ordre des exercices",
+    "clearAll": "Tout effacer",
     "custom": "Personnalisé",
     "interDashboard": "Mixer les exercices",
     "interDashboardDesc": "Mélanger les exercices de tous les tableaux de bord.",
     "launch": "Lancer ({{count}} exercice{{plural}})",
     "launch_one": "Lancer ({{count}} exercice)",
     "launch_other": "Lancer ({{count}} exercices)",
+    "reorderHint": "Utilise les flèches ou glisse pour réordonner",
+    "selectExercises": "Sélectionner les exercices",
     "sessionDone": "Séance terminée !",
-    "shuffle": "Mélanger"
+    "shuffle": "Mélanger",
+    "yourOrder": "Ton ordre"
   },
   "sessionNames": {
     "light": {

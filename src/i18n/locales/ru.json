@@ -395,7 +395,12 @@
     "doneAt": "Выполнено в {{time}}",
     "noExercisesConfigured": "Вы еще не настроили упражнения здесь.",
     "session": "Тренировка",
-    "waiting": "⏳ Ожидание"
+    "waiting": "⏳ Ожидание",
+    "editSession": "Изменить тренировку",
+    "resume": "Возобновить",
+    "discard": "Сбросить",
+    "inProgress": "Тренировка в процессе",
+    "discardConfirm": "Вы действительно хотите сбросить текущую тренировку?"
   },
   "exercises": {
     "abs": "Пресс",
@@ -662,15 +667,18 @@
   },
   "workout": {
     "allCompleted": "Все упражнения выполнены 💪",
-    "chooseOrder": "Выберите порядок упражнений",
+    "clearAll": "Очистить всё",
     "custom": "Пользовательский",
     "interDashboard": "Смешать упражнения",
     "interDashboardDesc": "Объединить упражнения со всех панелей.",
     "launch": "Начать ({{count}} упражнени{{plural}})",
     "launch_one": "Начать ({{count}} упражнение)",
     "launch_other": "Начать ({{count}} упражнений)",
+    "reorderHint": "Используйте стрелки или перетащите для изменения порядка",
+    "selectExercises": "Выбрать упражнения",
     "sessionDone": "Тренировка завершена!",
-    "shuffle": "Перемешать"
+    "shuffle": "Перемешать",
+    "yourOrder": "Ваш порядок"
   },
   "customCategories": {
     "colorLabel": "Цвет категории",

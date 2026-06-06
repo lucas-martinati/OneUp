@@ -395,7 +395,12 @@
     "doneAt": "{{time}}에 완료됨",
     "noExercisesConfigured": "여기에는 아직 어떤 운동도 구성하지 않았습니다.",
     "session": "세션",
-    "waiting": "⏳ 대기 중"
+    "waiting": "⏳ 대기 중",
+    "editSession": "세션 수정",
+    "resume": "재개",
+    "discard": "포기",
+    "inProgress": "세션 진행 중",
+    "discardConfirm": "진행 중인 세션을 포기하시겠습니까?"
   },
   "exercises": {
     "abs": "복근",
@@ -662,15 +667,18 @@
   },
   "workout": {
     "allCompleted": "모든 운동이 완료되었습니다 💪",
-    "chooseOrder": "운동순서를 선택하세요",
+    "clearAll": "모두 지우기",
     "custom": "관습",
     "interDashboard": "혼합 운동",
     "interDashboardDesc": "모든 대시보드의 연습을 결합합니다.",
     "launch": "시작({{count}} 운동{{plural}})",
     "launch_one": "시작({{count}} 운동)",
     "launch_other": "시작({{count}} 운동)",
+    "reorderHint": "화살표 또는 드래그하여 순서 변경",
+    "selectExercises": "운동 선택",
     "sessionDone": "세션이 완료되었습니다!",
-    "shuffle": "혼합"
+    "shuffle": "혼합",
+    "yourOrder": "순서"
   },
   "customCategories": {
     "colorLabel": "카테고리 색상",

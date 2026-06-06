@@ -35,7 +35,8 @@ export function DashboardModals({
     currentCatKey, effectiveSlide,
     selectedExercise, selectedExerciseId, dailyGoal, currentCount, isExerciseDone,
     dayNumber, today,
-    customExModalCatId, setCustomExModalCatId
+    customExModalCatId, setCustomExModalCatId,
+    sessionMode, setSessionInProgress
 }) {
     const startDate = useProgressStore(s => s.startDate);
     const completions = useProgressStore(s => s.completions);
@@ -141,6 +142,8 @@ export function DashboardModals({
                         today={today}
                         dayNumber={dayNumber}
                         activeSlide={effectiveSlide}
+                        sessionMode={sessionMode}
+                        setSessionInProgress={setSessionInProgress}
                     />
                 </Suspense>
             )}

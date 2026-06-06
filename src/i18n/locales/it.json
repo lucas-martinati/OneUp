@@ -395,7 +395,12 @@
     "doneAt": "Fatto a {{time}}",
     "noExercisesConfigured": "Non hai ancora configurato alcun esercizio qui.",
     "session": "Sessione",
-    "waiting": "⏳ In attesa"
+    "waiting": "⏳ In attesa",
+    "editSession": "Modifica la sessione",
+    "resume": "Riprendi",
+    "discard": "Abbandona",
+    "inProgress": "Sessione in corso",
+    "discardConfirm": "Vuoi abbandonare la sessione in corso?"
   },
   "exercises": {
     "abs": "Ass",
@@ -662,15 +667,18 @@
   },
   "workout": {
     "allCompleted": "Tutti gli esercizi completati 💪",
-    "chooseOrder": "Scegli l'ordine degli esercizi",
+    "clearAll": "Cancella tutto",
     "custom": "Costume",
     "interDashboard": "Esercizi misti",
     "interDashboardDesc": "Combina esercizi da tutte le dashboard.",
     "launch": "Inizio ({{count}} allenamento{{plural}})",
     "launch_one": "Inizio (esercizio{{count}})",
     "launch_other": "Inizio ({{count}} esercizi)",
+    "reorderHint": "Usa le frecce o trascina per riordinare",
+    "selectExercises": "Seleziona esercizi",
     "sessionDone": "Sessione completata!",
-    "shuffle": "Mescola"
+    "shuffle": "Mescola",
+    "yourOrder": "Il tuo ordine"
   },
   "customCategories": {
     "colorLabel": "Colore categoria",

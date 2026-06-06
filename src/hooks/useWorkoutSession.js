@@ -19,7 +19,7 @@ import { generateSessionName } from '../utils/sessionNameGenerator';
  * Extracts all state management and business logic from WorkoutSession,
  * leaving the component as a pure render function.
  */
-export function useWorkoutSession({ onClose, today, dayNumber, activeSlide }) {
+export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sessionMode, setSessionInProgress }) {
     // ── Store consumption ──
     const getExerciseCount = useProgressStore(s => s.getExerciseCount);
     const updateExerciseCount = useProgressStore(s => s.updateExerciseCount);
@@ -36,10 +36,45 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide }) {
     const fullCategoryColors = useMemo(() => buildFullCategoryColors(customCategories), [customCategories]);
     const { t } = useTranslation();
 
+    const isStarted = localStorage.getItem('sessionStarted') === 'true';
+
     // ── Phase & queue state ──
-    const [phase, setPhase] = useState('config'); // 'config' | 'running' | 'done'
-    const [queue, setQueue] = useState([]);
-    const [currentIdx, setCurrentIdx] = useState(0);
+    const [phase, setPhase] = useState(() => {
+        if (isStarted) {
+            return sessionMode || 'running';
+        }
+        return 'config';
+    }); // 'config' | 'running' | 'done'
+
+    const [queue, setQueue] = useState(() => {
+        if (isStarted) {
+            try {
+                const savedQueue = localStorage.getItem('workout_session_queue');
+                if (savedQueue) return JSON.parse(savedQueue);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        return [];
+    });
+
+    const [currentIdx, setCurrentIdx] = useState(() => {
+        if (isStarted) {
+            const savedIdx = localStorage.getItem('workout_session_current_idx');
+            if (savedIdx !== null) return parseInt(savedIdx, 10);
+        }
+        return 0;
+    });
+
+    const sessionActiveSlide = useMemo(() => {
+        const isCurrentlyStarted = localStorage.getItem('sessionStarted') === 'true';
+        if (isCurrentlyStarted) {
+            const savedSlide = localStorage.getItem('workout_session_active_slide');
+            if (savedSlide !== null) return parseInt(savedSlide, 10);
+        }
+        return activeSlide;
+    }, [activeSlide]);
+
     const [showSaveRoutine, setShowSaveRoutine] = useState(false);
     const [routineName, setRoutineName] = useState('');
     const [showRoutineList, setShowRoutineList] = useState(false);
@@ -56,9 +91,24 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide }) {
 
     // Session tracking
     const sessionStartTime = useRef(null);
+
+    useEffect(() => {
+        if (isStarted) {
+            const savedStart = localStorage.getItem('workout_session_start_time');
+            if (savedStart) {
+                sessionStartTime.current = parseInt(savedStart, 10);
+            }
+        }
+    }, [isStarted]);
+
     const [sessionDuration, setSessionDuration] = useState(0);
     const [savedSession, setSavedSession] = useState(null);
-    const [sessionName, setSessionName] = useState('');
+    const [sessionName, setSessionName] = useState(() => {
+        if (isStarted) {
+            return localStorage.getItem('workout_session_name') || '';
+        }
+        return '';
+    });
     const [hasAnimatedFirstPanel, setHasAnimatedFirstPanel] = useState(false);
 
     // ── Back handler ──
@@ -72,13 +122,13 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide }) {
 
     // ── Exercise lists ──
     const localExercises = useMemo(() => {
-        const currentCatKey = fullCategoryOrder[activeSlide];
+        const currentCatKey = fullCategoryOrder[sessionActiveSlide];
         if (currentCatKey === CATEGORIES.BODYWEIGHT) return EXERCISES;
         if (currentCatKey === CATEGORIES.WEIGHTS) return WEIGHT_EXERCISES;
         if (currentCatKey === CATEGORIES.CUSTOM) return defaultCustomExercises;
         if (isUserCategory(currentCatKey)) return exercisesByUserCategory[currentCatKey] || [];
         return EXERCISES;
-    }, [activeSlide, defaultCustomExercises, fullCategoryOrder, exercisesByUserCategory]);
+    }, [sessionActiveSlide, defaultCustomExercises, fullCategoryOrder, exercisesByUserCategory]);
 
     const allExercises = useMemo(() => {
         return [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises];
@@ -196,7 +246,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide }) {
         };
 
         const categoriesInRoutine = new Set(validExercises.map(getExCategory));
-        const currentCat = fullCategoryOrder[activeSlide];
+        const currentCat = fullCategoryOrder[sessionActiveSlide];
 
         // Only enable showAll if the routine has exercises from a category different from the current slide
         const hasDifferentCategory = [...categoriesInRoutine].some(cat => cat !== currentCat);
@@ -244,6 +294,20 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide }) {
         setShowSaveRoutine(true);
         setShowRoutineList(false);
     };
+
+    // ── Move item up / down ──
+    const moveItem = useCallback((fromIdx, toIdx) => {
+        if (toIdx < 0) return;
+        setQueue(prev => {
+            if (toIdx >= prev.length) return prev;
+            const newQueue = [...prev];
+            const [removed] = newQueue.splice(fromIdx, 1);
+            newQueue.splice(toIdx, 0, removed);
+            return newQueue;
+        });
+    }, []);
+
+    const clearQueue = useCallback(() => { setQueue([]); }, []);
 
     // ── Drag & Drop handlers ──
     const handleDragStart = useCallback((idx) => { setDragIdx(idx); }, []);
@@ -319,6 +383,29 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide }) {
         return () => clearTimeout(timer);
     }, [phase, currentEx, hasAnimatedFirstPanel]);
 
+    // Automatically save session state to localStorage when running/config
+    useEffect(() => {
+        if (phase === 'done') {
+            localStorage.removeItem('sessionStarted');
+            localStorage.removeItem('workout_session_queue');
+            localStorage.removeItem('workout_session_current_idx');
+            localStorage.removeItem('workout_session_start_time');
+            localStorage.removeItem('workout_session_name');
+            localStorage.removeItem('workout_session_active_slide');
+            setSessionInProgress?.(false);
+        } else if (phase === 'running' || localStorage.getItem('sessionStarted') === 'true') {
+            localStorage.setItem('sessionStarted', 'true');
+            localStorage.setItem('workout_session_queue', JSON.stringify(queue));
+            localStorage.setItem('workout_session_current_idx', currentIdx.toString());
+            if (sessionStartTime.current) {
+                localStorage.setItem('workout_session_start_time', sessionStartTime.current.toString());
+            }
+            localStorage.setItem('workout_session_name', sessionName);
+            localStorage.setItem('workout_session_active_slide', sessionActiveSlide.toString());
+            setSessionInProgress?.(true);
+        }
+    }, [phase, queue, currentIdx, sessionName, sessionActiveSlide, setSessionInProgress]);
+
     const advanceToNext = () => {
         setHasAnimatedFirstPanel(true);
         for (let offset = 1; offset <= queue.length; offset++) {
@@ -370,7 +457,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide }) {
             date: new Date().toISOString(),
             duration,
             name: detectedName,
-            type: fullCategoryOrder[activeSlide] === CATEGORIES.WEIGHTS ? 'weights' : fullCategoryOrder[activeSlide] === CATEGORIES.CUSTOM ? 'custom' : isUserCategory(fullCategoryOrder[activeSlide]) ? fullCategoryOrder[activeSlide] : (fullCategoryOrder[activeSlide] === CATEGORIES.CARDIO ? 'cardio' : 'bodyweight'),
+            type: fullCategoryOrder[sessionActiveSlide] === CATEGORIES.WEIGHTS ? 'weights' : fullCategoryOrder[sessionActiveSlide] === CATEGORIES.CUSTOM ? 'custom' : isUserCategory(fullCategoryOrder[sessionActiveSlide]) ? fullCategoryOrder[sessionActiveSlide] : (fullCategoryOrder[sessionActiveSlide] === CATEGORIES.CARDIO ? 'cardio' : 'bodyweight'),
             exercises: completedExercises,
         });
         setSavedSession(session);
@@ -400,10 +487,11 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide }) {
         // Actions
         toggleExercise, shuffleQueue, startSession, loadRoutine,
         handleSaveRoutine, editRoutine, advanceToNext,
+        moveItem, clearQueue,
         handleDragStart, handleDragOver, handleDragEnd,
         handleTouchStart, handleTouchMove, handleTouchEnd,
 
         // Context
-        today, dayNumber, activeSlide, onClose,
+        today, dayNumber, activeSlide: sessionActiveSlide, onClose,
     };
 }

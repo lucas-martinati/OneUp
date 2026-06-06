@@ -410,7 +410,12 @@
     "doneAt": "Done at {{time}}",
     "noExercisesConfigured": "You haven't configured any exercises here yet.",
     "session": "Session",
-    "waiting": "⏳ Waiting"
+    "waiting": "⏳ Waiting",
+    "editSession": "Edit session",
+    "resume": "Resume",
+    "discard": "Discard",
+    "inProgress": "Session in progress",
+    "discardConfirm": "Do you want to discard the session in progress?"
   },
   "exercises": {
     "abs": "Abs",
@@ -677,15 +682,18 @@
   },
   "workout": {
     "allCompleted": "All exercises completed 💪",
-    "chooseOrder": "Choose exercise order",
+    "clearAll": "Clear all",
     "custom": "Custom",
     "interDashboard": "Mix exercises",
     "interDashboardDesc": "Combine exercises from all dashboards.",
     "launch": "Start ({{count}} exercise{{plural}})",
     "launch_one": "Start ({{count}} exercise)",
     "launch_other": "Start ({{count}} exercises)",
+    "reorderHint": "Use arrows or drag to reorder",
+    "selectExercises": "Select exercises",
     "sessionDone": "Session Complete!",
-    "shuffle": "Shuffle"
+    "shuffle": "Shuffle",
+    "yourOrder": "Your order"
   },
   "sessionNames": {
     "light": {

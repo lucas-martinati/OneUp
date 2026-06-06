@@ -395,7 +395,12 @@
     "doneAt": "完成于 {{time}}",
     "noExercisesConfigured": "您尚未在此处配置任何练习。",
     "session": "训练",
-    "waiting": "⏳ 等待中"
+    "waiting": "⏳ 等待中",
+    "editSession": "修改运动",
+    "resume": "继续",
+    "discard": "放弃",
+    "inProgress": "运动进行中",
+    "discardConfirm": "您确定要放弃当前的运动吗？"
   },
   "exercises": {
     "abs": "腹肌",
@@ -662,15 +667,18 @@
   },
   "workout": {
     "allCompleted": "所有运动已完成 💪",
-    "chooseOrder": "选择运动顺序",
+    "clearAll": "全部清除",
     "custom": "自定义",
     "interDashboard": "混合运动",
     "interDashboardDesc": "合并所有仪表板的运动。",
     "launch": "开始 ({{count}} 项运动)",
     "launch_one": "开始 ({{count}} 项运动)",
     "launch_other": "开始 ({{count}} 项运动)",
+    "reorderHint": "使用箭头或拖动来重新排序",
+    "selectExercises": "选择运动",
     "sessionDone": "训练完成！",
-    "shuffle": "随机排序"
+    "shuffle": "随机排序",
+    "yourOrder": "你的顺序"
   },
   "customCategories": {
     "colorLabel": "类别颜色",

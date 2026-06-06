@@ -395,7 +395,12 @@
     "doneAt": "Geschehen am {{time}}",
     "noExercisesConfigured": "Sie haben hier noch keine Übungen konfiguriert.",
     "session": "Sitzung",
-    "waiting": "⏳ Warten"
+    "waiting": "⏳ Warten",
+    "editSession": "Sitzung bearbeiten",
+    "resume": "Fortsetzen",
+    "discard": "Abbrechen",
+    "inProgress": "Sitzung läuft",
+    "discardConfirm": "Möchten Sie die laufende Sitzung abbrechen?"
   },
   "exercises": {
     "abs": "Abs",
@@ -662,15 +667,18 @@
   },
   "workout": {
     "allCompleted": "Alle Übungen absolviert 💪",
-    "chooseOrder": "Wählen Sie die Übungsreihenfolge",
+    "clearAll": "Alle löschen",
     "custom": "Brauch",
     "interDashboard": "Mischen Sie Übungen",
     "interDashboardDesc": "Kombinieren Sie Übungen aus allen Dashboards.",
     "launch": "Start ({{count}} Übung{{plural}})",
     "launch_one": "Start ({{count}} Übung)",
     "launch_other": "Start ({{count}} Übungen)",
+    "reorderHint": "Pfeile oder Ziehen zum Umordnen",
+    "selectExercises": "Übungen auswählen",
     "sessionDone": "Sitzung abgeschlossen!",
-    "shuffle": "Shuffle"
+    "shuffle": "Shuffle",
+    "yourOrder": "Deine Reihenfolge"
   },
   "customCategories": {
     "colorLabel": "Kategoriefarbe",

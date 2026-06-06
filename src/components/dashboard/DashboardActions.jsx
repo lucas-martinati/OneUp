@@ -5,7 +5,7 @@ import { Calendar as CalendarIcon, Play } from '../../utils/icons';
 import styles from './DashboardActions.module.css';
 
 export const DashboardActions = React.memo(({
-    setShowCalendar, setShowSession, pauseCloudSync, selectedExercise, activeCategoryColor, isDay100
+    setShowCalendar, setShowSession, setSessionMode, sessionInProgress, pauseCloudSync, selectedExercise, activeCategoryColor, isDay100
 }) => {
     const { t } = useTranslation();
 
@@ -25,12 +25,16 @@ export const DashboardActions = React.memo(({
 
             {/* Session Button */}
             <button
-                onClick={() => { setShowSession(true); pauseCloudSync?.(); }}
+                onClick={() => {
+                    setSessionMode('config');
+                    setShowSession(true);
+                    pauseCloudSync?.();
+                }}
                 className={`${styles.actionBtn} hover-lift`}
                 style={{ background }}
             >
                 <Play size={18} />
-                {t('dashboard.session')}
+                {sessionInProgress ? t('dashboard.editSession') : t('dashboard.session')}
             </button>
         </div>
     );

@@ -395,7 +395,12 @@
     "doneAt": "{{time}} に完了",
     "noExercisesConfigured": "ここではまだ演習を設定していません。",
     "session": "セッション",
-    "waiting": "⏳ 待機中"
+    "waiting": "⏳ 待機中",
+    "editSession": "セッションを変更",
+    "resume": "再開",
+    "discard": "破棄",
+    "inProgress": "セッション進行中",
+    "discardConfirm": "進行中のセッションを破棄しますか？"
   },
   "exercises": {
     "abs": "腹筋",
@@ -662,15 +667,18 @@
   },
   "workout": {
     "allCompleted": "すべての練習が完了しました💪",
-    "chooseOrder": "エクササイズの順序を選択してください",
+    "clearAll": "すべてクリア",
     "custom": "カスタム",
     "interDashboard": "ミックスエクササイズ",
     "interDashboardDesc": "すべてのダッシュボードの演習を組み合わせます。",
     "launch": "開始 ({{count}} 演習{{plural}})",
     "launch_one": "開始 ({{count}} 演習)",
     "launch_other": "開始 ({{count}} 演習)",
+    "reorderHint": "矢印またはドラッグで並び替え",
+    "selectExercises": "エクササイズを選択",
     "sessionDone": "セッション完了！",
-    "shuffle": "シャッフル"
+    "shuffle": "シャッフル",
+    "yourOrder": "順序"
   },
   "customCategories": {
     "colorLabel": "カテゴリーの色",
