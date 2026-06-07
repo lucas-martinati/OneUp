@@ -400,9 +400,7 @@
     "session": "Sessione",
     "waiting": "⏳ In attesa",
     "editSession": "Modifica la sessione",
-    "resume": "Riprendi",
     "discard": "Abbandona",
-    "inProgress": "Sessione in corso",
     "discardConfirm": "Vuoi abbandonare la sessione in corso?"
   },
   "exercises": {

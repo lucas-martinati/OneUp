@@ -400,9 +400,7 @@
     "session": "训练",
     "waiting": "⏳ 等待中",
     "editSession": "修改运动",
-    "resume": "继续",
     "discard": "放弃",
-    "inProgress": "运动进行中",
     "discardConfirm": "您确定要放弃当前的运动吗？"
   },
   "exercises": {

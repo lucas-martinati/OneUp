@@ -415,9 +415,7 @@
     "session": "Session",
     "waiting": "⏳ Waiting",
     "editSession": "Edit session",
-    "resume": "Resume",
     "discard": "Discard",
-    "inProgress": "Session in progress",
     "discardConfirm": "Do you want to discard the session in progress?"
   },
   "exercises": {

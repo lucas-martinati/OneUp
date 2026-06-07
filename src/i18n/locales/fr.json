@@ -415,9 +415,7 @@
     "session": "Séance",
     "waiting": "⏳ En attente",
     "editSession": "Modifier la séance",
-    "resume": "Reprendre",
     "discard": "Abandonner",
-    "inProgress": "Séance en cours",
     "discardConfirm": "Voulez-vous abandonner la séance en cours ?"
   },
   "exercises": {

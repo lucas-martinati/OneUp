@@ -6,6 +6,7 @@ import { ConflictOverlay } from './ui/ConflictOverlay';
 import { ConfirmDialog } from './ui/ConfirmDialog';
 import { DashboardHeader } from './dashboard/DashboardHeader';
 import { DashboardActions } from './dashboard/DashboardActions';
+import { SessionBubble } from './dashboard/SessionBubble';
 import { CategoryNav } from './dashboard/CategoryNav';
 import { Day100Overlay, Day100HackModal, Day100UnhackAnimation, useDay100Logic } from '../features/events/Day100Event';
 import { useAchievementToast } from '../hooks/useAchievementToast';
@@ -274,72 +275,14 @@ export function Dashboard() {
                     isDay100={hackActive}
                 />
 
-                {sessionInProgress && (
-                    <div className="glass-premium" style={{
-                        margin: 'var(--spacing-xs) var(--spacing-md) 0 var(--spacing-md)',
-                        padding: '10px 14px',
-                        borderRadius: 'var(--radius-lg)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        background: 'linear-gradient(135deg, rgba(129, 140, 248, 0.12), rgba(139, 92, 246, 0.12))',
-                        border: '1px solid rgba(139, 92, 246, 0.25)',
-                        gap: '12px',
-                        flexWrap: 'wrap'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{
-                                width: '8px',
-                                height: '8px',
-                                borderRadius: '50%',
-                                background: '#a78bfa',
-                                boxShadow: '0 0 8px #a78bfa',
-                                display: 'inline-block'
-                            }} />
-                            <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                                {t('dashboard.inProgress')}
-                            </span>
-                        </div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            <button
-                                onClick={handleDiscardSession}
-                                className="hover-lift"
-                                style={{
-                                    padding: '6px 12px',
-                                    borderRadius: '20px',
-                                    background: 'rgba(239, 68, 68, 0.1)',
-                                    border: '1px solid rgba(239, 68, 68, 0.25)',
-                                    color: '#f87171',
-                                    fontSize: '0.7rem',
-                                    fontWeight: '700',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                {t('dashboard.discard')}
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setSessionMode('running');
-                                    setShowSession(true);
-                                }}
-                                className="hover-lift"
-                                style={{
-                                    padding: '6px 12px',
-                                    borderRadius: '20px',
-                                    background: 'linear-gradient(135deg, #818cf8, #6366f1)',
-                                    border: 'none',
-                                    color: 'white',
-                                    fontSize: '0.7rem',
-                                    fontWeight: '700',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                {t('dashboard.resume')}
-                            </button>
-                        </div>
-                    </div>
+                {sessionInProgress && !anyModalOpen && (
+                    <SessionBubble
+                        onResume={() => {
+                            setSessionMode('running');
+                            setShowSession(true);
+                        }}
+                        onDiscard={handleDiscardSession}
+                    />
                 )}
 
                 <main className="flex-1 flex-col pos-relative" style={{ minHeight: 0 }}>

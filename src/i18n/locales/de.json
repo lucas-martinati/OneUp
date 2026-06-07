@@ -400,9 +400,7 @@
     "session": "Sitzung",
     "waiting": "⏳ Warten",
     "editSession": "Sitzung bearbeiten",
-    "resume": "Fortsetzen",
     "discard": "Abbrechen",
-    "inProgress": "Sitzung läuft",
     "discardConfirm": "Möchten Sie die laufende Sitzung abbrechen?"
   },
   "exercises": {

@@ -400,9 +400,7 @@
     "session": "세션",
     "waiting": "⏳ 대기 중",
     "editSession": "세션 수정",
-    "resume": "재개",
     "discard": "포기",
-    "inProgress": "세션 진행 중",
     "discardConfirm": "진행 중인 세션을 포기하시겠습니까?"
   },
   "exercises": {

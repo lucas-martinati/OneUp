@@ -400,9 +400,7 @@
     "session": "セッション",
     "waiting": "⏳ 待機中",
     "editSession": "セッションを変更",
-    "resume": "再開",
     "discard": "破棄",
-    "inProgress": "セッション進行中",
     "discardConfirm": "進行中のセッションを破棄しますか？"
   },
   "exercises": {
