@@ -266,6 +266,10 @@ body {
   transition: background 0.5s ease;
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
+  /* Prevent text selection & callout on mobile (interferes with long-press gestures) */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 /* Subtle animated background effect */
