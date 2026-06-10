@@ -2449,4 +2449,30 @@ input:checked + .slider:before { transform: translateX(20px); }
   color: var(--text-secondary);
 }
 
+/* Responsive adjustments for devices with shorter viewport heights (e.g. Xiaomi 15T Pro, zoomed views) */
+@media (max-height: 740px) {
+  #root {
+    padding: 6px !important;
+  }
+  .gap-responsive {
+    gap: 4px !important;
+  }
+  header.glass {
+    padding: 8px 12px !important;
+  }
+}
+
+@media (max-height: 660px) {
+  #root {
+    padding: 4px !important;
+  }
+  .gap-responsive {
+    gap: 2px !important;
+  }
+  header.glass {
+    padding: 6px 10px !important;
+  }
+}
+
+
 

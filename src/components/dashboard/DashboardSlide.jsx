@@ -44,10 +44,12 @@ export const DashboardSlide = React.memo(({
 
     return (
         <div
-            className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative overflow-hidden gap-responsive ${isDay100 ? 'dashboard-glitch-bg' : (isDayPerfect ? styles.goldBg : '')}`}
+            className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative hide-scrollbar gap-responsive ${isDay100 ? 'dashboard-glitch-bg' : (isDayPerfect ? styles.goldBg : '')}`}
             style={{
-                paddingTop: title ? '12px' : '0',
-                transition: 'all 0.6s ease-in-out'
+                paddingTop: title ? 'clamp(6px, 1vh, 12px)' : '0',
+                transition: 'all 0.6s ease-in-out',
+                overflowY: 'auto',
+                overflowX: 'hidden'
             }}
         >
             {isDayPerfect && (
@@ -110,13 +112,13 @@ export const DashboardSlide = React.memo(({
 
                         {/* Big animated day number */}
                         <div className="flex-center pos-relative overflow-hidden" style={{
-                            height: 'clamp(3.2rem, 9vh, 7rem)',
-                            marginBottom: 'clamp(2px, 0.5vh, 6px)',
+                            height: 'clamp(2.4rem, 8vh, 6.5rem)',
+                            marginBottom: 'clamp(2px, 0.4vh, 6px)',
                             filter: isDay100 ? 'drop-shadow(0 0 15px rgba(239,68,68,0.4))' : (isDayPerfect ? 'drop-shadow(0 0 15px rgba(251,191,36,0.2))' : 'none')
                         }}>
                             {isCounterTransitioning && prevDayNumber && (
                                 <div className={isDay100 ? 'glitch-text' : (isDayPerfect ? 'gold-text' : 'rainbow-gradient')} style={{
-                                    position: 'absolute', fontSize: 'clamp(3rem, 8.5vh, 6.5rem)', fontWeight: '800', lineHeight: 1,
+                                    position: 'absolute', fontSize: 'clamp(2.2rem, 7.5vh, 6rem)', fontWeight: '800', lineHeight: 1,
                                     animation: isDay100
                                         ? 'textGlitch 0.6s infinite, counterSlideDown 1s ease-out forwards'
                                         : (isDayPerfect
@@ -131,7 +133,7 @@ export const DashboardSlide = React.memo(({
                                 className={isDay100 ? 'glitch-text' : (isDayPerfect ? 'gold-text' : 'rainbow-gradient')}
                                 data-text={isDay100 ? dayNumber : undefined}
                                 style={{
-                                    fontSize: 'clamp(3rem, 8.5vh, 6.5rem)', fontWeight: '800', lineHeight: 1,
+                                    fontSize: 'clamp(2.2rem, 7.5vh, 6rem)', fontWeight: '800', lineHeight: 1,
                                     animation: isDay100
                                         ? (isCounterTransitioning ? 'textGlitch 0.6s infinite, counterSlideUp 1s ease-out' : 'textGlitch 0.6s infinite')
                                         : (isCounterTransitioning
@@ -146,7 +148,7 @@ export const DashboardSlide = React.memo(({
 
                     {/* ── Exercise Selector ── */}
                     <div className="exercise-grid flex-row flex-wrap flex-justify-center" style={{
-                        gap: 'clamp(6px, 1.2vw, 10px)', width: '100%', maxWidth: '640px',
+                        gap: 'clamp(4px, 1vh, 8px)', width: '100%', maxWidth: '640px',
                         padding: '2px'
                     }}>
                         {exercisesList.map(ex => (
@@ -169,8 +171,8 @@ export const DashboardSlide = React.memo(({
                     {/* ── Progress ring + Counter button + Completion status (grouped) ── */}
                     <div className="flex-col flex-align-center gap-responsive">
                         <div className="flex-center pos-relative" style={{
-                            width: 'clamp(72px, 12vh, 110px)',
-                            height: 'clamp(72px, 12vh, 110px)'
+                            width: 'clamp(64px, 10vh, 96px)',
+                            height: 'clamp(64px, 10vh, 96px)'
                         }}>
                             {/* Year progress ring */}
                             <svg viewBox="0 0 100 100" className={isDay100 ? 'day100-ring' : ''} style={{
@@ -231,9 +233,9 @@ export const DashboardSlide = React.memo(({
                                             background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
                                             pointerEvents: 'none'
                                         }} />
-                                        <UI_ICONS.Check size={26} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
+                                        <UI_ICONS.Check size={22} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
                                         <span style={{
-                                            fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)',
+                                            fontSize: 'clamp(0.45rem, 1vh, 0.65rem)',
                                             color: 'white',
                                             fontWeight: '800',
                                             textShadow: '0 1px 2px rgba(0,0,0,0.3)',
@@ -248,8 +250,8 @@ export const DashboardSlide = React.memo(({
                                     </>
                                 ) : (
                                     <>
-                                        <DynamicIcon icon={safeSelectedExercise.icon} size={22} color={safeSelectedExercise.color} />
-                                        <span style={{ fontSize: 'clamp(0.45rem, 1.2vh, 0.65rem)', color: safeSelectedExercise.color, fontWeight: '700' }}>
+                                        <DynamicIcon icon={safeSelectedExercise.icon} size={20} color={safeSelectedExercise.color} />
+                                        <span style={{ fontSize: 'clamp(0.42rem, 1vh, 0.6rem)', color: safeSelectedExercise.color, fontWeight: '700' }}>
                                             {safeSelectedExercise.type === 'timer'
                                                 ? `${formatTime(currentCount)}/${formatTime(dailyGoal)}`
                                                 : `${currentCount}/${dailyGoal}`}
@@ -269,8 +271,8 @@ export const DashboardSlide = React.memo(({
                             return timeStr ? (
                                 <div className="scale-in" style={{
                                     color: 'var(--text-secondary)', fontWeight: '500',
-                                    marginTop: '8px', opacity: 0.75,
-                                    fontSize: 'clamp(0.7rem, 2.8vw, 0.95rem)'
+                                    marginTop: 'clamp(4px, 0.8vh, 6px)', opacity: 0.75,
+                                    fontSize: 'clamp(0.65rem, 2.5vw, 0.85rem)'
                                 }}>
                                     {t('dashboard.doneAt', { time: timeStr })}
                                 </div>
@@ -310,14 +312,14 @@ const ExerciseButton = React.memo(({
             onClick={() => onSelect(ex.id)}
             className={`hover-lift ${isDay100 ? 'day100-exercise-btn' : ''}`}
             style={{
-                flex: '1 1 calc(33.333% - 10px)',
-                minWidth: 'clamp(70px, 20vw, 100px)',
+                flex: '1 1 calc(33.333% - 8px)',
+                minWidth: 'clamp(60px, 18vw, 100px)',
                 maxWidth: '130px',
                 display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: 'clamp(3px, 0.5vh, 6px)',
-                padding: 'clamp(8px, 1.2vh, 12px) clamp(6px, 1vw, 10px)',
+                alignItems: 'center', gap: 'clamp(2px, 0.4vh, 5px)',
+                padding: 'clamp(6px, 1vh, 10px) clamp(4px, 0.8vw, 8px)',
                 borderRadius: 'var(--radius-md)',
-                minHeight: 'var(--touch-min)',
+                minHeight: 'clamp(36px, 6vh, 44px)',
                 background: exDone
                     ? `linear-gradient(135deg, ${ex.color}20, ${ex.gradient[1]}18)`
                     : isActive
@@ -353,12 +355,12 @@ const ExerciseButton = React.memo(({
             )}
             <DynamicIcon
                 icon={ex.icon}
-                size={20}
+                size={18}
                 color={exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)'}
                 style={{ transition: 'color 0.2s ease' }}
             />
             <span style={{
-                fontSize: 'clamp(0.6rem, 1.4vh, 0.8rem)', fontWeight: '600',
+                fontSize: 'clamp(0.55rem, 1.2vh, 0.75rem)', fontWeight: '600',
                 color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
                 textAlign: 'center', lineHeight: '1.1',
                 transition: 'color 0.2s ease'
@@ -366,7 +368,7 @@ const ExerciseButton = React.memo(({
                 {getExerciseLabel(ex)}
             </span>
             <span style={{
-                fontSize: 'clamp(0.65rem, 1.5vh, 0.85rem)', fontWeight: '700',
+                fontSize: 'clamp(0.6rem, 1.3vh, 0.8rem)', fontWeight: '700',
                 color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
                 opacity: exDone ? 1 : isActive ? 1 : 0.6,
                 transition: 'color 0.2s ease',
@@ -381,7 +383,7 @@ const ExerciseButton = React.memo(({
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '-2px' }}>
                 {WEIGHT_EXERCISES_MAP[ex.id] && (
                     <span style={{
-                        fontSize: 'clamp(0.5rem, 1.1vh, 0.65rem)',
+                        fontSize: 'clamp(0.45rem, 1vh, 0.6rem)',
                         color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
                         opacity: exDone ? 1 : 0.8,
                         filter: exDone ? 'none' : 'grayscale(50%)'
@@ -391,7 +393,7 @@ const ExerciseButton = React.memo(({
                 )}
                 {exStreak > 0 && (
                     <span style={{
-                        fontSize: 'clamp(0.5rem, 1.1vh, 0.65rem)',
+                        fontSize: 'clamp(0.45rem, 1vh, 0.6rem)',
                         color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
                         opacity: exDone ? 1 : 0.6,
                         filter: exDone ? 'none' : 'grayscale(100%)'

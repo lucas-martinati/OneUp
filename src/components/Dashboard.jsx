@@ -266,7 +266,7 @@ export function Dashboard() {
             {hackActive && <Day100Overlay />}
 
             <div className={`flex-col full-height fade-in gap-responsive ${hackActive ? 'day100-global day100-flicker' : ''} ${day100Unhacked ? 'day100-unhacking' : ''}`} style={{
-                paddingBottom: 'clamp(2px, 0.5vh, 8px)'
+                paddingBottom: 'clamp(1px, 0.3vh, 6px)'
             }}>
                 <DashboardHeader
                     setShowSettings={setShowSettings}

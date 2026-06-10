@@ -430,7 +430,7 @@ export const SessionBubble = React.memo(({ onResume, onDiscard }) => {
                     <div className={styles.liveIndicator} />
 
                     <div className={styles.bubbleIcon}>
-                        <Play size={22} fill="white" />
+                        <Play size={18} fill="#a78bfa" color="#a78bfa" style={{ marginLeft: '2px' }} />
                     </div>
                 </div>
             </div>

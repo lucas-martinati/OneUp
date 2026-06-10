@@ -21,3 +21,12 @@
   box-shadow: var(--shadow-md);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+@media (max-height: 740px) {
+  .actionBtn {
+    padding: clamp(8px, 1.2vh, 12px);
+    font-size: clamp(0.7rem, 1.4vh, 0.85rem);
+    border-radius: var(--radius-md);
+  }
+}
+
