@@ -328,10 +328,10 @@ export function ExercisePanel({
                                 {t('common.reps')}
                             </span>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
-                                <span style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-primary)', lineHeight: 1 }}>
+                                <span style={{ fontSize: '2.2rem', fontWeight: '800', color: activeColor, lineHeight: 0.9 }}>
                                     {displayCount}
                                 </span>
-                                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                                <span style={{ fontSize: '1.05rem', color: 'var(--text-secondary)' }}>
                                     / {dailyGoal}
                                 </span>
                             </div>
