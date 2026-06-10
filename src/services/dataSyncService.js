@@ -85,6 +85,29 @@ export function mergeData(localData, cloudData) {
   if (!cloudData) return localData;
   if (!localData) return cloudData;
 
+  const localLCC = localData.lastCompletionChange;
+  const cloudLCC = cloudData.lastCompletionChange;
+  const localLCCIsPlaceholder = localLCC && typeof localLCC === 'object' && localLCC['.sv'];
+  const cloudLCCIsPlaceholder = cloudLCC && typeof cloudLCC === 'object' && cloudLCC['.sv'];
+  
+  const localLCCTs = localLCCIsPlaceholder ? 0 : (localLCC ? new Date(localLCC).getTime() : 0);
+  const cloudLCCTs = cloudLCCIsPlaceholder ? 0 : (cloudLCC ? new Date(cloudLCC).getTime() : 0);
+
+  // If cloud data is strictly newer (e.g. updated by admin or another device)
+  // and local does not have a pending placeholder write, we treat the cloud
+  // data as the absolute ground truth and overwrite local state.
+  if (cloudLCCTs > localLCCTs && !localLCCIsPlaceholder) {
+    logger.info('Cloud data is newer than local data. Overwriting local cache with cloud state.');
+    return {
+      startDate: cloudData.startDate,
+      userStartDate: cloudData.userStartDate,
+      completions: cloudData.completions || {},
+      isSetup: cloudData.isSetup,
+      lastCompletionChange: cloudData.lastCompletionChange,
+      cardio: cloudData.cardio || { sessions: {} }
+    };
+  }
+
   logger.info(`Merging data: local has ${Object.keys(localData.completions).length} days, cloud has ${cloudData.completions ? Object.keys(cloudData.completions).length : 0} days`);
 
   const mergedCompletions = { ...localData.completions };
@@ -129,14 +152,6 @@ export function mergeData(localData, cloudData) {
     });
   }
 
-  const localLCC = localData.lastCompletionChange;
-  const cloudLCC = cloudData.lastCompletionChange;
-  const localLCCIsPlaceholder = localLCC && typeof localLCC === 'object' && localLCC['.sv'];
-  const cloudLCCIsPlaceholder = cloudLCC && typeof cloudLCC === 'object' && cloudLCC['.sv'];
-  
-  const localLCCTs = localLCCIsPlaceholder ? 0 : (localLCC ? new Date(localLCC).getTime() : 0);
-  const cloudLCCTs = cloudLCCIsPlaceholder ? 0 : (cloudLCC ? new Date(cloudLCC).getTime() : 0);
-  
   const finalLCC = (cloudLCCTs > localLCCTs || (localLCCIsPlaceholder && !cloudLCCIsPlaceholder)) 
     ? cloudLCC 
     : localLCC;

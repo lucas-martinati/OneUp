@@ -141,7 +141,7 @@ export function AdminPanel({ onClose }) {
         usersData: uData || {},
         leaderboardData: lbData
       });
-    } catch (err) {
+    } catch {
       setMessage({ type: 'error', text: 'Erreur lors du chargement des utilisateurs. Vérifiez vos permissions.' });
     } finally {
       setLoading(false);
@@ -279,38 +279,57 @@ export function AdminPanel({ onClose }) {
       const db = getDatabaseInstance();
       if (!db) throw new Error('Database not initialized');
 
+      let finalValue = parsedValue;
+      if (key === 'progress') {
+        finalValue = {
+          ...parsedValue,
+          lastCompletionChange: new Date().toISOString()
+        };
+      } else if (key === '__full__') {
+        finalValue = {
+          ...parsedValue,
+          progress: parsedValue.progress ? {
+            ...parsedValue.progress,
+            lastCompletionChange: new Date().toISOString()
+          } : {
+            lastCompletionChange: new Date().toISOString()
+          }
+        };
+      }
+
       if (key === '__full__') {
         // Save full overwrite
-        await saveUserData(selectedUid, parsedValue);
+        await saveUserData(selectedUid, finalValue);
         // Refresh entire local contents map
         const contents = {};
-        Object.keys(parsedValue || {}).forEach(k => {
-          contents[k] = JSON.stringify(parsedValue[k], null, 2);
+        Object.keys(finalValue || {}).forEach(k => {
+          contents[k] = JSON.stringify(finalValue[k], null, 2);
         });
-        contents['__full__'] = JSON.stringify(parsedValue, null, 2);
+        contents['__full__'] = JSON.stringify(finalValue, null, 2);
         setKeyJsonContents(contents);
         
         setDataState(prev => ({
           ...prev,
           usersData: {
             ...prev.usersData,
-            [selectedUid]: parsedData
+            [selectedUid]: finalValue
           }
         }));
       } else {
         // Save sub-key update
-        await set(ref(db, `users/${selectedUid}/${key}`), parsedValue);
+        await set(ref(db, `users/${selectedUid}/${key}`), finalValue);
         
         // Update local state and '__full__' content
         setDataState(prev => {
           const originalUser = prev.usersData[selectedUid] || {};
           const updatedUser = {
             ...originalUser,
-            [key]: parsedValue
+            [key]: finalValue
           };
           
           setKeyJsonContents(c => ({
             ...c,
+            [key]: JSON.stringify(finalValue, null, 2),
             '__full__': JSON.stringify(updatedUser, null, 2)
           }));
           
@@ -362,7 +381,8 @@ export function AdminPanel({ onClose }) {
       const progress = {
         ...originalUser.progress,
         startDate: formState.startDate,
-        isSetup: formState.isSetup
+        isSetup: formState.isSetup,
+        lastCompletionChange: new Date().toISOString()
       };
 
       await updateUserProfile(selectedUid, profile);
