@@ -465,7 +465,8 @@
     "whenStarted": "📅いつから始めましたか？",
     "whichExercises": "🎯 どのエクササイズをカウントするか?",
     "yourExercises": "あなたのエクササイズ",
-    "yourJourney": "あなたの旅"
+    "yourJourney": "あなたの旅",
+    "reconnectOption": "すでにアカウントをお持ちですか？サインイン"
   },
   "paywall": {
     "proRequired": "プロモードが必要です",

@@ -480,7 +480,8 @@
     "whenStarted": "📅 When did you start?",
     "whichExercises": "🎯 Which exercises to count?",
     "yourExercises": "Your Exercises",
-    "yourJourney": "Your Journey"
+    "yourJourney": "Your Journey",
+    "reconnectOption": "Already have an account? Sign in"
   },
   "paywall": {
     "proRequired": "Pro Mode Required",

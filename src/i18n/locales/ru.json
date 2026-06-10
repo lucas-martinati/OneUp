@@ -465,7 +465,8 @@
     "whenStarted": "📅 Когда вы начали?",
     "whichExercises": "🎯 Какие упражнения считать?",
     "yourExercises": "Ваши упражнения",
-    "yourJourney": "Ваш путь"
+    "yourJourney": "Ваш путь",
+    "reconnectOption": "Уже есть аккаунт? Войти"
   },
   "paywall": {
     "proRequired": "Требуется Pro режим",

@@ -465,7 +465,8 @@
     "whenStarted": "📅 ¿Cuándo comenzaste?",
     "whichExercises": "🎯 ¿Qué ejercicios contar?",
     "yourExercises": "Tus Ejercicios",
-    "yourJourney": "Tu Viaje"
+    "yourJourney": "Tu Viaje",
+    "reconnectOption": "¿Ya tienes una cuenta? Iniciar sesión"
   },
   "paywall": {
     "proRequired": "Modo Pro Requerido",

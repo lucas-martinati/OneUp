@@ -465,7 +465,8 @@
     "whenStarted": "📅 언제부터 시작하셨나요?",
     "whichExercises": "🎯 어떤 운동을 계산해야 할까요?",
     "yourExercises": "당신의 운동",
-    "yourJourney": "당신의 여행"
+    "yourJourney": "당신의 여행",
+    "reconnectOption": "이미 계정이 있으신가요? 로그인"
   },
   "paywall": {
     "proRequired": "프로 모드 필요",

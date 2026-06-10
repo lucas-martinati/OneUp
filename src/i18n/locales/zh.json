@@ -465,7 +465,8 @@
     "whenStarted": "📅 你什么时候开始的？",
     "whichExercises": "🎯 计算哪些运动？",
     "yourExercises": "你的运动",
-    "yourJourney": "你的旅程"
+    "yourJourney": "你的旅程",
+    "reconnectOption": "已有账号？登录"
   },
   "paywall": {
     "proRequired": "需要 Pro 模式",

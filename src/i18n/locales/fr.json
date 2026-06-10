@@ -480,7 +480,8 @@
     "whenStarted": "📅 Quand as-tu commencé ?",
     "whichExercises": "🎯 Quels exercices valider ?",
     "yourExercises": "Tes Exercices",
-    "yourJourney": "Ton Parcours"
+    "yourJourney": "Ton Parcours",
+    "reconnectOption": "Déjà un compte ? Se connecter"
   },
   "paywall": {
     "proRequired": "Mode Pro Requis",
