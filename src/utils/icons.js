@@ -5,7 +5,7 @@ import {
   Flame, Activity, MoveDown, MoveDiagonal, Square,
   // UI icons
   X, Check, CheckCheck, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Plus, Minus, 
-  Play, Pause, RotateCcw, Save, Trash2, Edit3, Edit2,
+  Play, Pause, RotateCcw, Save, Trash2, Edit3, Edit2, Code,
   FolderOpen, FolderPlus, GripVertical, Shuffle, ArrowLeft, ArrowRight,
   // Social & gamification
   Trophy, Medal, Award, Star, Crown,
@@ -34,7 +34,7 @@ export {
   Dumbbell, Zap, Footprints,
   Flame, Activity,
   X, Check, CheckCheck, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Plus, Minus,
-  Play, Pause, RotateCcw, Save, Trash2, Edit2,
+  Play, Pause, RotateCcw, Save, Trash2, Edit2, Code,
   FolderOpen, FolderPlus, GripVertical, Shuffle, ArrowLeft, ArrowRight,
   Trophy, Medal, Award, Star, Crown,
   Users, User, LogIn, UserPlus, Shield, ShieldAlert, HeartHandshake,

@@ -5,7 +5,7 @@ import {
   onAuthStateChanged,
   deleteUser
 } from 'firebase/auth';
-import { ref, remove } from 'firebase/database';
+import { ref, remove, update } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { Preferences } from '../utils/preferences';
 import { getAuthInstance, getDatabaseInstance, initializeFirebase } from './firebase';
@@ -14,6 +14,22 @@ const logger = createLogger('Auth');
 
 function notifyListeners(listeners, state) {
   listeners.forEach(listener => listener(state));
+}
+
+async function syncProfileToDatabase(user) {
+  if (!user || !user.uid) return;
+  try {
+    const db = getDatabaseInstance();
+    if (!db) return;
+    await update(ref(db, `users/${user.uid}/profile`), {
+      email: user.email || '',
+      displayName: user.displayName || '',
+      photoURL: user.photoURL || '',
+      lastSeen: new Date().toISOString()
+    });
+  } catch (err) {
+    logger.warn('Failed to sync profile to database:', err);
+  }
 }
 
 export function setupAuthListener(listeners) {
@@ -25,9 +41,13 @@ export function setupAuthListener(listeners) {
       logger.info('Firebase Auth Restored:', user.email);
       await Preferences.set({ key: 'user_signed_in', value: 'true' });
       await Preferences.set({ key: 'user_id', value: user.uid });
+      
+      const authUser = { uid: user.uid, email: user.email, displayName: user.displayName, photoURL: user.photoURL };
+      syncProfileToDatabase(authUser);
+
       notifyListeners(listeners, {
         isSignedIn: true,
-        user: { uid: user.uid, email: user.email, displayName: user.displayName, photoURL: user.photoURL }
+        user: authUser
       });
     } else {
       notifyListeners(listeners, { isSignedIn: false, user: null });
@@ -45,10 +65,14 @@ export async function signInWithGoogle(idToken, listeners) {
   await Preferences.set({ key: 'user_signed_in', value: 'true' });
   await Preferences.set({ key: 'user_id', value: result.user.uid });
 
+  const authUser = { uid: result.user.uid, email: result.user.email, displayName: result.user.displayName, photoURL: result.user.photoURL };
+  
   notifyListeners(listeners, {
     isSignedIn: true,
-    user: { uid: result.user.uid, email: result.user.email, displayName: result.user.displayName, photoURL: result.user.photoURL }
+    user: authUser
   });
+  
+  syncProfileToDatabase(authUser);
   return result.user;
 }
 
@@ -62,15 +86,19 @@ export async function signInWithGoogleWeb(accessToken, userInfo, listeners) {
   await Preferences.set({ key: 'user_signed_in', value: 'true' });
   await Preferences.set({ key: 'user_id', value: result.user.uid });
 
+  const authUser = {
+    uid: result.user.uid,
+    email: result.user.email || userInfo.email,
+    displayName: result.user.displayName || userInfo.name,
+    photoURL: result.user.photoURL || userInfo.picture
+  };
+
   notifyListeners(listeners, {
     isSignedIn: true,
-    user: {
-      uid: result.user.uid,
-      email: result.user.email || userInfo.email,
-      displayName: result.user.displayName || userInfo.name,
-      photoURL: result.user.photoURL || userInfo.picture
-    }
+    user: authUser
   });
+  
+  syncProfileToDatabase(authUser);
   return result.user;
 }
 

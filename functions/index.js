@@ -470,6 +470,54 @@ exports.onPurchaseChange = onValueWritten("users/{uid}/purchase", async (event) 
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
+// Profile Backfill Function (Administrative utility)
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Backfills user profiles with email and name from Firebase Auth database.
+ * Admin can invoke this manually once to populate missing profile nodes.
+ */
+exports.backfillUserProfiles = onRequest(async (req, res) => {
+  try {
+    let nextPageToken;
+    let totalUpdated = 0;
+    const updates = {};
+    
+    do {
+      const listUsersResult = await admin.auth().listUsers(1000, nextPageToken);
+      for (const userRecord of listUsersResult.users) {
+        const uid = userRecord.uid;
+        const email = userRecord.email || '';
+        const displayName = userRecord.displayName || '';
+        const photoURL = userRecord.photoURL || '';
+        
+        // Fetch current profile to check if it's missing or incomplete
+        const profileSnap = await db.ref(`users/${uid}/profile`).once('value');
+        const currentProfile = profileSnap.val() || {};
+        
+        if (!currentProfile.email) {
+          updates[`users/${uid}/profile/email`] = email;
+          updates[`users/${uid}/profile/displayName`] = currentProfile.displayName || displayName;
+          updates[`users/${uid}/profile/photoURL`] = currentProfile.photoURL || photoURL;
+          updates[`users/${uid}/profile/lastSeen`] = currentProfile.lastSeen || new Date().toISOString();
+          totalUpdated++;
+        }
+      }
+      nextPageToken = listUsersResult.pageToken;
+    } while (nextPageToken);
+    
+    if (Object.keys(updates).length > 0) {
+      await db.ref().update(updates);
+    }
+    
+    res.status(200).send(`Backfill terminé. ${totalUpdated} profils d'utilisateurs mis à jour.`);
+  } catch (error) {
+    console.error("Backfill failed:", error);
+    res.status(500).send("Erreur lors du backfill : " + error.message);
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
 // RevenueCat Webhook (existing)
 // ══════════════════════════════════════════════════════════════════════════════
 

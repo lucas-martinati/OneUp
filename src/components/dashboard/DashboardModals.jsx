@@ -20,6 +20,7 @@ const Achievements = lazy(() => import('../feedback/Achievements').then(m => ({ 
 const WorkoutSession = lazy(() => import('../exercises/WorkoutSession').then(m => ({ default: m.WorkoutSession })));
 const CustomExercisesModal = lazy(() => import('../exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
 const CategoryManagerModal = lazy(() => import('../exercises/CategoryManagerModal').then(m => ({ default: m.CategoryManagerModal })));
+const AdminPanel = lazy(() => import('../admin/AdminPanel').then(m => ({ default: m.AdminPanel })));
 
 export function DashboardModals({
     showCalendar, setShowCalendar,
@@ -31,6 +32,7 @@ export function DashboardModals({
     showSession, setShowSession,
     showCustomExercisesModal, setShowCustomExercisesModal,
     showCategoryManager, setShowCategoryManager,
+    showAdmin, setShowAdmin,
     openStoreDirectly, setOpenStoreDirectly,
     currentCatKey, effectiveSlide,
     selectedExercise, selectedExerciseId, dailyGoal, currentCount, isExerciseDone,
@@ -165,6 +167,13 @@ export function DashboardModals({
                         customCategoriesHook={customCategoriesHook}
                         exercisesByUserCategory={exercisesByUserCategory}
                         defaultCustomExercises={defaultCustomExercises}
+                    />
+                </Suspense>
+            )}
+            {showAdmin && (
+                <Suspense fallback={null}>
+                    <AdminPanel
+                        onClose={() => setShowAdmin(false)}
                     />
                 </Suspense>
             )}

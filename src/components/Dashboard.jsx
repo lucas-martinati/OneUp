@@ -24,6 +24,7 @@ import { DashboardSlideRenderer } from './dashboard/DashboardSlideRenderer';
 import { DashboardModals } from './dashboard/DashboardModals';
 
 // Contexts
+import { useAuth } from '../contexts/AuthContext';
 import { useProgressStore } from '../store/useProgressStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useCloudSyncStore } from '../store/useCloudSyncStore';
@@ -57,6 +58,9 @@ export function Dashboard() {
         setShowDiscardConfirm(false);
     }, []);
 
+    const auth = useAuth();
+    const isAdmin = auth?.user?.email === 'lucasm2.054800@gmail.com';
+
     // ── Stores ──
     const getDayNumber = useProgressStore(s => s.getDayNumber);
     const completions = useProgressStore(s => s.completions);
@@ -86,7 +90,7 @@ export function Dashboard() {
 
     // ── Modals ──
     const { modals, openModal, closeModal, anyModalOpen, handleBack } = useModalManager(
-        { calendar: false, stats: false, settings: false, counter: false, leaderboard: false, achievements: false, session: false, customExercises: false, categoryManager: false },
+        { calendar: false, stats: false, settings: false, counter: false, leaderboard: false, achievements: false, session: false, customExercises: false, categoryManager: false, admin: false },
         ['counter', 'session']
     );
     const setShowCalendar = (v) => v ? openModal('calendar') : closeModal('calendar');
@@ -98,6 +102,7 @@ export function Dashboard() {
     const setShowSession = (v) => v ? openModal('session') : closeModal('session');
     const setShowCustomExercisesModal = (v) => v ? openModal('customExercises') : closeModal('customExercises');
     const setShowCategoryManager = (v) => v ? openModal('categoryManager') : closeModal('categoryManager');
+    const setShowAdmin = (v) => v ? openModal('admin') : closeModal('admin');
 
     const [openStoreDirectly, setOpenStoreDirectly] = useState(false);
     const [customExModalCatId, setCustomExModalCatId] = useState(null);
@@ -267,6 +272,8 @@ export function Dashboard() {
                     setShowSettings={setShowSettings}
                     setShowStats={setShowStats}
                     setShowLeaderboard={setShowLeaderboard}
+                    setShowAdmin={setShowAdmin}
+                    isAdmin={isAdmin}
                     pauseCloudSync={pauseCloudSync}
                     streakActive={computedStats.streakActive}
                     displayStreak={computedStats.displayStreak}
@@ -337,6 +344,7 @@ export function Dashboard() {
                     showSession={modals.session} setShowSession={setShowSession}
                     showCustomExercisesModal={modals.customExercises} setShowCustomExercisesModal={setShowCustomExercisesModal}
                     showCategoryManager={modals.categoryManager} setShowCategoryManager={setShowCategoryManager}
+                    showAdmin={modals.admin} setShowAdmin={setShowAdmin}
                     openStoreDirectly={openStoreDirectly} setOpenStoreDirectly={setOpenStoreDirectly}
                     currentCatKey={currentCatKey} effectiveSlide={effectiveSlide}
                     selectedExercise={selectedExercise} selectedExerciseId={globalSelectedId}

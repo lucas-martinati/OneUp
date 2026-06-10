@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { SettingsIcon, PieChart, Users, Shield, Flame, Trophy } from '../../utils/icons';
 
 export const DashboardHeader = React.memo(({
-    setShowSettings, setShowStats, setShowLeaderboard,
+    setShowSettings, setShowStats, setShowLeaderboard, setShowAdmin, isAdmin,
     streakActive, displayStreak, selectedExercise, totalReps, isDay100
 }) => {
     const iconBtnStyle = {
@@ -100,6 +100,11 @@ export const DashboardHeader = React.memo(({
             </div>
 
             <div ref={rightSideRef} style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 0, justifyContent: 'flex-end' }}>
+                {isAdmin && (
+                    <button onClick={() => setShowAdmin(true)} aria-label="Admin Panel" className="hover-lift" style={{ ...iconBtnStyle, color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+                        <Shield size={19} />
+                    </button>
+                )}
                 <button onClick={() => setShowSettings(true)} aria-label="Settings" className="hover-lift" style={iconBtnStyle}>
                     <SettingsIcon size={19} />
                 </button>
