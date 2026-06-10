@@ -361,7 +361,13 @@
       "Breathe well after the effort.",
       "1% better every day."
     ],
-    "validated": "{{exercise}} Complete!"
+    "validated": "{{exercise}} Complete!",
+    "cameraMode": "Camera Counter",
+    "cameraCalibrate": "Recalibrate",
+    "cameraNoPermission": "Camera access denied",
+    "cameraLoading": "Starting camera...",
+    "cameraCalibrating": "Calibrating in {{count}}s...",
+    "cameraModeDesc": "Place the phone on the floor under your face. The camera counts your push-ups automatically."
   },
   "customCategories": {
     "colorLabel": "Category color",

@@ -361,7 +361,13 @@
       "Правильно дышите после нагрузки.",
       "На 1% лучше каждый день."
     ],
-    "validated": "{{exercise}} выполнено!"
+    "validated": "{{exercise}} выполнено!",
+    "cameraMode": "Camera Counter",
+    "cameraCalibrate": "Recalibrate",
+    "cameraNoPermission": "Camera access denied",
+    "cameraLoading": "Starting camera...",
+    "cameraCalibrating": "Calibrating in {{count}}s...",
+    "cameraModeDesc": "Положите телефон на пол под лицо. Камера автоматически считает отжимания."
   },
   "customExercises": {
     "categoryLabel": "Категория",

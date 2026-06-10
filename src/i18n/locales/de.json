@@ -361,7 +361,13 @@
       "Atmen Sie nach der Anstrengung gut durch.",
       "Jeden Tag 1 % besser."
     ],
-    "validated": "{{exercise}} Abgeschlossen!"
+    "validated": "{{exercise}} Abgeschlossen!",
+    "cameraMode": "Camera Counter",
+    "cameraCalibrate": "Recalibrate",
+    "cameraNoPermission": "Camera access denied",
+    "cameraLoading": "Starting camera...",
+    "cameraCalibrating": "Calibrating in {{count}}s...",
+    "cameraModeDesc": "Legen Sie das Telefon unter Ihr Gesicht auf den Boden. Die Kamera zählt Ihre Liegestütze automatisch."
   },
   "customExercises": {
     "categoryLabel": "Kategorie",

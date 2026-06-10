@@ -13,6 +13,8 @@ import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 import { useWakeLock } from '../../hooks/useWakeLock';
 import { Z_INDEX } from '../../utils/zIndex';
 import { useSettingsStore } from '../../store/useSettingsStore';
+import { useCameraPushUpCounter } from '../../hooks/useCameraPushUpCounter';
+import { Camera, CameraOff, RefreshCw } from 'lucide-react';
 
 export function ExercisePanel({
     onClose,
@@ -109,7 +111,7 @@ export function ExercisePanel({
     const [gradStart, gradEnd] = exerciseConfig?.gradient || (isTimer ? ['#7c3aed', '#8b5cf6'] : ['#667eea', '#818cf8']);
     const exerciseLabel = getExerciseLabel(exerciseConfig);
     const gradientId = 'exercisePanelGrad';
-    const ringSize = 'clamp(180px, 32vh, 240px)';
+    const ringSize = 'clamp(150px, 26vh, 200px)';
     const ringRadius = 100;
     const ringCircumference = 2 * Math.PI * ringRadius;
     const displayTime = formatTime(displayCount);
@@ -161,6 +163,36 @@ export function ExercisePanel({
         }, 600);
     };
 
+    const isPushups = exerciseConfig?.id === 'pushups';
+    const {
+        isActive: isCameraActive,
+        videoRef,
+        error: cameraError,
+        proximity,
+        isCalibrated,
+        calibrateCountdown,
+        pushupState,
+        startCamera,
+        stopCamera,
+        recalibrate
+    } = useCameraPushUpCounter(() => {
+        if (!isCompleted) {
+            handleIncrement(1);
+        }
+    });
+
+    useEffect(() => {
+        return () => {
+            stopCamera();
+        };
+    }, [stopCamera]);
+
+    useEffect(() => {
+        if (!isPushups && isCameraActive) {
+            stopCamera();
+        }
+    }, [exerciseConfig?.id, isPushups, isCameraActive, stopCamera]);
+
     const content = (
         <div
             className={`modal-content ${isSession && fadeIn ? 'fade-in' : ''}`}
@@ -195,8 +227,73 @@ export function ExercisePanel({
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 'clamp(16px, 2.5vh, 28px)'
+                gap: 'clamp(8px, 1.8vh, 16px)'
             }}>
+                {isPushups && (
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '4px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <button
+                            onClick={isCameraActive ? stopCamera : startCamera}
+                            className="hover-lift glass"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '8px 16px',
+                                borderRadius: '20px',
+                                background: isCameraActive ? `${activeColor}20` : 'rgba(255, 255, 255, 0.05)',
+                                border: `1px solid ${isCameraActive ? activeColor + '60' : 'rgba(255, 255, 255, 0.1)'}`,
+                                color: isCameraActive ? activeColor : 'var(--text-primary)',
+                                cursor: 'pointer',
+                                fontSize: '0.8rem',
+                                fontWeight: '700',
+                                transition: 'all 0.2s ease',
+                                minHeight: 'var(--touch-min)'
+                            }}
+                        >
+                            {isCameraActive ? <CameraOff size={16} /> : <Camera size={16} />}
+                            {t('counter.cameraMode')}
+                        </button>
+                        {isCameraActive && isCalibrated && (
+                            <button
+                                onClick={recalibrate}
+                                className="hover-lift glass"
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    padding: '8px 14px',
+                                    borderRadius: '20px',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    color: 'var(--text-secondary)',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '700',
+                                    transition: 'all 0.2s ease',
+                                    minHeight: 'var(--touch-min)'
+                                }}
+                            >
+                                <RefreshCw size={12} />
+                                {t('counter.cameraCalibrate')}
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                {isPushups && !isCameraActive && (
+                    <p style={{
+                        fontSize: '0.75rem',
+                        color: 'var(--text-secondary)',
+                        margin: '-4px 0 4px 0',
+                        textAlign: 'center',
+                        maxWidth: '280px',
+                        lineHeight: '1.4',
+                        opacity: 0.75
+                    }}>
+                        {t('counter.cameraModeDesc')}
+                    </p>
+                )}
+
                 <ProgressRing
                     activeColor={activeColor}
                     displayCount={displayCount}
@@ -215,18 +312,73 @@ export function ExercisePanel({
                     ringSize={ringSize}
                     dailyGoal={dailyGoal}
                     timeFontSize={timeFontSize}
-                />
-
-                <StatusLine
-                    activeColor={activeColor}
-                    exerciseLabel={exerciseLabel}
-                    gradEnd={gradEnd}
-                    gradStart={gradStart}
-                    isCompleted={isCompleted}
-                    isTimer={isTimer}
-                    remaining={remaining}
+                    isCameraActive={isCameraActive}
+                    videoRef={videoRef}
+                    cameraError={cameraError}
+                    isCalibrated={isCalibrated}
+                    calibrateCountdown={calibrateCountdown}
                     t={t}
                 />
+
+                {isCameraActive ? (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: '280px', minHeight: '52px', gap: '16px' }}>
+                        {/* Reps counter left side */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', flexShrink: 0 }}>
+                            <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: '700' }}>
+                                {t('common.reps')}
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                                <span style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-primary)', lineHeight: 1 }}>
+                                    {displayCount}
+                                </span>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                                    / {dailyGoal}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Proximity bar & status right side */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flex: 1, maxWidth: '160px' }}>
+                            {isCalibrated ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', width: '100%' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                                        <span className="camera-active-ring-pulse" style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: activeColor }} />
+                                        <span style={{ fontSize: '0.72rem', color: pushupState === 'down' ? activeColor : 'var(--text-primary)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                            {pushupState === 'down' ? '↓ BAS' : '↑ HAUT'}
+                                        </span>
+                                    </div>
+                                    <div className="camera-proximity-container" style={{ margin: 0, width: '100%' }}>
+                                        <div 
+                                            className="camera-proximity-fill" 
+                                            style={{ 
+                                                width: `${proximity}%`,
+                                                '--exercise-color': activeColor,
+                                                '--exercise-color-dim': exerciseConfig?.colorDim || 'rgba(129,140,248,0.15)'
+                                            }} 
+                                        />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontStyle: 'italic', textAlign: 'right' }}>
+                                        {calibrateCountdown > 0 ? t('counter.cameraCalibrating', { count: calibrateCountdown }) : t('counter.cameraLoading')}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ) : (
+                    <StatusLine
+                        activeColor={activeColor}
+                        exerciseLabel={exerciseLabel}
+                        gradEnd={gradEnd}
+                        gradStart={gradStart}
+                        isCompleted={isCompleted}
+                        isTimer={isTimer}
+                        remaining={remaining}
+                        t={t}
+                    />
+                )}
 
                 {isTimer ? (
                     <TimerControls
@@ -253,26 +405,29 @@ export function ExercisePanel({
                         handleReset={handleReset}
                         isCompleted={isCompleted}
                         t={t}
+                        isCameraActive={isCameraActive}
                     />
                 )}
             </div>
 
-            <div style={{
-                marginTop: 'auto',
-                marginBottom: '8px',
-                padding: '8px 16px',
-                borderRadius: '12px',
-                background: 'rgba(255,255,255,0.03)',
-                color: 'var(--text-secondary)',
-                fontSize: '0.8rem',
-                textAlign: 'center',
-                alignSelf: 'center',
-                width: '90%',
-                maxWidth: '300px',
-                border: '1px solid rgba(255,255,255,0.05)'
-            }}>
-                {'\u{1F4A1}'} {t(isTimer ? 'timer.tips' : 'counter.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
-            </div>
+            {!isCameraActive && (
+                <div style={{
+                    marginTop: 'auto',
+                    marginBottom: '8px',
+                    padding: '8px 16px',
+                    borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.03)',
+                    color: 'var(--text-secondary)',
+                    fontSize: '0.8rem',
+                    textAlign: 'center',
+                    alignSelf: 'center',
+                    width: '90%',
+                    maxWidth: '300px',
+                    border: '1px solid rgba(255,255,255,0.05)'
+                }}>
+                    {'\u{1F4A1}'} {t(isTimer ? 'timer.tips' : 'counter.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
+                </div>
+            )}
         </div>
     );
 
@@ -296,7 +451,7 @@ function Header({ activeColor, exerciseConfig, exerciseLabel, onClose, onNext, h
     const showNextButton = onNext && !hideNextButton;
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--spacing-lg)', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'clamp(8px, 1.5vh, 16px)', gap: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
                 <div style={{
                     width: 'var(--touch-min)',
@@ -462,20 +617,37 @@ function ProgressRing({
     ringCircumference,
     ringRadius,
     ringSize,
-    timeFontSize
+    timeFontSize,
+    // Camera props
+    isCameraActive = false,
+    videoRef = null,
+    cameraError = null,
+    isCalibrated = false,
+    calibrateCountdown = 0,
+    t = null
 }) {
     return (
-        <div style={{ position: 'relative', textAlign: 'center' }}>
+        <div style={{ 
+            position: 'relative', 
+            width: ringSize,
+            height: ringSize,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            '--exercise-color': activeColor,
+            '--exercise-color-dim': activeColor + '15'
+        }}>
             <svg
                 viewBox="0 0 220 220"
                 overflow="visible"
                 style={{
                     position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    width: ringSize,
-                    height: ringSize,
-                    transform: 'translate(-50%, -50%)'
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    pointerEvents: 'none'
                 }}
             >
                 <circle cx="110" cy="110" r={ringRadius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
@@ -490,6 +662,7 @@ function ProgressRing({
                     strokeDashoffset={ringCircumference * (1 - progress / 100)}
                     strokeLinecap="round"
                     transform="rotate(-90 110 110)"
+                    className={isCameraActive ? 'camera-active-ring-pulse' : ''}
                     style={{
                         transition: `${isTimer && isRunning ? 'stroke-dashoffset 1s linear' : 'stroke-dashoffset 0.45s ease'}, stroke 0.45s ease, filter 0.45s ease`,
                         filter: isCompleted ? `drop-shadow(0 0 8px ${activeColor}88)` : 'none'
@@ -503,33 +676,76 @@ function ProgressRing({
                 </defs>
             </svg>
 
-            <div style={{
-                width: ringSize,
-                height: ringSize,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                <div
-                    className={!isTimer && isAnimating ? 'scale-in' : ''}
-                    style={{
-                        fontSize: isTimer ? timeFontSize : 'clamp(4rem, 12vw, 6rem)',
-                        fontWeight: '800',
-                        color: isCompleted ? activeColor : 'var(--text-primary)',
-                        lineHeight: 1,
-                        transition: 'color 0.45s ease, font-size 0.45s ease',
-                        fontVariantNumeric: 'tabular-nums',
-                        maxWidth: isTimer ? '88%' : undefined,
-                        whiteSpace: 'nowrap'
-                    }}
-                >
-                    {isTimer ? displayTime : displayCount}
+            {isCameraActive && (
+                <div className="camera-video-wrapper" style={{ width: `calc(${ringSize} - 24px)`, height: `calc(${ringSize} - 24px)` }}>
+                    <video 
+                        ref={videoRef} 
+                        className="camera-video-feed" 
+                        playsInline 
+                        muted 
+                        autoPlay
+                    />
+                    <div className="camera-scanning-line" style={{ '--exercise-color': activeColor }} />
+                    
+                    {cameraError === 'permission_denied' && (
+                        <div className="camera-calibration-overlay">
+                            <span style={{ fontSize: '0.8rem', color: '#f87171', fontWeight: '700' }}>
+                                {t ? t('counter.cameraNoPermission') : 'Accès caméra refusé'}
+                            </span>
+                        </div>
+                    )}
+                    
+                    {!cameraError && !isCalibrated && calibrateCountdown > 0 && (
+                        <div className="camera-calibration-overlay">
+                            <div className="camera-countdown-num" style={{ '--exercise-color': activeColor, fontSize: '4.5rem' }}>{calibrateCountdown}</div>
+                        </div>
+                    )}
+
+                    {!cameraError && !isCalibrated && calibrateCountdown === 0 && (
+                        <div className="camera-calibration-overlay">
+                            <span style={{ fontSize: '0.75rem', color: 'white', opacity: 0.8 }}>
+                                {t ? t('counter.cameraLoading') : 'Chargement...'}
+                            </span>
+                        </div>
+                    )}
                 </div>
-                <div style={{ fontSize: 'clamp(1rem, 3vw, 1.3rem)', color: 'var(--text-secondary)', marginTop: '8px' }}>
-                    / {isTimer ? goalTime : dailyGoal}
+            )}
+
+            {/* Reps / Timer Numbers */}
+            {!isCameraActive && (
+                <div style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    pointerEvents: 'none'
+                }}>
+                    <div
+                        className={!isTimer && isAnimating ? 'scale-in' : ''}
+                        style={{
+                            fontSize: isTimer ? timeFontSize : 'clamp(4rem, 12vw, 6rem)',
+                            fontWeight: '800',
+                            color: isCompleted ? activeColor : 'var(--text-primary)',
+                            lineHeight: 1,
+                            transition: 'color 0.45s ease, font-size 0.45s ease',
+                            fontVariantNumeric: 'tabular-nums',
+                            maxWidth: isTimer ? '88%' : undefined,
+                            whiteSpace: 'nowrap'
+                        }}
+                    >
+                        {isTimer ? displayTime : displayCount}
+                    </div>
+                    <div style={{ 
+                        fontSize: 'clamp(1rem, 3vw, 1.3rem)', 
+                        color: 'var(--text-secondary)', 
+                        marginTop: '8px'
+                    }}>
+                        / {isTimer ? goalTime : dailyGoal}
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
@@ -644,7 +860,7 @@ function CounterControls({
 }) {
     return (
         <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', width: '100%', maxWidth: '360px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'clamp(6px, 1vh, 8px)', width: '100%', maxWidth: '360px' }}>
                 {[1, 2, 5, 10].map(amount => (
                     <button
                         key={`plus-${amount}`}
@@ -652,7 +868,7 @@ function CounterControls({
                         className="glass hover-lift ripple"
                         disabled={isCompleted}
                         style={{
-                            padding: 'clamp(14px, 2vh, 20px) 8px',
+                            padding: 'clamp(12px, 2.2vh, 20px) 8px',
                             borderRadius: 'var(--radius-md)',
                             background: `linear-gradient(135deg, ${activeColor}2a, ${gradEnd}2a)`,
                             border: `1px solid ${activeColor}44`,
@@ -675,7 +891,7 @@ function CounterControls({
                 ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', width: '100%', maxWidth: '220px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'clamp(6px, 1vh, 8px)', width: '100%', maxWidth: '200px' }}>
                 {[1, 5].map(amount => {
                     const canDecrement = displayCount > 0;
                     return (
@@ -685,7 +901,7 @@ function CounterControls({
                             className="glass hover-lift ripple"
                             disabled={!canDecrement}
                             style={{
-                                padding: 'clamp(12px, 1.8vh, 18px) 8px',
+                                padding: 'clamp(10px, 1.8vh, 16px) 8px',
                                 borderRadius: 'var(--radius-md)',
                                 background: 'rgba(255, 255, 255, 0.05)',
                                 border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -748,7 +964,7 @@ function ActionButtons({
                 className="glass hover-lift"
                 disabled={displayCount === 0}
                 style={{
-                    padding: 'clamp(10px, 1.5vh, 14px) clamp(16px, 3vw, 24px)',
+                    padding: 'clamp(10px, 1.5vh, 13px) clamp(16px, 3vw, 24px)',
                     borderRadius: 'var(--radius-lg)',
                     background: 'rgba(239, 68, 68, 0.1)',
                     border: '1px solid rgba(239, 68, 68, 0.3)',
@@ -772,7 +988,7 @@ function ActionButtons({
                 className={`glass hover-lift${completeFlash ? ' complete-flash success-glow' : ''}`}
                 disabled={isCompleted}
                 style={{
-                    padding: 'clamp(10px, 1.5vh, 14px) clamp(16px, 3vw, 24px)',
+                    padding: 'clamp(10px, 1.5vh, 13px) clamp(16px, 3vw, 24px)',
                     borderRadius: 'var(--radius-lg)',
                     background: isCompleted
                         ? `linear-gradient(135deg, ${activeColor}33, ${gradEnd}33)`

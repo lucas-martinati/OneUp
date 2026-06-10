@@ -361,7 +361,13 @@
       "运动后好好呼吸。",
       "每天进步1%。"
     ],
-    "validated": "{{exercise}} 完成！"
+    "validated": "{{exercise}} 完成！",
+    "cameraMode": "Camera Counter",
+    "cameraCalibrate": "Recalibrate",
+    "cameraNoPermission": "Camera access denied",
+    "cameraLoading": "Starting camera...",
+    "cameraCalibrating": "Calibrating in {{count}}s...",
+    "cameraModeDesc": "将手机放在脸下方的地面上。相机会自动记录您的俯卧撑次数。"
   },
   "customExercises": {
     "categoryLabel": "类别",

@@ -361,7 +361,13 @@
       "努力した後はよく呼吸してください。",
       "毎日 1% 改善します。"
     ],
-    "validated": "{{exercise}} 完了しました!"
+    "validated": "{{exercise}} 完了しました!",
+    "cameraMode": "Camera Counter",
+    "cameraCalibrate": "Recalibrate",
+    "cameraNoPermission": "Camera access denied",
+    "cameraLoading": "Starting camera...",
+    "cameraCalibrating": "Calibrating in {{count}}s...",
+    "cameraModeDesc": "顔の下の床にスマートフォンを置いてください。カメラが自動的に腕立て伏せをカウントします。"
   },
   "customExercises": {
     "categoryLabel": "カテゴリー",

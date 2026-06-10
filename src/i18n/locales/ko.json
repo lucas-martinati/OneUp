@@ -361,7 +361,13 @@
       "노력한 후에는 숨을 잘 쉬십시오.",
       "매일 1% 더 좋아집니다."
     ],
-    "validated": "{{exercise}} 완료되었습니다!"
+    "validated": "{{exercise}} 완료되었습니다!",
+    "cameraMode": "Camera Counter",
+    "cameraCalibrate": "Recalibrate",
+    "cameraNoPermission": "Camera access denied",
+    "cameraLoading": "Starting camera...",
+    "cameraCalibrating": "Calibrating in {{count}}s...",
+    "cameraModeDesc": "얼굴 아래 바닥에 휴대폰을 놓으세요. 자동으로 푸시업을 감지합니다."
   },
   "customExercises": {
     "categoryLabel": "카테고리",

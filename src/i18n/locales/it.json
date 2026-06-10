@@ -361,7 +361,13 @@
       "Respira bene dopo lo sforzo.",
       "1% meglio ogni giorno."
     ],
-    "validated": "{{exercise}} Completo!"
+    "validated": "{{exercise}} Completo!",
+    "cameraMode": "Camera Counter",
+    "cameraCalibrate": "Recalibrate",
+    "cameraNoPermission": "Camera access denied",
+    "cameraLoading": "Starting camera...",
+    "cameraCalibrating": "Calibrating in {{count}}s...",
+    "cameraModeDesc": "Posiziona il telefono sul pavimento sotto il viso. La fotocamera conta automaticamente i piegamenti."
   },
   "customExercises": {
     "categoryLabel": "Categoria",

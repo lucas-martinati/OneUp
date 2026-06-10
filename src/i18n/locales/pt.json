@@ -361,7 +361,13 @@
       "Respire bem após o esforço.",
       "1% melhor a cada dia."
     ],
-    "validated": "{{exercise}} Concluído!"
+    "validated": "{{exercise}} Concluído!",
+    "cameraMode": "Camera Counter",
+    "cameraCalibrate": "Recalibrate",
+    "cameraNoPermission": "Camera access denied",
+    "cameraLoading": "Starting camera...",
+    "cameraCalibrating": "Calibrating in {{count}}s...",
+    "cameraModeDesc": "Coloque o telefone no chão sob o seu rosto. A câmera conta as suas flexões automaticamente."
   },
   "customExercises": {
     "categoryLabel": "Categoria",
