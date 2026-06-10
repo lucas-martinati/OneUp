@@ -46,10 +46,18 @@ export const DashboardSlide = React.memo(({
         <div
             className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative hide-scrollbar gap-responsive ${isDay100 ? 'dashboard-glitch-bg' : (isDayPerfect ? styles.goldBg : '')}`}
             style={{
-                paddingTop: title ? 'clamp(6px, 1vh, 12px)' : '0',
+                paddingTop: title ? 'var(--dashboard-slide-padding-top, clamp(6px, 1vh, 12px))' : '0',
                 transition: 'all 0.6s ease-in-out',
                 overflowY: 'auto',
-                overflowX: 'hidden'
+                overflowX: 'hidden',
+                ...(title ? {
+                    '--day-num-height': 'var(--day-num-height-with-title, var(--day-num-height))',
+                    '--day-num-font-size': 'var(--day-num-font-size-with-title, var(--day-num-font-size))',
+                    '--exercise-btn-min-height': 'var(--exercise-btn-min-height-with-title, var(--exercise-btn-min-height))',
+                    '--done-text-margin': 'var(--done-text-margin-with-title, var(--done-text-margin))',
+                    '--done-text-size': 'var(--done-text-size-with-title, var(--done-text-size))',
+                    '--bottom-btn-size': 'var(--bottom-btn-size-with-title, var(--bottom-btn-size))'
+                } : {})
             }}
         >
             {isDayPerfect && (
@@ -76,7 +84,7 @@ export const DashboardSlide = React.memo(({
             {title && (
                 <div className="flex-align-center" style={{ gap: '8px' }}>
                     <div style={{
-                        fontSize: '0.8rem', fontWeight: '800',
+                        fontSize: 'var(--category-title-size, 0.8rem)', fontWeight: '800',
                         color: isDayPerfect ? '#ffdf00' : (categoryColor || 'var(--text-secondary)'),
                         textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8,
                         textShadow: isDayPerfect ? '0 0 10px rgba(255,223,0,0.5)' : 'none'
@@ -112,13 +120,13 @@ export const DashboardSlide = React.memo(({
 
                         {/* Big animated day number */}
                         <div className="flex-center pos-relative overflow-hidden" style={{
-                            height: 'clamp(2.4rem, 8vh, 6.5rem)',
+                            height: 'var(--day-num-height, clamp(2.4rem, 8vh, 6.5rem))',
                             marginBottom: 'clamp(2px, 0.4vh, 6px)',
                             filter: isDay100 ? 'drop-shadow(0 0 15px rgba(239,68,68,0.4))' : (isDayPerfect ? 'drop-shadow(0 0 15px rgba(251,191,36,0.2))' : 'none')
                         }}>
                             {isCounterTransitioning && prevDayNumber && (
                                 <div className={isDay100 ? 'glitch-text' : (isDayPerfect ? 'gold-text' : 'rainbow-gradient')} style={{
-                                    position: 'absolute', fontSize: 'clamp(2.2rem, 7.5vh, 6rem)', fontWeight: '800', lineHeight: 1,
+                                    position: 'absolute', fontSize: 'var(--day-num-font-size, clamp(2.2rem, 7.5vh, 6rem))', fontWeight: '800', lineHeight: 1,
                                     animation: isDay100
                                         ? 'textGlitch 0.6s infinite, counterSlideDown 1s ease-out forwards'
                                         : (isDayPerfect
@@ -133,7 +141,7 @@ export const DashboardSlide = React.memo(({
                                 className={isDay100 ? 'glitch-text' : (isDayPerfect ? 'gold-text' : 'rainbow-gradient')}
                                 data-text={isDay100 ? dayNumber : undefined}
                                 style={{
-                                    fontSize: 'clamp(2.2rem, 7.5vh, 6rem)', fontWeight: '800', lineHeight: 1,
+                                    fontSize: 'var(--day-num-font-size, clamp(2.2rem, 7.5vh, 6rem))', fontWeight: '800', lineHeight: 1,
                                     animation: isDay100
                                         ? (isCounterTransitioning ? 'textGlitch 0.6s infinite, counterSlideUp 1s ease-out' : 'textGlitch 0.6s infinite')
                                         : (isCounterTransitioning
@@ -148,7 +156,7 @@ export const DashboardSlide = React.memo(({
 
                     {/* ── Exercise Selector ── */}
                     <div className="exercise-grid flex-row flex-wrap flex-justify-center" style={{
-                        gap: 'clamp(4px, 1vh, 8px)', width: '100%', maxWidth: '640px',
+                        gap: 'var(--exercise-btn-gap, clamp(4px, 1vh, 8px))', width: '100%', maxWidth: '640px',
                         padding: '2px'
                     }}>
                         {exercisesList.map(ex => (
@@ -171,8 +179,8 @@ export const DashboardSlide = React.memo(({
                     {/* ── Progress ring + Counter button + Completion status (grouped) ── */}
                     <div className="flex-col flex-align-center gap-responsive">
                         <div className="flex-center pos-relative" style={{
-                            width: 'clamp(64px, 10vh, 96px)',
-                            height: 'clamp(64px, 10vh, 96px)'
+                            width: 'var(--bottom-btn-size, clamp(72px, 12vh, 110px))',
+                            height: 'var(--bottom-btn-size, clamp(72px, 12vh, 110px))'
                         }}>
                             {/* Year progress ring */}
                             <svg viewBox="0 0 100 100" className={isDay100 ? 'day100-ring' : ''} style={{
@@ -233,9 +241,9 @@ export const DashboardSlide = React.memo(({
                                             background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
                                             pointerEvents: 'none'
                                         }} />
-                                        <UI_ICONS.Check size={22} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
+                                        <UI_ICONS.Check size={26} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
                                         <span style={{
-                                            fontSize: 'clamp(0.45rem, 1vh, 0.65rem)',
+                                            fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)',
                                             color: 'white',
                                             fontWeight: '800',
                                             textShadow: '0 1px 2px rgba(0,0,0,0.3)',
@@ -250,8 +258,8 @@ export const DashboardSlide = React.memo(({
                                     </>
                                 ) : (
                                     <>
-                                        <DynamicIcon icon={safeSelectedExercise.icon} size={20} color={safeSelectedExercise.color} />
-                                        <span style={{ fontSize: 'clamp(0.42rem, 1vh, 0.6rem)', color: safeSelectedExercise.color, fontWeight: '700' }}>
+                                        <DynamicIcon icon={safeSelectedExercise.icon} size={22} color={safeSelectedExercise.color} />
+                                        <span style={{ fontSize: 'clamp(0.45rem, 1.2vh, 0.65rem)', color: safeSelectedExercise.color, fontWeight: '700' }}>
                                             {safeSelectedExercise.type === 'timer'
                                                 ? `${formatTime(currentCount)}/${formatTime(dailyGoal)}`
                                                 : `${currentCount}/${dailyGoal}`}
@@ -262,21 +270,32 @@ export const DashboardSlide = React.memo(({
                         </div>
 
                         {/* Completion status (under button with spacing) */}
-                        {isExerciseDone && (() => {
+                        {(() => {
                             const exData = completions[today]?.[activeExerciseId];
                             const completedAt = exData?.timestamp ? parseTimestamp(exData.timestamp) : null;
                             const timeStr = completedAt
                                 ? completedAt.toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' })
                                 : null;
-                            return timeStr ? (
-                                <div className="scale-in" style={{
-                                    color: 'var(--text-secondary)', fontWeight: '500',
-                                    marginTop: 'clamp(4px, 0.8vh, 6px)', opacity: 0.75,
-                                    fontSize: 'clamp(0.65rem, 2.5vw, 0.85rem)'
-                                }}>
-                                    {t('dashboard.doneAt', { time: timeStr })}
+                            const showDoneText = isExerciseDone && !!timeStr;
+                            return (
+                                <div 
+                                    className={showDoneText ? "scale-in" : ""} 
+                                    style={{
+                                        color: 'var(--text-secondary)', 
+                                        fontWeight: '500',
+                                        marginTop: 'var(--done-text-margin, clamp(4px, 0.8vh, 6px))', 
+                                        opacity: showDoneText ? 0.75 : 0,
+                                        visibility: showDoneText ? 'visible' : 'hidden',
+                                        fontSize: 'var(--done-text-size, clamp(0.65rem, 2.5vw, 0.85rem))',
+                                        transition: 'opacity 0.2s ease, visibility 0.2s ease',
+                                        pointerEvents: 'none',
+                                        textAlign: 'center',
+                                        minHeight: '1.2em'
+                                    }}
+                                >
+                                    {showDoneText ? t('dashboard.doneAt', { time: timeStr }) : '\u00A0'}
                                 </div>
-                            ) : null;
+                            );
                         })()}
                     </div>
                 </>
@@ -316,10 +335,10 @@ const ExerciseButton = React.memo(({
                 minWidth: 'clamp(60px, 18vw, 100px)',
                 maxWidth: '130px',
                 display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: 'clamp(2px, 0.4vh, 5px)',
-                padding: 'clamp(6px, 1vh, 10px) clamp(4px, 0.8vw, 8px)',
+                alignItems: 'center', gap: 'var(--exercise-btn-gap, clamp(2px, 0.4vh, 5px))',
+                padding: 'var(--exercise-btn-padding, clamp(8px, 1.2vh, 12px) clamp(4px, 0.8vw, 8px))',
                 borderRadius: 'var(--radius-md)',
-                minHeight: 'clamp(36px, 6vh, 44px)',
+                minHeight: 'var(--exercise-btn-min-height, clamp(44px, 7.2vh, 58px))',
                 background: exDone
                     ? `linear-gradient(135deg, ${ex.color}20, ${ex.gradient[1]}18)`
                     : isActive
@@ -360,7 +379,7 @@ const ExerciseButton = React.memo(({
                 style={{ transition: 'color 0.2s ease' }}
             />
             <span style={{
-                fontSize: 'clamp(0.55rem, 1.2vh, 0.75rem)', fontWeight: '600',
+                fontSize: 'clamp(0.55rem, 1.25vh, 0.78rem)', fontWeight: '600',
                 color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
                 textAlign: 'center', lineHeight: '1.1',
                 transition: 'color 0.2s ease'
@@ -368,7 +387,7 @@ const ExerciseButton = React.memo(({
                 {getExerciseLabel(ex)}
             </span>
             <span style={{
-                fontSize: 'clamp(0.6rem, 1.3vh, 0.8rem)', fontWeight: '700',
+                fontSize: 'clamp(0.6rem, 1.35vh, 0.82rem)', fontWeight: '700',
                 color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
                 opacity: exDone ? 1 : isActive ? 1 : 0.6,
                 transition: 'color 0.2s ease',
@@ -383,7 +402,7 @@ const ExerciseButton = React.memo(({
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '-2px' }}>
                 {WEIGHT_EXERCISES_MAP[ex.id] && (
                     <span style={{
-                        fontSize: 'clamp(0.45rem, 1vh, 0.6rem)',
+                        fontSize: 'clamp(0.42rem, 1vh, 0.6rem)',
                         color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
                         opacity: exDone ? 1 : 0.8,
                         filter: exDone ? 'none' : 'grayscale(50%)'
@@ -393,7 +412,7 @@ const ExerciseButton = React.memo(({
                 )}
                 {exStreak > 0 && (
                     <span style={{
-                        fontSize: 'clamp(0.45rem, 1vh, 0.6rem)',
+                        fontSize: 'clamp(0.42rem, 1vh, 0.6rem)',
                         color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
                         opacity: exDone ? 1 : 0.6,
                         filter: exDone ? 'none' : 'grayscale(100%)'
