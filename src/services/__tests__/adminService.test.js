@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref, get, set, update } from 'firebase/database';
-import { getDatabaseInstance } from '../firebase';
 import {
   fetchAllUsersData,
   saveUserData,

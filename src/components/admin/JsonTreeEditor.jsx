@@ -14,23 +14,6 @@ function setDeepValue(obj, path, value) {
   return newObj;
 }
 
-// Deep immutable deletes
-function deleteDeepValue(obj, path) {
-  if (!path) return {};
-  const parts = path.split('.');
-  const newObj = JSON.parse(JSON.stringify(obj));
-  let current = newObj;
-  for (let i = 0; i < parts.length - 1; i++) {
-    current = current[parts[i]];
-  }
-  if (Array.isArray(current)) {
-    current.splice(Number(parts[parts.length - 1]), 1);
-  } else {
-    delete current[parts[parts.length - 1]];
-  }
-  return newObj;
-}
-
 function JsonTreeNode({ 
   name, 
   value, 
@@ -321,11 +304,6 @@ export function JsonTreeEditor({ value, onChange }) {
 
   const handleValueChange = (path, newValue) => {
     const updated = setDeepValue(parsedValue, path, newValue);
-    onChange(updated);
-  };
-
-  const handleDelete = (path) => {
-    const updated = deleteDeepValue(parsedValue, path);
     onChange(updated);
   };
 
