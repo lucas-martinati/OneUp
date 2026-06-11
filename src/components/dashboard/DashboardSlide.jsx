@@ -182,6 +182,13 @@ export const DashboardSlide = React.memo(({
                             width: 'var(--bottom-btn-size, clamp(72px, 12vh, 110px))',
                             height: 'var(--bottom-btn-size, clamp(72px, 12vh, 110px))'
                         }}>
+                            {/* Ambient halo behind the counter button */}
+                            <div style={{
+                                position: 'absolute', inset: '-45%', borderRadius: '50%',
+                                background: `radial-gradient(circle, ${safeSelectedExercise.color}${isExerciseDone ? '38' : '24'} 0%, transparent 62%)`,
+                                pointerEvents: 'none',
+                                transition: 'background 0.6s ease'
+                            }} />
                             {/* Year progress ring */}
                             <svg viewBox="0 0 100 100" className={isDay100 ? 'day100-ring' : ''} style={{
                                 position: 'absolute', top: '50%', left: '50%',
@@ -325,6 +332,7 @@ const ExerciseButton = React.memo(({
     const { difficulty: exDiff, weight } = getConfig(ex.id, today);
     const exGoal = getDailyGoal(ex, dayNumber, exDiff);
     const exDone = completions[today]?.[ex.id]?.isCompleted || exCount >= exGoal;
+    const exPct = exDone ? 100 : Math.min(100, (exCount / Math.max(exGoal, 1)) * 100);
 
     return (
         <button
@@ -340,10 +348,10 @@ const ExerciseButton = React.memo(({
                 borderRadius: 'var(--radius-md)',
                 minHeight: 'var(--exercise-btn-min-height, clamp(44px, 7.2vh, 58px))',
                 background: exDone
-                    ? `linear-gradient(135deg, ${ex.color}20, ${ex.gradient[1]}18)`
+                    ? `linear-gradient(160deg, ${ex.color}26 0%, ${ex.gradient[1]}14 100%)`
                     : isActive
-                        ? `linear-gradient(135deg, ${ex.color}28, ${ex.gradient[0]}28)`
-                        : 'var(--surface-subtle)',
+                        ? `linear-gradient(160deg, ${ex.color}2e 0%, ${ex.gradient[0]}16 100%)`
+                        : `linear-gradient(160deg, ${ex.color}0d 0%, var(--surface-subtle) 80%)`,
                 border: exDone
                     ? `1.5px solid ${ex.color}66`
                     : isActive
@@ -352,32 +360,65 @@ const ExerciseButton = React.memo(({
                 cursor: 'pointer',
                 transition: 'all 0.25s ease',
                 position: 'relative',
+                overflow: 'hidden',
                 '--done-color': `${ex.color}55`,
                 '--done-color-dim': `${ex.color}12`,
                 animation: exDone ? 'doneGlow 3s ease-in-out infinite' : 'none',
-                boxShadow: exDone ? `0 0 8px ${ex.color}33` : 'none'
+                boxShadow: exDone
+                    ? `0 0 8px ${ex.color}33`
+                    : isActive
+                        ? `0 4px 16px ${ex.color}22`
+                        : 'none'
             }}
         >
-            {/* Done checkmark */}
+            {/* Done checkmark (top-right corner) */}
             {exDone && (
                 <div style={{
-                    position: 'absolute', top: '-4px', right: '-4px',
-                    width: '16px', height: '16px', borderRadius: '50%',
+                    position: 'absolute', top: '3px', right: '3px',
+                    width: '15px', height: '15px', borderRadius: '50%',
                     background: `linear-gradient(135deg, ${ex.gradient[0]}, ${ex.gradient[1]})`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     boxShadow: `0 0 8px ${ex.color}66`,
                     animation: 'checkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     zIndex: 1
                 }}>
-                    <span style={{ fontSize: '9px', color: 'white', fontWeight: '700', lineHeight: 1 }}>✓</span>
+                    <span style={{ fontSize: '8px', color: 'white', fontWeight: '700', lineHeight: 1 }}>✓</span>
                 </div>
             )}
-            <DynamicIcon
-                icon={ex.icon}
-                size={18}
-                color={exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)'}
-                style={{ transition: 'color 0.2s ease' }}
-            />
+            {/* Streak badge (top-left corner — keeps the tile height stable) */}
+            {exStreak > 0 && (
+                <span style={{
+                    position: 'absolute', top: '3px', left: '3px',
+                    display: 'flex', alignItems: 'center', gap: '1px',
+                    fontSize: 'clamp(0.52rem, 1.2vh, 0.7rem)',
+                    fontWeight: '700',
+                    padding: '1px 5px',
+                    borderRadius: '999px',
+                    background: 'rgba(0, 0, 0, 0.35)',
+                    border: '1px solid rgba(249, 115, 22, 0.3)',
+                    color: 'var(--text-primary)',
+                    lineHeight: 1.4,
+                    zIndex: 1
+                }}>
+                    🔥{exStreak}
+                </span>
+            )}
+            {/* Icon in a tinted chip — always carries the exercise color */}
+            <div style={{
+                width: 'clamp(24px, 3.6vh, 30px)', height: 'clamp(24px, 3.6vh, 30px)',
+                borderRadius: '30%',
+                background: `${ex.color}${exDone || isActive ? '2e' : '16'}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+                transition: 'background 0.25s ease'
+            }}>
+                <DynamicIcon
+                    icon={ex.icon}
+                    size={16}
+                    color={ex.color}
+                    style={{ transition: 'opacity 0.2s ease', opacity: exDone || isActive ? 1 : 0.85 }}
+                />
+            </div>
             <span style={{
                 fontSize: 'clamp(0.55rem, 1.25vh, 0.78rem)', fontWeight: '600',
                 color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
@@ -388,38 +429,49 @@ const ExerciseButton = React.memo(({
             </span>
             <span style={{
                 fontSize: 'clamp(0.6rem, 1.35vh, 0.82rem)', fontWeight: '700',
-                color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
-                opacity: exDone ? 1 : isActive ? 1 : 0.6,
+                color: exDone ? ex.color : isActive ? ex.color : 'var(--text-primary)',
+                opacity: exDone ? 1 : isActive ? 1 : 0.75,
                 transition: 'color 0.2s ease',
-                textDecorationLine: exDone ? 'line-through' : 'none',
-                textDecorationColor: `${ex.color}88`
+                fontVariantNumeric: 'tabular-nums',
+                whiteSpace: 'nowrap'
             }}>
-                {ex.type === 'timer'
-                                                ? (exDone ? formatTime(exGoal) : `${formatTime(exCount)}/${formatTime(exGoal)}`)
-                                                : (exDone ? exGoal : `${exCount}/${exGoal}`)
-                                            }
-            </span>
-            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '-2px' }}>
+                <span style={{
+                    textDecorationLine: exDone ? 'line-through' : 'none',
+                    textDecorationColor: `${ex.color}88`
+                }}>
+                    {ex.type === 'timer'
+                        ? (exDone ? formatTime(exGoal) : `${formatTime(exCount)}/${formatTime(exGoal)}`)
+                        : (exDone ? exGoal : `${exCount}/${exGoal}`)
+                    }
+                </span>
                 {WEIGHT_EXERCISES_MAP[ex.id] && (
                     <span style={{
-                        fontSize: 'clamp(0.42rem, 1vh, 0.6rem)',
-                        color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
-                        opacity: exDone ? 1 : 0.8,
-                        filter: exDone ? 'none' : 'grayscale(50%)'
+                        fontSize: 'clamp(0.52rem, 1.2vh, 0.7rem)', fontWeight: '700',
+                        marginLeft: '5px',
+                        padding: '1px 6px',
+                        borderRadius: '999px',
+                        background: `${ex.color}1f`,
+                        border: `1px solid ${ex.color}30`,
+                        color: ex.color,
+                        verticalAlign: 'middle'
                     }}>
-                        🏋️{weight}kg
+                        {weight}kg
                     </span>
                 )}
-                {exStreak > 0 && (
-                    <span style={{
-                        fontSize: 'clamp(0.42rem, 1vh, 0.6rem)',
-                        color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
-                        opacity: exDone ? 1 : 0.6,
-                        filter: exDone ? 'none' : 'grayscale(100%)'
-                    }}>
-                        🔥{exStreak}
-                    </span>
-                )}
+            </span>
+            {/* Per-tile progress bar */}
+            <div style={{
+                position: 'absolute', left: 0, right: 0, bottom: 0,
+                height: '3px',
+                background: `${ex.color}14`
+            }}>
+                <div style={{
+                    height: '100%',
+                    width: `${exPct}%`,
+                    background: `linear-gradient(90deg, ${ex.gradient[0]}, ${ex.gradient[1]})`,
+                    boxShadow: exPct > 0 ? `0 0 6px ${ex.color}88` : 'none',
+                    transition: 'width 0.4s ease'
+                }} />
             </div>
         </button>
     );

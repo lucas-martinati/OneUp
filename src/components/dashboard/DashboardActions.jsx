@@ -15,7 +15,14 @@ export const DashboardActions = React.memo(({
     const sessionInProgress = useUIStore(s => s.sessionInProgress);
     const pauseCloudSync = useCloudSyncStore(s => s.pauseCloudSync);
 
-    const background = `linear-gradient(135deg, ${activeCategoryColor || selectedExercise.color}28, ${activeCategoryColor || (selectedExercise.gradient && selectedExercise.gradient[0]) || selectedExercise.color}28)`;
+    const accent = activeCategoryColor || selectedExercise.color;
+    const gradEnd = activeCategoryColor || (selectedExercise.gradient && selectedExercise.gradient[0]) || selectedExercise.color;
+    const background = `linear-gradient(135deg, ${accent}28, ${gradEnd}28)`;
+    const accentStyle = {
+        background,
+        border: `1px solid ${accent}38`,
+        transition: 'background 0.4s ease, border-color 0.4s ease'
+    };
 
     return (
         <div className={`${styles.actions} ${isDay100 ? 'day100-actions' : ''}`}>
@@ -23,9 +30,9 @@ export const DashboardActions = React.memo(({
             <button
                 onClick={() => openModal('calendar')}
                 className={`${styles.actionBtn} hover-lift`}
-                style={{ background }}
+                style={accentStyle}
             >
-                <CalendarIcon size={18} />
+                <CalendarIcon size={18} color={accent} />
                 {t('dashboard.calendar')}
             </button>
 
@@ -36,9 +43,9 @@ export const DashboardActions = React.memo(({
                     pauseCloudSync?.();
                 }}
                 className={`${styles.actionBtn} hover-lift`}
-                style={{ background }}
+                style={accentStyle}
             >
-                <Play size={18} />
+                <Play size={18} color={accent} />
                 {sessionInProgress ? t('dashboard.editSession') : t('dashboard.session')}
             </button>
         </div>

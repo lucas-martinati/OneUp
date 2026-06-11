@@ -63,6 +63,7 @@ export function ExercisePanelHeader({ activeColor, exerciseConfig, exerciseLabel
                 )}
                 <button
                     onClick={onClose}
+                    aria-label={t('common.close', 'Fermer')}
                     className="glass hover-lift"
                     style={{
                         width: 'var(--touch-min)',

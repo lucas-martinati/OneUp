@@ -5,7 +5,8 @@ const config = {
     "src/components/index.js",
     "src/components/*/index.js",
     "src/services/*Service.js",
-    "coverage/**"
+    "coverage/**",
+    "scratch/**"
   ],
   ignoreDependencies: [
     "@capacitor/android", // Indispensable pour GitHub Actions
