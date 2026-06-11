@@ -2,7 +2,7 @@ export { Dashboard } from './Dashboard';
 export { CSSConfetti } from './feedback/CSSConfetti';
 export { NotificationManager } from './social/NotificationManager';
 export { ConflictOverlay } from './ui/ConflictOverlay';
-export { DashboardHeader, DashboardSlide, DashboardActions, ProPaywall } from './dashboard';
+export { DashboardHeader, DashboardSlide, DashboardNavBar, ProPaywall } from './dashboard';
 export { Day100Overlay, Day100HackModal, Day100UnhackAnimation, useDay100Logic } from '../features/events/Day100Event';
 export { useAchievementToast } from '../hooks/useAchievementToast';
 export { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../config/categories';

@@ -5,7 +5,7 @@ import { NotificationManager } from './social/NotificationManager';
 import { ConflictOverlay } from './ui/ConflictOverlay';
 import { ConfirmDialog } from './ui/ConfirmDialog';
 import { DashboardHeader } from './dashboard/DashboardHeader';
-import { DashboardActions } from './dashboard/DashboardActions';
+import { DashboardNavBar } from './dashboard/DashboardNavBar';
 import { SessionBubble } from './dashboard/SessionBubble';
 import { CategoryNav } from './dashboard/CategoryNav';
 import { Day100Overlay, Day100HackModal, Day100UnhackAnimation, useDay100Logic } from '../features/events/Day100Event';
@@ -296,7 +296,7 @@ export function Dashboard() {
                     />
                 </main>
 
-                <DashboardActions
+                <DashboardNavBar
                     selectedExercise={selectedExercise}
                     activeCategoryColor={fullCategoryColors[fullCategoryOrder[effectiveSlide]]}
                     isDay100={hackActive}

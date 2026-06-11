@@ -42,6 +42,12 @@ export const DashboardSlide = React.memo(({
 
     const isDayPerfect = isPerfectDay(completions[today], exercisesList);
 
+    // Compact sizes only when the tile grid is at full height (4 rows = 10+
+    // exercises) AND a category title row eats vertical space. Pages with
+    // fewer tiles (e.g. weights) keep the same sizes as the default category.
+    const gridRows = Math.ceil(exercisesList.length / 3);
+    const isCompact = !!title && gridRows >= 4;
+
     return (
         <div
             className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative hide-scrollbar gap-responsive ${isDay100 ? 'dashboard-glitch-bg' : (isDayPerfect ? styles.goldBg : '')}`}
@@ -50,7 +56,8 @@ export const DashboardSlide = React.memo(({
                 transition: 'all 0.6s ease-in-out',
                 overflowY: 'auto',
                 overflowX: 'hidden',
-                ...(title ? {
+                ...(isCompact ? {
+                    '--day-label-size': 'var(--day-label-size-with-title, var(--day-label-size))',
                     '--day-num-height': 'var(--day-num-height-with-title, var(--day-num-height))',
                     '--day-num-font-size': 'var(--day-num-font-size-with-title, var(--day-num-font-size))',
                     '--exercise-btn-min-height': 'var(--exercise-btn-min-height-with-title, var(--exercise-btn-min-height))',
@@ -108,7 +115,7 @@ export const DashboardSlide = React.memo(({
                     {/* Day & Goal Hero Section */}
                     <div style={{ textAlign: 'center', position: 'relative' }}>
                         <div style={{
-                            fontSize: 'clamp(0.75rem, 1.6vh, 1rem)',
+                            fontSize: 'var(--day-label-size, clamp(0.75rem, 1.6vh, 1rem))',
                             color: isDay100 ? '#ef4444' : (isDayPerfect ? '#ffdf00' : 'var(--text-secondary)'),
                             textTransform: 'uppercase', letterSpacing: '4px',
                             marginBottom: '2px', fontWeight: '700',

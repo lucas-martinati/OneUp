@@ -17,13 +17,14 @@
   /* Dashboard sizes */
   --exercise-btn-min-height: clamp(58px, 9.2vh, 80px);
   --bottom-btn-size: clamp(72px, 12vh, 110px);
-  --category-title-size: 0.8rem;
+  --category-title-size: 0.7rem;
+  --day-label-size-with-title: clamp(0.7rem, 1.45vh, 0.9rem);
   --day-num-height-with-title: clamp(2rem, 6.5vh, 5.5rem);
   --day-num-font-size-with-title: clamp(1.8rem, 6vh, 5rem);
-  --exercise-btn-min-height-with-title: clamp(50px, 7.8vh, 68px);
+  --exercise-btn-min-height-with-title: clamp(46px, 7vh, 60px);
   --done-text-margin-with-title: clamp(2px, 0.4vh, 4px);
   --done-text-size-with-title: clamp(0.6rem, 2.2vw, 0.78rem);
-  --bottom-btn-size-with-title: clamp(66px, 11vh, 96px);
+  --bottom-btn-size-with-title: clamp(60px, 10vh, 84px);
 
   /* Motion */
   --ease-panel-in: cubic-bezier(0.16, 1, 0.3, 1);
@@ -2465,13 +2466,14 @@ input:checked + .slider:before { transform: translateX(20px); }
   :root {
     --exercise-btn-min-height: clamp(50px, 8.2vh, 64px);
     --bottom-btn-size: clamp(66px, 11vh, 90px);
-    --category-title-size: 0.72rem;
+    --category-title-size: 0.65rem;
+    --day-label-size-with-title: clamp(0.62rem, 1.3vh, 0.78rem);
     --day-num-height-with-title: clamp(1.7rem, 5.2vh, 3.4rem);
     --day-num-font-size-with-title: clamp(1.5rem, 4.8vh, 3rem);
-    --exercise-btn-min-height-with-title: clamp(44px, 7.2vh, 56px);
+    --exercise-btn-min-height-with-title: clamp(40px, 6.6vh, 50px);
     --done-text-margin-with-title: 2px;
     --done-text-size-with-title: 0.62rem;
-    --bottom-btn-size-with-title: clamp(58px, 10vh, 78px);
+    --bottom-btn-size-with-title: clamp(52px, 9vh, 70px);
   }
   #root {
     padding: 6px !important;
@@ -2488,13 +2490,14 @@ input:checked + .slider:before { transform: translateX(20px); }
   :root {
     --exercise-btn-min-height: clamp(44px, 7.4vh, 54px);
     --bottom-btn-size: clamp(56px, 10vh, 76px);
-    --category-title-size: 0.65rem;
+    --category-title-size: 0.6rem;
+    --day-label-size-with-title: clamp(0.58rem, 1.2vh, 0.7rem);
     --day-num-height-with-title: clamp(1.4rem, 4.4vh, 2.5rem);
     --day-num-font-size-with-title: clamp(1.2rem, 4vh, 2.2rem);
-    --exercise-btn-min-height-with-title: clamp(38px, 6.4vh, 48px);
+    --exercise-btn-min-height-with-title: clamp(36px, 6vh, 44px);
     --done-text-margin-with-title: 1px;
     --done-text-size-with-title: 0.58rem;
-    --bottom-btn-size-with-title: clamp(50px, 9vh, 66px);
+    --bottom-btn-size-with-title: clamp(46px, 8.4vh, 58px);
   }
   #root {
     padding: 4px !important;

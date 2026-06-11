@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { SettingsIcon, PieChart, Users, Shield, Flame, Trophy } from '../../utils/icons';
+import { Shield, Flame, Trophy } from '../../utils/icons';
 import { useUIStore } from '../../store/useUIStore';
 
 export const DashboardHeader = React.memo(({
@@ -107,16 +107,6 @@ export const DashboardHeader = React.memo(({
                         <Shield size={19} />
                     </button>
                 )}
-                <button onClick={() => openModal('settings')} aria-label="Settings" className="hover-lift" style={iconBtnStyle}>
-                    <SettingsIcon size={19} />
-                </button>
-                <button onClick={() => openModal('stats')} aria-label="Statistics" className="hover-lift" style={iconBtnStyle}>
-                    <PieChart size={19} />
-                </button>
-                <button onClick={() => openModal('leaderboard')} aria-label="Leaderboard" className="hover-lift" style={iconBtnStyle}>
-                    <Users size={19} />
-                </button>
-
 
                 {/* Global streak badge */}
                 <div 
