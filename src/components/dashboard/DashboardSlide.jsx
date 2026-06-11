@@ -42,11 +42,11 @@ export const DashboardSlide = React.memo(({
 
     const isDayPerfect = isPerfectDay(completions[today], exercisesList);
 
-    // Compact sizes only when the tile grid is at full height (4 rows = 10+
-    // exercises) AND a category title row eats vertical space. Pages with
-    // fewer tiles (e.g. weights) keep the same sizes as the default category.
+    // Compact sizes whenever the tile grid is at full height (4 rows = 10+
+    // exercises) — with or without a category title row. Pages with fewer
+    // tiles (e.g. weights) keep the same sizes as a small category.
     const gridRows = Math.ceil(exercisesList.length / 3);
-    const isCompact = !!title && gridRows >= 4;
+    const isCompact = gridRows >= 4;
 
     return (
         <div
@@ -54,15 +54,17 @@ export const DashboardSlide = React.memo(({
             style={{
                 paddingTop: title ? 'var(--dashboard-slide-padding-top, clamp(6px, 1vh, 12px))' : '0',
                 transition: 'all 0.6s ease-in-out',
-                overflowY: 'auto',
-                overflowX: 'hidden',
+                overflow: 'hidden',
                 ...(isCompact ? {
+                    '--exercise-btn-min-height': 'var(--exercise-btn-min-height-with-title, var(--exercise-btn-min-height))',
+                    '--done-text-margin': 'var(--done-text-margin-with-title, var(--done-text-margin))',
+                    '--done-text-size': 'var(--done-text-size-with-title, var(--done-text-size))'
+                } : {}),
+                // Hero + counter button only shrink when a title row eats space on top
+                ...(isCompact && title ? {
                     '--day-label-size': 'var(--day-label-size-with-title, var(--day-label-size))',
                     '--day-num-height': 'var(--day-num-height-with-title, var(--day-num-height))',
                     '--day-num-font-size': 'var(--day-num-font-size-with-title, var(--day-num-font-size))',
-                    '--exercise-btn-min-height': 'var(--exercise-btn-min-height-with-title, var(--exercise-btn-min-height))',
-                    '--done-text-margin': 'var(--done-text-margin-with-title, var(--done-text-margin))',
-                    '--done-text-size': 'var(--done-text-size-with-title, var(--done-text-size))',
                     '--bottom-btn-size': 'var(--bottom-btn-size-with-title, var(--bottom-btn-size))'
                 } : {})
             }}
@@ -116,6 +118,7 @@ export const DashboardSlide = React.memo(({
                     <div style={{ textAlign: 'center', position: 'relative' }}>
                         <div style={{
                             fontSize: 'var(--day-label-size, clamp(0.75rem, 1.6vh, 1rem))',
+                            lineHeight: 1.2,
                             color: isDay100 ? '#ef4444' : (isDayPerfect ? '#ffdf00' : 'var(--text-secondary)'),
                             textTransform: 'uppercase', letterSpacing: '4px',
                             marginBottom: '2px', fontWeight: '700',
@@ -412,7 +415,7 @@ const ExerciseButton = React.memo(({
             )}
             {/* Icon in a tinted chip — always carries the exercise color */}
             <div style={{
-                width: 'clamp(24px, 3.6vh, 30px)', height: 'clamp(24px, 3.6vh, 30px)',
+                width: 'var(--tile-icon-size, clamp(24px, 3.6vh, 30px))', height: 'var(--tile-icon-size, clamp(24px, 3.6vh, 30px))',
                 borderRadius: '30%',
                 background: `${ex.color}${exDone || isActive ? '2e' : '16'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -427,7 +430,7 @@ const ExerciseButton = React.memo(({
                 />
             </div>
             <span style={{
-                fontSize: 'clamp(0.55rem, 1.25vh, 0.78rem)', fontWeight: '600',
+                fontSize: 'var(--tile-label-size, clamp(0.55rem, 1.25vh, 0.78rem))', fontWeight: '600',
                 color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
                 textAlign: 'center', lineHeight: '1.1',
                 transition: 'color 0.2s ease'
@@ -435,7 +438,8 @@ const ExerciseButton = React.memo(({
                 {getExerciseLabel(ex)}
             </span>
             <span style={{
-                fontSize: 'clamp(0.6rem, 1.35vh, 0.82rem)', fontWeight: '700',
+                fontSize: 'var(--tile-count-size, clamp(0.6rem, 1.35vh, 0.82rem))', fontWeight: '700',
+                lineHeight: 1.2,
                 color: exDone ? ex.color : isActive ? ex.color : 'var(--text-primary)',
                 opacity: exDone ? 1 : isActive ? 1 : 0.75,
                 transition: 'color 0.2s ease',

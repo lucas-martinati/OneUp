@@ -2510,5 +2510,48 @@ input:checked + .slider:before { transform: translateX(20px); }
   }
 }
 
+/* ── Dashboard slide auto-calibration ───────────────────────────────────
+   Each slide is a size container: every size below is a % of the REAL
+   height available to the slide (cqh), not of the viewport (vh) — so the
+   content always fits whatever the header/nav/safe-areas eat up.
+   On WebViews without container-query support, the vh-based :root values
+   and inline fallbacks above keep working as before. */
+.dashboard-slide-container {
+  container-type: size;
+}
+
+@supports (height: 1cqh) {
+  .dashboard-slide-container {
+    /* Slides with up to 3 tile rows */
+    --dashboard-slide-padding-top: clamp(4px, 1.2cqh, 12px);
+    --day-label-size: clamp(0.7rem, 2.1cqh, 1rem);
+    --day-num-height: clamp(2rem, 9.6cqh, 6.5rem);
+    --day-num-font-size: clamp(1.9rem, 8.8cqh, 6rem);
+    --exercise-btn-gap: clamp(3px, 1cqh, 6px);
+    --exercise-btn-padding: clamp(5px, 1.2cqh, 10px) clamp(4px, 0.8vw, 8px);
+    --exercise-btn-min-height: clamp(48px, 11.8cqh, 80px);
+    --bottom-btn-size: clamp(64px, 14cqh, 110px);
+    --done-text-margin: clamp(3px, 1cqh, 6px);
+    --done-text-size: clamp(0.65rem, 2.5vw, 0.85rem);
+
+    /* Tile internals (the real height of a tile is content-bound) */
+    --tile-icon-size: clamp(20px, 4cqh, 28px);
+    --tile-label-size: clamp(0.52rem, 1.6cqh, 0.72rem);
+    --tile-count-size: clamp(0.56rem, 1.7cqh, 0.78rem);
+
+    /* Compact slide (4 tile rows, with or without category title) */
+    --day-label-size-with-title: clamp(0.6rem, 1.9cqh, 0.9rem);
+    --day-num-height-with-title: clamp(1.6rem, 8cqh, 5.5rem);
+    --day-num-font-size-with-title: clamp(1.4rem, 7.3cqh, 5rem);
+    --exercise-btn-min-height-with-title: clamp(36px, 8.6cqh, 60px);
+    --done-text-margin-with-title: clamp(2px, 0.5cqh, 4px);
+    --bottom-btn-size-with-title: clamp(48px, 11.5cqh, 84px);
+  }
+
+  .dashboard-slide-container .gap-responsive {
+    gap: clamp(3px, 1cqh, 10px);
+  }
+}
+
 
 
