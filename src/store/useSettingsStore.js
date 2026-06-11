@@ -105,15 +105,15 @@ export const useSettingsStore = create((set) => ({
       const prev = state.settings;
       const next = typeof update === 'function' ? update(prev) : update;
 
+      const merged = { ...prev, ...next };
       // Merge exerciseDifficulties carefully to avoid wiping them
+      // (without mutating `next`, which belongs to the caller)
       if (next.exerciseDifficulties && prev.exerciseDifficulties) {
-        next.exerciseDifficulties = {
+        merged.exerciseDifficulties = {
           ...prev.exerciseDifficulties,
           ...next.exerciseDifficulties,
         };
       }
-
-      const merged = { ...prev, ...next };
       saveToStorage(state._userId, merged);
       return { settings: merged };
     });

@@ -1,24 +1,12 @@
-import { ref, set, get } from 'firebase/database';
-import { createLogger } from '../utils/logger';
-import { getAuthInstance, getDatabaseInstance, initializeFirebase } from './firebase';
+import { ref, get } from 'firebase/database';
+import { getDatabaseInstance, initializeFirebase } from './firebase';
 import i18n from '../i18n';
-
-const logger = createLogger('Leaderboard');
 
 // NOTE: publishToLeaderboard has been removed.
 // Leaderboard entries are now computed server-side by the Cloud Function
 // `onProgressChange` / `onSettingsChange` in functions/index.js.
+// Cleanup on account deletion is handled by `onAccountDeleted`.
 // The client only reads from the leaderboard node.
-
-export async function removeFromLeaderboard() {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return false;
-
-  await set(ref(database, `leaderboard/${auth.currentUser.uid}`), null);
-  logger.success('Leaderboard entry removed');
-  return true;
-}
 
 export async function loadLeaderboard() {
   let database = getDatabaseInstance();

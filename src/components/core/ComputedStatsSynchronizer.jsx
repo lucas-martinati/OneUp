@@ -14,7 +14,11 @@ import { useComputedStatsStore } from '../../store/useComputedStatsStore';
  */
 export function ComputedStatsSynchronizer() {
     const completions = useProgressStore(s => s.completions);
-    const settings = useSettingsStore(s => s.settings);
+    // computeAllStats only reads exerciseDifficulties from settings (other
+    // settings keys it touches are legacy ones stripped on load), so subscribe
+    // to that slice only — avoids a full stats recompute on every unrelated
+    // settings change (sound toggle, leaderboard pseudo keystrokes, …).
+    const exerciseDifficulties = useSettingsStore(s => s.settings.exerciseDifficulties);
     const getDayNumber = useProgressStore(s => s.getDayNumber);
     const hasShared = useProgressStore(s => s.hasShared);
     const achievements = useProgressStore(s => s.achievements);
@@ -42,12 +46,12 @@ export function ComputedStatsSynchronizer() {
             if (savedDiff !== undefined) return savedDiff;
             return 1.0;
         }
-        const currentPrefs = settings?.exerciseDifficulties || {};
+        const currentPrefs = exerciseDifficulties || {};
         if (currentPrefs[exId] !== undefined) {
             return currentPrefs[exId];
         }
         return 1.0;
-    }, [completions, settings?.exerciseDifficulties]);
+    }, [completions, exerciseDifficulties]);
 
     const getConfig = useCallback((exId, dateStr) => ({
         difficulty: getDifficulty(exId, dateStr),
@@ -59,11 +63,11 @@ export function ComputedStatsSynchronizer() {
     // Recompute whenever any input changes
     useEffect(() => {
         recompute(
-            completions, settings, getDayNumber,
+            completions, { exerciseDifficulties }, getDayNumber,
             customExercises, hasShared, achievements,
             getConfig, cardioData, userStartDate
         );
-    }, [completions, settings, getDayNumber, customExercises, hasShared, achievements, getConfig, cardioData, userStartDate, recompute]);
+    }, [completions, exerciseDifficulties, getDayNumber, customExercises, hasShared, achievements, getConfig, cardioData, userStartDate, recompute]);
 
     return null; // Invisible component
 }

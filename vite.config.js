@@ -19,14 +19,18 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes('vite/preload-helper')) return 'preload-helper';
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('scheduler')) return 'react-vendor';
+            // Specific packages first: the generic react matcher below would
+            // otherwise swallow lucide-react, react-leaflet, react-easy-crop…
             if (id.includes('firebase')) return 'firebase-vendor';
             if (id.includes('@revenuecat/purchases-js')) return 'revenuecat-web-vendor';
             if (id.includes('@revenuecat/purchases-capacitor')) return 'revenuecat-native-vendor';
             if (id.includes('@capacitor')) return 'capacitor-vendor';
             if (id.includes('recharts') || id.includes('d3')) return 'charts-vendor';
             if (id.includes('lucide-react')) return 'ui-vendor';
-            if (id.includes('leaflet') || id.includes('react-leaflet')) return 'map-vendor';
+            if (id.includes('leaflet')) return 'map-vendor';
+            if (id.includes('react-easy-crop') || id.includes('tslib')) return 'crop-vendor';
+            if (id.includes('i18next')) return 'i18n-vendor';
+            if (id.includes('react') || id.includes('scheduler')) return 'react-vendor';
           }
         }
       }

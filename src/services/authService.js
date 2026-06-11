@@ -12,7 +12,16 @@ import { getAuthInstance, getDatabaseInstance, initializeFirebase } from './fire
 
 const logger = createLogger('Auth');
 
+// Last auth state emitted, so late subscribers (React effects mount after
+// onAuthStateChanged may have already fired) can be brought up to date.
+let lastAuthState = null;
+
+export function getLastAuthState() {
+  return lastAuthState;
+}
+
 function notifyListeners(listeners, state) {
+  lastAuthState = state;
   listeners.forEach(listener => listener(state));
 }
 
@@ -130,9 +139,21 @@ export async function deleteAccount(listeners, leaveClanFn, getUserClansFn) {
   const database = getDatabaseInstance();
   if (!database) { initializeFirebase(); }
 
+  // Best-effort client-side wipe. Security rules deny these writes for
+  // regular users (only per-topic writes are allowed, purchase is protected,
+  // leaderboard is server-managed). The onAccountDeleted Cloud Function is
+  // the authoritative cleanup once deleteUser() succeeds below.
   const db = getDatabaseInstance()
-  await remove(ref(db, `users/${userId}`));
-  await remove(ref(db, `leaderboard/${userId}`));
+  try {
+    await remove(ref(db, `users/${userId}`));
+  } catch (err) {
+    logger.warn('Client-side user data removal denied, deferring to server cleanup:', err);
+  }
+  try {
+    await remove(ref(db, `leaderboard/${userId}`));
+  } catch (err) {
+    logger.warn('Client-side leaderboard removal denied, deferring to server cleanup:', err);
+  }
 
   await Preferences.remove({ key: 'user_signed_in' });
   await Preferences.remove({ key: 'user_id' });

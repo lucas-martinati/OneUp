@@ -1,5 +1,6 @@
 const { onRequest } = require("firebase-functions/v2/https");
 const { onValueWritten } = require("firebase-functions/v2/database");
+const functionsV1 = require("firebase-functions/v1");
 const admin = require("firebase-admin");
 
 // Initialize Firebase Admin SDK using Default Compute Service Account
@@ -423,7 +424,19 @@ exports.onProgressChange = onValueWritten("users/{uid}/progress", async (event) 
   const uid = event.params.uid;
   const progress = event.data.after.val();
   const beforeProgress = event.data.before.val();
-  if (!progress) return;
+  if (!progress) {
+    // Progress wiped (account deletion or admin reset) → remove the orphaned
+    // leaderboard entry. Clients cannot do it (leaderboard writes are denied).
+    if (beforeProgress) {
+      try {
+        await db.ref(`leaderboard/${uid}`).remove();
+        console.log(`[Leaderboard] Entry removed for ${uid} (progress deleted)`);
+      } catch (error) {
+        console.error(`[Leaderboard] Failed to remove entry for ${uid}:`, error);
+      }
+    }
+    return;
+  }
 
   try {
     await recomputeLeaderboardEntry(uid, progress, beforeProgress);
@@ -466,6 +479,25 @@ exports.onPurchaseChange = onValueWritten("users/{uid}/purchase", async (event) 
     await recomputeLeaderboardEntry(uid, progress);
   } catch (error) {
     console.error(`[Leaderboard] Error recomputing for ${uid} (purchase change):`, error);
+  }
+});
+
+/**
+ * Triggered when a Firebase Auth account is deleted.
+ * Removes all RTDB data for the user. This is the authoritative cleanup:
+ * security rules prevent clients from deleting users/{uid} as a whole
+ * (the purchase node is write-protected) and from writing to leaderboard.
+ */
+exports.onAccountDeleted = functionsV1.auth.user().onDelete(async (user) => {
+  const uid = user.uid;
+  try {
+    await Promise.all([
+      db.ref(`users/${uid}`).remove(),
+      db.ref(`leaderboard/${uid}`).remove(),
+    ]);
+    console.log(`[AccountCleanup] Removed all data for deleted user ${uid}`);
+  } catch (error) {
+    console.error(`[AccountCleanup] Failed to remove data for ${uid}:`, error);
   }
 });
 

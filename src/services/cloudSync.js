@@ -39,6 +39,10 @@ class CloudSyncService {
 
   subscribe(callback) {
     this.listeners.add(callback);
+    // Replay the latest auth state: onAuthStateChanged may already have fired
+    // before this subscriber mounted (would otherwise stay on loading screen).
+    const last = authService.getLastAuthState();
+    if (last) callback(last);
     return () => this.listeners.delete(callback);
   }
 
