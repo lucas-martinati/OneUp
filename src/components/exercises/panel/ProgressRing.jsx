@@ -1,0 +1,149 @@
+export function ProgressRing({
+    activeColor,
+    dailyGoal,
+    displayCount,
+    displayTime,
+    goalTime,
+    gradEnd,
+    gradStart,
+    gradientId,
+    isAnimating,
+    isCompleted,
+    isRunning,
+    isTimer,
+    progress,
+    ringCircumference,
+    ringRadius,
+    ringSize,
+    timeFontSize,
+    // Camera props
+    isCameraActive = false,
+    videoRef = null,
+    cameraError = null,
+    isCalibrated = false,
+    calibrateCountdown = 0,
+    t = null
+}) {
+    return (
+        <div style={{
+            position: 'relative',
+            width: ringSize,
+            height: ringSize,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            '--exercise-color': activeColor,
+            '--exercise-color-dim': activeColor + '15'
+        }}>
+            <svg
+                viewBox="0 0 220 220"
+                overflow="visible"
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    pointerEvents: 'none'
+                }}
+            >
+                <circle cx="110" cy="110" r={ringRadius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                <circle
+                    cx="110"
+                    cy="110"
+                    r={ringRadius}
+                    fill="none"
+                    stroke={isCompleted ? activeColor : `url(#${gradientId})`}
+                    strokeWidth="8"
+                    strokeDasharray={ringCircumference}
+                    strokeDashoffset={ringCircumference * (1 - progress / 100)}
+                    strokeLinecap="round"
+                    transform="rotate(-90 110 110)"
+                    className={isCameraActive ? 'camera-active-ring-pulse' : ''}
+                    style={{
+                        transition: `${isTimer && isRunning ? 'stroke-dashoffset 1s linear' : 'stroke-dashoffset 0.45s ease'}, stroke 0.45s ease, filter 0.45s ease`,
+                        filter: isCompleted ? `drop-shadow(0 0 8px ${activeColor}88)` : 'none'
+                    }}
+                />
+                <defs>
+                    <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor={gradStart} style={{ transition: 'stop-color 0.45s ease' }} />
+                        <stop offset="100%" stopColor={gradEnd} style={{ transition: 'stop-color 0.45s ease' }} />
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            {isCameraActive && (
+                <div className="camera-video-wrapper" style={{ width: `calc(${ringSize} - 24px)`, height: `calc(${ringSize} - 24px)` }}>
+                    <video
+                        ref={videoRef}
+                        className="camera-video-feed"
+                        playsInline
+                        muted
+                        autoPlay
+                    />
+                    <div className="camera-scanning-line" style={{ '--exercise-color': activeColor }} />
+
+                    {cameraError === 'permission_denied' && (
+                        <div className="camera-calibration-overlay">
+                            <span style={{ fontSize: '0.8rem', color: '#f87171', fontWeight: '700' }}>
+                                {t ? t('counter.cameraNoPermission') : 'Accès caméra refusé'}
+                            </span>
+                        </div>
+                    )}
+
+                    {!cameraError && !isCalibrated && calibrateCountdown > 0 && (
+                        <div className="camera-calibration-overlay">
+                            <div className="camera-countdown-num" style={{ '--exercise-color': activeColor, fontSize: '4.5rem' }}>{calibrateCountdown}</div>
+                        </div>
+                    )}
+
+                    {!cameraError && !isCalibrated && calibrateCountdown === 0 && (
+                        <div className="camera-calibration-overlay">
+                            <span style={{ fontSize: '0.75rem', color: 'white', opacity: 0.8 }}>
+                                {t ? t('counter.cameraLoading') : 'Chargement...'}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Reps / Timer Numbers */}
+            {!isCameraActive && (
+                <div style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    pointerEvents: 'none'
+                }}>
+                    <div
+                        className={!isTimer && isAnimating ? 'scale-in' : ''}
+                        style={{
+                            fontSize: isTimer ? timeFontSize : 'clamp(4rem, 12vw, 6rem)',
+                            fontWeight: '800',
+                            color: isCompleted ? activeColor : 'var(--text-primary)',
+                            lineHeight: 1,
+                            transition: 'color 0.45s ease, font-size 0.45s ease',
+                            fontVariantNumeric: 'tabular-nums',
+                            maxWidth: isTimer ? '88%' : undefined,
+                            whiteSpace: 'nowrap'
+                        }}
+                    >
+                        {isTimer ? displayTime : displayCount}
+                    </div>
+                    <div style={{
+                        fontSize: 'clamp(1rem, 3vw, 1.3rem)',
+                        color: 'var(--text-secondary)',
+                        marginTop: '8px'
+                    }}>
+                        / {isTimer ? goalTime : dailyGoal}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
