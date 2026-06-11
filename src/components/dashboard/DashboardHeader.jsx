@@ -1,10 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { SettingsIcon, PieChart, Users, Shield, Flame, Trophy } from '../../utils/icons';
+import { useUIStore } from '../../store/useUIStore';
 
 export const DashboardHeader = React.memo(({
-    setShowSettings, setShowStats, setShowLeaderboard, setShowAdmin, isAdmin,
+    isAdmin,
     streakActive, displayStreak, selectedExercise, totalReps, isDay100
 }) => {
+    const openModal = useUIStore(s => s.openModal);
     const iconBtnStyle = {
         background: 'var(--surface-muted)', width: 'var(--touch-min)', height: 'var(--touch-min)',
         borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -101,17 +103,17 @@ export const DashboardHeader = React.memo(({
 
             <div ref={rightSideRef} style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 0, justifyContent: 'flex-end' }}>
                 {isAdmin && (
-                    <button onClick={() => setShowAdmin(true)} aria-label="Admin Panel" className="hover-lift" style={{ ...iconBtnStyle, color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+                    <button onClick={() => openModal('admin')} aria-label="Admin Panel" className="hover-lift" style={{ ...iconBtnStyle, color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
                         <Shield size={19} />
                     </button>
                 )}
-                <button onClick={() => setShowSettings(true)} aria-label="Settings" className="hover-lift" style={iconBtnStyle}>
+                <button onClick={() => openModal('settings')} aria-label="Settings" className="hover-lift" style={iconBtnStyle}>
                     <SettingsIcon size={19} />
                 </button>
-                <button onClick={() => setShowStats(true)} aria-label="Statistics" className="hover-lift" style={iconBtnStyle}>
+                <button onClick={() => openModal('stats')} aria-label="Statistics" className="hover-lift" style={iconBtnStyle}>
                     <PieChart size={19} />
                 </button>
-                <button onClick={() => setShowLeaderboard(true)} aria-label="Leaderboard" className="hover-lift" style={iconBtnStyle}>
+                <button onClick={() => openModal('leaderboard')} aria-label="Leaderboard" className="hover-lift" style={iconBtnStyle}>
                     <Users size={19} />
                 </button>
 

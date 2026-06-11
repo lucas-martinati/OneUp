@@ -7,6 +7,7 @@ import { useProgressStore } from '../../store/useProgressStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useCloudSyncStore } from '../../store/useCloudSyncStore';
 import { useComputedStatsStore } from '../../store/useComputedStatsStore';
+import { useUIStore } from '../../store/useUIStore';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
@@ -23,22 +24,9 @@ const CategoryManagerModal = lazy(() => import('../exercises/CategoryManagerModa
 const AdminPanel = lazy(() => import('../admin/AdminPanel').then(m => ({ default: m.AdminPanel })));
 
 export function DashboardModals({
-    showCalendar, setShowCalendar,
-    showStats, setShowStats,
-    showSettings, setShowSettings,
-    showCounter, setShowCounter,
-    showLeaderboard, setShowLeaderboard,
-    showAchievements, setShowAchievements,
-    showSession, setShowSession,
-    showCustomExercisesModal, setShowCustomExercisesModal,
-    showCategoryManager, setShowCategoryManager,
-    showAdmin, setShowAdmin,
-    openStoreDirectly, setOpenStoreDirectly,
     currentCatKey, effectiveSlide,
     selectedExercise, selectedExerciseId, dailyGoal, currentCount, isExerciseDone,
-    dayNumber, today,
-    customExModalCatId, setCustomExModalCatId,
-    sessionMode, setSessionInProgress
+    dayNumber, today
 }) {
     const startDate = useProgressStore(s => s.startDate);
     const completions = useProgressStore(s => s.completions);
@@ -54,9 +42,21 @@ export function DashboardModals({
         defaultCustomExercises, exercisesByUserCategory
     } = useExercises();
 
+    // ── UI store ──
+    const modals = useUIStore(s => s.modals);
+    const openModal = useUIStore(s => s.openModal);
+    const closeModal = useUIStore(s => s.closeModal);
+    const openStore = useUIStore(s => s.openStore);
+    const closeSettings = useUIStore(s => s.closeSettings);
+    const openStoreDirectly = useUIStore(s => s.openStoreDirectly);
+    const customExModalCatId = useUIStore(s => s.customExModalCatId);
+    const closeCustomExercises = useUIStore(s => s.closeCustomExercises);
+    const sessionMode = useUIStore(s => s.sessionMode);
+    const setSessionInProgress = useUIStore(s => s.setSessionInProgress);
+
     return (
         <>
-            {showCalendar && (
+            {modals.calendar && (
                 <Suspense fallback={null}>
                     <Calendar
                         startDate={startDate}
@@ -71,13 +71,13 @@ export function DashboardModals({
                             }[currentCatKey]}
                         isCustom={currentCatKey === CATEGORIES.CUSTOM || isUserCategory(currentCatKey)}
                         getDayNumber={getDayNumber}
-                        onClose={() => setShowCalendar(false)}
+                        onClose={() => closeModal('calendar')}
                         settings={settings}
                         getConfig={getConfig}
                     />
                 </Suspense>
             )}
-            {showStats && (
+            {modals.stats && (
                 <Suspense fallback={null}>
                     <Stats
                         initialCategory={isUserCategory(currentCatKey) ? currentCatKey : {
@@ -86,25 +86,25 @@ export function DashboardModals({
                             [CATEGORIES.CARDIO]: 'cardio',
                             [CATEGORIES.CUSTOM]: 'custom'
                         }[currentCatKey]}
-                        onClose={() => setShowStats(false)}
-                        onOpenAchievements={() => { setShowAchievements(true); }}
-                        onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
+                        onClose={() => closeModal('stats')}
+                        onOpenAchievements={() => { openModal('achievements'); }}
+                        onOpenStore={openStore}
                     />
                 </Suspense>
             )}
-            {showSettings && (
+            {modals.settings && (
                 <Suspense fallback={null}>
                     <Settings
                         defaultShowStore={openStoreDirectly}
-                        onClose={() => { setShowSettings(false); setOpenStoreDirectly(false); }}
+                        onClose={closeSettings}
                     />
                 </Suspense>
             )}
-            {showCounter && selectedExercise && (
+            {modals.counter && selectedExercise && (
                 <Suspense fallback={null}>
                     <ExercisePanel
                         exerciseConfig={selectedExercise}
-                        onClose={() => { setShowCounter(false); resumeCloudSync?.(); }}
+                        onClose={() => { closeModal('counter'); resumeCloudSync?.(); }}
                         dailyGoal={dailyGoal}
                         currentCount={currentCount}
                         onUpdateCount={(newCount) => {
@@ -116,20 +116,20 @@ export function DashboardModals({
                     />
                 </Suspense>
             )}
-            {showLeaderboard && (
+            {modals.leaderboard && (
                 <Suspense fallback={null}>
                     <Leaderboard
-                        onClose={() => setShowLeaderboard(false)}
+                        onClose={() => closeModal('leaderboard')}
                         activeSlide={effectiveSlide}
                     />
                 </Suspense>
             )}
-            {showAchievements && (
+            {modals.achievements && (
                 <Suspense fallback={null}>
                     <Achievements
                         completions={completions}
                         exercises={EXERCISES}
-                        onClose={() => { setShowAchievements(false); }}
+                        onClose={() => { closeModal('achievements'); }}
                         settings={settings}
                         getDayNumber={getDayNumber}
                         highlightedBadgeId={null}
@@ -137,10 +137,10 @@ export function DashboardModals({
                     />
                 </Suspense>
             )}
-            {showSession && (
+            {modals.session && (
                 <Suspense fallback={null}>
                     <WorkoutSession
-                        onClose={() => { setShowSession(false); resumeCloudSync?.(); }}
+                        onClose={() => { closeModal('session'); resumeCloudSync?.(); }}
                         today={today}
                         dayNumber={dayNumber}
                         activeSlide={effectiveSlide}
@@ -149,10 +149,10 @@ export function DashboardModals({
                     />
                 </Suspense>
             )}
-            {showCustomExercisesModal && isPro && (
+            {modals.customExercises && isPro && (
                 <Suspense fallback={null}>
                     <CustomExercisesModal
-                        onClose={() => { setShowCustomExercisesModal(false); setCustomExModalCatId(null); resumeCloudSync?.(); }}
+                        onClose={() => { closeCustomExercises(); resumeCloudSync?.(); }}
                         customExercisesHook={customExercisesHook}
                         customCategoriesHook={customCategoriesHook}
                         computedStats={computedStats}
@@ -160,20 +160,20 @@ export function DashboardModals({
                     />
                 </Suspense>
             )}
-            {showCategoryManager && isPro && (
+            {modals.categoryManager && isPro && (
                 <Suspense fallback={null}>
                     <CategoryManagerModal
-                        onClose={() => setShowCategoryManager(false)}
+                        onClose={() => closeModal('categoryManager')}
                         customCategoriesHook={customCategoriesHook}
                         exercisesByUserCategory={exercisesByUserCategory}
                         defaultCustomExercises={defaultCustomExercises}
                     />
                 </Suspense>
             )}
-            {showAdmin && (
+            {modals.admin && (
                 <Suspense fallback={null}>
                     <AdminPanel
-                        onClose={() => setShowAdmin(false)}
+                        onClose={() => closeModal('admin')}
                     />
                 </Suspense>
             )}

@@ -5,6 +5,7 @@ import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { useExercises } from '../../contexts/ExercisesContext';
 import { Z_INDEX } from '../../utils/zIndex';
+import { loadWorkoutSession } from '../../utils/workoutSessionStorage';
 import styles from './SessionBubble.module.css';
 
 const MAX_TRAIL_SPHERES = 6;
@@ -48,17 +49,7 @@ export const SessionBubble = React.memo(({ onResume, onDiscard }) => {
     );
 
     // ── Session data (fresh on every mount — see component docstring) ──
-    const [sessionQueue] = useState(() => {
-        try {
-            const raw = localStorage.getItem('workout_session_queue');
-            return raw ? JSON.parse(raw) : [];
-        } catch { return []; }
-    });
-
-    const [currentIdx] = useState(() => {
-        const raw = localStorage.getItem('workout_session_current_idx');
-        return raw !== null ? parseInt(raw, 10) : 0;
-    });
+    const [{ queue: sessionQueue, currentIdx }] = useState(() => loadWorkoutSession());
 
     const queueExercises = useMemo(() => {
         return sessionQueue

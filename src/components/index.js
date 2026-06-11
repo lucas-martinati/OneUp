@@ -7,7 +7,6 @@ export { Day100Overlay, Day100HackModal, Day100UnhackAnimation, useDay100Logic }
 export { useAchievementToast } from '../hooks/useAchievementToast';
 export { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../config/categories';
 export { useBackHandler } from '../hooks/useBackHandler';
-export { useModalManager } from '../hooks/useModalManager';
 export { useNewAchievement } from '../hooks/useNewAchievement';
 export { useAnnouncement } from '../features/announcements/useAnnouncement';
 export { AnnouncementOverlay } from '../features/announcements/AnnouncementOverlay';

@@ -14,6 +14,7 @@ import { useExerciseConfig } from './useExerciseConfig';
 import { useBackHandler } from './useBackHandler';
 import { getLocalDateStr } from '../utils/dateUtils';
 import { generateSessionName } from '../utils/sessionNameGenerator';
+import { isWorkoutSessionStarted, loadWorkoutSession, saveWorkoutSession, clearWorkoutSession } from '../utils/workoutSessionStorage';
 
 /**
  * Extracts all state management and business logic from WorkoutSession,
@@ -36,7 +37,10 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     const fullCategoryColors = useMemo(() => buildFullCategoryColors(customCategories), [customCategories]);
     const { t } = useTranslation();
 
-    const isStarted = localStorage.getItem('sessionStarted') === 'true';
+    const isStarted = isWorkoutSessionStarted();
+
+    // Persisted session snapshot, read once on mount (empty defaults when not started).
+    const [persisted] = useState(() => isStarted ? loadWorkoutSession() : null);
 
     // ── Phase & queue state ──
     const [phase, setPhase] = useState(() => {
@@ -46,31 +50,13 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         return 'config';
     }); // 'config' | 'running' | 'done'
 
-    const [queue, setQueue] = useState(() => {
-        if (isStarted) {
-            try {
-                const savedQueue = localStorage.getItem('workout_session_queue');
-                if (savedQueue) return JSON.parse(savedQueue);
-            } catch (e) {
-                console.error(e);
-            }
-        }
-        return [];
-    });
-
-    const [currentIdx, setCurrentIdx] = useState(() => {
-        if (isStarted) {
-            const savedIdx = localStorage.getItem('workout_session_current_idx');
-            if (savedIdx !== null) return parseInt(savedIdx, 10);
-        }
-        return 0;
-    });
+    const [queue, setQueue] = useState(() => persisted?.queue ?? []);
+    const [currentIdx, setCurrentIdx] = useState(() => persisted?.currentIdx ?? 0);
 
     const sessionActiveSlide = useMemo(() => {
-        const isCurrentlyStarted = localStorage.getItem('sessionStarted') === 'true';
-        if (isCurrentlyStarted) {
-            const savedSlide = localStorage.getItem('workout_session_active_slide');
-            if (savedSlide !== null) return parseInt(savedSlide, 10);
+        if (isWorkoutSessionStarted()) {
+            const savedSlide = loadWorkoutSession().activeSlide;
+            if (savedSlide !== null) return savedSlide;
         }
         return activeSlide;
     }, [activeSlide]);
@@ -93,22 +79,14 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     const sessionStartTime = useRef(null);
 
     useEffect(() => {
-        if (isStarted) {
-            const savedStart = localStorage.getItem('workout_session_start_time');
-            if (savedStart) {
-                sessionStartTime.current = parseInt(savedStart, 10);
-            }
+        if (persisted?.startTime) {
+            sessionStartTime.current = persisted.startTime;
         }
-    }, [isStarted]);
+    }, [persisted]);
 
     const [sessionDuration, setSessionDuration] = useState(0);
     const [savedSession, setSavedSession] = useState(null);
-    const [sessionName, setSessionName] = useState(() => {
-        if (isStarted) {
-            return localStorage.getItem('workout_session_name') || '';
-        }
-        return '';
-    });
+    const [sessionName, setSessionName] = useState(() => persisted?.name ?? '');
     const [hasAnimatedFirstPanel, setHasAnimatedFirstPanel] = useState(false);
 
     // ── Back handler ──
@@ -386,22 +364,16 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     // Automatically save session state to localStorage when running/config
     useEffect(() => {
         if (phase === 'done') {
-            localStorage.removeItem('sessionStarted');
-            localStorage.removeItem('workout_session_queue');
-            localStorage.removeItem('workout_session_current_idx');
-            localStorage.removeItem('workout_session_start_time');
-            localStorage.removeItem('workout_session_name');
-            localStorage.removeItem('workout_session_active_slide');
+            clearWorkoutSession();
             setSessionInProgress?.(false);
-        } else if (phase === 'running' || localStorage.getItem('sessionStarted') === 'true') {
-            localStorage.setItem('sessionStarted', 'true');
-            localStorage.setItem('workout_session_queue', JSON.stringify(queue));
-            localStorage.setItem('workout_session_current_idx', currentIdx.toString());
-            if (sessionStartTime.current) {
-                localStorage.setItem('workout_session_start_time', sessionStartTime.current.toString());
-            }
-            localStorage.setItem('workout_session_name', sessionName);
-            localStorage.setItem('workout_session_active_slide', sessionActiveSlide.toString());
+        } else if (phase === 'running' || isWorkoutSessionStarted()) {
+            saveWorkoutSession({
+                queue,
+                currentIdx,
+                startTime: sessionStartTime.current || null,
+                name: sessionName,
+                activeSlide: sessionActiveSlide,
+            });
             setSessionInProgress?.(true);
         }
     }, [phase, queue, currentIdx, sessionName, sessionActiveSlide, setSessionInProgress]);

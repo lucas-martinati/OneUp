@@ -11,6 +11,7 @@ import { ProPaywall } from './ProPaywall';
 import { useProgressStore } from '../../store/useProgressStore';
 import { useCloudSyncStore } from '../../store/useCloudSyncStore';
 import { useComputedStatsStore } from '../../store/useComputedStatsStore';
+import { useUIStore } from '../../store/useUIStore';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../contexts/ExercisesContext';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
@@ -23,7 +24,6 @@ export function DashboardSlideRenderer({
     isFuture, effectiveStart, dayNumber, today,
     isCounterTransitioning, prevDayNumber,
     classicSelected, weightsSelected, customSelected, userCatSelected, handleSelectExercise,
-    setShowCounter, setShowCustomExercisesModal, setCustomExModalCatId, setShowCategoryManager, setShowSettings, setOpenStoreDirectly,
     hackActive,
     customCategories
 }) {
@@ -32,6 +32,10 @@ export function DashboardSlideRenderer({
     const completions = useProgressStore(s => s.completions);
     const pauseCloudSync = useCloudSyncStore(s => s.pauseCloudSync);
     const computedStats = useComputedStatsStore(s => s.stats);
+    const openModal = useUIStore(s => s.openModal);
+    const openStore = useUIStore(s => s.openStore);
+    const openCustomExercises = useUIStore(s => s.openCustomExercises);
+    const setShowCounter = (v) => v && openModal('counter');
     const { getConfig } = useExerciseConfig();
     const { isPro } = useSubscription();
     const {
@@ -91,7 +95,7 @@ export function DashboardSlideRenderer({
                     ) : (
                         <ProPaywall
                             title={t('common.weights')}
-                            onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
+                            onOpenStore={openStore}
                         />
                     )}
                 </div>
@@ -115,15 +119,15 @@ export function DashboardSlideRenderer({
                             pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                             activeExerciseId={customExercisesMap[customSelected] ? customSelected : (defaultCustomExercises[0]?.id || null)} onSelectExercise={handleSelectExercise}
                             exercisesList={defaultCustomExercises} exercisesMap={customExercisesMap}
-                            onManageCustom={() => { setCustomExModalCatId(null); setShowCustomExercisesModal(true); pauseCloudSync?.(); }}
-                            onManageCategories={() => { setShowCategoryManager(true); }}
+                            onManageCustom={() => { openCustomExercises(null); pauseCloudSync?.(); }}
+                            onManageCategories={() => { openModal('categoryManager'); }}
                             isDay100={hackActive}
                             getConfig={getConfig}
                         />
                     ) : (
                         <ProPaywall
                             title={title}
-                            onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
+                            onOpenStore={openStore}
                         />
                     )}
                 </div>
@@ -149,14 +153,14 @@ export function DashboardSlideRenderer({
                             pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                             activeExerciseId={selId} onSelectExercise={handleSelectExercise}
                             exercisesList={catExercises} exercisesMap={catExMap}
-                            onManageCustom={() => { setCustomExModalCatId(catKey); setShowCustomExercisesModal(true); pauseCloudSync?.(); }}
+                            onManageCustom={() => { openCustomExercises(catKey); pauseCloudSync?.(); }}
                             isDay100={hackActive}
                             getConfig={getConfig}
                         />
                     ) : (
                         <ProPaywall
                             title={catDef.name}
-                            onOpenStore={() => { setShowSettings(true); setOpenStoreDirectly(true); }}
+                            onOpenStore={openStore}
                         />
                     )}
                 </div>

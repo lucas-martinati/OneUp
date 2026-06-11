@@ -1,13 +1,19 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar as CalendarIcon, Play } from '../../utils/icons';
+import { useUIStore } from '../../store/useUIStore';
+import { useCloudSyncStore } from '../../store/useCloudSyncStore';
 
 import styles from './DashboardActions.module.css';
 
 export const DashboardActions = React.memo(({
-    setShowCalendar, setShowSession, setSessionMode, sessionInProgress, pauseCloudSync, selectedExercise, activeCategoryColor, isDay100
+    selectedExercise, activeCategoryColor, isDay100
 }) => {
     const { t } = useTranslation();
+    const openModal = useUIStore(s => s.openModal);
+    const openSession = useUIStore(s => s.openSession);
+    const sessionInProgress = useUIStore(s => s.sessionInProgress);
+    const pauseCloudSync = useCloudSyncStore(s => s.pauseCloudSync);
 
     const background = `linear-gradient(135deg, ${activeCategoryColor || selectedExercise.color}28, ${activeCategoryColor || (selectedExercise.gradient && selectedExercise.gradient[0]) || selectedExercise.color}28)`;
 
@@ -15,7 +21,7 @@ export const DashboardActions = React.memo(({
         <div className={`${styles.actions} ${isDay100 ? 'day100-actions' : ''}`}>
             {/* Calendar Button */}
             <button
-                onClick={() => setShowCalendar(true)}
+                onClick={() => openModal('calendar')}
                 className={`${styles.actionBtn} hover-lift`}
                 style={{ background }}
             >
@@ -26,8 +32,7 @@ export const DashboardActions = React.memo(({
             {/* Session Button */}
             <button
                 onClick={() => {
-                    setSessionMode('config');
-                    setShowSession(true);
+                    openSession('config');
                     pauseCloudSync?.();
                 }}
                 className={`${styles.actionBtn} hover-lift`}

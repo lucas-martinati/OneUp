@@ -12,7 +12,6 @@ import { Day100Overlay, Day100HackModal, Day100UnhackAnimation, useDay100Logic }
 import { useAchievementToast } from '../hooks/useAchievementToast';
 import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../config/categories';
 import { useBackHandler } from '../hooks/useBackHandler';
-import { useModalManager } from '../hooks/useModalManager';
 import { useNewAchievement } from '../hooks/useNewAchievement';
 import { useAnnouncement } from '../features/announcements/useAnnouncement';
 import { AnnouncementOverlay } from '../features/announcements/AnnouncementOverlay';
@@ -29,33 +28,22 @@ import { useProgressStore } from '../store/useProgressStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useCloudSyncStore } from '../store/useCloudSyncStore';
 import { useComputedStatsStore } from '../store/useComputedStatsStore';
+import { useUIStore } from '../store/useUIStore';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { useExercises } from '../contexts/ExercisesContext';
 import { useExerciseConfig } from '../hooks/useExerciseConfig';
 
 import { setSoundSettingsGetter } from '../utils/soundManager';
+import { clearWorkoutSession } from '../utils/workoutSessionStorage';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { canAccessFeature, FEATURES } from '../utils/entitlements';
 
 export function Dashboard() {
     const { t } = useTranslation();
-    const [sessionInProgress, setSessionInProgress] = useState(() => localStorage.getItem('sessionStarted') === 'true');
-    const [sessionMode, setSessionMode] = useState('config');
     const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
 
     const handleDiscardSession = useCallback(() => {
         setShowDiscardConfirm(true);
-    }, []);
-
-    const confirmDiscard = useCallback(() => {
-        localStorage.removeItem('sessionStarted');
-        localStorage.removeItem('workout_session_queue');
-        localStorage.removeItem('workout_session_current_idx');
-        localStorage.removeItem('workout_session_start_time');
-        localStorage.removeItem('workout_session_name');
-        localStorage.removeItem('workout_session_active_slide');
-        setSessionInProgress(false);
-        setShowDiscardConfirm(false);
     }, []);
 
     const auth = useAuth();
@@ -74,7 +62,6 @@ export function Dashboard() {
     const mergeWithAnonymousData = useProgressStore(s => s.mergeWithAnonymousData);
     const settings = useSettingsStore(s => s.settings);
     const updateSettings = useSettingsStore(s => s.updateSettings);
-    const pauseCloudSync = useCloudSyncStore(s => s.pauseCloudSync);
     const conflictData = useCloudSyncStore(s => s.conflictData);
     const rawResolveConflict = useCloudSyncStore(s => s.onResolveConflict);
     const computedStats = useComputedStatsStore(s => s.stats);
@@ -82,30 +69,25 @@ export function Dashboard() {
     const { isPro } = useSubscription();
     const { customExercises, customExercisesMap, customCategories, exercisesByUserCategory } = useExercises();
 
+    // ── UI store (modals + session UI) ──
+    const openModal = useUIStore(s => s.openModal);
+    const closeTopModal = useUIStore(s => s.closeTopModal);
+    const anyModalOpen = useUIStore(s => s.modalStack.length > 0);
+    const sessionInProgress = useUIStore(s => s.sessionInProgress);
+    const setSessionInProgress = useUIStore(s => s.setSessionInProgress);
+    const openSession = useUIStore(s => s.openSession);
+
+    const confirmDiscard = useCallback(() => {
+        clearWorkoutSession();
+        setSessionInProgress(false);
+        setShowDiscardConfirm(false);
+    }, [setSessionInProgress]);
+
     const onResolveConflict = useCallback((action) => rawResolveConflict(action, {
       loadFromCloud, syncWithCloud, hasGuestData, clearAnonymousData, mergeWithAnonymousData, updateSettings,
     }), [rawResolveConflict, loadFromCloud, syncWithCloud, hasGuestData, clearAnonymousData, mergeWithAnonymousData, updateSettings]);
-    
+
     const { showAnnouncement, announcement, dismissAnnouncement } = useAnnouncement();
-
-    // ── Modals ──
-    const { modals, openModal, closeModal, anyModalOpen, handleBack } = useModalManager(
-        { calendar: false, stats: false, settings: false, counter: false, leaderboard: false, achievements: false, session: false, customExercises: false, categoryManager: false, admin: false },
-        ['counter', 'session']
-    );
-    const setShowCalendar = (v) => v ? openModal('calendar') : closeModal('calendar');
-    const setShowStats = (v) => v ? openModal('stats') : closeModal('stats');
-    const setShowSettings = (v) => v ? openModal('settings') : closeModal('settings');
-    const setShowCounter = (v) => v ? openModal('counter') : closeModal('counter');
-    const setShowLeaderboard = (v) => v ? openModal('leaderboard') : closeModal('leaderboard');
-    const setShowAchievements = (v) => v ? openModal('achievements') : closeModal('achievements');
-    const setShowSession = (v) => v ? openModal('session') : closeModal('session');
-    const setShowCustomExercisesModal = (v) => v ? openModal('customExercises') : closeModal('customExercises');
-    const setShowCategoryManager = (v) => v ? openModal('categoryManager') : closeModal('categoryManager');
-    const setShowAdmin = (v) => v ? openModal('admin') : closeModal('admin');
-
-    const [openStoreDirectly, setOpenStoreDirectly] = useState(false);
-    const [customExModalCatId, setCustomExModalCatId] = useState(null);
 
     // ── Slides State ──
     const fullCategoryOrder = useMemo(() => buildFullCategoryOrder(customCategories), [customCategories]);
@@ -186,8 +168,8 @@ export function Dashboard() {
     }, [settings]);
 
     const { showAchievement, AchievementToast: AchievementToastComponent } = useAchievementToast(() => {
-        setShowStats(true);
-        setTimeout(() => setShowAchievements(true), 100);
+        openModal('stats');
+        setTimeout(() => openModal('achievements'), 100);
     });
 
     const { achievement: detectedAchievement, clearAchievement } = useNewAchievement(computedStats, t);
@@ -206,8 +188,8 @@ export function Dashboard() {
     const dailyGoal = getDailyGoal(selectedExercise, dayNumber, currentDiff) || 1;
 
     // For Cardio slide, compute total from running and cycling stats, else use computedStats
-    const totalReps = currentCatKey === CATEGORIES.CARDIO 
-        ? ((computedStats.exerciseReps?.['running'] || 0) + (computedStats.exerciseReps?.['cycling'] || 0)) 
+    const totalReps = currentCatKey === CATEGORIES.CARDIO
+        ? ((computedStats.exerciseReps?.['running'] || 0) + (computedStats.exerciseReps?.['cycling'] || 0))
         : (computedStats.exerciseReps?.[globalSelectedId] || 0);
 
     const effectiveStart = userStartDate || startDate;
@@ -230,7 +212,7 @@ export function Dashboard() {
         handleDay100ModalDismiss, handleUnhackComplete
     } = useDay100Logic(dayNumber, isDayPerfectStandard);
 
-    useBackHandler(handleBack, anyModalOpen);
+    useBackHandler(closeTopModal, anyModalOpen);
 
     useEffect(() => {
         if (anyModalOpen) {
@@ -269,12 +251,7 @@ export function Dashboard() {
                 paddingBottom: 'clamp(1px, 0.3vh, 6px)'
             }}>
                 <DashboardHeader
-                    setShowSettings={setShowSettings}
-                    setShowStats={setShowStats}
-                    setShowLeaderboard={setShowLeaderboard}
-                    setShowAdmin={setShowAdmin}
                     isAdmin={isAdmin}
-                    pauseCloudSync={pauseCloudSync}
                     streakActive={computedStats.streakActive}
                     displayStreak={computedStats.displayStreak}
                     selectedExercise={selectedExercise}
@@ -284,10 +261,7 @@ export function Dashboard() {
 
                 {sessionInProgress && !anyModalOpen && (
                     <SessionBubble
-                        onResume={() => {
-                            setSessionMode('running');
-                            setShowSession(true);
-                        }}
+                        onResume={() => openSession('running')}
                         onDiscard={handleDiscardSession}
                     />
                 )}
@@ -308,13 +282,12 @@ export function Dashboard() {
                             isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
                             isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
                             classicSelected={classicSelected} weightsSelected={weightsSelected} customSelected={customSelected} userCatSelected={userCatSelected} handleSelectExercise={handleSelectExercise}
-                            setShowCounter={setShowCounter} setShowCustomExercisesModal={setShowCustomExercisesModal} setCustomExModalCatId={setCustomExModalCatId} setShowCategoryManager={setShowCategoryManager} setShowSettings={setShowSettings} setOpenStoreDirectly={setOpenStoreDirectly}
                             hackActive={hackActive}
                             customCategories={customCategories}
                         />
                     </div>
 
-                    <CategoryNav 
+                    <CategoryNav
                         fullCategoryOrder={fullCategoryOrder}
                         activeSlide={activeSlide}
                         customCategories={customCategories}
@@ -324,34 +297,16 @@ export function Dashboard() {
                 </main>
 
                 <DashboardActions
-                    setShowCalendar={setShowCalendar}
-                    setShowSession={setShowSession}
-                    setSessionMode={setSessionMode}
-                    sessionInProgress={sessionInProgress}
-                    pauseCloudSync={pauseCloudSync}
                     selectedExercise={selectedExercise}
                     activeCategoryColor={fullCategoryColors[fullCategoryOrder[effectiveSlide]]}
                     isDay100={hackActive}
                 />
 
                 <DashboardModals
-                    showCalendar={modals.calendar} setShowCalendar={setShowCalendar}
-                    showStats={modals.stats} setShowStats={setShowStats}
-                    showSettings={modals.settings} setShowSettings={setShowSettings}
-                    showCounter={modals.counter} setShowCounter={setShowCounter}
-                    showLeaderboard={modals.leaderboard} setShowLeaderboard={setShowLeaderboard}
-                    showAchievements={modals.achievements} setShowAchievements={setShowAchievements}
-                    showSession={modals.session} setShowSession={setShowSession}
-                    showCustomExercisesModal={modals.customExercises} setShowCustomExercisesModal={setShowCustomExercisesModal}
-                    showCategoryManager={modals.categoryManager} setShowCategoryManager={setShowCategoryManager}
-                    showAdmin={modals.admin} setShowAdmin={setShowAdmin}
-                    openStoreDirectly={openStoreDirectly} setOpenStoreDirectly={setOpenStoreDirectly}
                     currentCatKey={currentCatKey} effectiveSlide={effectiveSlide}
                     selectedExercise={selectedExercise} selectedExerciseId={globalSelectedId}
                     dailyGoal={dailyGoal} currentCount={currentCount} isExerciseDone={isExerciseDone}
                     dayNumber={dayNumber} today={today}
-                    customExModalCatId={customExModalCatId} setCustomExModalCatId={setCustomExModalCatId}
-                    sessionMode={sessionMode} setSessionInProgress={setSessionInProgress}
                 />
 
                 <ConfirmDialog
