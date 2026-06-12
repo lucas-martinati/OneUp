@@ -367,14 +367,21 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
             clearWorkoutSession();
             setSessionInProgress?.(false);
         } else if (phase === 'running' || isWorkoutSessionStarted()) {
-            saveWorkoutSession({
-                queue,
-                currentIdx,
-                startTime: sessionStartTime.current || null,
-                name: sessionName,
-                activeSlide: sessionActiveSlide,
-            });
-            setSessionInProgress?.(true);
+            if (queue.length === 0) {
+                // Emptying the queue of a started session discards it,
+                // otherwise the bubble would resume a session with no exercises
+                clearWorkoutSession();
+                setSessionInProgress?.(false);
+            } else {
+                saveWorkoutSession({
+                    queue,
+                    currentIdx,
+                    startTime: sessionStartTime.current || null,
+                    name: sessionName,
+                    activeSlide: sessionActiveSlide,
+                });
+                setSessionInProgress?.(true);
+            }
         }
     }, [phase, queue, currentIdx, sessionName, sessionActiveSlide, setSessionInProgress]);
 

@@ -19,6 +19,17 @@ describe('isWorkoutSessionStarted', () => {
     saveWorkoutSession({ queue: ['pushups'], currentIdx: 0, startTime: 123, name: 'Test', activeSlide: 1 });
     expect(isWorkoutSessionStarted()).toBe(true);
   });
+
+  it('is false when the saved queue is empty', () => {
+    saveWorkoutSession({ queue: [], currentIdx: 0, startTime: 123, name: 'Test', activeSlide: 1 });
+    expect(isWorkoutSessionStarted()).toBe(false);
+  });
+
+  it('is false when the saved queue is corrupted', () => {
+    localStorage.setItem('sessionStarted', 'true');
+    localStorage.setItem('workout_session_queue', '{not json');
+    expect(isWorkoutSessionStarted()).toBe(false);
+  });
 });
 
 describe('save/load round-trip', () => {

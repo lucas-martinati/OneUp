@@ -15,7 +15,15 @@ const KEYS = {
 };
 
 export function isWorkoutSessionStarted() {
-    return localStorage.getItem(KEYS.started) === 'true';
+    if (localStorage.getItem(KEYS.started) !== 'true') return false;
+    // A session without exercises is not resumable — treat it as not started
+    // (self-heals states persisted before empty queues discarded the session)
+    try {
+        const queue = JSON.parse(localStorage.getItem(KEYS.queue) || '[]');
+        return Array.isArray(queue) && queue.length > 0;
+    } catch {
+        return false;
+    }
 }
 
 /** Reads the full persisted session. Missing fields fall back to safe defaults. */
