@@ -101,8 +101,11 @@ export function useGoogleAuth() {
       const { value: wasPreviouslySignedIn } = await Preferences.get({ key: 'user_signed_in' });
 
       if (wasPreviouslySignedIn === 'true') {
-        // User was signed in before → keep loading=true, wait for onAuthStateChanged
-        // to fire with the real Firebase user (avoids flash of Onboarding)
+        // User was signed in before → boot Firebase so onAuthStateChanged can
+        // restore the real session. Keep loading=true meanwhile (avoids a flash
+        // of Onboarding). New visitors skip this entirely, keeping first paint
+        // free of the Firebase SDK + auth iframe.
+        cloudSync.ensureInitialized();
         logger.info('Previously signed-in user detected, waiting for Firebase to restore session...');
       } else {
         // Never signed in → resolve immediately, no need to wait
@@ -165,6 +168,9 @@ export function useGoogleAuth() {
   // Unified sign-in function
   const signIn = async () => {
     setAuthState(prev => ({ ...prev, loading: true, error: null }));
+
+    // Boot Firebase before authenticating (no-op if already initialized).
+    cloudSync.ensureInitialized();
 
     if (isNative) {
       await signInNative();

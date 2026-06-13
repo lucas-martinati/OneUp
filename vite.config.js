@@ -9,7 +9,12 @@ export default defineConfig({
   build: {
     modulePreload: {
       resolveDependencies(_filename, deps) {
-        return deps.filter(dep => !dep.includes('map-vendor') && !dep.includes('capacitor-vendor'));
+        // Keep non-critical vendors out of the initial modulepreload so they
+        // don't compete with first-paint resources. Firebase is booted lazily
+        // (only for returning/signing-in users) and the app renders local data
+        // first, so deferring its chunk doesn't delay perceived load.
+        const DEFERRED = ['map-vendor', 'capacitor-vendor', 'firebase-vendor'];
+        return deps.filter(dep => !DEFERRED.some(name => dep.includes(name)));
       }
     },
     cssCodeSplit: true,

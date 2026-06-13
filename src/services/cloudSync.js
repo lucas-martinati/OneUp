@@ -22,8 +22,7 @@ class CloudSyncService {
   constructor() {
     this.listeners = new Set();
     this._userDetailsCache = new Map();
-    initializeFirebase();
-    authService.setupAuthListener(this.listeners);
+    this._initialized = false;
 
     for (const service of DELEGATED_SERVICES) {
       for (const [key, method] of Object.entries(service)) {
@@ -35,6 +34,20 @@ class CloudSyncService {
         }
       }
     }
+  }
+
+  /**
+   * Lazily boot Firebase and the auth-state listener. Deferred out of the
+   * constructor so visitors who were never signed in don't pay the cost of
+   * loading the Firebase SDK and connecting the auth iframe on first paint.
+   * Call before any sign-in, and on startup only for returning users.
+   * Idempotent.
+   */
+  ensureInitialized() {
+    if (this._initialized) return;
+    this._initialized = true;
+    initializeFirebase();
+    authService.setupAuthListener(this.listeners);
   }
 
   subscribe(callback) {
