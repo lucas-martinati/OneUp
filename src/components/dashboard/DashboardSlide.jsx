@@ -8,7 +8,7 @@ import { isPerfectDay } from '../../utils/statUtils';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
-import { StreakFlame } from '../ui';
+import { StreakFlame, WeightBadge } from '../ui';
 import styles from './DashboardSlide.module.css';
 
 export const DashboardSlide = React.memo(({
@@ -448,18 +448,7 @@ const ExerciseButton = React.memo(({
                     }
                 </span>
                 {WEIGHT_EXERCISES_MAP[ex.id] && (
-                    <span style={{
-                        fontSize: 'clamp(0.52rem, 1.2vh, 0.7rem)', fontWeight: '700',
-                        marginLeft: '5px',
-                        padding: '1px 6px',
-                        borderRadius: '999px',
-                        background: `${ex.color}1f`,
-                        border: `1px solid ${ex.color}30`,
-                        color: ex.color,
-                        verticalAlign: 'middle'
-                    }}>
-                        {weight}kg
-                    </span>
+                    <WeightBadge weight={weight} color={ex.color} style={{ marginLeft: '5px' }} />
                 )}
             </span>
             {/* Per-tile progress bar */}

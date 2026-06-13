@@ -6,3 +6,4 @@ export { SegmentedControl } from './SegmentedControl';
 export { SettingRow } from './SettingRow';
 export { StreakFlame } from './StreakFlame';
 export { ToggleSwitch } from './ToggleSwitch';
+export { WeightBadge } from './WeightBadge';

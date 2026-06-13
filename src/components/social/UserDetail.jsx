@@ -5,6 +5,7 @@ import { Avatar } from '../ui/Avatar';
 import { Z_INDEX } from '../../utils/zIndex';
 import { DifficultyBadge } from '../ui/DifficultyBadge';
 import { StreakFlame } from '../ui/StreakFlame';
+import { WeightBadge } from '../ui/WeightBadge';
 import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { getLocalDateStr, calculateStreak, calculateExerciseStreak, calculateMaxStreak } from '../../utils/dateUtils';
@@ -75,15 +76,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                             {exDays !== null && (
                                 <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', opacity: 0.7 }}>{exDays}{t('common.daysAbbr')}</span>
                             )}
-                            {isWeightEx && (
-                                <span style={{ 
-                                    fontSize: '0.65rem', fontWeight: '600', color: 'var(--text-secondary)',
-                                    background: `${ex.color}12`, padding: '2px 6px', borderRadius: '8px',
-                                    border: `1px solid ${ex.color}20`
-                                }}>
-                                    {weight} {t('weight.kg')}
-                                </span>
-                            )}
+                            {isWeightEx && <WeightBadge weight={weight} color={ex.color} />}
                             {(() => {
                                 // Prioritize difficulty recorded in the latest completion
                                 let difficulty = 1.0;
@@ -266,21 +259,21 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0, paddingBottom: '16px' }}>
                         {CARDIO_EXERCISES && CARDIO_EXERCISES.length > 0 && (
                             <>
-                                <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '4px', letterSpacing: '1px' }}>
+                                <div style={{ ...sectionLabelStyle, marginTop: '4px' }}>
                                     {t('common.cardio')}
                                 </div>
                                 {CARDIO_EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
                             </>
                         )}
 
-                        <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '16px', letterSpacing: '1px' }}>
+                        <div style={sectionLabelStyle}>
                             {t('common.bodyweight')}
                         </div>
                         {EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
                         
                         {canAccessFeature(FEATURES.WEIGHTS, entry) && (
                             <>
-                                <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '4px', marginTop: '16px', letterSpacing: '1px' }}>
+                                <div style={sectionLabelStyle}>
                                     {t('common.weights')}
                                 </div>
                                 {WEIGHT_EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
@@ -292,6 +285,11 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
         </div>
     );
 }
+
+const sectionLabelStyle = {
+    fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)',
+    textTransform: 'uppercase', marginBottom: '4px', marginTop: '16px', letterSpacing: '1px'
+};
 
 function StatCard({ icon, label, value, color }) {
     return (
