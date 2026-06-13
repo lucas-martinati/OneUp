@@ -395,7 +395,7 @@ const ExerciseButton = React.memo(({
                     <span style={{ fontSize: '8px', color: 'white', fontWeight: '700', lineHeight: 1 }}>✓</span>
                 </div>
             )}
-            {/* Streak badge (top-left corner — keeps the tile height stable) */}
+            {/* Streak badge (top-left corner — keeps the tile height stable). */}
             {exStreak > 0 && (
                 <span style={{
                     position: 'absolute', top: '3px', left: '3px',
@@ -405,12 +405,12 @@ const ExerciseButton = React.memo(({
                     padding: '1px 5px',
                     borderRadius: '999px',
                     background: 'rgba(0, 0, 0, 0.35)',
-                    border: '1px solid rgba(249, 115, 22, 0.3)',
-                    color: 'var(--text-primary)',
+                    border: exDone ? '1px solid rgba(249, 115, 22, 0.3)' : '1px solid rgba(148, 163, 184, 0.3)',
+                    color: exDone ? 'var(--text-primary)' : 'var(--text-secondary)',
                     lineHeight: 1.4,
                     zIndex: 1
                 }}>
-                    🔥{exStreak}
+                    <span style={{ filter: exDone ? 'none' : 'grayscale(1)', opacity: exDone ? 1 : 0.7 }}>🔥</span>{exStreak}
                 </span>
             )}
             {/* Icon in a tinted chip — always carries the exercise color */}
