@@ -77,6 +77,10 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
 
     // Session tracking
     const sessionStartTime = useRef(null);
+    // Guards against the session being saved twice: setPhase('done') is async,
+    // so a second advanceToNext() call (double-tap / auto-advance + click) can
+    // re-enter the completion path while phase is still 'running'.
+    const sessionSaved = useRef(false);
 
     useEffect(() => {
         if (persisted?.startTime) {
@@ -185,6 +189,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         setCurrentIdx(0);
         setHasAnimatedFirstPanel(false);
         sessionStartTime.current = Date.now();
+        sessionSaved.current = false;
         setPhase('running');
     };
 
@@ -396,7 +401,10 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
                 return;
             }
         }
-        // Session complete
+        // Session complete — bail out if it was already saved (re-entry guard).
+        if (sessionSaved.current) return;
+        sessionSaved.current = true;
+
         const duration = sessionStartTime.current
             ? Math.round((Date.now() - sessionStartTime.current) / 1000)
             : 0;

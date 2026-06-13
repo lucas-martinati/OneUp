@@ -16,6 +16,7 @@ export function ProgressRing({
     ringRadius,
     ringSize,
     timeFontSize,
+    countFontSize = 'clamp(4rem, 12vw, 6rem)',
     // Camera props
     isCameraActive = false,
     videoRef = null,
@@ -29,6 +30,13 @@ export function ProgressRing({
             position: 'relative',
             width: ringSize,
             height: ringSize,
+            // Keep the ring at its full size regardless of how tall the
+            // surrounding controls are (timer controls are taller than the
+            // counter ones) — otherwise flex-shrink would compress the bubble.
+            flexShrink: 0,
+            // Container query context so the inner value can be sized in `cqw`
+            // (% of the ring's width) and never overflow, whatever the viewport.
+            containerType: 'inline-size',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -109,10 +117,12 @@ export function ProgressRing({
                 </div>
             )}
 
-            {/* Reps / Timer Numbers */}
+            {/* Reps / Timer Numbers — absolutely centered on the ring so the
+                value stays dead-center regardless of the SVG / font metrics. */}
             {!isCameraActive && (
                 <div style={{
-                    position: 'relative',
+                    position: 'absolute',
+                    inset: 0,
                     zIndex: 1,
                     display: 'flex',
                     flexDirection: 'column',
@@ -123,13 +133,14 @@ export function ProgressRing({
                     <div
                         className={!isTimer && isAnimating ? 'scale-in' : ''}
                         style={{
-                            fontSize: isTimer ? timeFontSize : 'clamp(4rem, 12vw, 6rem)',
+                            fontSize: isTimer ? timeFontSize : countFontSize,
                             fontWeight: '800',
                             color: isCompleted ? activeColor : 'var(--text-primary)',
                             lineHeight: 1,
                             transition: 'color 0.45s ease, font-size 0.45s ease',
                             fontVariantNumeric: 'tabular-nums',
-                            maxWidth: isTimer ? '88%' : undefined,
+                            maxWidth: '90%',
+                            textAlign: 'center',
                             whiteSpace: 'nowrap'
                         }}
                     >
@@ -138,7 +149,10 @@ export function ProgressRing({
                     <div style={{
                         fontSize: 'clamp(1rem, 3vw, 1.3rem)',
                         color: 'var(--text-secondary)',
-                        marginTop: '8px'
+                        marginTop: '8px',
+                        maxWidth: '90%',
+                        textAlign: 'center',
+                        whiteSpace: 'nowrap'
                     }}>
                         / {isTimer ? goalTime : dailyGoal}
                     </div>
