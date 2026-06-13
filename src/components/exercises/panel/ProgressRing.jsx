@@ -27,7 +27,7 @@ export function ProgressRing({
     calibrateCountdown = 0,
     t = null
 }) {
-    const label = isTimer ? (t ? t('common.duration', 'Temps') : 'Temps') : (t ? t('common.reps') : 'reps');
+    const label = isTimer ? (t ? t('cardio.duration', 'Temps') : 'Temps') : (t ? t('common.reps') : 'reps');
 
     return (
         <div
