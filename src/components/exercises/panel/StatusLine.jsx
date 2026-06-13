@@ -5,13 +5,25 @@ export function StatusLine({ activeColor, exerciseLabel, gradEnd, gradStart, isC
     if (!isCompleted) {
         return (
             <div style={{
-                color: 'var(--text-secondary)',
-                fontSize: '1rem',
-                minHeight: '52px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                borderRadius: 'var(--radius-full)',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                color: 'var(--text-secondary)',
+                fontSize: 'clamp(0.85rem, 2.4vw, 1rem)',
+                fontWeight: '500',
+                minHeight: '48px',
+                boxSizing: 'border-box'
             }}>
+                <span style={{
+                    width: '7px', height: '7px', borderRadius: '50%',
+                    background: activeColor, flexShrink: 0,
+                    boxShadow: `0 0 8px ${activeColor}`
+                }} />
                 {isTimer ? t('timer.remaining', { time: formatTime(remaining) }) : t('common.remaining', { count: remaining })}
             </div>
         );
@@ -21,20 +33,20 @@ export function StatusLine({ activeColor, exerciseLabel, gradEnd, gradStart, isC
         <div className="scale-in" style={{
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '10px',
-            padding: '14px 28px',
-            borderRadius: 'var(--radius-lg)',
-            background: `linear-gradient(135deg, ${activeColor}18, ${gradEnd}18)`,
-            border: `1px solid ${activeColor}44`,
-            boxShadow: `0 0 16px ${activeColor}22`,
-            minHeight: '52px',
+            padding: '10px 24px',
+            borderRadius: 'var(--radius-full)',
+            background: `linear-gradient(135deg, ${activeColor}22, ${gradEnd}1a)`,
+            border: `1px solid ${activeColor}55`,
+            boxShadow: `0 0 22px ${activeColor}33`,
+            minHeight: '48px',
             boxSizing: 'border-box'
         }}>
-            <Check size={24} color={activeColor} strokeWidth={3} />
+            <Check size={22} color={activeColor} strokeWidth={3} />
             <span style={{
-                color: activeColor,
-                fontWeight: '600',
-                fontSize: '1.1rem',
+                fontWeight: '700',
+                fontSize: 'clamp(0.95rem, 2.6vw, 1.1rem)',
                 background: `linear-gradient(135deg, ${gradStart}, ${gradEnd})`,
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',

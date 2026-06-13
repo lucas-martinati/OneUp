@@ -5,31 +5,32 @@ export function ExercisePanelHeader({ activeColor, exerciseConfig, exerciseLabel
 
     return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'clamp(8px, 1.5vh, 16px)', gap: '8px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
                 <div style={{
                     width: 'var(--touch-min)',
                     height: 'var(--touch-min)',
-                    borderRadius: '50%',
-                    background: `${activeColor}22`,
-                    border: `1.5px solid ${activeColor}55`,
+                    borderRadius: '14px',
+                    background: `linear-gradient(135deg, ${activeColor}33, ${activeColor}14)`,
+                    border: `1px solid ${activeColor}55`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
-                    transition: 'background 0.45s ease, border-color 0.45s ease'
+                    boxShadow: `0 4px 16px ${activeColor}33`,
+                    transition: 'background 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease'
                 }}>
                     <DynamicIcon icon={exerciseConfig?.icon} size={20} color={activeColor} />
                 </div>
                 <h2 className="panel-title" style={{
-                    color: activeColor,
+                    color: 'var(--text-primary)',
                     margin: 0,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    fontSize: 'clamp(1rem, 4.5vw, 1.4rem)',
+                    fontSize: 'clamp(1.05rem, 4.5vw, 1.4rem)',
+                    letterSpacing: '-0.01em',
                     flex: 1,
-                    textAlign: 'left',
-                    transition: 'color 0.45s ease'
+                    textAlign: 'left'
                 }}>
                     {exerciseLabel}
                 </h2>
@@ -41,30 +42,30 @@ export function ExercisePanelHeader({ activeColor, exerciseConfig, exerciseLabel
                         onClick={onNext}
                         className="hover-lift"
                         style={{
-                            padding: '8px 12px',
-                            borderRadius: '20px',
-                            background: `${activeColor}20`,
-                            border: `1px solid ${activeColor}40`,
+                            padding: '8px 14px',
+                            borderRadius: 'var(--radius-full)',
+                            background: `${activeColor}1f`,
+                            border: `1px solid ${activeColor}44`,
                             color: activeColor,
-                            fontSize: '0.8rem',
+                            fontSize: '0.82rem',
                             fontWeight: '700',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '4px',
+                            gap: '3px',
                             cursor: 'pointer',
                             minHeight: 'var(--touch-min)',
                             whiteSpace: 'nowrap',
                             transition: 'background 0.45s ease, border-color 0.45s ease, color 0.45s ease'
                         }}
                     >
-                        <span style={{ display: 'inline-block' }}>{t('common.next')}</span>
-                        <ChevronRight size={14} />
+                        <span>{t('common.next')}</span>
+                        <ChevronRight size={15} />
                     </button>
                 )}
                 <button
                     onClick={onClose}
                     aria-label={t('common.close', 'Fermer')}
-                    className="glass hover-lift"
+                    className="hover-lift"
                     style={{
                         width: 'var(--touch-min)',
                         height: 'var(--touch-min)',
@@ -72,8 +73,8 @@ export function ExercisePanelHeader({ activeColor, exerciseConfig, exerciseLabel
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        background: 'rgba(255,255,255,0.08)',
-                        border: 'none',
+                        background: 'rgba(255,255,255,0.06)',
+                        border: '1px solid rgba(255,255,255,0.08)',
                         color: 'var(--text-secondary)',
                         cursor: 'pointer',
                         flexShrink: 0

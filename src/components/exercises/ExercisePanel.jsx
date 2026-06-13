@@ -16,6 +16,7 @@ import { ProgressRing } from './panel/ProgressRing';
 import { StatusLine } from './panel/StatusLine';
 import { TimerControls, CounterControls } from './panel/Controls';
 import { CameraModeBar, CameraLiveStats } from './panel/CameraControls';
+import styles from './panel/ExercisePanel.module.css';
 
 export function ExercisePanel({
     onClose,
@@ -207,11 +208,18 @@ export function ExercisePanel({
 
     const content = (
         <div
-            className={`modal-content ${isSession && fadeIn ? 'fade-in' : ''}`}
+            className={`modal-content ${styles.content} ${isSession && fadeIn ? 'fade-in' : ''}`}
             role="dialog"
             aria-modal="true"
             aria-label={exerciseLabel}
+            style={{ '--ex': activeColor, '--ex2': gradEnd }}
         >
+            {/* Atmospheric backdrop — a pool of the exercise colour that gives
+                the flat overlay depth and intensifies on completion. */}
+            <div className={`${styles.atmosphere} ${isCompleted ? styles.atmosphereDone : ''}`} />
+            <div className={styles.vignette} />
+
+            <div className={`${styles.rise} ${styles.rise1}`}>
             <ExercisePanelHeader
                 activeColor={activeColor}
                 exerciseConfig={exerciseConfig}
@@ -221,6 +229,7 @@ export function ExercisePanel({
                 hideNextButton={hideNextButton}
                 t={t}
             />
+            </div>
 
             {isWeightExercise && currentWeight !== null && (
                 <WeightSelector
@@ -233,13 +242,13 @@ export function ExercisePanel({
                 />
             )}
 
-            <div style={{
+            <div className={`${styles.rise} ${styles.rise2}`} style={{
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 'clamp(8px, 1.8vh, 16px)'
+                gap: 'clamp(10px, 2vh, 18px)'
             }}>
                 {isPushups && (
                     <CameraModeBar
@@ -335,21 +344,23 @@ export function ExercisePanel({
             </div>
 
             {!isCameraActive && (
-                <div style={{
+                <div className={`${styles.rise} ${styles.rise3}`} style={{
                     marginTop: 'auto',
                     marginBottom: '8px',
-                    padding: '8px 16px',
-                    borderRadius: '12px',
-                    background: 'rgba(255,255,255,0.03)',
+                    padding: '10px 18px',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'rgba(255,255,255,0.035)',
                     color: 'var(--text-secondary)',
                     fontSize: '0.8rem',
+                    lineHeight: 1.45,
                     textAlign: 'center',
                     alignSelf: 'center',
                     width: '90%',
-                    maxWidth: '300px',
-                    border: '1px solid rgba(255,255,255,0.05)'
+                    maxWidth: '320px',
+                    border: '1px solid rgba(255,255,255,0.06)'
                 }}>
-                    {'\u{1F4A1}'} {t(isTimer ? 'timer.tips' : 'counter.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
+                    <span style={{ marginRight: '4px' }}>{'\u{1F4A1}'}</span>
+                    {t(isTimer ? 'timer.tips' : 'counter.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
                 </div>
             )}
         </div>

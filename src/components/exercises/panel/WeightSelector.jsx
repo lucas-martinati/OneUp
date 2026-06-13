@@ -9,18 +9,24 @@ export function WeightSelector({ activeColor, currentWeight, handleValidateWeigh
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '16px',
-            marginBottom: 'var(--spacing-sm)'
+            gap: '10px',
+            marginBottom: 'var(--spacing-xs)'
         }}>
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-lg)',
-                background: `linear-gradient(135deg, ${activeColor}12, ${activeColor}08)`,
-                border: `1px solid ${activeColor}30`
+                gap: '10px',
+                padding: '8px 8px 8px 18px',
+                borderRadius: 'var(--radius-full)',
+                background: `linear-gradient(135deg, ${activeColor}16, ${activeColor}08)`,
+                border: `1px solid ${activeColor}33`
             }}>
+                <span style={{
+                    fontSize: '0.62rem', fontWeight: '700', letterSpacing: '0.14em',
+                    textTransform: 'uppercase', color: 'var(--text-secondary)', opacity: 0.8
+                }}>
+                    {t('weight.kg')}
+                </span>
                 <input
                     type="number"
                     inputMode="decimal"
@@ -29,41 +35,41 @@ export function WeightSelector({ activeColor, currentWeight, handleValidateWeigh
                     onKeyDown={(e) => e.key === 'Enter' && handleValidateWeight()}
                     onBlur={handleValidateWeight}
                     style={{
-                        width: Math.max(40, localWeightStr.length * 14 + 10) + 'px',
+                        width: Math.max(38, localWeightStr.length * 15 + 8) + 'px',
                         background: 'transparent',
                         border: 'none',
                         outline: 'none',
-                        fontSize: '1.4rem',
+                        fontSize: '1.5rem',
                         fontWeight: '800',
                         color: activeColor,
                         textAlign: 'center'
                     }}
                 />
-                <span style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
-                    {t('weight.kg')}
-                </span>
+                <button
+                    onClick={handleValidateWeight}
+                    className="hover-lift"
+                    disabled={isUnchanged}
+                    aria-label={t('weight.kg')}
+                    style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        background: isUnchanged ? 'rgba(255,255,255,0.05)' : `linear-gradient(135deg, ${activeColor}, ${activeColor}cc)`,
+                        border: isUnchanged ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                        cursor: isUnchanged ? 'default' : 'pointer',
+                        color: isUnchanged ? 'var(--text-secondary)' : 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        boxShadow: isUnchanged ? 'none' : `0 4px 14px ${activeColor}55`,
+                        transition: 'all 0.2s',
+                        opacity: isUnchanged ? 0.5 : 1
+                    }}
+                >
+                    <Check size={19} />
+                </button>
             </div>
-            <button
-                onClick={handleValidateWeight}
-                className="hover-lift"
-                disabled={isUnchanged}
-                style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '50%',
-                    background: isUnchanged ? 'rgba(255,255,255,0.06)' : `${activeColor}20`,
-                    border: `1px solid ${activeColor}40`,
-                    cursor: isUnchanged ? 'default' : 'pointer',
-                    color: activeColor,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.2s',
-                    opacity: isUnchanged ? 0.4 : 1
-                }}
-            >
-                <Check size={20} />
-            </button>
         </div>
     );
 }

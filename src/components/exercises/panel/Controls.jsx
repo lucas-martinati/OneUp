@@ -13,27 +13,29 @@ export function TimerControls({
     t
 }) {
     return (
-        <>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(12px, 2vh, 20px)', width: '100%', maxWidth: '360px' }}>
             {!isCompleted && (
                 <button
                     onClick={() => setIsRunning(!isRunning)}
-                    className="glass hover-lift ripple"
+                    className="hover-lift ripple"
+                    aria-label={isRunning ? t('timer.reset') : t('common.next')}
                     style={{
-                        width: 'clamp(72px, 12vh, 90px)',
-                        height: 'clamp(72px, 12vh, 90px)',
+                        width: 'clamp(76px, 13vh, 96px)',
+                        height: 'clamp(76px, 13vh, 96px)',
                         borderRadius: '50%',
-                        background: `linear-gradient(135deg, ${activeColor}44, ${gradEnd}44)`,
-                        border: `2px solid ${activeColor}`,
+                        background: isRunning
+                            ? `linear-gradient(135deg, ${activeColor}, ${gradEnd})`
+                            : `radial-gradient(circle at 50% 35%, ${activeColor}cc, ${gradEnd})`,
+                        border: 'none',
                         color: 'white',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginTop: '10px',
-                        boxShadow: `0 0 20px ${activeColor}66`,
-                        transition: 'background 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease'
+                        boxShadow: `0 10px 30px ${activeColor}66, 0 0 0 6px ${activeColor}1f, inset 0 2px 0 rgba(255,255,255,0.3)`,
+                        transition: 'background 0.35s ease, box-shadow 0.35s ease, transform 0.2s ease'
                     }}
                 >
-                    {isRunning ? <Pause size={36} fill="white" /> : <Play size={36} fill="white" style={{ marginLeft: '4px' }} />}
+                    {isRunning ? <Pause size={34} fill="white" /> : <Play size={34} fill="white" style={{ marginLeft: '5px' }} />}
                 </button>
             )}
             <ActionButtons
@@ -47,7 +49,7 @@ export function TimerControls({
                 onReset={handleReset}
                 resetLabel={t('timer.reset')}
             />
-        </>
+        </div>
     );
 }
 
@@ -64,86 +66,159 @@ export function CounterControls({
     t
 }) {
     return (
-        <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'clamp(6px, 1vh, 8px)', width: '100%', maxWidth: '360px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(8px, 1.4vh, 12px)', width: '100%', maxWidth: '360px' }}>
+            {/* Primary interaction: increment quad */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'clamp(6px, 1vh, 8px)', width: '100%' }}>
                 {[1, 2, 5, 10].map(amount => (
                     <button
                         key={`plus-${amount}`}
                         onClick={() => handleIncrement(amount)}
-                        className="glass hover-lift ripple"
+                        className="hover-lift ripple"
                         disabled={isCompleted}
                         style={{
-                            padding: 'clamp(12px, 2.2vh, 20px) 8px',
-                            borderRadius: 'var(--radius-md)',
-                            background: `linear-gradient(135deg, ${activeColor}2a, ${gradEnd}2a)`,
-                            border: `1px solid ${activeColor}44`,
-                            color: isCompleted ? 'var(--text-secondary)' : 'var(--text-primary)',
-                            fontSize: 'clamp(1rem, 2.8vw, 1.3rem)',
-                            fontWeight: '700',
                             display: 'flex',
+                            flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '4px',
+                            gap: '1px',
+                            padding: 'clamp(12px, 2.2vh, 18px) 4px',
+                            borderRadius: 'var(--radius-md)',
+                            background: `linear-gradient(160deg, ${activeColor}33, ${gradEnd}1a)`,
+                            border: `1px solid ${activeColor}55`,
+                            color: isCompleted ? 'var(--text-secondary)' : 'var(--text-primary)',
+                            fontSize: 'clamp(1.1rem, 3.2vw, 1.45rem)',
+                            fontWeight: '800',
+                            fontVariantNumeric: 'tabular-nums',
                             minHeight: 'var(--touch-min)',
                             cursor: isCompleted ? 'not-allowed' : 'pointer',
-                            opacity: isCompleted ? 0.4 : 1,
-                            transition: 'background 0.45s ease, border-color 0.45s ease, opacity 0.2s ease'
+                            opacity: isCompleted ? 0.35 : 1,
+                            boxShadow: isCompleted ? 'none' : `0 3px 12px ${activeColor}26`,
+                            transition: 'background 0.45s ease, border-color 0.45s ease, opacity 0.2s ease, transform 0.12s ease'
                         }}
                     >
-                        <Plus size={16} />
+                        <Plus size={13} style={{ opacity: 0.7 }} />
                         {amount}
                     </button>
                 ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'clamp(6px, 1vh, 8px)', width: '100%', maxWidth: '200px' }}>
+            {/* Utility row: decrements + reset */}
+            <div style={{ display: 'flex', gap: 'clamp(6px, 1vh, 8px)', width: '100%' }}>
                 {[1, 5].map(amount => {
                     const canDecrement = displayCount > 0;
                     return (
                         <button
                             key={`minus-${amount}`}
                             onClick={() => handleDecrement(amount)}
-                            className="glass hover-lift ripple"
+                            className="hover-lift ripple"
                             disabled={!canDecrement}
                             style={{
-                                padding: 'clamp(10px, 1.8vh, 16px) 8px',
-                                borderRadius: 'var(--radius-md)',
-                                background: 'rgba(255, 255, 255, 0.05)',
-                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                color: !canDecrement ? 'var(--text-secondary)' : 'var(--text-primary)',
-                                fontSize: 'clamp(0.95rem, 2.5vw, 1.15rem)',
-                                fontWeight: '600',
+                                flex: 1,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 gap: '4px',
+                                padding: 'clamp(9px, 1.6vh, 13px) 4px',
+                                borderRadius: 'var(--radius-md)',
+                                background: 'rgba(255, 255, 255, 0.04)',
+                                border: '1px solid rgba(255, 255, 255, 0.09)',
+                                color: !canDecrement ? 'var(--text-secondary)' : 'var(--text-primary)',
+                                fontSize: 'clamp(0.85rem, 2.4vw, 1rem)',
+                                fontWeight: '600',
+                                fontVariantNumeric: 'tabular-nums',
                                 minHeight: 'var(--touch-min)',
                                 cursor: !canDecrement ? 'not-allowed' : 'pointer',
-                                opacity: !canDecrement ? 0.5 : 1
+                                opacity: !canDecrement ? 0.4 : 1
                             }}
                         >
-                            <Minus size={16} />
+                            <Minus size={14} style={{ opacity: 0.7 }} />
                             {amount}
                         </button>
                     );
                 })}
+                <ResetButton onReset={handleReset} disabled={displayCount === 0} label={t('counter.reset')} />
             </div>
 
-            <ActionButtons
+            {/* Primary CTA */}
+            <CompleteButton
                 activeColor={activeColor}
-                completeFlash={completeFlash}
-                completeLabel={t('counter.completeAll')}
-                displayCount={displayCount}
                 gradEnd={gradEnd}
+                completeFlash={completeFlash}
                 isCompleted={isCompleted}
                 onComplete={handleCompleteAll}
-                onReset={handleReset}
-                resetLabel={t('counter.reset')}
+                label={t('counter.completeAll')}
             />
-        </>
+        </div>
     );
 }
 
+/** Subtle, danger-tinted reset (utility). */
+function ResetButton({ onReset, disabled, label }) {
+    return (
+        <button
+            onClick={onReset}
+            className="hover-lift"
+            disabled={disabled}
+            style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: 'clamp(9px, 1.6vh, 13px) 4px',
+                borderRadius: 'var(--radius-md)',
+                background: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.22)',
+                color: disabled ? 'var(--text-secondary)' : 'var(--error)',
+                fontSize: 'clamp(0.85rem, 2.4vw, 1rem)',
+                fontWeight: '600',
+                minHeight: 'var(--touch-min)',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                opacity: disabled ? 0.4 : 1
+            }}
+        >
+            <RotateCcw size={16} />
+            {label}
+        </button>
+    );
+}
+
+/** Filled primary call-to-action: complete the exercise. */
+function CompleteButton({ activeColor, gradEnd, completeFlash, isCompleted, onComplete, label }) {
+    return (
+        <button
+            onClick={onComplete}
+            className={`hover-lift ripple${completeFlash ? ' complete-flash success-glow' : ''}`}
+            disabled={isCompleted}
+            style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: 'clamp(13px, 2vh, 17px)',
+                borderRadius: 'var(--radius-lg)',
+                background: isCompleted
+                    ? `linear-gradient(135deg, ${activeColor}26, ${gradEnd}1a)`
+                    : `linear-gradient(135deg, ${activeColor}, ${gradEnd})`,
+                border: isCompleted ? `1px solid ${activeColor}55` : 'none',
+                color: isCompleted ? activeColor : 'white',
+                fontSize: 'clamp(0.95rem, 2.6vw, 1.1rem)',
+                fontWeight: '800',
+                cursor: isCompleted ? 'not-allowed' : 'pointer',
+                opacity: isCompleted ? 0.65 : 1,
+                boxShadow: isCompleted ? 'none' : `0 8px 24px ${activeColor}55, inset 0 2px 0 rgba(255,255,255,0.25)`,
+                transition: 'background 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease',
+                minHeight: 'var(--touch-min)'
+            }}
+        >
+            <CheckCheck size={19} />
+            {label}
+        </button>
+    );
+}
+
+/** Reset + Complete pair, used by the timer (skip = complete). */
 function ActionButtons({
     activeColor,
     completeFlash,
@@ -156,64 +231,18 @@ function ActionButtons({
     resetLabel
 }) {
     return (
-        <div style={{
-            display: 'flex',
-            gap: '10px',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            marginTop: 'var(--spacing-sm)'
-        }}>
-            <button
-                onClick={onReset}
-                className="glass hover-lift"
-                disabled={displayCount === 0}
-                style={{
-                    padding: 'clamp(10px, 1.5vh, 13px) clamp(16px, 3vw, 24px)',
-                    borderRadius: 'var(--radius-lg)',
-                    background: 'rgba(239, 68, 68, 0.1)',
-                    border: '1px solid rgba(239, 68, 68, 0.3)',
-                    color: displayCount === 0 ? 'var(--text-secondary)' : 'var(--error)',
-                    fontSize: 'clamp(0.85rem, 2.2vw, 1rem)',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    cursor: displayCount === 0 ? 'not-allowed' : 'pointer',
-                    opacity: displayCount === 0 ? 0.5 : 1,
-                    minHeight: 'var(--touch-min)'
-                }}
-            >
-                <RotateCcw size={18} />
-                {resetLabel}
-            </button>
-
-            <button
-                onClick={onComplete}
-                className={`glass hover-lift${completeFlash ? ' complete-flash success-glow' : ''}`}
-                disabled={isCompleted}
-                style={{
-                    padding: 'clamp(10px, 1.5vh, 13px) clamp(16px, 3vw, 24px)',
-                    borderRadius: 'var(--radius-lg)',
-                    background: isCompleted
-                        ? `linear-gradient(135deg, ${activeColor}33, ${gradEnd}33)`
-                        : `linear-gradient(135deg, ${activeColor}22, ${gradEnd}22)`,
-                    border: `1px solid ${isCompleted ? activeColor + '66' : activeColor + '44'}`,
-                    color: isCompleted ? activeColor : 'var(--text-primary)',
-                    fontSize: 'clamp(0.85rem, 2.2vw, 1rem)',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    cursor: isCompleted ? 'not-allowed' : 'pointer',
-                    opacity: isCompleted ? 0.6 : 1,
-                    transition: 'all 0.3s ease',
-                    minHeight: 'var(--touch-min)'
-                }}
-            >
-                <CheckCheck size={18} />
-                {completeLabel}
-            </button>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'stretch', width: '100%' }}>
+            <ResetButton onReset={onReset} disabled={displayCount === 0} label={resetLabel} />
+            <div style={{ flex: 1.6, display: 'flex' }}>
+                <CompleteButton
+                    activeColor={activeColor}
+                    gradEnd={gradEnd}
+                    completeFlash={completeFlash}
+                    isCompleted={isCompleted}
+                    onComplete={onComplete}
+                    label={completeLabel}
+                />
+            </div>
         </div>
     );
 }

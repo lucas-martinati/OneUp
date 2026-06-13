@@ -1,3 +1,5 @@
+import styles from './ExercisePanel.module.css';
+
 export function ProgressRing({
     activeColor,
     dailyGoal,
@@ -25,25 +27,39 @@ export function ProgressRing({
     calibrateCountdown = 0,
     t = null
 }) {
+    const label = isTimer ? (t ? t('common.duration', 'Temps') : 'Temps') : (t ? t('common.reps') : 'reps');
+
     return (
-        <div style={{
-            position: 'relative',
-            width: ringSize,
-            height: ringSize,
-            // Keep the ring at its full size regardless of how tall the
-            // surrounding controls are (timer controls are taller than the
-            // counter ones) — otherwise flex-shrink would compress the bubble.
-            flexShrink: 0,
-            // Container query context so the inner value can be sized in `cqw`
-            // (% of the ring's width) and never overflow, whatever the viewport.
-            containerType: 'inline-size',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '--exercise-color': activeColor,
-            '--exercise-color-dim': activeColor + '15'
-        }}>
+        <div
+            style={{
+                position: 'relative',
+                width: ringSize,
+                height: ringSize,
+                // Keep the ring at full size whatever the controls' height, and
+                // expose the accent colour to the halo / container-query units.
+                flexShrink: 0,
+                containerType: 'inline-size',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                '--ex': activeColor,
+                '--exercise-color': activeColor,
+                '--exercise-color-dim': activeColor + '15'
+            }}
+        >
+            {/* Hero halo — soft pool of colour behind the ring, brighter when done */}
+            {!isCameraActive && (
+                <div
+                    className={styles.ringHalo}
+                    style={{
+                        background: `radial-gradient(circle, ${activeColor}${isCompleted ? '40' : '24'} 0%, transparent 70%)`,
+                        opacity: isCompleted ? 1 : 0.85,
+                        transform: isCompleted ? 'scale(1.08)' : 'scale(1)'
+                    }}
+                />
+            )}
+
             <svg
                 viewBox="0 0 220 220"
                 overflow="visible"
@@ -56,14 +72,14 @@ export function ProgressRing({
                     pointerEvents: 'none'
                 }}
             >
-                <circle cx="110" cy="110" r={ringRadius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                <circle cx="110" cy="110" r={ringRadius} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="7" />
                 <circle
                     cx="110"
                     cy="110"
                     r={ringRadius}
                     fill="none"
                     stroke={isCompleted ? activeColor : `url(#${gradientId})`}
-                    strokeWidth="8"
+                    strokeWidth="9"
                     strokeDasharray={ringCircumference}
                     strokeDashoffset={ringCircumference * (1 - progress / 100)}
                     strokeLinecap="round"
@@ -71,7 +87,12 @@ export function ProgressRing({
                     className={isCameraActive ? 'camera-active-ring-pulse' : ''}
                     style={{
                         transition: `${isTimer && isRunning ? 'stroke-dashoffset 1s linear' : 'stroke-dashoffset 0.45s ease'}, stroke 0.45s ease, filter 0.45s ease`,
-                        filter: isCompleted ? `drop-shadow(0 0 8px ${activeColor}88)` : 'none'
+                        // Glow is a paint-time filter. While a timer is actively
+                        // running the ring repaints every frame, so we drop the
+                        // filter then to avoid per-frame repaints (battery/heat).
+                        filter: isCompleted
+                            ? `drop-shadow(0 0 12px ${activeColor}aa)`
+                            : (isTimer && isRunning ? 'none' : `drop-shadow(0 0 5px ${activeColor}55)`)
                     }}
                 />
                 <defs>
@@ -117,8 +138,8 @@ export function ProgressRing({
                 </div>
             )}
 
-            {/* Reps / Timer Numbers — absolutely centered on the ring so the
-                value stays dead-center regardless of the SVG / font metrics. */}
+            {/* Reps / Timer readout — absolutely centred so it stays dead-centre
+                regardless of the SVG and font metrics. */}
             {!isCameraActive && (
                 <div style={{
                     position: 'absolute',
@@ -130,6 +151,17 @@ export function ProgressRing({
                     justifyContent: 'center',
                     pointerEvents: 'none'
                 }}>
+                    <span style={{
+                        fontSize: 'clamp(0.6rem, 1.6vh, 0.72rem)',
+                        fontWeight: '700',
+                        letterSpacing: '0.18em',
+                        textTransform: 'uppercase',
+                        color: 'var(--text-secondary)',
+                        opacity: 0.7,
+                        marginBottom: '2px'
+                    }}>
+                        {label}
+                    </span>
                     <div
                         className={!isTimer && isAnimating ? 'scale-in' : ''}
                         style={{
@@ -141,15 +173,17 @@ export function ProgressRing({
                             fontVariantNumeric: 'tabular-nums',
                             maxWidth: '90%',
                             textAlign: 'center',
-                            whiteSpace: 'nowrap'
+                            whiteSpace: 'nowrap',
+                            textShadow: isCompleted ? `0 0 22px ${activeColor}55` : 'none'
                         }}
                     >
                         {isTimer ? displayTime : displayCount}
                     </div>
                     <div style={{
-                        fontSize: 'clamp(1rem, 3vw, 1.3rem)',
+                        fontSize: 'clamp(0.95rem, 2.8vw, 1.25rem)',
+                        fontWeight: '600',
                         color: 'var(--text-secondary)',
-                        marginTop: '8px',
+                        marginTop: '6px',
                         maxWidth: '90%',
                         textAlign: 'center',
                         whiteSpace: 'nowrap'
