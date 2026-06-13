@@ -25,9 +25,9 @@ export function ProgressRing({
     cameraError = null,
     isCalibrated = false,
     calibrateCountdown = 0,
-    t = null
+    t
 }) {
-    const label = isTimer ? (t ? t('cardio.duration', 'Temps') : 'Temps') : (t ? t('common.reps') : 'reps');
+    const label = isTimer ? t('cardio.duration') : t('common.reps');
 
     return (
         <div
@@ -117,7 +117,7 @@ export function ProgressRing({
                     {cameraError === 'permission_denied' && (
                         <div className="camera-calibration-overlay">
                             <span style={{ fontSize: '0.8rem', color: '#f87171', fontWeight: '700' }}>
-                                {t ? t('counter.cameraNoPermission') : 'Accès caméra refusé'}
+                                {t('counter.cameraNoPermission')}
                             </span>
                         </div>
                     )}
@@ -131,7 +131,7 @@ export function ProgressRing({
                     {!cameraError && !isCalibrated && calibrateCountdown === 0 && (
                         <div className="camera-calibration-overlay">
                             <span style={{ fontSize: '0.75rem', color: 'white', opacity: 0.8 }}>
-                                {t ? t('counter.cameraLoading') : 'Chargement...'}
+                                {t('counter.cameraLoading')}
                             </span>
                         </div>
                     )}

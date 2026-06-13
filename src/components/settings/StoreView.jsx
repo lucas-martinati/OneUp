@@ -152,7 +152,7 @@ export function StoreView() {
                                                 color: 'rgba(255,255,255,0.35)', fontWeight: '600',
                                                 textTransform: 'uppercase', letterSpacing: '0.5px'
                                             }}>
-                                                {t('store.purchaseDate', 'Achat')}
+                                                {t('store.purchaseDate')}
                                             </span>
                                             <span style={{ color: 'var(--text-secondary)', fontWeight: '700' }}>
                                                 {new Date(receipt.date).toLocaleDateString()}
@@ -166,8 +166,8 @@ export function StoreView() {
                                                 textTransform: 'uppercase', letterSpacing: '0.5px'
                                             }}>
                                                 {receipt.isActive
-                                                    ? t('store.expiresOn', 'Fin')
-                                                    : t('store.expiredOn', 'Expiré le')}
+                                                    ? t('store.expiresOn')
+                                                    : t('store.expiredOn')}
                                             </span>
                                             <span style={{
                                                 color: receipt.isActive ? '#10b981' : '#ef4444',

@@ -180,7 +180,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                                     fontSize: '0.75rem', fontWeight: '700', color: '#10b981'
                                 }}>
                                     {ex.type === 'timer' ? `${ex.reps || ex.goal}s` : t('common.repsCount', { count: ex.reps || ex.goal })}
-                                    {ex.weight ? ` • ${ex.weight} ${t('weight.kg', 'kg')}` : ''}
+                                    {ex.weight ? ` • ${ex.weight} ${t('weight.kg')}` : ''}
                                 </span>
                             </div>
                         </div>

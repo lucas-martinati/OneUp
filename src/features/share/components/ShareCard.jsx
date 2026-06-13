@@ -132,7 +132,7 @@ function ExerciseList({ exercises, t }) {
               display: 'flex', alignItems: 'center'
             }}>
               {ex.type === 'timer' ? `${ex.reps}s` : `\u00d7${ex.reps}`}
-              {ex.weight ? ` • ${ex.weight} ${t('weight.kg', 'kg')}` : ''}
+              {ex.weight ? ` • ${ex.weight} ${t('weight.kg')}` : ''}
               <DifficultyBadge difficulty={ex.difficulty} />
             </span>
           </div>
