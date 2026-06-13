@@ -12,11 +12,13 @@ export function setSoundSettingsGetter(getter) {
   settingsGetter = getter;
 }
 
-// Preload audio files
+// Register audio files. We use preload='none' so the browser only fetches the
+// (relatively heavy) mp3s on first playback instead of competing with critical
+// app resources during the initial page load.
 function preloadSound(name, path) {
   if (!soundCache[name]) {
     const audio = new Audio(path);
-    audio.preload = 'auto';
+    audio.preload = 'none';
     soundCache[name] = audio;
   }
   return soundCache[name];
@@ -25,15 +27,11 @@ function preloadSound(name, path) {
 // Get the base URL configured in Vite (e.g. '/' or '/OneUp/')
 const baseUrl = import.meta.env.BASE_URL;
 
-// Preload all success sound variants
+// Register all sound variants (no eager download — see preloadSound above).
 preloadSound('success', `${baseUrl}sounds/success.mp3`);      // Common - 95%
 preloadSound('poke', `${baseUrl}sounds/poke.mp3`);            // For nudges
-
-// Delay loading of rare sounds to prevent network congestion/errors on startup
-setTimeout(() => {
-  preloadSound('perfect', `${baseUrl}sounds/perfect.mp3`);      // Rare - 4.99%
-  preloadSound('yaaas', `${baseUrl}sounds/yaaas.mp3`);          // Ultra Rare - 0.01%
-}, 3000);
+preloadSound('perfect', `${baseUrl}sounds/perfect.mp3`);      // Rare - 4.99%
+preloadSound('yaaas', `${baseUrl}sounds/yaaas.mp3`);          // Ultra Rare - 0.01%
 
 // Select success sound based on rarity
 function getSuccessSound() {
