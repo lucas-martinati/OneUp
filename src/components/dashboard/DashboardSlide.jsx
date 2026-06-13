@@ -8,6 +8,7 @@ import { isPerfectDay } from '../../utils/statUtils';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 
 import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
+import { StreakFlame } from '../ui';
 import styles from './DashboardSlide.module.css';
 
 export const DashboardSlide = React.memo(({
@@ -338,6 +339,7 @@ const ExerciseButton = React.memo(({
 }) => {
     const statsEx = computedStats.exerciseStats?.find(e => e.id === ex.id);
     const exStreak = statsEx ? statsEx.streak : 0;
+    const exStreakActive = !!statsEx?.streakActive;
     const exCount = getExerciseCount(today, ex.id);
     const { difficulty: exDiff, weight } = getConfig(ex.id, today);
     const exGoal = getDailyGoal(ex, dayNumber, exDiff);
@@ -395,24 +397,14 @@ const ExerciseButton = React.memo(({
                     <span style={{ fontSize: '8px', color: 'white', fontWeight: '700', lineHeight: 1 }}>✓</span>
                 </div>
             )}
-            {/* Streak badge (top-left corner — keeps the tile height stable). */}
-            {exStreak > 0 && (
-                <span style={{
-                    position: 'absolute', top: '3px', left: '3px',
-                    display: 'flex', alignItems: 'center', gap: '1px',
-                    fontSize: 'clamp(0.52rem, 1.2vh, 0.7rem)',
-                    fontWeight: '700',
-                    padding: '1px 5px',
-                    borderRadius: '999px',
-                    background: 'rgba(0, 0, 0, 0.35)',
-                    border: exDone ? '1px solid rgba(249, 115, 22, 0.3)' : '1px solid rgba(148, 163, 184, 0.3)',
-                    color: exDone ? 'var(--text-primary)' : 'var(--text-secondary)',
-                    lineHeight: 1.4,
-                    zIndex: 1
-                }}>
-                    <span style={{ filter: exDone ? 'none' : 'grayscale(1)', opacity: exDone ? 1 : 0.7 }}>🔥</span>{exStreak}
-                </span>
-            )}
+            {/* Streak badge (top-left corner — keeps the tile height stable).
+                Flame stays colored only when the streak is active today. */}
+            <StreakFlame
+                streak={exStreak}
+                active={exStreakActive}
+                variant="badge"
+                style={{ position: 'absolute', top: '3px', left: '3px', zIndex: 1 }}
+            />
             {/* Icon in a tinted chip — always carries the exercise color */}
             <div style={{
                 width: 'var(--tile-icon-size, clamp(24px, 3.6vh, 30px))', height: 'var(--tile-icon-size, clamp(24px, 3.6vh, 30px))',

@@ -4,6 +4,7 @@ import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activit
 import { Avatar } from '../ui/Avatar';
 import { Z_INDEX } from '../../utils/zIndex';
 import { DifficultyBadge } from '../ui/DifficultyBadge';
+import { StreakFlame } from '../ui/StreakFlame';
 import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { getLocalDateStr, calculateStreak, calculateExerciseStreak, calculateMaxStreak } from '../../utils/dateUtils';
@@ -65,15 +66,11 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
                         <span style={{ fontSize: '0.75rem', fontWeight: '600', color: ex.color }}>{getExerciseLabel(ex, t)}</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            {!loadingDetails && (stats.exerciseStreaks?.[ex.id] || 0) > 0 && (
-                                <div style={{
-                                    display: 'flex', alignItems: 'center', gap: '2px',
-                                    background: stats.exerciseDoneToday?.[ex.id] ? 'rgba(249,115,22,0.12)' : 'rgba(120,120,120,0.08)',
-                                    padding: '2px 6px', borderRadius: '8px'
-                                }}>
-                                    <span style={{ fontSize: '0.6rem', opacity: stats.exerciseDoneToday?.[ex.id] ? 1 : 0.5, filter: stats.exerciseDoneToday?.[ex.id] ? 'none' : 'grayscale(1)' }}>🔥</span>
-                                    <span style={{ fontSize: '0.65rem', fontWeight: '700', color: stats.exerciseDoneToday?.[ex.id] ? '#f97316' : '#888' }}>{stats.exerciseStreaks[ex.id]}{t('common.daysAbbr')}</span>
-                                </div>
+                            {!loadingDetails && (
+                                <StreakFlame
+                                    streak={stats.exerciseStreaks?.[ex.id] || 0}
+                                    active={!!stats.exerciseDoneToday?.[ex.id]}
+                                />
                             )}
                             {exDays !== null && (
                                 <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', opacity: 0.7 }}>{exDays}{t('common.daysAbbr')}</span>

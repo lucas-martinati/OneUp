@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { DynamicIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 import { CATEGORIES, isUserCategory } from '../../config/categories';
+import { StreakFlame } from '../ui';
 import { sectionTitleStyle } from './statsStyles';
 
 /** Per-exercise breakdown list, grouped by category. */
@@ -93,25 +94,7 @@ export function ExerciseBreakdown({
                                                                 {t('stats.maxDays', { count: ex.maxStreak })}
                                                             </span>
                                                         )}
-                                                        {ex.streak > 0 && (
-                                                            <div style={{
-                                                                display: 'flex', alignItems: 'center', gap: '3px',
-                                                                background: ex.streakActive
-                                                                    ? 'rgba(249,115,22,0.1)'
-                                                                    : 'rgba(120,120,120,0.08)',
-                                                                padding: '2px 8px', borderRadius: '10px'
-                                                            }}>
-                                                                <span style={{
-                                                                    fontSize: '0.7rem',
-                                                                    opacity: ex.streakActive ? 1 : 0.5,
-                                                                    filter: ex.streakActive ? 'none' : 'grayscale(1)'
-                                                                }}>🔥</span>
-                                                                <span style={{
-                                                                    fontSize: '0.75rem', fontWeight: '700',
-                                                                    color: ex.streakActive ? '#f97316' : '#888'
-                                                                }}>{ex.streak}{t('common.daysAbbr')}</span>
-                                                            </div>
-                                                        )}
+                                                        <StreakFlame streak={ex.streak} active={ex.streakActive} />
                                                     </div>
                                                 </div>
                                                 {/* Sub-stats row */}
