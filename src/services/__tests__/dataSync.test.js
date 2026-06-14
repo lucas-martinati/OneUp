@@ -100,6 +100,40 @@ describe('mergeData', () => {
     const merged = mergeData(local, cloud);
     expect(merged.isSetup).toBe(true);
   });
+
+  it('preserves local in-progress count when overwriting with a newer cloud snapshot', () => {
+    // Reproduces the "today's reps drop to 0" bug: a confirming serverTimestamp
+    // echo makes cloud look newer, triggering the overwrite branch. Cloud never
+    // stores `count`, so without re-attachment the in-progress reps are wiped.
+    const local = {
+      startDate: '2025-01-01',
+      lastCompletionChange: '2025-01-01T12:00:00Z',
+      completions: { '2025-01-01': { pushups: { isCompleted: false, count: 15, timestamp: '2025-01-01T12:00:00Z' } } },
+    };
+    const cloud = {
+      startDate: '2025-01-01',
+      lastCompletionChange: '2025-01-01T12:00:01Z', // server-confirmed, slightly later
+      completions: { '2025-01-01': { pushups: { isCompleted: false, timestamp: '2025-01-01T12:00:01Z' } } },
+    };
+    const merged = mergeData(local, cloud);
+    expect(merged.completions['2025-01-01'].pushups.count).toBe(15);
+  });
+
+  it('does not resurrect a stale count when cloud completion state changed', () => {
+    const local = {
+      startDate: '2025-01-01',
+      lastCompletionChange: '2025-01-01T12:00:00Z',
+      completions: { '2025-01-01': { pushups: { isCompleted: false, count: 15 } } },
+    };
+    const cloud = {
+      startDate: '2025-01-01',
+      lastCompletionChange: '2025-01-01T12:00:01Z',
+      completions: { '2025-01-01': { pushups: { isCompleted: true } } }, // completed elsewhere
+    };
+    const merged = mergeData(local, cloud);
+    expect(merged.completions['2025-01-01'].pushups.isCompleted).toBe(true);
+    expect(merged.completions['2025-01-01'].pushups.count).toBeUndefined();
+  });
 });
 
 // ── sanitizeForCloud ────────────────────────────────────────────────────

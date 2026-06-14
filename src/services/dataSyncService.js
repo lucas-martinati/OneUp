@@ -81,6 +81,42 @@ export function listenToCloudChanges(callback) {
   });
 }
 
+/**
+ * The cloud never stores per-exercise `count` — in-progress reps live only on
+ * the device (see sanitizeForCloud). So whenever we replace local completions
+ * with a cloud snapshot, re-attach the local rep counts. Without this, a
+ * confirming Firebase serverTimestamp echo of our own write looks "newer" than
+ * local and wipes today's in-progress reps back to 0.
+ *
+ * Counts are only re-attached when the completion state still agrees, so a
+ * genuine change from another device (e.g. an exercise toggled complete) is
+ * never overridden by a stale local count.
+ */
+function reattachLocalCounts(cloudCompletions, localCompletions) {
+  const result = { ...(cloudCompletions || {}) };
+  if (!localCompletions) return result;
+  for (const dateStr of Object.keys(result)) {
+    const cloudDay = result[dateStr];
+    const localDay = localCompletions[dateStr];
+    if (!cloudDay || typeof cloudDay !== 'object' || !localDay) continue;
+    let mergedDay = null;
+    for (const exId of Object.keys(cloudDay)) {
+      const cloudEx = cloudDay[exId];
+      const localEx = localDay[exId];
+      if (
+        cloudEx && typeof cloudEx === 'object' &&
+        cloudEx.count === undefined && localEx?.count !== undefined &&
+        !!cloudEx.isCompleted === !!localEx.isCompleted
+      ) {
+        if (!mergedDay) mergedDay = { ...cloudDay };
+        mergedDay[exId] = { ...cloudEx, count: localEx.count };
+      }
+    }
+    if (mergedDay) result[dateStr] = mergedDay;
+  }
+  return result;
+}
+
 export function mergeData(localData, cloudData) {
   if (!cloudData) return localData;
   if (!localData) return cloudData;
@@ -101,7 +137,7 @@ export function mergeData(localData, cloudData) {
     return {
       startDate: cloudData.startDate,
       userStartDate: cloudData.userStartDate,
-      completions: cloudData.completions || {},
+      completions: reattachLocalCounts(cloudData.completions, localData.completions),
       isSetup: cloudData.isSetup,
       lastCompletionChange: cloudData.lastCompletionChange,
       cardio: cloudData.cardio || { sessions: {} }
