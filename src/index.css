@@ -64,7 +64,7 @@
   --radius-full: 9999px;
 
   /* Theme-dependent surfaces */
-  --overlay-bg: rgba(5, 5, 5, 0.97);
+  --overlay-bg: rgb(5, 5, 5);
   --overlay-bg-heavy: rgba(0, 0, 0, 0.88);
   --overlay-backdrop: rgba(0, 0, 0, 0.7);
   --surface-elevated: linear-gradient(135deg, rgba(15, 15, 20, 0.6), rgba(25, 25, 35, 0.6));
@@ -104,7 +104,7 @@
   --surface-section: linear-gradient(135deg, rgba(15, 22, 30, 0.8), rgba(20, 32, 45, 0.8));
   --surface-elevated: linear-gradient(135deg, rgba(15, 22, 30, 0.6), rgba(20, 32, 45, 0.6));
   --sheet-bg: rgba(10, 16, 22, 0.97);
-  --overlay-bg: rgba(5, 8, 12, 0.97);
+  --overlay-bg: rgb(5, 8, 12);
   --border-subtle: rgba(6, 182, 212, 0.05);
   --border-muted: rgba(6, 182, 212, 0.06);
   --border-default: rgba(6, 182, 212, 0.1);
@@ -132,7 +132,7 @@
   --surface-section: linear-gradient(135deg, rgba(30, 18, 15, 0.8), rgba(45, 24, 20, 0.8));
   --surface-elevated: linear-gradient(135deg, rgba(30, 18, 15, 0.6), rgba(45, 24, 20, 0.6));
   --sheet-bg: rgba(22, 14, 10, 0.97);
-  --overlay-bg: rgba(12, 8, 5, 0.97);
+  --overlay-bg: rgb(12, 8, 5);
   --border-subtle: rgba(249, 115, 22, 0.05);
   --border-muted: rgba(249, 115, 22, 0.06);
   --border-default: rgba(249, 115, 22, 0.1);
@@ -160,7 +160,7 @@
   --surface-section: linear-gradient(135deg, rgba(15, 25, 18, 0.8), rgba(22, 38, 25, 0.8));
   --surface-elevated: linear-gradient(135deg, rgba(15, 25, 18, 0.6), rgba(22, 38, 25, 0.6));
   --sheet-bg: rgba(10, 18, 12, 0.97);
-  --overlay-bg: rgba(5, 10, 6, 0.97);
+  --overlay-bg: rgb(5, 10, 6);
   --border-subtle: rgba(34, 197, 94, 0.05);
   --border-muted: rgba(34, 197, 94, 0.06);
   --border-default: rgba(34, 197, 94, 0.1);
@@ -188,7 +188,7 @@
   --surface-section: linear-gradient(135deg, rgba(22, 15, 30, 0.8), rgba(35, 22, 45, 0.8));
   --surface-elevated: linear-gradient(135deg, rgba(22, 15, 30, 0.6), rgba(35, 22, 45, 0.6));
   --sheet-bg: rgba(16, 10, 22, 0.97);
-  --overlay-bg: rgba(8, 5, 12, 0.97);
+  --overlay-bg: rgb(8, 5, 12);
   --border-subtle: rgba(168, 85, 247, 0.05);
   --border-muted: rgba(168, 85, 247, 0.06);
   --border-default: rgba(168, 85, 247, 0.1);
