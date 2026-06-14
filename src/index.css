@@ -547,6 +547,17 @@ button:active {
   }
 }
 
+/* ConfirmDialog (moved out of a per-render JSX <style> tag) */
+@keyframes confirmOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes confirmPanelIn {
+  from { opacity: 0; transform: scale(0.85) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 @keyframes panelEnter {
   from {
     opacity: 0;

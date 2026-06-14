@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Clock, Check, Trash2, Pencil, Dumbbell, Zap } from '../../../utils/icons';
 import { getIcon } from '../../../utils/icons';
+import { IconButton } from '../../../components/ui';
 import { Z_INDEX } from '../../../utils/zIndex';
 import { updateSessionName } from '../services/sessionHistoryService';
 import { getExerciseLabel, getExerciseColor } from '../../../utils/exerciseLabel';
@@ -69,14 +70,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
         }}>
           {t('share.sessionDetail')}
         </h2>
-        <button onClick={onClose} style={{
-          background: 'rgba(255,255,255,0.1)', border: 'none',
-          borderRadius: '50%', width: '36px', height: '36px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'white', cursor: 'pointer',
-        }}>
-          <X size={20} />
-        </button>
+        <IconButton icon={X} variant="glass" onClick={onClose} aria-label="Close" />
       </div>
 
       <div style={{

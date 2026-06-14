@@ -1,18 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Shield, Flame, Trophy } from '../../utils/icons';
 import { useUIStore } from '../../store/useUIStore';
+import { Card, IconButton } from '../ui';
 
 export const DashboardHeader = React.memo(({
     isAdmin,
     streakActive, displayStreak, selectedExercise, totalReps, isDay100
 }) => {
     const openModal = useUIStore(s => s.openModal);
-    const iconBtnStyle = {
-        background: 'var(--surface-muted)', width: 'var(--touch-min)', height: 'var(--touch-min)',
-        borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: 'var(--text-primary)', border: '1px solid var(--border-default)', cursor: 'pointer', flexShrink: 0,
-        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-    };
 
     const headerRef = useRef(null);
     const rightSideRef = useRef(null);
@@ -78,12 +73,13 @@ export const DashboardHeader = React.memo(({
     const showLogo = availableSpace >= 35;  // Need at least ~35px for Logo alone
 
     return (
-        <header ref={headerRef} className={`glass ${isDay100 ? 'day100-header' : ''}`} style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: 'clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 20px)', borderRadius: 'var(--radius-lg)',
-            boxShadow: 'var(--shadow-md)', minWidth: 0, position: 'relative',
-            zIndex: 10
-        }}>
+        <Card as="header" ref={headerRef} variant="glass" padding="none"
+            className={isDay100 ? 'day100-header' : ''}
+            style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: 'clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 20px)',
+                minWidth: 0, position: 'relative', zIndex: 10
+            }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
                 {showLogo && (
                     <img
@@ -103,9 +99,13 @@ export const DashboardHeader = React.memo(({
 
             <div ref={rightSideRef} style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 0, justifyContent: 'flex-end' }}>
                 {isAdmin && (
-                    <button onClick={() => openModal('admin')} aria-label="Admin Panel" className="hover-lift" style={{ ...iconBtnStyle, color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
-                        <Shield size={19} />
-                    </button>
+                    <IconButton
+                        icon={Shield}
+                        variant="danger"
+                        onClick={() => openModal('admin')}
+                        aria-label="Admin Panel"
+                        className="hover-lift"
+                    />
                 )}
 
                 {/* Global streak badge */}
@@ -149,6 +149,6 @@ export const DashboardHeader = React.memo(({
                     {p.emoji}
                 </div>
             ))}
-        </header>
+        </Card>
     );
 });

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2, ShieldAlert } from '../../utils/icons';
+import { IconButton } from '../ui';
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr, parseTimestamp } from '../../utils/dateUtils';
 import { useBackHandler } from '../../hooks/useBackHandler';
@@ -203,14 +204,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                 <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
                     {t('dashboard.calendar')}
                 </h2>
-                <button onClick={onClose} className="hover-lift glass" style={{
-                    background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-                    width: '40px', height: '40px', flexShrink: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: 'var(--text-primary)', cursor: 'pointer'
-                }}>
-                    <X size={22} />
-                </button>
+                <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" style={{ flexShrink: 0 }} />
             </div>
 
             {/* Month Stats */}

@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from '../../utils/icons';
+import { Button } from './Button';
 
 /**
  * Custom confirm dialog replacing window.confirm().
@@ -103,7 +104,7 @@ export function ConfirmDialog({
                 }}>
                     <AlertTriangle
                         size={22}
-                        color={destructive ? '#f87171' : '#a78bfa'}
+                        color={destructive ? '#f87171' : 'var(--accent-glow)'}
                     />
                 </div>
 
@@ -125,59 +126,19 @@ export function ConfirmDialog({
                     gap: '10px',
                     width: '100%',
                 }}>
-                    <button
-                        onClick={onCancel}
-                        style={{
-                            flex: 1,
-                            padding: '10px 16px',
-                            borderRadius: '14px',
-                            background: 'rgba(255, 255, 255, 0.06)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            color: 'var(--text-secondary)',
-                            fontSize: '0.8rem',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                        }}
-                    >
+                    <Button variant="secondary" size="sm" onClick={onCancel} style={{ flex: 1 }}>
                         {cancelLabel || t('common.cancel')}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        variant={destructive ? 'danger' : 'primary'}
+                        size="sm"
                         onClick={onConfirm}
-                        style={{
-                            flex: 1,
-                            padding: '10px 16px',
-                            borderRadius: '14px',
-                            background: destructive
-                                ? 'linear-gradient(135deg, #ef4444, #dc2626)'
-                                : 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
-                            border: 'none',
-                            color: '#fff',
-                            fontSize: '0.8rem',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                            boxShadow: destructive
-                                ? '0 4px 16px rgba(239, 68, 68, 0.3)'
-                                : '0 4px 16px rgba(139, 92, 246, 0.3)',
-                        }}
+                        style={{ flex: 1 }}
                     >
                         {confirmLabel || t('common.confirm')}
-                    </button>
+                    </Button>
                 </div>
             </div>
-
-            {/* Keyframe animations injected inline */}
-            <style>{`
-                @keyframes confirmOverlayIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                @keyframes confirmPanelIn {
-                    from { opacity: 0; transform: scale(0.85) translateY(12px); }
-                    to { opacity: 1; transform: scale(1) translateY(0); }
-                }
-            `}</style>
         </div>,
         document.body
     );

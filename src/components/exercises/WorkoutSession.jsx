@@ -1,4 +1,5 @@
 import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle, ChevronUp, ChevronDown, DynamicIcon } from '../../utils/icons';
+import { IconButton } from '../ui';
 import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
 import { Z_INDEX } from '../../utils/zIndex';
 import { SessionSummary } from './SessionSummary';
@@ -126,14 +127,7 @@ export function WorkoutSession(props) {
                             <FolderOpen size={16} />
                             {t('routines.title')}
                         </button>
-                        <button onClick={onClose} className="hover-lift glass" style={{
-                            background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-                            width: '40px', height: '40px', flexShrink: 0,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            color: 'var(--text-primary)', cursor: 'pointer'
-                        }}>
-                            <X size={22} />
-                        </button>
+                        <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" style={{ flexShrink: 0 }} />
                     </div>
                 </div>
 

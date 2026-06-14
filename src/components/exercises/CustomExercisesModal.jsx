@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Plus, Settings2, Trash2, Edit2, Swords, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, ChevronDown, Check, Target } from '../../utils/icons';
+import { Button, IconButton } from '../ui';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { Z_INDEX } from '../../utils/zIndex';
 import { MAX_EXERCISES_PER_CATEGORY } from '../../hooks/useCustomExercises';
@@ -145,11 +146,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
         <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
           {t('customExercises.title')}
         </h2>
-        <button onClick={onClose} className="glass hover-lift" style={{
-          width: '40px', height: '40px', borderRadius: '50%',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'rgba(255,255,255,0.08)', border: 'none', color: 'var(--text-secondary)'
-        }}><X size={20} /></button>
+        <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
       </div>
 
       <div style={{ flex: 1, overflow: confirmDeleteEx ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -406,20 +403,20 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
             {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
 
             <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-              <button onClick={() => {
-                setEditingId(null);
-                setView('list');
-              }} style={{
-                flex: 1, padding: '14px', borderRadius: 'var(--radius-md)',
-                background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
-                color: 'var(--text-primary)', fontSize: '1rem', fontWeight: '600'
-              }}>{t('common.cancel')}</button>
-              
-              <button onClick={handleSave} style={{
-                flex: 1, padding: '14px', borderRadius: 'var(--radius-md)',
-                background: '#8b5cf6', border: 'none',
-                color: 'white', fontSize: '1rem', fontWeight: '700'
-              }}>{t('common.save')}</button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setEditingId(null);
+                  setView('list');
+                }}
+                style={{ flex: 1, padding: '14px', fontSize: '1rem' }}
+              >{t('common.cancel')}</Button>
+
+              <Button
+                variant="primary"
+                onClick={handleSave}
+                style={{ flex: 1, padding: '14px', fontSize: '1rem' }}
+              >{t('common.save')}</Button>
             </div>
           </div>
         )}

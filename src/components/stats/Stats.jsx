@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
 import { X, Award } from '../../utils/icons';
+import { IconButton } from '../ui';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../../hooks/useComputedStats';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
@@ -190,14 +191,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                 {globalStats.badgeCount}/{BADGE_DEFINITIONS.length}
                             </span>
                         </button>
-                        <button onClick={onClose} className="hover-lift glass" style={{
-                            background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-                            width: 'var(--touch-min)', height: 'var(--touch-min)',
-                            display: 'flex', alignItems: 'center',
-                            justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
-                        }}>
-                            <X size={22} />
-                        </button>
+                        <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
                     </div>
                 </div>
 

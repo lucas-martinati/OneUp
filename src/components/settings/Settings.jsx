@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Z_INDEX } from '../../utils/zIndex';
 import { X, ShoppingBag, ArrowLeft } from '../../utils/icons';
+import { Button, IconButton } from '../ui';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { StoreView } from './StoreView';
 import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection } from './SettingsSections';
@@ -54,14 +55,13 @@ export function Settings({ defaultShowStore = false, onClose }) {
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         {showStore && (
-                            <button onClick={() => setShowStore(false)} className="hover-lift glass" style={{
-                                background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-                                width: 'var(--touch-min)', height: 'var(--touch-min)',
-                                display: 'flex', alignItems: 'center',
-                                justifyContent: 'center', color: 'var(--text-primary)', cursor: 'pointer'
-                            }}>
-                                <ArrowLeft size={22} />
-                            </button>
+                            <IconButton
+                                icon={ArrowLeft}
+                                variant="glass"
+                                onClick={() => setShowStore(false)}
+                                className="hover-lift"
+                                aria-label="Back"
+                            />
                         )}
                         <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
                             {showStore ? t('store.title') : t('settings.title')}
@@ -70,30 +70,23 @@ export function Settings({ defaultShowStore = false, onClose }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                             {!showStore && (
-                                <button onClick={() => setShowStore(true)} className="hover-lift" style={{
-                                    background: 'linear-gradient(135deg, #10b981, #059669)',
-                                    border: '1px solid rgba(16, 185, 129, 0.4)',
-                                    borderRadius: '24px',
-                                    padding: '0 16px',
-                                    height: 'var(--touch-min)',
-                                    display: 'flex', alignItems: 'center', gap: '8px',
-                                    justifyContent: 'center', color: 'white', cursor: 'pointer',
-                                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
-                                    fontWeight: '800', fontSize: '0.85rem',
-                                    letterSpacing: '0.5px'
-                                }}>
-                                    <ShoppingBag size={18} />
-                                    <span>{t('store.title')}</span>
-                                </button>
+                                <Button
+                                    variant="success"
+                                    icon={ShoppingBag}
+                                    onClick={() => setShowStore(true)}
+                                    className="hover-lift"
+                                    style={{ borderRadius: 'var(--radius-xl)', height: 'var(--touch-min)', letterSpacing: '0.5px' }}
+                                >
+                                    {t('store.title')}
+                                </Button>
                             )}
-                            <button onClick={onClose} className="hover-lift glass" style={{
-                                background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-                                width: '40px', height: '40px', flexShrink: 0,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                color: 'var(--text-primary)', cursor: 'pointer'
-                            }}>
-                                <X size={22} />
-                            </button>
+                            <IconButton
+                                icon={X}
+                                variant="glass"
+                                onClick={onClose}
+                                className="hover-lift"
+                                aria-label="Close"
+                            />
                         </div>
                     </div>
                 </div>

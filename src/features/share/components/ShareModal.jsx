@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Share2, Download, X, Loader2 } from '../../../utils/icons';
+import { IconButton } from '../../../components/ui';
 import { Z_INDEX } from '../../../utils/zIndex';
 import { ShareCard } from './ShareCard';
 import { ShareOptions } from './ShareOptions';
@@ -53,14 +54,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
         }}>
           {t('common.share')}
         </h2>
-        <button onClick={onClose} style={{
-          background: 'rgba(255,255,255,0.1)', border: 'none',
-          borderRadius: '50%', width: '36px', height: '36px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'white', cursor: 'pointer',
-        }}>
-          <X size={20} />
-        </button>
+        <IconButton icon={X} variant="glass" onClick={onClose} aria-label="Close" />
       </div>
 
       {/* Card preview */}

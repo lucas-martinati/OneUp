@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Plus, Trash2, Edit2, FolderPlus, Check, ChevronRight, Lock, ChevronUp, ChevronDown } from '../../utils/icons';
+import { IconButton } from '../ui';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { Z_INDEX } from '../../utils/zIndex';
 import { DynamicIcon } from '../../utils/icons';
@@ -223,11 +224,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
           <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
             {view === 'delete' ? t('customCategories.deleteTitle') : t('customCategories.title')}
           </h2>
-          <button onClick={onClose} className="glass hover-lift" style={{
-            width: '40px', height: '40px', borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(255,255,255,0.08)', border: 'none', color: 'var(--text-secondary)'
-          }}><X size={20} /></button>
+          <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
         </div>
 
         <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

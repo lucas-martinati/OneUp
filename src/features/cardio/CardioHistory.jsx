@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import 'leaflet/dist/leaflet.css';
 import { X, Clock, Target, Footprints } from '../../utils/icons';
+import { IconButton } from '../../components/ui';
 import { Capacitor } from '@capacitor/core';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { CardioMap } from './CardioMap';
@@ -170,19 +171,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
             <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
               {t('cardio.history')}
             </h2>
-            <button
-              onClick={onClose}
-              className="hover-lift glass"
-              style={{
-                width: 'var(--touch-min)', height: 'var(--touch-min)',
-                borderRadius: '50%', background: 'var(--surface-hover)',
-                border: 'none',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--text-primary)', cursor: 'pointer',
-              }}
-            >
-              <X size={22} />
-            </button>
+            <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
           </div>
 
           <div className="custom-scrollbar" style={{

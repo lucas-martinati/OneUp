@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { X, Trophy, LogOut, Activity } from '../../utils/icons';
+import { IconButton } from '../ui';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { getLocalDateStr } from '../../utils/dateUtils';
@@ -195,14 +196,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                     />
                 </div>
 
-                <button onClick={onClose} className="hover-lift glass" style={{
-                    background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-                    width: '40px', height: '40px', flexShrink: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: 'var(--text-primary)', cursor: 'pointer'
-                }}>
-                    <X size={22} />
-                </button>
+                <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" style={{ flexShrink: 0 }} />
             </div>
 
             {/* Back button and Clan Name when viewing a specific clan */}

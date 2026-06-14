@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Heart, RotateCcw, Sparkles } from '../../utils/icons';
+import { Button } from '../ui';
 import { getPurchaseHistory } from '../../services/purchaseService';
 import { StoreCard } from '../store/StoreCard';
 import { useAuth } from '../../contexts/AuthContext';
@@ -81,23 +82,16 @@ export function StoreView() {
             />
 
             {/* Restore purchases button (shared for all tiers) */}
-            <button
+            <Button
+                variant="ghost"
+                size="sm"
+                fullWidth
+                icon={RotateCcw}
                 onClick={onRestorePurchases}
-                style={{
-                    width: '100%', padding: '10px',
-                    borderRadius: 'var(--radius-md)',
-                    background: 'transparent',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: 'var(--text-secondary)',
-                    fontSize: '0.8rem', fontWeight: '600',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    gap: '6px', cursor: 'pointer',
-                    marginBottom: 'var(--spacing-md)'
-                }}
+                style={{ border: '1px solid var(--border-default)', marginBottom: 'var(--spacing-md)' }}
             >
-                <RotateCcw size={14} />
                 {t('supporter.restore')}
-            </button>
+            </Button>
 
             {/* --- Historique des achats --- */}
             {displayHistory && displayHistory.length > 0 && (

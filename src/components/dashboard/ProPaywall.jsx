@@ -1,15 +1,13 @@
 import React from 'react';
 import { Lock, ShoppingBag } from '../../utils/icons';
 import { useTranslation } from 'react-i18next';
+import { Stack, Button } from '../ui';
 
 export const ProPaywall = ({ title, onOpenStore }) => {
     const { t } = useTranslation();
-    
+
     return (
-        <div style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            height: '100%', padding: '20px', textAlign: 'center', gap: '16px'
-        }}>
+        <Stack align="center" justify="center" gap="sm" style={{ height: '100%', padding: '20px', textAlign: 'center' }}>
             <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8 }}>
                 {title}
             </div>
@@ -27,14 +25,15 @@ export const ProPaywall = ({ title, onOpenStore }) => {
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5', margin: 0, maxWidth: '280px' }}>
                 {t('paywall.proRequiredDesc')}
             </p>
-            <button onClick={onOpenStore} className="hover-lift" style={{
-                marginTop: '8px', padding: '12px 24px', borderRadius: '24px',
-                background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white',
-                fontWeight: '800', border: 'none', cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)', display: 'flex', gap: '8px', alignItems: 'center'
-            }}>
-                <ShoppingBag size={18} /> {t('paywall.viewStore')}
-            </button>
-        </div>
+            <Button
+                variant="success"
+                icon={ShoppingBag}
+                onClick={onOpenStore}
+                className="hover-lift"
+                style={{ marginTop: '8px', borderRadius: 'var(--radius-xl)' }}
+            >
+                {t('paywall.viewStore')}
+            </Button>
+        </Stack>
     );
 };
