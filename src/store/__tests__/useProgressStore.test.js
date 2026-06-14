@@ -40,7 +40,7 @@ vi.mock('../../services/cloudSync', () => ({
 
 import { Preferences } from '@capacitor/preferences';
 import { cloudSync } from '../../services/cloudSync';
-import { loadAchievementsFromCloud } from '../../services/userDataService';
+import { loadAchievementsFromCloud, saveAchievementsToCloud } from '../../services/userDataService';
 import { useProgressStore } from '../useProgressStore';
 import { STORAGE_KEY_BASE } from '../../hooks/useProgressStorage';
 import { getLocalDateStr } from '../../utils/dateUtils';
@@ -410,5 +410,163 @@ describe('startChallenge', () => {
     const s = useProgressStore.getState();
     expect(s.isSetup).toBe(true);
     expect(s.completions).toEqual({});
+  });
+});
+
+// ── exercise count helpers ───────────────────────────────────────────────
+
+describe('exercise count helpers', () => {
+  it('getExerciseCount / getExerciseDone read per-exercise state', () => {
+    const store = useProgressStore.getState();
+    store.updateExerciseCount(today, 'pushups', 8, 10);
+    expect(useProgressStore.getState().getExerciseCount(today, 'pushups')).toBe(8);
+    expect(useProgressStore.getState().getExerciseDone(today, 'pushups')).toBe(false);
+
+    store.updateExerciseCount(today, 'pushups', 10, 10);
+    expect(useProgressStore.getState().getExerciseDone(today, 'pushups')).toBe(true);
+  });
+
+  it('default to 0 / false for an untouched day', () => {
+    const store = useProgressStore.getState();
+    expect(store.getExerciseCount('1999-01-01', 'pushups')).toBe(0);
+    expect(store.getExerciseDone('1999-01-01', 'pushups')).toBe(false);
+  });
+});
+
+// ── toggleCompletion ─────────────────────────────────────────────────────
+
+describe('toggleCompletion', () => {
+  it('marks every standard exercise done, then clears them on a second toggle', () => {
+    const store = useProgressStore.getState();
+    store.toggleCompletion(today);
+    let day = useProgressStore.getState().completions[today];
+    expect(Object.values(day).every(ex => ex.isCompleted)).toBe(true);
+    expect(useProgressStore.getState().isDayDone(today)).toBe(true);
+
+    store.toggleCompletion(today);
+    day = useProgressStore.getState().completions[today];
+    expect(Object.values(day).every(ex => ex.isCompleted === false)).toBe(true);
+    expect(useProgressStore.getState().isDayDone(today)).toBe(false);
+  });
+});
+
+// ── getTotalReps ─────────────────────────────────────────────────────────
+
+describe('getTotalReps', () => {
+  it('sums the daily goal of completed days from the start date', () => {
+    const store = useProgressStore.getState();
+    // Day 1 (Jan 1) → pushups goal 1, Day 11 (Jan 11) → goal 11
+    store.toggleCompletion(fixedStart);
+    store.toggleCompletion(`${currentYear}-01-11`);
+    expect(useProgressStore.getState().getTotalReps('pushups', 1.0)).toBe(1 + 11);
+  });
+
+  it('applies the difficulty multiplier', () => {
+    const store = useProgressStore.getState();
+    store.toggleCompletion(`${currentYear}-01-11`); // day 11
+    expect(useProgressStore.getState().getTotalReps('pushups', 2.0)).toBe(22);
+  });
+
+  it('returns 0 for an unknown exercise', () => {
+    expect(useProgressStore.getState().getTotalReps('not_real')).toBe(0);
+  });
+});
+
+// ── deleteExerciseHistory ────────────────────────────────────────────────
+
+describe('deleteExerciseHistory', () => {
+  it('removes one exercise across every day, leaving the others intact', () => {
+    const store = useProgressStore.getState();
+    store.updateExerciseCount(today, 'pushups', 10, 10);
+    store.updateExerciseCount(today, 'squats', 10, 10);
+    store.updateExerciseCount('2026-01-05', 'pushups', 10, 10);
+
+    store.deleteExerciseHistory('pushups');
+    const s = useProgressStore.getState();
+    expect(s.completions[today].pushups).toBeUndefined();
+    expect(s.completions[today].squats).toBeDefined();
+    expect(s.completions['2026-01-05'].pushups).toBeUndefined();
+  });
+});
+
+// ── updateCardioSessions ─────────────────────────────────────────────────
+
+describe('updateCardioSessions', () => {
+  it('normalises an array of sessions into a keyed map', () => {
+    useProgressStore.getState().updateCardioSessions([
+      { id: 'a', distance: 1000 },
+      { id: 'b', distance: 2000 },
+    ]);
+    expect(useProgressStore.getState().cardio.sessions).toEqual({
+      a: { id: 'a', distance: 1000 },
+      b: { id: 'b', distance: 2000 },
+    });
+  });
+
+  it('accepts an already-keyed object', () => {
+    useProgressStore.getState().updateCardioSessions({ x: { id: 'x', distance: 500 } });
+    expect(useProgressStore.getState().cardio.sessions.x.distance).toBe(500);
+  });
+});
+
+// ── applyCloudData / applySyncedData ─────────────────────────────────────
+
+describe('applyCloudData', () => {
+  it('validates and replaces local state from a cloud snapshot', () => {
+    useProgressStore.getState().applyCloudData({
+      startDate: fixedStart,
+      completions: { [today]: { pushups: { isCompleted: true, count: 5 } } },
+      isSetup: true,
+    });
+    const s = useProgressStore.getState();
+    expect(s.isSetup).toBe(true);
+    expect(s.completions[today].pushups.isCompleted).toBe(true);
+  });
+
+  it('ignores a null payload', () => {
+    const before = useProgressStore.getState().completions;
+    useProgressStore.getState().applyCloudData(null);
+    expect(useProgressStore.getState().completions).toBe(before);
+  });
+});
+
+describe('applySyncedData', () => {
+  it('applies merged data but keeps local achievements', () => {
+    useProgressStore.getState().validateBadge('first_blood');
+    useProgressStore.getState().applySyncedData({
+      startDate: fixedStart,
+      completions: { [today]: { squats: { isCompleted: true } } },
+      isSetup: true,
+    });
+    const s = useProgressStore.getState();
+    expect(s.completions[today].squats.isCompleted).toBe(true);
+    expect(s.achievements.first_blood).toBe(true);
+  });
+});
+
+// ── achievement setters ──────────────────────────────────────────────────
+
+describe('achievement setters', () => {
+  it('setHasShared flips first_share and hasShared, and pushes to cloud when signed in', async () => {
+    await useProgressStore.getState().initForUser('uid1');
+    await flush();
+    vi.clearAllMocks();
+    useProgressStore.getState().setHasShared();
+    const s = useProgressStore.getState();
+    expect(s.hasShared).toBe(true);
+    expect(s.achievements.first_share).toBe(true);
+    expect(saveAchievementsToCloud).toHaveBeenCalled();
+  });
+
+  it('validateBadge and invalidateBadge set the boolean value', () => {
+    useProgressStore.getState().validateBadge('ghost');
+    expect(useProgressStore.getState().achievements.ghost).toBe(true);
+    useProgressStore.getState().invalidateBadge('ghost');
+    expect(useProgressStore.getState().achievements.ghost).toBe(false);
+  });
+
+  it('setManualBadge stores an arbitrary value', () => {
+    useProgressStore.getState().setManualBadge('beast', true);
+    expect(useProgressStore.getState().achievements.beast).toBe(true);
   });
 });

@@ -156,6 +156,63 @@ describe('computeAllStats — difficulty multiplier', () => {
   });
 });
 
+describe('computeAllStats — time-of-day classification', () => {
+  const today = dateStr(0);
+
+  it('classifies an afternoon workout (12:00–17:59)', () => {
+    const completions = { [today]: fullDay(today, 14) };
+    const stats = computeAllStats(completions, settings, getDayNumber, allExercises, false, {}, getConfig);
+    expect(stats.afternoonWorkouts).toBe(1);
+    expect(stats.morningWorkouts).toBe(0);
+    expect(stats.eveningWorkouts).toBe(0);
+  });
+
+  it('classifies an evening workout (>=18:00)', () => {
+    const completions = { [today]: fullDay(today, 21) };
+    const stats = computeAllStats(completions, settings, getDayNumber, allExercises, false, {}, getConfig);
+    expect(stats.eveningWorkouts).toBe(1);
+  });
+
+  it('flags the ghost workout for the 3am–4am window', () => {
+    const completions = { [today]: fullDay(today, 3) };
+    const stats = computeAllStats(completions, settings, getDayNumber, allExercises, false, {}, getConfig);
+    expect(stats.ghostWorkout).toBe(true);
+  });
+});
+
+describe('computeAllStats — displayStreak when today is not yet done', () => {
+  const yesterday = dateStr(1);
+  const twoDaysAgo = dateStr(2);
+
+  it('shows yesterday\'s streak so the flame stays alive before today is done', () => {
+    const completions = { [twoDaysAgo]: fullDay(twoDaysAgo), [yesterday]: fullDay(yesterday) };
+    const stats = computeAllStats(completions, settings, getDayNumber, allExercises, false, {}, getConfig);
+    expect(stats.todayDone).toBe(false);
+    expect(stats.yesterdayStreak).toBe(2);
+    expect(stats.displayStreak).toBe(2);
+    expect(stats.streakActive).toBe(false);
+  });
+});
+
+describe('computeAllStats — badge count reacts to thresholds', () => {
+  it('awards first_blood + a streak/volume badge once enough activity exists', () => {
+    // Build a 3-day active streak ending today → maxStreak >= 3 (consistent badge)
+    const completions = {
+      [dateStr(0)]: fullDay(dateStr(0)),
+      [dateStr(1)]: fullDay(dateStr(1)),
+      [dateStr(2)]: fullDay(dateStr(2)),
+    };
+    const stats = computeAllStats(completions, settings, getDayNumber, allExercises, false, {}, getConfig);
+    expect(stats.badgeCount).toBeGreaterThanOrEqual(2); // first_blood + consistent
+  });
+
+  it('respects a manual achievement override in the badge count', () => {
+    const withOverride = computeAllStats({}, settings, getDayNumber, allExercises, false, { first_blood: true }, getConfig);
+    const without = computeAllStats({}, settings, getDayNumber, allExercises, false, {}, getConfig);
+    expect(withOverride.badgeCount).toBe(without.badgeCount + 1);
+  });
+});
+
 describe('computeAllStats — ignores exercises outside the active set', () => {
   const today = dateStr(0);
   const completions = {
@@ -166,5 +223,46 @@ describe('computeAllStats — ignores exercises outside the active set', () => {
   it('does not count days made only of foreign exercises', () => {
     expect(stats.totalDays).toBe(0);
     expect(stats.globalTotalReps).toBe(0);
+  });
+});
+
+describe('computeAllStats — cardio-only dashboard (weekly streaks)', () => {
+  const cardioExercises = [{ id: 'running', label: 'Course' }];
+  const userStart = getLocalDateStr(new Date()); // week 1 → running goal 0.45 km
+  const cardioSettings = { exerciseDifficulties: { running: 1.0 } };
+
+  const run = (km) => ({ type: 'running', startTime: Date.now(), distance: km * 1000 });
+
+  it('counts a current weekly streak when the distance goal is met', () => {
+    const cardioReps = { allSessions: [run(0.5)], running: 1234 };
+    const stats = computeAllStats({}, cardioSettings, getDayNumber, cardioExercises, false, {}, getConfig, cardioReps, userStart);
+
+    expect(stats.exerciseCurrentStreaks.running).toBeGreaterThanOrEqual(1);
+    expect(stats.exerciseMaxStreaks.running).toBeGreaterThanOrEqual(1);
+    // cardio reps are injected from the cardioReps argument, not recomputed
+    expect(stats.exerciseReps.running).toBe(1234);
+    // a cardio-only dashboard surfaces the weekly streak as the display streak
+    expect(stats.displayStreak).toBeGreaterThanOrEqual(1);
+    expect(stats.maxStreak).toBeGreaterThanOrEqual(1);
+  });
+
+  it('has no streak when the weekly distance falls short of the goal', () => {
+    const cardioReps = { allSessions: [run(0.1)], running: 0 }; // 0.1 km < 0.45 km
+    const stats = computeAllStats({}, cardioSettings, getDayNumber, cardioExercises, false, {}, getConfig, cardioReps, userStart);
+    expect(stats.exerciseCurrentStreaks.running).toBe(0);
+  });
+
+  it('scales the weekly goal by the per-exercise difficulty', () => {
+    const hardSettings = { exerciseDifficulties: { running: 2.0 } }; // goal becomes 0.9 km
+    const cardioReps = { allSessions: [run(0.5)], running: 0 }; // 0.5 km < 0.9 km
+    const stats = computeAllStats({}, hardSettings, getDayNumber, cardioExercises, false, {}, getConfig, cardioReps, userStart);
+    expect(stats.exerciseCurrentStreaks.running).toBe(0);
+  });
+
+  it('returns a zero streak when there are no sessions at all', () => {
+    const cardioReps = { allSessions: [], running: 0 };
+    const stats = computeAllStats({}, cardioSettings, getDayNumber, cardioExercises, false, {}, getConfig, cardioReps, userStart);
+    expect(stats.exerciseCurrentStreaks.running).toBe(0);
+    expect(stats.exerciseMaxStreaks.running).toBe(0);
   });
 });

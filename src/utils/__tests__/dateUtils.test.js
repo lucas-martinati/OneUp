@@ -6,6 +6,10 @@ import {
   calculateMaxStreak,
   isDayDoneFromCompletions,
   formatTime,
+  formatDuration,
+  getCurrentWeekNumber,
+  getWeekBounds,
+  parseTimestamp,
   MAX_STREAK_WINDOW,
 } from '../dateUtils';
 
@@ -190,5 +194,117 @@ describe('calculateMaxStreak', () => {
     }
     const c = makeCompletions(entries);
     expect(calculateMaxStreak(c)).toBe(5);
+  });
+});
+
+// ── formatDuration ───────────────────────────────────────────────────────
+
+describe('formatDuration', () => {
+  it('returns "0s" for zero or negative input', () => {
+    expect(formatDuration(0)).toBe('0s');
+    expect(formatDuration(-10)).toBe('0s');
+    expect(formatDuration(null)).toBe('0s');
+  });
+
+  it('formats seconds under a minute', () => {
+    expect(formatDuration(45)).toBe('45s');
+  });
+
+  it('formats whole minutes (dropping leftover seconds)', () => {
+    expect(formatDuration(90)).toBe('1m');
+    expect(formatDuration(150)).toBe('2m');
+  });
+
+  it('formats hours and minutes', () => {
+    expect(formatDuration(3600)).toBe('1h 0m');
+    expect(formatDuration(5400)).toBe('1h 30m');
+  });
+});
+
+// ── getCurrentWeekNumber ─────────────────────────────────────────────────
+
+describe('getCurrentWeekNumber', () => {
+  it('defaults to week 1 when no start date is given', () => {
+    expect(getCurrentWeekNumber(null)).toBe(1);
+  });
+
+  it('is week 1 on the start day and within the first 7 days', () => {
+    expect(getCurrentWeekNumber('2025-01-01', new Date('2025-01-01'))).toBe(1);
+    expect(getCurrentWeekNumber('2025-01-01', new Date('2025-01-07'))).toBe(1);
+  });
+
+  it('rolls to week 2 after 7 days and week 3 after 14', () => {
+    expect(getCurrentWeekNumber('2025-01-01', new Date('2025-01-08'))).toBe(2);
+    expect(getCurrentWeekNumber('2025-01-01', new Date('2025-01-14'))).toBe(2);
+    expect(getCurrentWeekNumber('2025-01-01', new Date('2025-01-15'))).toBe(3);
+  });
+
+  it('never returns less than 1 for dates before the start', () => {
+    expect(getCurrentWeekNumber('2025-01-10', new Date('2025-01-01'))).toBe(1);
+  });
+});
+
+// ── getWeekBounds ────────────────────────────────────────────────────────
+
+describe('getWeekBounds', () => {
+  it('returns Monday 00:00 → Sunday 23:59 for a midweek date', () => {
+    const { start, end } = getWeekBounds(new Date(2025, 0, 15)); // Wed Jan 15 2025
+    const s = new Date(start);
+    const e = new Date(end);
+    expect(s.getDay()).toBe(1);   // Monday
+    expect(s.getDate()).toBe(13);
+    expect(s.getHours()).toBe(0);
+    expect(e.getDay()).toBe(0);   // Sunday
+    expect(e.getDate()).toBe(19);
+    expect(e.getHours()).toBe(23);
+  });
+
+  it('maps a Sunday back to the Monday that starts its week', () => {
+    const { start } = getWeekBounds(new Date(2025, 0, 19)); // Sunday
+    expect(new Date(start).getDate()).toBe(13); // same Monday Jan 13
+  });
+});
+
+// ── isDayDoneFromCompletions — week-wide cardio rule ─────────────────────
+
+describe('isDayDoneFromCompletions — weekly cardio carries the day', () => {
+  it('marks a day done when running was completed earlier the same week', () => {
+    const wed = '2025-01-15';
+    const { start } = getWeekBounds(new Date(wed));
+    const mondayStr = getLocalDateStr(new Date(start));
+    const completions = { [mondayStr]: { running: { isCompleted: true } } };
+    expect(isDayDoneFromCompletions(completions, wed)).toBe(true);
+  });
+
+  it('does not mark a day done from cardio in a different week', () => {
+    const completions = { '2025-01-06': { cycling: { isCompleted: true } } };
+    // 2025-01-15 is the following week → not carried over
+    expect(isDayDoneFromCompletions(completions, '2025-01-15')).toBe(false);
+  });
+});
+
+// ── parseTimestamp ───────────────────────────────────────────────────────
+
+describe('parseTimestamp', () => {
+  it('returns a valid date for null / falsy input', () => {
+    expect(parseTimestamp(null)).toBeInstanceOf(Date);
+    expect(Number.isNaN(parseTimestamp(null).getTime())).toBe(false);
+  });
+
+  it('treats a Firebase serverTimestamp placeholder as "now"', () => {
+    const d = parseTimestamp({ '.sv': 'timestamp' });
+    expect(d).toBeInstanceOf(Date);
+    expect(Number.isNaN(d.getTime())).toBe(false);
+  });
+
+  it('parses an epoch number and an ISO string', () => {
+    expect(parseTimestamp(1700000000000).getTime()).toBe(1700000000000);
+    expect(parseTimestamp('2025-01-01T00:00:00.000Z').getTime())
+      .toBe(new Date('2025-01-01T00:00:00.000Z').getTime());
+  });
+
+  it('falls back to a valid date for unparseable input', () => {
+    const d = parseTimestamp('definitely-not-a-date');
+    expect(Number.isNaN(d.getTime())).toBe(false);
   });
 });

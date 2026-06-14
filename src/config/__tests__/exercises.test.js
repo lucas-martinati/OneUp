@@ -1,6 +1,26 @@
 import { describe, it, expect } from 'vitest';
-import { EXERCISES, EXERCISES_MAP, CARDIO_EXERCISES, getDailyGoal } from '../exercises';
+import { EXERCISES, EXERCISES_MAP, CARDIO_EXERCISES, getDailyGoal, getWeeklyGoalKm } from '../exercises';
 import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../weights';
+
+// ── getWeeklyGoalKm (cardio) ────────────────────────────────────────────
+
+describe('getWeeklyGoalKm', () => {
+  it('scales running by +0.45 km per week', () => {
+    expect(getWeeklyGoalKm('running', 1)).toBeCloseTo(0.45, 5);
+    expect(getWeeklyGoalKm('running', 2)).toBeCloseTo(0.9, 5);
+    expect(getWeeklyGoalKm('running', 10)).toBeCloseTo(4.5, 5);
+  });
+
+  it('scales cycling by +0.75 km per week', () => {
+    expect(getWeeklyGoalKm('cycling', 1)).toBeCloseTo(0.75, 5);
+    expect(getWeeklyGoalKm('cycling', 4)).toBeCloseTo(3.0, 5);
+  });
+
+  it('returns 0 for an unknown mode', () => {
+    expect(getWeeklyGoalKm('swimming', 5)).toBe(0);
+    expect(getWeeklyGoalKm(undefined, 5)).toBe(0);
+  });
+});
 
 // ── getDailyGoal ────────────────────────────────────────────────────────
 
