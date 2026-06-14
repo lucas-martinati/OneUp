@@ -53,9 +53,9 @@ export function ProgressRing({
                 <div
                     className={styles.ringHalo}
                     style={{
-                        background: `radial-gradient(circle, ${activeColor}${isCompleted ? '40' : '24'} 0%, transparent 70%)`,
-                        opacity: isCompleted ? 1 : 0.85,
-                        transform: isCompleted ? 'scale(1.08)' : 'scale(1)'
+                        background: `radial-gradient(circle, ${activeColor}${isCompleted ? '2e' : '16'} 0%, transparent 62%)`,
+                        opacity: isCompleted ? 0.9 : 0.7,
+                        transform: isCompleted ? 'scale(1.04)' : 'scale(1)'
                     }}
                 />
             )}

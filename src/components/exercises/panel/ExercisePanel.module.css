@@ -16,11 +16,14 @@
 }
 
 /* Ambient glow turning the flat overlay into a deep, lit space. Sits behind
-   the content (z-index -1 within the isolated context) and breathes slowly
-   for a sense of life. Absolute (not fixed) to avoid transform/stacking
-   pitfalls from the panel's enter animation. */
+   the content (z-index -1 within the isolated context).
+   Fixed to the viewport (not absolute): the panel card is capped at 640px and
+   clips its overflow-x, so an absolute glow gets sharply cut at the card edges
+   on wide/desktop viewports. Filling the viewport lets the light fade out
+   naturally instead. The overlay ancestor has no transform, so the viewport is
+   the containing block. */
 .atmosphere {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
@@ -43,9 +46,10 @@
   opacity: 1;
 }
 
-/* Faint vignette for edge focus. */
+/* Faint vignette for edge focus. Fixed for the same reason as .atmosphere —
+   so it spans the whole viewport instead of being clipped to the card. */
 .vignette {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
@@ -62,7 +66,7 @@
    on completion). */
 .ringHalo {
   position: absolute;
-  inset: -12%;
+  inset: -4%;
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
