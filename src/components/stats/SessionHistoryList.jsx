@@ -39,7 +39,7 @@ export function SessionHistoryList({ sessionHistory, onSelectSession }) {
                                 background: 'rgba(255,255,255,0.03)',
                                 border: '1px solid rgba(255,255,255,0.05)',
                                 cursor: 'pointer', width: '100%', textAlign: 'left',
-                                transition: 'all 0.15s ease',
+                                transition: 'background-color 0.15s ease, border-color 0.15s ease',
                             }}
                             onMouseEnter={e => {
                                 e.currentTarget.style.background = 'rgba(255,255,255,0.06)';

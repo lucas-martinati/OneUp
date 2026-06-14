@@ -43,7 +43,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, filteredUsers, onSe
                 background: 'var(--surface-section)',
                 border: '1px solid var(--border-subtle)',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                cursor: 'pointer', transition: 'all 0.2s ease'
+                cursor: 'pointer', transition: 'background-color 0.2s ease, border-color 0.2s ease'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>

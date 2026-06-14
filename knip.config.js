@@ -5,6 +5,7 @@ const config = {
     "src/components/index.js",
     "src/components/*/index.js",
     "src/services/*Service.js",
+    "src/services/revenuecatWebStub.js", // Référencé via un alias Vite (NATIVE_BUILD), invisible pour knip
     "coverage/**",
     "scratch/**"
   ],

@@ -58,7 +58,7 @@ export function LeaderboardRow({
                 background: bg,
                 border: border,
                 boxShadow: isPerfect ? '0 0 10px rgba(255, 215, 0, 0.08)' : 'none',
-                cursor: 'pointer', transition: 'all 0.2s ease',
+                cursor: 'pointer', transition: 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease',
                 position: 'relative', overflow: 'hidden'
             }}
         >

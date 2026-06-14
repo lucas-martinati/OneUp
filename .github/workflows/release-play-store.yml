@@ -151,8 +151,10 @@ jobs:
         run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > android/app/google-services.json
 
       # ── Build web assets ──────────────────────────────────────
+      # NATIVE_BUILD strips the RevenueCat web SDK (~626 KB) from the AAB — it is
+      # never executed on native (purchaseService guards it behind isNativePlatform).
       - name: Build web app
-        run: npm run build
+        run: NATIVE_BUILD=true npm run build
 
       # ── Sync Capacitor (copy assets + update native plugins) ──
       - name: Sync Capacitor Android

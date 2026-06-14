@@ -3,6 +3,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// Native (Capacitor) builds set NATIVE_BUILD=true: the RevenueCat *web* SDK is
+// never executed on native, so we alias it to a tiny stub to keep ~626 KB out of
+// the Android APK. Web/PWA builds leave it untouched.
+const NATIVE_BUILD = process.env.NATIVE_BUILD === 'true';
+
 // https://vitejs.dev/config/
 export default defineConfig({
   base: process.env.GITHUB_PAGES ? '/OneUp/' : '/',
@@ -44,6 +49,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      // Strip the RevenueCat web SDK from native builds (see NATIVE_BUILD above).
+      ...(NATIVE_BUILD ? { '@revenuecat/purchases-js': '/src/services/revenuecatWebStub.js' } : {}),
       '@components': '/src/components',
       '@config': '/src/config',
       '@contexts': '/src/contexts',

@@ -45,7 +45,7 @@ const StatCard = ({ icon: Icon, label, value, color }) => (
     border: '1px solid var(--border-subtle)',
     display: 'flex', flexDirection: 'column', gap: '4px',
     minWidth: '0',
-    transition: 'all 0.2s ease'
+    transition: 'background-color 0.2s ease, border-color 0.2s ease'
   }}>
     <div style={{
       display: 'flex', alignItems: 'center', gap: '6px',
