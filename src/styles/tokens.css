@@ -1,0 +1,207 @@
+:root {
+  /* Base Colors */
+  --bg-color: rgb(5, 5, 5);
+  --card-bg: rgba(10, 10, 15, 0.4);
+  --text-primary: rgb(255, 255, 255);
+  --text-secondary: rgb(176, 176, 186);
+  --accent: rgb(109, 40, 217);
+  --accent-glow: rgb(139, 92, 246);
+  --success: rgb(16, 185, 129);
+  --error: rgb(239, 68, 68);
+  --warning: rgb(245, 158, 11);
+  --font-main: 'Outfit', sans-serif;
+
+  /* Touch targets */
+  --touch-min: 40px;
+
+  /* Dashboard sizes */
+  --exercise-btn-min-height: clamp(58px, 9.2vh, 80px);
+  --bottom-btn-size: clamp(72px, 12vh, 110px);
+  --category-title-size: 0.7rem;
+  --day-label-size-with-title: clamp(0.7rem, 1.45vh, 0.9rem);
+  --day-num-height-with-title: clamp(2rem, 6.5vh, 5.5rem);
+  --day-num-font-size-with-title: clamp(1.8rem, 6vh, 5rem);
+  --exercise-btn-min-height-with-title: clamp(46px, 7vh, 60px);
+  --done-text-margin-with-title: clamp(2px, 0.4vh, 4px);
+  --done-text-size-with-title: clamp(0.6rem, 2.2vw, 0.78rem);
+  --bottom-btn-size-with-title: clamp(60px, 10vh, 84px);
+
+  /* Motion */
+  --ease-panel-in: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-fast: 180ms;
+  --motion-panel: 240ms;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-accent: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-glow: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 50%, #0ea5e9 100%);
+  --gradient-rainbow: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+  --gradient-gold: linear-gradient(135deg, #FFD700, #FDB931, #FFD700);
+  --gradient-gold-trans: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(251, 191, 36, 0.15));
+
+  /* Shadows & Glows */
+  --glow-primary: 0 0 20px rgba(102, 126, 234, 0.5);
+  --glow-success: 0 0 30px rgba(16, 185, 129, 0.4);
+  --glow-accent: 0 0 25px rgba(109, 40, 217, 0.6);
+  --glow-gold: 0 0 15px rgba(255, 215, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Theme-dependent surfaces */
+  --overlay-bg: rgb(5, 5, 5);
+  --overlay-bg-heavy: rgba(0, 0, 0, 0.88);
+  --overlay-backdrop: rgba(0, 0, 0, 0.7);
+  --surface-elevated: linear-gradient(135deg, rgba(15, 15, 20, 0.6), rgba(25, 25, 35, 0.6));
+  --surface-section: linear-gradient(135deg, rgba(15, 15, 20, 0.8), rgba(25, 25, 35, 0.8));
+  --surface-subtle: rgba(255, 255, 255, 0.03);
+  --surface-muted: rgba(255, 255, 255, 0.05);
+  --surface-dim: rgba(255, 255, 255, 0.08);
+  --surface-hover: rgba(255, 255, 255, 0.1);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-muted: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --text-on-surface: #ffffff;
+  --select-option-bg: #1a1a2e;
+  --sheet-bg: rgba(10, 10, 15, 0.97);
+  --sheet-handle: rgba(255, 255, 255, 0.15);
+  --progress-track: rgba(255, 255, 255, 0.15);
+  --progress-track-thin: rgba(255, 255, 255, 0.1);
+  --shimmer-color: rgba(255, 255, 255, 0.1);
+  --ripple-color: rgba(255, 255, 255, 0.3);
+  --divider: rgba(255, 255, 255, 0.04);
+  --body-bg: linear-gradient(180deg, #050505 0%, #0a0a0f 100%);
+  --body-glow-1: rgba(109, 40, 217, 0.1);
+  --body-glow-2: rgba(139, 92, 246, 0.08);
+  --tooltip-bg: rgba(18, 18, 20, 0.95);
+  color-scheme: dark;
+}
+
+/* App Themes */
+[data-theme="ocean"] {
+  --body-bg: linear-gradient(180deg, rgb(4, 5, 7) 0%, rgb(2, 3, 4) 100%);
+  --bg-color: rgb(2, 3, 4);
+  --surface-muted: rgba(6, 182, 212, 0.05);
+  --surface-subtle: rgba(6, 182, 212, 0.03);
+  --surface-dim: rgba(6, 182, 212, 0.08);
+  --card-bg: rgba(10, 16, 22, 0.4);
+  --surface-section: linear-gradient(135deg, rgba(15, 22, 30, 0.8), rgba(20, 32, 45, 0.8));
+  --surface-elevated: linear-gradient(135deg, rgba(15, 22, 30, 0.6), rgba(20, 32, 45, 0.6));
+  --sheet-bg: rgba(10, 16, 22, 0.97);
+  --overlay-bg: rgb(5, 8, 12);
+  --border-subtle: rgba(6, 182, 212, 0.05);
+  --border-muted: rgba(6, 182, 212, 0.06);
+  --border-default: rgba(6, 182, 212, 0.1);
+  --border-strong: rgba(6, 182, 212, 0.15);
+  --surface-hover: rgba(6, 182, 212, 0.1);
+
+  --accent: rgb(6, 182, 212);
+  --accent-glow: rgb(34, 211, 238);
+  --body-glow-1: rgba(6, 182, 212, 0.1);
+  --body-glow-2: rgba(14, 116, 144, 0.05);
+  --gradient-primary: linear-gradient(135deg, rgb(14, 165, 233) 0%, rgb(6, 182, 212) 100%);
+  --gradient-accent: linear-gradient(135deg, rgb(56, 189, 248) 0%, rgb(34, 211, 238) 100%);
+  --gradient-glow: linear-gradient(135deg, rgb(2, 132, 199) 0%, rgb(6, 182, 212) 50%, rgb(34, 211, 238) 100%);
+  --glow-primary: 0 0 20px rgba(14, 165, 233, 0.4);
+  --glow-accent: 0 0 25px rgba(6, 182, 212, 0.5);
+}
+
+[data-theme="sunset"] {
+  --body-bg: linear-gradient(180deg, rgb(8, 5, 4) 0%, rgb(4, 3, 2) 100%);
+  --bg-color: rgb(4, 3, 2);
+  --surface-muted: rgba(249, 115, 22, 0.05);
+  --surface-subtle: rgba(249, 115, 22, 0.03);
+  --surface-dim: rgba(249, 115, 22, 0.08);
+  --card-bg: rgba(22, 14, 10, 0.4);
+  --surface-section: linear-gradient(135deg, rgba(30, 18, 15, 0.8), rgba(45, 24, 20, 0.8));
+  --surface-elevated: linear-gradient(135deg, rgba(30, 18, 15, 0.6), rgba(45, 24, 20, 0.6));
+  --sheet-bg: rgba(22, 14, 10, 0.97);
+  --overlay-bg: rgb(12, 8, 5);
+  --border-subtle: rgba(249, 115, 22, 0.05);
+  --border-muted: rgba(249, 115, 22, 0.06);
+  --border-default: rgba(249, 115, 22, 0.1);
+  --border-strong: rgba(249, 115, 22, 0.15);
+  --surface-hover: rgba(249, 115, 22, 0.1);
+
+  --accent: rgb(249, 115, 22);
+  --accent-glow: rgb(251, 146, 60);
+  --body-glow-1: rgba(249, 115, 22, 0.1);
+  --body-glow-2: rgba(220, 38, 38, 0.05);
+  --gradient-primary: linear-gradient(135deg, rgb(239, 68, 68) 0%, rgb(249, 115, 22) 100%);
+  --gradient-accent: linear-gradient(135deg, rgb(248, 113, 113) 0%, rgb(251, 146, 60) 100%);
+  --gradient-glow: linear-gradient(135deg, rgb(220, 38, 38) 0%, rgb(249, 115, 22) 50%, rgb(251, 146, 60) 100%);
+  --glow-primary: 0 0 20px rgba(239, 68, 68, 0.4);
+  --glow-accent: 0 0 25px rgba(249, 115, 22, 0.5);
+}
+
+[data-theme="forest"] {
+  --body-bg: linear-gradient(180deg, rgb(4, 6, 5) 0%, rgb(2, 3, 2) 100%);
+  --bg-color: rgb(2, 3, 2);
+  --surface-muted: rgba(34, 197, 94, 0.05);
+  --surface-subtle: rgba(34, 197, 94, 0.03);
+  --surface-dim: rgba(34, 197, 94, 0.08);
+  --card-bg: rgba(10, 18, 12, 0.4);
+  --surface-section: linear-gradient(135deg, rgba(15, 25, 18, 0.8), rgba(22, 38, 25, 0.8));
+  --surface-elevated: linear-gradient(135deg, rgba(15, 25, 18, 0.6), rgba(22, 38, 25, 0.6));
+  --sheet-bg: rgba(10, 18, 12, 0.97);
+  --overlay-bg: rgb(5, 10, 6);
+  --border-subtle: rgba(34, 197, 94, 0.05);
+  --border-muted: rgba(34, 197, 94, 0.06);
+  --border-default: rgba(34, 197, 94, 0.1);
+  --border-strong: rgba(34, 197, 94, 0.15);
+  --surface-hover: rgba(34, 197, 94, 0.1);
+
+  --accent: rgb(34, 197, 94);
+  --accent-glow: rgb(74, 222, 128);
+  --body-glow-1: rgba(34, 197, 94, 0.1);
+  --body-glow-2: rgba(20, 83, 45, 0.05);
+  --gradient-primary: linear-gradient(135deg, rgb(16, 185, 129) 0%, rgb(34, 197, 94) 100%);
+  --gradient-accent: linear-gradient(135deg, rgb(52, 211, 153) 0%, rgb(74, 222, 128) 100%);
+  --gradient-glow: linear-gradient(135deg, rgb(5, 150, 105) 0%, rgb(34, 197, 94) 50%, rgb(74, 222, 128) 100%);
+  --glow-primary: 0 0 20px rgba(16, 185, 129, 0.4);
+  --glow-accent: 0 0 25px rgba(34, 197, 94, 0.5);
+}
+
+[data-theme="purple"] {
+  --body-bg: linear-gradient(180deg, rgb(6, 4, 8) 0%, rgb(3, 2, 4) 100%);
+  --bg-color: rgb(3, 2, 4);
+  --surface-muted: rgba(168, 85, 247, 0.05);
+  --surface-subtle: rgba(168, 85, 247, 0.03);
+  --surface-dim: rgba(168, 85, 247, 0.08);
+  --card-bg: rgba(16, 10, 22, 0.4);
+  --surface-section: linear-gradient(135deg, rgba(22, 15, 30, 0.8), rgba(35, 22, 45, 0.8));
+  --surface-elevated: linear-gradient(135deg, rgba(22, 15, 30, 0.6), rgba(35, 22, 45, 0.6));
+  --sheet-bg: rgba(16, 10, 22, 0.97);
+  --overlay-bg: rgb(8, 5, 12);
+  --border-subtle: rgba(168, 85, 247, 0.05);
+  --border-muted: rgba(168, 85, 247, 0.06);
+  --border-default: rgba(168, 85, 247, 0.1);
+  --border-strong: rgba(168, 85, 247, 0.15);
+  --surface-hover: rgba(168, 85, 247, 0.1);
+
+  --accent: rgb(168, 85, 247);
+  --accent-glow: rgb(192, 132, 252);
+  --body-glow-1: rgba(168, 85, 247, 0.1);
+  --body-glow-2: rgba(126, 34, 206, 0.08);
+  --gradient-primary: linear-gradient(135deg, rgb(139, 92, 246) 0%, rgb(168, 85, 247) 100%);
+  --gradient-accent: linear-gradient(135deg, rgb(167, 139, 250) 0%, rgb(192, 132, 252) 100%);
+  --gradient-glow: linear-gradient(135deg, rgb(124, 58, 237) 0%, rgb(168, 85, 247) 50%, rgb(192, 132, 252) 100%);
+  --glow-primary: 0 0 20px rgba(139, 92, 246, 0.4);
+  --glow-accent: 0 0 25px rgba(168, 85, 247, 0.5);
+}

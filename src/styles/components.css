@@ -1,0 +1,448 @@
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Shared Typography ──────────────────────────────────────────────── */
+.panel-title {
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+
+/* ── Shared Modal Overlay ───────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+  touch-action: auto;
+  padding: 0;
+  padding-top: calc(var(--spacing-md) + env(safe-area-inset-top));
+  padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom));
+}
+
+.modal-overlay .modal-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 640px; /* Centralized width for all panels */
+  margin: 0 auto;
+  padding: 0 var(--spacing-sm);
+}
+
+.modal-overlay.fade-in {
+  animation: modalOverlayFadeIn var(--motion-fast) ease-out;
+}
+
+.modal-overlay.fade-in > .modal-content {
+  animation: panelEnter var(--motion-panel) var(--ease-panel-in);
+  transform-origin: top center;
+}
+
+@media (min-width: 600px) {
+  .modal-overlay {
+    align-items: center;
+    justify-content: flex-start;
+  }
+}
+
+/* ── Shared Bottom Sheet ────────────────────────────────────────────── */
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--sheet-bg);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-default);
+  z-index: 200;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
+}
+
+.bottom-sheet .sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--sheet-handle);
+  border-radius: var(--radius-full);
+  margin: var(--spacing-sm) auto;
+}
+
+@media (min-width: 600px) {
+  .bottom-sheet {
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 560px;
+    border-radius: var(--radius-xl);
+    bottom: var(--spacing-lg);
+    border: 1px solid var(--border-default);
+  }
+}
+/* --- Chart Components --- */
+.chart-card {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.chart-title {
+    margin-bottom: var(--spacing-sm);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    text-align: center;
+    width: 100%;
+}
+
+.chart-empty-state {
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text-secondary);
+}
+
+.chart-empty-icon {
+    font-size: 1.5rem;
+}
+
+.chart-empty-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.chart-empty-hint {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    text-align: center;
+    max-width: 240px;
+}
+
+.chart-wrapper {
+    width: 100%;
+    height: 200px;
+    min-height: 200px;
+}
+
+.chart-wrapper-overflow {
+    width: calc(100% + 16px);
+    margin-left: -16px;
+    height: 200px;
+    min-height: 200px;
+}
+
+/* Premium Slider */
+.premium-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  touch-action: pan-y;
+  pointer-events: none;
+}
+
+.premium-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--slider-color, var(--accent));
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--slider-color, var(--accent));
+  border: 2px solid var(--bg-color);
+  transition: transform 0.15s ease;
+  pointer-events: auto;
+}
+
+.premium-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.premium-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--bg-color);
+  border-radius: 50%;
+  background: var(--slider-color, var(--accent));
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--slider-color, var(--accent));
+  transition: transform 0.15s ease;
+  pointer-events: auto;
+}
+
+.premium-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Easter Egg Animations */
+@keyframes streak-float {
+  0% { transform: translate(-50%, -50%) scale(0.5) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 5px rgba(249,115,22,0.8)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 15px rgba(249,115,22,1)); }
+  100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.8) rotate(var(--rot)); opacity: 0; filter: drop-shadow(0 0 5px rgba(249,115,22,0)); }
+}
+
+.streak-particle {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  animation: streak-float 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  z-index: 9999;
+}
+
+/* ── Cardio Module ──────────────────────────────────────────────────── */
+
+.cardio-module {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 28px;
+}
+
+.cardio-tabs button:active {
+  transform: scale(0.95);
+}
+
+.cardio-progress-fill {
+  position: relative;
+  overflow: hidden;
+}
+
+.cardio-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: translateX(-200%);
+  animation: cardioShimmer 2.5s ease-in-out infinite;
+}
+
+@keyframes cardioShimmer {
+  0% { transform: translateX(-200%); }
+  100% { transform: translateX(400%); }
+}
+
+.cardio-map-container {
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Leaflet Accessibility Contrast Fixes */
+.leaflet-control-attribution {
+  background: rgba(10, 10, 15, 0.8) !important;
+  color: var(--text-secondary) !important;
+}
+.leaflet-control-attribution a {
+  color: #4facfe !important;
+}
+
+/* ── Category Navigation Sidebar ── */
+.category-nav-container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  gap: 10px;
+  z-index: 100;
+  padding: 12px 6px; /* Tighter padding around the elements */
+  background: rgba(10, 10, 15, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.category-nav-container::before {
+  /* Invisible extended hit area — pointer-events: none so it doesn't block
+     vertical scroll on the page. The actual scrubber drag uses setPointerCapture
+     which tracks the pointer regardless of position once activated. */
+  content: '';
+  position: absolute;
+  top: -20px;
+  bottom: -20px;
+  left: -20px;
+  right: -20px;
+  pointer-events: none;
+}
+
+.category-nav-container.expanded {
+  background: rgba(20, 20, 25, 0.7);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-default);
+}
+
+.category-nav-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 10px;
+  background: var(--text-secondary);
+  opacity: 0.35;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Apple-style Bump */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 0 auto;
+}
+
+.category-nav-dot.active {
+  height: 20px;
+  opacity: 1;
+  background: var(--text-primary);
+  width: 5px;
+}
+
+.category-nav-container.expanded .category-nav-dot {
+  width: 14px; /* Pill shape */
+  opacity: 0.6;
+}
+
+@media (hover: hover) {
+  .category-nav-container:hover .category-nav-dot {
+    width: 14px;
+    opacity: 0.6;
+  }
+}
+
+.category-nav-container.expanded .category-nav-dot.active {
+  width: 22px; /* Active pill is longer */
+  height: 24px;
+  opacity: 1;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+@media (hover: hover) {
+  .category-nav-container:hover .category-nav-dot.active {
+    width: 22px;
+    height: 24px;
+    opacity: 1;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+  }
+}
+
+.category-nav-dot.drag-over {
+  width: 28px !important;
+  opacity: 1 !important;
+  background: var(--text-primary) !important;
+}
+
+@media (hover: hover) {
+  .category-nav-dot:hover {
+    width: 28px !important;
+    opacity: 1 !important;
+    background: var(--text-primary) !important;
+  }
+}
+
+.category-nav-label {
+  position: absolute;
+  right: 36px;
+  background: var(--overlay-bg-heavy);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-primary);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(10px) scale(0.9);
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-lg);
+  letter-spacing: 0.5px;
+}
+
+.category-nav-dot.drag-over .category-nav-label,
+.category-nav-container.expanded .category-nav-dot.active .category-nav-label {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+@media (hover: hover) {
+  .category-nav-dot:hover .category-nav-label {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* ── Large Screen Optimizations (PC/Tablet) ── */
+@media (min-width: 768px) {
+  .category-nav-container {
+    right: 24px;
+    padding: 16px 10px;
+    gap: 16px;
+    border-radius: 24px;
+  }
+  
+  .category-nav-container::before {
+    /* Larger hit area on desktop, but doesn't overlap center content */
+    left: -30px; 
+    right: -30px;
+  }
+  
+  .category-nav-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .category-nav-dot.active {
+    height: 28px;
+    width: 6px;
+  }
+  
+  .category-nav-container.expanded .category-nav-dot,
+  .category-nav-container:hover .category-nav-dot {
+    width: 18px;
+  }
+  
+  .category-nav-container.expanded .category-nav-dot.active,
+  .category-nav-container:hover .category-nav-dot.active {
+    width: 26px;
+    height: 30px;
+  }
+  
+  .category-nav-dot.drag-over,
+  .category-nav-dot:hover {
+    width: 32px !important;
+  }
+}
