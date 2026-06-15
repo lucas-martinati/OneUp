@@ -67,7 +67,8 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
         return (
             <div key={ex.id} style={{
                 display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px',
-                borderRadius: 'var(--radius-md)', background: `${ex.color}08`
+                borderRadius: 'var(--radius-md)', background: `${ex.color}16`,
+                border: `1px solid ${ex.color}22`
             }}>
                 <ExIcon size={16} color={ex.color} style={{ flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -140,14 +141,10 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                         ? '0 0 30px rgba(255, 215, 0, 0.25), 0 20px 60px rgba(0,0,0,0.5)' 
                         : '0 20px 60px rgba(0,0,0,0.5)',
                     maxHeight: '90vh', display: 'flex', flexDirection: 'column',
-                    background: rank === 1 
-                        ? 'linear-gradient(135deg, rgba(30, 25, 10, 0.8), rgba(20, 15, 5, 0.5))' 
-                        : rank === 2 
-                            ? 'linear-gradient(135deg, rgba(25, 25, 25, 0.8), rgba(15, 15, 15, 0.5))'
-                            : rank === 3
-                                ? 'linear-gradient(135deg, rgba(30, 20, 15, 0.8), rgba(20, 10, 5, 0.5))'
-                                : undefined,
-                    border: rank <= 3 ? `1px solid ${rankColor}40` : undefined,
+                    background: rank <= 3
+                        ? `linear-gradient(160deg, ${rankColor}24, transparent 58%), var(--surface-section)`
+                        : 'var(--surface-section)',
+                    border: rank <= 3 ? `1px solid ${rankColor}40` : '1px solid var(--border-default)',
                     position: 'relative', overflow: 'hidden'
                 }}
             >
@@ -192,13 +189,25 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
 
                 <div style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    gap: '8px', marginBottom: 'var(--spacing-md)'
+                    gap: '10px', marginBottom: 'var(--spacing-md)'
                 }}>
-                    <Avatar photoURL={entry.photoURL} name={entry.pseudo} size={64} borderColor={rankColor} />
+                    <div style={{
+                        position: 'relative', borderRadius: '50%',
+                        boxShadow: isPerfect ? '0 0 28px -2px rgba(255,215,0,0.6)' : `0 0 24px -6px ${rankColor}`
+                    }}>
+                        {isPerfect && (
+                            <>
+                                <Star className="sparkle-icon" size={13} fill="#FFD700" style={{ top: '-4px', left: '-2px', animationDelay: '0s' }} />
+                                <Star className="sparkle-icon" size={10} fill="#FFD700" style={{ bottom: '2px', right: '-4px', animationDelay: '1.6s' }} />
+                                <Star className="sparkle-icon" size={11} fill="#FFD700" style={{ top: '46%', right: '-8px', animationDelay: '2.9s' }} />
+                            </>
+                        )}
+                        <Avatar photoURL={entry.photoURL} name={entry.pseudo} size={76} borderColor={isPerfect ? '#ffd700' : rankColor} />
+                    </div>
 
                     <div style={{ textAlign: 'center' }}>
                         <div style={{
-                            fontSize: '1.4rem', fontWeight: '800', color: isMe ? '#fbbf24' : 'var(--text-primary)',
+                            fontSize: '1.45rem', fontWeight: '800', color: 'var(--text-primary)',
                             display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', justifyContent: 'center'
                         }}>
                             <span style={{ wordBreak: 'break-all' }}>
@@ -251,12 +260,13 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                             })}
                         </div>
                         <div style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '4px',
-                            padding: '3px 10px', borderRadius: '12px', marginTop: '4px',
-                            background: `${rankColor}18`, border: `1px solid ${rankColor}30`
+                            display: 'inline-flex', alignItems: 'center', gap: '5px',
+                            padding: '4px 12px', borderRadius: 'var(--radius-full)', marginTop: '6px',
+                            background: `${rankColor}1f`, border: `1px solid ${rankColor}3d`,
+                            boxShadow: rank <= 3 ? `0 0 14px -4px ${rankColor}` : 'none'
                         }}>
-                            {rank <= 3 ? <Medal size={14} color={rankColor} /> : <span style={{ fontSize: '0.75rem', color: rankColor, fontWeight: '700' }}>#</span>}
-                            <span style={{ fontSize: '0.8rem', fontWeight: '700', color: rankColor }}>{rank}</span>
+                            {rank <= 3 ? <Medal size={14} color={rankColor} /> : <span style={{ fontSize: '0.78rem', color: rankColor, fontWeight: '800' }}>#</span>}
+                            <span style={{ fontSize: '0.82rem', fontWeight: '800', color: rankColor }}>{rank}</span>
                         </div>
                     </div>
                 </div>
@@ -334,12 +344,21 @@ const sectionLabelStyle = {
 
 function StatCard({ icon, label, value, color }) {
     return (
-        <div style={{ padding: '10px', borderRadius: 'var(--radius-md)', background: `${color}08`, border: `1px solid ${color}15`, textAlign: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', marginBottom: '4px' }}>
+        <div style={{
+            padding: '13px 10px', borderRadius: 'var(--radius-lg)',
+            background: `linear-gradient(160deg, ${color}2e, ${color}12)`,
+            border: `1px solid ${color}38`,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '7px'
+        }}>
+            <div style={{
+                width: '32px', height: '32px', borderRadius: '50%',
+                background: `${color}1f`, border: `1px solid ${color}33`,
+                display: 'grid', placeItems: 'center'
+            }}>
                 {icon}
-                <span style={{ fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)' }}>{label}</span>
             </div>
-            <div style={{ fontSize: '1.3rem', fontWeight: '800', color }}>{value}</div>
+            <div style={{ fontSize: '1.4rem', fontWeight: '800', color, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{value}</div>
+            <div style={{ fontSize: '0.56rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-secondary)', textAlign: 'center' }}>{label}</div>
         </div>
     );
 }

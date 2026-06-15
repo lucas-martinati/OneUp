@@ -1,142 +1,89 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Dumbbell, Activity, Filter, ChevronDown, ChevronUp } from '../../utils/icons';
+import { Trophy, Dumbbell, Filter, ChevronUp } from '../../utils/icons';
+
+const domainActive = {
+    bodyweight: { bg: 'linear-gradient(135deg, rgba(251,191,36,0.22), rgba(245,158,11,0.08))', border: 'rgba(251,191,36,0.45)', color: '#fbbf24' },
+    weights: { bg: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(234,88,12,0.08))', border: 'rgba(249,115,22,0.45)', color: '#fb923c' },
+};
 
 export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VISIBLE_TABS, showDomainFilter = true, showExerciseTabs = true }) {
     const { t } = useTranslation();
     const [showAll, setShowAll] = useState(false);
 
-    // Ensure we know which tab is active, fallback to first if none match
     const currentActiveId = VISIBLE_TABS.find(t => t.id === activeTab) ? activeTab : VISIBLE_TABS[0].id;
-
-    // Filter tabs
     const globalTabs = VISIBLE_TABS.filter(tab => tab.isGlobal);
     const exerciseTabs = VISIBLE_TABS.filter(tab => !tab.isGlobal);
+
+    const domainBtnStyle = (active, key) => ({
+        flex: 1, padding: '11px', borderRadius: 'var(--radius-md)',
+        background: active ? domainActive[key].bg : 'var(--surface-subtle)',
+        color: active ? domainActive[key].color : 'var(--text-secondary)',
+        border: `1px solid ${active ? domainActive[key].border : 'var(--border-subtle)'}`,
+        fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+        transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease'
+    });
+
+    const chipStyle = (isActive, color, special = false, dashed = false) => ({
+        display: 'inline-flex', alignItems: 'center', gap: '5px',
+        padding: special ? '7px 15px' : '7px 12px',
+        borderRadius: 'var(--radius-full)',
+        background: isActive ? `linear-gradient(135deg, ${color}2e, ${color}14)` : 'var(--surface-subtle)',
+        border: `1.5px ${dashed ? 'dashed' : 'solid'} ${isActive ? `${color}66` : 'var(--border-subtle)'}`,
+        color: isActive ? color : 'var(--text-secondary)',
+        fontSize: '0.75rem', fontWeight: special ? '800' : '600',
+        textTransform: special ? 'uppercase' : 'none',
+        letterSpacing: special ? '0.06em' : 'normal',
+        cursor: 'pointer', minHeight: 'var(--touch-min)',
+        boxShadow: isActive && special ? `0 0 14px ${color}33` : 'none',
+        transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease'
+    });
 
     return (
         <>
             {/* ── Domain Filter ── */}
             {showDomainFilter && (
-            <div style={{
-                display: 'flex', gap: '8px', padding: '12px 0 16px',
-                background: 'transparent',
-                marginBottom: '4px'
-            }}>
-                <button
-                    onClick={() => { setDomain('bodyweight'); setActiveTab('bodyweight'); setShowAll(false); }}
-                    style={{
-                        flex: 1, padding: '10px', borderRadius: 'var(--radius-md)',
-                        background: domain === 'bodyweight' ? '#ffffff' : 'rgba(255,255,255,0.05)',
-                        color: domain === 'bodyweight' ? '#000000' : 'var(--text-secondary)',
-                        border: 'none', fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
-                    }}
-                >
-                    <Trophy size={16} /> {t('common.bodyweight')}
-                </button>
-                <button
-                    onClick={() => { setDomain('weights'); setActiveTab('weights'); setShowAll(false); }}
-                    style={{
-                        flex: 1, padding: '10px', borderRadius: 'var(--radius-md)',
-                        background: domain === 'weights' ? 'linear-gradient(135deg, #f97316, #ea580c)' : 'rgba(255,255,255,0.05)',
-                        color: domain === 'weights' ? '#ffffff' : 'var(--text-secondary)',
-                        border: domain === 'weights' ? '1px solid rgba(249,115,22,0.4)' : '1px solid transparent',
-                        fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
-                    }}
-                >
-                    <Dumbbell size={16} /> {t('common.weights')}
-                </button>
-            </div>
+                <div style={{ display: 'flex', gap: '8px', padding: '14px 0 8px' }}>
+                    <button onClick={() => { setDomain('bodyweight'); setActiveTab('bodyweight'); setShowAll(false); }} style={domainBtnStyle(domain === 'bodyweight', 'bodyweight')}>
+                        <Trophy size={16} /> {t('common.bodyweight')}
+                    </button>
+                    <button onClick={() => { setDomain('weights'); setActiveTab('weights'); setShowAll(false); }} style={domainBtnStyle(domain === 'weights', 'weights')}>
+                        <Dumbbell size={16} /> {t('common.weights')}
+                    </button>
+                </div>
             )}
 
-            {/* ── Tabs (wrapping) ───────────────────────────────── */}
+            {/* ── Tabs (wrapping) ── */}
             {showExerciseTabs && (
-            <div style={{
-                display: 'flex', flexWrap: 'wrap', gap: '6px',
-                padding: showDomainFilter ? '0' : '0 0 var(--spacing-sm) 0'
-            }}>
-                {/* Always show Global tabs */}
-                {globalTabs.map(tab => {
-                    const isActive = tab.id === currentActiveId;
-                    const Icon = tab.icon;
-                    return (
-                        <button
-                            key={tab.id}
-                            onClick={() => { setActiveTab(tab.id); setShowAll(false); }}
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '5px',
-                                padding: tab.isSpecial ? '7px 16px' : '7px 12px',
-                                borderRadius: '20px',
-                                background: isActive
-                                    ? `linear-gradient(135deg, ${tab.color}30, ${tab.color}18)`
-                                    : tab.isSpecial ? `linear-gradient(135deg, ${tab.color}15, transparent)` : 'rgba(255,255,255,0.05)',
-                                border: isActive
-                                    ? `1.5px solid ${tab.color}60`
-                                    : tab.isSpecial ? `1.5px solid ${tab.color}30` : '1.5px solid rgba(255,255,255,0.08)',
-                                color: isActive ? tab.color : 'var(--text-secondary)',
-                                fontSize: '0.75rem', fontWeight: tab.isSpecial ? '800' : '600',
-                                textTransform: tab.isSpecial ? 'uppercase' : 'none',
-                                letterSpacing: tab.isSpecial ? '1px' : 'normal',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                minHeight: 'var(--touch-min)',
-                                boxShadow: isActive && tab.isSpecial ? `0 0 12px ${tab.color}40` : 'none'
-                            }}
-                        >
-                            <Icon size={14} />
-                            {tab.customLabel ? tab.customLabel : t(tab.labelKey)}
-                        </button>
-                    );
-                })}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: showDomainFilter ? '0' : '4px 0 var(--spacing-sm)' }}>
+                    {globalTabs.map(tab => {
+                        const isActive = tab.id === currentActiveId;
+                        const Icon = tab.icon;
+                        return (
+                            <button key={tab.id} onClick={() => { setActiveTab(tab.id); setShowAll(false); }} style={chipStyle(isActive, tab.color, tab.isSpecial)}>
+                                <Icon size={14} />
+                                {tab.customLabel ? tab.customLabel : t(tab.labelKey)}
+                            </button>
+                        );
+                    })}
 
-                {/* Show active exercise if showAll is false, OR show all exercises if showAll is true */}
-                {exerciseTabs.filter(tab => showAll || tab.id === currentActiveId).map(tab => {
-                    const isActive = tab.id === currentActiveId;
-                    const Icon = tab.icon;
-                    return (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '5px',
-                                padding: '7px 12px',
-                                borderRadius: '20px',
-                                background: isActive ? `linear-gradient(135deg, ${tab.color}30, ${tab.color}18)` : 'rgba(255,255,255,0.05)',
-                                border: isActive ? `1.5px solid ${tab.color}60` : '1.5px solid rgba(255,255,255,0.08)',
-                                color: isActive ? tab.color : 'var(--text-secondary)',
-                                fontSize: '0.75rem', fontWeight: '600',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                minHeight: 'var(--touch-min)'
-                            }}
-                        >
-                            <Icon size={14} />
-                            {tab.customLabel ? tab.customLabel : t(tab.labelKey)}
-                        </button>
-                    );
-                })}
+                    {exerciseTabs.filter(tab => showAll || tab.id === currentActiveId).map(tab => {
+                        const isActive = tab.id === currentActiveId;
+                        const Icon = tab.icon;
+                        return (
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={chipStyle(isActive, tab.color)}>
+                                <Icon size={14} />
+                                {tab.customLabel ? tab.customLabel : t(tab.labelKey)}
+                            </button>
+                        );
+                    })}
 
-                {/* Toggle Button */}
-                <button
-                    onClick={() => setShowAll(!showAll)}
-                    style={{
-                        display: 'flex', alignItems: 'center', gap: '5px',
-                        padding: '7px 12px',
-                        borderRadius: '20px',
-                        background: showAll ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)',
-                        border: showAll ? '1.5px solid rgba(255,255,255,0.2)' : '1.5px dashed rgba(255,255,255,0.2)',
-                        color: 'var(--text-secondary)',
-                        fontSize: '0.75rem', fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        minHeight: 'var(--touch-min)'
-                    }}
-                >
-                    {showAll ? <ChevronUp size={14} /> : <Filter size={14} />}
-                    {showAll ? t('common.close') : t('share.exercises')}
-                </button>
-            </div>
+                    <button onClick={() => setShowAll(!showAll)} style={chipStyle(false, '#ffffff', false, !showAll)}>
+                        {showAll ? <ChevronUp size={14} /> : <Filter size={14} />}
+                        {showAll ? t('common.close') : t('share.exercises')}
+                    </button>
+                </div>
             )}
         </>
     );

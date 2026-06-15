@@ -8,6 +8,8 @@ import { getLocalDateStr } from '../../utils/dateUtils';
 import { ClanInviteCard } from './ClanInviteCard';
 import { LeaderboardTabs } from './LeaderboardTabs';
 import { LeaderboardRow } from './LeaderboardRow';
+import { LeaderboardPodium } from './LeaderboardPodium';
+import styles from './Leaderboard.module.css';
 import { Z_INDEX } from '../../utils/zIndex';
 import { UserDetail } from './UserDetail';
 import { getIcon } from '../../utils/icons';
@@ -19,6 +21,10 @@ import { useSwipe } from '../../hooks/useSwipe';
 import { ClanManager } from './ClanManager';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { SegmentedControl } from '../ui/SegmentedControl';
+
+// Flip to false to disable the top-3 podium and render everyone as plain rows
+// (handy to preview how rows look — e.g. a perfect day outside the podium).
+const SHOW_PODIUM = true;
 
 export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, onLeaveClan }) {
 
@@ -162,28 +168,32 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
 
     const activeTabConfig = VISIBLE_TABS.find(t => t.id === activeTab) || VISIBLE_TABS[0];
 
+    // Top 3 feed the podium hero; everyone else falls into the list below.
+    // When the podium is disabled, everyone is rendered as plain rows instead.
+    const usePodium = SHOW_PODIUM;
+    const podiumCount = usePodium ? 3 : 0;
+    const podiumItems = sorted.slice(0, podiumCount).map((entry, i) => ({
+        entry: entry.uid === currentUid ? { ...entry, exerciseDifficulties: settings.exerciseDifficulties } : entry,
+        rank: getRank(i),
+        reps: getReps(entry)
+    }));
+    const restEntries = sorted.slice(podiumCount);
+
     return (
         <div 
             className="fade-in modal-overlay" 
             {...swipeHandlers}
             style={{ zIndex: Z_INDEX.MODAL }}
         >
-            <div className="modal-content">
+            <div className={`modal-content ${styles.shell}`}>
                 {/* Header with Switch */}
-            <div style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <h2 className="panel-title" style={{
-                        margin: 0,
-                        background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                        WebkitBackgroundClip: 'text', backgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
-                    }}>
+            <div className={`${styles.header} ${styles.rise} ${styles.rise1}`}>
+                <div className={styles.headerLeft}>
+                    <h2 className="panel-title" style={{ margin: 0 }}>
                         {t('leaderboard.title')}
                     </h2>
-                    
-                    <SegmentedControl 
+
+                    <SegmentedControl
                         value={communityContext === 'global' ? 'global' : 'clans'}
                         onChange={(val) => {
                             if (val === 'global') setCommunityContext('global');
@@ -201,15 +211,11 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
 
             {/* Back button and Clan Name when viewing a specific clan */}
             {communityContext !== 'global' && communityContext !== 'manage' && (
-                <div className="fade-in" style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '16px' }}>
-                    <button onClick={() => setCommunityContext('manage')} className="hover-lift" style={{
-                        background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '20px',
-                        padding: '6px 12px', color: 'white', fontWeight: '700', fontSize: '0.8rem',
-                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'
-                    }}>
+                <div className={`fade-in ${styles.clanBar}`}>
+                    <button onClick={() => setCommunityContext('manage')} className={styles.backBtn}>
                         ← {t('onboarding.back')}
                     </button>
-                    <span style={{ fontWeight: '800', color: '#f59e0b', fontSize: '1.1rem' }}>{clanData?.name}</span>
+                    <span className={styles.clanName}>{clanData?.name}</span>
                 </div>
             )}
 
@@ -234,12 +240,9 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                 showExerciseTabs={false}
             />
 
-            {/* Content - exercise tabs + users list scroll together */}
-            <div style={{
-                flex: 1, overflowY: 'auto',
-                display: 'flex', flexDirection: 'column', gap: '6px'
-            }}>
-                <LeaderboardTabs 
+            {/* Content - exercise tabs + podium + users list scroll together */}
+            <div className={styles.list}>
+                <LeaderboardTabs
                     domain={domain}
                     setDomain={setDomain}
                     activeTab={activeTab}
@@ -249,41 +252,40 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                     showExerciseTabs={true}
                 />
                 {loading ? (
-                    <div style={{
-                        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'var(--text-secondary)', flexDirection: 'column', gap: '12px'
-                    }}>
-                        <div style={{
-                            width: '32px', height: '32px', border: '3px solid rgba(251,191,36,0.3)',
-                            borderTopColor: '#fbbf24', borderRadius: '50%',
-                            animation: 'spin 0.8s linear infinite'
-                        }} />
+                    <div className={styles.center}>
+                        <div className={styles.spinner} />
                         <span style={{ fontSize: '0.85rem' }}>{t('common.loading')}</span>
                     </div>
                 ) : sorted.length === 0 ? (
-                    <div style={{
-                        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'var(--text-secondary)', flexDirection: 'column', gap: '8px',
-                        textAlign: 'center', padding: 'var(--spacing-xl)'
-                    }}>
-                        <Trophy size={40} color="rgba(251,191,36,0.3)" />
-                        <p style={{ fontSize: '1rem', fontWeight: '600' }}>{t('leaderboard.empty')}</p>
-                        {!cloudAuth?.isSignedIn ? (
-                            <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>{t('leaderboard.signInToAppear')}</p>
-                        ) : (
-                            <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>{t('leaderboard.enableToAppear')}</p>
-                        )}
+                    <div className={styles.center}>
+                        <div className={styles.emptyIcon}>
+                            <Trophy size={30} color="#fbbf24" />
+                        </div>
+                        <p className={styles.emptyTitle}>{t('leaderboard.empty')}</p>
+                        <p className={styles.emptyHint}>
+                            {!cloudAuth?.isSignedIn ? t('leaderboard.signInToAppear') : t('leaderboard.enableToAppear')}
+                        </p>
                     </div>
                 ) : (
                     <>
-                        {sorted.map((entry, i) => (
-                            <LeaderboardRow 
+                        {usePodium && (
+                            <LeaderboardPodium
+                                items={podiumItems}
+                                currentUid={currentUid}
+                                todayStr={todayStr}
+                                onSelect={setSelectedUser}
+                                t={t}
+                            />
+                        )}
+
+                        {restEntries.map((entry, i) => (
+                            <LeaderboardRow
                                 key={entry.uid}
-                                entry={entry.uid === currentUid ? { 
-                                    ...entry, 
+                                entry={entry.uid === currentUid ? {
+                                    ...entry,
                                     exerciseDifficulties: settings.exerciseDifficulties
                                 } : entry}
-                                rank={getRank(i)}
+                                rank={getRank(i + podiumCount)}
                                 isMe={entry.uid === currentUid}
                                 reps={getReps(entry)}
                                 activeTabConfig={activeTabConfig}
