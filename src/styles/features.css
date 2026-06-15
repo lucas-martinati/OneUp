@@ -232,7 +232,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   :root {
     --exercise-btn-min-height: clamp(50px, 8.2vh, 64px);
     --bottom-btn-size: clamp(66px, 11vh, 90px);
-    --category-title-size: 0.65rem;
+    --category-title-size: 0.8rem;
     --day-label-size-with-title: clamp(0.62rem, 1.3vh, 0.78rem);
     --day-num-height-with-title: clamp(1.7rem, 5.2vh, 3.4rem);
     --day-num-font-size-with-title: clamp(1.5rem, 4.8vh, 3rem);
@@ -256,7 +256,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   :root {
     --exercise-btn-min-height: clamp(44px, 7.4vh, 54px);
     --bottom-btn-size: clamp(56px, 10vh, 76px);
-    --category-title-size: 0.6rem;
+    --category-title-size: 0.72rem;
     --day-label-size-with-title: clamp(0.58rem, 1.2vh, 0.7rem);
     --day-num-height-with-title: clamp(1.4rem, 4.4vh, 2.5rem);
     --day-num-font-size-with-title: clamp(1.2rem, 4vh, 2.2rem);

@@ -17,7 +17,7 @@
   /* Dashboard sizes */
   --exercise-btn-min-height: clamp(58px, 9.2vh, 80px);
   --bottom-btn-size: clamp(72px, 12vh, 110px);
-  --category-title-size: 0.7rem;
+  --category-title-size: 0.9rem;
   --day-label-size-with-title: clamp(0.7rem, 1.45vh, 0.9rem);
   --day-num-height-with-title: clamp(2rem, 6.5vh, 5.5rem);
   --day-num-font-size-with-title: clamp(1.8rem, 6vh, 5rem);
