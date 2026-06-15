@@ -180,7 +180,9 @@
       "streak": "连续",
       "volume": "总量"
     },
-    "validated": "完成"
+    "filterAll": "全部",
+    "filterUnlocked": "已解锁",
+    "filterLocked": "未解锁"
   },
   "announcement": {
     "badge": "新功能",

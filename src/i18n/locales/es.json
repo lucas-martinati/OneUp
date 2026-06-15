@@ -180,7 +180,9 @@
       "streak": "Racha",
       "volume": "Volumen"
     },
-    "validated": "Hecho"
+    "filterAll": "Todos",
+    "filterUnlocked": "Desbloqueados",
+    "filterLocked": "Bloqueados"
   },
   "announcement": {
     "badge": "Nuevo",

@@ -180,7 +180,9 @@
       "streak": "줄",
       "volume": "용량"
     },
-    "validated": "완료"
+    "filterAll": "전체",
+    "filterUnlocked": "획득",
+    "filterLocked": "미획득"
   },
   "announcement": {
     "badge": "새로운",

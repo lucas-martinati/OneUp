@@ -180,7 +180,9 @@
       "streak": "Onda",
       "volume": "Volume"
     },
-    "validated": "Feito"
+    "filterAll": "Todos",
+    "filterUnlocked": "Desbloqueados",
+    "filterLocked": "Bloqueados"
   },
   "announcement": {
     "badge": "Novo",

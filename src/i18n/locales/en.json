@@ -180,7 +180,9 @@
       "streak": "Streak",
       "volume": "Volume"
     },
-    "validated": "Done"
+    "filterAll": "All",
+    "filterUnlocked": "Unlocked",
+    "filterLocked": "Locked"
   },
   "announcement": {
     "badge": "New",

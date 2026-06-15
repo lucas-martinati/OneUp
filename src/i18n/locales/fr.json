@@ -180,7 +180,9 @@
       "streak": "Série",
       "volume": "Volume"
     },
-    "validated": "Validé"
+    "filterAll": "Tous",
+    "filterUnlocked": "Débloqués",
+    "filterLocked": "Verrouillés"
   },
   "announcement": {
     "badge": "Nouveau",

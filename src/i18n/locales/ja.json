@@ -180,7 +180,9 @@
       "streak": "ストリーク",
       "volume": "音量"
     },
-    "validated": "終わり"
+    "filterAll": "すべて",
+    "filterUnlocked": "解除済み",
+    "filterLocked": "未解除"
   },
   "announcement": {
     "badge": "新しい",

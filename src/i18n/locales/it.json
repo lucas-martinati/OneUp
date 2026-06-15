@@ -180,7 +180,9 @@
       "streak": "Strisciante",
       "volume": "Volume"
     },
-    "validated": "Fatto"
+    "filterAll": "Tutti",
+    "filterUnlocked": "Sbloccati",
+    "filterLocked": "Bloccati"
   },
   "announcement": {
     "badge": "Nuovo",

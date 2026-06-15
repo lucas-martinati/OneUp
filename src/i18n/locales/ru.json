@@ -180,7 +180,9 @@
       "streak": "Серия",
       "volume": "Объём"
     },
-    "validated": "Готово"
+    "filterAll": "Все",
+    "filterUnlocked": "Открытые",
+    "filterLocked": "Закрытые"
   },
   "announcement": {
     "badge": "Новинка",

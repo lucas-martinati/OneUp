@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Award, Lock } from '../../utils/icons';
 import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '../../config/badgeDefinitions';
 import { useBackHandler } from '../../hooks/useBackHandler';
+import { SegmentedControl } from '../ui/SegmentedControl';
 
 const CATEGORY_COLORS = {
     streak: '#f97316',
@@ -24,58 +25,122 @@ const CATEGORY_TITLES = {
     social: 'achievements.categories.social',
 };
 
+// Visual-only progress metadata: [stat key, goal]. Lets locked numeric badges
+// show how close they are. Unlock logic stays in badgeDefinitions (test()).
+const PROGRESS_META = {
+    first_blood: ['totalDays', 1],
+    consistent: ['maxStreak', 3], week_warrior: ['maxStreak', 7], two_weeks: ['maxStreak', 14],
+    month_warrior: ['maxStreak', 30], two_months: ['maxStreak', 60], quarter_year: ['maxStreak', 90],
+    half_year: ['maxStreak', 180], year_beast: ['maxStreak', 365],
+    ten_sessions: ['totalDays', 10], fifty_sessions: ['totalDays', 50], hundred_sessions: ['totalDays', 100],
+    two_hundred_sessions: ['totalDays', 200], five_hundred_sessions: ['totalDays', 500],
+    rep_500: ['totalRepsAll', 500], rep_1000: ['totalRepsAll', 1000], rep_5000: ['totalRepsAll', 5000],
+    rep_10000: ['totalRepsAll', 10000], rep_50000: ['totalRepsAll', 50000],
+    perfect_one: ['perfectDays', 1], perfect_five: ['perfectDays', 5], perfect_fifty: ['perfectDays', 50], perfect_hundred: ['perfectDays', 100],
+    weekday_warrior: ['weekdayWorkouts', 25], weekend_warrior: ['weekendWorkouts', 25],
+    morning_5: ['morningWorkouts', 5], morning_10: ['morningWorkouts', 10], morning_25: ['morningWorkouts', 25],
+    afternoon_5: ['afternoonWorkouts', 5], afternoon_10: ['afternoonWorkouts', 10], afternoon_25: ['afternoonWorkouts', 25],
+    evening_5: ['eveningWorkouts', 5], evening_10: ['eveningWorkouts', 10], evening_25: ['eveningWorkouts', 25],
+};
+
+const fmt = (n) => n.toLocaleString();
+
 const BadgeItem = React.memo(({ badge }) => {
     const { t } = useTranslation();
-    const IconComponent = badge.icon;
-    const displayTitle = badge.titleKey ? t(badge.titleKey) : (badge.secret ? t('achievements.badges.secret') : '???');
-    const displayDesc = badge.descKey && badge.unlocked ? t(badge.descKey) : (badge.secret ? '🔒 ??????' : (badge.descKey ? t(badge.descKey) : ''));
-    
+    const Icon = badge.icon;
+    const { unlocked, secret, color } = badge;
+    const title = badge.titleKey ? t(badge.titleKey) : (secret ? t('achievements.badges.secret') : '???');
+    const desc = badge.descKey ? t(badge.descKey) : (secret ? '???' : '');
+    const showProgress = !unlocked && !secret && badge.goal != null && badge.progress != null;
+
     return (
         <div
+            className={unlocked ? 'hover-lift' : ''}
             style={{
-                padding: '16px 12px',
+                position: 'relative', overflow: 'hidden',
+                padding: '16px 12px 14px',
                 borderRadius: 'var(--radius-xl)',
                 textAlign: 'center',
-                background: badge.unlocked ? `${badge.color}15` : 'var(--surface-muted)',
-                border: badge.unlocked ? `1px solid ${badge.color}44` : '1px solid var(--border-subtle)',
-                opacity: badge.unlocked ? 1 : 0.6,
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                minHeight: '140px'
+                background: unlocked ? `linear-gradient(160deg, ${color}26, ${color}0a)` : 'var(--surface-muted)',
+                border: unlocked ? `1px solid ${color}55` : '1px solid var(--border-subtle)',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+                minHeight: '156px'
             }}>
-            
+
+            {/* Corner glow + check medal for unlocked */}
+            {unlocked && (
+                <>
+                    <div aria-hidden="true" style={{
+                        position: 'absolute', top: '-30px', right: '-30px',
+                        width: '92px', height: '92px', borderRadius: '50%',
+                        background: `radial-gradient(circle, ${color}40 0%, transparent 70%)`, pointerEvents: 'none'
+                    }} />
+                    <div style={{
+                        position: 'absolute', top: '8px', right: '8px',
+                        width: '20px', height: '20px', borderRadius: '50%',
+                        background: color, color: '#fff', fontSize: '0.7rem', fontWeight: 900,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: `0 2px 8px ${color}66`, zIndex: 2
+                    }}>✓</div>
+                </>
+            )}
+
+            {/* Icon chip */}
             <div style={{
-                width: '46px', height: '46px', borderRadius: '50%',
-                background: badge.unlocked ? `${badge.color}15` : 'var(--surface-hover)',
+                position: 'relative', zIndex: 1,
+                width: '52px', height: '52px', borderRadius: '16px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                marginBottom: '12px'
+                background: unlocked ? `${color}22` : 'var(--surface-hover)',
+                border: unlocked ? `1px solid ${color}44` : '1px solid var(--border-subtle)',
+                boxShadow: unlocked ? `0 4px 16px ${color}33` : 'none'
             }}>
-                <IconComponent size={22} color={badge.unlocked ? badge.color : 'var(--text-secondary)'} />
+                {(!unlocked && secret)
+                    ? <Lock size={22} color="var(--text-secondary)" />
+                    : <Icon size={24} color={unlocked ? color : 'var(--text-secondary)'} />}
+                {(!unlocked && !secret) && (
+                    <div style={{
+                        position: 'absolute', bottom: '-5px', right: '-5px',
+                        width: '19px', height: '19px', borderRadius: '50%',
+                        background: 'var(--sheet-bg)', border: '1px solid var(--border-subtle)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        <Lock size={10} color="var(--text-secondary)" />
+                    </div>
+                )}
             </div>
-            
+
+            {/* Title */}
             <div style={{
-                fontSize: '0.85rem', fontWeight: '800',
-                color: badge.unlocked ? 'var(--text-primary)' : 'var(--text-secondary)',
-                marginBottom: '4px', lineHeight: 1.2
+                position: 'relative', zIndex: 1,
+                fontSize: '0.82rem', fontWeight: '800', lineHeight: 1.2,
+                color: unlocked ? 'var(--text-primary)' : 'var(--text-secondary)'
             }}>
-                {displayTitle}
+                {title}
             </div>
-            
+
+            {/* Description */}
             <div style={{
-                fontSize: '0.65rem', color: badge.unlocked ? 'var(--text-secondary)' : 'var(--text-tertiary)', 
-                lineHeight: 1.3, flex: 1, display: 'flex', alignItems: 'center'
+                position: 'relative', zIndex: 1,
+                fontSize: '0.64rem', lineHeight: 1.3, color: 'var(--text-secondary)',
+                opacity: unlocked ? 0.9 : 0.6, flex: 1,
+                display: 'flex', alignItems: 'center'
             }}>
-                {displayDesc}
+                {desc}
             </div>
-            
-            {badge.unlocked && (
-                <div style={{
-                    marginTop: '10px', fontSize: '0.6rem',
-                    background: `${badge.color}15`, 
-                    color: badge.color,
-                    padding: '3px 8px', borderRadius: '12px', fontWeight: '800',
-                    textTransform: 'uppercase', letterSpacing: '0.5px'
-                }}>
-                    {t('achievements.validated')}
+
+            {/* Progress toward unlock (locked numeric badges) */}
+            {showProgress && (
+                <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+                    <div style={{ height: '5px', borderRadius: '3px', background: 'var(--progress-track-thin)', overflow: 'hidden' }}>
+                        <div style={{
+                            width: `${Math.round(badge.progress * 100)}%`, height: '100%', borderRadius: '3px',
+                            background: `linear-gradient(90deg, ${color}, ${color}aa)`,
+                            transition: 'width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                        }} />
+                    </div>
+                    <div style={{ fontSize: '0.58rem', color: 'var(--text-secondary)', marginTop: '5px', fontWeight: '700' }}>
+                        {fmt(badge.current)} / {fmt(badge.goal)}
+                    </div>
                 </div>
             )}
         </div>
@@ -86,6 +151,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
     const { t } = useTranslation();
     const [isVisible, setIsVisible] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
+    const [filter, setFilter] = useState('all'); // 'all' | 'unlocked' | 'locked'
     
     // Use refs for drag state to avoid React re-renders which causes jank with long lists
     const sheetRef = useRef(null);
@@ -195,15 +261,22 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
 
     const badges = useMemo(() => BADGE_DEFINITIONS.map(def => {
         const IconComp = getBadgeIconFromDef(def);
+        const unlocked = isBadgeUnlocked(def.id, statsSnapshot, statsSnapshot.achievements);
+        const meta = PROGRESS_META[def.id];
+        const current = meta ? (statsSnapshot[meta[0]] || 0) : null;
+        const goal = meta ? meta[1] : null;
         return {
             id: def.id,
             icon: IconComp,
             color: def.color,
             category: def.category,
             secret: def.secret || false,
-            titleKey: def.secret && !isBadgeUnlocked(def.id, statsSnapshot, statsSnapshot.achievements) ? null : `achievements.badges.${def.id}.title`,
-            descKey: def.secret && !isBadgeUnlocked(def.id, statsSnapshot, statsSnapshot.achievements) ? null : `achievements.badges.${def.id}.desc`,
-            unlocked: isBadgeUnlocked(def.id, statsSnapshot, statsSnapshot.achievements),
+            titleKey: def.secret && !unlocked ? null : `achievements.badges.${def.id}.title`,
+            descKey: def.secret && !unlocked ? null : `achievements.badges.${def.id}.desc`,
+            unlocked,
+            current,
+            goal,
+            progress: goal != null ? Math.min(current / goal, 1) : null,
         };
     }), [statsSnapshot]);
 
@@ -266,71 +339,109 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                     flex: 1, overflowY: 'auto',
                     paddingTop: 0
                 }}>
-                    {/* Progress Overview Section (Minimalist Eco Mode) */}
-                    <div style={{
-                        padding: 'var(--spacing-md) var(--spacing-sm)',
-                        borderRadius: 'var(--radius-xl)', 
-                        textAlign: 'center',
-                        marginBottom: 'var(--spacing-xl)',
-                        background: 'rgba(251, 191, 36, 0.05)',
-                        border: '1px solid rgba(251, 191, 36, 0.15)'
-                    }}>
-                        <Award size={48} color="#fbbf24" style={{ marginBottom: '12px' }} />
-                        
-                        <div style={{ fontSize: '3rem', fontWeight: '900', color: '#fbbf24', lineHeight: 1, display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: '6px' }}>
-                            {unlockedCount} <span style={{fontSize: '1.4rem', opacity: 0.6, fontWeight: '700', color: 'var(--text-primary)'}}>/ {badges.length}</span>
-                        </div>
-                        
-                        <div style={{ 
-                            fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '8px', 
-                            textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800' 
-                        }}>
-                            {t('achievements.badgesUnlocked')}
-                        </div>
-                        
-                        {/* Simple Progress Bar */}
-                        <div style={{
-                            width: '100%', height: '6px', background: 'var(--progress-track)',
-                            borderRadius: '3px', marginTop: '16px', overflow: 'hidden'
-                        }}>
+                    {/* ── Hero: circular progress ring ─────────────────────── */}
+                    {(() => {
+                        const total = badges.length || 1;
+                        const pct = unlockedCount / total;
+                        const R = 54;
+                        const C = 2 * Math.PI * R;
+                        return (
                             <div style={{
-                                width: `${(unlockedCount / badges.length) * 100}%`,
-                                height: '100%',
-                                background: '#fbbf24',
-                                borderRadius: '3px',
-                                transition: 'width 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s'
-                            }} />
-                        </div>
+                                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                padding: 'var(--spacing-sm) 0 var(--spacing-lg)', marginBottom: 'var(--spacing-md)'
+                            }}>
+                                <div style={{ position: 'relative', width: '132px', height: '132px' }}>
+                                    <svg width="132" height="132" viewBox="0 0 132 132" style={{ transform: 'rotate(-90deg)' }}>
+                                        <circle cx="66" cy="66" r={R} fill="none" stroke="var(--progress-track)" strokeWidth="8" />
+                                        <circle
+                                            cx="66" cy="66" r={R} fill="none"
+                                            stroke="url(#achHeroGrad)" strokeWidth="8" strokeLinecap="round"
+                                            strokeDasharray={C} strokeDashoffset={C * (1 - pct)}
+                                            style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s' }}
+                                        />
+                                        <defs>
+                                            <linearGradient id="achHeroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" stopColor="#fbbf24" />
+                                                <stop offset="100%" stopColor="#f59e0b" />
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <div style={{
+                                        position: 'absolute', inset: 0, display: 'flex',
+                                        flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
+                                    }}>
+                                        <Award size={20} color="#fbbf24" style={{ marginBottom: '2px' }} />
+                                        <div style={{ fontSize: '2.1rem', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1 }}>
+                                            {unlockedCount}
+                                        </div>
+                                        <div style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--text-secondary)' }}>
+                                            / {badges.length}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{
+                                    marginTop: '12px', fontSize: '0.78rem', textTransform: 'uppercase',
+                                    letterSpacing: '1.5px', fontWeight: '800', color: '#fbbf24'
+                                }}>
+                                    {t('achievements.badgesUnlocked')}
+                                </div>
+                                <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                    {Math.round(pct * 100)}%
+                                </div>
+                            </div>
+                        );
+                    })()}
+
+                    {/* ── Filter ───────────────────────────────────────────── */}
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--spacing-lg)' }}>
+                        <SegmentedControl
+                            options={[
+                                { id: 'all', label: t('achievements.filterAll') },
+                                { id: 'unlocked', label: t('achievements.filterUnlocked') },
+                                { id: 'locked', label: t('achievements.filterLocked') },
+                            ]}
+                            value={filter}
+                            onChange={setFilter}
+                            style={{ width: '100%' }}
+                        />
                     </div>
 
-                    {/* Categories Listing */}
+                    {/* ── Categories Listing ───────────────────────────────── */}
                     {categories.map(cat => {
                         const catBadges = badges.filter(b => b.category === cat.id);
                         if (catBadges.length === 0) return null;
-                        
+                        const shown = catBadges.filter(b =>
+                            filter === 'all' || (filter === 'unlocked' ? b.unlocked : !b.unlocked)
+                        );
+                        if (shown.length === 0) return null;
+                        const catUnlocked = catBadges.filter(b => b.unlocked).length;
+
                         return (
                             <div key={cat.id} style={{ marginBottom: 'var(--spacing-xl)' }}>
                                 <div style={{
-                                    display: 'flex', alignItems: 'center', gap: '12px',
+                                    display: 'flex', alignItems: 'center', gap: '10px',
                                     marginBottom: 'var(--spacing-sm)', paddingLeft: '4px'
                                 }}>
                                     <div style={{
-                                        fontSize: '0.85rem', fontWeight: '800',
-                                        color: cat.color, textTransform: 'uppercase',
-                                        letterSpacing: '1px'
+                                        fontSize: '0.82rem', fontWeight: '800',
+                                        color: cat.color, textTransform: 'uppercase', letterSpacing: '1px'
                                     }}>
                                         {t(cat.titleKey)}
                                     </div>
-                                    <div style={{ flex: 1, height: '1px', background: 'var(--border-muted)' }} />
+                                    <div style={{
+                                        fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-secondary)',
+                                        background: `${cat.color}1a`, border: `1px solid ${cat.color}33`,
+                                        padding: '2px 8px', borderRadius: '20px'
+                                    }}>
+                                        {catUnlocked}/{catBadges.length}
+                                    </div>
+                                    <div style={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${cat.color}40, transparent)` }} />
                                 </div>
                                 <div style={{
                                     display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px'
                                 }}>
-                                    {catBadges.map((badge) => (
-                                        <BadgeItem
-                                            key={badge.id}
-                                            badge={badge}
-                                        />
+                                    {shown.map((badge) => (
+                                        <BadgeItem key={badge.id} badge={badge} />
                                     ))}
                                 </div>
                             </div>
