@@ -14,9 +14,13 @@ import { useBackHandler } from '../../hooks/useBackHandler';
 import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 import { cloudSync } from '../../services/cloudSync';
+import { useComputedStatsFromStore } from '../../hooks/useComputedStatsFromStore';
 
 export function UserDetail({ entry, rank, isMe, onClose }) {
     const { t } = useTranslation();
+    // For the current user, trust the locally-computed badge count so the value
+    // matches the Stats page exactly (the server count can be stale/approximate).
+    const myStats = useComputedStatsFromStore();
     const rankColors = { 1: '#fbbf24', 2: '#c0c0c0', 3: '#cd7f32' };
     const todayStr = getLocalDateStr(new Date());
     const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
@@ -300,7 +304,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                             />
                         )}
 
-                        <StatCard icon={<Award size={16} color="#a855f7" />} label={t('leaderboard.achievements')} value={entry.achievements || 0} color="#a855f7" />
+                        <StatCard icon={<Award size={16} color="#a855f7" />} label={t('leaderboard.achievements')} value={(isMe && myStats?.badgeCount != null ? myStats.badgeCount : entry.achievements) || 0} color="#a855f7" />
                         <StatCard icon={<Flame size={16} color="#f97316" />} label={t('common.bestStreak')} value={loadingDetails ? '…' : (stats.maxStreak || 0)} color="#f97316" />
                         <StatCard icon={<Calendar size={16} color="#22d3ee" />} label={t('leaderboard.activeDays')} value={loadingDetails ? '…' : (stats.totalDays || 0)} color="#22d3ee" />
                         <StatCard icon={<TrendingUp size={16} color="#10b981" />} label={t('leaderboard.currentStreak')} value={loadingDetails ? '…' : (stats.currentStreak || 0)} color="#10b981" />

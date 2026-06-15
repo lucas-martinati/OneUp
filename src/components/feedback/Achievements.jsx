@@ -151,6 +151,10 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
     const { t } = useTranslation();
     const [isVisible, setIsVisible] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
+    // Once the entrance slide finishes we drop the persistent transform +
+    // will-change: a permanently composited, transformed scroll container makes
+    // the webview intermittently fail to repaint badges scrolled back into view.
+    const [entered, setEntered] = useState(false);
     const [filter, setFilter] = useState('all'); // 'all' | 'unlocked' | 'locked'
     
     // Use refs for drag state to avoid React re-renders which causes jank with long lists
@@ -317,15 +321,16 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                 onMouseMove={(e) => handleMove(e.clientY)}
                 onMouseUp={handleEnd}
                 onMouseLeave={handleEnd}
+                onTransitionEnd={(e) => { if (e.propertyName === 'transform' && isVisible && !isClosing) setEntered(true); }}
                 style={{
                     position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
                     background: 'var(--sheet-bg)',
                     borderRadius: 'calc(var(--radius-xl) * 1.5) calc(var(--radius-xl) * 1.5) 0 0',
                     boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
-                    transform: isClosing ? 'translateY(100%)' : (isVisible ? 'translateY(0%)' : 'translateY(100%)'),
+                    transform: isClosing ? 'translateY(100%)' : (entered ? 'none' : (isVisible ? 'translateY(0%)' : 'translateY(100%)')),
                     transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     maxHeight: '90vh', display: 'flex', flexDirection: 'column',
-                    willChange: 'transform',
+                    willChange: entered ? 'auto' : 'transform',
                     pointerEvents: 'auto'
                 }}>
 
