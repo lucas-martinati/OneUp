@@ -276,163 +276,129 @@ export function CardioModule() {
           </div>
         )}
 
-        {/* Strava Glass Wall — visible when signed in to Google but not Strava */}
-        {needsStravaLogin && (
-          <div className="fade-in cardio-strava-wall" style={{
-            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            background: 'linear-gradient(160deg, rgba(12, 10, 18, 0.82), rgba(18, 12, 8, 0.95))',
-            backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
-            zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            padding: '28px', textAlign: 'center', gap: '14px', borderRadius: 'inherit',
-            overflow: 'hidden',
-            boxShadow: 'inset 0 0 60px rgba(0,0,0,0.7), 0 0 80px rgba(0,0,0,0.4)'
-          }}>
-            {/* Animated particles */}
-            <div className="cardio-wall-particles">
-              <div className="cardio-particle cardio-p1" />
-              <div className="cardio-particle cardio-p2" />
-              <div className="cardio-particle cardio-p3" />
-            </div>
-            {/* Icon */}
-            <div className="cardio-strava-icon-wrap">
-              <div className="cardio-strava-icon-pulse" />
+        {/* Unified Cardio Login Wall — same design for both auth steps, with a
+            3-step progress (Google → Strava → auto-sync). The accent follows
+            the current step; the background follows the active theme/event. */}
+        {isDemo && (() => {
+          const onGoogleStep = needsGoogleLogin;
+          const accent = onGoogleStep ? '#4285F4' : '#fc4c02';
+          const steps = [
+            { label: t('cardio.googleWallStep1'), color: '#4285F4', done: auth.isSignedIn, active: needsGoogleLogin },
+            { label: t('cardio.googleWallStep2'), color: '#fc4c02', done: stravaConnected, active: needsStravaLogin },
+            { label: t('cardio.googleWallStep3'), color: '#34A853', done: false, active: false },
+          ];
+          return (
+            <div className="fade-in cardio-login-wall" style={{
+              position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+              background: 'var(--surface-section)',
+              backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)',
+              zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              padding: '28px', textAlign: 'center', gap: '12px', borderRadius: 'inherit',
+              overflow: 'hidden',
+              boxShadow: 'inset 0 0 60px rgba(0,0,0,0.35), 0 0 80px rgba(0,0,0,0.3)'
+            }}>
+              {/* Ambient glows — luminous reminders of the brand colors */}
               <div style={{
-                width: '76px', height: '76px', borderRadius: '22px',
-                background: 'linear-gradient(145deg, rgba(252, 76, 2, 0.2), rgba(252, 76, 2, 0.08))',
+                position: 'absolute', top: '-60px', left: '50%', transform: 'translateX(-50%)',
+                width: '200px', height: '200px', borderRadius: '50%',
+                background: `radial-gradient(circle, ${accent}22 0%, transparent 70%)`,
+                pointerEvents: 'none', animation: 'cardioGlowFloat 6s ease-in-out infinite'
+              }} />
+              <div style={{
+                position: 'absolute', bottom: '-40px', right: '-20px',
+                width: '150px', height: '150px', borderRadius: '50%',
+                background: `radial-gradient(circle, ${onGoogleStep ? 'rgba(234,67,53,0.12)' : 'rgba(252,140,2,0.14)'} 0%, transparent 70%)`,
+                pointerEvents: 'none', animation: 'cardioGlowFloat 8s ease-in-out infinite reverse'
+              }} />
+
+              {/* Icon for the current step */}
+              <div style={{
+                width: '72px', height: '72px', borderRadius: '20px',
+                background: `linear-gradient(145deg, ${accent}26, ${accent}0d)`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                border: '1px solid rgba(252, 76, 2, 0.35)',
-                boxShadow: '0 12px 40px rgba(252, 76, 2, 0.3), 0 0 0 6px rgba(252, 76, 2, 0.06)',
+                border: `1px solid ${accent}40`,
+                boxShadow: `0 12px 40px ${accent}33, 0 0 0 6px ${accent}0f`,
                 position: 'relative', zIndex: 1
               }}>
-                <img src={`${import.meta.env.BASE_URL}strava-icon.svg`} alt="Strava" style={{ width: '38px', height: '38px', objectFit: 'contain' }} />
+                {onGoogleStep
+                  ? <GoogleIcon size={30} />
+                  : <img src={`${import.meta.env.BASE_URL}strava-icon.svg`} alt="Strava" style={{ width: '38px', height: '38px', objectFit: 'contain' }} />}
               </div>
+
+              <h2 style={{
+                margin: 0, fontSize: 'clamp(1.15rem, 2.7vh, 1.45rem)', fontWeight: '800',
+                background: `linear-gradient(135deg, var(--text-primary) 0%, ${accent} 170%)`,
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'
+              }}>
+                {onGoogleStep ? t('cardio.googleWallTitle') : t('cardio.stravaWallTitle')}
+              </h2>
+              <p style={{
+                color: 'var(--text-secondary)', fontSize: 'clamp(0.76rem, 1.45vh, 0.9rem)',
+                lineHeight: '1.6', margin: 0, maxWidth: '260px'
+              }}>
+                {onGoogleStep ? t('cardio.googleWallDesc') : t('cardio.stravaWallDesc')}
+              </p>
+
+              {/* 3-step progress indicator */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '6px 0 4px' }}>
+                {steps.map((step, i) => {
+                  const lit = step.active || step.done;
+                  return (
+                    <React.Fragment key={i}>
+                      {i > 0 && <div style={{ width: '16px', height: '1px', background: steps[i - 1].done ? `${steps[i - 1].color}66` : 'var(--border-subtle)' }} />}
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '4px',
+                        padding: '4px 8px', borderRadius: '8px',
+                        background: lit ? `${step.color}18` : 'var(--surface-subtle)',
+                        border: `1px solid ${lit ? `${step.color}40` : 'var(--border-subtle)'}`,
+                        fontSize: '0.6rem', fontWeight: '700',
+                        color: lit ? step.color : 'var(--text-secondary)',
+                        opacity: lit ? 1 : 0.5,
+                        whiteSpace: 'nowrap'
+                      }}>
+                        <span style={{
+                          width: '14px', height: '14px', borderRadius: '50%', fontSize: '0.5rem',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: lit ? `${step.color}25` : 'var(--surface-muted)',
+                          fontWeight: '900'
+                        }}>{step.done ? '✓' : i + 1}</span>
+                        {step.label}
+                      </div>
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+
+              {/* Action button for the current step */}
+              {onGoogleStep ? (
+                <button onClick={() => auth.signIn()} className="hover-lift" style={{
+                  marginTop: '8px', padding: '13px 26px', borderRadius: '14px',
+                  background: 'white', color: '#1f1f1f',
+                  fontWeight: '700', fontSize: 'clamp(0.82rem, 1.5vh, 0.92rem)',
+                  border: 'none', cursor: 'pointer',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25), 0 8px 40px rgba(66, 133, 244, 0.15)',
+                  display: 'flex', gap: '10px', alignItems: 'center',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}>
+                  <GoogleIcon size={18} />
+                  {t('cloud.signInWithGoogle')}
+                </button>
+              ) : (
+                <button onClick={handleConnectStrava} className="hover-lift cardio-strava-btn" style={{
+                  marginTop: '8px', padding: '14px 30px', borderRadius: '16px',
+                  background: 'linear-gradient(145deg, #fc4c02, #d94400)', color: 'white',
+                  fontWeight: '800', fontSize: 'clamp(0.85rem, 1.6vh, 0.95rem)',
+                  border: 'none', cursor: 'pointer',
+                  boxShadow: '0 8px 28px rgba(252, 76, 2, 0.45), inset 0 1px 0 rgba(255,255,255,0.15)',
+                  display: 'flex', gap: '8px', alignItems: 'center', letterSpacing: '0.3px',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}>
+                  <Link2 size={18} /> {t('cardio.connectTitle')}
+                </button>
+              )}
             </div>
-            <h2 style={{
-              margin: 0, fontSize: 'clamp(1.2rem, 2.8vh, 1.5rem)', fontWeight: '800',
-              background: 'linear-gradient(135deg, #fff 0%, #fc9a6c 100%)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'
-            }}>
-              {t('cardio.stravaWallTitle')}
-            </h2>
-            <p style={{
-              color: 'rgba(255,255,255,0.65)', fontSize: 'clamp(0.78rem, 1.5vh, 0.92rem)',
-              lineHeight: '1.6', margin: 0, maxWidth: '260px'
-            }}>
-              {t('cardio.stravaWallDesc')}
-            </p>
-            <button onClick={handleConnectStrava} className="hover-lift cardio-strava-btn" style={{
-              marginTop: '10px', padding: '14px 30px', borderRadius: '16px',
-              background: 'linear-gradient(145deg, #fc4c02, #d94400)', color: 'white',
-              fontWeight: '800', fontSize: 'clamp(0.85rem, 1.6vh, 0.95rem)',
-              border: 'none', cursor: 'pointer',
-              boxShadow: '0 8px 28px rgba(252, 76, 2, 0.45), inset 0 1px 0 rgba(255,255,255,0.15)',
-              display: 'flex', gap: '8px', alignItems: 'center', letterSpacing: '0.3px',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}>
-              <Link2 size={18} /> {t('cardio.connectTitle')}
-            </button>
-          </div>
-        )}
-
-        {/* Google Login Wall — visible when NOT signed in to Google (on top of everything) */}
-        {needsGoogleLogin && (
-          <div className="fade-in cardio-google-wall" style={{
-            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            background: 'linear-gradient(170deg, rgba(8, 10, 22, 0.88), rgba(10, 8, 20, 0.96))',
-            backdropFilter: 'blur(36px)', WebkitBackdropFilter: 'blur(36px)',
-            zIndex: 11, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            padding: '28px', textAlign: 'center', gap: '12px', borderRadius: 'inherit',
-            overflow: 'hidden',
-            boxShadow: 'inset 0 0 60px rgba(0,0,0,0.7), 0 0 80px rgba(0,0,0,0.4)'
-          }}>
-            {/* Ambient glow */}
-            <div style={{
-              position: 'absolute', top: '-60px', left: '50%', transform: 'translateX(-50%)',
-              width: '200px', height: '200px', borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(66, 133, 244, 0.12) 0%, transparent 70%)',
-              pointerEvents: 'none', animation: 'cardioGlowFloat 6s ease-in-out infinite'
-            }} />
-            <div style={{
-              position: 'absolute', bottom: '-40px', right: '-20px',
-              width: '150px', height: '150px', borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(234, 67, 53, 0.08) 0%, transparent 70%)',
-              pointerEvents: 'none', animation: 'cardioGlowFloat 8s ease-in-out infinite reverse'
-            }} />
-
-            {/* Google icon */}
-            <div style={{
-              width: '68px', height: '68px', borderRadius: '20px',
-              background: 'linear-gradient(145deg, rgba(66, 133, 244, 0.15), rgba(234, 67, 53, 0.08))',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: '1px solid rgba(255,255,255,0.1)',
-              boxShadow: '0 8px 32px rgba(66, 133, 244, 0.2)',
-              position: 'relative', zIndex: 1
-            }}>
-              <GoogleIcon size={30} />
-            </div>
-
-            <h2 style={{
-              margin: 0, fontSize: 'clamp(1.15rem, 2.6vh, 1.4rem)', fontWeight: '800',
-              background: 'linear-gradient(135deg, #fff 0%, #a8c8ff 100%)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'
-            }}>
-              {t('cardio.googleWallTitle')}
-            </h2>
-            <p style={{
-              color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(0.75rem, 1.4vh, 0.88rem)',
-              lineHeight: '1.6', margin: 0, maxWidth: '250px'
-            }}>
-              {t('cardio.googleWallDesc')}
-            </p>
-
-            {/* Steps indicator */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '6px',
-              margin: '6px 0 4px', opacity: 0.7
-            }}>
-              {[
-                { label: t('cardio.googleWallStep1'), color: '#4285F4', active: true },
-                { label: t('cardio.googleWallStep2'), color: '#fc4c02', active: false },
-                { label: t('cardio.googleWallStep3'), color: '#34A853', active: false },
-              ].map((step, i) => (
-                <React.Fragment key={i}>
-                  {i > 0 && <div style={{ width: '16px', height: '1px', background: 'rgba(255,255,255,0.15)' }} />}
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: '4px',
-                    padding: '4px 8px', borderRadius: '8px',
-                    background: step.active ? `${step.color}18` : 'rgba(255,255,255,0.04)',
-                    border: `1px solid ${step.active ? `${step.color}40` : 'rgba(255,255,255,0.06)'}`,
-                    fontSize: '0.6rem', fontWeight: '700',
-                    color: step.active ? step.color : 'rgba(255,255,255,0.35)',
-                    whiteSpace: 'nowrap'
-                  }}>
-                    <span style={{
-                      width: '14px', height: '14px', borderRadius: '50%', fontSize: '0.5rem',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: step.active ? `${step.color}25` : 'rgba(255,255,255,0.06)',
-                      fontWeight: '900'
-                    }}>{i + 1}</span>
-                    {step.label}
-                  </div>
-                </React.Fragment>
-              ))}
-            </div>
-
-            {/* Google Sign-In button */}
-            <button onClick={() => auth.signIn()} className="hover-lift" style={{
-              marginTop: '8px', padding: '13px 26px', borderRadius: '14px',
-              background: 'white', color: '#1f1f1f',
-              fontWeight: '700', fontSize: 'clamp(0.82rem, 1.5vh, 0.92rem)',
-              border: 'none', cursor: 'pointer',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25), 0 8px 40px rgba(66, 133, 244, 0.15)',
-              display: 'flex', gap: '10px', alignItems: 'center',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}>
-              <GoogleIcon size={18} />
-              {t('cloud.signInWithGoogle')}
-            </button>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* History Modal */}

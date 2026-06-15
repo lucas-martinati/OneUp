@@ -9,6 +9,7 @@ import { DashboardNavBar } from './dashboard/DashboardNavBar';
 import { SessionBubble } from './dashboard/SessionBubble';
 import { CategoryNav } from './dashboard/CategoryNav';
 import { Day100EventManager } from '../features/events/Day100Event';
+import { Day200EventManager } from '../features/events/Day200Event';
 import { useAchievementToast } from '../hooks/useAchievementToast';
 import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../config/categories';
 import { useBackHandler } from '../hooks/useBackHandler';
@@ -228,6 +229,13 @@ export function Dashboard() {
             />
             {AchievementToastComponent}
             <Day100EventManager
+                dayNumber={dayNumber}
+                today={today}
+                getExerciseCount={getExerciseCount}
+                getConfig={getConfig}
+                completions={completions}
+            />
+            <Day200EventManager
                 dayNumber={dayNumber}
                 today={today}
                 getExerciseCount={getExerciseCount}

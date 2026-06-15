@@ -19,6 +19,49 @@ const Day100Styles = () => (
         .day100-global {
           position: relative;
         }
+
+        /* ── PALETTE DE THÈME "HACK" (cohérente partout) ──
+           On redéfinit l'ensemble des tokens du thème sur la racine de l'event,
+           comme un vrai [data-theme]. Tout ce qui consomme var(--…) (modales,
+           barres, cartes, mur cardio, sliders…) s'adapte automatiquement.
+           Surfaces denses et opaques pour l'atmosphère d'intrusion. */
+        .day100-global {
+          /* Accent : rouge alerte + lueur */
+          --accent: rgb(239, 68, 68) !important;
+          --accent-glow: rgb(248, 113, 113) !important;
+
+          /* Surfaces sombres rouges */
+          --bg-color: rgb(8, 3, 3) !important;
+          --card-bg: rgba(22, 8, 8, 0.45) !important;
+          --surface-elevated: linear-gradient(135deg, rgba(28, 10, 10, 0.62), rgba(42, 12, 12, 0.66)) !important;
+          --surface-section: linear-gradient(135deg, rgba(28, 10, 10, 0.85), rgba(42, 12, 12, 0.92)) !important;
+          --surface-subtle: rgba(239, 68, 68, 0.06) !important;
+          --surface-muted: rgba(239, 68, 68, 0.10) !important;
+          --surface-dim: rgba(239, 68, 68, 0.14) !important;
+          --surface-hover: rgba(239, 68, 68, 0.16) !important;
+
+          /* Bordures rouges */
+          --border-subtle: rgba(239, 68, 68, 0.10) !important;
+          --border-muted: rgba(239, 68, 68, 0.14) !important;
+          --border-default: rgba(239, 68, 68, 0.22) !important;
+          --border-strong: rgba(239, 68, 68, 0.35) !important;
+
+          /* Overlays / sheets */
+          --overlay-bg: rgb(10, 3, 3) !important;
+          --sheet-bg: rgba(18, 6, 6, 0.97) !important;
+          --progress-track: rgba(239, 68, 68, 0.15) !important;
+
+          /* Lueurs de fond : rouge + soupçon de cyan (glitch) */
+          --body-glow-1: rgba(239, 68, 68, 0.12) !important;
+          --body-glow-2: rgba(14, 165, 233, 0.06) !important;
+
+          /* Gradients : rouge → cyan → vert (signature glitch) */
+          --gradient-primary: linear-gradient(135deg, #ef4444 0%, #f97316 100%) !important;
+          --gradient-accent: linear-gradient(135deg, #ef4444 0%, #0ea5e9 100%) !important;
+          --gradient-glow: linear-gradient(135deg, #ef4444 0%, #0ea5e9 50%, #10b981 100%) !important;
+          --glow-primary: 0 0 20px rgba(239, 68, 68, 0.4) !important;
+          --glow-accent: 0 0 25px rgba(239, 68, 68, 0.5) !important;
+        }
         .day100-global::before {
           content: '';
           position: fixed;

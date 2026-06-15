@@ -218,11 +218,13 @@ button:focus:not(:focus-visible) {
 }
 
 /* ── Cardio Module ──────────────────────────────────────────────────── */
+.dashboard-slide-bg, .cardio-module {
+  border-radius: 28px;
+}
 
 .cardio-module {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: 28px;
 }
 
 .cardio-tabs button:active {
