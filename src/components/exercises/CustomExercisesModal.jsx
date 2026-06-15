@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Plus, Settings2, Trash2, Edit2, Swords, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, ChevronDown, Check, Target } from '../../utils/icons';
 import { Button, IconButton } from '../ui';
@@ -38,6 +38,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
   const [multiplier, setMultiplier] = useState(1);
   const [selectedCatId, setSelectedCatId] = useState(effectiveCatId);
   const [error, setError] = useState('');
+  const nameInputRef = useRef(null);
 
   // Handle back button to switch view or close modal
   useBackHandler(() => {
@@ -281,6 +282,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                   {(() => { const SelectedIcon = CUSTOM_EXERCISE_ICONS[iconName] || Star; return <SelectedIcon size={20} />; })()}
                 </div>
                 <input
+                  ref={nameInputRef}
                   type="text"
                   maxLength={20}
                   value={label}
@@ -390,6 +392,10 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                   className="premium-slider"
                   min="0.1" max="5" step="0.1"
                   value={multiplier}
+                  // On release, take focus out of the name field (and dismiss the
+                  // mobile keyboard) if it was being edited — done on pointer-up so
+                  // the keyboard doesn't close mid-drag and shift the layout.
+                  onPointerUp={() => nameInputRef.current?.blur()}
                   onChange={e => setMultiplier(parseFloat(e.target.value))}
                   style={{ 
                     width: '100%', 
