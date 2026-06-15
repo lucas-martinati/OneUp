@@ -137,6 +137,98 @@ function getUserLocalDate(completions, serverNow) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// Achievements — shared rules so the leaderboard publishes the REAL badge count
+// (previously it only counted the manual flags stored in the `achievements`
+// node — first_share / white_hat — i.e. at most 2).
+// Badge unlock logic is the SINGLE SOURCE OF TRUTH in functions/shared/badgeRules.js,
+// imported here AND by the client (src/config/badgeDefinitions.js) — no copy-paste.
+// The stats snapshot below mirrors src/hooks/useComputedStats.js.
+// ══════════════════════════════════════════════════════════════════════════════
+
+const { BADGE_RULES, isBadgeUnlocked } = require('./shared/badgeRules');
+
+const MAX_STREAK_WINDOW = 365;
+
+// Build the achievement stats snapshot from the user's completions.
+// NOTE: time-of-day badges (morning/afternoon/evening/ghost) depend on the
+// user's LOCAL hour, which can't be recovered exactly server-side (we only have
+// the UTC timestamp + the local date string). We approximate the local hour as
+// the offset from the recorded local day's UTC midnight — accurate for users
+// near UTC, slightly off for far timezones. All date-based badges are exact.
+function computeAchievementStats(completions, totalRepsAll) {
+  const pad = n => String(n).padStart(2, '0');
+  const toStr = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
+  const dayIsDone = day => !!day && typeof day === 'object' &&
+    Object.entries(day).some(([id, e]) => e?.isCompleted && ALL_EXERCISE_IDS.has(id));
+  const isStandardPerfect = day => EXERCISES.every(ex => day[ex.id]?.isCompleted);
+  const isWeightsPerfect = day => WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => day[ex.id]?.isCompleted);
+
+  const localHour = (dateStr, ts) => {
+    const ms = typeof ts === 'number' ? ts : new Date(ts).getTime();
+    if (isNaN(ms)) return null;
+    const [y, m, d] = dateStr.split('-').map(Number);
+    if (!y || !m || !d) return null;
+    const diffH = (ms - Date.UTC(y, m - 1, d)) / (1000 * 60 * 60);
+    return ((Math.floor(diffH) % 24) + 24) % 24;
+  };
+
+  let totalDays = 0, perfectDays = 0, weekdayWorkouts = 0, weekendWorkouts = 0;
+  let morningWorkouts = 0, afternoonWorkouts = 0, eveningWorkouts = 0, ghostWorkout = false;
+  const completedStandard = new Set();
+
+  for (const [dateStr, day] of Object.entries(completions)) {
+    if (!dayIsDone(day)) continue;
+    totalDays++;
+    if (isStandardPerfect(day) || isWeightsPerfect(day)) perfectDays++;
+
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+    if (dow >= 1 && dow <= 5) weekdayWorkouts++;
+    if (dow === 0 || dow === 6) weekendWorkouts++;
+
+    let hasMorning = false, hasAfternoon = false, hasEvening = false;
+    for (const [exId, exData] of Object.entries(day)) {
+      if (!exData?.isCompleted) continue;
+      if (ALL_STANDARD_IDS.has(exId)) completedStandard.add(exId);
+      if (exData.timestamp) {
+        const h = localHour(dateStr, exData.timestamp);
+        if (h !== null) {
+          if (h < 12) hasMorning = true;
+          else if (h < 18) hasAfternoon = true;
+          else hasEvening = true;
+          if (h >= 3 && h < 4) ghostWorkout = true;
+        }
+      }
+    }
+    if (hasMorning) morningWorkouts++;
+    if (hasAfternoon) afternoonWorkouts++;
+    if (hasEvening) eveningWorkouts++;
+  }
+
+  const hasCompletedAllExercisesOnce = EXERCISES.every(ex => completedStandard.has(ex.id));
+
+  // Streaks: walk backwards from today (server UTC) over the window.
+  const now = new Date();
+  const todayUTCms = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  let maxStreak = 0, tempStreak = 0, perfectStreak = 0, tempPerfect = 0;
+  for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
+    const day = completions[toStr(new Date(todayUTCms - i * 86400000))];
+    if (dayIsDone(day)) { tempStreak++; if (tempStreak > maxStreak) maxStreak = tempStreak; }
+    else tempStreak = 0;
+    if (day && (isStandardPerfect(day) || isWeightsPerfect(day))) {
+      tempPerfect++; if (tempPerfect > perfectStreak) perfectStreak = tempPerfect;
+    } else tempPerfect = 0;
+  }
+
+  return {
+    totalDays, perfectDays, weekdayWorkouts, weekendWorkouts,
+    morningWorkouts, afternoonWorkouts, eveningWorkouts, ghostWorkout,
+    hasCompletedAllExercisesOnce, maxStreak, perfectStreak,
+    totalRepsAll,
+  };
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // Core: recompute leaderboard entry from source of truth
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -267,8 +359,11 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     isPerfectToday = isStandardPerfect || isWeightsPerfect;
   }
 
-  // ── Badge count from achievements node ─────────────────────────────────
-  const badgeCount = Object.values(achievements).filter(v => v === true).length;
+  // ── Badge count — computed from stats (derived badges) + the manual flags
+  //    stored in the achievements node (first_share / white_hat) ────────────
+  const totalRepsAll = totalClassicReps + weightsTotalReps + cardioTotalReps;
+  const badgeStats = computeAchievementStats(completions, totalRepsAll);
+  const badgeCount = BADGE_RULES.filter(b => isBadgeUnlocked(b.id, badgeStats, achievements)).length;
 
   // ── Determine pseudo and visibility ────────────────────────────────────
   const pseudo = settings.leaderboardPseudo
