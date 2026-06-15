@@ -572,7 +572,6 @@
     "basedOnManual": "Baseado no manual {{count}} dia{{plural}}",
     "basedOnManual_one": "Baseado em {{count}} dia manual",
     "basedOnManual_other": "Com base em {{count}} dias manuais",
-    "byExercise": "Por exercício",
     "champion": "Campeão",
     "completeForHabits": "Complete seus exercícios diários para ver<br />seus hábitos aqui!",
     "completedDays": "Dias concluídos",
@@ -615,7 +614,11 @@
     "quote": "\"A consistência vence a perfeição\"",
     "quoteSub": "Apareça todos os dias, um passo de cada vez!",
     "title": "Estatísticas",
-    "totalReps": "Total de repetições"
+    "totalReps": "Total de repetições",
+    "recordDay": "Dia recorde",
+    "tabOverview": "Visão geral",
+    "tabCharts": "Gráficos",
+    "tabDetails": "Detalhes"
   },
   "store": {
     "historyDesc": "Transação OneUp",

@@ -4,7 +4,6 @@ import { DynamicIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
 import { CATEGORIES, isUserCategory } from '../../config/categories';
 import { StreakFlame } from '../ui';
-import { sectionTitleStyle } from './statsStyles';
 
 /** Per-exercise breakdown list, grouped by category. */
 export function ExerciseBreakdown({
@@ -22,7 +21,6 @@ export function ExerciseBreakdown({
             marginBottom: 'var(--spacing-md)',
             background: 'var(--surface-section)'
         }}>
-            <h3 style={sectionTitleStyle}>{t('stats.byExercise')}</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {fullCategoryOrder.map((catId, index) => {
                     const catStats = enrichedExerciseStats.filter(ex => ex.categoryId === catId);

@@ -587,7 +587,6 @@
     "basedOnManual": "Basé sur {{count}} journée{{plural}} manuelles",
     "basedOnManual_one": "Basé sur {{count}} journée manuelle",
     "basedOnManual_other": "Basé sur {{count}} journées manuelles",
-    "byExercise": "Par exercice",
     "champion": "Champion",
     "completeForHabits": "Complète tes exercices quotidiens pour voir<br />tes habitudes ici !",
     "completedDays": "Jours complétés",
@@ -630,7 +629,11 @@
     "quote": "\"La régularité bat la perfection\"",
     "quoteSub": "Montre-toi chaque jour, un pas à la fois !",
     "title": "Statistiques",
-    "totalReps": "Reps totales"
+    "totalReps": "Reps totales",
+    "recordDay": "Jour record",
+    "tabOverview": "Aperçu",
+    "tabCharts": "Graphiques",
+    "tabDetails": "Détails"
   },
   "store": {
     "historyDesc": "Transaction OneUp",

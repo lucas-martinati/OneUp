@@ -572,7 +572,6 @@
     "basedOnManual": "{{count}} マニュアル日{{plural}} に基づく",
     "basedOnManual_one": "{{count}} 手動日に基づく",
     "basedOnManual_other": "{{count}} 手動日数に基づく",
-    "byExercise": "運動による",
     "champion": "チャンピオン",
     "completeForHabits": "毎日のエクササイズを完了して<br /> ここで自分の習慣を確認してください。",
     "completedDays": "完了した日数",
@@ -615,7 +614,11 @@
     "quote": "「一貫性は完璧に勝る」",
     "quoteSub": "毎日、一歩ずつ現れてください！",
     "title": "統計",
-    "totalReps": "合計担当者"
+    "totalReps": "合計担当者",
+    "recordDay": "記録日",
+    "tabOverview": "概要",
+    "tabCharts": "グラフ",
+    "tabDetails": "詳細"
   },
   "store": {
     "historyDesc": "ワンアップトランザクション",

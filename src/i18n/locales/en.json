@@ -587,7 +587,6 @@
     "basedOnManual": "Based on {{count}} manual day{{plural}}",
     "basedOnManual_one": "Based on {{count}} manual day",
     "basedOnManual_other": "Based on {{count}} manual days",
-    "byExercise": "By Exercise",
     "champion": "Champion",
     "completeForHabits": "Complete your daily exercises to see<br />your habits here!",
     "completedDays": "Days Completed",
@@ -630,7 +629,11 @@
     "quote": "\"Consistency beats perfection\"",
     "quoteSub": "Show up every day, one step at a time!",
     "title": "Statistics",
-    "totalReps": "Total Reps"
+    "totalReps": "Total Reps",
+    "recordDay": "Record day",
+    "tabOverview": "Overview",
+    "tabCharts": "Charts",
+    "tabDetails": "Details"
   },
   "store": {
     "historyDesc": "OneUp Transaction",

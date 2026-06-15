@@ -572,7 +572,6 @@
     "basedOnManual": "{{count}} 수동일{{plural}} 기준",
     "basedOnManual_one": "{{count}} 수동일 기준",
     "basedOnManual_other": "{{count}} 수동 일수 기준",
-    "byExercise": "운동으로",
     "champion": "챔피언",
     "completeForHabits": "일일 운동을 완료하여<br />여기에서 습관을 확인하세요!",
     "completedDays": "완료 일수",
@@ -615,7 +614,11 @@
     "quote": "\"일관성이 완벽함을 이긴다\"",
     "quoteSub": "매일 한걸음씩 나타나세요!",
     "title": "통계",
-    "totalReps": "총 담당자"
+    "totalReps": "총 담당자",
+    "recordDay": "기록일",
+    "tabOverview": "개요",
+    "tabCharts": "차트",
+    "tabDetails": "세부정보"
   },
   "store": {
     "historyDesc": "원업 거래",

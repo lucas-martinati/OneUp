@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
+import React, { useState, useCallback, useRef, useDeferredValue, Suspense, lazy } from 'react';
 import { X, Award } from '../../utils/icons';
 import { IconButton } from '../ui';
+import { SegmentedControl } from '../ui/SegmentedControl';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '../../hooks/useComputedStats';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
@@ -49,7 +50,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
     const fullCategoryColors = buildFullCategoryColors(customCategories);
     const { getConfig } = useExerciseConfig();
     const { t } = useTranslation();
-    const [chartsReady, setChartsReady] = useState(false);
+    const [activeTab, setActiveTab] = useState('overview');
     const [selectedSession, setSelectedSession] = useState(null);
     const [activeCategories, setActiveCategories] = useState(() => {
         if (initialCategory === 'global') return ['standard', 'weights', 'custom'];
@@ -59,6 +60,14 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
     });
     const [showFilters, setShowFilters] = useState(false);
     const isClosingRef = useRef(false);
+
+    // Deferred copy of the selected categories: the filter chips toggle
+    // instantly (urgent state), while the heavy stats recompute below reads
+    // this deferred value so it never blocks the toggle interaction.
+    const deferredCategories = useDeferredValue(activeCategories);
+    // useDeferredValue returns the previous (stale) reference while a recompute
+    // is pending, so this is true exactly while the stats are catching up.
+    const statsPending = activeCategories !== deferredCategories;
 
     const hasCardio = activeCategories.includes('cardio');
     const onlyCardio = hasCardio && activeCategories.length === 1;
@@ -85,28 +94,20 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         return true;
     }, true);
 
-    // Wait for the modal transition to finish before attempting to load huge charting libraries
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setChartsReady(true);
-        }, 500); // Wait for transition
-        return () => clearTimeout(timer);
-    }, []);
-
     const exercises = React.useMemo(() => {
         let list = [];
-        if (activeCategories.includes('standard')) list.push(...(exercisesList.standard || []).map(e => ({ ...e, categoryId: CATEGORIES.BODYWEIGHT })));
-        if (activeCategories.includes('weights')) list.push(...(exercisesList.weights || []).map(e => ({ ...e, categoryId: CATEGORIES.WEIGHTS })));
-        if (activeCategories.includes('custom')) list.push(...(exercisesList.custom || []).map(e => ({ ...e, categoryId: CATEGORIES.CUSTOM })));
-        if (activeCategories.includes('cardio')) list.push(...(exercisesList.cardio || []).map(e => ({ ...e, categoryId: CATEGORIES.CARDIO })));
+        if (deferredCategories.includes('standard')) list.push(...(exercisesList.standard || []).map(e => ({ ...e, categoryId: CATEGORIES.BODYWEIGHT })));
+        if (deferredCategories.includes('weights')) list.push(...(exercisesList.weights || []).map(e => ({ ...e, categoryId: CATEGORIES.WEIGHTS })));
+        if (deferredCategories.includes('custom')) list.push(...(exercisesList.custom || []).map(e => ({ ...e, categoryId: CATEGORIES.CUSTOM })));
+        if (deferredCategories.includes('cardio')) list.push(...(exercisesList.cardio || []).map(e => ({ ...e, categoryId: CATEGORIES.CARDIO })));
         // User-created categories
         customCategories.forEach(cat => {
-            if (activeCategories.includes(cat.id)) {
+            if (deferredCategories.includes(cat.id)) {
                 list.push(...(exercisesByUserCategory[cat.id] || []).map(e => ({ ...e, categoryId: cat.id })));
             }
         });
         return list;
-    }, [activeCategories, exercisesList, customCategories, exercisesByUserCategory]);
+    }, [deferredCategories, exercisesList, customCategories, exercisesByUserCategory]);
 
     const localCardioData = React.useMemo(() => {
         const sessions = cardioData?.allSessions || [];
@@ -122,9 +123,9 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
     const userStartDate = useProgressStore(s => s.userStartDate);
 
     const computedStats = React.useMemo(() => {
-        if (canAccessFeature(FEATURES.MERGED_STATS, { isPro: hasProAccess }) && activeCategories.length === 4) return globalStats;
+        if (canAccessFeature(FEATURES.MERGED_STATS, { isPro: hasProAccess }) && deferredCategories.length === 4) return globalStats;
         return computeAllStats(completions, settings, getDayNumber, exercises, false, {}, getConfig, localCardioData, userStartDate);
-    }, [activeCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess, getConfig, localCardioData, userStartDate]);
+    }, [deferredCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess, getConfig, localCardioData, userStartDate]);
 
     // All values come from computedStats
     const {
@@ -167,6 +168,19 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         setSessionHistory(prev => prev.map(s => s.id === sessionId ? { ...s, name: newName } : s));
     }, []);
 
+    // Share button reused at the bottom of every tab (consistent spacing).
+    const shareBlock = (
+        <div style={{ marginBottom: 'var(--spacing-md)' }}>
+            <SharePanel
+                sessionData={{ date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') }}
+                stats={globalStats}
+                variant="stats"
+                mode="global"
+                activeCategories={activeCategories}
+            />
+        </div>
+    );
+
     return (
         <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.MODAL }}>
             <div className="modal-content">
@@ -203,27 +217,58 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                     hasProAccess={hasProAccess} onOpenStore={onOpenStore}
                 />
 
-                <StatsOverviewCards
-                    onlyCardio={onlyCardio} cardioKm={cardioKm} cardioSessionsCount={cardioData.allSessions.length}
-                    globalTotalReps={globalTotalReps} exercisesCount={exercises?.length || 0} totalDays={totalDays}
-                    displayStreak={displayStreak} streakActive={streakActive} maxStreak={maxStreak} successRate={successRate}
-                    totalExerciseCompletions={totalExerciseCompletions} perfectDays={perfectDays}
-                />
+                {/* ── Section tabs: keep each view short, no endless scroll ── */}
+                <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                    <SegmentedControl
+                        options={[
+                            { id: 'overview', label: t('stats.tabOverview') },
+                            { id: 'charts', label: t('stats.tabCharts') },
+                            { id: 'details', label: t('stats.tabDetails') },
+                        ]}
+                        value={activeTab}
+                        onChange={setActiveTab}
+                        style={{ width: '100%' }}
+                    />
+                </div>
 
-                <StatsHighlights
-                    champion={champion}
-                    bestDayDate={bestDayDate} bestDayReps={bestDayReps} bestDayExReps={bestDayExReps}
-                    exercises={exercises}
-                />
+                {/* ── Tab: Overview ─────────────────────────────────────── */}
+                {activeTab === 'overview' && (
+                    <>
+                        <StatsOverviewCards
+                            onlyCardio={onlyCardio} cardioKm={cardioKm} cardioSessionsCount={cardioData.allSessions.length}
+                            globalTotalReps={globalTotalReps} exercisesCount={exercises?.length || 0} totalDays={totalDays}
+                            displayStreak={displayStreak} streakActive={streakActive} maxStreak={maxStreak} successRate={successRate}
+                            totalExerciseCompletions={totalExerciseCompletions} perfectDays={perfectDays}
+                            pending={statsPending}
+                        />
 
-                <MonthlyActivityChart
-                    monthlyActivityTotal={monthlyActivityTotal}
-                    monthlyActivityByExercise={monthlyActivityByExercise}
-                    exercises={exercises}
-                />
+                        <StatsHighlights
+                            champion={champion}
+                            bestDayDate={bestDayDate} bestDayReps={bestDayReps} bestDayExReps={bestDayExReps}
+                            exercises={exercises}
+                            pending={statsPending}
+                        />
 
-                {/* ── Equilibre Musculaire + Time-of-day pie + Daily Reps (Lazy Loaded) ────────────────────────── */}
-                {chartsReady ? (
+                        {shareBlock}
+
+                        {/* ── Motivational footer ───────────────────────── */}
+                        <div className="glass slide-up" style={{
+                            marginBottom: 'var(--spacing-md)', padding: 'var(--spacing-sm) var(--spacing-md)',
+                            borderRadius: 'var(--radius-lg)', textAlign: 'center',
+                            background: 'linear-gradient(135deg, rgba(14,165,233,0.1), rgba(6,182,212,0.1))'
+                        }}>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                                💪 <strong style={{ color: '#0ea5e9' }}>{t('stats.quote')}</strong>
+                            </p>
+                            <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '2px', opacity: 0.7 }}>
+                                {t('stats.quoteSub')}
+                            </p>
+                        </div>
+                    </>
+                )}
+
+                {/* ── Tab: Charts (heavy Recharts only mount on demand) ── */}
+                {activeTab === 'charts' && (
                     <Suspense fallback={
                         <div className="glass-premium" style={{
                             padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
@@ -233,6 +278,11 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                             <div style={{ color: 'var(--text-secondary)' }}>{t('stats.loadingCharts')}</div>
                         </div>
                     }>
+                        <MonthlyActivityChart
+                            monthlyActivityTotal={monthlyActivityTotal}
+                            monthlyActivityByExercise={monthlyActivityByExercise}
+                            exercises={exercises}
+                        />
                         <DailyRepsChart
                             dailyRepsData={dailyRepsData}
                             title={t('stats.dailyReps')}
@@ -266,55 +316,32 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                             emptyTitle={t('stats.notEnoughData')}
                             emptySub={t('stats.completeForHabits')}
                         />
-                    </Suspense>
-                ) : null}
-
-                {hasCardio && (
-                    <Suspense fallback={null}>
-                        <CardioStatsPanel />
+                        {hasCardio && <CardioStatsPanel />}
                     </Suspense>
                 )}
+                {activeTab === 'charts' && shareBlock}
 
-                <ExerciseBreakdown
-                    enrichedExerciseStats={enrichedExerciseStats}
-                    fullCategoryOrder={fullCategoryOrder} fullCategoryColors={fullCategoryColors}
-                    customCategories={customCategories}
-                    hasCardio={hasCardio} cardioSessions={cardioData.allSessions}
-                />
+                {/* ── Tab: Details (per-exercise breakdown + history) ──── */}
+                {activeTab === 'details' && (
+                    <>
+                        <ExerciseBreakdown
+                            enrichedExerciseStats={enrichedExerciseStats}
+                            fullCategoryOrder={fullCategoryOrder} fullCategoryColors={fullCategoryColors}
+                            customCategories={customCategories}
+                            hasCardio={hasCardio} cardioSessions={cardioData.allSessions}
+                        />
 
-                {/* ── Share & Session History ──────────────────────────────── */}
-                <div style={{
-                    display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)',
-                    marginBottom: 'var(--spacing-md)',
-                }}>
-                    <SessionHistoryList
-                        sessionHistory={sessionHistory}
-                        onSelectSession={setSelectedSession}
-                    />
+                        {/* ── Session History ──────────────────────────── */}
+                        <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                            <SessionHistoryList
+                                sessionHistory={sessionHistory}
+                                onSelectSession={setSelectedSession}
+                            />
+                        </div>
 
-                    {/* Share button */}
-                    <SharePanel
-                        sessionData={{ date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') }}
-                        stats={globalStats}
-                        variant="stats"
-                        mode="global"
-                        activeCategories={activeCategories}
-                    />
-                </div>
-
-                {/* ── Motivational footer ─────────────────────────────────── */}
-                <div className="glass slide-up" style={{
-                    marginTop: '4px', padding: 'var(--spacing-sm) var(--spacing-md)',
-                    borderRadius: 'var(--radius-lg)', textAlign: 'center',
-                    background: 'linear-gradient(135deg, rgba(14,165,233,0.1), rgba(6,182,212,0.1))'
-                }}>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
-                        💪 <strong style={{ color: '#0ea5e9' }}>{t('stats.quote')}</strong>
-                    </p>
-                    <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '2px', opacity: 0.7 }}>
-                        {t('stats.quoteSub')}
-                    </p>
-                </div>
+                        {shareBlock}
+                    </>
+                )}
 
                 {/* ── Session Detail Modal (lazy) ──────────────────────────── */}
                 <Suspense fallback={null}>

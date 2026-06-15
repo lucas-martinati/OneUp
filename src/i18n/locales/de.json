@@ -572,7 +572,6 @@
     "basedOnManual": "Basierend auf {{count}} manuellem Tag{{plural}}",
     "basedOnManual_one": "Basierend auf {{count}} manuellen Tag",
     "basedOnManual_other": "Basierend auf {{count}} manuellen Tagen",
-    "byExercise": "Durch Übung",
     "champion": "Champion",
     "completeForHabits": "Machen Sie Ihre täglichen Übungen, um<br />Ihre Gewohnheiten hier zu sehen!",
     "completedDays": "Tage abgeschlossen",
@@ -615,7 +614,11 @@
     "quote": "„Konsistenz schlägt Perfektion“",
     "quoteSub": "Erscheinen Sie jeden Tag, Schritt für Schritt!",
     "title": "Statistiken",
-    "totalReps": "Gesamtzahl der Wiederholungen"
+    "totalReps": "Gesamtzahl der Wiederholungen",
+    "recordDay": "Rekordtag",
+    "tabOverview": "Übersicht",
+    "tabCharts": "Diagramme",
+    "tabDetails": "Details"
   },
   "store": {
     "historyDesc": "OneUp-Transaktion",

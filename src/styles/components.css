@@ -60,6 +60,17 @@ button:focus:not(:focus-visible) {
   }
 }
 
+/* Perf: a modal's overlay background is fully opaque, so the heavy
+   backdrop-filter blur on glass cards inside it is invisible — yet it forces
+   the compositor to re-blur every frame while scrolling, causing blank
+   containers that take 1-2s to paint on mobile webviews. Disable it here;
+   the cards keep their surface background + shadow. */
+.modal-overlay .glass,
+.modal-overlay .glass-premium {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 /* ── Shared Bottom Sheet ────────────────────────────────────────────── */
 .bottom-sheet {
   position: fixed;

@@ -572,7 +572,6 @@
     "basedOnManual": "基于{{count}}个手动记录的天数",
     "basedOnManual_one": "基于{{count}}个手动记录的天数",
     "basedOnManual_other": "基于{{count}}个手动记录的天数",
-    "byExercise": "按运动",
     "champion": "冠军",
     "completeForHabits": "完成每日运动以查看<br />你的习惯！",
     "completedDays": "完成天数",
@@ -615,7 +614,11 @@
     "quote": "\"坚持胜过完美\"",
     "quoteSub": "每天出现，一步一个脚印！",
     "title": "统计",
-    "totalReps": "总次数"
+    "totalReps": "总次数",
+    "recordDay": "纪录日",
+    "tabOverview": "概览",
+    "tabCharts": "图表",
+    "tabDetails": "详情"
   },
   "store": {
     "historyDesc": "OneUp 交易",

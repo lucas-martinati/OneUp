@@ -572,7 +572,6 @@
     "basedOnManual": "Basato su {{count}} giorno manuale{{plural}}",
     "basedOnManual_one": "Basato su {{count}} giorno manuale",
     "basedOnManual_other": "Basato su {{count}} giorni manuali",
-    "byExercise": "Per esercizio",
     "champion": "Campione",
     "completeForHabits": "Completa i tuoi esercizi quotidiani per vedere<br />le tue abitudini qui!",
     "completedDays": "Giorni completati",
@@ -615,7 +614,11 @@
     "quote": "\"La coerenza batte la perfezione\"",
     "quoteSub": "Presentati ogni giorno, un passo alla volta!",
     "title": "Statistiche",
-    "totalReps": "Rappresentazioni totali"
+    "totalReps": "Rappresentazioni totali",
+    "recordDay": "Giorno record",
+    "tabOverview": "Panoramica",
+    "tabCharts": "Grafici",
+    "tabDetails": "Dettagli"
   },
   "store": {
     "historyDesc": "Transazione OneUp",

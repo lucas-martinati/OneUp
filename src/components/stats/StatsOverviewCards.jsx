@@ -1,110 +1,131 @@
 import { useTranslation } from 'react-i18next';
 import { TrendingUp, Award, Flame, Target, Hash, Star } from '../../utils/icons';
-import { statCardStyle, statLabelStyle } from './statsStyles';
+import { AnimatedNumber } from '../ui/AnimatedNumber';
+
+/**
+ * A single refined stat card: a tinted icon chip, a bold value and a label,
+ * over a neutral glass surface with a soft colored corner glow. Replaces the
+ * old fully-colored blocks for a calmer, more premium look.
+ */
+function StatCard({ icon: Icon, value, format, label, color, dim = false, delay = 0, pending = false }) {
+    const c = dim ? '#8a8a93' : color;
+    return (
+        <div className="glass-premium hover-lift scale-in" style={{
+            position: 'relative', overflow: 'hidden',
+            padding: '15px 14px', borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--border-subtle)',
+            display: 'flex', flexDirection: 'column', gap: '11px',
+            animationDelay: `${delay}s`
+        }}>
+            {/* Soft accent glow in the corner */}
+            <div aria-hidden="true" style={{
+                position: 'absolute', top: '-28px', right: '-28px',
+                width: '86px', height: '86px', borderRadius: '50%',
+                background: `radial-gradient(circle, ${c}33 0%, transparent 70%)`,
+                pointerEvents: 'none', opacity: dim ? 0.4 : 1
+            }} />
+            {/* Icon chip */}
+            <div style={{
+                width: '38px', height: '38px', borderRadius: '12px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: `${c}1f`, border: `1px solid ${c}3a`, color: c,
+                position: 'relative', zIndex: 1
+            }}>
+                <Icon size={20} />
+            </div>
+            {/* Value + label */}
+            <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{
+                    fontSize: 'clamp(1.5rem, 6vw, 1.8rem)', fontWeight: '800', lineHeight: 1,
+                    color: 'var(--text-primary)'
+                }}>
+                    <AnimatedNumber value={value} format={format} pending={pending} />
+                </div>
+                <div style={{
+                    fontSize: 'clamp(0.6rem, 1.5vw, 0.68rem)', color: 'var(--text-secondary)',
+                    textTransform: 'uppercase', letterSpacing: '0.6px', marginTop: '6px',
+                    fontWeight: '600'
+                }}>{label}</div>
+            </div>
+        </div>
+    );
+}
+
+const intFormat = (v) => v.toLocaleString();
+const pctFormat = (v) => `${v}%`;
 
 /** Hero total + the six main stat cards of the Stats panel. */
 export function StatsOverviewCards({
     onlyCardio, cardioKm, cardioSessionsCount,
     globalTotalReps, exercisesCount, totalDays,
     displayStreak, streakActive, maxStreak, successRate,
-    totalExerciseCompletions, perfectDays
+    totalExerciseCompletions, perfectDays, pending = false
 }) {
     const { t } = useTranslation();
+
+    const isCardioHero = onlyCardio && cardioKm !== null;
+    // Solid colour (not background-clip:text): a gradient-clipped number can flash
+    // as a filled rectangle with invisible text when it re-renders on filter change.
+    const heroNumberColor = isCardioHero ? '#f97316' : '#818cf8';
 
     return (
         <>
             {/* ── Hero: Global Total Reps ─────────────────────────────── */}
             <div className="glass-premium scale-in" style={{
+                position: 'relative', overflow: 'hidden',
                 padding: 'var(--spacing-lg) var(--spacing-md)',
                 borderRadius: 'var(--radius-xl)', textAlign: 'center',
                 marginBottom: 'var(--spacing-md)',
-                background: onlyCardio && cardioKm !== null ? 'linear-gradient(135deg, rgba(249,115,22,0.15), rgba(239,68,68,0.12))' : 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.12), rgba(236,72,153,0.1))'
+                border: '1px solid var(--border-subtle)'
             }}>
-                <div style={{
-                    fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '2px',
-                    color: 'var(--text-secondary)', marginBottom: '4px'
-                }}>
-                    {onlyCardio && cardioKm !== null ? t('cardio.totalDistance', { unit: t('cardio.units.km') }) : t('stats.totalReps')}
-                </div>
-                <div style={{
-                    fontSize: 'clamp(2.5rem, 10vw, 4.5rem)', fontWeight: '900', lineHeight: 1.1,
-                    color: onlyCardio && cardioKm !== null ? '#f97316' : '#818cf8'
-                }}>
-                    {onlyCardio && cardioKm !== null ? cardioKm.toFixed(1) : globalTotalReps.toLocaleString()}
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                    {onlyCardio && cardioKm !== null ? t('cardio.overSessions', { count: cardioSessionsCount }) : t('stats.overExercises', { count: exercisesCount, days: totalDays, plural: totalDays !== 1 ? 's' : '' })}
-                </div>
-            </div>
-
-            {/* ── 4 main stat cards (2×2) ─────────────────────────────── */}
-            <div style={{
-                display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '10px', marginBottom: '10px'
-            }}>
-                <div className="glass-premium scale-in" style={statCardStyle(
-                    streakActive ? 'rgba(239,68,68,0.15)' : 'rgba(120,120,120,0.1)',
-                    streakActive ? 'rgba(249,115,22,0.15)' : 'rgba(90,90,90,0.1)'
-                )}>
-                    <Flame size={24} color={streakActive ? '#f97316' : '#888'}
-                        style={{ marginBottom: '6px', opacity: streakActive ? 1 : 0.6 }} />
+                {/* Layered ambient glow */}
+                <div aria-hidden="true" style={{
+                    position: 'absolute', inset: 0, pointerEvents: 'none',
+                    background: isCardioHero
+                        ? 'radial-gradient(ellipse at 30% 0%, rgba(249,115,22,0.18) 0%, transparent 60%), radial-gradient(ellipse at 80% 120%, rgba(239,68,68,0.14) 0%, transparent 55%)'
+                        : 'radial-gradient(ellipse at 25% 0%, rgba(129,140,248,0.20) 0%, transparent 60%), radial-gradient(ellipse at 85% 120%, rgba(236,72,153,0.14) 0%, transparent 55%)'
+                }} />
+                <div style={{ position: 'relative', zIndex: 1 }}>
                     <div style={{
-                        fontSize: '1.8rem', fontWeight: '800', lineHeight: 1,
-                        color: streakActive ? '#f97316' : '#888'
-                    }}>{displayStreak}</div>
-                    <div style={statLabelStyle}>{t('stats.currentStreak')}</div>
-                </div>
-                <div className="glass-premium scale-in" style={{
-                    ...statCardStyle('rgba(251,191,36,0.15)', 'rgba(245,158,11,0.15)'),
-                    animationDelay: '0.1s'
-                }}>
-                    <Award size={24} color="#fbbf24" style={{ marginBottom: '6px' }} />
-                    <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fbbf24', lineHeight: 1 }}>{maxStreak}</div>
-                    <div style={statLabelStyle}>{t('common.bestStreak')}</div>
-                </div>
-                <div className="glass-premium scale-in" style={{
-                    ...statCardStyle('rgba(16,185,129,0.15)', 'rgba(5,150,105,0.15)'),
-                    animationDelay: '0.2s'
-                }}>
-                    <Target size={24} color="#10b981" style={{ marginBottom: '6px' }} />
-                    <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#10b981', lineHeight: 1 }}>{totalDays}</div>
-                    <div style={statLabelStyle}>{t('stats.completedDays')}</div>
-                </div>
-                <div className="glass-premium scale-in" style={{
-                    ...statCardStyle('rgba(139,92,246,0.15)', 'rgba(109,40,217,0.15)'),
-                    animationDelay: '0.3s'
-                }}>
-                    <TrendingUp size={24} color="#8b5cf6" style={{ marginBottom: '6px' }} />
-                    <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#8b5cf6', lineHeight: 1 }}>{successRate}%</div>
-                    <div style={statLabelStyle}>{t('stats.ofYear')}</div>
+                        fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '2.5px',
+                        color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: '600'
+                    }}>
+                        {isCardioHero ? t('cardio.totalDistance', { unit: t('cardio.units.km') }) : t('stats.totalReps')}
+                    </div>
+                    <div style={{
+                        fontSize: 'clamp(2.6rem, 11vw, 4.6rem)', fontWeight: '900', lineHeight: 1.05,
+                        color: heroNumberColor,
+                        letterSpacing: '-1px'
+                    }}>
+                        <AnimatedNumber
+                            value={isCardioHero ? cardioKm : globalTotalReps}
+                            format={isCardioHero ? (v) => v.toFixed(1) : intFormat}
+                            pending={pending}
+                        />
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
+                        {isCardioHero ? t('cardio.overSessions', { count: cardioSessionsCount }) : t('stats.overExercises', { count: exercisesCount, days: totalDays, plural: totalDays !== 1 ? 's' : '' })}
+                    </div>
                 </div>
             </div>
 
-            {/* ── 2 secondary stat cards (same style as above) ─────────── */}
+            {/* ── Six stat cards (2 columns) ──────────────────────────── */}
             <div style={{
                 display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
                 gap: '10px', marginBottom: 'var(--spacing-md)'
             }}>
-                <div className="glass-premium scale-in" style={{
-                    ...statCardStyle('rgba(6,182,212,0.15)', 'rgba(6,182,212,0.08)'),
-                    animationDelay: '0.35s'
-                }}>
-                    <Hash size={24} color="#22d3ee" style={{ marginBottom: '6px' }} />
-                    <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#22d3ee', lineHeight: 1 }}>
-                        {totalExerciseCompletions}
-                    </div>
-                    <div style={statLabelStyle}>{t('stats.exercisesDone')}</div>
-                </div>
-                <div className="glass-premium scale-in" style={{
-                    ...statCardStyle('rgba(236,72,153,0.15)', 'rgba(236,72,153,0.08)'),
-                    animationDelay: '0.4s'
-                }}>
-                    <Star size={24} color="#ec4899" style={{ marginBottom: '6px' }} />
-                    <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#ec4899', lineHeight: 1 }}>
-                        {perfectDays}
-                    </div>
-                    <div style={statLabelStyle}>{t('common.perfectDays')}</div>
-                </div>
+                <StatCard icon={Flame} value={displayStreak} format={intFormat} label={t('stats.currentStreak')}
+                    color="#f97316" dim={!streakActive} delay={0} pending={pending} />
+                <StatCard icon={Award} value={maxStreak} format={intFormat} label={t('common.bestStreak')}
+                    color="#fbbf24" delay={0.05} pending={pending} />
+                <StatCard icon={Target} value={totalDays} format={intFormat} label={t('stats.completedDays')}
+                    color="#10b981" delay={0.1} pending={pending} />
+                <StatCard icon={TrendingUp} value={successRate} format={pctFormat} label={t('stats.ofYear')}
+                    color="#8b5cf6" delay={0.15} pending={pending} />
+                <StatCard icon={Hash} value={totalExerciseCompletions} format={intFormat} label={t('stats.exercisesDone')}
+                    color="#22d3ee" delay={0.2} pending={pending} />
+                <StatCard icon={Star} value={perfectDays} format={intFormat} label={t('common.perfectDays')}
+                    color="#ec4899" delay={0.25} pending={pending} />
             </div>
         </>
     );

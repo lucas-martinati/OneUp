@@ -572,7 +572,6 @@
     "basedOnManual": "На основе {{count}} ручных дней",
     "basedOnManual_one": "На основе {{count}} ручного дня",
     "basedOnManual_other": "На основе {{count}} ручных дней",
-    "byExercise": "По упражнениям",
     "champion": "Чемпион",
     "completeForHabits": "Выполняйте ежедневные упражнения, чтобы увидеть<br />свои привычки здесь!",
     "completedDays": "Выполненных дней",
@@ -615,7 +614,11 @@
     "quote": "\"Постоянство важнее совершенства\"",
     "quoteSub": "Показывайтесь каждый день, шаг за шагом!",
     "title": "Статистика",
-    "totalReps": "Всего повторений"
+    "totalReps": "Всего повторений",
+    "recordDay": "Рекордный день",
+    "tabOverview": "Обзор",
+    "tabCharts": "Графики",
+    "tabDetails": "Детали"
   },
   "store": {
     "historyDesc": "Транзакция OneUp",

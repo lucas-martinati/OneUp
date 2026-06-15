@@ -572,7 +572,6 @@
     "basedOnManual": "Basado en {{count}} día{{plural}} manual{{plural}}",
     "basedOnManual_one": "Basado en {{count}} día manual",
     "basedOnManual_other": "Basado en {{count}} días manuales",
-    "byExercise": "Por Ejercicio",
     "champion": "Campeón",
     "completeForHabits": "Completa tus ejercicios diarios para ver<br />tus hábitos aquí!",
     "completedDays": "Días Completados",
@@ -615,7 +614,11 @@
     "quote": "\"La constancia vence a la perfección\"",
     "quoteSub": "¡Preséntate cada día, un paso a la vez!",
     "title": "Estadísticas",
-    "totalReps": "Repeticiones Totales"
+    "totalReps": "Repeticiones Totales",
+    "recordDay": "Día récord",
+    "tabOverview": "Resumen",
+    "tabCharts": "Gráficos",
+    "tabDetails": "Detalles"
   },
   "store": {
     "historyDesc": "Transacción OneUp",
