@@ -222,8 +222,11 @@
 .muted .dayNum { color: var(--text-secondary); opacity: 0.32; }
 
 .done {
-  background: color-mix(in srgb, var(--accent) 13%, transparent);
-  border-color: color-mix(in srgb, var(--accent-glow) 34%, transparent);
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  border-color: color-mix(in srgb, var(--success) 34%, transparent);
+}
+.done .dayNum {
+  color: var(--success);
 }
 
 .caught {
@@ -286,7 +289,7 @@
   background: linear-gradient(135deg, #ffd700, #fdb931);
   box-shadow: 0 0 8px rgba(255, 215, 0, 0.55);
 }
-.swDone { background: var(--accent-glow); box-shadow: 0 0 7px color-mix(in srgb, var(--accent-glow) 60%, transparent); }
+.swDone { background: var(--success); box-shadow: 0 0 7px color-mix(in srgb, var(--success) 60%, transparent); }
 .swCaught { background: var(--warning); }
 .swMissed { background: rgba(239, 68, 68, 0.55); border: 1px solid rgba(239, 68, 68, 0.7); }
 
