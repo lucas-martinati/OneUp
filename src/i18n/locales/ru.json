@@ -1,4 +1,10 @@
 {
+  "tierBadge": {
+    "supporterTitle": "Меценат",
+    "supporterDesc": "Поддерживает приложение пожертвованием",
+    "proTitle": "Pro",
+    "proDesc": "Pro-участник — свои программы"
+  },
   "achievementToast": {
     "title": "Достижение разблокировано!"
   },

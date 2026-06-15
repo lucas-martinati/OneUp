@@ -132,6 +132,14 @@
   }
 }
 
+/* Pop for centered tooltips/bubbles: keeps the translateX(-50%) centering in
+   every keyframe so the element never drifts sideways while animating in
+   (unlike .fade-in, whose transform would clobber the centering). */
+@keyframes tooltipPop {
+  from { opacity: 0; transform: translateX(-50%) translateY(-4px) scale(0.96); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
 @keyframes modalOverlayFadeIn {
   from {
     opacity: 0;

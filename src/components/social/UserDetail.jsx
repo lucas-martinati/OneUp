@@ -24,6 +24,13 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
 
     const [details, setDetails] = useState(null);
     const [loadingDetails, setLoadingDetails] = useState(true);
+    // Which tier badge (supporter / pro) has its explanation bubble open.
+    const [openBadge, setOpenBadge] = useState(null);
+
+    const badgeInfo = {
+        supporter: { title: t('tierBadge.supporterTitle'), desc: t('tierBadge.supporterDesc') },
+        pro: { title: t('tierBadge.proTitle'), desc: t('tierBadge.proDesc') },
+    };
 
     useBackHandler(() => {
         onClose();
@@ -124,7 +131,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
             }}
         >
             <div
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => { e.stopPropagation(); setOpenBadge(null); }}
                 className="glass-premium slide-up"
                 style={{
                     width: '100%', maxWidth: '400px',
@@ -199,12 +206,46 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                             </span>
                             {getTierBadgeConfigs(entry).map(badge => {
                                 const BadgeIcon = badge.icon;
+                                const info = badgeInfo[badge.key];
+                                const isOpen = openBadge === badge.key;
                                 return (
-                                    <span key={badge.key} style={{
-                                        display: 'inline-flex', alignItems: 'center', background: badge.bgColor, borderRadius: '12px',
-                                        padding: '2px 8px', gap: '4px', marginLeft: '4px', border: `1px solid ${badge.borderColor}`
-                                    }}>
-                                        <BadgeIcon size={12} color={badge.color} fill={badge.fill} />
+                                    <span key={badge.key} style={{ position: 'relative', display: 'inline-flex' }}>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); setOpenBadge(isOpen ? null : badge.key); }}
+                                            aria-label={info?.title}
+                                            style={{
+                                                display: 'inline-flex', alignItems: 'center', background: badge.bgColor, borderRadius: '12px',
+                                                padding: '2px 8px', gap: '4px', marginLeft: '4px', border: `1px solid ${badge.borderColor}`,
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            <BadgeIcon size={12} color={badge.color} fill={badge.fill} />
+                                        </button>
+                                        {isOpen && info && (
+                                            <div role="tooltip" style={{
+                                                position: 'absolute', top: 'calc(100% + 9px)', left: '50%', transform: 'translateX(-50%)',
+                                                animation: 'tooltipPop 0.18s var(--ease-panel-in)',
+                                                width: 'max-content', maxWidth: '200px',
+                                                background: 'var(--tooltip-bg)', border: `1px solid ${badge.borderColor}`,
+                                                borderRadius: 'var(--radius-md)', padding: '8px 11px',
+                                                boxShadow: 'var(--shadow-lg)', zIndex: 5, textAlign: 'center',
+                                                WebkitTextFillColor: 'initial'
+                                            }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', fontSize: '0.8rem', fontWeight: '700', color: badge.color }}>
+                                                    <BadgeIcon size={13} color={badge.color} fill={badge.fill} />
+                                                    {info.title}
+                                                </div>
+                                                <div style={{ fontSize: '0.68rem', fontWeight: '500', lineHeight: 1.35, color: 'var(--text-secondary)', marginTop: '3px' }}>
+                                                    {info.desc}
+                                                </div>
+                                                <span aria-hidden style={{
+                                                    position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)',
+                                                    borderLeft: '6px solid transparent', borderRight: '6px solid transparent',
+                                                    borderBottom: `6px solid ${badge.borderColor}`
+                                                }} />
+                                            </div>
+                                        )}
                                     </span>
                                 );
                             })}

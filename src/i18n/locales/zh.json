@@ -1,4 +1,10 @@
 {
+  "tierBadge": {
+    "supporterTitle": "支持者",
+    "supporterDesc": "通过捐赠支持应用",
+    "proTitle": "Pro",
+    "proDesc": "Pro 会员 — 自定义计划"
+  },
   "achievementToast": {
     "title": "成就解锁！"
   },

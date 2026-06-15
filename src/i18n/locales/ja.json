@@ -1,4 +1,10 @@
 {
+  "tierBadge": {
+    "supporterTitle": "サポーター",
+    "supporterDesc": "寄付でアプリを支援",
+    "proTitle": "Pro",
+    "proDesc": "Proメンバー — カスタムプログラム"
+  },
   "achievementToast": {
     "title": "実績が解除されました！"
   },

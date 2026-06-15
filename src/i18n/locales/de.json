@@ -1,4 +1,10 @@
 {
+  "tierBadge": {
+    "supporterTitle": "Unterstützer",
+    "supporterDesc": "Unterstützt die App mit einer Spende",
+    "proTitle": "Pro",
+    "proDesc": "Pro-Mitglied — eigene Programme"
+  },
   "achievementToast": {
     "title": "Erfolg freigeschaltet!"
   },

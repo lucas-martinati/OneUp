@@ -1,4 +1,10 @@
 {
+  "tierBadge": {
+    "supporterTitle": "Patrocinador",
+    "supporterDesc": "Apoya la app con una donación",
+    "proTitle": "Pro",
+    "proDesc": "Miembro Pro — programas personalizados"
+  },
   "achievementToast": {
     "title": "¡Logro Desbloqueado!"
   },

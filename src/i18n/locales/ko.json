@@ -1,4 +1,10 @@
 {
+  "tierBadge": {
+    "supporterTitle": "서포터",
+    "supporterDesc": "후원으로 앱을 지원",
+    "proTitle": "Pro",
+    "proDesc": "Pro 회원 — 맞춤 프로그램"
+  },
   "achievementToast": {
     "title": "업적 잠금 해제!"
   },
