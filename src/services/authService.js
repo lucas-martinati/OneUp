@@ -143,7 +143,7 @@ export async function deleteAccount(listeners, leaveClanFn, getUserClansFn) {
   // regular users (only per-topic writes are allowed, purchase is protected,
   // leaderboard is server-managed). The onAccountDeleted Cloud Function is
   // the authoritative cleanup once deleteUser() succeeds below.
-  const db = getDatabaseInstance()
+  const db = getDatabaseInstance();
   try {
     await remove(ref(db, `users/${userId}`));
   } catch (err) {

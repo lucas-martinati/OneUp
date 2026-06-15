@@ -1,11 +1,13 @@
 {
   "rules": {
-    ".read": "auth != null && auth.token.email === 'lucasm2.054800@gmail.com'",
-    ".write": "auth != null && auth.token.email === 'lucasm2.054800@gmail.com'",
+    ".read": "auth != null && auth.uid === 'bAI8hvjR5TdIu0hDEDh4uP2MyCh1'",
+    ".write": "auth != null && auth.uid === 'bAI8hvjR5TdIu0hDEDh4uP2MyCh1'",
     "users": {
       "$uid": {
         ".read": "$uid === auth.uid",
         "progress": {
+          // Intentionnel : la lecture est ouverte à tout utilisateur authentifié
+          // pour permettre les fonctionnalités sociales (clans, classement, profils).
           ".read": "auth != null",
           ".write": "$uid === auth.uid"
         },

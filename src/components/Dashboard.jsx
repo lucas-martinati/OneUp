@@ -37,6 +37,7 @@ import { setSoundSettingsGetter } from '../utils/soundManager';
 import { clearWorkoutSession } from '../utils/workoutSessionStorage';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { canAccessFeature, FEATURES } from '../utils/entitlements';
+import { isAdminEmail } from '../config/admin';
 
 export function Dashboard() {
     const { t } = useTranslation();
@@ -47,7 +48,7 @@ export function Dashboard() {
     }, []);
 
     const auth = useAuth();
-    const isAdmin = auth?.user?.email === 'lucasm2.054800@gmail.com';
+    const isAdmin = isAdminEmail(auth?.user?.email);
 
     // ── Stores ──
     const getDayNumber = useProgressStore(s => s.getDayNumber);

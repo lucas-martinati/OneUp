@@ -1,3 +1,12 @@
+/**
+ * Day100Event — Événement spécial du Jour 100.
+ *
+ * ⚠️  CE FICHIER EST VOLONTAIREMENT MONOLITHIQUE.
+ * Tous les composants, styles et logique de l'événement sont regroupés ici
+ * dans un seul fichier pour garantir un comportement 100 % plug & play :
+ * ajouter ou retirer cet événement de l'app se fait en un seul import,
+ * sans dépendances dispersées dans le projet.
+ */
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 
 // ============================================================================

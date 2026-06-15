@@ -1,5 +1,6 @@
 import { useEffect, Suspense, lazy } from 'react';
-import { useTranslation } from 'react-i18next';
+import { PREMIUM_THEMES } from './config/themes';
+import { LoadingScreen } from './components/core/LoadingScreen';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SubscriptionProvider, useSubscription } from './contexts/SubscriptionContext';
 import { ExercisesProvider, useExercises } from './contexts/ExercisesContext';
@@ -18,7 +19,6 @@ if (import.meta.env.DEV) {
   import('./utils/consoleAchievements');
 }
 
-const PREMIUM_THEMES = ['ocean', 'sunset', 'forest', 'purple'];
 const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
 const Onboarding = lazy(() => import('./components/settings/Onboarding').then(module => ({ default: module.Onboarding })));
 
@@ -27,7 +27,6 @@ const Onboarding = lazy(() => import('./components/settings/Onboarding').then(mo
  * Handles cross-context wiring (cloud auto-save for routines/exercises).
  */
 function AppContent() {
-  const { t } = useTranslation();
   const auth = useAuth();
   const { isPro, isSubscriptionLoading } = useSubscription();
 
@@ -63,25 +62,11 @@ function AppContent() {
   const isInitializing = auth.loading || (auth.isSignedIn && !isSetup && !isInitialSyncDone);
 
   return (
-    <Suspense fallback={
-      <div style={{
-        position: 'fixed', inset: 0, background: '#050505',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: '600'
-      }}>
-        {t('app.initializing')}
-      </div>
-    }>
+    <Suspense fallback={<LoadingScreen />}>
       <ComputedStatsSynchronizer />
       <AppOrchestrator computedStats={computedStats} />
       {isInitializing ? (
-        <div style={{
-          position: 'fixed', inset: 0, background: '#050505',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: '600'
-        }}>
-          {t('app.initializing')}
-        </div>
+        <LoadingScreen />
       ) : !isSetup ? (
         <Onboarding onStart={startChallenge} />
       ) : (

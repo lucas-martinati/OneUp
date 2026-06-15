@@ -245,7 +245,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const d = new Date(today);
         d.setDate(d.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
+        const dateStr = getLocalDateStr(d);
         const dayCompletions = completions[dateStr];
         
         const isStandardPerfect = hasStandard && EXERCISES.every(ex => dayCompletions?.[ex.id]?.isCompleted);

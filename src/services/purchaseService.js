@@ -179,7 +179,6 @@ async function _getOffering(tier) {
       return null;
     }
 
-    if (!pkg) return null;
 
     // Normalize product info across native/web
     const product = pkg.product || pkg.webBillingProduct;
