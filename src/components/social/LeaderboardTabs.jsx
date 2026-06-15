@@ -44,7 +44,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
         <>
             {/* ── Domain Filter ── */}
             {showDomainFilter && (
-                <div style={{ display: 'flex', gap: '8px', padding: '14px 0 8px' }}>
+                <div style={{ display: 'flex', gap: '8px', padding: '0 0 8px' }}>
                     <button onClick={() => { setDomain('bodyweight'); setActiveTab('bodyweight'); setShowAll(false); }} style={domainBtnStyle(domain === 'bodyweight', 'bodyweight')}>
                         <Trophy size={16} /> {t('common.bodyweight')}
                     </button>
