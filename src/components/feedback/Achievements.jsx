@@ -328,7 +328,15 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                     willChange: 'transform',
                     pointerEvents: 'auto'
                 }}>
-                
+
+                {/* Background extension below the sheet: the spring easing
+                    overshoots past bottom:0, lifting the sheet up and briefly
+                    exposing a gap underneath. This fills that gap. */}
+                <div aria-hidden style={{
+                    position: 'absolute', top: '100%', left: 0, right: 0, height: '40vh',
+                    background: 'var(--sheet-bg)', pointerEvents: 'none'
+                }} />
+
                 <div style={{
                     width: '48px', height: '5px', borderRadius: '3px',
                     background: 'var(--sheet-handle)', margin: 'var(--spacing-sm) auto',

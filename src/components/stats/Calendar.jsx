@@ -467,11 +467,18 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
         const diffHours = (tsMs - localDayStartUTC) / (1000 * 60 * 60);
         return diffHours < -15 || diffHours >= 37;
     });
-    const [dragY, setDragY] = useState(0);
-    const [isDragging, setIsDragging] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
+    // Blur is only enabled once the entrance slide finishes. Keeping the
+    // backdrop-filter live while the sheet translates forces the browser to
+    // re-blur the whole backdrop every frame, which makes the slide-in
+    // extremely choppy on desktop (large viewport = expensive blur).
+    const [entranceDone, setEntranceDone] = useState(false);
+    // Drag state lives in refs (not React state) so dragging mutates the DOM
+    // directly instead of re-rendering the whole sheet. Re-rendering the
+    // exercise list on every pointer-move is what made the drag choppy.
     const startY = useRef(0);
-    const currentDragY = useRef(0);
+    const dragPx = useRef(0);
+    const isDragging = useRef(false);
     const sheetRef = useRef(null);
     const isClosing = externalIsClosing ?? false;
 
@@ -484,67 +491,59 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
         return true;
     }, true);
 
-    const handleTouchStart = (e) => {
+    // Unified pointer drag handlers — mutate the DOM via sheetRef instead of
+    // React state so a drag never re-renders the sheet.
+    const beginDrag = (y) => {
         const contentEl = sheetRef.current?.querySelector('[data-scroll-content]');
         const canScrollUp = contentEl ? contentEl.scrollTop > 0 : false;
-        
-        const touchY = e.touches[0].clientY;
-        const isNearTop = touchY < 100;
-        
-        if (!canScrollUp || isNearTop) {
-            startY.current = e.touches[0].clientY;
-            setIsDragging(true);
+        if (!canScrollUp || y < 100) {
+            startY.current = y;
+            dragPx.current = 0;
+            isDragging.current = true;
         }
     };
 
-    const handleTouchMove = (e) => {
-        if (!isDragging) return;
-        const currentY = e.touches[0].clientY;
-        const diff = currentY - startY.current;
+    const moveDrag = (y) => {
+        if (!isDragging.current) return;
+        const diff = y - startY.current;
         if (diff > 0) {
-            const newDragY = diff * 0.13;
-            currentDragY.current = newDragY;
-            setDragY(newDragY);
+            const px = diff * 0.5;
+            dragPx.current = px;
+            if (sheetRef.current) {
+                // No transition + no blur while following the finger — both
+                // would force expensive per-frame recompositing.
+                sheetRef.current.style.transition = 'none';
+                sheetRef.current.style.backdropFilter = 'none';
+                sheetRef.current.style.webkitBackdropFilter = 'none';
+                sheetRef.current.style.transform = `translateY(${px}px)`;
+            }
         }
     };
 
-    const handleTouchEnd = () => {
-        setIsDragging(false);
-        if (currentDragY.current > 15) {
+    const endDrag = () => {
+        if (!isDragging.current) return;
+        isDragging.current = false;
+        if (dragPx.current > 80) {
             onClose();
-        } else {
-            currentDragY.current = 0;
-            setDragY(0);
+        } else if (dragPx.current > 0 && sheetRef.current) {
+            // Snap back; blur is only re-enabled once the sheet has settled so
+            // it never re-blurs while still moving.
+            sheetRef.current.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), backdrop-filter 0.3s ease';
+            sheetRef.current.style.transform = 'translateY(0px)';
+            setTimeout(() => {
+                if (sheetRef.current) {
+                    sheetRef.current.style.transform = '';
+                    sheetRef.current.style.backdropFilter = 'blur(20px)';
+                    sheetRef.current.style.webkitBackdropFilter = 'blur(20px)';
+                }
+            }, 420);
         }
+        dragPx.current = 0;
     };
 
-    const handleMouseDown = (e) => {
-        startY.current = e.clientY;
-        setIsDragging(true);
-    };
-
-    const handleMouseMove = (e) => {
-        if (!isDragging) return;
-        const currentY = e.clientY;
-        const diff = currentY - startY.current;
-        if (diff > 0) {
-            const newDragY = diff * 0.13;
-            currentDragY.current = newDragY;
-            setDragY(newDragY);
-        }
-    };
-
-    const handleMouseUp = () => {
-        setIsDragging(false);
-        if (currentDragY.current > 15) {
-            onClose();
-        } else {
-            currentDragY.current = 0;
-            setDragY(0);
-        }
-    };
-
-    const translateY = dragY;
+    // Only blur when the sheet is settled at rest — never while it is
+    // translating (entrance / drag / close), to avoid per-frame re-blur jank.
+    const showBlur = entranceDone && !isClosing;
 
     return (
         <div className="modal-overlay" style={{
@@ -554,26 +553,38 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
         <div
             ref={sheetRef}
             onClick={(e) => e.stopPropagation()}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
+            onTouchStart={(e) => beginDrag(e.touches[0].clientY)}
+            onTouchMove={(e) => moveDrag(e.touches[0].clientY)}
+            onTouchEnd={endDrag}
+            onMouseDown={(e) => beginDrag(e.clientY)}
+            onMouseMove={(e) => moveDrag(e.clientY)}
+            onMouseUp={endDrag}
+            onMouseLeave={endDrag}
+            onTransitionEnd={(e) => {
+                if (e.propertyName === 'transform' && isVisible && !isClosing) {
+                    setEntranceDone(true);
+                }
+            }}
             style={{
                 position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
                 background: 'var(--sheet-bg)',
-                backdropFilter: isDragging ? 'none' : 'blur(20px)',
-                WebkitBackdropFilter: isDragging ? 'none' : 'blur(20px)',
+                backdropFilter: showBlur ? 'blur(20px)' : 'none',
+                WebkitBackdropFilter: showBlur ? 'blur(20px)' : 'none',
                 borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
                 boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
-                transform: `translateY(${isClosing ? 100 : (isVisible ? translateY : 100)}%)`,
-                transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), backdrop-filter 0.3s ease',
+                transform: `translateY(${isClosing ? 100 : (isVisible ? 0 : 100)}%)`,
+                transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), backdrop-filter 0.3s ease',
                 willChange: 'transform',
                 maxHeight: '80vh', display: 'flex', flexDirection: 'column',
                 pointerEvents: 'auto'
             }}>
+            {/* Background extension below the sheet: the spring easing overshoots
+                past bottom:0, lifting the sheet up and briefly exposing a gap
+                underneath. This fills that gap so nothing shows through. */}
+            <div aria-hidden style={{
+                position: 'absolute', top: '100%', left: 0, right: 0, height: '40vh',
+                background: 'var(--sheet-bg)', pointerEvents: 'none'
+            }} />
             <div style={{
                 width: '40px', height: '4px', borderRadius: '2px',
                 background: 'var(--sheet-handle)', margin: 'var(--spacing-sm) auto',
@@ -583,7 +594,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
             <div className="modal-content" style={{
                 flex: 1, overflowY: 'auto',
                 paddingTop: 0,
-                paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))',
+                paddingBottom: 0,
                 maxWidth: 'none',
                 display: 'flex', flexDirection: 'column'
             }}>
@@ -630,7 +641,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                 </div>
             </div>
 
-            <div data-scroll-content style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">
+            <div data-scroll-content style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">
                 {exercises && exercises.map(ex => {
                     const ExIcon = getIcon(ex.icon);
                     const exDiff = getConfig(ex.id, dateString).difficulty;

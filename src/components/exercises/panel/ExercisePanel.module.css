@@ -15,6 +15,25 @@
   overflow-x: clip;
 }
 
+/* The shared modal entrance (`panelEnter` via .modal-overlay.fade-in, or the
+   global `.fade-in` in session mode) animates a `transform` on this card.
+   While that transform is live it becomes the containing block for the
+   `position: fixed` .atmosphere / .vignette below, clipping the full-viewport
+   halo to the 640px card width — so on desktop the halo looks crop'd like
+   mobile for the first frames until the animation ends. Re-run a
+   transform-free (opacity-only) entrance so the fixed layers stay
+   viewport-wide from frame one; the inner `.rise` sections still provide the
+   motion. `!important` overrides only the name, keeping the shared timing. */
+:global(.modal-overlay.fade-in) > .content,
+.content:global(.fade-in) {
+  animation-name: exercisePanelEnter !important;
+}
+
+@keyframes exercisePanelEnter {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 /* Ambient glow turning the flat overlay into a deep, lit space. Sits behind
    the content (z-index -1 within the isolated context).
    Fixed to the viewport (not absolute): the panel card is capped at 640px and
