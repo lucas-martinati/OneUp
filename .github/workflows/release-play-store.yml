@@ -128,6 +128,7 @@ jobs:
           VITE_REVENUECAT_API_KEY=${{ secrets.VITE_REVENUECAT_API_KEY }}
           VITE_STRAVA_CLIENT_ID=${{ secrets.VITE_STRAVA_CLIENT_ID }}
           VITE_STRAVA_CLIENT_SECRET=${{ secrets.VITE_STRAVA_CLIENT_SECRET }}
+          VITE_ADMIN_EMAIL=${{ secrets.VITE_ADMIN_EMAIL }}
           EOF
 
       # ── Generate capacitor.config.json & strings.xml ──────────
