@@ -16,7 +16,7 @@ export function ClanInviteCard({ clanData }) {
     if (!clanData) return null;
 
     return (
-        <div style={{ paddingTop: 'var(--spacing-md)' }}>
+        <div style={{ paddingTop: 'var(--spacing-md)', paddingBottom: 'var(--spacing-md)' }}>
             <div style={{
                 background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.1))',
                 border: '1px solid rgba(245,158,11,0.2)',

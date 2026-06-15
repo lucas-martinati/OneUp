@@ -87,6 +87,7 @@ function isBadgeUnlocked(badgeId, stats, achievements = {}) {
 const exportsObj = { BADGE_RULES, BADGE_RULES_BY_ID, isBadgeUnlocked };
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = exportsObj;
-} else {
+}
+if (typeof globalThis !== 'undefined') {
   globalThis.BADGE_RULES_PKG = exportsObj;
 }
