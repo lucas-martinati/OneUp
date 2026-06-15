@@ -293,6 +293,115 @@
 .swCaught { background: var(--warning); }
 .swMissed { background: rgba(239, 68, 68, 0.55); border: 1px solid rgba(239, 68, 68, 0.7); }
 
+/* ── Day detail sheet ────────────────────────────────────────────────── */
+.detailHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.detailDate {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+  letter-spacing: 0.03em;
+}
+.detailDay {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  margin-top: 2px;
+  color: var(--text-primary);
+}
+.detailPills { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.pillPerfect {
+  background: var(--gradient-gold-trans);
+  color: #fcd34d;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+}
+.pillCaught {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Exercise list */
+.exList {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
+  position: relative;
+  z-index: 1;
+}
+.exRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-muted);
+  flex-shrink: 0;
+}
+.exRowTodo { opacity: 0.55; }
+.exIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: var(--surface-muted);
+}
+.exMain { flex: 1; min-width: 0; }
+.exName {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.exSub {
+  margin-top: 2px;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.exReps {
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.exRepsUnit { font-size: 0.6rem; font-weight: 700; color: var(--text-secondary); margin-left: 2px; }
+.exTodoMark {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  flex-shrink: 0;
+}
+
 /* ── Entrance (one-shot, on open) ────────────────────────────────────── */
 /* Use `backwards` (not `both`/`forwards`): a persisting final state would
    override the inline transform the swipe handlers write to the grid via

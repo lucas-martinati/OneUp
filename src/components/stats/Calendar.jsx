@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { X, ChevronLeft, ChevronRight, CheckCircle2, ShieldAlert } from '../../utils/icons';
+import { X, ChevronLeft, ChevronRight, CheckCircle2, ShieldAlert, Star } from '../../utils/icons';
 import { IconButton } from '../ui';
 import { useTranslation } from 'react-i18next';
-import { getLocalDateStr, parseTimestamp } from '../../utils/dateUtils';
+import { getLocalDateStr } from '../../utils/dateUtils';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { getDailyGoal } from '../../config/exercises';
 import { getIcon } from '../../utils/icons';
@@ -475,6 +475,13 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
     // translating (entrance / drag / close), to avoid per-frame re-blur jank.
     const showBlur = entranceDone && !isClosing;
 
+    // ── Day summary ──────────────────────────────────────────────────────
+    const doneCount = exercises ? exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length : 0;
+    const totalCount = exercises ? exercises.length : 0;
+    const totalReps = calculateRepsForDay(dayCompletions, dayNum, exercises, getConfig, dateString, startDate);
+    const successRate = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+    const isPerfectDay = totalCount > 0 && doneCount === totalCount;
+
     return (
         <div className="modal-overlay" style={{
             background: 'transparent', zIndex: 199,
@@ -528,82 +535,82 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                 maxWidth: 'none',
                 display: 'flex', flexDirection: 'column'
             }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-sm)' }}>
-                <div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', textTransform: 'capitalize', letterSpacing: '0.04em' }}>
+            <div className={styles.detailHead}>
+                <div style={{ minWidth: 0 }}>
+                    <div className={styles.detailDate}>
                         {new Date(`${dateString}T00:00:00`).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}
                     </div>
-                    <div style={{ fontSize: '1.3rem', fontWeight: '800', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '1px' }}>
-                        {t('calendar.day', { num: dayNum })}
+                    <div className={styles.detailDay}>{t('calendar.day', { num: dayNum })}</div>
+                </div>
+                {(isPerfectDay || isCaughtUp) && (
+                    <div className={styles.detailPills}>
+                        {isPerfectDay && (
+                            <span className={`${styles.statusPill} ${styles.pillPerfect}`}>
+                                <Star size={11} color="#fcd34d" fill="#fcd34d" /> {t('calendar.perfectDayLegend')}
+                            </span>
+                        )}
                         {isCaughtUp && (
-                            <span style={{
-                                display: 'inline-flex', alignItems: 'center', gap: '3px',
-                                background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b',
-                                border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px',
-                                padding: '1px 8px', fontSize: '0.7rem', fontWeight: '600', textTransform: 'none'
-                            }}>
-                                <ShieldAlert size={10} color="#f59e0b" />
-                                {t('calendar.caughtUp')}
+                            <span className={`${styles.statusPill} ${styles.pillCaught}`}>
+                                <ShieldAlert size={11} color="#f59e0b" /> {t('calendar.caughtUp')}
                             </span>
                         )}
                     </div>
-                    {(() => {
-                        const timestamps = Object.values(dayCompletions)
-                            .filter(ex => ex?.timestamp)
-                            .map(ex => parseTimestamp(ex.timestamp).getTime());
-                        if (timestamps.length > 0) {
-                            const earliest = new Date(Math.min(...timestamps));
-                            return (
-                                <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                                    {earliest.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </div>
-                            );
-                        }
-                        return null;
-                    })()}
+                )}
+            </div>
+
+            {/* Summary ribbon — at-a-glance recap */}
+            <div className={styles.stats} style={{ marginBottom: '14px' }}>
+                <div className={styles.stat}>
+                    <div className={`${styles.statValue} ${styles.statValueAccent}`}>{doneCount}/{totalCount}</div>
+                    <div className={styles.statLabel}>{t('share.exercises')}</div>
                 </div>
-                <div style={{
-                    fontSize: '1.4rem', fontWeight: '800',
-                    background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
-                    WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
-                }}>
-                    {calculateRepsForDay(dayCompletions, dayNum, exercises, getConfig, dateString, startDate)} <span style={{ fontSize: '0.7rem', WebkitTextFillColor: 'var(--text-secondary)' }}>{t('common.reps')}</span>
+                <div className={styles.statDivider} />
+                <div className={styles.stat}>
+                    <div className={`${styles.statValue} ${styles.statValueGold}`}>{totalReps.toLocaleString()}</div>
+                    <div className={styles.statLabel}>{t('common.reps')}</div>
+                </div>
+                <div className={styles.statDivider} />
+                <div className={styles.stat}>
+                    <div className={`${styles.statValue} ${styles.statValueSuccess}`}>{successRate}%</div>
+                    <div className={styles.statLabel}>{t('calendar.success')}</div>
                 </div>
             </div>
 
-            <div data-scroll-content style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingBottom: 'calc(var(--spacing-lg) + env(safe-area-inset-bottom))', scrollbarWidth: 'none', msOverflowStyle: 'none', position: 'relative', zIndex: 1 }} className="no-scrollbar">
+            <div data-scroll-content className={`${styles.exList} no-scrollbar`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 {exercises && exercises.map(ex => {
                     const ExIcon = getIcon(ex.icon);
                     const exDiff = getConfig(ex.id, dateString).difficulty;
                     const isCardio = ex.id === 'running' || ex.id === 'cycling';
                     const num = isCardio ? getCurrentWeekNumber(startDate, new Date(dateString)) : dayNum;
                     const goal = getDailyGoal(ex, num, exDiff, isCardio);
-                    const exData = dayCompletions[ex.id] || { isCompleted: false };
+                    const done = !!(dayCompletions[ex.id] || {}).isCompleted;
                     return (
-                        <div key={ex.id} style={{
-                            display: 'flex', alignItems: 'center', gap: '12px',
-                            padding: '10px 14px', borderRadius: 'var(--radius-md)',
-                            background: exData.isCompleted ? `${ex.color}18` : 'var(--surface-subtle)',
-                            border: `1px solid ${exData.isCompleted ? ex.color + '44' : 'var(--border-muted)'}`,
-                            flexShrink: 0
-                        }}>
-                            <div style={{
-                                width: '34px', height: '34px', borderRadius: '50%',
-                                background: `${ex.color}22`, display: 'flex', alignItems: 'center', justifyContent: 'center'
-                            }}>
-                                <ExIcon size={16} color={ex.color} />
+                        <div
+                            key={ex.id}
+                            className={`${styles.exRow} ${done ? '' : styles.exRowTodo}`}
+                            style={done ? { background: `${ex.color}16`, borderColor: `${ex.color}3a` } : undefined}
+                        >
+                            <div className={styles.exIcon} style={done ? { background: `${ex.color}26` } : undefined}>
+                                <ExIcon size={18} color={done ? ex.color : 'var(--text-secondary)'} />
                             </div>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: '0.9rem', fontWeight: '600', color: exData.isCompleted ? ex.color : 'var(--text-primary)', display: 'flex', alignItems: 'center' }}>
+                            <div className={styles.exMain}>
+                                <div className={styles.exName} style={done ? { color: ex.color } : undefined}>
                                     {getExerciseLabel(ex, t)}
                                 </div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                    {t('calendar.repsCount', { done: exData.isCompleted ? goal : 0, goal })}
+                                <div className={styles.exSub}>
+                                    {t('calendar.repsCount', { done: done ? goal : 0, goal })}
                                     <DifficultyBadge difficulty={exDiff} />
                                 </div>
                             </div>
-                            {exData.isCompleted && (
-                                <CheckCircle2 size={20} color={ex.color} strokeWidth={2} />
+                            {done ? (
+                                <>
+                                    <span className={styles.exReps} style={{ color: ex.color }}>
+                                        {goal.toLocaleString()}<span className={styles.exRepsUnit}>{t('common.reps')}</span>
+                                    </span>
+                                    <CheckCircle2 size={22} color={ex.color} strokeWidth={2.2} />
+                                </>
+                            ) : (
+                                <span className={styles.exTodoMark} aria-hidden />
                             )}
                         </div>
                     );
