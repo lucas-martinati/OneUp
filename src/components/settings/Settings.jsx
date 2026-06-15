@@ -63,7 +63,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                 aria-label="Back"
                             />
                         )}
-                        <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
+                        <h2 className="panel-title" style={{ margin: 0 }}>
                             {showStore ? t('store.title') : t('settings.title')}
                         </h2>
                     </div>

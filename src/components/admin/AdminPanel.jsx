@@ -50,7 +50,7 @@ export function AdminPanel({ onClose }) {
                 <ArrowLeft size={22} />
               </button>
             )}
-            <h2 className="panel-title rainbow-gradient" style={{ margin: 0, fontSize: '1.4rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h2 className="panel-title" style={{ margin: 0, fontSize: '1.4rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Shield size={22} color="#ef4444" />
               {selectedUid ? 'Modifier Utilisateur' : "Panel d'Administration"}
             </h2>

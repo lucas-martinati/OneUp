@@ -9,12 +9,21 @@ button:focus:not(:focus-visible) {
 }
 
 /* ── Shared Typography ──────────────────────────────────────────────── */
+/* Canonical page / panel title. Single source of truth for every heading in
+   the app: a tight, bold title that fades from white into the active theme
+   accent so it adapts to every theme (default, ocean, sunset, forest, purple).
+   Override only `margin` / `text-align` at the call site when needed. */
 .panel-title {
   font-size: clamp(1.4rem, 4vw, 1.8rem);
   font-weight: 800;
-  color: var(--text-primary);
+  letter-spacing: -0.02em;
   margin: 0 0 16px 0;
   text-align: center;
+  background: var(--gradient-glow);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--accent-glow); /* fallback if background-clip:text is unsupported */
 }
 
 /* ── Shared Modal Overlay ───────────────────────────────────────────── */

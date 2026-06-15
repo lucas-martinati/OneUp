@@ -198,6 +198,8 @@
   "calendar": {
     "caughtUp": "补签",
     "caughtUpDayLegend": "补签的日期",
+    "missed": "未完成",
+    "today": "今天",
     "completed": "已完成",
     "day": "第{{num}}天",
     "months": [

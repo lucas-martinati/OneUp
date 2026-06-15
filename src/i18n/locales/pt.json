@@ -198,6 +198,8 @@
   "calendar": {
     "caughtUp": "Recuperado",
     "caughtUpDayLegend": "Dia Recuperado",
+    "missed": "Perdido",
+    "today": "Hoje",
     "completed": "Concluído",
     "day": "Dia {{num}}",
     "months": [

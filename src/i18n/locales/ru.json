@@ -198,6 +198,8 @@
   "calendar": {
     "caughtUp": "Восстановлено",
     "caughtUpDayLegend": "Восстановленный день",
+    "missed": "Пропущено",
+    "today": "Сегодня",
     "completed": "Выполнено",
     "day": "День {{num}}",
     "months": [

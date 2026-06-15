@@ -198,6 +198,8 @@
   "calendar": {
     "caughtUp": "Rattrapé",
     "caughtUpDayLegend": "Journée Rattrapée",
+    "missed": "Manqué",
+    "today": "Aujourd'hui",
     "completed": "Complétés",
     "day": "Jour {{num}}",
     "months": [

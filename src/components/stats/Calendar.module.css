@@ -1,0 +1,312 @@
+/* ───────────────────────────────────────────────────────────────────────
+   Calendar — "Momentum" redesign.
+   A premium activity tracker: the month is the hero, every day is a progress
+   ring (fraction of exercises done), perfect days glow gold. Everything is
+   driven by the app accent tokens so it follows every theme. Decorative
+   layers are entrance-only (no continuous animation) to stay light.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.shell {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* Soft accent pool behind the whole panel for depth. */
+.shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 50% at 50% -8%,
+      color-mix(in srgb, var(--accent-glow) 16%, transparent) 0%, transparent 60%);
+  opacity: 0.7;
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────────── */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+/* ── Month navigation (hero) ─────────────────────────────────────────── */
+.monthNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+.navBtn {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  color: var(--text-secondary);
+  background: var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+.navBtn:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 1px var(--border-default);
+}
+.navBtn:active { transform: scale(0.9); }
+
+.monthLabel {
+  flex: 1;
+  text-align: center;
+  line-height: 1.02;
+  cursor: pointer;
+  user-select: none;
+}
+.monthName {
+  font-size: clamp(1.7rem, 6.5vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  background: var(--gradient-glow);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.monthYear {
+  margin-top: 1px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: var(--text-secondary);
+}
+.todayHint {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-glow);
+  opacity: 0.85;
+}
+
+/* ── Stats ribbon ────────────────────────────────────────────────────── */
+.stats {
+  display: flex;
+  align-items: stretch;
+  gap: var(--spacing-xs);
+  padding: 14px var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+.stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.statValue {
+  font-size: 1.55rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.statValueGold { color: #fcd34d; text-shadow: 0 0 12px rgba(255, 200, 0, 0.35); }
+.statValueAccent { color: var(--accent-glow); }
+.statValueSuccess { color: var(--success); }
+.statLabel {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-align: center;
+}
+.statDivider {
+  width: 1px;
+  align-self: center;
+  height: 60%;
+  background: var(--border-muted);
+}
+
+/* ── Grid ────────────────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: clamp(4px, 1.3vw, 9px);
+  align-content: start;
+  flex: 1;
+  will-change: transform, opacity;
+}
+.weekday {
+  text-align: center;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.65;
+  padding-bottom: 6px;
+}
+.pad { aspect-ratio: 1; }
+
+/* Day cell — number on top, exercise dots below */
+.day {
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  width: 100%;
+  aspect-ratio: 1;
+  margin: 0;
+  padding: clamp(3px, 1vw, 5px) 2px;
+  position: relative;
+  overflow: hidden;
+  border: 1.5px solid transparent;
+  border-radius: clamp(10px, 2.4vw, 16px);
+  background: var(--surface-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2px, 0.8vh, 5px);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.25s ease;
+}
+.day:disabled { cursor: default; }
+
+.dayNum {
+  font-size: clamp(0.78rem, 2.7vw, 1rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.5px, 0.5vw, 3px);
+  justify-content: center;
+  align-content: center;
+  max-width: 100%;
+  max-height: 42%;
+  overflow: hidden;
+  min-height: 0;
+}
+.dot {
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.day:not(:disabled):hover { transform: translateY(-2px); }
+.day:not(:disabled):active { transform: scale(0.93); }
+
+/* ── Day states ──────────────────────────────────────────────────────── */
+.muted {
+  cursor: default;
+  background: transparent;
+  border-color: transparent;
+}
+.muted .dayNum { color: var(--text-secondary); opacity: 0.32; }
+
+.done {
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+  border-color: color-mix(in srgb, var(--accent-glow) 34%, transparent);
+}
+
+.caught {
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  border-color: color-mix(in srgb, var(--warning) 38%, transparent);
+}
+
+.perfect {
+  background: var(--gradient-gold-trans);
+  border-color: rgba(255, 215, 0, 0.55);
+  box-shadow: 0 0 15px -3px rgba(255, 200, 0, 0.5);
+}
+.perfect .dayNum { color: #fcd34d; text-shadow: 0 0 8px rgba(255, 200, 0, 0.45); }
+
+.missed {
+  background: rgba(239, 68, 68, 0.07);
+  border-color: rgba(239, 68, 68, 0.28);
+}
+.missed .dayNum { color: rgba(248, 113, 113, 0.85); }
+
+.today {
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 0 1px var(--accent-glow), 0 0 15px -4px var(--accent-glow);
+}
+.today .dayNum { color: var(--accent-glow); }
+
+/* selected wins over the rest */
+.selected {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 1px var(--text-primary), 0 0 18px -5px rgba(255, 255, 255, 0.45);
+}
+
+/* ── Legend ──────────────────────────────────────────────────────────── */
+.legend {
+  margin-top: var(--spacing-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  justify-content: center;
+  padding: 12px var(--spacing-sm);
+  border-radius: var(--radius-lg);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+}
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.swatch {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.swPerfect {
+  background: linear-gradient(135deg, #ffd700, #fdb931);
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.55);
+}
+.swDone { background: var(--accent-glow); box-shadow: 0 0 7px color-mix(in srgb, var(--accent-glow) 60%, transparent); }
+.swCaught { background: var(--warning); }
+.swMissed { background: rgba(239, 68, 68, 0.55); border: 1px solid rgba(239, 68, 68, 0.7); }
+
+/* ── Entrance (one-shot, on open) ────────────────────────────────────── */
+/* Use `backwards` (not `both`/`forwards`): a persisting final state would
+   override the inline transform the swipe handlers write to the grid via
+   gridRef, killing the month slide gesture. `backwards` keeps the staggered
+   reveal but releases control back to JS once the entrance finishes. */
+.rise { animation: calRise 500ms var(--ease-panel-in) backwards; }
+.rise1 { animation-delay: 20ms; }
+.rise2 { animation-delay: 80ms; }
+.rise3 { animation-delay: 140ms; }
+.rise4 { animation-delay: 200ms; }
+
+@keyframes calRise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise { animation: none; }
+  .ring, .ringInner, .navBtn { transition: none; }
+}

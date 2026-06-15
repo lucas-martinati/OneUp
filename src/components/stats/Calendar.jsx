@@ -10,6 +10,7 @@ import { getExerciseLabel } from '../../utils/exerciseLabel';
 import { isPerfectDay, calculateRepsForDay } from '../../utils/statUtils';
 import { getCurrentWeekNumber } from '../../utils/dateUtils';
 import { DifficultyBadge } from '../ui/DifficultyBadge';
+import styles from './Calendar.module.css';
 
 export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, getConfig }) {
     const { t } = useTranslation();
@@ -155,7 +156,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 
     const todayStr = getLocalDateStr(new Date());
 
-    const { days, monthCompleted, completionRate } = useMemo(() => {
+    const { days, monthCompleted, completionRate, monthPerfect } = useMemo(() => {
         const daysInMonth = getDaysInMonth(year, month);
         const firstDay = getFirstDayOfMonth(year, month);
 
@@ -164,8 +165,8 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
         for (let i = 1; i <= daysInMonth; i++) daysArr.push(new Date(year, month, i));
 
         const todayStr = getLocalDateStr(new Date());
-        let completed = 0, total = 0;
-        
+        let completed = 0, total = 0, perfect = 0;
+
         daysArr.filter(Boolean).forEach(date => {
             const dStr = getLocalDateStr(date);
             const isFuture = dStr > todayStr;
@@ -174,18 +175,28 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                 total++;
                 const day = completions[dStr];
                 if (day && Object.values(day).some(ex => ex?.isCompleted)) completed++;
+                if (!isCustom && day && isPerfectDay(day, exercises)) perfect++;
             }
         });
-        
+
         const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
-        
-        return { days: daysArr, monthCompleted: completed, completionRate: rate };
-    }, [year, month, startDate, completions]);
+
+        return { days: daysArr, monthCompleted: completed, completionRate: rate, monthPerfect: perfect };
+    }, [year, month, startDate, completions, exercises, isCustom]);
 
     // Slide-in animation for button navigation
     const gridSlideStyle = slideDirection ? {
         animation: `cal-slide-${slideDirection} 0.2s ease forwards`
     } : {};
+
+    const now = new Date();
+    const viewingCurrentMonth = year === now.getFullYear() && month === now.getMonth();
+    const goToToday = () => {
+        if (viewingCurrentMonth || swipeAnimating.current) return;
+        setCurrentDate(new Date());
+    };
+
+    const weekdayLabels = t('calendar.weekdays', { returnObjects: true });
 
     return (
         <div
@@ -195,252 +206,171 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
             onTouchEnd={handleTouchEnd}
             style={{ zIndex: 100, touchAction: 'pan-y', overflowX: 'hidden' }}
         >
-            <div className="modal-content">
-            {/* Header */}
-            <div style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                marginBottom: 'var(--spacing-md)'
-            }}>
-                <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
-                    {t('dashboard.calendar')}
-                </h2>
-                <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" style={{ flexShrink: 0 }} />
-            </div>
-
-            {/* Month Stats */}
-            <div className="glass-premium slide-up" style={{
-                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-lg)',
-                marginBottom: 'var(--spacing-md)',
-                background: 'linear-gradient(135deg, rgba(109,40,217,0.15), rgba(139,92,246,0.15))',
-                display: 'flex', justifyContent: 'space-around', gap: 'var(--spacing-sm)'
-            }}>
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '1.8rem', fontWeight: '700', color: '#10b981' }}>{monthCompleted}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('calendar.completed')}</div>
+            <div className={`modal-content ${styles.shell}`}>
+                {/* Top bar */}
+                <div className={`${styles.topBar} ${styles.rise} ${styles.rise1}`}>
+                    <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
+                        {t('dashboard.calendar')}
+                    </h2>
+                    <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" style={{ flexShrink: 0 }} />
                 </div>
-                <div style={{ width: '1px', background: 'var(--border-default)' }} />
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '1.8rem', fontWeight: '700', color: '#8b5cf6' }}>{completionRate}%</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('calendar.success')}</div>
+
+                {/* Month navigation — the hero */}
+                <div className={`${styles.monthNav} ${styles.rise} ${styles.rise1}`}>
+                    <button onClick={goToPrevMonth} aria-label="Previous month" className={styles.navBtn}>
+                        <ChevronLeft size={22} />
+                    </button>
+                    <div
+                        className={styles.monthLabel}
+                        onClick={goToToday}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToToday(); } }}
+                    >
+                        <div className={styles.monthName}>{monthNames[month]}</div>
+                        <div className={styles.monthYear}>{year}</div>
+                        {!viewingCurrentMonth && <span className={styles.todayHint}>{'↩'} {t('calendar.today')}</span>}
+                    </div>
+                    <button onClick={goToNextMonth} aria-label="Next month" className={styles.navBtn}>
+                        <ChevronRight size={22} />
+                    </button>
                 </div>
-            </div>
 
-            {/* Month navigation */}
-            <div style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                marginBottom: 'var(--spacing-md)', padding: '0 var(--spacing-xs)'
-            }}>
-                <button onClick={goToPrevMonth} aria-label="Previous month" className="hover-lift glass" style={navBtnStyle}>
-                    <ChevronLeft size={24} />
-                </button>
-                <span style={{
-                    fontSize: '1.3rem', fontWeight: '700',
-                    background: 'linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%)',
-                    WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
-                }}>
-                    {monthNames[month]} {year}
-                </span>
-                <button onClick={goToNextMonth} aria-label="Next month" className="hover-lift glass" style={navBtnStyle}>
-                    <ChevronRight size={24} />
-                </button>
-            </div>
+                {/* Stats ribbon */}
+                <div className={`${styles.stats} ${styles.rise} ${styles.rise2}`}>
+                    <div className={styles.stat}>
+                        <div className={`${styles.statValue} ${styles.statValueGold}`}>{monthPerfect}</div>
+                        <div className={styles.statLabel}>{t('common.perfectDays')}</div>
+                    </div>
+                    <div className={styles.statDivider} />
+                    <div className={styles.stat}>
+                        <div className={`${styles.statValue} ${styles.statValueAccent}`}>{monthCompleted}</div>
+                        <div className={styles.statLabel}>{t('calendar.completed')}</div>
+                    </div>
+                    <div className={styles.statDivider} />
+                    <div className={styles.stat}>
+                        <div className={`${styles.statValue} ${styles.statValueSuccess}`}>{completionRate}%</div>
+                        <div className={styles.statLabel}>{t('calendar.success')}</div>
+                    </div>
+                </div>
 
-            {/* Grid */}
-            <div ref={gridRef} style={{
-                display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)',
-                gap: '6px', flex: 1, alignContent: 'start',
-                willChange: 'transform, opacity',
-                ...gridSlideStyle
-            }}>
-                {/* Weekday headers */}
-                {t('calendar.weekdays', { returnObjects: true }).map(d => (
-                    <div key={d} style={{
-                        textAlign: 'center', color: 'var(--text-secondary)',
-                        fontSize: '0.7rem', fontWeight: '700', textTransform: 'uppercase',
-                        letterSpacing: '0.5px', marginBottom: '4px'
-                    }}>{d}</div>
-                ))}
-
-                {days.map((date, i) => {
-                    if (!date) return <div key={`pad-${i}`} />;
-
-                    const dateString = getLocalDateStr(date);
-                    const isFuture = dateString > todayStr;
-                    const isBeforeStart = dateString < startDate;
-                    const isToday = dateString === todayStr;
-
-                    const dayCompletions = completions[dateString] || {};
-                    const isPerfect = !isCustom && isPerfectDay(dayCompletions, exercises);
-                    const isAnyDone = !isPerfect && Object.values(dayCompletions).some(ex => ex?.isCompleted);
-                    const completedExs = Object.values(dayCompletions).filter(ex => {
-                        if (!ex?.isCompleted || !ex?.timestamp) return false;
-                        if (typeof ex.timestamp === 'object') return false;
-                        const timeMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
-                        return !isNaN(timeMs);
-                    });
-                    const isCaughtUp = completedExs.length > 0 && completedExs.every(ex => {
-                        const tsMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
-                        const parts = dateString.split('-');
-                        if (parts.length !== 3) return false;
-                        const year = parseInt(parts[0], 10);
-                        const month = parseInt(parts[1], 10) - 1;
-                        const day = parseInt(parts[2], 10);
-                        const localDayStartUTC = Date.UTC(year, month, day);
-                        const diffHours = (tsMs - localDayStartUTC) / (1000 * 60 * 60);
-                        return diffHours < -15 || diffHours >= 37;
-                    });
-                    const isMissed = !isPerfect && !isAnyDone && !isFuture && !isBeforeStart;
-                    const completedCount = exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length;
-                    const totalCount = completedCount + (isMissed ? 1 : 0);
-                    const dotSize = totalCount > 12 ? '4px' : totalCount > 8 ? '5px' : totalCount > 4 ? '6px' : '7px';
-                    const dotGap = totalCount > 12 ? '1px' : totalCount > 8 ? '2px' : '3px';
-
-                    let bgColor = 'var(--surface-subtle)';
-                    if (isToday) bgColor = 'rgba(139, 92, 246, 0.1)';
-                    if (isAnyDone) bgColor = 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.15))';
-                    if (isPerfect) bgColor = 'var(--gradient-gold-trans)';
-                    if (isCaughtUp) bgColor = 'linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(217, 119, 6, 0.12))';
-                    if (isMissed) bgColor = 'linear-gradient(135deg, rgba(239,68,68,0.1), rgba(220,38,38,0.1))';
-
-                    const isSelected = selectedDay === dateString;
-
-                    return (
-                        <div
-                            key={i}
-                            onClick={() => {
-                                if (!isFuture && !isBeforeStart) {
-                                    setSelectedDay(isSelected ? null : dateString);
-                                }
-                            }}
-                            className={!isFuture && !isBeforeStart ? 'hover-lift' : ''}
-                            style={{
-                                aspectRatio: '1', display: 'flex', flexDirection: 'column',
-                                alignItems: 'center', justifyContent: 'center',
-                                background: bgColor, borderRadius: 'var(--radius-md)',
-                                position: 'relative',
-                                minWidth: 0, overflow: 'hidden',
-                                opacity: isFuture || isBeforeStart ? 0.25 : 1,
-                                border: isSelected
-                                    ? '2px solid var(--border-strong)'
-                                    : isPerfect
-                                        ? '2px solid rgba(255, 223, 0, 0.6)'
-                                        : isToday
-                                            ? '2px solid rgba(139,92,246,0.5)'
-                                            : '2px solid transparent',
-                                boxShadow: isPerfect ? 'var(--glow-gold)' : 'none',
-                                backdropFilter: isPerfect ? 'brightness(1.2) saturate(1.2)' : 'none',
-                                WebkitBackdropFilter: isPerfect ? 'brightness(1.2) saturate(1.2)' : 'none',
-                                transition: 'all 0.2s ease',
-                                cursor: !isFuture && !isBeforeStart ? 'pointer' : 'default'
-                            }}
-                        >
-                            <span style={{
-                                fontSize: '0.85rem', fontWeight: (isToday || isPerfect) ? '700' : '600',
-                                color: isPerfect ? '#fbbf24' : isToday ? '#8b5cf6' : 'var(--text-primary)',
-                                marginBottom: '2px',
-                                textShadow: isPerfect ? '0 0 8px rgba(255, 215, 0, 0.4)' : 'none'
-                            }}>
-                                {date.getDate()}
-                            </span>
-
-                            {/* Exercise dots */}
-                            {!isFuture && !isBeforeStart && exercises && (
-                                <div style={{
-                                    display: 'flex',
-                                    gap: dotGap,
-                                    flexWrap: 'wrap',
-                                    justifyContent: 'center',
-                                    alignContent: 'center',
-                                    maxWidth: '100%',
-                                    maxHeight: '100%',
-                                    overflow: 'hidden',
-                                    padding: '0 2px',
-                                    flex: 1,
-                                    minHeight: 0
-                                }}>
-                                    {exercises.map(ex => {
-                                        const exData = dayCompletions[ex.id];
-                                        if (!exData?.isCompleted) return null;
-                                        return (
-                                            <div key={ex.id} style={{
-                                                width: dotSize, height: dotSize, borderRadius: '50%',
-                                                background: ex.color, flexShrink: 0,
-                                                boxShadow: `0 0 4px ${ex.color}88`
-                                            }} />
-                                        );
-                                    })}
-                                    {/* Red X if nothing done and not future */}
-                                    {isMissed && (
-                                        <X size={parseInt(dotSize) + 6} color="#ef4444" strokeWidth={3} style={{ flexShrink: 0, filter: 'drop-shadow(0 0 3px rgba(239,68,68,0.5))' }} />
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* Detail popup */}
-            {selectedDay && (
-                <>
-                    <div onClick={handleCloseDetail} style={{
-                        position: 'fixed', inset: 0, zIndex: 199,
-                        background: 'rgba(0,0,0,0.5)', opacity: isClosing ? 0 : 1, transition: 'opacity 0.15s'
-                    }} />
-                    <DayDetail
-                        dateString={selectedDay}
-                        completions={completions}
-                        exercises={exercises}
-                        getDayNumber={getDayNumber}
-                        onClose={handleCloseDetail}
-                        isClosing={isClosing}
-                        getConfig={getConfig}
-                        t={t}
-                        startDate={startDate}
-                    />
-                </>
-            )}
-
-            {/* Legend */}
-            <div className="glass" style={{
-                marginTop: 'var(--spacing-md)', padding: 'var(--spacing-sm)',
-                borderRadius: 'var(--radius-lg)', display: 'flex',
-                flexDirection: 'column', gap: '8px', fontSize: '0.75rem'
-            }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
-                    {exercises && exercises.map(ex => (
-                        <div key={ex.id} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <div style={{
-                                width: '8px', height: '8px', borderRadius: '50%',
-                                background: ex.color, boxShadow: `0 0 4px ${ex.color}`
-                            }} />
-                            <span style={{ color: 'var(--text-secondary)' }}>{getExerciseLabel(ex, t)}</span>
-                        </div>
+                {/* Day grid */}
+                <div ref={gridRef} className={`${styles.grid} ${styles.rise} ${styles.rise3}`} style={gridSlideStyle}>
+                    {weekdayLabels.map(d => (
+                        <div key={d} className={styles.weekday}>{d}</div>
                     ))}
+
+                    {days.map((date, i) => {
+                        if (!date) return <div key={`pad-${i}`} className={styles.pad} />;
+
+                        const dateString = getLocalDateStr(date);
+                        const isFuture = dateString > todayStr;
+                        const isBeforeStart = dateString < startDate;
+                        const isToday = dateString === todayStr;
+                        const isMuted = isFuture || isBeforeStart;
+
+                        const dayCompletions = completions[dateString] || {};
+                        const isPerfect = !isCustom && isPerfectDay(dayCompletions, exercises);
+                        const isAnyDone = !isPerfect && Object.values(dayCompletions).some(ex => ex?.isCompleted);
+                        const completedExs = Object.values(dayCompletions).filter(ex => {
+                            if (!ex?.isCompleted || !ex?.timestamp) return false;
+                            if (typeof ex.timestamp === 'object') return false;
+                            const timeMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
+                            return !isNaN(timeMs);
+                        });
+                        const isCaughtUp = completedExs.length > 0 && completedExs.every(ex => {
+                            const tsMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
+                            const parts = dateString.split('-');
+                            if (parts.length !== 3) return false;
+                            const yr = parseInt(parts[0], 10);
+                            const mo = parseInt(parts[1], 10) - 1;
+                            const dy = parseInt(parts[2], 10);
+                            const localDayStartUTC = Date.UTC(yr, mo, dy);
+                            const diffHours = (tsMs - localDayStartUTC) / (1000 * 60 * 60);
+                            return diffHours < -15 || diffHours >= 37;
+                        });
+                        // Today is never shown as "missed" — it isn't a failure yet.
+                        const isMissed = !isPerfect && !isAnyDone && !isMuted && !isToday;
+                        const completedCount = exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length;
+                        const isSelected = selectedDay === dateString;
+
+                        // Exercise dots scale down as the day gets busier so they stay inside the cell.
+                        const dotCount = completedCount + (isMissed ? 1 : 0);
+                        const dotPx = dotCount > 12 ? 4 : dotCount > 8 ? 5 : dotCount > 5 ? 6 : 7;
+
+                        const cls = [styles.day];
+                        if (isMuted) cls.push(styles.muted);
+                        else if (isPerfect) cls.push(styles.perfect);
+                        else if (isCaughtUp) cls.push(styles.caught);
+                        else if (isAnyDone) cls.push(styles.done);
+                        else if (isMissed) cls.push(styles.missed);
+                        if (isToday) cls.push(styles.today);
+                        if (isSelected) cls.push(styles.selected);
+
+                        return (
+                            <button
+                                key={i}
+                                type="button"
+                                className={cls.join(' ')}
+                                disabled={isMuted}
+                                aria-pressed={isSelected}
+                                aria-label={`${date.getDate()} ${monthNames[month]}`}
+                                onClick={() => setSelectedDay(isSelected ? null : dateString)}
+                            >
+                                <span className={styles.dayNum}>{date.getDate()}</span>
+                                {!isMuted && (
+                                    <span className={styles.dots}>
+                                        {exercises && exercises.map(ex => (
+                                            dayCompletions[ex.id]?.isCompleted ? (
+                                                <span
+                                                    key={ex.id}
+                                                    className={styles.dot}
+                                                    style={{
+                                                        width: dotPx, height: dotPx,
+                                                        background: ex.color,
+                                                        boxShadow: `0 0 4px ${ex.color}99`
+                                                    }}
+                                                />
+                                            ) : null
+                                        ))}
+                                        {isMissed && (
+                                            <X size={dotPx + 6} color="#ef4444" strokeWidth={3} style={{ filter: 'drop-shadow(0 0 3px rgba(239,68,68,0.5))' }} />
+                                        )}
+                                    </span>
+                                )}
+                            </button>
+                        );
+                    })}
                 </div>
-                <div style={{
-                    width: '100%', height: '1px', background: 'var(--border-muted)',
-                    margin: '2px 0'
-                }} />
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', justifyContent: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <div style={{
-                            width: '12px', height: '12px', borderRadius: '3px',
-                            background: 'var(--gradient-gold-trans)', border: '1.5px solid rgba(255, 223, 0, 0.6)',
-                            boxShadow: 'var(--glow-gold)'
-                        }} />
-                        <span style={{ color: 'var(--text-secondary)' }}>{t('calendar.perfectDayLegend')}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <div style={{
-                            width: '12px', height: '12px', borderRadius: '3px',
-                            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(217, 119, 6, 0.12))',
-                            border: '1.5px solid transparent'
-                        }} />
-                        <span style={{ color: 'var(--text-secondary)' }}>{t('calendar.caughtUpDayLegend')}</span>
-                    </div>
+
+                {/* Legend — calendar states (per-exercise breakdown lives in the day sheet) */}
+                <div className={`${styles.legend} ${styles.rise} ${styles.rise4}`}>
+                    <div className={styles.legendItem}><span className={`${styles.swatch} ${styles.swPerfect}`} />{t('calendar.perfectDayLegend')}</div>
+                    <div className={styles.legendItem}><span className={`${styles.swatch} ${styles.swDone}`} />{t('calendar.completed')}</div>
+                    <div className={styles.legendItem}><span className={`${styles.swatch} ${styles.swCaught}`} />{t('calendar.caughtUpDayLegend')}</div>
+                    <div className={styles.legendItem}><span className={`${styles.swatch} ${styles.swMissed}`} />{t('calendar.missed')}</div>
                 </div>
-            </div>
+
+                {/* Detail popup */}
+                {selectedDay && (
+                    <>
+                        <div onClick={handleCloseDetail} style={{
+                            position: 'fixed', inset: 0, zIndex: 199,
+                            background: 'rgba(0,0,0,0.5)', opacity: isClosing ? 0 : 1, transition: 'opacity 0.15s'
+                        }} />
+                        <DayDetail
+                            dateString={selectedDay}
+                            completions={completions}
+                            exercises={exercises}
+                            getDayNumber={getDayNumber}
+                            onClose={handleCloseDetail}
+                            isClosing={isClosing}
+                            getConfig={getConfig}
+                            t={t}
+                            startDate={startDate}
+                        />
+                    </>
+                )}
             </div>
         </div>
     );
@@ -600,10 +530,10 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
             }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-sm)' }}>
                 <div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                        {dateString}
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', textTransform: 'capitalize', letterSpacing: '0.04em' }}>
+                        {new Date(`${dateString}T00:00:00`).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}
                     </div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ fontSize: '1.3rem', fontWeight: '800', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '1px' }}>
                         {t('calendar.day', { num: dayNum })}
                         {isCaughtUp && (
                             <span style={{
@@ -685,8 +615,3 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
     );
 }
 
-const navBtnStyle = {
-    color: 'var(--text-secondary)', background: 'var(--surface-muted)',
-    border: 'none', borderRadius: '50%', width: 'var(--touch-min)', height: 'var(--touch-min)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
-};

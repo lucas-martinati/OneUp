@@ -198,6 +198,8 @@
   "calendar": {
     "caughtUp": "Nachgeholt",
     "caughtUpDayLegend": "Nachgeholter Tag",
+    "missed": "Verpasst",
+    "today": "Heute",
     "completed": "Vollendet",
     "day": "Tag {{num}}",
     "months": [

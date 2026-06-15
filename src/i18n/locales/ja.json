@@ -198,6 +198,8 @@
   "calendar": {
     "caughtUp": "取り戻した日",
     "caughtUpDayLegend": "取り戻した日",
+    "missed": "未達成",
+    "today": "今日",
     "completed": "完了",
     "day": "{{num}} 日",
     "months": [

@@ -198,6 +198,8 @@
   "calendar": {
     "caughtUp": "만회함",
     "caughtUpDayLegend": "만회한 하루",
+    "missed": "놓침",
+    "today": "오늘",
     "completed": "완전한",
     "day": "일 {{num}}",
     "months": [
