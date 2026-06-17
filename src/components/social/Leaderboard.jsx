@@ -274,6 +274,9 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                                 currentUid={currentUid}
                                 todayStr={todayStr}
                                 onSelect={setSelectedUser}
+                                clanData={clanData}
+                                nudgedMember={nudgedMember}
+                                onNudge={handleNudge}
                                 t={t}
                             />
                         )}

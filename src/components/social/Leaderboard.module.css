@@ -291,6 +291,26 @@
 .nudgeBtn:hover { transform: scale(1.08); }
 .nudgeBtnDone { background: var(--success); color: #fff; }
 
+/* Compact nudge badge anchored to the bottom-right of a podium avatar */
+.pNudgeBtn {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--accent) 92%, #000);
+  color: #fff;
+  border: 2px solid var(--sheet-bg);
+  cursor: pointer;
+  flex-shrink: 0;
+  z-index: 1;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.pNudgeBtn:hover { transform: scale(1.08); }
+
 /* ── States ──────────────────────────────────────────────────────────── */
 .center {
   flex: 1;

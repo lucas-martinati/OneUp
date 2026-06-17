@@ -1,5 +1,5 @@
 import React from 'react';
-import { Crown, Star } from '../../utils/icons';
+import { Crown, Star, HeartHandshake, Check } from '../../utils/icons';
 import { Avatar } from '../ui/Avatar';
 import { getTierBadgeConfigs } from '../../utils/entitlements';
 import styles from './Leaderboard.module.css';
@@ -14,7 +14,7 @@ const MEDALS = {
  * Top-3 podium hero. `items` is the (up to 3) leaderboard entries ordered by
  * standing: items[0] is the leader (rendered centre & tallest).
  */
-export function LeaderboardPodium({ items, currentUid, todayStr, onSelect, t }) {
+export function LeaderboardPodium({ items, currentUid, todayStr, onSelect, clanData, nudgedMember, onNudge, t }) {
     if (!items || items.length === 0) return null;
 
     return (
@@ -46,6 +46,17 @@ export function LeaderboardPodium({ items, currentUid, todayStr, onSelect, t }) 
                                 </>
                             )}
                             <Avatar photoURL={entry.photoURL} name={entry.pseudo} size={avatarSize} borderColor={isPerfect ? '#ffd700' : medal.border} />
+
+                            {clanData && !isMe && (
+                                <button
+                                    onClick={(e) => onNudge(e, entry.uid)}
+                                    disabled={nudgedMember === entry.uid}
+                                    aria-label="nudge"
+                                    className={`${styles.pNudgeBtn} ${nudgedMember === entry.uid ? styles.nudgeBtnDone : ''}`}
+                                >
+                                    {nudgedMember === entry.uid ? <Check size={14} /> : <HeartHandshake size={14} />}
+                                </button>
+                            )}
                         </div>
 
                         <div className={styles.pName}>
