@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search } from 'lucide-react';
-import { User, Clock } from '../../utils/icons';
+import { Clock } from '../../utils/icons';
+import { Avatar } from '../ui/Avatar';
 
 /** Searchable user list of the admin panel. */
 export function AdminUserList({ searchQuery, setSearchQuery, filteredUsers, onSelectUser }) {
@@ -47,25 +48,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, filteredUsers, onSe
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
-                {user.photoURL ? (
-                  <img
-                    src={user.photoURL}
-                    alt={user.displayName}
-                    referrerPolicy="no-referrer"
-                    loading="lazy"
-                    decoding="async"
-                    style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }}
-                  />
-                ) : (
-                  <div style={{
-                    width: '44px', height: '44px', borderRadius: '50%',
-                    background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.05))',
-                    border: '2px solid rgba(239, 68, 68, 0.3)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444'
-                  }}>
-                    <User size={20} />
-                  </div>
-                )}
+                <Avatar photoURL={user.photoURL} name={user.displayName} size={44} />
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontWeight: '800', fontSize: '1.05rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {user.displayName}
