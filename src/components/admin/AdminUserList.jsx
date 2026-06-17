@@ -51,6 +51,9 @@ export function AdminUserList({ searchQuery, setSearchQuery, filteredUsers, onSe
                   <img
                     src={user.photoURL}
                     alt={user.displayName}
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
                     style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }}
                   />
                 ) : (

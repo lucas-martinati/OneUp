@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const GRADIENTS = [
     ['#4f46e5', '#7c3aed'],
     ['#db2777', '#be185d'],
@@ -29,6 +31,13 @@ export function Avatar({ photoURL, name, size = 32, borderColor = null }) {
     const gradient = getGradientFromString(name || '');
     const initial = getInitial(name);
 
+    // Remember which URL failed to load so we can fall back to the initial.
+    // Tracking the URL (not a boolean) auto-resets when photoURL changes, since
+    // the same <Avatar> instance is reused across users.
+    const [failedUrl, setFailedUrl] = useState(null);
+
+    const showImg = photoURL && failedUrl !== photoURL;
+
     return (
         <div style={{
             width: size,
@@ -36,7 +45,8 @@ export function Avatar({ photoURL, name, size = 32, borderColor = null }) {
             borderRadius: '50%',
             overflow: 'hidden',
             flexShrink: 0,
-            background: photoURL ? 'transparent' : `linear-gradient(135deg, ${gradient[0]}, ${gradient[1]})`,
+            position: 'relative',
+            background: `linear-gradient(135deg, ${gradient[0]}, ${gradient[1]})`,
             border: borderColor ? `1.5px solid ${borderColor}` : '1.5px solid rgba(255,255,255,0.12)',
             display: 'flex',
             alignItems: 'center',
@@ -45,32 +55,33 @@ export function Avatar({ photoURL, name, size = 32, borderColor = null }) {
             fontWeight: '700',
             color: 'white',
             textShadow: '0 1px 4px rgba(0,0,0,0.4)',
-            boxShadow: photoURL ? 'none' : `0 4px 12px ${gradient[0]}50`
+            boxShadow: showImg ? 'none' : `0 4px 12px ${gradient[0]}50`
         }}>
-            {photoURL ? (
+            {/* Gradient + initial sit underneath as the fallback / loading state */}
+            <span style={{
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'
+            }}>
+                {initial}
+            </span>
+
+            {showImg && (
                 <img
                     src={photoURL}
                     alt=""
+                    // Google profile photos (lh3.googleusercontent.com) return 429/403
+                    // when a Referer header is sent — stripping it lets them load reliably.
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
+                    onError={() => setFailedUrl(photoURL)}
                     style={{
+                        position: 'absolute',
+                        inset: 0,
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover'
                     }}
-                    onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.parentElement.style.background = `linear-gradient(135deg, ${gradient[0]}, ${gradient[1]})`;
-                        e.target.parentElement.style.boxShadow = `0 4px 12px ${gradient[0]}50`;
-                        e.target.parentElement.textContent = initial;
-                    }}
                 />
-            ) : (
-                <span style={{
-                    position: 'relative',
-                    zIndex: 1,
-                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'
-                }}>
-                    {initial}
-                </span>
             )}
         </div>
     );
