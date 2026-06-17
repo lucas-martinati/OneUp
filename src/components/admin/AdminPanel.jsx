@@ -24,12 +24,15 @@ export function AdminPanel({ onClose }) {
   const {
     loading, refreshing, loadData, message,
     searchQuery, setSearchQuery, filteredUsers,
+    sortBy, sortReversed, cycleSort,
+    activeFilters, toggleFilter, clearFilters,
     selectedUid, setSelectedUid, editMode, setEditMode,
-    handleSelectUser, selectedUserKeys,
+    handleSelectUser, selectedUserKeys, selectedMeta,
     expandedKeys, toggleKeyAccordion,
     keyJsonContents, keyJsonErrors, keyEditorFormats, setKeyEditorFormats,
     handleKeyJsonChange, handleFormatKeyJson, handleSaveKeyJson,
     formState, setFormState, saveLoading, handleSaveForm,
+    handleResetProgress, handleDeleteUser,
   } = useAdminPanel();
 
   return (
@@ -100,6 +103,12 @@ export function AdminPanel({ onClose }) {
           <AdminUserList
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
+            sortBy={sortBy}
+            sortReversed={sortReversed}
+            cycleSort={cycleSort}
+            activeFilters={activeFilters}
+            toggleFilter={toggleFilter}
+            clearFilters={clearFilters}
             filteredUsers={filteredUsers}
             onSelectUser={handleSelectUser}
           />
@@ -121,8 +130,11 @@ export function AdminPanel({ onClose }) {
                 <AdminUserForm
                   formState={formState}
                   setFormState={setFormState}
+                  meta={selectedMeta}
                   saveLoading={saveLoading}
                   onSave={handleSaveForm}
+                  onResetProgress={handleResetProgress}
+                  onDeleteUser={handleDeleteUser}
                   onBack={() => setSelectedUid(null)}
                 />
               ) : (

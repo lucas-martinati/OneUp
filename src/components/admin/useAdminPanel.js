@@ -1,7 +1,36 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ref, get, set } from 'firebase/database';
 import { getDatabaseInstance } from '../../services/firebase';
-import { fetchAllUsersData, updateUserProfile, updateUserSettings, updateUserProgress, updateUserPurchase, saveUserData } from '../../services/adminService';
+import { fetchAllUsersData, updateUserProfile, updateUserSettings, updateUserProgress, updateUserPurchase, saveUserData, resetUserProgress, deleteUserData } from '../../services/adminService';
+
+/** Activity timestamp used for the default sort (most recent first). */
+function activityTs(u) {
+  if (u.lastSeen) { const t = Date.parse(u.lastSeen); if (!isNaN(t)) return t; }
+  if (u.lastActiveDay) { const t = Date.parse(u.lastActiveDay); if (!isNaN(t)) return t; }
+  return 0;
+}
+
+/** Comparators for the account list, keyed by sort mode. */
+const SORTERS = {
+  activity: (a, b) => activityTs(b) - activityTs(a),
+  reps: (a, b) => (b.totalReps || 0) - (a.totalReps || 0),
+  days: (a, b) => (b.completionsCount || 0) - (a.completionsCount || 0),
+  name: (a, b) => a.displayName.localeCompare(b.displayName),
+};
+
+/**
+ * Account list filters. Options sharing a `group` are mutually exclusive
+ * (selecting one clears the others in that group); across groups they AND.
+ */
+export const FILTER_OPTIONS = [
+  { id: 'setup_yes', group: 'setup', label: 'Configuré', test: u => u.isSetup },
+  { id: 'setup_no', group: 'setup', label: 'Non configuré', test: u => !u.isSetup },
+  { id: 'active', group: 'active', label: 'Actif', test: u => u.completionsCount > 0 },
+  { id: 'inactive', group: 'active', label: 'Inactif', test: u => !u.completionsCount },
+  { id: 'pro', group: 'pro', label: 'PRO', test: u => u.isPro },
+  { id: 'supporter', group: 'supporter', label: 'Support', test: u => u.isSupporter },
+  { id: 'no_photo', group: 'photo', label: 'Sans photo', test: u => !u.photoURL },
+];
 
 /**
  * All state and Firebase logic of the admin panel: user list loading,
@@ -13,6 +42,26 @@ export function useAdminPanel() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('activity'); // 'activity' | 'reps' | 'days' | 'name'
+  const [sortReversed, setSortReversed] = useState(false); // invert the active sort order
+  const [activeFilters, setActiveFilters] = useState([]); // array of FILTER_OPTIONS ids
+
+  // Click a sort: same one toggles its direction, a new one resets to natural order.
+  const cycleSort = (id) => {
+    if (id === sortBy) setSortReversed(r => !r);
+    else { setSortBy(id); setSortReversed(false); }
+  };
+
+  const toggleFilter = (id) => {
+    setActiveFilters(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
+      const opt = FILTER_OPTIONS.find(o => o.id === id);
+      const sameGroup = FILTER_OPTIONS.filter(o => o.group === opt?.group).map(o => o.id);
+      return [...prev.filter(x => !sameGroup.includes(x)), id];
+    });
+  };
+
+  const clearFilters = () => setActiveFilters([]);
 
   // Selection & Editor state
   const [selectedUid, setSelectedUid] = useState(null);
@@ -29,8 +78,15 @@ export function useAdminPanel() {
     displayName: '',
     photoURL: '',
     leaderboardPseudo: '',
+    leaderboardEnabled: false,
+    notificationsEnabled: false,
+    notificationTime: { hour: 9, minute: 0 },
+    soundsEnabled: true,
+    performanceMode: 'high',
+    appTheme: 'dark',
     isPro: false,
     isSupporter: false,
+    hadPro: false,
     startDate: '',
     isSetup: false,
   });
@@ -96,6 +152,10 @@ export function useAdminPanel() {
         isPro: !!data.purchase?.isPro,
         isSupporter: !!data.purchase?.isSupporter,
         completionsCount,
+        startDate: data.progress?.startDate || null,
+        isSetup: !!data.progress?.isSetup,
+        totalReps: (lbEntry.totalReps || 0) + (lbEntry.weightsTotalReps || 0),
+        lastActiveDay: lbEntry.lastActiveDay || null,
         rawData: data
       };
     }).filter(u => {
@@ -104,8 +164,14 @@ export function useAdminPanel() {
         u.email.toLowerCase().includes(query) ||
         u.displayName.toLowerCase().includes(query)
       );
+    }).filter(u => activeFilters.every(id => {
+      const opt = FILTER_OPTIONS.find(o => o.id === id);
+      return opt ? opt.test(u) : true;
+    })).sort((a, b) => {
+      const r = (SORTERS[sortBy] || SORTERS.activity)(a, b);
+      return sortReversed ? -r : r;
     });
-  }, [dataState, searchQuery]);
+  }, [dataState, searchQuery, sortBy, sortReversed, activeFilters]);
 
   // Select User
   const handleSelectUser = (user) => {
@@ -123,8 +189,15 @@ export function useAdminPanel() {
       displayName: user.rawData.profile?.displayName || lbEntry.pseudo || user.rawData.settings?.leaderboardPseudo || '',
       photoURL: user.rawData.profile?.photoURL || lbEntry.photoURL || '',
       leaderboardPseudo: user.rawData.settings?.leaderboardPseudo || lbEntry.pseudo || '',
+      leaderboardEnabled: !!user.rawData.settings?.leaderboardEnabled,
+      notificationsEnabled: !!user.rawData.settings?.notificationsEnabled,
+      notificationTime: user.rawData.settings?.notificationTime || { hour: 9, minute: 0 },
+      soundsEnabled: user.rawData.settings?.soundsEnabled !== false,
+      performanceMode: user.rawData.settings?.performanceMode || 'high',
+      appTheme: user.rawData.settings?.appTheme || 'dark',
       isPro: !!user.rawData.purchase?.isPro,
       isSupporter: !!user.rawData.purchase?.isSupporter,
+      hadPro: !!user.rawData.purchase?.hadPro,
       startDate: user.rawData.progress?.startDate || '',
       isSetup: !!user.rawData.progress?.isSetup,
     });
@@ -158,6 +231,23 @@ export function useAdminPanel() {
 
     // Append the '__full__' pseudo key to allow full document editing at the end
     return [...keys, '__full__'];
+  }, [selectedUid, dataState]);
+
+  // Read-only metadata shown at the top of the selected user's detail sheet.
+  const selectedMeta = useMemo(() => {
+    if (!selectedUid || !dataState.usersData) return null;
+    const data = dataState.usersData[selectedUid] || {};
+    const lbEntry = (dataState.leaderboardData && dataState.leaderboardData[selectedUid]) || {};
+    return {
+      uid: selectedUid,
+      lastSeen: data.profile?.lastSeen || null,
+      completionsCount: data.progress?.completions ? Object.keys(data.progress.completions).length : 0,
+      totalReps: lbEntry.totalReps || 0,
+      weightsTotalReps: lbEntry.weightsTotalReps || 0,
+      achievements: lbEntry.achievements || 0,
+      lastActiveDay: lbEntry.lastActiveDay || null,
+      lastCompletionChange: data.progress?.lastCompletionChange || null,
+    };
   }, [selectedUid, dataState]);
 
   // Handle collapsible key expand/collapse toggling
@@ -289,14 +379,20 @@ export function useAdminPanel() {
 
       const settings = {
         ...originalUser.settings,
-        leaderboardPseudo: formState.leaderboardPseudo
+        leaderboardPseudo: formState.leaderboardPseudo,
+        leaderboardEnabled: formState.leaderboardEnabled,
+        notificationsEnabled: formState.notificationsEnabled,
+        notificationTime: formState.notificationTime,
+        soundsEnabled: formState.soundsEnabled,
+        performanceMode: formState.performanceMode,
+        appTheme: formState.appTheme,
       };
 
       const purchase = {
         ...originalUser.purchase,
         isPro: formState.isPro,
         isSupporter: formState.isSupporter,
-        hadPro: formState.isPro || !!originalUser.purchase?.hadPro
+        hadPro: formState.hadPro || formState.isPro
       };
 
       const progress = {
@@ -334,14 +430,71 @@ export function useAdminPanel() {
     }
   };
 
+  // Danger action: clear completions + zero leaderboard totals.
+  const handleResetProgress = async () => {
+    if (!selectedUid) return;
+    setSaveLoading(true);
+    setMessage(null);
+    try {
+      await resetUserProgress(selectedUid);
+      setDataState(prev => {
+        const originalUser = prev.usersData[selectedUid] || {};
+        const updatedUser = {
+          ...originalUser,
+          progress: {
+            ...originalUser.progress,
+            completions: {},
+            lastCompletionChange: new Date().toISOString(),
+          },
+        };
+        setKeyJsonContents(c => ({
+          ...c,
+          progress: JSON.stringify(updatedUser.progress, null, 2),
+          '__full__': JSON.stringify(updatedUser, null, 2),
+        }));
+        return { ...prev, usersData: { ...prev.usersData, [selectedUid]: updatedUser } };
+      });
+      setMessage({ type: 'success', text: 'Progression réinitialisée (jours et totaux remis à zéro).' });
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Erreur lors de la réinitialisation : ' + err.message });
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  // Danger action: delete the user's database record + leaderboard entry.
+  const handleDeleteUser = async () => {
+    if (!selectedUid) return;
+    setSaveLoading(true);
+    setMessage(null);
+    const deletedUid = selectedUid;
+    try {
+      await deleteUserData(deletedUid);
+      setSelectedUid(null);
+      setDataState(prev => {
+        const nextUsers = { ...prev.usersData };
+        delete nextUsers[deletedUid];
+        return { ...prev, usersData: nextUsers };
+      });
+      setMessage({ type: 'success', text: 'Données de l\'utilisateur supprimées (compte Auth non affecté).' });
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Erreur lors de la suppression : ' + err.message });
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
   return {
     loading, refreshing, loadData, message,
     searchQuery, setSearchQuery, filteredUsers,
+    sortBy, sortReversed, cycleSort,
+    activeFilters, toggleFilter, clearFilters,
     selectedUid, setSelectedUid, editMode, setEditMode,
-    handleSelectUser, selectedUserKeys,
+    handleSelectUser, selectedUserKeys, selectedMeta,
     expandedKeys, toggleKeyAccordion,
     keyJsonContents, keyJsonErrors, keyEditorFormats, setKeyEditorFormats,
     handleKeyJsonChange, handleFormatKeyJson, handleSaveKeyJson,
     formState, setFormState, saveLoading, handleSaveForm,
+    handleResetProgress, handleDeleteUser,
   };
 }

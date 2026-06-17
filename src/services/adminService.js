@@ -90,3 +90,37 @@ export async function updateUserPurchase(uid, purchase) {
   logger.success(`Updated purchase info for ${uid}`);
   return true;
 }
+
+/**
+ * Clear a user's daily completions and zero their public leaderboard totals.
+ * Keeps profile / settings / startDate / Pro status intact.
+ */
+export async function resetUserProgress(uid) {
+  const database = getDatabaseInstance();
+  if (!database) throw new Error('Database not initialized');
+  await update(ref(database), {
+    [`users/${uid}/progress/completions`]: null,
+    [`users/${uid}/progress/lastCompletionChange`]: new Date().toISOString(),
+    [`leaderboard/${uid}/totalReps`]: 0,
+    [`leaderboard/${uid}/weightsTotalReps`]: 0,
+    [`leaderboard/${uid}/exerciseReps`]: null,
+  });
+  logger.success(`Reset progress for ${uid}`);
+  return true;
+}
+
+/**
+ * Delete a user's database record and their leaderboard entry (atomic).
+ * NOTE: this does NOT remove their Firebase Auth account — that requires the
+ * (not-yet-deployed) onAccountDeleted Cloud Function / Admin SDK.
+ */
+export async function deleteUserData(uid) {
+  const database = getDatabaseInstance();
+  if (!database) throw new Error('Database not initialized');
+  await update(ref(database), {
+    [`users/${uid}`]: null,
+    [`leaderboard/${uid}`]: null,
+  });
+  logger.success(`Deleted user data + leaderboard for ${uid}`);
+  return true;
+}

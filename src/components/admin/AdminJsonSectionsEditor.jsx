@@ -72,16 +72,18 @@ export function AdminJsonSectionsEditor({
             {isExpanded && (
               <div className="scale-in" style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{
-                    background: isFullDoc ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                    border: `1px solid ${isFullDoc ? 'rgba(239, 68, 68, 0.3)' : 'var(--border-subtle)'}`,
-                    padding: '6px 12px', borderRadius: 'var(--radius-md)',
-                    color: isFullDoc ? '#fca5a5' : 'var(--text-secondary)',
-                    fontSize: '0.72rem', display: 'flex', gap: '6px', alignItems: 'center'
-                  }}>
-                    <Lock size={12} />
-                    <span>{isFullDoc ? 'Édition globale directe.' : `Modifie uniquement la clé "${key}".`}</span>
-                  </div>
+                  {isFullDoc ? (
+                    <div style={{
+                      background: 'rgba(239, 68, 68, 0.15)',
+                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                      padding: '6px 12px', borderRadius: 'var(--radius-md)',
+                      color: '#fca5a5',
+                      fontSize: '0.72rem', display: 'flex', gap: '6px', alignItems: 'center'
+                    }}>
+                      <Lock size={12} />
+                      <span>Édition globale directe.</span>
+                    </div>
+                  ) : <div />}
 
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     {/* Editor Format Toggle Switcher */}
