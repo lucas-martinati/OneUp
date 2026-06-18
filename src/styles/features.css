@@ -12,7 +12,233 @@ input:checked + .slider:before { transform: translateX(20px); }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .spin { animation: spin 1s linear infinite; }
 
-/* ── AnnouncementOverlay: Animations ──────────────────────────────────── */
+/* ── AnnouncementOverlay ───────────────────────────────────────────────
+   Theme-aware announcement panel. Every accent surface derives from the
+   active theme tokens (--accent, --accent-glow, --gradient-glow) so the
+   panel adapts to default / ocean / sunset / forest / purple themes. */
+
+.ann-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.ann-card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  max-height: 90vh;
+  overflow: hidden;
+  overflow-y: auto;
+  padding: 30px 24px 24px;
+  text-align: center;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 14%, transparent), transparent 38%),
+    linear-gradient(135deg, rgba(16, 16, 24, 0.96), rgba(8, 8, 14, 0.98));
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.55),
+    0 0 50px color-mix(in srgb, var(--accent-glow) 18%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Soft ambient accent glow centered behind the content */
+.ann-aura {
+  position: absolute;
+  top: -45%;
+  left: 50%;
+  width: 200%;
+  height: 100%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--accent-glow) 22%, transparent) 0%,
+    transparent 62%
+  );
+}
+
+/* Hero icon + pulsing rings */
+.ann-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 92px;
+  margin: 4px auto 14px;
+}
+
+.ann-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--accent-glow) 55%, transparent);
+  opacity: 0;
+}
+
+.ann-ring-1 { animation: ann-ring-pulse 2.8s ease-out 0.8s infinite; }
+.ann-ring-2 { animation: ann-ring-pulse 2.8s ease-out 1.7s infinite; }
+
+.ann-emoji {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  font-size: 40px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--accent) 40%, transparent), transparent 70%),
+    rgba(255, 255, 255, 0.04);
+  border: 1px solid color-mix(in srgb, var(--accent-glow) 35%, transparent);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 35%, transparent);
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+  animation: ann-emoji-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s backwards;
+}
+
+.ann-badge {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 4px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #fff;
+  border-radius: 999px;
+  background: var(--gradient-glow);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 45%, transparent);
+  animation: ann-emoji-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+}
+
+.ann-title {
+  position: relative;
+  margin: 0 0 10px;
+  animation: ann-text-in 0.5s ease 0.35s backwards;
+}
+
+.ann-body {
+  position: relative;
+  margin: 0 0 18px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.62);
+  animation: ann-text-in 0.5s ease 0.45s backwards;
+}
+
+/* Highlights list */
+.ann-highlights {
+  position: relative;
+  list-style: none;
+  margin: 0 0 22px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.ann-highlight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  animation: ann-text-in 0.5s ease backwards;
+}
+
+.ann-highlight-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-glow) 28%, transparent);
+}
+
+.ann-highlight-text {
+  font-size: 12.5px;
+  line-height: 1.45;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* Optional images */
+.ann-images {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 22px;
+  animation: ann-text-in 0.6s ease 0.55s backwards;
+}
+
+.ann-image-frame {
+  display: flex;
+  justify-content: center;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.ann-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.4));
+}
+
+/* CTA */
+.ann-cta {
+  position: relative;
+  width: 100%;
+  padding: 15px 24px;
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--gradient-glow);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 40%, transparent);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  animation: ann-text-in 0.5s ease 0.7s backwards;
+}
+
+.ann-cta-shine {
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: ann-cta-shine 3.2s ease-in-out 1.2s infinite;
+}
+
+.ann-cta-label { position: relative; }
 
 @keyframes ann-fade-in {
   from { opacity: 0; }
@@ -42,6 +268,21 @@ input:checked + .slider:before { transform: translateX(20px); }
 @keyframes ann-text-in {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ann-ring-pulse {
+  0% { opacity: 0.6; transform: scale(0.78); }
+  100% { opacity: 0; transform: scale(1.35); }
+}
+
+@keyframes ann-cta-shine {
+  0% { left: -60%; }
+  55%, 100% { left: 130%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ann-ring,
+  .ann-cta-shine { animation: none; }
 }
 
 /* ── CardioFullscreenMap ──────────────────────────────────────────────── */

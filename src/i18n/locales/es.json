@@ -191,11 +191,16 @@
     "filterLocked": "Bloqueados"
   },
   "announcement": {
+    "_comment": "⚠️ Bloc temporaire, réécrit À CHAQUE nouvelle annonce. Les clés (title, body, cta, highlights.*) sont à PLAT et remplacent entièrement celles de l'annonce précédente : pas de sous-objet par annonce. Voir src/features/announcements/announcementConfig.js.",
     "badge": "Nuevo",
-    "cardio": {
-      "body": "Conecta Strava para sincronizar automáticamente tus carreras y salidas en bicicleta. Sigue tus objetivos semanales, tu racha y visualiza tus rutas GPS. El cardio ahora contribuye a tu racha global.",
-      "cta": "¡Genial!",
-      "title": "¡Nuevo módulo de Cardio! 🏃🚴"
+    "title": "Una interfaz totalmente nueva ✨",
+    "body": "¡OneUp estrena imagen! Toda la aplicación se ha rediseñado para una experiencia más fluida, coherente y agradable en el día a día.",
+    "cta": "Descubrir",
+    "highlights": {
+      "design": "Un diseño renovado de arriba abajo, con avatares y degradados rediseñados",
+      "motion": "Animaciones y estados de carga más fluidos en todas partes",
+      "components": "Componentes unificados para una coherencia perfecta entre pantallas",
+      "onboarding": "Un onboarding rediseñado, con selector de idioma"
     }
   },
   "app": {

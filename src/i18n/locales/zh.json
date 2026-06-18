@@ -191,11 +191,16 @@
     "filterLocked": "未解锁"
   },
   "announcement": {
+    "_comment": "⚠️ Bloc temporaire, réécrit À CHAQUE nouvelle annonce. Les clés (title, body, cta, highlights.*) sont à PLAT et remplacent entièrement celles de l'annonce précédente : pas de sous-objet par annonce. Voir src/features/announcements/announcementConfig.js.",
     "badge": "新功能",
-    "cardio": {
-      "body": "连接 Strava 以自动同步您的跑步和骑行。追踪您的每周目标、连续纪录，并查看您的 GPS 轨迹。有氧运动现在计入您的总连续纪录。",
-      "cta": "太棒了！",
-      "title": "全新有氧运动模块！🏃🚴"
+    "title": "全新的界面 ✨",
+    "body": "OneUp 焕然一新！整个应用都经过重新设计，带来更流畅、更统一、更舒适的日常体验。",
+    "cta": "去看看",
+    "highlights": {
+      "design": "从里到外焕新的设计，重新打造的头像与渐变",
+      "motion": "各处更流畅的动画与加载效果",
+      "components": "统一的组件，让各页面之间保持完美一致",
+      "onboarding": "重新设计的引导流程，并支持语言切换"
     }
   },
   "app": {

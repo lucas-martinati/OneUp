@@ -191,11 +191,16 @@
     "filterLocked": "Gesperrt"
   },
   "announcement": {
+    "_comment": "⚠️ Bloc temporaire, réécrit À CHAQUE nouvelle annonce. Les clés (title, body, cta, highlights.*) sont à PLAT et remplacent entièrement celles de l'annonce précédente : pas de sous-objet par annonce. Voir src/features/announcements/announcementConfig.js.",
     "badge": "Neu",
-    "cardio": {
-      "body": "Verbinde Strava, um deine Läufe und Radtouren automatisch zu synchronisieren. Verfolgen Sie Ihre wöchentlichen Ziele, Ihren Streak und sehen Sie sich Ihre GPS-Tracks an. Cardio trägt jetzt zu Ihrem globalen Streak bei.",
-      "cta": "Eindrucksvoll!",
-      "title": "Neues Cardio-Modul! 🏃🚴"
+    "title": "Ein ganz neues Design ✨",
+    "body": "OneUp im neuen Look! Die gesamte App wurde überarbeitet – für ein flüssigeres, einheitlicheres und angenehmeres Erlebnis im Alltag.",
+    "cta": "Entdecken",
+    "highlights": {
+      "design": "Ein rundum aufgefrischtes Design mit überarbeiteten Avataren und Farbverläufen",
+      "motion": "Überall flüssigere Animationen und Ladezustände",
+      "components": "Einheitliche Komponenten für perfekte Konsistenz auf allen Bildschirmen",
+      "onboarding": "Ein neu gestaltetes Onboarding mit Sprachauswahl"
     }
   },
   "app": {

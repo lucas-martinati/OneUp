@@ -191,11 +191,16 @@
     "filterLocked": "Закрытые"
   },
   "announcement": {
+    "_comment": "⚠️ Bloc temporaire, réécrit À CHAQUE nouvelle annonce. Les clés (title, body, cta, highlights.*) sont à PLAT et remplacent entièrement celles de l'annonce précédente : pas de sous-objet par annonce. Voir src/features/announcements/announcementConfig.js.",
     "badge": "Новинка",
-    "cardio": {
-      "body": "Подключите Strava для автоматической синхронизации ваших пробежек и велопоездок. Отслеживайте недельные цели, серию и просматривайте свои GPS-треки. Кардио теперь учитывается в вашей общей серии.",
-      "cta": "Круто!",
-      "title": "Новый модуль Кардио! 🏃🚴"
+    "title": "Совершенно новый интерфейс ✨",
+    "body": "OneUp обновился! Всё приложение переработано ради более плавного, целостного и приятного ежедневного опыта.",
+    "cta": "Посмотреть",
+    "highlights": {
+      "design": "Обновлённый дизайн от и до, с переработанными аватарами и градиентами",
+      "motion": "Более плавные анимации и загрузки повсюду",
+      "components": "Единые компоненты для идеальной согласованности между экранами",
+      "onboarding": "Переработанное знакомство с приложением и выбор языка"
     }
   },
   "app": {

@@ -191,11 +191,16 @@
     "filterLocked": "미획득"
   },
   "announcement": {
+    "_comment": "⚠️ Bloc temporaire, réécrit À CHAQUE nouvelle annonce. Les clés (title, body, cta, highlights.*) sont à PLAT et remplacent entièrement celles de l'annonce précédente : pas de sous-objet par annonce. Voir src/features/announcements/announcementConfig.js.",
     "badge": "새로운",
-    "cardio": {
-      "body": "Strava를 연결하여 달리기와 자전거 타기를 자동으로 동기화하세요. 주간 목표와 연속 기록을 추적하고 GPS 트랙을 확인하세요. 심장 강화 운동은 이제 귀하의 글로벌 연속 기록에 기여합니다.",
-      "cta": "엄청난!",
-      "title": "새로운 심장강화 모듈! 🏃🚴"
+    "title": "완전히 새로워진 인터페이스 ✨",
+    "body": "OneUp가 새 단장을 했어요! 더 부드럽고 일관되며 매일 사용하기 즐거운 경험을 위해 앱 전체를 새롭게 디자인했습니다.",
+    "cta": "둘러보기",
+    "highlights": {
+      "design": "아바타와 그라데이션을 새롭게 다듬어 구석구석 새로워진 디자인",
+      "motion": "모든 화면에서 더욱 부드러워진 애니메이션과 로딩",
+      "components": "화면 간 완벽한 일관성을 위한 통합 컴포넌트",
+      "onboarding": "언어 선택 기능을 갖춘 새로워진 온보딩"
     }
   },
   "app": {
