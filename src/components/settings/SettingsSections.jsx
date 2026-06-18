@@ -298,6 +298,8 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
 export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
     const { t } = useTranslation();
 
+    const currentTheme = settings.appTheme || 'dark';
+
     return (
         <div className="glass-premium" style={{
             ...sectionCardStyle,
@@ -312,7 +314,7 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
                     <ThemeSwatch
                         key={theme.key}
                         theme={theme}
-                        isSelected={(settings.appTheme || 'dark') === theme.key}
+                        isSelected={currentTheme === theme.key}
                         onClick={() => updateSettings(prev => ({ ...prev, appTheme: theme.key }))}
                         title={t(`share.theme.${theme.key}`)}
                     />

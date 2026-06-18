@@ -556,3 +556,16 @@
     transform: translateX(40px);
   }
 }
+
+/* ── Theme swatch: organic water droplet ───────────────────────────── */
+
+/* Elastic press feedback — the droplet wobbles like jelly, squishing wide
+   then tall before settling, giving it a fluid / liquid feel. */
+@keyframes dropletSquish {
+  0%   { transform: scale(1, 1); }
+  25%  { transform: scale(1.28, 0.74); }
+  50%  { transform: scale(0.8, 1.22); }
+  72%  { transform: scale(1.1, 0.92); }
+  88%  { transform: scale(0.96, 1.04); }
+  100% { transform: scale(1, 1); }
+}
