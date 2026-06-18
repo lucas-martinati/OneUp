@@ -1,4 +1,4 @@
-import { ref, set, get, remove, push, onValue, serverTimestamp, runTransaction, query, orderByChild, equalTo, limitToFirst } from 'firebase/database';
+import { ref, set, get, remove, push, update, onValue, serverTimestamp, runTransaction } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
 import i18n from '../i18n';
@@ -13,17 +13,38 @@ export async function createClan(name) {
 
     const uid = auth.currentUser.uid;
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
-    for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
 
-    const newClanRef = push(ref(database, 'clans'));
-    const clanId = newClanRef.key;
+    let attempts = 0;
+    while (attempts < 5) {
+      let code = '';
+      for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
 
-    await set(newClanRef, { name, code, createdBy: uid, createdAt: serverTimestamp(), members: { [uid]: 'admin' } });
-    await set(ref(database, `users/${uid}/clans/${clanId}`), 'admin');
+      // Check if code exists first (cheap local check before write)
+      const codeSnapshot = await get(ref(database, `clanCodes/${code}`));
+      if (!codeSnapshot.exists()) {
+        try {
+          const newClanRef = push(ref(database, 'clans'));
+          const clanId = newClanRef.key;
 
-    logger.success(`Clan ${name} created with code ${code}`);
-    return { success: true, clanId, code };
+          const updates = {};
+          updates[`clans/${clanId}`] = { name, code, createdBy: uid, createdAt: serverTimestamp(), members: { [uid]: 'admin' } };
+          updates[`clanCodes/${code}`] = clanId;
+          updates[`users/${uid}/clans/${clanId}`] = 'admin';
+
+          await update(ref(database), updates);
+
+          logger.success(`Clan ${name} created with code ${code}`);
+          return { success: true, clanId, code };
+        } catch (err) {
+          logger.warn(`Collision or write failure for code ${code}, retrying...`, err);
+        }
+      }
+      attempts++;
+    }
+
+    throw new Error('Could not generate a unique clan code');
   } catch (error) {
     logger.error('Error creating clan:', error);
     return { success: false, error: i18n.t('clan.createError') };
@@ -39,14 +60,15 @@ export async function joinClan(code) {
     const uid = auth.currentUser.uid;
     const cleanCode = code.toUpperCase().trim();
 
-    const clansRef = ref(database, 'clans');
-    const q = query(clansRef, orderByChild('code'), equalTo(cleanCode), limitToFirst(1));
-    const snapshot = await get(q);
-    if (!snapshot.exists()) return { success: false, error: i18n.t('clan.invalidCode') };
+    // Direct lookup on the unique mapping table
+    const codeSnapshot = await get(ref(database, `clanCodes/${cleanCode}`));
+    if (!codeSnapshot.exists()) return { success: false, error: i18n.t('clan.invalidCode') };
 
-    const clans = snapshot.val();
-    const foundClanId = Object.keys(clans)[0];
-    if (!foundClanId) return { success: false, error: i18n.t('clan.invalidCode') };
+    const foundClanId = codeSnapshot.val();
+
+    // Verify clan exists
+    const clanSnapshot = await get(ref(database, `clans/${foundClanId}`));
+    if (!clanSnapshot.exists()) return { success: false, error: i18n.t('clan.invalidCode') };
 
     const userClanSnapshot = await get(ref(database, `users/${uid}/clans/${foundClanId}`));
     if (userClanSnapshot.exists()) return { success: false, error: i18n.t('clan.alreadyMember') };
@@ -78,9 +100,15 @@ export async function leaveClan(clanId) {
 
     const clanSnapshot = await get(ref(database, `clans/${clanId}`));
     if (clanSnapshot.exists()) {
-      const remainingMembers = clanSnapshot.val().members || {};
+      const clanData = clanSnapshot.val();
+      const remainingMembers = clanData.members || {};
       if (Object.keys(remainingMembers).length === 0) {
-        await remove(ref(database, `clans/${clanId}`));
+        const updates = {};
+        updates[`clans/${clanId}`] = null;
+        if (clanData.code) {
+          updates[`clanCodes/${clanData.code}`] = null;
+        }
+        await update(ref(database), updates);
         logger.success(`Clan ${clanId} deleted because it became empty.`);
       }
     }

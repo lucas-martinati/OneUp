@@ -34,6 +34,12 @@
         }
       }
     },
+    "clanCodes": {
+      ".read": "auth != null",
+      "$code": {
+        ".write": "auth != null && ((!data.exists() && newData.exists()) || (!newData.exists() && (!root.child('clans').child(data.val()).exists() || !root.child('clans').child(data.val()).child('members').exists() || root.child('clans').child(data.val()).child('members').child(auth.uid).exists())))"
+      }
+    },
     "notifications": {
       "$uid": {
         ".read": "auth != null && $uid === auth.uid",
