@@ -9,6 +9,7 @@
       "@services/*": ["./src/services/*"],
       "@utils/*": ["./src/utils/*"]
     },
+    "module": "esnext",
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
