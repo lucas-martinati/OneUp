@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getDatabase, serverTimestamp } from 'firebase/database';
 import { createLogger } from '../utils/logger';
+import { setServerTimestampFn } from '../utils/firebaseTimestamp';
 
 const logger = createLogger('Firebase');
 
@@ -30,6 +31,7 @@ export function initializeFirebase() {
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);
       database = getDatabase(app);
+      setServerTimestampFn(serverTimestamp);
       isInitialized = true;
       logger.success('Firebase initialized successfully');
     } catch (error) {

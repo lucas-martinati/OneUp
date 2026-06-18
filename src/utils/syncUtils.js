@@ -1,0 +1,150 @@
+import { createLogger } from './logger';
+
+const logger = createLogger('SyncUtils');
+
+export function sanitizeForCloud(data) {
+  if (!data || !data.completions) return data;
+  const sanitizedCompletions = {};
+  Object.keys(data.completions).forEach(dateStr => {
+    const dayEntry = data.completions[dateStr];
+    if (!dayEntry || typeof dayEntry !== 'object') return;
+    const sanitizedDay = {};
+    Object.keys(dayEntry).forEach(exerciseId => {
+      const ex = dayEntry[exerciseId];
+      if (!ex || typeof ex !== 'object') return;
+      sanitizedDay[exerciseId] = {
+        isCompleted: ex.isCompleted || false,
+        timestamp: ex.timestamp || null,
+        ...(ex.weight !== undefined ? { weight: ex.weight } : {}),
+        ...(ex.difficulty !== undefined ? { difficulty: ex.difficulty } : {})
+      };
+    });
+    sanitizedCompletions[dateStr] = sanitizedDay;
+  });
+  
+  // Remove achievements and hasShared from progress sync (they are handled independently or deprecated)
+  const { achievements: _a, hasShared: _h, ...restOfData } = data;
+  return { ...restOfData, completions: sanitizedCompletions };
+}
+
+function reattachLocalCounts(cloudCompletions, localCompletions) {
+  const result = { ...(cloudCompletions || {}) };
+  if (!localCompletions) return result;
+  for (const dateStr of Object.keys(result)) {
+    const cloudDay = result[dateStr];
+    const localDay = localCompletions[dateStr];
+    if (!cloudDay || typeof cloudDay !== 'object' || !localDay) continue;
+    let mergedDay = null;
+    for (const exId of Object.keys(cloudDay)) {
+      const cloudEx = cloudDay[exId];
+      const localEx = localDay[exId];
+      if (
+        cloudEx && typeof cloudEx === 'object' &&
+        cloudEx.count === undefined && localEx?.count !== undefined &&
+        !!cloudEx.isCompleted === !!localEx.isCompleted
+      ) {
+        if (!mergedDay) mergedDay = { ...cloudDay };
+        mergedDay[exId] = { ...cloudEx, count: localEx.count };
+      }
+    }
+    if (mergedDay) result[dateStr] = mergedDay;
+  }
+  return result;
+}
+
+export function mergeData(localData, cloudData) {
+  if (!cloudData) return localData;
+  if (!localData) return cloudData;
+
+  const localLCC = localData.lastCompletionChange;
+  const cloudLCC = cloudData.lastCompletionChange;
+  const localLCCIsPlaceholder = localLCC && typeof localLCC === 'object' && localLCC['.sv'];
+  const cloudLCCIsPlaceholder = cloudLCC && typeof cloudLCC === 'object' && cloudLCC['.sv'];
+  
+  const localLCCTs = localLCCIsPlaceholder ? 0 : (localLCC ? new Date(localLCC).getTime() : 0);
+  const cloudLCCTs = cloudLCCIsPlaceholder ? 0 : (cloudLCC ? new Date(cloudLCC).getTime() : 0);
+
+  // If cloud data is strictly newer (e.g. updated by admin or another device)
+  // and local does not have a pending placeholder write, we treat the cloud
+  // data as the absolute ground truth and overwrite local state.
+  if (cloudLCCTs > localLCCTs && !localLCCIsPlaceholder) {
+    logger.info('Cloud data is newer than local data. Overwriting local cache with cloud state.');
+    return {
+      startDate: cloudData.startDate,
+      userStartDate: cloudData.userStartDate,
+      completions: reattachLocalCounts(cloudData.completions, localData.completions),
+      isSetup: cloudData.isSetup,
+      lastCompletionChange: cloudData.lastCompletionChange,
+      cardio: cloudData.cardio || { sessions: {} }
+    };
+  }
+
+  logger.info(`Merging data: local has ${Object.keys(localData.completions).length} days, cloud has ${cloudData.completions ? Object.keys(cloudData.completions).length : 0} days`);
+
+  const mergedCompletions = { ...localData.completions };
+  if (cloudData.completions) {
+    Object.keys(cloudData.completions).forEach(dateStr => {
+      const cloudDay = cloudData.completions[dateStr];
+      const localDay = mergedCompletions[dateStr];
+      if (!localDay) {
+        mergedCompletions[dateStr] = cloudDay;
+      } else if (cloudDay && typeof cloudDay === 'object') {
+        const merged = { ...localDay };
+        Object.keys(cloudDay).forEach(exId => {
+          const cloudEx = cloudDay[exId];
+          const localEx = merged[exId];
+          
+          // Use cloud version if it has a strictly newer timestamp,
+          // or if local has a placeholder and cloud has a real timestamp.
+          const localIsPlaceholder = localEx?.timestamp && typeof localEx.timestamp === 'object' && localEx.timestamp['.sv'];
+          const cloudIsPlaceholder = cloudEx?.timestamp && typeof cloudEx.timestamp === 'object' && cloudEx.timestamp['.sv'];
+          
+          const localTs = localIsPlaceholder ? 0 : (localEx?.timestamp ? new Date(localEx.timestamp).getTime() : 0);
+          const cloudTs = cloudIsPlaceholder ? 0 : (cloudEx?.timestamp ? new Date(cloudEx.timestamp).getTime() : 0);
+          
+          const cloudIsNewer = !localIsPlaceholder && cloudTs > localTs;
+          const localHasNoTimestamp = (cloudEx?.timestamp && !localEx?.timestamp);
+          const valuesMatch = localEx?.isCompleted === cloudEx?.isCompleted &&
+            (localEx?.count === undefined || cloudEx?.count === undefined || localEx?.count === cloudEx?.count);
+          const cloudReplacesPlaceholder = localIsPlaceholder && !cloudIsPlaceholder && cloudEx?.timestamp && valuesMatch;
+
+          if (!localEx || cloudIsNewer || localHasNoTimestamp || cloudReplacesPlaceholder) {
+            merged[exId] = { ...localEx, ...cloudEx };
+          }
+        });
+        // Ensure local-only exercises (added offline) are preserved on shared days
+        Object.keys(localDay).forEach(exId => {
+          if (!merged[exId]) {
+            merged[exId] = localDay[exId];
+          }
+        });
+        mergedCompletions[dateStr] = merged;
+      }
+    });
+  }
+
+  const finalLCC = (cloudLCCTs > localLCCTs || (localLCCIsPlaceholder && !cloudLCCIsPlaceholder)) 
+    ? cloudLCC 
+    : localLCC;
+
+  const mergedSessions = { 
+    ...(localData.cardio?.sessions || {}), 
+    ...(cloudData.cardio?.sessions || {}) 
+  };
+
+  const result = {
+    startDate: localData.startDate || cloudData.startDate,
+    userStartDate: localData.userStartDate || cloudData.userStartDate,
+    completions: mergedCompletions,
+    isSetup: localData.isSetup || cloudData.isSetup,
+    lastCompletionChange: finalLCC,
+    cardio: {
+      ...localData.cardio,
+      ...cloudData.cardio,
+      sessions: mergedSessions
+    }
+  };
+
+  logger.debug(`Merge complete. Final completion days: ${Object.keys(result.completions).length}`);
+  return result;
+}

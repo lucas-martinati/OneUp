@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 import { Preferences } from '@capacitor/preferences';
-import { serverTimestamp } from '../services/firebase';
+import { serverTimestamp } from '../utils/firebaseTimestamp';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
-import { saveAchievementsToCloud, loadAchievementsFromCloud } from '../services/userDataService';
 import { createLogger } from '../utils/logger';
 import { getLocalDateStr } from '../utils/dateUtils';
 import { STORAGE_KEY_BASE, getDefaultState, parseProgressData, validateProgressData } from '../hooks/useProgressStorage';
@@ -113,7 +112,7 @@ export const useProgressStore = create((set, get) => ({
 
     // Load achievements from cloud (async, non-blocking)
     if (userId) {
-      loadAchievementsFromCloud(userId).then(cloudAch => {
+      cloudSync.loadAchievementsFromCloud(userId).then(cloudAch => {
         const finalAch = cloudAch || {};
         let changed = false;
 
@@ -121,7 +120,7 @@ export const useProgressStore = create((set, get) => ({
         if (finalAch.white_hat === undefined) { finalAch.white_hat = false; changed = true; }
 
         if (changed) {
-          saveAchievementsToCloud(finalAch, userId).catch(() => {});
+          cloudSync.saveAchievementsToCloud(finalAch, userId).catch(() => {});
         }
 
         set({
@@ -338,7 +337,7 @@ export const useProgressStore = create((set, get) => ({
     const { _userId } = get();
     set((state) => {
       const newAch = { ...state.achievements, first_share: true };
-      if (_userId) saveAchievementsToCloud(newAch, _userId).catch(() => {});
+      if (_userId) cloudSync.saveAchievementsToCloud(newAch, _userId).catch(() => {});
       return { achievements: newAch, hasShared: true };
     });
     get()._persist();
@@ -348,7 +347,7 @@ export const useProgressStore = create((set, get) => ({
     const { _userId } = get();
     set((state) => {
       const newAch = { ...state.achievements, [badgeId]: value };
-      if (_userId) saveAchievementsToCloud(newAch, _userId).catch(() => {});
+      if (_userId) cloudSync.saveAchievementsToCloud(newAch, _userId).catch(() => {});
       return { achievements: newAch };
     });
     get()._persist();
@@ -358,7 +357,7 @@ export const useProgressStore = create((set, get) => ({
     const { _userId } = get();
     set((state) => {
       const newAch = { ...state.achievements, [badgeId]: true };
-      if (_userId) saveAchievementsToCloud(newAch, _userId).catch(() => {});
+      if (_userId) cloudSync.saveAchievementsToCloud(newAch, _userId).catch(() => {});
       return { achievements: newAch };
     });
     get()._persist();
@@ -368,7 +367,7 @@ export const useProgressStore = create((set, get) => ({
     const { _userId } = get();
     set((state) => {
       const newAch = { ...state.achievements, [badgeId]: false };
-      if (_userId) saveAchievementsToCloud(newAch, _userId).catch(() => {});
+      if (_userId) cloudSync.saveAchievementsToCloud(newAch, _userId).catch(() => {});
       return { achievements: newAch };
     });
     get()._persist();

@@ -18,6 +18,10 @@ const FIXED_TS = '2026-06-11T12:00:00.000Z';
 vi.mock('../../services/firebase', () => ({
   serverTimestamp: vi.fn(() => FIXED_TS),
 }));
+vi.mock('../../utils/firebaseTimestamp', () => ({
+  serverTimestamp: vi.fn(() => FIXED_TS),
+  setServerTimestampFn: vi.fn(),
+}));
 
 vi.mock('../../services/userDataService', () => ({
   saveAchievementsToCloud: vi.fn(async () => {}),
@@ -35,12 +39,13 @@ vi.mock('../../services/cloudSync', () => ({
       ...cloud,
       completions: { ...(local.completions || {}), ...(cloud.completions || {}) },
     })),
+    loadAchievementsFromCloud: vi.fn(async () => null),
+    saveAchievementsToCloud: vi.fn(async () => {}),
   },
 }));
 
 import { Preferences } from '@capacitor/preferences';
 import { cloudSync } from '../../services/cloudSync';
-import { loadAchievementsFromCloud, saveAchievementsToCloud } from '../../services/userDataService';
 import { useProgressStore } from '../useProgressStore';
 import { STORAGE_KEY_BASE } from '../../hooks/useProgressStorage';
 import { getLocalDateStr } from '../../utils/dateUtils';
@@ -95,7 +100,7 @@ describe('initForUser', () => {
   });
 
   it('hydrates achievements from the cloud for signed-in users', async () => {
-    loadAchievementsFromCloud.mockResolvedValueOnce({ first_share: true, my_badge: true });
+    cloudSync.loadAchievementsFromCloud.mockResolvedValueOnce({ first_share: true, my_badge: true });
     await useProgressStore.getState().initForUser('uid1');
     await flush();
     const s = useProgressStore.getState();
@@ -555,7 +560,7 @@ describe('achievement setters', () => {
     const s = useProgressStore.getState();
     expect(s.hasShared).toBe(true);
     expect(s.achievements.first_share).toBe(true);
-    expect(saveAchievementsToCloud).toHaveBeenCalled();
+    expect(cloudSync.saveAchievementsToCloud).toHaveBeenCalled();
   });
 
   it('validateBadge and invalidateBadge set the boolean value', () => {

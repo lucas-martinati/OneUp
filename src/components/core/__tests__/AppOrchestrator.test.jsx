@@ -35,6 +35,8 @@ vi.mock('../../../services/cloudSync', () => ({
     listenToSettingsFromCloud: vi.fn(() => () => {}),
     saveSettingsToCloud: vi.fn(async () => {}),
     getUserClans: vi.fn(async () => []),
+    loadAchievementsFromCloud: vi.fn(async () => null),
+    saveAchievementsToCloud: vi.fn(async () => {}),
   },
 }));
 
