@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Bell, Volume2, Clock, Users, Lock, Gauge, Globe, Smartphone } from '../../utils/icons';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { SettingRow } from '../ui/SettingRow';
+import { LANGUAGES } from '../../config/languages';
 import { sectionTitleStyle } from './settingsStyles';
 
 const sectionCardStyle = {
@@ -161,16 +162,11 @@ export function LanguageSection() {
                         outline: 'none'
                     }}
                 >
-                    <option value="fr" style={{ background: '#0a0a0f', color: '#ffffff' }}>Français</option>
-                    <option value="en" style={{ background: '#0a0a0f', color: '#ffffff' }}>English</option>
-                    <option value="es" style={{ background: '#0a0a0f', color: '#ffffff' }}>Español</option>
-                    <option value="de" style={{ background: '#0a0a0f', color: '#ffffff' }}>Deutsch</option>
-                    <option value="it" style={{ background: '#0a0a0f', color: '#ffffff' }}>Italiano</option>
-                    <option value="pt" style={{ background: '#0a0a0f', color: '#ffffff' }}>Português</option>
-                    <option value="zh" style={{ background: '#0a0a0f', color: '#ffffff' }}>中文</option>
-                    <option value="ja" style={{ background: '#0a0a0f', color: '#ffffff' }}>日本語</option>
-                    <option value="ko" style={{ background: '#0a0a0f', color: '#ffffff' }}>한국어</option>
-                    <option value="ru" style={{ background: '#0a0a0f', color: '#ffffff' }}>Русский</option>
+                    {LANGUAGES.map(lang => (
+                        <option key={lang.code} value={lang.code} style={{ background: '#0a0a0f', color: '#ffffff' }}>
+                            {lang.label}
+                        </option>
+                    ))}
                 </select>
             </SettingRow>
         </div>
