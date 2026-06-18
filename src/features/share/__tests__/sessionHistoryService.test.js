@@ -1,17 +1,39 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { set, get } from 'firebase/database';
+import { getAuthInstance, getDatabaseInstance } from '../../../services/firebase';
 import {
   getSessionHistory,
   saveSessionHistory,
   addSession,
   removeSession,
+  updateSessionName,
+  syncSessionHistory,
   clearHistory,
 } from '../services/sessionHistoryService';
+
+// ── firebase mocks ─────────────────────────────────────────────────────
+
+vi.mock('firebase/database', () => ({
+  ref: vi.fn((db, path) => path),
+  set: vi.fn(() => Promise.resolve()),
+  get: vi.fn(() => Promise.resolve({ exists: () => false })),
+}));
+
+vi.mock('../../../services/firebase', () => ({
+  getAuthInstance: vi.fn(() => ({ currentUser: { uid: 'u1' } })),
+  getDatabaseInstance: vi.fn(() => ({})),
+}));
 
 // ── localStorage mock ──────────────────────────────────────────────────
 
 let store = {};
 beforeEach(() => {
   store = {};
+  vi.clearAllMocks();
+  vi.mocked(set).mockResolvedValue();
+  vi.mocked(get).mockResolvedValue({ exists: () => false });
+  vi.mocked(getAuthInstance).mockReturnValue({ currentUser: { uid: 'u1' } });
+  vi.mocked(getDatabaseInstance).mockReturnValue({});
   vi.stubGlobal('localStorage', {
     getItem: vi.fn((key) => store[key] || null),
     setItem: vi.fn((key, value) => { store[key] = String(value); }),
@@ -20,6 +42,11 @@ beforeEach(() => {
 });
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+const snapshot = (value) => ({
+  exists: () => value !== undefined && value !== null,
+  val: () => value,
 });
 
 // ── Tests ──────────────────────────────────────────────────────────────
@@ -115,6 +142,85 @@ describe('sessionHistoryService', () => {
       const result = removeSession(s2.id);
       expect(result).toHaveLength(2);
       expect(result.find(s => s.id === s2.id)).toBeUndefined();
+    });
+  });
+
+  describe('updateSessionName', () => {
+    it('renames an existing session and bumps updatedAt', () => {
+      const s = addSession({ name: 'Old', duration: 100, exercises: [] });
+      const before = getSessionHistory()[0].updatedAt;
+
+      const result = updateSessionName(s.id, 'New name');
+      const updated = result.find(x => x.id === s.id);
+
+      expect(updated.name).toBe('New name');
+      expect(updated.updatedAt).toBeDefined();
+      // updatedAt is refreshed (>= the original timestamp)
+      expect(new Date(updated.updatedAt).getTime())
+        .toBeGreaterThanOrEqual(new Date(before).getTime());
+    });
+
+    it('is a no-op for an unknown session id', () => {
+      addSession({ name: 'A', duration: 100, exercises: [] });
+      const result = updateSessionName('does-not-exist', 'X');
+      expect(result.find(s => s.name === 'X')).toBeUndefined();
+    });
+  });
+
+  describe('syncSessionHistory', () => {
+    it('returns local history and pushes it up when cloud is empty', async () => {
+      const local = [{ id: '1', date: '2025-01-01', name: 'Local' }];
+      store['oneup_session_history'] = JSON.stringify(local);
+      vi.mocked(get).mockResolvedValueOnce(snapshot(null)); // cloud empty
+
+      const result = await syncSessionHistory();
+
+      expect(result).toEqual(local);
+      expect(set).toHaveBeenCalled(); // local uploaded to cloud
+    });
+
+    it('merges cloud and local by id, sorted by date descending', async () => {
+      const local = [{ id: 'a', date: '2025-01-01', name: 'LocalA' }];
+      const cloud = [{ id: 'b', date: '2025-02-01', name: 'CloudB' }];
+      store['oneup_session_history'] = JSON.stringify(local);
+      vi.mocked(get).mockResolvedValueOnce(snapshot(cloud));
+
+      const result = await syncSessionHistory();
+
+      expect(result.map(s => s.id)).toEqual(['b', 'a']); // newest date first
+      expect(result).toHaveLength(2);
+    });
+
+    it('prefers the more recently updated copy on id conflict', async () => {
+      const local = [{ id: 'x', date: '2025-01-01', updatedAt: '2025-03-10', name: 'NewerLocal' }];
+      const cloud = [{ id: 'x', date: '2025-01-01', updatedAt: '2025-01-05', name: 'OlderCloud' }];
+      store['oneup_session_history'] = JSON.stringify(local);
+      vi.mocked(get).mockResolvedValueOnce(snapshot(cloud));
+
+      const result = await syncSessionHistory();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].name).toBe('NewerLocal');
+    });
+
+    it('migrates legacy sessionHistory path to progress/sessionHistory', async () => {
+      const legacy = [{ id: 'old', date: '2024-12-01', name: 'Legacy' }];
+      // 1st get: new path missing → 2nd get: legacy path present
+      vi.mocked(get)
+        .mockResolvedValueOnce(snapshot(null))
+        .mockResolvedValueOnce(snapshot(legacy));
+
+      const result = await syncSessionHistory();
+
+      expect(result.map(s => s.id)).toContain('old');
+      // Migration writes to the new path and clears the legacy one.
+      expect(set).toHaveBeenCalled();
+    });
+
+    it('returns [] gracefully when not signed in and no local history', async () => {
+      vi.mocked(getAuthInstance).mockReturnValue({ currentUser: null });
+      const result = await syncSessionHistory();
+      expect(result).toEqual([]);
     });
   });
 

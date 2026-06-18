@@ -1,12 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref, get, set, update } from 'firebase/database';
+import { getDatabaseInstance } from '../firebase';
 import {
   fetchAllUsersData,
   saveUserData,
   updateUserProfile,
   updateUserSettings,
   updateUserProgress,
-  updateUserPurchase
+  updateUserPurchase,
+  resetUserProgress,
+  deleteUserData
 } from '../adminService';
 
 // Mock firebase/database
@@ -25,6 +28,7 @@ vi.mock('../firebase', () => ({
 describe('adminService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(getDatabaseInstance).mockReturnValue({});
   });
 
   describe('fetchAllUsersData', () => {
@@ -108,6 +112,76 @@ describe('adminService', () => {
       expect(ref).toHaveBeenCalledWith(expect.anything(), 'users/test-uid/purchase');
       expect(set).toHaveBeenCalledWith('users/test-uid/purchase', mockPurchase);
       expect(result).toBe(true);
+    });
+  });
+
+  describe('resetUserProgress', () => {
+    it('clears completions and zeroes leaderboard totals atomically', async () => {
+      vi.mocked(update).mockResolvedValueOnce();
+
+      const result = await resetUserProgress('test-uid');
+
+      expect(update).toHaveBeenCalledTimes(1);
+      const payload = vi.mocked(update).mock.calls[0][1];
+      expect(payload['users/test-uid/progress/completions']).toBeNull();
+      expect(payload['leaderboard/test-uid/totalReps']).toBe(0);
+      expect(payload['leaderboard/test-uid/weightsTotalReps']).toBe(0);
+      expect(payload['leaderboard/test-uid/exerciseReps']).toBeNull();
+      expect(typeof payload['users/test-uid/progress/lastCompletionChange']).toBe('string');
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('deleteUserData', () => {
+    it('removes the user record and leaderboard entry atomically', async () => {
+      vi.mocked(update).mockResolvedValueOnce();
+
+      const result = await deleteUserData('test-uid');
+
+      expect(update).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(update).mock.calls[0][1]).toEqual({
+        'users/test-uid': null,
+        'leaderboard/test-uid': null,
+      });
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('database not initialized', () => {
+    beforeEach(() => {
+      vi.mocked(getDatabaseInstance).mockReturnValue(null);
+    });
+
+    it('throws from fetchAllUsersData', async () => {
+      await expect(fetchAllUsersData()).rejects.toThrow('Database not initialized');
+    });
+
+    it('throws from saveUserData', async () => {
+      await expect(saveUserData('uid', {})).rejects.toThrow('Database not initialized');
+    });
+
+    it('throws from updateUserProgress', async () => {
+      await expect(updateUserProgress('uid', {})).rejects.toThrow('Database not initialized');
+    });
+
+    it('throws from resetUserProgress', async () => {
+      await expect(resetUserProgress('uid')).rejects.toThrow('Database not initialized');
+    });
+
+    it('throws from deleteUserData', async () => {
+      await expect(deleteUserData('uid')).rejects.toThrow('Database not initialized');
+    });
+  });
+
+  describe('error propagation', () => {
+    it('rethrows when get fails in fetchAllUsersData', async () => {
+      vi.mocked(get).mockRejectedValueOnce(new Error('network'));
+      await expect(fetchAllUsersData()).rejects.toThrow('network');
+    });
+
+    it('rethrows when set fails in saveUserData', async () => {
+      vi.mocked(set).mockRejectedValueOnce(new Error('denied'));
+      await expect(saveUserData('uid', {})).rejects.toThrow('denied');
     });
   });
 });
