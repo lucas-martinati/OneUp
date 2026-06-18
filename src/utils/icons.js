@@ -37,7 +37,7 @@ export {
   Play, Pause, RotateCcw, Save, Trash2, Edit2, Code,
   FolderOpen, FolderPlus, GripVertical, Shuffle, ArrowLeft, ArrowRight,
   Trophy, Medal, Award, Star, Crown,
-  Users, User, LogIn, UserPlus, Shield, ShieldAlert, HeartHandshake,
+  Users, LogIn, UserPlus, Shield, ShieldAlert, HeartHandshake,
   LogOut, Hash, Swords,
   Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
   Globe, Gauge, ShoppingBag, PieChart,
@@ -128,8 +128,6 @@ export function getIcon(name, fallback = 'Dumbbell') {
   if (!name) return ICON_MAP[fallback] || Dumbbell;
   return ICON_MAP[name] || ICON_MAP[fallback] || Dumbbell;
 }
-
-
 
 /**
  * A stable component for rendering icons dynamically by name.

@@ -188,7 +188,8 @@
     },
     "filterAll": "Tous",
     "filterUnlocked": "Débloqués",
-    "filterLocked": "Verrouillés"
+    "filterLocked": "Verrouillés",
+    "title": "Succès"
   },
   "announcement": {
     "badge": "Nouveau",
@@ -475,11 +476,46 @@
     "title": "Classement"
   },
   "notifications": {
-    "body1": "🎯 Jour {{day}} — Des exercices t'attendent ! 💪",
-    "body2": "💥 Challenge : maintiens ta série ! 🔥",
-    "body3": "⚡ Entraîne-toi aujourd'hui et garde le cap ! ✨",
-    "body4": "🚀 {{day}} reps pour garder la flamme ! 🏆",
-    "title": "💪 OneUp — Défi du jour !"
+    "title": "💪 OneUp — Défi du jour !",
+    "titleStreak": "🔥 {{streak}} jours d'affilée !",
+    "titleMilestone": "🏆 Jour {{day}} — Cap important !",
+    "titleComeBack": "👋 Tu nous manques !",
+    "streak": [
+      "🔥 {{streak}} jours d'affilée ! Ne casse pas ta série maintenant !",
+      "💎 Série de {{streak}} jours — chaque jour compte, celui-ci aussi !",
+      "⚡ {{streak}} jours de suite… et si on en ajoutait un de plus ?",
+      "🏅 Ta série de {{streak}} jours impressionne déjà. Continue !"
+    ],
+    "milestone": [
+      "🎯 Jour {{day}} — Tu as déjà fait {{day}} jours, chapeau ! 👑",
+      "🚀 Jour {{day}} ! Tu entres dans une nouvelle dimension 💫",
+      "🏆 {{day}} jours de défi — la légende continue !"
+    ],
+    "motivational": [
+      "💪 Ton corps te remerciera. {{day}} reps aujourd'hui, c'est tout !",
+      "🌅 Un bon entraînement change toute la journée. On s'y met ?",
+      "⭐ Les champions s'entraînent même quand la motivation est absente.",
+      "🧠 20 minutes, c'est tout. Ton futur toi sera fier.",
+      "🎯 Jour {{day}} — Des exercices t'attendent ! Montre-leur qui tu es 💪"
+    ],
+    "fun": [
+      "🐻 Tes muscles se demandent où tu es passé(e)...",
+      "🎮 Nouveau niveau débloqué ! Boss du jour : {{day}} reps 👾",
+      "🍕 Tu peux manger cette pizza… APRÈS ta séance 😏",
+      "🦸 Ta cape de super-héros n'est pas loin. Enfile-la !",
+      "🎲 Défi aléatoire du jour : fais tes exos les yeux fermés 😄"
+    ],
+    "challenge": [
+      "💥 {{day}} reps. Pas d'excuse. Pas demain. Maintenant ! 🔥",
+      "⚔️ Le défi du jour ne va pas se faire tout seul. Go ! 🏋️",
+      "🥊 {{day}} reps, c'est rien pour toi. Prouve-le ! 💪",
+      "🔥 Ton meilleur ennemi c'est le canapé. Bats-le aujourd'hui !"
+    ],
+    "comeback": [
+      "👋 Ça fait un moment ! Reviens en force avec {{day}} reps aujourd'hui 💪",
+      "🔄 Pas grave d'avoir raté un jour. L'important c'est de revenir !",
+      "🌱 Chaque jour est un nouveau départ. Celui-ci t'attend !"
+    ]
   },
   "onboarding": {
     "back": "Retour",
@@ -547,7 +583,6 @@
     "allEffects": "Tous les effets activés",
     "appTheme": "Thème de l'application",
     "community": "Communauté",
-    "dataCloud": "Données & Cloud",
     "disable": "Désactiver",
     "displayName": "Pseudo affiché",
     "eco": "Éco",

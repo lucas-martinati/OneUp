@@ -188,7 +188,8 @@
     },
     "filterAll": "All",
     "filterUnlocked": "Unlocked",
-    "filterLocked": "Locked"
+    "filterLocked": "Locked",
+    "title": "Achievements"
   },
   "announcement": {
     "badge": "New",
@@ -475,11 +476,46 @@
     "title": "Leaderboard"
   },
   "notifications": {
-    "body1": "🎯 Day {{day}} — Exercises await! 💪",
-    "body2": "💥 Challenge: keep your streak! 🔥",
-    "body3": "⚡ Train today and stay on track! ✨",
-    "body4": "🚀 {{day}} reps to keep the flame! 🏆",
-    "title": "💪 OneUp — Daily Challenge!"
+    "title": "💪 OneUp — Daily Challenge!",
+    "titleStreak": "🔥 {{streak}} days in a row!",
+    "titleMilestone": "🏆 Day {{day}} — Big milestone!",
+    "titleComeBack": "👋 We miss you!",
+    "streak": [
+      "🔥 {{streak}} days in a row! Don't break the chain now!",
+      "💎 {{streak}}-day streak — every day counts, including this one!",
+      "⚡ {{streak}} days straight… how about one more?",
+      "🏅 Your {{streak}}-day streak is impressive. Keep it going!"
+    ],
+    "milestone": [
+      "🎯 Day {{day}} — You've already crushed {{day}} days! 👑",
+      "🚀 Day {{day}}! You're entering a whole new level 💫",
+      "🏆 {{day}} days of challenge — the legend continues!"
+    ],
+    "motivational": [
+      "💪 Your body will thank you. Just {{day}} reps today!",
+      "🌅 A good workout changes your whole day. Ready?",
+      "⭐ Champions train even when motivation is missing.",
+      "🧠 20 minutes is all it takes. Future you will be proud.",
+      "🎯 Day {{day}} — Exercises are waiting! Show them who's boss 💪"
+    ],
+    "fun": [
+      "🐻 Your muscles are wondering where you've been...",
+      "🎮 New level unlocked! Today's boss: {{day}} reps 👾",
+      "🍕 You can have that pizza… AFTER your workout 😏",
+      "🦸 Your superhero cape is right there. Put it on!",
+      "🎲 Random challenge: do your exercises with your eyes closed 😄"
+    ],
+    "challenge": [
+      "💥 {{day}} reps. No excuses. Not tomorrow. NOW! 🔥",
+      "⚔️ Today's challenge won't complete itself. Let's go! 🏋️",
+      "🥊 {{day}} reps is nothing for you. Prove it! 💪",
+      "🔥 Your worst enemy is the couch. Beat it today!"
+    ],
+    "comeback": [
+      "👋 It's been a while! Come back strong with {{day}} reps today 💪",
+      "🔄 Missing a day is fine. What matters is coming back!",
+      "🌱 Every day is a fresh start. This one's waiting for you!"
+    ]
   },
   "onboarding": {
     "back": "Back",
@@ -547,7 +583,6 @@
     "allEffects": "All effects enabled",
     "appTheme": "App Theme",
     "community": "Community",
-    "dataCloud": "Data & Cloud",
     "disable": "Disable",
     "displayName": "Display Name",
     "eco": "Eco",

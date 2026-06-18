@@ -2,7 +2,7 @@ import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '../../c
 
 // Visual-only progress metadata: [stat key, goal]. Lets locked numeric badges
 // show how close they are. Unlock logic stays in badgeDefinitions (test()).
-export const PROGRESS_META = {
+const PROGRESS_META = {
     first_blood: ['totalDays', 1],
     consistent: ['maxStreak', 3], week_warrior: ['maxStreak', 7], two_weeks: ['maxStreak', 14],
     month_warrior: ['maxStreak', 30], two_months: ['maxStreak', 60], quarter_year: ['maxStreak', 90],

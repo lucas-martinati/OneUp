@@ -188,7 +188,8 @@
     },
     "filterAll": "Alle",
     "filterUnlocked": "Freigeschaltet",
-    "filterLocked": "Gesperrt"
+    "filterLocked": "Gesperrt",
+    "title": "Erfolge"
   },
   "announcement": {
     "badge": "Neu",
@@ -460,11 +461,46 @@
     "title": "Bestenliste"
   },
   "notifications": {
-    "body1": "🎯 Tag {{day}} – Übungen warten auf Sie! 💪",
-    "body2": "💥 Herausforderung: Bleib dran! 🔥",
-    "body3": "⚡ Trainiere noch heute und bleib auf dem richtigen Weg! ✨",
-    "body4": "🚀 {{day}} Wiederholungen, um die Flamme zu behalten! 🏆",
-    "title": "💪 OneUp – Tägliche Herausforderung!"
+    "title": "💪 OneUp – Tägliche Herausforderung!",
+    "titleStreak": "🔥 {{streak}} Tage am Stück!",
+    "titleMilestone": "🏆 Tag {{day}} – Großer Meilenstein!",
+    "titleComeBack": "👋 Wir vermissen dich!",
+    "streak": [
+      "🔥 {{streak}} Tage am Stück! Brich die Serie jetzt nicht ab!",
+      "💎 {{streak}}-Tage-Serie — jeder Tag zählt, auch dieser!",
+      "⚡ {{streak}} Tage am Stück… wie wäre es mit einem mehr?",
+      "🏅 Deine {{streak}}-Tage-Serie beeindruckt. Weiter so!"
+    ],
+    "milestone": [
+      "🎯 Tag {{day}} — Du hast schon {{day}} Tage geschafft! 👑",
+      "🚀 Tag {{day}}! Du erreichst ein neues Level 💫",
+      "🏆 {{day}} Tage Challenge — die Legende geht weiter!"
+    ],
+    "motivational": [
+      "💪 Dein Körper wird es dir danken. Nur {{day}} Wdh. heute!",
+      "🌅 Ein gutes Training verändert den ganzen Tag. Bereit?",
+      "⭐ Champions trainieren auch ohne Motivation.",
+      "🧠 20 Minuten reichen. Dein zukünftiges Ich wird stolz sein.",
+      "🎯 Tag {{day}} — Übungen warten! Zeig ihnen, wer du bist 💪"
+    ],
+    "fun": [
+      "🐻 Deine Muskeln fragen sich, wo du bist...",
+      "🎮 Neues Level freigeschaltet! Boss des Tages: {{day}} Wdh. 👾",
+      "🍕 Du darfst die Pizza essen… NACH dem Training 😏",
+      "🦸 Dein Superhelden-Umhang liegt bereit. Zieh ihn an!",
+      "🎲 Zufalls-Challenge: Mach deine Übungen mit geschlossenen Augen 😄"
+    ],
+    "challenge": [
+      "💥 {{day}} Wdh. Keine Ausreden. Nicht morgen. JETZT! 🔥",
+      "⚔️ Die heutige Challenge erledigt sich nicht von selbst. Los! 🏋️",
+      "🥊 {{day}} Wdh. sind nichts für dich. Beweise es! 💪",
+      "🔥 Dein schlimmster Feind ist die Couch. Besiege sie heute!"
+    ],
+    "comeback": [
+      "👋 Es ist eine Weile her! Komm stark zurück mit {{day}} Wdh. heute 💪",
+      "🔄 Einen Tag verpasst? Kein Problem. Hauptsache, du kommst zurück!",
+      "🌱 Jeder Tag ist ein Neuanfang. Dieser wartet auf dich!"
+    ]
   },
   "onboarding": {
     "back": "Zurück",
@@ -532,7 +568,6 @@
     "allEffects": "Alle Effekte aktiviert",
     "appTheme": "App-Theme",
     "community": "Gemeinschaft",
-    "dataCloud": "Daten & Cloud",
     "disable": "Deaktivieren",
     "displayName": "Anzeigename",
     "eco": "Öko",
