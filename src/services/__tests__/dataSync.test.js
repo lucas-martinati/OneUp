@@ -22,8 +22,9 @@ vi.mock('../../features/share/services/sessionHistoryService', () => ({
   syncSessionHistory: vi.fn(() => Promise.resolve()),
 }));
 
-import { get, update } from 'firebase/database';
-import { mergeData, sanitizeForCloud, saveToCloud, loadFromCloud, syncData } from '../dataSyncService';
+import { get, update, onValue } from 'firebase/database';
+import { getAuthInstance } from '../firebase';
+import { mergeData, sanitizeForCloud, saveToCloud, loadFromCloud, syncData, listenToCloudChanges } from '../dataSyncService';
 
 const snapshot = (val) => ({ exists: () => val != null, val: () => val });
 
@@ -242,6 +243,17 @@ describe('saveToCloud', () => {
     expect(result).toBe(true);
     expect(update).toHaveBeenCalled();
   });
+
+  it('throws when the user is not signed in', async () => {
+    getAuthInstance.mockReturnValueOnce({ currentUser: null });
+    await expect(saveToCloud({ isSetup: true, completions: {} })).rejects.toThrow(/not signed in/i);
+  });
+
+  it('blocks a save when the completions field is missing entirely and not set up', async () => {
+    const result = await saveToCloud({ isSetup: false }); // no completions key at all
+    expect(result).toBe(false);
+    expect(update).not.toHaveBeenCalled();
+  });
 });
 
 // ── loadFromCloud ────────────────────────────────────────────────────────
@@ -256,6 +268,36 @@ describe('loadFromCloud', () => {
   it('returns null when there is no cloud data', async () => {
     get.mockResolvedValueOnce(snapshot(null));
     expect(await loadFromCloud()).toBeNull();
+  });
+
+  it('throws when the user is not signed in', async () => {
+    getAuthInstance.mockReturnValueOnce({ currentUser: null });
+    await expect(loadFromCloud()).rejects.toThrow(/not signed in/i);
+  });
+});
+
+// ── listenToCloudChanges ─────────────────────────────────────────────────
+
+describe('listenToCloudChanges', () => {
+  it('returns null and does not subscribe when not signed in', () => {
+    getAuthInstance.mockReturnValueOnce({ currentUser: null });
+    expect(listenToCloudChanges(() => {})).toBeNull();
+    expect(onValue).not.toHaveBeenCalled();
+  });
+
+  it('invokes the callback with the value when a snapshot exists', () => {
+    onValue.mockImplementationOnce((path, cb) => { cb(snapshot({ startDate: 'X' })); return 'unsub'; });
+    const cb = vi.fn();
+    const unsub = listenToCloudChanges(cb);
+    expect(unsub).toBe('unsub');
+    expect(cb).toHaveBeenCalledWith({ startDate: 'X' });
+  });
+
+  it('does not invoke the callback when the snapshot is empty', () => {
+    onValue.mockImplementationOnce((path, cb) => { cb(snapshot(null)); return 'unsub'; });
+    const cb = vi.fn();
+    listenToCloudChanges(cb);
+    expect(cb).not.toHaveBeenCalled();
   });
 });
 

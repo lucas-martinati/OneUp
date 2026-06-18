@@ -131,6 +131,25 @@ describe('sessionHistoryService', () => {
       expect(session.exercises).toEqual([]);
       expect(session.date).toBeDefined();
     });
+
+    it('fills exercise field fallbacks (label←id, reps←goal, default color, weight kept)', () => {
+      const session = addSession({
+        exercises: [{ id: 'squats', goal: 15, weight: 40 }], // no label, no reps, no color
+      });
+      const ex = session.exercises[0];
+      expect(ex.label).toBe('squats');   // label ← id
+      expect(ex.reps).toBe(15);          // reps ← goal
+      expect(ex.color).toBe('#818cf8');  // default color
+      expect(ex.type).toBe('counter');   // default type
+      expect(ex.weight).toBe(40);        // weight preserved
+    });
+
+    it('defaults reps to 0 and omits weight when absent', () => {
+      const session = addSession({ exercises: [{ id: 'plank' }] });
+      const ex = session.exercises[0];
+      expect(ex.reps).toBe(0);
+      expect(ex.weight).toBeUndefined();
+    });
   });
 
   describe('removeSession', () => {
@@ -221,6 +240,46 @@ describe('sessionHistoryService', () => {
       vi.mocked(getAuthInstance).mockReturnValue({ currentUser: null });
       const result = await syncSessionHistory();
       expect(result).toEqual([]);
+    });
+
+    it('keeps the cloud copy when the local copy is older on conflict', async () => {
+      const local = [{ id: 'x', date: '2025-01-01', updatedAt: '2025-01-02', name: 'OlderLocal' }];
+      const cloud = [{ id: 'x', date: '2025-01-01', updatedAt: '2025-03-01', name: 'NewerCloud' }];
+      store['oneup_session_history'] = JSON.stringify(local);
+      vi.mocked(get).mockResolvedValueOnce(snapshot(cloud));
+      const result = await syncSessionHistory();
+      expect(result[0].name).toBe('NewerCloud');
+    });
+
+    it('falls back to date when updatedAt is missing on conflict', async () => {
+      const local = [{ id: 'x', date: '2025-05-01', name: 'LocalByDate' }]; // no updatedAt
+      const cloud = [{ id: 'x', date: '2025-01-01', name: 'CloudByDate' }]; // no updatedAt
+      store['oneup_session_history'] = JSON.stringify(local);
+      vi.mocked(get).mockResolvedValueOnce(snapshot(cloud));
+      const result = await syncSessionHistory();
+      expect(result[0].name).toBe('LocalByDate'); // newer date → local wins
+    });
+
+    it('treats a non-array cloud payload as empty', async () => {
+      store['oneup_session_history'] = JSON.stringify([{ id: 'L', date: '2025-01-01' }]);
+      vi.mocked(get).mockResolvedValueOnce(snapshot({ not: 'an array' }));
+      const result = await syncSessionHistory();
+      expect(result.map(s => s.id)).toEqual(['L']);
+    });
+
+    it('treats a non-array legacy payload as empty during migration', async () => {
+      vi.mocked(get)
+        .mockResolvedValueOnce(snapshot(null))        // new path missing
+        .mockResolvedValueOnce(snapshot({ bad: 1 })); // legacy path non-array
+      const result = await syncSessionHistory();
+      expect(result).toEqual([]);
+    });
+
+    it('skips cloud entirely when there is no database instance', async () => {
+      vi.mocked(getDatabaseInstance).mockReturnValue(null);
+      store['oneup_session_history'] = JSON.stringify([{ id: 'L', date: '2025-01-01' }]);
+      const result = await syncSessionHistory();
+      expect(result.map(s => s.id)).toEqual(['L']);
     });
   });
 
