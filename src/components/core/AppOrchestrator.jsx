@@ -64,11 +64,13 @@ export function AppOrchestrator({ computedStats }) {
   }, [settings.performanceMode, settings.appTheme]);
 
   // ── Pre-load user clans ────────────────────────────────────────────
+  // Gated on `authConfirmed`: this hits the cloud, so it must wait for the
+  // real Firebase session rather than firing during an optimistic boot.
   useEffect(() => {
-    if (auth.isSignedIn && !auth.loading) {
+    if (auth.isSignedIn && auth.authConfirmed) {
       refreshUserClans();
     }
-  }, [auth.isSignedIn, auth.loading, refreshUserClans]);
+  }, [auth.isSignedIn, auth.authConfirmed, refreshUserClans]);
 
   return null;
 }

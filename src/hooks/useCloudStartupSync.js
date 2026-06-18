@@ -80,12 +80,15 @@ export function useCloudStartupSync(auth) {
     }
   }, [auth.isSignedIn, auth.user?.uid, resetSyncState]);
 
-  // Launch the startup sequence once per signed-in user, after local init
+  // Launch the startup sequence once per signed-in user, after local init.
+  // Gated on `authConfirmed` (not just !loading): during an optimistic boot the
+  // app is rendered before Firebase is ready, and cloud calls would fail and
+  // never retry. We wait for the real session.
   useEffect(() => {
-    if (!auth.isSignedIn || auth.loading || !isStoreInitialized) return;
+    if (!auth.isSignedIn || !auth.authConfirmed || !isStoreInitialized) return;
     if (useCloudSyncStore.getState().conflictCheckDone) return;
     if (startedForUid.current === auth.user?.uid) return;
     startedForUid.current = auth.user?.uid;
     runStartupSequence();
-  }, [auth.isSignedIn, auth.loading, auth.user?.uid, isStoreInitialized]);
+  }, [auth.isSignedIn, auth.authConfirmed, auth.user?.uid, isStoreInitialized]);
 }

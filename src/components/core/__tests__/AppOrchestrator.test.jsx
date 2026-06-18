@@ -39,7 +39,7 @@ vi.mock('../../../services/cloudSync', () => ({
 }));
 
 // Auth is driven per-test through this mutable holder
-const authState = { value: { isSignedIn: false, loading: false, user: null } };
+const authState = { value: { isSignedIn: false, loading: false, authConfirmed: true, user: null } };
 vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => authState.value,
 }));
@@ -90,7 +90,7 @@ beforeEach(() => {
   localStorage.clear();
   useProgressStore.getState().reset();
   useCloudSyncStore.getState().resetSyncState();
-  authState.value = { isSignedIn: false, loading: false, user: null };
+  authState.value = { isSignedIn: false, loading: false, authConfirmed: true, user: null };
 });
 
 // ── Scenarios ───────────────────────────────────────────────────────────
@@ -109,7 +109,7 @@ describe('AppOrchestrator — signed out', () => {
 
 describe('AppOrchestrator — sign-in with no local data', () => {
   beforeEach(() => {
-    authState.value = { isSignedIn: true, loading: false, user: { uid: 'u1' } };
+    authState.value = { isSignedIn: true, loading: false, authConfirmed: true, user: { uid: 'u1' } };
   });
 
   it('restores cloud data when the cloud has some', async () => {
@@ -154,7 +154,7 @@ describe('AppOrchestrator — sign-in with no local data', () => {
 
 describe('AppOrchestrator — signed-in user with local data', () => {
   beforeEach(() => {
-    authState.value = { isSignedIn: true, loading: false, user: { uid: 'u1' } };
+    authState.value = { isSignedIn: true, loading: false, authConfirmed: true, user: { uid: 'u1' } };
     // User-scoped local data exists and is set up
     Preferences._mem.set(`${STORAGE_KEY_BASE}_u1`, JSON.stringify({
       startDate: fixedStart,
@@ -191,7 +191,7 @@ describe('AppOrchestrator — signed-in user with local data', () => {
 
 describe('AppOrchestrator — guest data conflict on sign-in', () => {
   beforeEach(() => {
-    authState.value = { isSignedIn: true, loading: false, user: { uid: 'u1' } };
+    authState.value = { isSignedIn: true, loading: false, authConfirmed: true, user: { uid: 'u1' } };
     // Guest (unsuffixed) data with completions…
     Preferences._mem.set(STORAGE_KEY_BASE, JSON.stringify(guestData));
     // …and the signed-in user already has set-up local data
@@ -259,7 +259,7 @@ describe('AppOrchestrator — guest data conflict on sign-in', () => {
 
 describe('AppOrchestrator — sync pause', () => {
   it('does not start the realtime listener while sync is paused', async () => {
-    authState.value = { isSignedIn: true, loading: false, user: { uid: 'u1' } };
+    authState.value = { isSignedIn: true, loading: false, authConfirmed: true, user: { uid: 'u1' } };
     Preferences._mem.set(`${STORAGE_KEY_BASE}_u1`, JSON.stringify({
       startDate: fixedStart,
       isSetup: true,

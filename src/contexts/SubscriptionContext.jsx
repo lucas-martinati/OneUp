@@ -60,8 +60,14 @@ export function SubscriptionProvider({ children }) {
   }, [auth.isSignedIn, auth.user?.uid]);
 
   // Initialize purchases and check ALL tier statuses on sign-in
+  // Gated on `authConfirmed`: entitlement checks hit RevenueCat + Firebase and
+  // overwrite the cached Pro status. During an optimistic boot Firebase isn't
+  // ready, so loadPurchase() would return nothing and wrongly downgrade the
+  // user (and reset their premium theme). We wait for the real session;
+  // isSubscriptionLoading stays true meanwhile, keeping Pro features locked but
+  // the cached theme intact.
   useEffect(() => {
-    if (auth.isSignedIn && !auth.loading && auth.user?.uid) {
+    if (auth.isSignedIn && auth.authConfirmed && auth.user?.uid) {
       const initAndCheck = async () => {
         setIsSubscriptionLoading(true);
         try {
@@ -113,14 +119,14 @@ export function SubscriptionProvider({ children }) {
         }
       };
       initAndCheck();
-    } else if (!auth.isSignedIn && !auth.loading) {
+    } else if (!auth.isSignedIn && auth.authConfirmed) {
       setIsSubscriptionLoading(false);
     }
     // Intentionally omitted from deps: this effect is an auth-triggered initializer.
     // initPurchases, cloudSync, resolveEntitlements are stable references (module-level
     // singletons or useState setters). Adding them would cause spurious re-inits.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth.isSignedIn, auth.loading, auth.user?.uid]);
+  }, [auth.isSignedIn, auth.authConfirmed, auth.user?.uid]);
 
   const handlePurchaseSupporter = useCallback(async () => {
     const result = await purchaseSupporter();

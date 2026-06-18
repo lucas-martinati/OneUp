@@ -50,8 +50,11 @@ export function setupAuthListener(listeners) {
       logger.info('Firebase Auth Restored:', user.email);
       await Preferences.set({ key: 'user_signed_in', value: 'true' });
       await Preferences.set({ key: 'user_id', value: user.uid });
-      
+
       const authUser = { uid: user.uid, email: user.email, displayName: user.displayName, photoURL: user.photoURL };
+      // Cache the identity so the next launch can boot optimistically (avatar +
+      // name) without waiting on the network. See useGoogleAuth optimistic boot.
+      Preferences.set({ key: 'user_profile', value: JSON.stringify(authUser) }).catch(() => {});
       syncProfileToDatabase(authUser);
 
       notifyListeners(listeners, {
@@ -118,6 +121,7 @@ export async function signOut(listeners) {
   await firebaseSignOut(auth);
   await Preferences.remove({ key: 'user_signed_in' });
   await Preferences.remove({ key: 'user_id' });
+  await Preferences.remove({ key: 'user_profile' });
   notifyListeners(listeners, { isSignedIn: false, user: null });
 }
 
@@ -157,6 +161,7 @@ export async function deleteAccount(listeners, leaveClanFn, getUserClansFn) {
 
   await Preferences.remove({ key: 'user_signed_in' });
   await Preferences.remove({ key: 'user_id' });
+  await Preferences.remove({ key: 'user_profile' });
   notifyListeners(listeners, { isSignedIn: false, user: null });
 
   try {

@@ -31,8 +31,10 @@ export function useCloudSettingsSync(auth) {
   // A real-time listener keeps settings in sync when they are changed from the
   // admin panel or another device. It fires once immediately with the current
   // cloud value, which also drives the initial load.
+  // Gated on `authConfirmed`: the listener needs the real Firebase currentUser,
+  // which isn't available yet during an optimistic boot.
   useEffect(() => {
-    if (auth.isSignedIn && !auth.loading) {
+    if (auth.isSignedIn && auth.authConfirmed) {
       let firstSnapshot = true;
       const unsubscribe = cloudSync.listenToSettingsFromCloud((cloudSettings) => {
         if (cloudSettings) {
@@ -45,10 +47,10 @@ export function useCloudSettingsSync(auth) {
         }
       });
       return unsubscribe;
-    } else if (!auth.isSignedIn && !auth.loading) {
+    } else if (!auth.isSignedIn && auth.authConfirmed) {
       setTimeout(() => markSettingsSynced(), 0);
     }
-  }, [auth.isSignedIn, auth.loading, applyCloudSettings, markSettingsSynced]);
+  }, [auth.isSignedIn, auth.authConfirmed, applyCloudSettings, markSettingsSynced]);
 
   // ── Cloud auto-save for settings ───────────────────────────────────────
   const saveSettings = useCallback(

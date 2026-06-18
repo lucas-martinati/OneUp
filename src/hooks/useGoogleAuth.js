@@ -15,6 +15,11 @@ export function useGoogleAuth() {
     isSignedIn: false,
     user: null,
     loading: true,
+    // True once Firebase has definitively resolved the auth state (or we know
+    // for sure there's no session). Optimistic boot sets isSignedIn=true while
+    // this stays false, so cloud reads/writes stay paused until Firebase is
+    // actually ready — see useCloudStartupSync / useCloudSettingsSync.
+    authConfirmed: false,
     error: null,
     syncStatus: 'idle' // idle, syncing, synced, error
   });
@@ -102,19 +107,40 @@ export function useGoogleAuth() {
 
       if (wasPreviouslySignedIn === 'true') {
         // User was signed in before → boot Firebase so onAuthStateChanged can
-        // restore the real session. Keep loading=true meanwhile (avoids a flash
-        // of Onboarding). New visitors skip this entirely, keeping first paint
-        // free of the Firebase SDK + auth iframe.
+        // restore the real session. New visitors skip this entirely, keeping
+        // first paint free of the Firebase SDK + auth iframe.
         cloudSync.ensureInitialized();
         logger.info('Previously signed-in user detected, waiting for Firebase to restore session...');
+
+        // Optimistic boot: render the app immediately from the cached identity
+        // and local data, while Firebase restores the real session in the
+        // background. On a slow network onAuthStateChanged can take 10-15s
+        // (it refreshes the ID token first) — without this the whole app sits
+        // on "Initialisation...". Cloud access stays gated on `authConfirmed`,
+        // so nothing hits the network until Firebase is genuinely ready.
+        const { value: cachedUid } = await Preferences.get({ key: 'user_id' });
+        if (cachedUid && isMounted) {
+          let cachedUser = { uid: cachedUid };
+          try {
+            const { value: profileJson } = await Preferences.get({ key: 'user_profile' });
+            if (profileJson) cachedUser = { ...cachedUser, ...JSON.parse(profileJson) };
+          } catch { /* ignore malformed cache */ }
+          setAuthState(prev => ({
+            ...prev,
+            isSignedIn: true,
+            user: cachedUser,
+            loading: false,
+          }));
+        }
       } else {
-        // Never signed in → resolve immediately, no need to wait
+        // Never signed in → definitive state immediately, no need to wait
         if (isMounted) {
           setAuthState(prev => ({
             ...prev,
             loading: false,
             isSignedIn: false,
             user: null,
+            authConfirmed: true,
           }));
         }
       }
@@ -130,7 +156,8 @@ export function useGoogleAuth() {
           ...prev,
           isSignedIn: state.isSignedIn,
           user: state.user,
-          loading: false
+          loading: false,
+          authConfirmed: true
         }));
       }
     });
@@ -207,6 +234,7 @@ export function useGoogleAuth() {
         isSignedIn: false,
         user: null,
         loading: false,
+        authConfirmed: true,
         error: null,
         syncStatus: 'idle'
       });
