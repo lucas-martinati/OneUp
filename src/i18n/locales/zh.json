@@ -465,6 +465,8 @@
     "titleStreak": "🔥 连续 {{streak}} 天！",
     "titleMilestone": "🏆 第 {{day}} 天 — 重要里程碑！",
     "titleComeBack": "👋 想你了！",
+    "titleGoodbye": "👋 暂时告别",
+    "goodbye": "这些提醒似乎不起作用。我们暂时停止发送。",
     "streak": [
       "🔥 连续 {{streak}} 天！别在现在断掉！",
       "💎 {{streak}} 天连续记录 — 每天都很重要，包括今天！",

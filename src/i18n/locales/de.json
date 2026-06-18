@@ -465,6 +465,8 @@
     "titleStreak": "🔥 {{streak}} Tage am Stück!",
     "titleMilestone": "🏆 Tag {{day}} – Großer Meilenstein!",
     "titleComeBack": "👋 Wir vermissen dich!",
+    "titleGoodbye": "👋 Tschüss für den Moment",
+    "goodbye": "Diese Erinnerungen scheinen nicht zu funktionieren. Wir hören erst mal auf, sie zu senden.",
     "streak": [
       "🔥 {{streak}} Tage am Stück! Brich die Serie jetzt nicht ab!",
       "💎 {{streak}}-Tage-Serie — jeder Tag zählt, auch dieser!",

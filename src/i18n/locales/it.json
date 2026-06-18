@@ -465,6 +465,8 @@
     "titleStreak": "🔥 {{streak}} giorni di fila!",
     "titleMilestone": "🏆 Giorno {{day}} — Grande traguardo!",
     "titleComeBack": "👋 Ci manchi!",
+    "titleGoodbye": "👋 Addio per ora",
+    "goodbye": "Questi promemoria non sembrano funzionare. Smetteremo di inviarli per ora.",
     "streak": [
       "🔥 {{streak}} giorni di fila! Non spezzare la serie adesso!",
       "💎 Serie di {{streak}} giorni — ogni giorno conta, anche questo!",

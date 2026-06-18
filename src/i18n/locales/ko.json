@@ -465,6 +465,8 @@
     "titleStreak": "🔥 {{streak}}일 연속!",
     "titleMilestone": "🏆 {{day}}일차 — 대단한 이정표!",
     "titleComeBack": "👋 보고 싶었어요!",
+    "titleGoodbye": "👋 잠시만 안녕",
+    "goodbye": "이 알림은 작동하지 않는 것 같습니다. 당분간 알림 전송을 중단합니다.",
     "streak": [
       "🔥 {{streak}}일 연속! 지금 끊지 마세요!",
       "💎 {{streak}}일 연속 기록 — 매일이 중요해요, 오늘도!",

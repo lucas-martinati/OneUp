@@ -465,6 +465,8 @@
     "titleStreak": "🔥 {{streak}}日連続！",
     "titleMilestone": "🏆 {{day}}日目 — 大きな節目！",
     "titleComeBack": "👋 お待ちしています！",
+    "titleGoodbye": "👋 またね",
+    "goodbye": "リマインダーが届かないようです。一時的に送信を停止します。",
     "streak": [
       "🔥 {{streak}}日連続！ここで途切れさせないで！",
       "💎 {{streak}}日連続記録 — 毎日が大切、今日も！",

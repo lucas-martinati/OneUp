@@ -480,6 +480,8 @@
     "titleStreak": "🔥 {{streak}} jours d'affilée !",
     "titleMilestone": "🏆 Jour {{day}} — Cap important !",
     "titleComeBack": "👋 Tu nous manques !",
+    "titleGoodbye": "👋 À la prochaine",
+    "goodbye": "Ces rappels ne semblent pas fonctionner. On arrête de t'embêter pour l'instant.",
     "streak": [
       "🔥 {{streak}} jours d'affilée ! Ne casse pas ta série maintenant !",
       "💎 Série de {{streak}} jours — chaque jour compte, celui-ci aussi !",

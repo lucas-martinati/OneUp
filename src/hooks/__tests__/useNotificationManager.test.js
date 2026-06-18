@@ -105,17 +105,27 @@ describe('useNotificationManager', () => {
 
     await result.current.scheduleNotification(settings);
 
-    expect(mockCancel).toHaveBeenCalledWith({ notifications: [{ id: 1 }] });
+    expect(mockCancel).toHaveBeenCalledWith({
+      notifications: [
+        { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }
+      ]
+    });
+
     expect(mockSchedule).toHaveBeenCalledWith(expect.objectContaining({
       notifications: expect.arrayContaining([
         expect.objectContaining({
           id: 1,
-          schedule: expect.objectContaining({
-            repeats: true,
-            every: 'day'
-          })
+          schedule: expect.objectContaining({ at: expect.any(Date) })
+        }),
+        expect.objectContaining({
+          id: 7,
+          schedule: expect.objectContaining({ at: expect.any(Date) })
         })
       ])
     }));
+    
+    // Check that we schedule exactly 7 notifications
+    const scheduleArgs = vi.mocked(mockSchedule).mock.calls[0][0];
+    expect(scheduleArgs.notifications).toHaveLength(7);
   });
 });

@@ -94,6 +94,57 @@ function buildNotificationContent({ dayNum, streak }) {
   };
 }
 
+function buildIncrementalContent({ dayNum, streak, dayIndex }) {
+  const vars = { day: dayNum, streak };
+
+  switch (dayIndex) {
+    case 0:
+      return buildNotificationContent({ dayNum, streak });
+    
+    case 1: {
+      const messages = i18n.t('notifications.fun', { returnObjects: true, ...vars });
+      return {
+        title: i18n.t('notifications.title', vars),
+        body: pickRandom(messages),
+      };
+    }
+    case 2: {
+      const messages = i18n.t('notifications.challenge', { returnObjects: true, ...vars });
+      return {
+        title: i18n.t('notifications.title', vars),
+        body: pickRandom(messages),
+      };
+    }
+    case 3: {
+      const messages = i18n.t('notifications.comeback', { returnObjects: true, ...vars });
+      return {
+        title: i18n.t('notifications.titleComeBack', vars),
+        body: pickRandom(messages),
+      };
+    }
+    case 4: {
+      const messages = i18n.t('notifications.motivational', { returnObjects: true, ...vars });
+      return {
+        title: i18n.t('notifications.title', vars),
+        body: pickRandom(messages),
+      };
+    }
+    case 5: {
+      const messages = i18n.t('notifications.challenge', { returnObjects: true, ...vars });
+      return {
+        title: i18n.t('notifications.title', vars),
+        body: pickRandom(messages),
+      };
+    }
+    case 6:
+    default:
+      return {
+        title: i18n.t('notifications.titleGoodbye', vars),
+        body: i18n.t('notifications.goodbye', vars),
+      };
+  }
+}
+
 export function useNotificationManager({ isDayDone, getDayNumber }) {
   const isDayDoneRef = useRef(isDayDone);
   const getDayNumberRef = useRef(getDayNumber);
@@ -109,7 +160,8 @@ export function useNotificationManager({ isDayDone, getDayNumber }) {
       const permission = await LocalNotifications.checkPermissions();
 
       if (permission.display === 'granted') {
-        await LocalNotifications.cancel({ notifications: [{ id: NOTIFICATION_ID }] });
+        const cancelIds = Array.from({ length: 7 }, (_, idx) => ({ id: NOTIFICATION_ID + idx }));
+        await LocalNotifications.cancel({ notifications: cancelIds });
 
         if (settings?.notificationsEnabled) {
           const { hour, minute } = settings.notificationTime;
@@ -132,40 +184,51 @@ export function useNotificationManager({ isDayDone, getDayNumber }) {
             safetyCounter++;
           }
 
-          const dayNum = getDayNumberRef.current(notificationDateStr);
+          const notificationsList = [];
 
-          // Compute a rough streak up to yesterday to determine context.
-          // We check backwards from today (not from notificationDateStr, which
-          // may be in the future after skipping done days).
-          const todayStr = getLocalDateStr(new Date());
-          let streak = 0;
-          const todayDate = new Date(todayStr);
-          for (let i = 0; i < 365; i++) {
-            const checkDate = new Date(todayDate);
-            checkDate.setDate(checkDate.getDate() - i);
-            if (isDayDoneRef.current(getLocalDateStr(checkDate))) {
-              streak++;
-            } else {
-              break;
+          for (let i = 0; i < 7; i++) {
+            const targetTime = new Date(notificationTime);
+            targetTime.setDate(targetTime.getDate() + i);
+
+            const targetDateStr = getLocalDateStr(targetTime);
+            // Defensive check to avoid scheduling notifications on days already completed
+            if (isDayDoneRef.current(targetDateStr)) {
+              continue;
             }
+
+            const dayNum = getDayNumberRef.current(targetDateStr);
+
+            // Compute a rough streak up to yesterday to determine context.
+            const todayStr = getLocalDateStr(new Date());
+            let streak = 0;
+            const todayDate = new Date(todayStr);
+            for (let j = 0; j < 365; j++) {
+              const checkDate = new Date(todayDate);
+              checkDate.setDate(checkDate.getDate() - j);
+              if (isDayDoneRef.current(getLocalDateStr(checkDate))) {
+                streak++;
+              } else {
+                break;
+              }
+            }
+
+            const { title, body } = buildIncrementalContent({ dayNum, streak, dayIndex: i });
+
+            notificationsList.push({
+              id: NOTIFICATION_ID + i,
+              title,
+              body,
+              schedule: { at: targetTime },
+              sound: null,
+              attachments: null,
+              actionTypeId: '',
+              extra: null,
+            });
           }
 
-          const { title, body } = buildNotificationContent({ dayNum, streak });
-
-          await LocalNotifications.schedule({
-            notifications: [
-              {
-                id: NOTIFICATION_ID,
-                title,
-                body,
-                schedule: { at: notificationTime, repeats: true, every: 'day' },
-                sound: null,
-                attachments: null,
-                actionTypeId: '',
-                extra: null,
-              },
-            ],
-          });
+          if (notificationsList.length > 0) {
+            await LocalNotifications.schedule({ notifications: notificationsList });
+          }
         }
       }
     } catch (error) {

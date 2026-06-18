@@ -465,6 +465,8 @@
     "titleStreak": "🔥 ¡{{streak}} días seguidos!",
     "titleMilestone": "🏆 Día {{day}} — ¡Gran meta!",
     "titleComeBack": "👋 ¡Te echamos de menos!",
+    "titleGoodbye": "👋 Adiós por ahora",
+    "goodbye": "Estos recordatorios no parecen estar funcionando. Dejaremos de enviarlos por ahora.",
     "streak": [
       "🔥 ¡{{streak}} días seguidos! ¡No rompas la racha ahora!",
       "💎 Racha de {{streak}} días — ¡cada día cuenta, incluido este!",

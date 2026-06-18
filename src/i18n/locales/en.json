@@ -480,6 +480,8 @@
     "titleStreak": "🔥 {{streak}} days in a row!",
     "titleMilestone": "🏆 Day {{day}} — Big milestone!",
     "titleComeBack": "👋 We miss you!",
+    "titleGoodbye": "👋 Goodbye for now",
+    "goodbye": "These reminders don't seem to be working. We'll stop sending them for now.",
     "streak": [
       "🔥 {{streak}} days in a row! Don't break the chain now!",
       "💎 {{streak}}-day streak — every day counts, including this one!",
