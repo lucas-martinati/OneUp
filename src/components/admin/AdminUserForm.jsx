@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Heart, Save, Calendar, Loader2, Crown, Copy, Check, Activity, Award, Clock, Dumbbell, RotateCcw, Trash2, AlertTriangle, Trophy, Bell, Volume2, Gauge, Palette } from '../../utils/icons';
+import { Sparkles, Heart, Save, Calendar, Loader2, Crown, Copy, Check, Activity, Award, Clock, Dumbbell, RotateCcw, Trash2, AlertTriangle, Trophy, Bell, Volume2, Palette } from '../../utils/icons';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { SettingRow } from '../ui/SettingRow';
 
@@ -271,36 +271,8 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
           />
         </SettingRow>
 
-        {/* Performance mode */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '12px 0', borderBottom: '1px solid var(--border-subtle)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Gauge size={18} color="#10b981" />
-            <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>Mode graphique</span>
-          </div>
-          <div style={{ display: 'flex', gap: '4px' }}>
-            {[{ value: 'low', label: 'Éco' }, { value: 'high', label: 'Max' }].map(opt => {
-              const active = formState.performanceMode === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  onClick={() => setFormState(prev => ({ ...prev, performanceMode: opt.value }))}
-                  style={{
-                    padding: '6px 14px', borderRadius: 'var(--radius-md)', cursor: 'pointer',
-                    fontSize: '0.8rem', fontWeight: '800',
-                    background: active ? 'var(--accent)' : 'var(--surface-muted)',
-                    border: `1px solid ${active ? 'var(--accent)' : 'var(--border-subtle)'}`,
-                    color: active ? '#fff' : 'var(--text-secondary)'
-                  }}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
         {/* App theme */}
-        <div style={{ paddingTop: '12px' }}>
+        <div style={{ paddingTop: '12px', borderTop: '1px solid var(--border-subtle)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
             <Palette size={18} color="#ec4899" />
             <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>Thème de l'application</span>

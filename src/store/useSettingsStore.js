@@ -22,6 +22,30 @@ const LEGACY_KEYS = [
 ];
 
 /**
+ * Keys that live only on the current device and must never be synced to or
+ * from the cloud (graphics/performance mode and keep-screen-on depend on the
+ * device, not the account).
+ */
+export const LOCAL_ONLY_KEYS = ['performanceMode', 'keepScreenOn'];
+
+/**
+ * Shallow-ish equality for two settings objects (nested objects compared by
+ * JSON). Used to avoid re-rendering / re-saving when a cloud snapshot echoes
+ * back values we already hold.
+ */
+function settingsEqual(a, b) {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  for (const k of keys) {
+    const av = a[k];
+    const bv = b[k];
+    if (av && typeof av === 'object') {
+      if (JSON.stringify(av) !== JSON.stringify(bv)) return false;
+    } else if (av !== bv) return false;
+  }
+  return true;
+}
+
+/**
  * Clean legacy keys from loaded settings data.
  */
 function cleanSettings(raw) {
@@ -133,6 +157,8 @@ export const useSettingsStore = create((set) => ({
       const prev = state.settings;
       const cleanedCloud = { ...cloudSettings };
       for (const key of LEGACY_KEYS) delete cleanedCloud[key];
+      // Device-local settings are never taken from the cloud.
+      for (const key of LOCAL_ONLY_KEYS) delete cleanedCloud[key];
 
       const safeSettings = {
         ...cleanedCloud,
@@ -147,6 +173,10 @@ export const useSettingsStore = create((set) => ({
       }
 
       const merged = { ...prev, ...safeSettings };
+      // No-op when the cloud snapshot matches what we already have. This keeps
+      // a live cloud listener from echoing our own auto-saves back into an
+      // endless save loop, and avoids needless re-renders.
+      if (settingsEqual(prev, merged)) return {};
       saveToStorage(state._userId, merged);
       return { settings: merged };
     });

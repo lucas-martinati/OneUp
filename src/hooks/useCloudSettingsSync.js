@@ -1,11 +1,18 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useProgressStore } from '../store/useProgressStore';
-import { useSettingsStore } from '../store/useSettingsStore';
+import { useSettingsStore, LOCAL_ONLY_KEYS } from '../store/useSettingsStore';
 import { useCloudAutoSave } from './useCloudAutoSave';
 import { cloudSync } from '../services/cloudSync';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('SettingsSync');
+
+/** Drop device-local settings so they are never written to the cloud. */
+function stripLocalOnly(settings) {
+  const out = { ...settings };
+  for (const key of LOCAL_ONLY_KEYS) delete out[key];
+  return out;
+}
 
 /**
  * Settings ↔ cloud synchronization: loads cloud settings on sign-in and
@@ -20,32 +27,39 @@ export function useCloudSettingsSync(auth) {
   const isStoreInitialized = useProgressStore(s => s.isStoreInitialized);
   const isSetup = useProgressStore(s => s.isSetup);
 
-  // ── Cloud settings load ────────────────────────────────────────────────
+  // ── Live cloud settings sync ───────────────────────────────────────────
+  // A real-time listener keeps settings in sync when they are changed from the
+  // admin panel or another device. It fires once immediately with the current
+  // cloud value, which also drives the initial load.
   useEffect(() => {
     if (auth.isSignedIn && !auth.loading) {
-      const loadSettings = async () => {
-        try {
-          const cloudSettings = await cloudSync.loadSettingsFromCloud();
-          if (cloudSettings) {
-            logger.info('Cloud settings loaded:', cloudSettings);
-            applyCloudSettings(cloudSettings);
-          }
-          setTimeout(() => markSettingsSynced(), 0);
-        } catch (error) {
-          logger.error('Settings sync error:', error);
+      let firstSnapshot = true;
+      const unsubscribe = cloudSync.listenToSettingsFromCloud((cloudSettings) => {
+        if (cloudSettings) {
+          logger.info('Cloud settings received:', cloudSettings);
+          applyCloudSettings(cloudSettings);
         }
-      };
-      loadSettings();
+        if (firstSnapshot) {
+          firstSnapshot = false;
+          setTimeout(() => markSettingsSynced(), 0);
+        }
+      });
+      return unsubscribe;
     } else if (!auth.isSignedIn && !auth.loading) {
       setTimeout(() => markSettingsSynced(), 0);
     }
   }, [auth.isSignedIn, auth.loading, applyCloudSettings, markSettingsSynced]);
 
   // ── Cloud auto-save for settings ───────────────────────────────────────
+  const saveSettings = useCallback(
+    (s) => cloudSync.saveSettingsToCloud(stripLocalOnly(s)),
+    []
+  );
+
   useCloudAutoSave(
     auth.isSignedIn && !auth.loading && isStoreInitialized && isSetup && settingsInitialSyncDone,
     settings,
-    cloudSync.saveSettingsToCloud,
+    saveSettings,
     { delay: 2000 }
   );
 }

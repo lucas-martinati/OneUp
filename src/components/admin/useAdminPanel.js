@@ -82,7 +82,6 @@ export function useAdminPanel() {
     notificationsEnabled: false,
     notificationTime: { hour: 9, minute: 0 },
     soundsEnabled: true,
-    performanceMode: 'high',
     appTheme: 'dark',
     isPro: false,
     isSupporter: false,
@@ -193,7 +192,6 @@ export function useAdminPanel() {
       notificationsEnabled: !!user.rawData.settings?.notificationsEnabled,
       notificationTime: user.rawData.settings?.notificationTime || { hour: 9, minute: 0 },
       soundsEnabled: user.rawData.settings?.soundsEnabled !== false,
-      performanceMode: user.rawData.settings?.performanceMode || 'high',
       appTheme: user.rawData.settings?.appTheme || 'dark',
       isPro: !!user.rawData.purchase?.isPro,
       isSupporter: !!user.rawData.purchase?.isSupporter,
@@ -384,9 +382,11 @@ export function useAdminPanel() {
         notificationsEnabled: formState.notificationsEnabled,
         notificationTime: formState.notificationTime,
         soundsEnabled: formState.soundsEnabled,
-        performanceMode: formState.performanceMode,
         appTheme: formState.appTheme,
       };
+      // The graphics/performance mode is device-local and must never live in
+      // the cloud — strip any stale value left by older versions.
+      delete settings.performanceMode;
 
       const purchase = {
         ...originalUser.purchase,

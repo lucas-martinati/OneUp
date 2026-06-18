@@ -32,6 +32,7 @@ vi.mock('../../../services/cloudSync', () => ({
     listenToCloudChanges: vi.fn(() => () => {}),
     mergeData: vi.fn((local, cloud) => ({ ...local, ...cloud })),
     loadSettingsFromCloud: vi.fn(async () => null),
+    listenToSettingsFromCloud: vi.fn(() => () => {}),
     saveSettingsToCloud: vi.fn(async () => {}),
     getUserClans: vi.fn(async () => []),
   },

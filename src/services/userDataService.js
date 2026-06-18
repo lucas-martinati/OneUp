@@ -26,6 +26,21 @@ export async function loadSettingsFromCloud() {
   return null;
 }
 
+/**
+ * Subscribe to live settings changes (e.g. edited from the admin panel or
+ * another device). Fires once immediately with the current value (or null when
+ * none exist). Returns an unsubscribe function.
+ */
+export function listenToSettingsFromCloud(callback) {
+  const auth = getAuthInstance();
+  const database = getDatabaseInstance();
+  if (!auth?.currentUser || !database) return () => {};
+
+  return onValue(ref(database, `users/${auth.currentUser.uid}/settings`), (snapshot) => {
+    callback(snapshot.exists() ? snapshot.val() : null);
+  });
+}
+
 // ── Purchase ────────────────────────────────────────────────────────────
 
 export async function loadPurchase() {
