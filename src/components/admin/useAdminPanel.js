@@ -248,6 +248,34 @@ export function useAdminPanel() {
     };
   }, [selectedUid, dataState]);
 
+  // Per-section "has unsaved changes" flags, derived by comparing the edited
+  // text against the last-saved cloud value (normalised, so reformatting alone
+  // is not flagged). Invalid JSON always counts as dirty.
+  const keyJsonDirty = useMemo(() => {
+    const result = {};
+    if (!selectedUid) return result;
+    const userObj = (dataState.usersData && dataState.usersData[selectedUid]) || {};
+    for (const key of selectedUserKeys) {
+      const content = keyJsonContents[key];
+      if (content === undefined) { result[key] = false; continue; }
+      const baseline = key === '__full__' ? userObj : userObj[key];
+      try {
+        result[key] = JSON.stringify(JSON.parse(content)) !== JSON.stringify(baseline ?? null);
+      } catch {
+        result[key] = true;
+      }
+    }
+    return result;
+  }, [selectedUid, dataState, keyJsonContents, selectedUserKeys]);
+
+  // Discard local edits for a section, restoring the last-saved cloud value.
+  const handleRevertKeyJson = (key) => {
+    const userObj = (dataState.usersData && dataState.usersData[selectedUid]) || {};
+    const baseline = key === '__full__' ? userObj : userObj[key];
+    setKeyJsonContents(prev => ({ ...prev, [key]: JSON.stringify(baseline ?? {}, null, 2) }));
+    setKeyJsonErrors(prev => ({ ...prev, [key]: null }));
+  };
+
   // Handle collapsible key expand/collapse toggling
   const toggleKeyAccordion = (key) => {
     setExpandedKeys(prev => ({
@@ -493,6 +521,7 @@ export function useAdminPanel() {
     handleSelectUser, selectedUserKeys, selectedMeta,
     expandedKeys, toggleKeyAccordion,
     keyJsonContents, keyJsonErrors, keyEditorFormats, setKeyEditorFormats,
+    keyJsonDirty, handleRevertKeyJson,
     handleKeyJsonChange, handleFormatKeyJson, handleSaveKeyJson,
     formState, setFormState, saveLoading, handleSaveForm,
     handleResetProgress, handleDeleteUser,

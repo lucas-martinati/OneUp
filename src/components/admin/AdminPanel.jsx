@@ -30,6 +30,7 @@ export function AdminPanel({ onClose }) {
     handleSelectUser, selectedUserKeys, selectedMeta,
     expandedKeys, toggleKeyAccordion,
     keyJsonContents, keyJsonErrors, keyEditorFormats, setKeyEditorFormats,
+    keyJsonDirty, handleRevertKeyJson,
     handleKeyJsonChange, handleFormatKeyJson, handleSaveKeyJson,
     formState, setFormState, saveLoading, handleSaveForm,
     handleResetProgress, handleDeleteUser,
@@ -146,6 +147,8 @@ export function AdminPanel({ onClose }) {
                   keyJsonErrors={keyJsonErrors}
                   keyEditorFormats={keyEditorFormats}
                   setKeyEditorFormats={setKeyEditorFormats}
+                  keyJsonDirty={keyJsonDirty}
+                  onRevertJson={handleRevertKeyJson}
                   onJsonChange={handleKeyJsonChange}
                   onFormatJson={handleFormatKeyJson}
                   onSaveJson={handleSaveKeyJson}

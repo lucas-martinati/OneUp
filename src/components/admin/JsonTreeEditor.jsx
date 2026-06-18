@@ -1,5 +1,20 @@
 import React, { useState } from 'react';
-import { Edit2, Check, X, Trash2, ChevronRight, ChevronDown } from '../../utils/icons';
+import { Edit2, Check, X, Trash2, ChevronRight, Plus } from '../../utils/icons';
+
+/** Children beyond this count start collapsed to keep big nodes (e.g. progress
+ *  completions) readable and fast to render. */
+const AUTO_COLLAPSE_THRESHOLD = 15;
+
+/** Parse a raw text value as JSON, falling back to a plain string. */
+function parseLooseValue(raw) {
+  const trimmed = raw.trim();
+  if (trimmed === '') return '';
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    return raw;
+  }
+}
 
 // Deep immutable updates
 function setDeepValue(obj, path, value) {
@@ -22,10 +37,23 @@ function JsonTreeNode({
   onDelete, 
   depth = 0 
 }) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  // Big nodes (and everything below the root) start collapsed so a user with
+  // hundreds of completion days doesn't render the whole tree at once.
+  const [isExpanded, setIsExpanded] = useState(() => {
+    if (path === '') return true; // section root stays open
+    if (value !== null && typeof value === 'object') {
+      const count = Array.isArray(value) ? value.length : Object.keys(value).length;
+      return count <= AUTO_COLLAPSE_THRESHOLD;
+    }
+    return true;
+  });
   const [isEditingRaw, setIsEditingRaw] = useState(false);
   const [rawText, setRawText] = useState('');
   const [rawError, setRawError] = useState(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newKey, setNewKey] = useState('');
+  const [newVal, setNewVal] = useState('');
+  const [addError, setAddError] = useState(null);
 
   // Type checks
   const isObject = value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -56,6 +84,31 @@ function JsonTreeNode({
     setRawText(JSON.stringify(value, null, 2));
     setRawError(null);
     setIsEditingRaw(true);
+  };
+
+  const startAdd = (e) => {
+    e.stopPropagation();
+    setNewKey('');
+    setNewVal('');
+    setAddError(null);
+    setIsAdding(true);
+    setIsExpanded(true);
+  };
+
+  const handleAddConfirm = () => {
+    const parsedVal = parseLooseValue(newVal);
+    if (isObject) {
+      const k = newKey.trim();
+      if (!k) { setAddError('Nom de clé requis'); return; }
+      if (Object.prototype.hasOwnProperty.call(value, k)) { setAddError('Cette clé existe déjà'); return; }
+      onValueChange(path, { ...value, [k]: parsedVal });
+    } else {
+      onValueChange(path, [...value, parsedVal]);
+    }
+    setIsAdding(false);
+    setNewKey('');
+    setNewVal('');
+    setAddError(null);
   };
 
   const indentStyle = { paddingLeft: `${depth * 16}px` };
@@ -225,7 +278,20 @@ function JsonTreeNode({
         )}
 
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
-          <button 
+          <button
+            onClick={startAdd}
+            title={isObject ? 'Ajouter une clé' : 'Ajouter un élément'}
+            style={{
+              background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)',
+              borderRadius: '4px', color: '#34d399', fontSize: '0.65rem',
+              padding: '2px 6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px'
+            }}
+          >
+            <Plus size={10} />
+            <span>Ajouter</span>
+          </button>
+
+          <button
             onClick={startRawEdit}
             title="Modifier en JSON"
             style={{
@@ -237,7 +303,7 @@ function JsonTreeNode({
             <Edit2 size={10} />
             <span>Modifier</span>
           </button>
-          
+
           {onDelete && (
             <button 
               onClick={() => onDelete(path)}
@@ -255,11 +321,76 @@ function JsonTreeNode({
         </div>
       </div>
 
+      {/* Inline "add key / add item" form */}
+      {isExpanded && isAdding && (
+        <div style={{
+          marginLeft: `${depth * 16 + 22}px`, marginTop: '6px', marginBottom: '6px',
+          padding: '10px', background: '#07070a', borderRadius: 'var(--radius-md)',
+          border: '1px solid rgba(52,211,153,0.2)', display: 'flex', flexDirection: 'column', gap: '8px'
+        }}>
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+            {isObject && (
+              <input
+                autoFocus
+                type="text"
+                value={newKey}
+                onChange={(e) => setNewKey(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleAddConfirm(); if (e.key === 'Escape') setIsAdding(false); }}
+                placeholder="nom de la clé"
+                style={{
+                  background: '#020204', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '4px',
+                  color: '#c084fc', fontFamily: 'monospace', fontSize: '0.8rem', padding: '4px 8px',
+                  outline: 'none', width: '140px', boxSizing: 'border-box'
+                }}
+              />
+            )}
+            <input
+              autoFocus={isArray}
+              type="text"
+              value={newVal}
+              onChange={(e) => setNewVal(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleAddConfirm(); if (e.key === 'Escape') setIsAdding(false); }}
+              placeholder='valeur (ex: "texte", 42, true, {})'
+              style={{
+                background: '#020204', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '4px',
+                color: '#34d399', fontFamily: 'monospace', fontSize: '0.8rem', padding: '4px 8px',
+                outline: 'none', flex: 1, minWidth: '160px', boxSizing: 'border-box'
+              }}
+            />
+            <button
+              onClick={handleAddConfirm}
+              style={{
+                padding: '4px 8px', fontSize: '0.72rem', background: '#10b981', color: 'white',
+                border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '800',
+                display: 'flex', alignItems: 'center', gap: '4px'
+              }}
+            >
+              <Check size={12} /> Ajouter
+            </button>
+            <button
+              onClick={() => setIsAdding(false)}
+              style={{
+                padding: '4px 8px', fontSize: '0.72rem', background: 'rgba(255,255,255,0.1)', color: 'white',
+                border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'
+              }}
+            >
+              <X size={12} /> Annuler
+            </button>
+          </div>
+          {addError && (
+            <div style={{ color: '#ef4444', fontSize: '0.72rem', fontFamily: 'monospace' }}>⚠️ {addError}</div>
+          )}
+          <div style={{ color: '#6b7280', fontSize: '0.68rem', fontStyle: 'italic' }}>
+            La valeur est interprétée en JSON (nombre, booléen, objet, tableau…), sinon traitée comme texte.
+          </div>
+        </div>
+      )}
+
       {/* Indented recursive children */}
       {isExpanded && !isEmpty && (
-        <div style={{ 
-          display: 'flex', flexDirection: 'column', 
-          borderLeft: '1px dashed rgba(255,255,255,0.06)', 
+        <div style={{
+          display: 'flex', flexDirection: 'column',
+          borderLeft: '1px dashed rgba(255,255,255,0.06)',
           marginLeft: `${depth * 16 + 18}px`,
           paddingLeft: '4px'
         }}>

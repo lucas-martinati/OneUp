@@ -1,7 +1,52 @@
-import React from 'react';
-import { Save, Lock, Code } from '../../utils/icons';
+import React, { useState } from 'react';
+import { Save, Lock, Code, Copy, Check, RotateCcw } from '../../utils/icons';
 import { JsonTreeEditor } from './JsonTreeEditor';
 import { LineNumberTextarea } from './LineNumberTextarea';
+
+/** Short human summary of a JSON document, e.g. "12 clés" / "3 éléments". */
+function describeContent(text) {
+  try {
+    const parsed = JSON.parse(text);
+    if (Array.isArray(parsed)) return `${parsed.length} élément${parsed.length > 1 ? 's' : ''}`;
+    if (parsed && typeof parsed === 'object') {
+      const n = Object.keys(parsed).length;
+      return `${n} clé${n > 1 ? 's' : ''}`;
+    }
+    return String(parsed);
+  } catch {
+    return 'JSON invalide';
+  }
+}
+
+/** Small copy-to-clipboard button with a transient "copied" confirmation. */
+function CopyButton({ text }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = (e) => {
+    e.stopPropagation();
+    navigator.clipboard?.writeText(text || '').then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }).catch(() => {});
+  };
+  return (
+    <button
+      onClick={handleCopy}
+      title="Copier le JSON"
+      style={{
+        padding: '6px 10px',
+        background: 'var(--surface-hover)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: 'var(--radius-md)',
+        color: copied ? '#34d399' : 'var(--text-secondary)',
+        fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer',
+        display: 'flex', alignItems: 'center', gap: '4px'
+      }}
+    >
+      {copied ? <Check size={12} /> : <Copy size={12} />}
+      {copied ? 'Copié' : 'Copier'}
+    </button>
+  );
+}
 
 /** Accordion JSON editor: one collapsible section per database key plus a raw full-document section. */
 export function AdminJsonSectionsEditor({
@@ -9,6 +54,8 @@ export function AdminJsonSectionsEditor({
   expandedKeys, onToggleKey,
   keyJsonContents, keyJsonErrors,
   keyEditorFormats, setKeyEditorFormats,
+  keyJsonDirty = {},
+  onRevertJson,
   onJsonChange, onFormatJson, onSaveJson,
   saveLoading, onBack
 }) {
@@ -18,14 +65,27 @@ export function AdminJsonSectionsEditor({
         const isExpanded = !!expandedKeys[key];
         const contentValue = keyJsonContents[key] || '';
         const hasError = keyJsonErrors[key];
+        const isDirty = !!keyJsonDirty[key];
         const isFullDoc = key === '__full__';
+        const canSave = isDirty && !hasError && !saveLoading;
+
+        // Ctrl/Cmd+S saves the section being edited (keydown bubbles up from
+        // the inner inputs/textarea to this wrapper).
+        const handleKeyDown = (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+            e.preventDefault();
+            if (canSave) onSaveJson(key);
+          }
+        };
 
         return (
           <div
             key={key}
             style={{
               borderRadius: 'var(--radius-lg)',
-              border: isExpanded ? '1px solid rgba(167,139,250,0.3)' : '1px solid var(--border-subtle)',
+              border: isExpanded
+                ? '1px solid rgba(167,139,250,0.3)'
+                : (isDirty ? '1px solid rgba(245,158,11,0.4)' : '1px solid var(--border-subtle)'),
               background: isExpanded ? 'rgba(10, 10, 15, 0.6)' : 'var(--surface-section)',
               transition: 'all 0.2s ease',
               overflow: 'hidden'
@@ -41,10 +101,11 @@ export function AdminJsonSectionsEditor({
                 alignItems: 'center',
                 cursor: 'pointer',
                 background: isExpanded ? 'rgba(167, 139, 250, 0.08)' : 'transparent',
-                userSelect: 'none'
+                userSelect: 'none',
+                gap: '12px'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                 <span style={{
                   color: isExpanded ? '#a78bfa' : 'var(--text-secondary)',
                   fontSize: '0.75rem',
@@ -58,20 +119,32 @@ export function AdminJsonSectionsEditor({
                   fontFamily: 'monospace',
                   fontWeight: '700',
                   color: isFullDoc ? '#ef4444' : (isExpanded ? '#a78bfa' : 'var(--text-primary)'),
-                  fontSize: '0.95rem'
+                  fontSize: '0.95rem',
+                  whiteSpace: 'nowrap'
                 }}>
                   {isFullDoc ? '📄 Fiche complète (Raw)' : `"${key}"`}
                 </span>
+                {isDirty && (
+                  <span style={{
+                    fontSize: '0.65rem', fontWeight: '800', color: '#f59e0b',
+                    background: 'rgba(245, 158, 11, 0.12)',
+                    border: '1px solid rgba(245, 158, 11, 0.3)',
+                    borderRadius: '999px', padding: '2px 8px',
+                    display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap'
+                  }}>
+                    ● Modifié
+                  </span>
+                )}
               </div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', opacity: 0.7 }}>
-                {isExpanded ? 'Clic pour plier' : `Clic pour déplier { ... }`}
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', opacity: 0.7, whiteSpace: 'nowrap' }}>
+                {isExpanded ? 'Clic pour plier' : describeContent(contentValue)}
               </span>
             </div>
 
             {/* Accordion Content */}
             {isExpanded && (
-              <div className="scale-in" style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <div className="scale-in" onKeyDown={handleKeyDown} style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', gap: '8px', flexWrap: 'wrap' }}>
                   {isFullDoc ? (
                     <div style={{
                       background: 'rgba(239, 68, 68, 0.15)',
@@ -85,7 +158,7 @@ export function AdminJsonSectionsEditor({
                     </div>
                   ) : <div />}
 
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                     {/* Editor Format Toggle Switcher */}
                     <div style={{
                       display: 'flex',
@@ -151,27 +224,49 @@ export function AdminJsonSectionsEditor({
                       </button>
                     )}
 
+                    <CopyButton text={contentValue} />
+
+                    {isDirty && onRevertJson && (
+                      <button
+                        onClick={() => onRevertJson(key)}
+                        title="Annuler les modifications non sauvegardées"
+                        style={{
+                          padding: '6px 10px',
+                          background: 'var(--surface-hover)',
+                          border: '1px solid rgba(245, 158, 11, 0.3)',
+                          borderRadius: 'var(--radius-md)',
+                          color: '#f59e0b',
+                          fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', gap: '4px'
+                        }}
+                      >
+                        <RotateCcw size={12} />
+                        Annuler
+                      </button>
+                    )}
+
                     <button
-                      disabled={saveLoading || !!hasError}
+                      disabled={!canSave}
                       onClick={() => onSaveJson(key)}
                       className="hover-lift"
+                      title={isDirty ? 'Sauvegarder (Ctrl+S)' : 'Aucune modification à sauvegarder'}
                       style={{
                         padding: '6px 12px',
-                        background: 'linear-gradient(135deg, #10b981, #059669)',
+                        background: canSave ? 'linear-gradient(135deg, #10b981, #059669)' : 'var(--surface-muted)',
                         border: 'none',
                         borderRadius: 'var(--radius-md)',
-                        color: 'white',
+                        color: canSave ? 'white' : 'var(--text-secondary)',
                         fontSize: '0.72rem',
                         fontWeight: '800',
-                        cursor: (saveLoading || !!hasError) ? 'not-allowed' : 'pointer',
+                        cursor: canSave ? 'pointer' : 'not-allowed',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '4px',
-                        opacity: (saveLoading || !!hasError) ? 0.6 : 1
+                        opacity: canSave ? 1 : 0.6
                       }}
                     >
                       <Save size={12} />
-                      Sauvegarder Section
+                      Sauvegarder
                     </button>
                   </div>
                 </div>
