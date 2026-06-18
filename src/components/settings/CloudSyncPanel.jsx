@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { Cloud, CloudOff, User, AlertCircle, Trash2, AlertTriangle } from '../../utils/icons';
 import { Avatar } from '../ui/Avatar';
-import { GoogleIcon } from '../ui/GoogleIcon';
+import { GoogleSignInButton } from '../ui/GoogleSignInButton';
 
 export function CloudSyncPanel({
   authState,
@@ -184,14 +184,7 @@ export function CloudSyncPanel({
             </ul>
           </div>
 
-          <button
-            className="btn-cloud-signin"
-            onClick={onSignIn}
-            disabled={authState.loading}
-          >
-            <GoogleIcon className="google-icon" />
-            {t('cloud.signInWithGoogle')}
-          </button>
+          <GoogleSignInButton onClick={onSignIn} disabled={authState.loading} />
 
           {authState.error && (
             <div className="sync-message error">

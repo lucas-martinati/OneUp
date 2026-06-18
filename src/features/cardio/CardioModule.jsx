@@ -12,6 +12,7 @@ import { Capacitor } from '@capacitor/core';
 import { ChevronRight, Play, Link2, CheckCircle2, LogIn } from '../../utils/icons';
 import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { GoogleIcon } from '../../components/ui/GoogleIcon';
+import { GoogleSignInButton } from '../../components/ui/GoogleSignInButton';
 
 const MODES = [
   { key: 'running', emoji: '🏃' },
@@ -371,18 +372,11 @@ export function CardioModule() {
 
               {/* Action button for the current step */}
               {onGoogleStep ? (
-                <button onClick={() => auth.signIn()} className="hover-lift" style={{
-                  marginTop: '8px', padding: '13px 26px', borderRadius: '14px',
-                  background: 'white', color: '#1f1f1f',
-                  fontWeight: '700', fontSize: 'clamp(0.82rem, 1.5vh, 0.92rem)',
-                  border: 'none', cursor: 'pointer',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25), 0 8px 40px rgba(66, 133, 244, 0.15)',
-                  display: 'flex', gap: '10px', alignItems: 'center',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                }}>
-                  <GoogleIcon size={18} />
-                  {t('cloud.signInWithGoogle')}
-                </button>
+                <GoogleSignInButton
+                  onClick={() => auth.signIn()}
+                  className="hover-lift"
+                  style={{ width: 'auto', marginTop: '8px' }}
+                />
               ) : (
                 <button onClick={handleConnectStrava} className="hover-lift cardio-strava-btn" style={{
                   marginTop: '8px', padding: '14px 30px', borderRadius: '16px',

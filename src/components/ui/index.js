@@ -5,6 +5,7 @@ export { ConfirmDialog } from './ConfirmDialog';
 export { ConflictOverlay } from './ConflictOverlay';
 export { DifficultyBadge } from './DifficultyBadge';
 export { GoogleIcon } from './GoogleIcon';
+export { GoogleSignInButton } from './GoogleSignInButton';
 export { IconButton } from './IconButton';
 export { SegmentedControl } from './SegmentedControl';
 export { SettingRow } from './SettingRow';

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Users, LogIn, Plus, Shield } from '../../utils/icons';
 import { CSSConfetti } from '../feedback/CSSConfetti';
+import { GoogleSignInButton } from '../ui/GoogleSignInButton';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useCloudSyncStore } from '../../store/useCloudSyncStore';
@@ -107,11 +108,7 @@ export function ClanManager({ onClanJoined }) {
                                 <p style={{ color: 'var(--text-secondary)', textAlign: 'center', margin: 0, lineHeight: '1.5' }}>
                                     {t('clan.signInRequired')}
                                 </p>
-                                <button onClick={() => cloudAuth.signIn()} className="hover-lift" style={{
-                                    width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
-                                    background: 'linear-gradient(135deg, #818cf8, #6366f1)', border: 'none', color: 'white',
-                                    fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
-                                }}><LogIn size={20} /> {t('clan.signIn')}</button>
+                                <GoogleSignInButton onClick={() => cloudAuth.signIn()} />
                             </>
                         ) : (
                             <>

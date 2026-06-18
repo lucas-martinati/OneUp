@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { X, Trophy, LogOut, Activity } from '../../utils/icons';
-import { IconButton, Spinner } from '../ui';
+import { IconButton, Spinner, GoogleSignInButton } from '../ui';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { getLocalDateStr } from '../../utils/dateUtils';
@@ -260,10 +260,18 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                         <div className={styles.emptyIcon}>
                             <Trophy size={30} color="#fbbf24" />
                         </div>
-                        <p className={styles.emptyTitle}>{t('leaderboard.empty')}</p>
-                        <p className={styles.emptyHint}>
-                            {!cloudAuth?.isSignedIn ? t('leaderboard.signInToAppear') : t('leaderboard.enableToAppear')}
-                        </p>
+                        {!cloudAuth?.isSignedIn ? (
+                            <>
+                                <p className={styles.emptyTitle}>{t('leaderboard.signInTitle')}</p>
+                                <p className={styles.emptyHint}>{t('leaderboard.signInToAppear')}</p>
+                                <GoogleSignInButton onClick={() => cloudAuth.signIn()} className={styles.signInBtn} />
+                            </>
+                        ) : (
+                            <>
+                                <p className={styles.emptyTitle}>{t('leaderboard.empty')}</p>
+                                <p className={styles.emptyHint}>{t('leaderboard.enableToAppear')}</p>
+                            </>
+                        )}
                     </div>
                 ) : (
                     <>
