@@ -2,7 +2,9 @@ import { useCallback, useRef, useEffect } from 'react';
 import i18n from '../i18n';
 import { getLocalDateStr } from '../utils/dateUtils';
 
-const NOTIFICATION_ID = 1;
+// Starting ID for daily notifications. The range [NOTIFICATION_ID, NOTIFICATION_ID + 6]
+// is reserved exclusively for the 7 days of daily reminders.
+const NOTIFICATION_ID = 1000;
 
 let localNotificationsPromise = null;
 
@@ -186,6 +188,24 @@ export function useNotificationManager({ isDayDone, getDayNumber }) {
 
           const notificationsList = [];
 
+          // Compute a rough streak up to yesterday once (avoids redundant 7 x 365 iterations)
+          const todayStr = getLocalDateStr(new Date());
+          let streak = 0;
+          const todayDate = new Date(todayStr);
+          for (let j = 0; j < 365; j++) {
+            const checkDate = new Date(todayDate);
+            checkDate.setDate(checkDate.getDate() - j);
+            if (isDayDoneRef.current(getLocalDateStr(checkDate))) {
+              streak++;
+            } else {
+              break;
+            }
+          }
+
+          // Track the count of successfully scheduled notifications to maintain cohesive narrative progression.
+          // Using scheduledCount for dayIndex ensures the user receives the motivational/challenge steps
+          // in the correct logical sequence (without gaps) even if some days are skipped.
+          let scheduledCount = 0;
           for (let i = 0; i < 7; i++) {
             const targetTime = new Date(notificationTime);
             targetTime.setDate(targetTime.getDate() + i);
@@ -197,25 +217,10 @@ export function useNotificationManager({ isDayDone, getDayNumber }) {
             }
 
             const dayNum = getDayNumberRef.current(targetDateStr);
-
-            // Compute a rough streak up to yesterday to determine context.
-            const todayStr = getLocalDateStr(new Date());
-            let streak = 0;
-            const todayDate = new Date(todayStr);
-            for (let j = 0; j < 365; j++) {
-              const checkDate = new Date(todayDate);
-              checkDate.setDate(checkDate.getDate() - j);
-              if (isDayDoneRef.current(getLocalDateStr(checkDate))) {
-                streak++;
-              } else {
-                break;
-              }
-            }
-
-            const { title, body } = buildIncrementalContent({ dayNum, streak, dayIndex: i });
+            const { title, body } = buildIncrementalContent({ dayNum, streak, dayIndex: scheduledCount });
 
             notificationsList.push({
-              id: NOTIFICATION_ID + i,
+              id: NOTIFICATION_ID + i, // Maps directly to daily offset to maintain fixed slot IDs
               title,
               body,
               schedule: { at: targetTime },
@@ -224,6 +229,8 @@ export function useNotificationManager({ isDayDone, getDayNumber }) {
               actionTypeId: '',
               extra: null,
             });
+
+            scheduledCount++;
           }
 
           if (notificationsList.length > 0) {

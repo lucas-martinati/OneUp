@@ -28,6 +28,7 @@ vi.mock('../../i18n', () => ({
   }
 }));
 
+import { getLocalDateStr } from '../../utils/dateUtils';
 import { useNotificationManager } from '../useNotificationManager';
 
 describe('useNotificationManager', () => {
@@ -107,18 +108,18 @@ describe('useNotificationManager', () => {
 
     expect(mockCancel).toHaveBeenCalledWith({
       notifications: [
-        { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }
+        { id: 1000 }, { id: 1001 }, { id: 1002 }, { id: 1003 }, { id: 1004 }, { id: 1005 }, { id: 1006 }
       ]
     });
 
     expect(mockSchedule).toHaveBeenCalledWith(expect.objectContaining({
       notifications: expect.arrayContaining([
         expect.objectContaining({
-          id: 1,
+          id: 1000,
           schedule: expect.objectContaining({ at: expect.any(Date) })
         }),
         expect.objectContaining({
-          id: 7,
+          id: 1006,
           schedule: expect.objectContaining({ at: expect.any(Date) })
         })
       ])
@@ -127,5 +128,32 @@ describe('useNotificationManager', () => {
     // Check that we schedule exactly 7 notifications
     const scheduleArgs = vi.mocked(mockSchedule).mock.calls[0][0];
     expect(scheduleArgs.notifications).toHaveLength(7);
+  });
+
+  it('skips scheduling on days already completed', async () => {
+    mockCheckPermissions.mockResolvedValueOnce({ display: 'granted' });
+    mockCancel.mockResolvedValueOnce({});
+    mockSchedule.mockResolvedValueOnce({});
+
+    // Skip the day after tomorrow (offset 2 days) to test intra-loop skipping
+    const dayAfterTomorrowStr = getLocalDateStr(new Date(Date.now() + 2 * 24 * 60 * 60 * 1000));
+    const isDayDone = vi.fn((dateStr) => dateStr === dayAfterTomorrowStr);
+    const getDayNumber = vi.fn(() => 5);
+
+    const { result } = renderHook(() => useNotificationManager({
+      isDayDone,
+      getDayNumber,
+    }));
+
+    const settings = {
+      notificationsEnabled: true,
+      notificationTime: { hour: 10, minute: 30 }
+    };
+
+    await result.current.scheduleNotification(settings);
+
+    // Tomorrow is skipped, so we should only schedule 6 notifications instead of 7
+    const scheduleArgs = vi.mocked(mockSchedule).mock.calls[0][0];
+    expect(scheduleArgs.notifications).toHaveLength(6);
   });
 });
