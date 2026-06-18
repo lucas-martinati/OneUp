@@ -25,6 +25,7 @@ import { StatsHighlights } from './StatsHighlights';
 import { MonthlyActivityChart } from './MonthlyActivityChart';
 import { ExerciseBreakdown } from './ExerciseBreakdown';
 import { SessionHistoryList } from './SessionHistoryList';
+import { AchievementsShowcase } from './AchievementsShowcase';
 
 // Lazy load Recharts components
 const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
@@ -234,6 +235,8 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 {/* ── Tab: Overview ─────────────────────────────────────── */}
                 {activeTab === 'overview' && (
                     <>
+                        <AchievementsShowcase stats={globalStats} onOpen={onOpenAchievements} />
+
                         <StatsOverviewCards
                             onlyCardio={onlyCardio} cardioKm={cardioKm} cardioSessionsCount={cardioData.allSessions.length}
                             globalTotalReps={globalTotalReps} exercisesCount={exercises?.length || 0} totalDays={totalDays}

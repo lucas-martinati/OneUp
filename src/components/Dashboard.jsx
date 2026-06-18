@@ -73,6 +73,7 @@ export function Dashboard() {
 
     // ── UI store (modals + session UI) ──
     const openModal = useUIStore(s => s.openModal);
+    const openAchievements = useUIStore(s => s.openAchievements);
     const closeTopModal = useUIStore(s => s.closeTopModal);
     const anyModalOpen = useUIStore(s => s.modalStack.length > 0);
     const sessionInProgress = useUIStore(s => s.sessionInProgress);
@@ -169,9 +170,9 @@ export function Dashboard() {
         setSoundSettingsGetter(() => settings);
     }, [settings]);
 
-    const { showAchievement, AchievementToast: AchievementToastComponent } = useAchievementToast(() => {
+    const { showAchievement, AchievementToast: AchievementToastComponent } = useAchievementToast((badgeId) => {
         openModal('stats');
-        setTimeout(() => openModal('achievements'), 100);
+        setTimeout(() => openAchievements(badgeId), 100);
     });
 
     const { achievement: detectedAchievement, clearAchievement } = useNewAchievement(computedStats, t);

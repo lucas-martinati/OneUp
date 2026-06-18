@@ -44,13 +44,15 @@ export function DashboardModals({
 
     // ── UI store ──
     const modals = useUIStore(s => s.modals);
-    const openModal = useUIStore(s => s.openModal);
     const closeModal = useUIStore(s => s.closeModal);
     const openStore = useUIStore(s => s.openStore);
     const closeSettings = useUIStore(s => s.closeSettings);
     const openStoreDirectly = useUIStore(s => s.openStoreDirectly);
     const customExModalCatId = useUIStore(s => s.customExModalCatId);
     const closeCustomExercises = useUIStore(s => s.closeCustomExercises);
+    const openAchievements = useUIStore(s => s.openAchievements);
+    const closeAchievements = useUIStore(s => s.closeAchievements);
+    const highlightedBadgeId = useUIStore(s => s.highlightedBadgeId);
     const sessionMode = useUIStore(s => s.sessionMode);
     const setSessionInProgress = useUIStore(s => s.setSessionInProgress);
 
@@ -87,7 +89,7 @@ export function DashboardModals({
                             [CATEGORIES.CUSTOM]: 'custom'
                         }[currentCatKey]}
                         onClose={() => closeModal('stats')}
-                        onOpenAchievements={() => { openModal('achievements'); }}
+                        onOpenAchievements={(badgeId) => openAchievements(badgeId)}
                         onOpenStore={openStore}
                     />
                 </Suspense>
@@ -129,10 +131,10 @@ export function DashboardModals({
                     <Achievements
                         completions={completions}
                         exercises={EXERCISES}
-                        onClose={() => { closeModal('achievements'); }}
+                        onClose={closeAchievements}
                         settings={settings}
                         getDayNumber={getDayNumber}
-                        highlightedBadgeId={null}
+                        highlightedBadgeId={highlightedBadgeId}
                         computedStats={computedStats}
                     />
                 </Suspense>

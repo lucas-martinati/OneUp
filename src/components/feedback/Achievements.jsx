@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Award, Lock } from '../../utils/icons';
-import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '../../config/badgeDefinitions';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { SegmentedControl } from '../ui/SegmentedControl';
+import { buildBadges } from './buildBadges';
 
 const CATEGORY_COLORS = {
     streak: '#f97316',
@@ -25,27 +25,9 @@ const CATEGORY_TITLES = {
     social: 'achievements.categories.social',
 };
 
-// Visual-only progress metadata: [stat key, goal]. Lets locked numeric badges
-// show how close they are. Unlock logic stays in badgeDefinitions (test()).
-const PROGRESS_META = {
-    first_blood: ['totalDays', 1],
-    consistent: ['maxStreak', 3], week_warrior: ['maxStreak', 7], two_weeks: ['maxStreak', 14],
-    month_warrior: ['maxStreak', 30], two_months: ['maxStreak', 60], quarter_year: ['maxStreak', 90],
-    half_year: ['maxStreak', 180], year_beast: ['maxStreak', 365],
-    ten_sessions: ['totalDays', 10], fifty_sessions: ['totalDays', 50], hundred_sessions: ['totalDays', 100],
-    two_hundred_sessions: ['totalDays', 200], five_hundred_sessions: ['totalDays', 500],
-    rep_500: ['totalRepsAll', 500], rep_1000: ['totalRepsAll', 1000], rep_5000: ['totalRepsAll', 5000],
-    rep_10000: ['totalRepsAll', 10000], rep_50000: ['totalRepsAll', 50000],
-    perfect_one: ['perfectDays', 1], perfect_five: ['perfectDays', 5], perfect_fifty: ['perfectDays', 50], perfect_hundred: ['perfectDays', 100],
-    weekday_warrior: ['weekdayWorkouts', 25], weekend_warrior: ['weekendWorkouts', 25],
-    morning_5: ['morningWorkouts', 5], morning_10: ['morningWorkouts', 10], morning_25: ['morningWorkouts', 25],
-    afternoon_5: ['afternoonWorkouts', 5], afternoon_10: ['afternoonWorkouts', 10], afternoon_25: ['afternoonWorkouts', 25],
-    evening_5: ['eveningWorkouts', 5], evening_10: ['eveningWorkouts', 10], evening_25: ['eveningWorkouts', 25],
-};
-
 const fmt = (n) => n.toLocaleString();
 
-const BadgeItem = React.memo(({ badge }) => {
+const BadgeItem = React.memo(({ badge, highlighted }) => {
     const { t } = useTranslation();
     const Icon = badge.icon;
     const { unlocked, secret, color } = badge;
@@ -55,6 +37,7 @@ const BadgeItem = React.memo(({ badge }) => {
 
     return (
         <div
+            data-badge-id={badge.id}
             className={unlocked ? 'hover-lift' : ''}
             style={{
                 position: 'relative', overflow: 'hidden',
@@ -62,7 +45,9 @@ const BadgeItem = React.memo(({ badge }) => {
                 borderRadius: 'var(--radius-xl)',
                 textAlign: 'center',
                 background: unlocked ? `linear-gradient(160deg, ${color}26, ${color}0a)` : 'var(--surface-muted)',
-                border: unlocked ? `1px solid ${color}55` : '1px solid var(--border-subtle)',
+                border: highlighted ? `2px solid ${color}` : (unlocked ? `1px solid ${color}55` : '1px solid var(--border-subtle)'),
+                boxShadow: highlighted ? `0 0 0 4px ${color}33, 0 8px 28px ${color}55` : 'none',
+                animation: highlighted ? 'badgeHighlightPulse 1.5s ease-out 2' : 'none',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
                 minHeight: '156px'
             }}>
@@ -147,7 +132,7 @@ const BadgeItem = React.memo(({ badge }) => {
     );
 });
 
-export function Achievements({ /* completions, exercises, settings, getDayNumber, */ onClose, computedStats }) {
+export function Achievements({ /* completions, exercises, settings, getDayNumber, */ onClose, computedStats, highlightedBadgeId }) {
     const { t } = useTranslation();
     const [isVisible, setIsVisible] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
@@ -160,9 +145,21 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
     // Use refs for drag state to avoid React re-renders which causes jank with long lists
     const sheetRef = useRef(null);
     const overlayRef = useRef(null);
+    const scrollContentRef = useRef(null);
     const startY = useRef(0);
     const isDragging = useRef(false);
-    
+
+    // Deep-link: when opened from a specific badge, scroll it into view once the
+    // entrance slide has settled. The badge also gets a highlight ring + pulse.
+    useEffect(() => {
+        if (!highlightedBadgeId) return;
+        const timer = setTimeout(() => {
+            const el = scrollContentRef.current?.querySelector(`[data-badge-id="${highlightedBadgeId}"]`);
+            el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 480);
+        return () => clearTimeout(timer);
+    }, [highlightedBadgeId]);
+
     const handleClose = useCallback(() => {
         setIsClosing(true);
         setTimeout(() => onClose(), 300); // 300ms to allow spring animation to run
@@ -263,26 +260,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
         ghostWorkout, perfectStreak, hasShared, achievements
     }), [totalDays, maxStreak, totalRepsAll, perfectDays, hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts, morningWorkouts, afternoonWorkouts, eveningWorkouts, ghostWorkout, perfectStreak, hasShared, achievements]);
 
-    const badges = useMemo(() => BADGE_DEFINITIONS.map(def => {
-        const IconComp = getBadgeIconFromDef(def);
-        const unlocked = isBadgeUnlocked(def.id, statsSnapshot, statsSnapshot.achievements);
-        const meta = PROGRESS_META[def.id];
-        const current = meta ? (statsSnapshot[meta[0]] || 0) : null;
-        const goal = meta ? meta[1] : null;
-        return {
-            id: def.id,
-            icon: IconComp,
-            color: def.color,
-            category: def.category,
-            secret: def.secret || false,
-            titleKey: def.secret && !unlocked ? null : `achievements.badges.${def.id}.title`,
-            descKey: def.secret && !unlocked ? null : `achievements.badges.${def.id}.desc`,
-            unlocked,
-            current,
-            goal,
-            progress: goal != null ? Math.min(current / goal, 1) : null,
-        };
-    }), [statsSnapshot]);
+    const badges = useMemo(() => buildBadges(statsSnapshot), [statsSnapshot]);
 
     const unlockedCount = useMemo(() => badges.filter(b => b.unlocked).length, [badges]);
 
@@ -348,7 +326,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                     cursor: 'grab', opacity: 0.7
                 }} />
 
-                <div data-scroll-content className="modal-content no-scrollbar" style={{
+                <div ref={scrollContentRef} data-scroll-content className="modal-content no-scrollbar" style={{
                     flex: 1, overflowY: 'auto',
                     paddingTop: 0
                 }}>
@@ -454,7 +432,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                                     display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px'
                                 }}>
                                     {shown.map((badge) => (
-                                        <BadgeItem key={badge.id} badge={badge} />
+                                        <BadgeItem key={badge.id} badge={badge} highlighted={badge.id === highlightedBadgeId} />
                                     ))}
                                 </div>
                             </div>

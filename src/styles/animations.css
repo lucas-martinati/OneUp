@@ -569,3 +569,23 @@
   88%  { transform: scale(0.96, 1.04); }
   100% { transform: scale(1, 1); }
 }
+
+/* Achievements deep-link: the targeted badge pulses to draw the eye. */
+@keyframes badgeHighlightPulse {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.06); }
+  60%  { transform: scale(0.99); }
+  100% { transform: scale(1); }
+}
+
+/* Achievement toast: one-shot light sweep + auto-dismiss countdown bar. */
+@keyframes toastSheen {
+  0%   { transform: translateX(-130%) skewX(-18deg); opacity: 0; }
+  18%  { opacity: 0.55; }
+  100% { transform: translateX(240%) skewX(-18deg); opacity: 0; }
+}
+
+@keyframes toastCountdown {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}

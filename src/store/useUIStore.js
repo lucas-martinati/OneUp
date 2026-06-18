@@ -46,6 +46,19 @@ export const useUIStore = create((set, get) => ({
     set({ openStoreDirectly: false });
   },
 
+  // ── Achievements modal deep-link ────────────────────────────────────
+  // When opened from a specific badge, that badge is scrolled to and
+  // highlighted in the panel. null = opened normally (no highlight).
+  highlightedBadgeId: null,
+  openAchievements: (badgeId = null) => {
+    set({ highlightedBadgeId: badgeId });
+    get().openModal('achievements');
+  },
+  closeAchievements: () => {
+    get().closeModal('achievements');
+    set({ highlightedBadgeId: null });
+  },
+
   // ── Custom exercises modal target category ──────────────────────────
   // null targets the default "custom" category.
   customExModalCatId: null,
