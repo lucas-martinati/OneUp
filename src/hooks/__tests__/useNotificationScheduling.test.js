@@ -68,20 +68,20 @@ describe('useNotificationScheduling', () => {
   it('schedules notification when notification hour or minute changes', () => {
     const { rerender } = renderHook(() => useNotificationScheduling());
 
-    expect(mockScheduleNotification).toHaveBeenCalledTimes(2); // effect 1 + effect 2 on mount
+    expect(mockScheduleNotification).toHaveBeenCalledTimes(1); // consolidated effect on mount
 
     // Mutate and rerender
     mockSettingsStore.settings.notificationTime = { hour: 9, minute: 30 };
     rerender();
 
-    // Both effects should run again because the notification time changed
-    expect(mockScheduleNotification).toHaveBeenCalledTimes(4);
+    // The consolidated effect should run again because the notification time changed
+    expect(mockScheduleNotification).toHaveBeenCalledTimes(2);
   });
 
   it('does not re-schedule notifications when other unrelated settings change', () => {
     const { rerender } = renderHook(() => useNotificationScheduling());
 
-    expect(mockScheduleNotification).toHaveBeenCalledTimes(2); // mount
+    expect(mockScheduleNotification).toHaveBeenCalledTimes(1); // mount
 
     // Mutate unrelated settings (e.g. theme or pseudo) without changing notification settings
     mockSettingsStore.settings = {
@@ -91,7 +91,7 @@ describe('useNotificationScheduling', () => {
     };
     rerender();
 
-    // scheduleNotification should NOT have been called again (still 2 calls)
-    expect(mockScheduleNotification).toHaveBeenCalledTimes(2);
+    // scheduleNotification should NOT have been called again (still 1 call)
+    expect(mockScheduleNotification).toHaveBeenCalledTimes(1);
   });
 });

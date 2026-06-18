@@ -24,7 +24,7 @@ vi.mock('../firebase', () => ({
   getDatabaseInstance: vi.fn(() => ({})),
 }));
 
-import { set, get, remove, push, update, onValue, runTransaction } from 'firebase/database';
+import { get, remove, push, update, onValue, runTransaction } from 'firebase/database';
 import { 
   createClan, 
   joinClan, 
@@ -104,15 +104,20 @@ describe('clanService', () => {
         .mockResolvedValueOnce(snapshot(mockClan))
         .mockResolvedValueOnce(snapshot(null));
 
-      vi.mocked(set).mockResolvedValue();
+      vi.mocked(update).mockResolvedValue();
 
       const result = await joinClan('CLANCODE');
       expect(result.success).toBe(true);
       expect(result.clanId).toBe('clan_id_123');
 
       expect(get).toHaveBeenCalledTimes(3);
-      expect(set).toHaveBeenCalledWith('clans/clan_id_123/members/test-uid', 'member');
-      expect(set).toHaveBeenCalledWith('users/test-uid/clans/clan_id_123', 'member');
+      expect(update).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          'clans/clan_id_123/members/test-uid': 'member',
+          'users/test-uid/clans/clan_id_123': 'member'
+        })
+      );
     });
 
     it('returns error if the invitation code is not registered', async () => {
@@ -145,17 +150,15 @@ describe('clanService', () => {
     it('leaves a clan and deletes it along with its code if empty', async () => {
       vi.mocked(get)
         .mockResolvedValueOnce(snapshot('member')) // user is member
-        .mockResolvedValueOnce(snapshot({ members: {}, code: 'MYCODE' })); // clan has no members remaining
-      vi.mocked(remove).mockResolvedValue();
+        .mockResolvedValueOnce(snapshot({ members: { 'test-uid': 'member' }, code: 'MYCODE' })); // clan details with only test-uid
       vi.mocked(update).mockResolvedValue();
 
       const result = await leaveClan('clan_id_123');
       expect(result.success).toBe(true);
-      expect(remove).toHaveBeenCalledWith('clans/clan_id_123/members/test-uid');
-      expect(remove).toHaveBeenCalledWith('users/test-uid/clans/clan_id_123');
       expect(update).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({
+          'users/test-uid/clans/clan_id_123': null,
           'clans/clan_id_123': null,
           'clanCodes/MYCODE': null
         })
@@ -165,15 +168,18 @@ describe('clanService', () => {
     it('leaves a clan but does not delete it if members remain', async () => {
       vi.mocked(get)
         .mockResolvedValueOnce(snapshot('member')) // user is member
-        .mockResolvedValueOnce(snapshot({ members: { 'other-uid': 'member' }, code: 'MYCODE' })); // other members remain
-      vi.mocked(remove).mockResolvedValue();
+        .mockResolvedValueOnce(snapshot({ members: { 'test-uid': 'member', 'other-uid': 'member' }, code: 'MYCODE' })); // other members remain
       vi.mocked(update).mockResolvedValue();
 
       const result = await leaveClan('clan_id_123');
       expect(result.success).toBe(true);
-      expect(remove).toHaveBeenCalledWith('clans/clan_id_123/members/test-uid');
-      expect(remove).toHaveBeenCalledWith('users/test-uid/clans/clan_id_123');
-      expect(update).not.toHaveBeenCalled();
+      expect(update).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          'users/test-uid/clans/clan_id_123': null,
+          'clans/clan_id_123/members/test-uid': null
+        })
+      );
     });
   });
 

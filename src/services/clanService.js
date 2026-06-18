@@ -1,4 +1,4 @@
-import { ref, set, get, remove, push, update, onValue, serverTimestamp, runTransaction } from 'firebase/database';
+import { ref, get, remove, push, update, onValue, serverTimestamp, runTransaction } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
 import i18n from '../i18n';
@@ -73,8 +73,10 @@ export async function joinClan(code) {
     const userClanSnapshot = await get(ref(database, `users/${uid}/clans/${foundClanId}`));
     if (userClanSnapshot.exists()) return { success: false, error: i18n.t('clan.alreadyMember') };
 
-    await set(ref(database, `clans/${foundClanId}/members/${uid}`), 'member');
-    await set(ref(database, `users/${uid}/clans/${foundClanId}`), 'member');
+    const updates = {};
+    updates[`clans/${foundClanId}/members/${uid}`] = 'member';
+    updates[`users/${uid}/clans/${foundClanId}`] = 'member';
+    await update(ref(database), updates);
 
     logger.success(`Joined clan ${foundClanId}`);
     return { success: true, clanId: foundClanId };
@@ -95,23 +97,27 @@ export async function leaveClan(clanId) {
     const userSnapshot = await get(ref(database, `users/${uid}/clans/${clanId}`));
     if (!userSnapshot.exists()) return { success: true };
 
-    await remove(ref(database, `clans/${clanId}/members/${uid}`));
-    await remove(ref(database, `users/${uid}/clans/${clanId}`));
-
     const clanSnapshot = await get(ref(database, `clans/${clanId}`));
+    const updates = {};
+    updates[`users/${uid}/clans/${clanId}`] = null;
+
     if (clanSnapshot.exists()) {
       const clanData = clanSnapshot.val();
-      const remainingMembers = clanData.members || {};
+      const remainingMembers = { ...(clanData.members || {}) };
+      delete remainingMembers[uid];
+
       if (Object.keys(remainingMembers).length === 0) {
-        const updates = {};
         updates[`clans/${clanId}`] = null;
         if (clanData.code) {
           updates[`clanCodes/${clanData.code}`] = null;
         }
-        await update(ref(database), updates);
-        logger.success(`Clan ${clanId} deleted because it became empty.`);
+        logger.success(`Clan ${clanId} will be deleted because it became empty.`);
+      } else {
+        updates[`clans/${clanId}/members/${uid}`] = null;
       }
     }
+
+    await update(ref(database), updates);
 
     logger.success(`Left clan ${clanId} successfully`);
     return { success: true };

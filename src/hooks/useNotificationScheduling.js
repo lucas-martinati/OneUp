@@ -24,33 +24,35 @@ export function useNotificationScheduling() {
     getDayNumber,
   });
 
-  // ── Permission + scheduling on settings change ─────────────────────────
+  // ── Permission & scheduling on settings / completion changes, plus midnight reschedule ──
   useEffect(() => {
     if (isSetup && notificationsEnabled) {
       requestNotificationPermission();
-      scheduleNotification({
-        notificationsEnabled,
-        notificationTime: { hour: notificationHour, minute: notificationMinute }
-      });
-    }
-  }, [isSetup, notificationsEnabled, requestNotificationPermission, scheduleNotification, notificationHour, notificationMinute]);
 
-  // ── Re-schedule at midnight (completion state changes the message) ─────
-  useEffect(() => {
-    if (isSetup && notificationsEnabled) {
       const lightweightSettings = {
         notificationsEnabled,
         notificationTime: { hour: notificationHour, minute: notificationMinute }
       };
       scheduleNotification(lightweightSettings);
+
       const now = new Date();
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(0, 0, 30, 0);
+
       const midnightTimer = setTimeout(() => {
         scheduleNotification(lightweightSettings);
       }, tomorrow.getTime() - now.getTime());
+
       return () => clearTimeout(midnightTimer);
     }
-  }, [isSetup, notificationsEnabled, notificationHour, notificationMinute, completions, scheduleNotification]);
+  }, [
+    isSetup,
+    notificationsEnabled,
+    notificationHour,
+    notificationMinute,
+    completions,
+    requestNotificationPermission,
+    scheduleNotification
+  ]);
 }
