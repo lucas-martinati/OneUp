@@ -64,4 +64,11 @@ export default defineConfig([
       },
     },
   },
+  // E2E Playwright test files
+  {
+    files: ['e2e/**/*.{js,jsx}'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+    },
+  },
 ])

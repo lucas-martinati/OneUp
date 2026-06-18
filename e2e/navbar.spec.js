@@ -1,31 +1,8 @@
-import { test, expect } from '@playwright/test';
-
-async function completeOnboardingIfNeeded(page) {
-  const letsGoButton = page.getByRole('button', { name: /let's go|c'est parti/i });
-  if (!(await letsGoButton.isVisible().catch(() => false))) return;
-
-  await letsGoButton.click();
-
-  const startChallengeButton = page.getByRole('button', { name: /start challenge|lancer le défi/i });
-  await expect(startChallengeButton).toBeVisible();
-  await startChallengeButton.click();
-
-  await expect(page.locator('button[aria-label$="counter"]').first()).toBeVisible();
-}
-
-async function dismissAnnouncementIfVisible(page) {
-  const dismissButton = page.getByRole('button', { name: /awesome|génial/i });
-  await dismissButton.waitFor({ state: 'visible', timeout: 1500 })
-    .then(() => dismissButton.click())
-    .catch(() => {});
-}
+import { test, expect, gotoDashboard } from './helpers';
 
 test.describe('Bottom navigation bar', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    await completeOnboardingIfNeeded(page);
-    await dismissAnnouncementIfVisible(page);
+    await gotoDashboard(page);
   });
 
   test('shows the five destinations', async ({ page }) => {

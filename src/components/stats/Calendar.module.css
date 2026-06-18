@@ -420,5 +420,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .rise { animation: none; }
-  .ring, .ringInner, .navBtn { transition: none; }
+  .navBtn { transition: none; }
 }

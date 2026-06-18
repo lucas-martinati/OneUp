@@ -37,24 +37,6 @@
   100% { background-position: 200% 0; }
 }
 
-@keyframes topRankPulse1 {
-  0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.1); border-color: rgba(255, 215, 0, 0.3); }
-  50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.4); border-color: rgba(255, 215, 0, 0.7); }
-}
-
-@keyframes topRankPulse2 {
-  0%, 100% { box-shadow: 0 0 8px rgba(192, 192, 192, 0.1); border-color: rgba(192, 192, 192, 0.2); }
-  50% { box-shadow: 0 0 18px rgba(192, 192, 192, 0.3); border-color: rgba(192, 192, 192, 0.5); }
-}
-
-@keyframes topRankPulse3 {
-  0%, 100% { box-shadow: 0 0 8px rgba(205, 127, 50, 0.1); border-color: rgba(205, 127, 50, 0.2); }
-  50% { box-shadow: 0 0 15px rgba(205, 127, 50, 0.3); border-color: rgba(205, 127, 50, 0.5); }
-}
-
-.top-rank-1 { animation: topRankPulse1 3s infinite ease-in-out; border-width: 1.5px !important; }
-.top-rank-2 { animation: topRankPulse2 4s infinite ease-in-out; }
-.top-rank-3 { animation: topRankPulse3 4s infinite ease-in-out; }
 
 .perfect-day-row {
   position: relative;
@@ -235,38 +217,7 @@
   }
 }
 
-.pulse-glow {
-  animation: badgeHighlight 1.5s ease-in-out infinite;
-}
 
-@keyframes badgeHighlight {
-
-  0%,
-  100% {
-    box-shadow: 0 0 15px var(--badge-color, rgba(251, 191, 36, 0.5));
-  }
-
-  50% {
-    box-shadow: 0 0 30px var(--badge-color, rgba(251, 191, 36, 0.8));
-  }
-}
-
-.pulse-ring {
-  animation: pulseGlow 2s ease-in-out infinite;
-  border-radius: 50%;
-}
-
-@keyframes pulseGlow {
-
-  0%,
-  100% {
-    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
-  }
-
-  50% {
-    filter: drop-shadow(0 0 16px rgba(139, 92, 246, 1));
-  }
-}
 
 @keyframes pulseGlowExercise {
 
@@ -307,38 +258,7 @@
 }
 
 /* Slide down animation (for toasts) */
-.slide-down {
-  animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Slide exit animation */
-.slide-exit {
-  animation: slideExit 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes slideExit {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  to {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-}
 
 /* Ripple effect helper */
 .ripple {

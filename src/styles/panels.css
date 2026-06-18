@@ -348,22 +348,7 @@ body.exercise-panel-active::before {
   flex-wrap: wrap;
 }
 
-.user-avatar {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  min-height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, hsl(220, 90%, 60%), hsl(260, 90%, 65%));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
-}
 
-.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.user-avatar svg { width: 24px; height: 24px; color: white; }
 
 .user-details { flex: 1; min-width: 0; overflow: hidden; }
 
@@ -455,16 +440,7 @@ body.exercise-panel-active::before {
   box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
 }
 
-.btn-overwrite {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
 
-.btn-overwrite:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-}
 
 .btn-conflict:disabled {
   opacity: 0.5;

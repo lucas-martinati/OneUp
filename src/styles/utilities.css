@@ -16,13 +16,6 @@
   box-shadow: var(--shadow-lg), inset 0 1px 0 var(--border-default);
 }
 
-.title-gradient {
-  background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 .rainbow-gradient {
   background: var(--gradient-rainbow);
   background-size: 200% 200%;
@@ -47,20 +40,18 @@
 .flex-center { display: flex; align-items: center; justify-content: center; }
 .flex-align-center { display: flex; align-items: center; }
 .flex-justify-center { display: flex; justify-content: center; }
-.flex-justify-between { display: flex; justify-content: space-between; }
+
 .flex-justify-evenly { display: flex; justify-content: space-evenly; }
 .flex-1 { flex: 1; }
 .flex-wrap { flex-wrap: wrap; }
 .full-height { height: 100%; }
 .full-width { width: 100%; }
 .pos-relative { position: relative; }
-.pos-absolute { position: absolute; }
+
 .overflow-hidden { overflow: hidden; }
 
 /* ── Typography & Spacing Utilities ── */
 .text-center { text-align: center; }
-.gap-xs { gap: var(--spacing-xs, 0.5rem); }
-.gap-sm { gap: var(--spacing-sm, 1rem); }
-.gap-md { gap: var(--spacing-md, 1.5rem); }
+
 .gap-responsive { gap: clamp(4px, 1vh, 10px); }
-.gap-responsive-sm { gap: clamp(3px, 0.5vh, 6px); }
+

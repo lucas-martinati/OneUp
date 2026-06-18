@@ -145,12 +145,16 @@ function extractI18nUsage(content) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
+console.log('\n\x1b[34m┌────────────────────────────────────────────────────────┐');
+console.log('│  \x1b[1m\x1b[37m[i18n] CLÉS DE TRADUCTION (SANITY CHECK)\x1b[0m\x1b[34m              │');
+console.log('└────────────────────────────────────────────────────────┘\x1b[0m\n');
+
 // 1. Charger toutes les clés définies dans en.json
 const enJson     = JSON.parse(fs.readFileSync(path.join(LOCALES_DIR, 'en.json'), 'utf-8'));
 const allKeys    = flattenKeys(enJson);
 const allKeysSet = new Set(allKeys);
 
-console.log(`Total keys in en.json: ${allKeys.length}\n`);
+console.log(`\x1b[90m📁 en.json : ${allKeys.length} clés définies au total\x1b[0m`);
 
 // 2. Scanner le code source
 const usedStaticKeys = new Set();
@@ -163,8 +167,7 @@ walkDir(SRC_DIR, (filepath) => {
   prefixes.forEach(p   => usedPrefixes.add(p));
 });
 
-console.log(`Static keys found in code : ${usedStaticKeys.size}`);
-console.log(`Dynamic prefixes found    : ${usedPrefixes.size}\n`);
+console.log(`\x1b[90m🔍 Code source : ${usedStaticKeys.size} clés statiques & ${usedPrefixes.size} préfixes dynamiques trouvés\x1b[0m`);
 
 // ─── 2.5 Manual Whitelists ────────────────────────────────────────────────────
 usedPrefixes.add('sessionNames');
@@ -184,7 +187,7 @@ if (fs.existsSync(badgeDefPath)) {
     usedStaticKeys.add(`achievements.badges.${id}.desc`);
     badgeCount++;
   }
-  console.log(`Added ${badgeCount * 2} keys from ${badgeCount} badge definitions.\n`);
+  console.log(`\x1b[90m🏅 Badges : ${badgeCount * 2} clés générées dynamiquement\x1b[0m\n`);
 }
 
 // 4. Clés inutilisées
@@ -227,8 +230,12 @@ function isKeyUsed(key) {
 
 const unusedKeys = allKeys.filter(key => !isKeyUsed(key));
 
-console.log(`=== UNUSED KEYS (${unusedKeys.length}) ===\n`);
-unusedKeys.forEach(k => console.log(`  - ${k}`));
+if (unusedKeys.length > 0) {
+  console.log(`\x1b[33m⚠️  CLÉS INUTILISÉES (${unusedKeys.length}) :\x1b[0m`);
+  unusedKeys.forEach(k => console.log(`  \x1b[90m- ${k}\x1b[0m`));
+} else {
+  console.log('  \x1b[32m✓ Aucune clé inutilisée trouvée.\x1b[0m');
+}
 
 // 5. Clés utilisées dans le code mais absentes de en.json
 //    (ignorer les "bases" de clés plurielles qui existent sous forme _one/_other)
@@ -246,10 +253,10 @@ let hasErrors = false;
 
 if (missingKeys.length > 0) {
   hasErrors = true;
-  console.log(`\n=== MISSING KEYS — used in code but not in en.json (${missingKeys.length}) ===\n`);
-  missingKeys.forEach(k => console.log(`  ! ${k}`));
+  console.log(`\n\x1b[31m❌ CLÉS MANQUANTES (utilisées dans le code mais absentes de en.json) (${missingKeys.length}) :\x1b[0m`);
+  missingKeys.forEach(k => console.log(`  \x1b[31m! ${k}\x1b[0m`));
 } else {
-  console.log('\n✓ All static keys are defined in en.json.');
+  console.log('  \x1b[32m✓ Toutes les clés statiques utilisées sont définies dans en.json.\x1b[0m');
 }
 
 if (unusedKeys.length > 0) {
@@ -257,8 +264,8 @@ if (unusedKeys.length > 0) {
 }
 
 if (hasErrors) {
-  console.error('\n❌ i18n checks failed. Please fix missing or unused keys.');
+  console.error('\n\x1b[1m\x1b[31m❌ Échec de la validation i18n. Veuillez corriger les clés manquantes ou inutilisées.\x1b[0m');
   process.exit(1);
 } else {
-  console.log('\n✅ i18n checks passed. No missing or unused keys.');
+  console.log('\n\x1b[1m\x1b[32m✅ Validation i18n réussie (aucune clé manquante ni inutilisée) !\x1b[0m');
 }

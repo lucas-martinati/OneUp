@@ -106,21 +106,6 @@
   filter: drop-shadow(0 2px 5px rgba(255, 190, 0, 0.5));
   z-index: 2;
 }
-.pMedal {
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 0.7rem;
-  font-weight: 900;
-  color: #1a1a1a;
-  border: 2px solid var(--sheet-bg);
-}
 
 .pName {
   margin-top: 12px;
@@ -166,7 +151,7 @@
 .gold   { --m1: #ffd700; --m2: #f59e0b; }
 .silver { --m1: #e2e8f0; --m2: #94a3b8; }
 .bronze { --m1: #e0a06a; --m2: #b45309; }
-.gold .pMedal, .silver .pMedal, .bronze .pMedal { background: linear-gradient(135deg, var(--m1), var(--m2)); }
+
 .gold .pReps { color: var(--m1); }
 .silver .pReps { color: var(--m1); }
 .bronze .pReps { color: var(--m1); }
@@ -342,15 +327,7 @@
 }
 
 /* ── Section label above the list ────────────────────────────────────── */
-.listLabel {
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  opacity: 0.7;
-  padding: 6px 4px 2px;
-}
+
 
 /* ── Entrance ────────────────────────────────────────────────────────── */
 .rise { animation: lbRise 460ms var(--ease-panel-in) backwards; }

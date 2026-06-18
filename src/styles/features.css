@@ -285,51 +285,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   .ann-cta-shine { animation: none; }
 }
 
-/* ── CardioFullscreenMap ──────────────────────────────────────────────── */
 
-.cardio-fs-map .leaflet-control-zoom { display: none; }
-
-/* ── CardioModule: Strava wall particles ──────────────────────────────── */
-
-.cardio-wall-particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-
-.cardio-particle { position: absolute; border-radius: 50%; opacity: 0.4; }
-
-.cardio-p1 {
-  width: 120px; height: 120px; top: -30px; right: -20px;
-  background: radial-gradient(circle, rgba(252, 76, 2, 0.2) 0%, transparent 70%);
-  animation: cardioGlowFloat 7s ease-in-out infinite;
-}
-
-.cardio-p2 {
-  width: 80px; height: 80px; bottom: 20px; left: -10px;
-  background: radial-gradient(circle, rgba(252, 140, 2, 0.15) 0%, transparent 70%);
-  animation: cardioGlowFloat 9s ease-in-out infinite reverse;
-}
-
-.cardio-p3 {
-  width: 60px; height: 60px; top: 40%; left: 60%;
-  background: radial-gradient(circle, rgba(252, 76, 2, 0.1) 0%, transparent 70%);
-  animation: cardioGlowFloat 5s ease-in-out infinite 1s;
-}
-
-.cardio-strava-icon-wrap { position: relative; margin-bottom: 4px; }
-
-.cardio-strava-icon-pulse {
-  position: absolute; inset: -10px; border-radius: 26px;
-  background: radial-gradient(circle, rgba(252, 76, 2, 0.25) 0%, transparent 70%);
-  animation: cardioPulse 2.5s ease-in-out infinite;
-}
-
-@keyframes cardioPulse {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.15); opacity: 0.2; }
-}
-
-@keyframes cardioGlowFloat {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(12px, 8px); }
-}
 
 .cardio-strava-btn:active { transform: scale(0.97) !important; }
 
@@ -447,26 +403,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   transition: width 0.1s ease-out;
 }
 
-.camera-reps-counter-below {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  margin: 10px 0;
-  animation: slideUp 0.3s ease;
-}
 
-.camera-reps-current-below {
-  font-size: clamp(2.8rem, 8vw, 3.8rem);
-  font-weight: 800;
-  color: var(--exercise-color, #818cf8);
-  line-height: 1;
-}
-
-.camera-reps-goal-below {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-}
 
 /* Responsive adjustments for devices with shorter viewport heights (e.g. Xiaomi 15T Pro, zoomed views) */
 @media (max-height: 740px) {

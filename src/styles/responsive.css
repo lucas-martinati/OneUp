@@ -32,8 +32,7 @@
 }
 
 [data-perf="low"] .glass,
-[data-perf="low"] .glass-premium,
-[data-perf="low"] .pulse-glow {
+[data-perf="low"] .glass-premium {
   background-color: var(--card-bg) !important;
 }
 
@@ -55,9 +54,7 @@
   display: none !important;
 }
 
-[data-perf="low"] .pulse-glow {
-  animation: none !important;
-}
+
 
 [data-perf="low"] .progress-ring-circle {
   transition: none !important;

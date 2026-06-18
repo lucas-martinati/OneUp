@@ -8,7 +8,9 @@ const config = {
     "src/services/*Service.js",
     "src/services/revenuecatWebStub.js", // Référencé via un alias Vite (NATIVE_BUILD), invisible pour knip
     "coverage/**",
-    "scratch/**"
+    "scratch/**",
+    "scripts/check-unused-css.cjs",
+    "e2e/**"
   ],
   ignoreDependencies: [
     "@capacitor/android", // Indispensable pour GitHub Actions

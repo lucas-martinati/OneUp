@@ -14,12 +14,15 @@
     "build:apk:dev": "NATIVE_BUILD=true npm run build && npx cap copy android && cd android && ./gradlew assembleDevRelease",
     "deploy:android": "NATIVE_BUILD=true npm run build && npx cap sync android && npx cap run android --flavor dev",
     "deploy:android:prod": "NATIVE_BUILD=true npm run build && npx cap sync android && npx cap run android --flavor prod",
-    "lint": "eslint . && knip --no-config-hints && node scripts/check-i18n-keys.cjs && node scripts/check-i18n-consistency.cjs",
+    "lint": "eslint . && knip --no-config-hints && node scripts/check-i18n-keys.cjs && node scripts/check-i18n-consistency.cjs && node scripts/check-unused-css.cjs",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "npm run build && playwright test",
     "preview": "vite preview",
+    "deploy": "GITHUB_PAGES=true npm run build && gh-pages -d dist -b gh-pages --dotfiles",
     "deploy:functions": "npx firebase-tools deploy --only functions --project oneup-1c3f5",
-    "deploy": "GITHUB_PAGES=true npm run build && gh-pages -d dist -b gh-pages --dotfiles"
+    "deploy:database": "npx firebase-tools deploy --only database --project oneup-1c3f5",
+    "deploy:hosting": "npx firebase-tools deploy --only hosting --project oneup-1c3f5"
   },
   "dependencies": {
     "@capacitor/android": "^8.2.0",
