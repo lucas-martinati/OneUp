@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation, Trans } from 'react-i18next';
-import { Cloud, CloudOff, User, AlertCircle, Trash2, AlertTriangle } from '../../utils/icons';
+import { Cloud, CloudOff, AlertCircle, Trash2, AlertTriangle, Check, Smartphone, RefreshCw } from '../../utils/icons';
 import { Avatar } from '../ui/Avatar';
 import { GoogleSignInButton } from '../ui/GoogleSignInButton';
 
@@ -29,7 +29,7 @@ export function CloudSyncPanel({
         </div>
         <div className="cloud-sync-title">
           <h3>{t('cloud.cloudBackup')}</h3>
-          <p className="cloud-sync-subtitle">
+          <p className={`cloud-sync-subtitle${authState.isSignedIn ? ' connected' : ''}`}>
             {authState.isSignedIn
               ? t('cloud.connectedGooglePlay')
               : t('cloud.notConnected')
@@ -77,24 +77,25 @@ export function CloudSyncPanel({
             <span>{t('cloud.autoSyncEnabled')}</span>
           </div>
 
-          {/* Sign out */}
-          <button
-            className="btn-cloud-signout"
-            onClick={onSignOut}
-            disabled={authState.loading}
-          >
-            {t('cloud.signOut')}
-          </button>
+          {/* Account management */}
+          <div className="cloud-account-actions">
+            <button
+              className="btn-cloud-signout"
+              onClick={onSignOut}
+              disabled={authState.loading}
+            >
+              {t('cloud.signOut')}
+            </button>
 
-          {/* Delete account */}
-          <button
-            className="btn-cloud-delete"
-            onClick={() => setShowDeleteConfirm(true)}
-            disabled={authState.loading}
-          >
-            <Trash2 size={16} />
-            {t('cloud.deleteAccount')}
-          </button>
+            <button
+              className="btn-cloud-delete"
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={authState.loading}
+            >
+              <Trash2 size={16} />
+              {t('cloud.deleteAccount')}
+            </button>
+          </div>
 
           {/* Delete confirmation modal */}
           {showDeleteConfirm && createPortal(
@@ -170,15 +171,15 @@ export function CloudSyncPanel({
             </p>
             <ul className="cloud-benefits">
               <li>
-                <Cloud className="icon-check" />
+                <RefreshCw className="icon-check" />
                 <span>{t('cloud.autoBackup')}</span>
               </li>
               <li>
-                <Cloud className="icon-check" />
+                <Smartphone className="icon-check" />
                 <span>{t('cloud.multiDevice')}</span>
               </li>
               <li>
-                <Cloud className="icon-check" />
+                <Check className="icon-check" />
                 <span>{t('cloud.neverLose')}</span>
               </li>
             </ul>

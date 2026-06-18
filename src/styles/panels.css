@@ -264,59 +264,62 @@ body.exercise-panel-active::before {
 
 /* ── CloudSyncPanel: Main panel styles ────────────────────────────────── */
 
+/* Layout-only — the enclosing .glass-premium section already provides the
+   card surface, so the panel itself should not draw a second card. */
 .cloud-sync-panel {
-  background: var(--surface-card);
-  border-radius: 24px;
-  padding: 28px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 4px;
 }
 
 .cloud-sync-header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
 .cloud-sync-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, hsl(220, 90%, 60%), hsl(260, 90%, 65%));
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+  box-shadow: var(--glow-accent);
+}
+
+.cloud-sync-icon:has(.disconnected) {
+  background: var(--surface-hover);
+  box-shadow: none;
 }
 
 .icon-cloud {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   color: white;
 }
 
 .icon-cloud.disconnected {
-  opacity: 0.6;
+  color: var(--text-secondary);
 }
 
 .cloud-sync-title h3 {
-  font-size: 22px;
+  font-size: 17px;
   font-weight: 700;
-  margin: 0 0 4px 0;
-  background: linear-gradient(135deg, hsl(220, 90%, 60%), hsl(260, 90%, 65%));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  margin: 0 0 2px 0;
+  color: var(--text-primary);
 }
 
 .cloud-sync-subtitle {
   margin: 0;
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-weight: 500;
+}
+
+.cloud-sync-subtitle.connected {
+  color: var(--success);
 }
 
 .cloud-sync-loading {
@@ -325,7 +328,7 @@ body.exercise-panel-active::before {
   justify-content: center;
   gap: 12px;
   padding: 40px 20px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .cloud-sync-content {
@@ -337,11 +340,11 @@ body.exercise-panel-active::before {
 .cloud-user-info {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 14px;
+  padding: 14px;
+  background: var(--surface-muted);
+  border-radius: 14px;
+  border: 1px solid var(--border-default);
   flex-wrap: wrap;
 }
 
@@ -377,7 +380,7 @@ body.exercise-panel-active::before {
 .user-email {
   margin: 0;
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -414,7 +417,7 @@ body.exercise-panel-active::before {
 .conflict-message {
   margin: 0 0 20px 0;
   font-size: 14px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.6;
 }
 
@@ -491,24 +494,32 @@ body.exercise-panel-active::before {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Account management actions, grouped and separated from the sync status. */
+.cloud-account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
 .btn-cloud-signout {
   width: 100%;
-  padding: 14px 20px;
-  border: 1px solid rgba(255, 87, 87, 0.3);
+  padding: 13px 20px;
+  border: 1px solid var(--border-default);
   border-radius: 12px;
-  background: rgba(255, 87, 87, 0.1);
-  color: hsl(0, 84%, 70%);
+  background: var(--surface-muted);
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 600;
   font-family: var(--font-primary);
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-cloud-signout:hover:not(:disabled) {
-  background: rgba(255, 87, 87, 0.2);
-  border-color: rgba(255, 87, 87, 0.5);
-  transform: translateY(-2px);
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
 }
 
 .btn-cloud-signout:disabled {
@@ -519,7 +530,7 @@ body.exercise-panel-active::before {
 .cloud-promo { text-align: center; }
 
 .cloud-promo-text {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
   margin: 0 0 24px 0;
@@ -528,22 +539,35 @@ body.exercise-panel-active::before {
 .cloud-benefits {
   list-style: none;
   padding: 0;
-  margin: 0 0 28px 0;
+  margin: 0 0 24px 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  text-align: left;
 }
 
 .cloud-benefits li {
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 12px 14px;
   font-size: 14px;
   color: var(--text-primary);
   font-weight: 500;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
 }
 
-.icon-check { width: 20px; height: 20px; color: hsl(220, 90%, 60%); flex-shrink: 0; }
+.icon-check {
+  width: 34px;
+  height: 34px;
+  padding: 7px;
+  flex-shrink: 0;
+  color: var(--accent);
+  background: var(--surface-hover);
+  border-radius: 10px;
+}
 
 .btn-cloud-signin {
   width: 100%;

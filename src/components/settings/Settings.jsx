@@ -6,7 +6,6 @@ import { Button, IconButton } from '../ui';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { StoreView } from './StoreView';
 import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection } from './SettingsSections';
-import { sectionTitleStyle } from './settingsStyles';
 import { DifficultySettings } from './DifficultySettings';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettingsStore } from '../../store/useSettingsStore';
@@ -115,7 +114,6 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                 marginBottom: 'var(--spacing-md)',
                                 background: 'var(--surface-section)'
                             }}>
-                                <h3 style={sectionTitleStyle}>{t('settings.dataCloud')}</h3>
                                 <CloudSyncPanel
                                     authState={cloudAuth}
                                     onSignIn={() => cloudAuth.signIn()}
