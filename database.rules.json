@@ -24,6 +24,7 @@
     },
     "clans": {
       ".read": "auth != null",
+      ".indexOn": ["code"],
       "$clanId": {
         ".write": "auth != null && (!data.exists() || (!newData.exists() && !data.child('members').exists()))",
         "members": {

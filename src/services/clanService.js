@@ -1,4 +1,4 @@
-import { ref, set, get, remove, push, onValue, serverTimestamp, runTransaction } from 'firebase/database';
+import { ref, set, get, remove, push, onValue, serverTimestamp, runTransaction, query, orderByChild, equalTo, limitToFirst } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
 import i18n from '../i18n';
@@ -39,14 +39,13 @@ export async function joinClan(code) {
     const uid = auth.currentUser.uid;
     const cleanCode = code.toUpperCase().trim();
 
-    const snapshot = await get(ref(database, 'clans'));
+    const clansRef = ref(database, 'clans');
+    const q = query(clansRef, orderByChild('code'), equalTo(cleanCode), limitToFirst(1));
+    const snapshot = await get(q);
     if (!snapshot.exists()) return { success: false, error: i18n.t('clan.invalidCode') };
 
     const clans = snapshot.val();
-    let foundClanId = null;
-    for (const [id, clan] of Object.entries(clans)) {
-      if (clan.code === cleanCode) { foundClanId = id; break; }
-    }
+    const foundClanId = Object.keys(clans)[0];
     if (!foundClanId) return { success: false, error: i18n.t('clan.invalidCode') };
 
     const userClanSnapshot = await get(ref(database, `users/${uid}/clans/${foundClanId}`));
