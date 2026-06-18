@@ -36,7 +36,7 @@ export {
   X, Check, CheckCheck, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Plus, Minus,
   Play, Pause, RotateCcw, Save, Trash2, Edit2, Code,
   FolderOpen, FolderPlus, GripVertical, Shuffle, ArrowLeft, ArrowRight,
-  Trophy, Medal, User, Award, Star, Crown,
+  Trophy, Medal, Award, Star, Crown,
   Users, LogIn, UserPlus, Shield, ShieldAlert, HeartHandshake,
   LogOut, Hash, Swords,
   Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,

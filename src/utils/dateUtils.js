@@ -6,14 +6,37 @@
 export const MAX_STREAK_WINDOW = 365;
 
 /**
+ * Safely parse a date string in YYYY-MM-DD format as local midnight.
+ * If given a Date object, numeric timestamp, or falsy value, behaves robustly.
+ * @param {any} dateStr
+ * @returns {Date}
+ */
+export function parseLocalDate(dateStr) {
+    if (!dateStr) return new Date();
+    if (dateStr instanceof Date) return new Date(dateStr);
+    if (typeof dateStr === 'number') return new Date(dateStr);
+    if (typeof dateStr !== 'string') return new Date(dateStr);
+
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // 0-indexed
+        const day = parseInt(parts[2], 10);
+        return new Date(year, month, day, 0, 0, 0, 0);
+    }
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? new Date() : d;
+}
+
+/**
  * Compute the current ISO week number relative to the challenge start date.
  * Week 1 = the first Monday-Sunday period that includes or follows startDate.
  */
 export function getCurrentWeekNumber(startDate, targetDate = new Date()) {
     if (!startDate) return 1;
-    const start = new Date(startDate);
+    const start = parseLocalDate(startDate);
     start.setHours(0, 0, 0, 0);
-    const target = new Date(targetDate);
+    const target = parseLocalDate(targetDate);
     target.setHours(0, 0, 0, 0);
     const diffMs = target.getTime() - start.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -24,7 +47,7 @@ export function getCurrentWeekNumber(startDate, targetDate = new Date()) {
  * Returns the ISO week boundaries (Monday 00:00 → Sunday 23:59) for a given date.
  */
 export function getWeekBounds(date = new Date()) {
-    const d = new Date(date);
+    const d = parseLocalDate(date);
     const day = d.getDay();
     const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
     const monday = new Date(d.getFullYear(), d.getMonth(), diff);
@@ -41,9 +64,10 @@ export function getWeekBounds(date = new Date()) {
  * @returns {string}
  */
 export function getLocalDateStr(d) {
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
+    const dObj = parseLocalDate(d);
+    const year = dObj.getFullYear();
+    const month = String(dObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dObj.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
 
@@ -56,7 +80,7 @@ export function getLocalDateStr(d) {
  */
 export function calculateStreak(completions, todayStr) {
     let streak = 0;
-    const todayDate = new Date(todayStr);
+    const todayDate = parseLocalDate(todayStr);
     for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const checkDate = new Date(todayDate);
         checkDate.setDate(checkDate.getDate() - i);
@@ -80,7 +104,7 @@ export function calculateStreak(completions, todayStr) {
  */
 export function calculateExerciseStreak(completions, todayStr, exerciseId) {
     let streak = 0;
-    const todayDate = new Date(todayStr);
+    const todayDate = parseLocalDate(todayStr);
     for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const checkDate = new Date(todayDate);
         checkDate.setDate(checkDate.getDate() - i);
@@ -110,9 +134,9 @@ export function isDayDoneFromCompletions(completions, dateStr) {
 
     // 2. Week-wide completion for Cardio
     // If running or cycling was completed anytime between last Monday and dateStr, this day is "done"
-    const { start } = getWeekBounds(new Date(dateStr));
+    const { start } = getWeekBounds(parseLocalDate(dateStr));
     const monday = new Date(start);
-    const current = new Date(dateStr);
+    const current = parseLocalDate(dateStr);
     
     // Check each day from Monday to current
     let loop = new Date(monday);

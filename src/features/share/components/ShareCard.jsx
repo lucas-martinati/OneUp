@@ -9,7 +9,7 @@ import { sumExerciseReps } from '../../../utils/stats';
 import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../../../config/categories';
 import { EXERCISES, CARDIO_EXERCISES, getDailyGoal } from '../../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../../config/weights';
-import { formatDuration, getLocalDateStr, getCurrentWeekNumber } from '../../../utils/dateUtils';
+import { formatDuration, getLocalDateStr, getCurrentWeekNumber, parseLocalDate } from '../../../utils/dateUtils';
 import { useExerciseConfig } from '../../../hooks/useExerciseConfig';
 import { DifficultyBadge } from '../../../components/ui/DifficultyBadge';
 import { useExercises } from '../../../contexts/ExercisesContext';
@@ -17,7 +17,7 @@ import { THEMES as GLOBAL_THEMES } from '../../../config/themes';
 
 function formatDate(dateStr, lang) {
   try {
-    const d = new Date(dateStr);
+    const d = parseLocalDate(dateStr);
     return d.toLocaleDateString(lang || undefined, { weekday: 'short', day: 'numeric', month: 'short' });
   } catch {
     return '';
@@ -239,12 +239,12 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
         let weekDate = null;
         
         // Look back until previous Monday to find if done in CURRENT week
-        const targetD = new Date(targetDate);
+        const targetD = parseLocalDate(targetDate);
         const dayOfWeek = targetD.getDay(); // 0 is Sunday
         const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
         
         for (let i = 0; i <= daysSinceMonday; i++) {
-          const checkDate = new Date(targetDate);
+          const checkDate = parseLocalDate(targetDate);
           checkDate.setDate(checkDate.getDate() - i);
           const dateStr = getLocalDateStr(checkDate);
           if (completions[dateStr]?.[cardio.id]?.isCompleted) {
@@ -256,7 +256,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
         
         if (isDoneInWeek) {
           const conf = getConfig(cardio.id, weekDate);
-          const weekNum = getCurrentWeekNumber(settings?.startDate || stats?.firstActiveDate, new Date(targetDate));
+          const weekNum = getCurrentWeekNumber(settings?.startDate || stats?.firstActiveDate, parseLocalDate(targetDate));
           dailyExercises.push({
             ...cardio,
             reps: getDailyGoal(cardio, weekNum, conf.difficulty, true),

@@ -10,6 +10,7 @@ import {
   getCurrentWeekNumber,
   getWeekBounds,
   parseTimestamp,
+  parseLocalDate,
   MAX_STREAK_WINDOW,
 } from '../dateUtils';
 
@@ -306,5 +307,38 @@ describe('parseTimestamp', () => {
   it('falls back to a valid date for unparseable input', () => {
     const d = parseTimestamp('definitely-not-a-date');
     expect(Number.isNaN(d.getTime())).toBe(false);
+  });
+});
+
+// ── parseLocalDate ───────────────────────────────────────────────────────
+
+describe('parseLocalDate', () => {
+  it('parses YYYY-MM-DD string to a Date object at local midnight', () => {
+    const d = parseLocalDate('2026-06-18');
+    expect(d.getFullYear()).toBe(2026);
+    expect(d.getMonth()).toBe(5); // June is 5
+    expect(d.getDate()).toBe(18);
+    expect(d.getHours()).toBe(0);
+    expect(d.getMinutes()).toBe(0);
+    expect(d.getSeconds()).toBe(0);
+    expect(d.getMilliseconds()).toBe(0);
+  });
+
+  it('handles Date objects', () => {
+    const input = new Date(2026, 5, 18);
+    const d = parseLocalDate(input);
+    expect(d.getTime()).toBe(input.getTime());
+  });
+
+  it('handles timestamps', () => {
+    const input = 1700000000000;
+    const d = parseLocalDate(input);
+    expect(d.getTime()).toBe(input);
+  });
+
+  it('returns valid date for falsy / invalid values', () => {
+    expect(parseLocalDate(null)).toBeInstanceOf(Date);
+    expect(parseLocalDate(undefined)).toBeInstanceOf(Date);
+    expect(parseLocalDate('invalid-string')).toBeInstanceOf(Date);
   });
 });

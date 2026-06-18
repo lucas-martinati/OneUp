@@ -3,7 +3,7 @@ import { Preferences } from '@capacitor/preferences';
 import { serverTimestamp } from '../utils/firebaseTimestamp';
 import { EXERCISES, getDailyGoal } from '../config/exercises';
 import { createLogger } from '../utils/logger';
-import { getLocalDateStr } from '../utils/dateUtils';
+import { getLocalDateStr, parseLocalDate } from '../utils/dateUtils';
 import { STORAGE_KEY_BASE, getDefaultState, parseProgressData, validateProgressData } from '../hooks/useProgressStorage';
 import { cloudSync } from '../services/cloudSync';
 
@@ -281,8 +281,8 @@ export const useProgressStore = create((set, get) => ({
   getDayNumber: (dateStr) => {
     const { startDate } = get();
     if (!startDate) return 0;
-    const start = new Date(startDate);
-    const current = new Date(dateStr);
+    const start = parseLocalDate(startDate);
+    const current = parseLocalDate(dateStr);
 
     const utcStart = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
     const utcCurrent = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
@@ -298,13 +298,13 @@ export const useProgressStore = create((set, get) => ({
     const state = get();
     const exercise = EXERCISES.find(e => e.id === exerciseId);
     if (!exercise || !state.startDate) return 0;
-    const start = new Date(state.startDate);
+    const start = parseLocalDate(state.startDate);
     const utcStart = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
     return Object.keys(state.completions).reduce((total, dateStr) => {
       if (dateStr < state.startDate) return total;
       const ex = state.completions[dateStr]?.[exerciseId];
       if (!ex?.isCompleted) return total;
-      const current = new Date(dateStr);
+      const current = parseLocalDate(dateStr);
       const utcCurrent = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
       const dayNum = Math.floor((utcCurrent - utcStart) / (1000 * 60 * 60 * 24)) + 1;
       return total + getDailyGoal(exercise, dayNum, difficultyMultiplier);
