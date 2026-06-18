@@ -38,8 +38,10 @@ function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
   );
 }
 
-import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../../../config/categories';
+import { buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../../../config/categories';
 import { useExercises } from '../../../contexts/ExercisesContext';
+import { THEMES as GLOBAL_THEMES } from '../../../config/themes';
+import { ThemeSwatch } from '../../../components/ui/ThemeSwatch';
 
 export function ShareOptions({ options, toggleOption, setOption, toggleCategory, clearBackgroundImage, originalImage, openCropModal, mode = 'session', isPro = false, sessionData }) {
   const { t } = useTranslation();
@@ -244,35 +246,15 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
             {t('share.theme')}
           </div>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {[
-              { key: 'dark', color: '#0f0f1a', accent: '#818cf8' },
-              { key: 'ocean', color: '#0a1628', accent: '#06b6d4' },
-              { key: 'sunset', color: '#1a0a0a', accent: '#f97316' },
-              { key: 'forest', color: '#0a1a0f', accent: '#22c55e' },
-              { key: 'purple', color: '#120a1a', accent: '#a855f7' },
-            ].map(theme => {
-              const isSelected = options.theme === theme.key;
-              return (
-                <button
-                  key={theme.key}
-                  onClick={() => setOption('theme', theme.key)}
-                  style={{
-                    width: '36px', height: '36px', borderRadius: '10px',
-                    border: isSelected ? `2px solid ${theme.accent}` : '2px solid rgba(255,255,255,0.1)',
-                    background: theme.color,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                  title={t(`share.theme.${theme.key}`, theme.key)}
-                >
-                  <div style={{
-                    width: '14px', height: '14px', borderRadius: '50%',
-                    background: theme.accent,
-                  }} />
-                </button>
-              );
-            })}
+            {GLOBAL_THEMES.map(theme => (
+              <ThemeSwatch
+                key={theme.key}
+                theme={theme}
+                isSelected={options.theme === theme.key}
+                onClick={() => setOption('theme', theme.key)}
+                title={t(`share.theme.${theme.key}`, theme.key)}
+              />
+            ))}
           </div>
         </>
       )}

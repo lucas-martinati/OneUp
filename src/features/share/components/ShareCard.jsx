@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
-  getIcon, EXERCISE_ICONS, UI_ICONS, SOCIAL_ICONS, SHARE_ICONS,
-  Clock, Target, Award, Flame 
+  getIcon, EXERCISE_ICONS, SOCIAL_ICONS, SHARE_ICONS,
+  Clock, Award, Flame 
 } from '../../../utils/icons';
 import { getExerciseLabel, getExerciseColor, isCustomExercise } from '../../../utils/exerciseLabel';
 import { sumExerciseReps } from '../../../utils/stats';
@@ -13,6 +13,7 @@ import { formatDuration, getLocalDateStr, getCurrentWeekNumber } from '../../../
 import { useExerciseConfig } from '../../../hooks/useExerciseConfig';
 import { DifficultyBadge } from '../../../components/ui/DifficultyBadge';
 import { useExercises } from '../../../contexts/ExercisesContext';
+import { THEMES as GLOBAL_THEMES } from '../../../config/themes';
 
 function formatDate(dateStr, lang) {
   try {
@@ -142,6 +143,48 @@ function ExerciseList({ exercises, t }) {
   );
 }
 
+function darkenHex(hex, factor) {
+  if (!hex || !hex.startsWith('#')) return hex;
+  let color = hex.replace('#', '');
+  if (color.length === 3) color = color.split('').map(c => c + c).join('');
+  let r = parseInt(color.substring(0, 2), 16);
+  let g = parseInt(color.substring(2, 4), 16);
+  let b = parseInt(color.substring(4, 6), 16);
+  r = Math.floor(r * factor);
+  g = Math.floor(g * factor);
+  b = Math.floor(b * factor);
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+function hexToRgba(hex, alpha) {
+  if (!hex || !hex.startsWith('#')) return hex;
+  let color = hex.replace('#', '');
+  if (color.length === 3) color = color.split('').map(c => c + c).join('');
+  let r = parseInt(color.substring(0, 2), 16);
+  let g = parseInt(color.substring(2, 4), 16);
+  let b = parseInt(color.substring(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+const THEMES = {};
+GLOBAL_THEMES.forEach(t => {
+  THEMES[t.key] = {
+    bg: `linear-gradient(165deg, ${t.color} 0%, ${darkenHex(t.color, 0.6)} 40%, ${darkenHex(t.color, 0.8)} 100%)`,
+    accent: t.accent,
+    glow1: hexToRgba(t.accent, 0.15),
+    glow2: hexToRgba(t.accent2 || t.accent, 0.1),
+    streakGlow: hexToRgba(t.accent, 0.18)
+  };
+});
+// Add gold theme for perfect days
+THEMES.gold = { 
+  bg: 'linear-gradient(165deg, #1a1305 0%, #171104 40%, #1f1b0a 100%)', 
+  accent: '#fbbf24', 
+  glow1: 'rgba(251,191,36,0.15)', 
+  glow2: 'rgba(245,158,11,0.1)', 
+  streakGlow: 'rgba(251,191,36,0.18)' 
+};
+
 /**
  * ShareCard - Visual card rendered for export.
  * Supports two modes:
@@ -163,15 +206,6 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
     difficulty: ex.difficulty || (getConfig ? getConfig(ex.id, sessionData?.date).difficulty : 1.0)
   }));
   const sessionType = sessionData?.type || CATEGORIES.BODYWEIGHT;
-
-  const THEMES = {
-    dark: { bg: 'linear-gradient(165deg, #0f0f1a 0%, #0a0a14 40%, #0d0d18 100%)', accent: '#818cf8', glow1: 'rgba(129,140,248,0.15)', glow2: 'rgba(139,92,246,0.1)', streakGlow: 'rgba(249,115,22,0.18)' },
-    ocean: { bg: 'linear-gradient(165deg, #0a1628 0%, #061018 40%, #081420 100%)', accent: '#06b6d4', glow1: 'rgba(6,182,212,0.15)', glow2: 'rgba(14,116,144,0.1)', streakGlow: 'rgba(34,211,238,0.18)' },
-    sunset: { bg: 'linear-gradient(165deg, #1a0a0a 0%, #0f0505 40%, #150808 100%)', accent: '#f97316', glow1: 'rgba(249,115,22,0.15)', glow2: 'rgba(220,38,38,0.1)', streakGlow: 'rgba(249,115,22,0.2)' },
-    forest: { bg: 'linear-gradient(165deg, #0a1a0f 0%, #050d07 40%, #081209 100%)', accent: '#22c55e', glow1: 'rgba(34,197,94,0.15)', glow2: 'rgba(20,83,45,0.1)', streakGlow: 'rgba(74,222,128,0.18)' },
-    purple: { bg: 'linear-gradient(165deg, #120a1a 0%, #0a0610 40%, #0f0814 100%)', accent: '#a855f7', glow1: 'rgba(168,85,247,0.15)', glow2: 'rgba(126,34,206,0.1)', streakGlow: 'rgba(192,132,252,0.18)' },
-    gold: { bg: 'linear-gradient(165deg, #1a1305 0%, #171104 40%, #1f1b0a 100%)', accent: '#fbbf24', glow1: 'rgba(251,191,36,0.15)', glow2: 'rgba(245,158,11,0.1)', streakGlow: 'rgba(251,191,36,0.18)' },
-  };
 
   let activeThemeKey = options.theme || 'dark';
   let dailyExercises = [];
