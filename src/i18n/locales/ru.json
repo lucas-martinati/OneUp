@@ -191,7 +191,6 @@
     "filterLocked": "Закрытые"
   },
   "announcement": {
-    "_comment": "⚠️ Bloc temporaire, réécrit À CHAQUE nouvelle annonce. Les clés (title, body, cta, highlights.*) sont à PLAT et remplacent entièrement celles de l'annonce précédente : pas de sous-objet par annonce. Voir src/features/announcements/announcementConfig.js.",
     "badge": "Новинка",
     "title": "Совершенно новый интерфейс ✨",
     "body": "OneUp обновился! Всё приложение переработано ради более плавного, целостного и приятного ежедневного опыта.",
@@ -303,7 +302,6 @@
     "missingId": "Отсутствует ID клана",
     "nameRequired": "Название клана обязательно",
     "pseudoRequired": "Имя обязательно",
-    "signIn": "Войти",
     "signInRequired": "Войдите через Google, чтобы создать или вступить в клан!",
     "title": "Клан",
     "yourClans": "Ваши кланы ({{count}})",
@@ -583,8 +581,12 @@
     "showWeights": "Разделить по категориям",
     "takePhoto": "Сделать фото",
     "theme": "Тема",
+    "theme.aurora": "Аврора",
+    "theme.cosmic": "Космос",
     "theme.dark": "Тёмная",
+    "theme.flamingo": "Фламинго",
     "theme.forest": "Лес",
+    "theme.lagoon": "Лагуна",
     "theme.ocean": "Океан",
     "theme.purple": "Фиолетовый",
     "theme.sunset": "Закат",

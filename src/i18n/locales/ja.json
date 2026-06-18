@@ -191,7 +191,6 @@
     "filterLocked": "未解除"
   },
   "announcement": {
-    "_comment": "⚠️ Bloc temporaire, réécrit À CHAQUE nouvelle annonce. Les clés (title, body, cta, highlights.*) sont à PLAT et remplacent entièrement celles de l'annonce précédente : pas de sous-objet par annonce. Voir src/features/announcements/announcementConfig.js.",
     "badge": "新しい",
     "title": "まったく新しいインターフェース ✨",
     "body": "OneUp が生まれ変わりました！アプリ全体を見直し、より滑らかで一貫性のある、毎日が心地よい体験に仕上げました。",
@@ -303,7 +302,6 @@
     "missingId": "クランIDがありません",
     "nameRequired": "クラン名は必須です",
     "pseudoRequired": "名前は必須です",
-    "signIn": "サインイン",
     "signInRequired": "クランを作成または参加するには、Google にサインインしてください。",
     "title": "クラン",
     "yourClans": "あなたのクラン ({{count}})",
@@ -583,8 +581,12 @@
     "showWeights": "カテゴリごとに分ける",
     "takePhoto": "写真を撮る",
     "theme": "テーマ",
+    "theme.aurora": "オーロラ",
+    "theme.cosmic": "コスミック",
     "theme.dark": "暗い",
+    "theme.flamingo": "フラミンゴ",
     "theme.forest": "森",
+    "theme.lagoon": "ラグーン",
     "theme.ocean": "海",
     "theme.purple": "紫",
     "theme.sunset": "日没",

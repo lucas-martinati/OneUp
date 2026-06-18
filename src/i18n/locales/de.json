@@ -191,7 +191,6 @@
     "filterLocked": "Gesperrt"
   },
   "announcement": {
-    "_comment": "⚠️ Bloc temporaire, réécrit À CHAQUE nouvelle annonce. Les clés (title, body, cta, highlights.*) sont à PLAT et remplacent entièrement celles de l'annonce précédente : pas de sous-objet par annonce. Voir src/features/announcements/announcementConfig.js.",
     "badge": "Neu",
     "title": "Ein ganz neues Design ✨",
     "body": "OneUp im neuen Look! Die gesamte App wurde überarbeitet – für ein flüssigeres, einheitlicheres und angenehmeres Erlebnis im Alltag.",
@@ -303,7 +302,6 @@
     "missingId": "Fehlende Clan-ID",
     "nameRequired": "Clanname ist erforderlich",
     "pseudoRequired": "Ein Name ist erforderlich",
-    "signIn": "Anmelden",
     "signInRequired": "Melden Sie sich bei Google an, um einen Clan zu gründen oder einem beizutreten!",
     "title": "Clan",
     "yourClans": "Deine Clans ({{count}})",
@@ -583,8 +581,12 @@
     "showWeights": "Nach Kategorie getrennt",
     "takePhoto": "Machen Sie ein Foto",
     "theme": "Thema",
+    "theme.aurora": "Aurora",
+    "theme.cosmic": "Kosmisch",
     "theme.dark": "Dunkel",
+    "theme.flamingo": "Flamingo",
     "theme.forest": "Wald",
+    "theme.lagoon": "Lagune",
     "theme.ocean": "Ozean",
     "theme.purple": "Lila",
     "theme.sunset": "Sonnenuntergang",

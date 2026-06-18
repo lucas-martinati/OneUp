@@ -2,7 +2,9 @@ import { useTranslation } from 'react-i18next';
 import { Bell, Volume2, Clock, Users, Lock, Gauge, Globe, Smartphone } from '../../utils/icons';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { SettingRow } from '../ui/SettingRow';
+import { ThemeSwatch } from '../ui';
 import { LANGUAGES } from '../../config/languages';
+import { THEMES } from '../../config/themes';
 import { sectionTitleStyle } from './settingsStyles';
 
 const sectionCardStyle = {
@@ -306,36 +308,15 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
                 {t('settings.appTheme')} {!isPro && <Lock size={14} color="var(--accent)" style={{ marginLeft: 'auto', opacity: 0.8 }} />}
             </h3>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px', opacity: isPro ? 1 : 0.6, pointerEvents: isPro ? 'auto' : 'none' }}>
-                {[
-                    { key: 'dark', color: '#0f0f1a', accent: '#818cf8' },
-                    { key: 'ocean', color: '#0a1628', accent: '#06b6d4' },
-                    { key: 'sunset', color: '#1a0a0a', accent: '#f97316' },
-                    { key: 'forest', color: '#0a1a0f', accent: '#22c55e' },
-                    { key: 'purple', color: '#120a1a', accent: '#a855f7' }
-                ].map(theme => {
-                    const isSelected = (settings.appTheme || 'dark') === theme.key;
-                    return (
-                        <button
-                            key={theme.key}
-                            onClick={() => updateSettings(prev => ({ ...prev, appTheme: theme.key }))}
-                            style={{
-                                width: '42px', height: '42px', borderRadius: '12px',
-                                border: isSelected ? `2px solid ${theme.accent}` : '2px solid rgba(255,255,255,0.1)',
-                                background: theme.color,
-                                cursor: 'pointer',
-                                transition: 'all 0.15s ease',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}
-                            title={t(`share.theme.${theme.key}`)}
-                        >
-                            <div style={{
-                                width: '16px', height: '16px', borderRadius: '50%',
-                                background: theme.accent,
-                                boxShadow: isSelected ? `0 0 8px ${theme.accent}66` : 'none'
-                            }} />
-                        </button>
-                    );
-                })}
+                {THEMES.map(theme => (
+                    <ThemeSwatch
+                        key={theme.key}
+                        theme={theme}
+                        isSelected={(settings.appTheme || 'dark') === theme.key}
+                        onClick={() => updateSettings(prev => ({ ...prev, appTheme: theme.key }))}
+                        title={t(`share.theme.${theme.key}`)}
+                    />
+                ))}
             </div>
             {!isPro && (
                 <div

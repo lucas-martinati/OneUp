@@ -191,7 +191,6 @@
     "filterLocked": "미획득"
   },
   "announcement": {
-    "_comment": "⚠️ Bloc temporaire, réécrit À CHAQUE nouvelle annonce. Les clés (title, body, cta, highlights.*) sont à PLAT et remplacent entièrement celles de l'annonce précédente : pas de sous-objet par annonce. Voir src/features/announcements/announcementConfig.js.",
     "badge": "새로운",
     "title": "완전히 새로워진 인터페이스 ✨",
     "body": "OneUp가 새 단장을 했어요! 더 부드럽고 일관되며 매일 사용하기 즐거운 경험을 위해 앱 전체를 새롭게 디자인했습니다.",
@@ -303,7 +302,6 @@
     "missingId": "클랜 ID가 누락되었습니다.",
     "nameRequired": "클랜 이름은 필수 항목입니다.",
     "pseudoRequired": "이름은 필수 항목입니다.",
-    "signIn": "로그인",
     "signInRequired": "클랜을 만들거나 가입하려면 Google에 로그인하세요!",
     "title": "씨족",
     "yourClans": "귀하의 클랜({{count}})",
@@ -583,8 +581,12 @@
     "showWeights": "카테고리별로 구분",
     "takePhoto": "사진 찍기",
     "theme": "주제",
+    "theme.aurora": "오로라",
+    "theme.cosmic": "우주",
     "theme.dark": "어두운",
+    "theme.flamingo": "플라밍고",
     "theme.forest": "숲",
+    "theme.lagoon": "라군",
     "theme.ocean": "대양",
     "theme.purple": "보라",
     "theme.sunset": "일몰",

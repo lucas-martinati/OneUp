@@ -191,7 +191,6 @@
     "filterLocked": "未解锁"
   },
   "announcement": {
-    "_comment": "⚠️ Bloc temporaire, réécrit À CHAQUE nouvelle annonce. Les clés (title, body, cta, highlights.*) sont à PLAT et remplacent entièrement celles de l'annonce précédente : pas de sous-objet par annonce. Voir src/features/announcements/announcementConfig.js.",
     "badge": "新功能",
     "title": "全新的界面 ✨",
     "body": "OneUp 焕然一新！整个应用都经过重新设计，带来更流畅、更统一、更舒适的日常体验。",
@@ -303,7 +302,6 @@
     "missingId": "缺少公会ID",
     "nameRequired": "需要部落名称",
     "pseudoRequired": "需要一个名字",
-    "signIn": "登录",
     "signInRequired": "用Google登录以创建或加入部落！",
     "title": "部落",
     "yourClans": "你的部落 ({{count}})",
@@ -583,8 +581,12 @@
     "showWeights": "按类别分开",
     "takePhoto": "拍摄照片",
     "theme": "主题",
+    "theme.aurora": "极光",
+    "theme.cosmic": "宇宙",
     "theme.dark": "深色",
+    "theme.flamingo": "火烈鸟",
     "theme.forest": "森林",
+    "theme.lagoon": "泻湖",
     "theme.ocean": "海洋",
     "theme.purple": "紫色",
     "theme.sunset": "日落",

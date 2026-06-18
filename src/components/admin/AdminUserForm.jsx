@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Sparkles, Heart, Save, Calendar, Loader2, Crown, Copy, Check, Activity, Award, Clock, Dumbbell, RotateCcw, Trash2, AlertTriangle, Trophy, Bell, Volume2, Palette } from '../../utils/icons';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { SettingRow } from '../ui/SettingRow';
+import { ThemeSwatch } from '../ui';
+import { THEMES } from '../../config/themes';
 
 const sectionTitleStyle = {
   marginBottom: 'var(--spacing-md)', fontSize: '0.85rem', fontWeight: '700',
@@ -29,14 +31,7 @@ const timeInputStyle = {
   color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: '700', outline: 'none', boxSizing: 'border-box'
 };
 
-// Mirror of the theme swatches shown in the user-facing settings screen.
-const THEME_SWATCHES = [
-  { key: 'dark', color: '#0f0f1a', accent: '#818cf8' },
-  { key: 'ocean', color: '#0a1628', accent: '#06b6d4' },
-  { key: 'sunset', color: '#1a0a0a', accent: '#f97316' },
-  { key: 'forest', color: '#0a1a0f', accent: '#22c55e' },
-  { key: 'purple', color: '#120a1a', accent: '#a855f7' },
-];
+
 
 function clampInt(value, min, max) {
   const n = parseInt(value, 10);
@@ -278,28 +273,15 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
             <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>Thème de l'application</span>
           </div>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {THEME_SWATCHES.map(theme => {
-              const isSelected = (formState.appTheme || 'dark') === theme.key;
-              return (
-                <button
-                  key={theme.key}
-                  onClick={() => setFormState(prev => ({ ...prev, appTheme: theme.key }))}
-                  title={theme.key}
-                  style={{
-                    width: '42px', height: '42px', borderRadius: '12px',
-                    border: isSelected ? `2px solid ${theme.accent}` : '2px solid rgba(255,255,255,0.1)',
-                    background: theme.color, cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                  }}
-                >
-                  <div style={{
-                    width: '16px', height: '16px', borderRadius: '50%',
-                    background: theme.accent,
-                    boxShadow: isSelected ? `0 0 8px ${theme.accent}66` : 'none'
-                  }} />
-                </button>
-              );
-            })}
+            {THEMES.map(theme => (
+              <ThemeSwatch
+                key={theme.key}
+                theme={theme}
+                isSelected={(formState.appTheme || 'dark') === theme.key}
+                onClick={() => setFormState(prev => ({ ...prev, appTheme: theme.key }))}
+                title={theme.key}
+              />
+            ))}
           </div>
         </div>
       </div>

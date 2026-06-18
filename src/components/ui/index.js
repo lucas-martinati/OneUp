@@ -13,4 +13,5 @@ export { Spinner } from './Spinner';
 export { Stack } from './Stack';
 export { StreakFlame } from './StreakFlame';
 export { ToggleSwitch } from './ToggleSwitch';
+export { ThemeSwatch } from './ThemeSwatch';
 export { WeightBadge } from './WeightBadge';

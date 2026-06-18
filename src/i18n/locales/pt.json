@@ -191,7 +191,6 @@
     "filterLocked": "Bloqueados"
   },
   "announcement": {
-    "_comment": "⚠️ Bloc temporaire, réécrit À CHAQUE nouvelle annonce. Les clés (title, body, cta, highlights.*) sont à PLAT et remplacent entièrement celles de l'annonce précédente : pas de sous-objet par annonce. Voir src/features/announcements/announcementConfig.js.",
     "badge": "Novo",
     "title": "Uma interface totalmente nova ✨",
     "body": "O OneUp está com visual novo! Todo o aplicativo foi redesenhado para uma experiência mais fluida, consistente e agradável no dia a dia.",
@@ -303,7 +302,6 @@
     "missingId": "ID do clã ausente",
     "nameRequired": "O nome do clã é obrigatório",
     "pseudoRequired": "É necessário um nome",
-    "signIn": "Entrar",
     "signInRequired": "Faça login no Google para criar ou ingressar em um clã!",
     "title": "Clã",
     "yourClans": "Seus clãs ({{count}})",
@@ -583,8 +581,12 @@
     "showWeights": "Separar por categoria",
     "takePhoto": "Tirar foto",
     "theme": "Tema",
+    "theme.aurora": "Aurora",
+    "theme.cosmic": "Cósmico",
     "theme.dark": "Escuro",
+    "theme.flamingo": "Flamingo",
     "theme.forest": "Floresta",
+    "theme.lagoon": "Lagoa",
     "theme.ocean": "Oceano",
     "theme.purple": "Roxo",
     "theme.sunset": "Pôr do sol",

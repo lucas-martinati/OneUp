@@ -205,3 +205,116 @@
   --glow-primary: 0 0 20px rgba(139, 92, 246, 0.4);
   --glow-accent: 0 0 25px rgba(168, 85, 247, 0.5);
 }
+
+/* Dual themes — two distinct accent colors blended through the gradients */
+[data-theme="aurora"] {
+  --body-bg: linear-gradient(180deg, rgb(6, 5, 10) 0%, rgb(3, 3, 6) 100%);
+  --bg-color: rgb(3, 3, 6);
+  --surface-muted: rgba(168, 85, 247, 0.05);
+  --surface-subtle: rgba(168, 85, 247, 0.03);
+  --surface-dim: rgba(168, 85, 247, 0.08);
+  --card-bg: rgba(14, 12, 22, 0.4);
+  --surface-section: linear-gradient(135deg, rgba(20, 16, 30, 0.8), rgba(18, 30, 42, 0.8));
+  --surface-elevated: linear-gradient(135deg, rgba(20, 16, 30, 0.6), rgba(18, 30, 42, 0.6));
+  --sheet-bg: rgba(14, 12, 22, 0.97);
+  --overlay-bg: rgb(7, 6, 12);
+  --border-subtle: rgba(168, 85, 247, 0.05);
+  --border-muted: rgba(168, 85, 247, 0.06);
+  --border-default: rgba(168, 85, 247, 0.1);
+  --border-strong: rgba(168, 85, 247, 0.15);
+  --surface-hover: rgba(168, 85, 247, 0.1);
+
+  --accent: rgb(168, 85, 247);
+  --accent-glow: rgb(34, 211, 238);
+  --body-glow-1: rgba(168, 85, 247, 0.1);
+  --body-glow-2: rgba(34, 211, 238, 0.06);
+  --gradient-primary: linear-gradient(135deg, rgb(168, 85, 247) 0%, rgb(34, 211, 238) 100%);
+  --gradient-accent: linear-gradient(135deg, rgb(192, 132, 252) 0%, rgb(103, 232, 249) 100%);
+  --gradient-glow: linear-gradient(135deg, rgb(168, 85, 247) 0%, rgb(99, 102, 241) 50%, rgb(34, 211, 238) 100%);
+  --glow-primary: 0 0 20px rgba(168, 85, 247, 0.4);
+  --glow-accent: 0 0 25px rgba(34, 211, 238, 0.5);
+}
+
+[data-theme="flamingo"] {
+  --body-bg: linear-gradient(180deg, rgb(10, 5, 7) 0%, rgb(5, 3, 3) 100%);
+  --bg-color: rgb(5, 3, 3);
+  --surface-muted: rgba(236, 72, 153, 0.05);
+  --surface-subtle: rgba(236, 72, 153, 0.03);
+  --surface-dim: rgba(236, 72, 153, 0.08);
+  --card-bg: rgba(20, 12, 15, 0.4);
+  --surface-section: linear-gradient(135deg, rgba(30, 16, 22, 0.8), rgba(40, 26, 18, 0.8));
+  --surface-elevated: linear-gradient(135deg, rgba(30, 16, 22, 0.6), rgba(40, 26, 18, 0.6));
+  --sheet-bg: rgba(20, 12, 15, 0.97);
+  --overlay-bg: rgb(12, 6, 8);
+  --border-subtle: rgba(236, 72, 153, 0.05);
+  --border-muted: rgba(236, 72, 153, 0.06);
+  --border-default: rgba(236, 72, 153, 0.1);
+  --border-strong: rgba(236, 72, 153, 0.15);
+  --surface-hover: rgba(236, 72, 153, 0.1);
+
+  --accent: rgb(236, 72, 153);
+  --accent-glow: rgb(251, 146, 60);
+  --body-glow-1: rgba(236, 72, 153, 0.1);
+  --body-glow-2: rgba(251, 146, 60, 0.06);
+  --gradient-primary: linear-gradient(135deg, rgb(236, 72, 153) 0%, rgb(251, 146, 60) 100%);
+  --gradient-accent: linear-gradient(135deg, rgb(244, 114, 182) 0%, rgb(253, 186, 116) 100%);
+  --gradient-glow: linear-gradient(135deg, rgb(236, 72, 153) 0%, rgb(249, 115, 22) 50%, rgb(251, 146, 60) 100%);
+  --glow-primary: 0 0 20px rgba(236, 72, 153, 0.4);
+  --glow-accent: 0 0 25px rgba(251, 146, 60, 0.5);
+}
+
+[data-theme="cosmic"] {
+  --body-bg: linear-gradient(180deg, rgb(5, 6, 12) 0%, rgb(3, 3, 6) 100%);
+  --bg-color: rgb(3, 3, 6);
+  --surface-muted: rgba(59, 130, 246, 0.05);
+  --surface-subtle: rgba(59, 130, 246, 0.03);
+  --surface-dim: rgba(59, 130, 246, 0.08);
+  --card-bg: rgba(12, 14, 24, 0.4);
+  --surface-section: linear-gradient(135deg, rgba(16, 20, 34, 0.8), rgba(30, 18, 40, 0.8));
+  --surface-elevated: linear-gradient(135deg, rgba(16, 20, 34, 0.6), rgba(30, 18, 40, 0.6));
+  --sheet-bg: rgba(12, 14, 24, 0.97);
+  --overlay-bg: rgb(6, 7, 14);
+  --border-subtle: rgba(59, 130, 246, 0.05);
+  --border-muted: rgba(59, 130, 246, 0.06);
+  --border-default: rgba(59, 130, 246, 0.1);
+  --border-strong: rgba(59, 130, 246, 0.15);
+  --surface-hover: rgba(59, 130, 246, 0.1);
+
+  --accent: rgb(59, 130, 246);
+  --accent-glow: rgb(217, 70, 239);
+  --body-glow-1: rgba(59, 130, 246, 0.1);
+  --body-glow-2: rgba(217, 70, 239, 0.06);
+  --gradient-primary: linear-gradient(135deg, rgb(59, 130, 246) 0%, rgb(217, 70, 239) 100%);
+  --gradient-accent: linear-gradient(135deg, rgb(96, 165, 250) 0%, rgb(232, 121, 249) 100%);
+  --gradient-glow: linear-gradient(135deg, rgb(59, 130, 246) 0%, rgb(139, 92, 246) 50%, rgb(217, 70, 239) 100%);
+  --glow-primary: 0 0 20px rgba(59, 130, 246, 0.4);
+  --glow-accent: 0 0 25px rgba(217, 70, 239, 0.5);
+}
+
+[data-theme="lagoon"] {
+  --body-bg: linear-gradient(180deg, rgb(4, 8, 8) 0%, rgb(2, 4, 5) 100%);
+  --bg-color: rgb(2, 4, 5);
+  --surface-muted: rgba(20, 184, 166, 0.05);
+  --surface-subtle: rgba(20, 184, 166, 0.03);
+  --surface-dim: rgba(20, 184, 166, 0.08);
+  --card-bg: rgba(10, 18, 20, 0.4);
+  --surface-section: linear-gradient(135deg, rgba(14, 26, 28, 0.8), rgba(16, 24, 40, 0.8));
+  --surface-elevated: linear-gradient(135deg, rgba(14, 26, 28, 0.6), rgba(16, 24, 40, 0.6));
+  --sheet-bg: rgba(10, 18, 20, 0.97);
+  --overlay-bg: rgb(5, 10, 11);
+  --border-subtle: rgba(20, 184, 166, 0.05);
+  --border-muted: rgba(20, 184, 166, 0.06);
+  --border-default: rgba(20, 184, 166, 0.1);
+  --border-strong: rgba(20, 184, 166, 0.15);
+  --surface-hover: rgba(20, 184, 166, 0.1);
+
+  --accent: rgb(20, 184, 166);
+  --accent-glow: rgb(59, 130, 246);
+  --body-glow-1: rgba(20, 184, 166, 0.1);
+  --body-glow-2: rgba(59, 130, 246, 0.06);
+  --gradient-primary: linear-gradient(135deg, rgb(20, 184, 166) 0%, rgb(59, 130, 246) 100%);
+  --gradient-accent: linear-gradient(135deg, rgb(45, 212, 191) 0%, rgb(96, 165, 250) 100%);
+  --gradient-glow: linear-gradient(135deg, rgb(20, 184, 166) 0%, rgb(14, 165, 233) 50%, rgb(59, 130, 246) 100%);
+  --glow-primary: 0 0 20px rgba(20, 184, 166, 0.4);
+  --glow-accent: 0 0 25px rgba(59, 130, 246, 0.5);
+}

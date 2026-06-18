@@ -1,5 +1,5 @@
 import { useEffect, Suspense, lazy } from 'react';
-import { PREMIUM_THEMES } from './config/themes';
+import { THEMES } from './config/themes';
 import { LoadingScreen } from './components/core/LoadingScreen';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SubscriptionProvider, useSubscription } from './contexts/SubscriptionContext';
@@ -52,7 +52,7 @@ function AppContent() {
 
   // Reset theme if Pro is lost
   useEffect(() => {
-    if (!isSubscriptionLoading && isPro === false && settings.appTheme && PREMIUM_THEMES.includes(settings.appTheme)) {
+    if (!isSubscriptionLoading && isPro === false && settings.appTheme && THEMES.some(t => t.key === settings.appTheme && t.key !== 'dark')) {
       updateSettings(prev => ({ ...prev, appTheme: 'dark' }));
     }
   }, [isPro, isSubscriptionLoading, settings.appTheme, updateSettings]);
