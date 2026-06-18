@@ -110,7 +110,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
         e.stopPropagation();
         if (nudgedMember === uid) return;
         setNudgedMember(uid);
-        await cloudSync.sendClanNotification(uid, 'nudge', t('common.poke'));
+        await cloudSync.sendPoke(uid, 'nudge', t('common.poke'));
         setTimeout(() => setNudgedMember(null), 2000);
     };
 

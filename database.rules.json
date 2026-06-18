@@ -36,8 +36,15 @@
     "notifications": {
       "$uid": {
         ".read": "auth != null && $uid === auth.uid",
-        "$notifId": {
-          ".write": "auth != null && (!data.exists() && newData.child('fromUid').val() === auth.uid || $uid === auth.uid)"
+        "$senderUid": {
+          // Pokes are aggregated per sender: the node is keyed by the sender's
+          // uid. A sender may create OR update (increment) only their own node
+          // and must stamp fromUid as themselves; the recipient may do anything
+          // to their own notifications (e.g. delete on dismiss).
+          // The sender also needs read on their own node so the increment
+          // transaction can see the current count.
+          ".read": "auth != null && ($senderUid === auth.uid || $uid === auth.uid)",
+          ".write": "auth != null && (($senderUid === auth.uid && (!newData.exists() || newData.child('fromUid').val() === auth.uid)) || $uid === auth.uid)"
         }
       }
     }

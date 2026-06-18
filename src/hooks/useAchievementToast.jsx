@@ -3,15 +3,15 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, Sparkles } from '../utils/icons';
 import { BADGE_DEFINITIONS, BADGE_ICONS, getBadgeIconFromDef } from '../config/badgeDefinitions';
-import { Z_INDEX } from '../utils/zIndex';
 import { useToastGestures } from './useToastGestures';
+import { getToastRoot } from '../components/feedback/toastRoot';
 
 const TOAST_DURATION_MS = 5000;
 
 /**
  * Affiche une notification de succès en haut de l'écran (composant interne)
  */
-function AchievementNotification({ achievement, onClose, onView }) {
+function AchievementNotification({ achievement, count = 1, onClose, onView }) {
     const { t } = useTranslation();
     const [isVisible, setIsVisible] = useState(false);
     // Auto-dismiss + swipe-to-dismiss are shared with the poke toast.
@@ -33,13 +33,16 @@ function AchievementNotification({ achievement, onClose, onView }) {
 
     return createPortal(
         <div style={{
-            position: 'fixed', top: 'calc(var(--spacing-md) + env(safe-area-inset-top))', left: '50%',
-            transform: `translateX(-50%) translateY(${isVisible ? '0' : '-24px'})`,
-            zIndex: Z_INDEX.DELETE_OVERLAY,
+            order: 0, // achievements sit on top of the shared toast stack
+            // While leaving, drop out of the flex flow so the poke below rises
+            // to the top immediately instead of waiting for the exit to finish.
+            ...(exit ? { position: 'absolute', left: 0, right: 0, top: 0 } : null),
+            transform: `translateY(${isVisible ? '0' : '-24px'})`,
             opacity: isVisible ? 1 : 0,
             transition: 'transform 0.34s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease',
-            pointerEvents: isVisible ? 'auto' : 'none',
-            maxWidth: 'calc(100vw - 32px)'
+            pointerEvents: isVisible && !exit ? 'auto' : 'none',
+            maxWidth: 'min(360px, calc(100vw - 32px))', width: '100%',
+            display: 'flex', justifyContent: 'center'
         }}>
             <div
                 {...gestureHandlers}
@@ -81,6 +84,19 @@ function AchievementNotification({ achievement, onClose, onView }) {
                     }}>
                         <Sparkles size={14} color="#fff" fill="#fff" style={{ filter: `drop-shadow(0 0 4px ${achievement.color})` }} />
                     </span>
+                    {count > 1 && (
+                        <span className="scale-in" style={{
+                            position: 'absolute', top: '-7px', left: '-7px',
+                            minWidth: '20px', height: '20px', padding: '0 5px',
+                            borderRadius: '10px', display: 'grid', placeItems: 'center',
+                            fontSize: '0.68rem', fontWeight: 900, color: '#fff',
+                            background: achievement.color,
+                            border: '2px solid var(--tooltip-bg)',
+                            boxShadow: `0 2px 8px ${achievement.color}88`
+                        }}>
+                            ×{count}
+                        </span>
+                    )}
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -113,7 +129,7 @@ function AchievementNotification({ achievement, onClose, onView }) {
                 )}
             </div>
         </div>,
-        document.body
+        getToastRoot()
     );
 }
 
@@ -132,8 +148,18 @@ function AchievementNotification({ achievement, onClose, onView }) {
  * Le composant AchievementToast doit être rendu dans le JSX
  */
 export function useAchievementToast(onViewAchievement, onValidateBadge) {
-    const [currentAchievement, setCurrentAchievement] = useState(null);
+    // toast = { achievement, count, seq } — while one is showing, further
+    // unlocks bump `count` and show the latest badge instead of stacking.
+    const [toast, setToast] = useState(null);
     const { t } = useTranslation();
+
+    const pushAchievement = useCallback((achievement) => {
+        setToast(prev => ({
+            achievement,
+            count: prev ? prev.count + 1 : 1,
+            seq: (prev?.seq || 0) + 1,
+        }));
+    }, []);
 
     const showAchievement = useCallback((badgeId) => {
         const badge = BADGE_DEFINITIONS.find(b => b.id === badgeId);
@@ -143,7 +169,7 @@ export function useAchievementToast(onViewAchievement, onValidateBadge) {
         }
 
         const IconComponent = getBadgeIconFromDef(badge);
-        setCurrentAchievement({
+        pushAchievement({
             id: badge.id,
             title: t(`achievements.badges.${badge.id}.title`, badge.id),
             color: badge.color,
@@ -154,17 +180,17 @@ export function useAchievementToast(onViewAchievement, onValidateBadge) {
         if (onValidateBadge) {
             onValidateBadge(badgeId);
         }
-    }, [t, onValidateBadge]);
+    }, [t, onValidateBadge, pushAchievement]);
 
     const hideAchievement = useCallback(() => {
-        setCurrentAchievement(null);
+        setToast(null);
     }, []);
 
     const handleView = useCallback(() => {
-        const viewedId = currentAchievement?.id;
+        const viewedId = toast?.achievement?.id;
         hideAchievement();
         onViewAchievement?.(viewedId);
-    }, [hideAchievement, onViewAchievement, currentAchievement]);
+    }, [hideAchievement, onViewAchievement, toast]);
 
     // Écoute les événements globaux pour afficher des achievements
     // Permet aux composants enfants (ex: ShareModal) de trigger un toast sans prop drilling
@@ -179,12 +205,11 @@ export function useAchievementToast(onViewAchievement, onValidateBadge) {
         const handleShowCustom = (e) => {
             const { title, color } = e.detail || {};
             if (title) {
-                const IconComponent = BADGE_ICONS.Star;
-                setCurrentAchievement({
+                pushAchievement({
                     id: 'custom',
-                    title: title,
+                    title,
                     color: color || '#fbbf24',
-                    icon: IconComponent
+                    icon: BADGE_ICONS.Star
                 });
             }
         };
@@ -196,14 +221,16 @@ export function useAchievementToast(onViewAchievement, onValidateBadge) {
             window.removeEventListener('show-achievement', handleShowAchievement);
             window.removeEventListener('show-achievement-custom', handleShowCustom);
         };
-    }, [showAchievement]);
+    }, [showAchievement, pushAchievement]);
 
     return {
         showAchievement,
         hideAchievement,
-        AchievementToast: currentAchievement ? (
+        AchievementToast: toast ? (
             <AchievementNotification
-                achievement={currentAchievement}
+                key={toast.seq}
+                achievement={toast.achievement}
+                count={toast.count}
                 onClose={hideAchievement}
                 onView={handleView}
             />

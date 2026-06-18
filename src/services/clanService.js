@@ -1,4 +1,4 @@
-import { ref, set, get, remove, push, onValue, serverTimestamp } from 'firebase/database';
+import { ref, set, get, remove, push, onValue, serverTimestamp, runTransaction } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
 import i18n from '../i18n';
@@ -153,21 +153,50 @@ export async function getClanDetails(clanId) {
   return { id: clanId, name: clanData.name, code: clanData.code, members };
 }
 
-export async function sendClanNotification(targetUid, type = 'nudge', message = i18n.t('common.poke')) {
+/**
+ * Send a poke to another user. Pokes are aggregated into a single node per
+ * sender (`notifications/{target}/{fromUid}`): repeated pokes just bump a
+ * `count` via a transaction, instead of pushing an unbounded list of nodes.
+ * This keeps the data self-grouping, bounded, and cheap to clear.
+ */
+export async function sendPoke(targetUid, type = 'nudge', message = i18n.t('common.poke')) {
   const auth = getAuthInstance();
   const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return false;
+  if (!auth?.currentUser || !database || !targetUid) return false;
 
   const fromUid = auth.currentUser.uid;
-  const lbSnapshot = await get(ref(database, `leaderboard/${fromUid}`));
-  const pseudo = lbSnapshot.exists() && lbSnapshot.val().pseudo ? lbSnapshot.val().pseudo : i18n.t('common.member');
-  const photoURL = lbSnapshot.exists() && lbSnapshot.val().photoURL ? lbSnapshot.val().photoURL : null;
+  if (targetUid === fromUid) return false; // can't poke yourself
 
-  const newNotifRef = push(ref(database, `notifications/${targetUid}`));
-  await set(newNotifRef, { type, message, fromUid, fromName: pseudo, fromPhoto: photoURL, timestamp: serverTimestamp(), read: false });
+  // Best-effort sender identity; falls back gracefully if the read fails.
+  let fromName = i18n.t('common.member');
+  let fromPhoto = null;
+  try {
+    const lb = await get(ref(database, `leaderboard/${fromUid}`));
+    if (lb.exists()) {
+      const v = lb.val();
+      if (v.pseudo) fromName = v.pseudo;
+      if (v.photoURL) fromPhoto = v.photoURL;
+    }
+  } catch { /* keep fallback identity */ }
 
-  logger.success(`Nudge sent to ${targetUid}`);
-  return true;
+  try {
+    const notifRef = ref(database, `notifications/${targetUid}/${fromUid}`);
+    await runTransaction(notifRef, (current) => ({
+      type,
+      message,
+      fromUid,
+      fromName,
+      fromPhoto,
+      count: (current?.count || 0) + 1,
+      timestamp: Date.now(),
+      read: false,
+    }));
+    logger.success(`Poke sent to ${targetUid}`);
+    return true;
+  } catch (e) {
+    logger.error?.(`Poke failed: ${e?.message || e}`);
+    return false;
+  }
 }
 
 export function listenToNotifications(callback) {
@@ -175,6 +204,7 @@ export function listenToNotifications(callback) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return null;
 
+  // Children are keyed by sender uid; each carries an aggregated `count`.
   return onValue(ref(database, `notifications/${auth.currentUser.uid}`), (snapshot) => {
     if (snapshot.exists()) {
       const notifs = [];
