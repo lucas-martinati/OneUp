@@ -86,20 +86,7 @@ export function SharePanel({
     return false;
   }, showShare);
 
-  const buttonStyle = isStats ? {
-    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-    padding: '14px', borderRadius: 'var(--radius-lg)',
-    background: 'linear-gradient(135deg, rgba(129,140,248,0.15), rgba(139,92,246,0.1))',
-    border: '1px solid rgba(129,140,248,0.2)',
-    color: '#818cf8', fontSize: '0.9rem', fontWeight: 700,
-    cursor: 'pointer', width: '100%',
-  } : isCompact ? {
-    padding: '12px', borderRadius: '12px',
-    background: 'linear-gradient(135deg, #818cf8, #6366f1)',
-    border: 'none', color: 'white', fontSize: '0.85rem', fontWeight: 700,
-    cursor: 'pointer', display: 'flex', alignItems: 'center',
-    justifyContent: 'center', gap: '8px', flex: 1,
-  } : {
+  let buttonStyle = {
     padding: '14px 16px', borderRadius: 'var(--radius-lg)',
     background: 'rgba(255,255,255,0.08)',
     border: '1px solid rgba(255,255,255,0.15)',
@@ -107,10 +94,38 @@ export function SharePanel({
     cursor: 'pointer', display: 'flex',
     alignItems: 'center', justifyContent: 'center',
   };
+  if (isStats) {
+    buttonStyle = {
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+      padding: '14px', borderRadius: 'var(--radius-lg)',
+      background: 'linear-gradient(135deg, rgba(129,140,248,0.15), rgba(139,92,246,0.1))',
+      border: '1px solid rgba(129,140,248,0.2)',
+      color: '#818cf8', fontSize: '0.9rem', fontWeight: 700,
+      cursor: 'pointer', width: '100%',
+    };
+  } else if (isCompact) {
+    buttonStyle = {
+      padding: '12px', borderRadius: '12px',
+      background: 'linear-gradient(135deg, #818cf8, #6366f1)',
+      border: 'none', color: 'white', fontSize: '0.85rem', fontWeight: 700,
+      cursor: 'pointer', display: 'flex', alignItems: 'center',
+      justifyContent: 'center', gap: '8px', flex: 1,
+    };
+  }
 
-  const defaultLabel = isStats
-    ? t('share.shareCard')
-    : isCompact ? t('common.share') : undefined;
+  let defaultLabel = undefined;
+  if (isStats) {
+    defaultLabel = t('share.shareCard');
+  } else if (isCompact) {
+    defaultLabel = t('common.share');
+  }
+
+  let iconSize = 20;
+  if (isCompact) {
+    iconSize = 16;
+  } else if (isStats) {
+    iconSize = 18;
+  }
 
   return (
     <>
@@ -119,7 +134,7 @@ export function SharePanel({
         className="hover-lift"
         style={buttonStyle}
       >
-        <Share2 size={isCompact ? 16 : isStats ? 18 : 20} />
+        <Share2 size={iconSize} />
         {(label || defaultLabel)}
       </button>
 

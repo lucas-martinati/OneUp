@@ -12,21 +12,40 @@ import { getLocalDateStr } from '../../utils/dateUtils';
 
 // ── Exercise grid item ──────────────────────────────────────────────────
 function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
+    let backgroundStyle = 'rgba(255,255,255,0.05)';
+    if (ex.done) {
+        backgroundStyle = 'rgba(255,255,255,0.03)';
+    } else if (selected) {
+        backgroundStyle = `linear-gradient(135deg, ${ex.color}25, ${ex.color}12)`;
+    }
+
+    let colorStyle = 'var(--text-secondary)';
+    if (ex.done) {
+        colorStyle = '#555';
+    } else if (selected) {
+        colorStyle = ex.color;
+    }
+
+    let remainingLabel = '';
+    if (ex.done) {
+        remainingLabel = t('common.completed');
+    } else if (ex.type === 'timer') {
+        remainingLabel = `${ex.goal - ex.count}s`;
+    } else {
+        remainingLabel = t('common.remaining', { count: ex.goal - ex.count });
+    }
+
     return (
         <button
             onClick={() => !ex.done && onToggle(ex.id)}
             disabled={ex.done}
             style={{
                 padding: '14px 10px', borderRadius: 'var(--radius-md)',
-                background: ex.done
-                    ? 'rgba(255,255,255,0.03)'
-                    : selected
-                        ? `linear-gradient(135deg, ${ex.color}25, ${ex.color}12)`
-                        : 'rgba(255,255,255,0.05)',
+                background: backgroundStyle,
                 border: selected
                     ? `2px solid ${ex.color}80`
                     : '2px solid rgba(255,255,255,0.08)',
-                color: ex.done ? '#555' : selected ? ex.color : 'var(--text-secondary)',
+                color: colorStyle,
                 cursor: ex.done ? 'default' : 'pointer',
                 opacity: ex.done ? 0.4 : 1,
                 display: 'flex', flexDirection: 'column',
@@ -61,7 +80,7 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
                 {getExerciseLabel(ex, t)}
             </span>
             <span style={{ fontSize: '0.6rem', opacity: 0.6 }}>
-                {ex.done ? t('common.completed') : (ex.type === 'timer' ? `${ex.goal - ex.count}s` : t('common.remaining', { count: ex.goal - ex.count }))}
+                {remainingLabel}
             </span>
         </button>
     );
@@ -275,7 +294,13 @@ export function WorkoutSession(props) {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             {fullCategoryOrder.map(catId => {
                                 if (catId === CATEGORIES.CARDIO) return null;
-                                const catExercises = exerciseInfo.filter(ex => ex.category === (catId === CATEGORIES.CUSTOM ? 'custom' : catId === CATEGORIES.BODYWEIGHT ? 'bodyweight' : catId === CATEGORIES.WEIGHTS ? 'weights' : catId));
+                                const categoryMap = {
+                                    [CATEGORIES.CUSTOM]: 'custom',
+                                    [CATEGORIES.BODYWEIGHT]: 'bodyweight',
+                                    [CATEGORIES.WEIGHTS]: 'weights'
+                                };
+                                const targetCategory = categoryMap[catId] || catId;
+                                const catExercises = exerciseInfo.filter(ex => ex.category === targetCategory);
                                 if (catExercises.length === 0) return null;
                                 
                                 let catTitle;
@@ -284,11 +309,13 @@ export function WorkoutSession(props) {
                                     catTitle = catDef?.name || catId;
                                 } else {
                                     const catDef = customCategories.find(c => c.id === catId);
-                                    catTitle = catDef?.name || (catId === CATEGORIES.BODYWEIGHT 
-                                        ? t('common.bodyweight')
-                                        : catId === CATEGORIES.WEIGHTS 
-                                            ? t('common.weights')
-                                            : t('workout.custom'));
+                                    let fallbackTitle = t('workout.custom');
+                                    if (catId === CATEGORIES.BODYWEIGHT) {
+                                        fallbackTitle = t('common.bodyweight');
+                                    } else if (catId === CATEGORIES.WEIGHTS) {
+                                        fallbackTitle = t('common.weights');
+                                    }
+                                    catTitle = catDef?.name || fallbackTitle;
                                 }
 
                                 return (
@@ -388,6 +415,14 @@ export function WorkoutSession(props) {
                                 const isDragOver = dragOverIdx === i;
                                 const isFirst = i === 0;
                                 const isLast = i === queue.length - 1;
+
+                                let itemBg = `linear-gradient(135deg, ${ex.color}0a, ${ex.color}05)`;
+                                if (isDragging) {
+                                    itemBg = `${ex.color}20`;
+                                } else if (isDragOver) {
+                                    itemBg = 'rgba(129,140,248,0.18)';
+                                }
+
                                 return (
                                     <div
                                         key={id}
@@ -402,11 +437,7 @@ export function WorkoutSession(props) {
                                         style={{
                                             display: 'flex', alignItems: 'center', gap: '6px',
                                             padding: '10px 8px', borderRadius: '14px',
-                                            background: isDragging
-                                                ? `${ex.color}20`
-                                                : isDragOver
-                                                    ? 'rgba(129,140,248,0.18)'
-                                                    : `linear-gradient(135deg, ${ex.color}0a, ${ex.color}05)`,
+                                            background: itemBg,
                                             border: isDragOver
                                                 ? '1.5px dashed rgba(129,140,248,0.5)'
                                                 : `1px solid ${ex.color}18`,
@@ -663,6 +694,16 @@ export function WorkoutSession(props) {
             return ex ? { id: ex.id, label: getExerciseLabel(ex, t), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff } : null;
         }).filter(Boolean);
 
+        const currentCategory = CATEGORY_ORDER[activeSlide];
+        let sessionType = 'bodyweight';
+        if (currentCategory === CATEGORIES.WEIGHTS) {
+            sessionType = 'weights';
+        } else if (currentCategory === CATEGORIES.CUSTOM) {
+            sessionType = 'custom';
+        } else if (currentCategory === CATEGORIES.CARDIO) {
+            sessionType = 'cardio';
+        }
+
         return (
             <SessionSummary
                 queue={queue}
@@ -674,7 +715,7 @@ export function WorkoutSession(props) {
                     exercises: completedExercises,
                     duration: sessionDuration,
                     name: sessionName,
-                    type: CATEGORY_ORDER[activeSlide] === CATEGORIES.WEIGHTS ? 'weights' : CATEGORY_ORDER[activeSlide] === CATEGORIES.CUSTOM ? 'custom' : CATEGORY_ORDER[activeSlide] === CATEGORIES.CARDIO ? 'cardio' : 'bodyweight',
+                    type: sessionType,
                 }}
                 stats={computedStats}
                 sessionHistory={getSessionHistory()}

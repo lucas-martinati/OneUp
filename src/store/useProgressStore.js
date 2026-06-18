@@ -15,6 +15,11 @@ function getStorageKey(userId) {
   return userId ? `${STORAGE_KEY_BASE}_${userId}` : STORAGE_KEY_BASE;
 }
 
+function getTsMs(t) {
+  if (!t) return 0;
+  return typeof t === 'number' ? t : new Date(t).getTime();
+}
+
 async function loadFromStorage(userId) {
   try {
     const key = getStorageKey(userId);
@@ -248,9 +253,7 @@ export const useProgressStore = create((set, get) => ({
       const wasDone = current.isCompleted || false;
       let timestamp = current.timestamp;
 
-      if (!wasDone && isNowDone) {
-        timestamp = serverTimestamp();
-      } else if (wasDone && !isNowDone) {
+      if (wasDone !== isNowDone) {
         timestamp = serverTimestamp();
       }
 
@@ -487,8 +490,8 @@ export const useProgressStore = create((set, get) => ({
                 const difficulty = guestEx.difficulty !== undefined && guestEx.difficulty !== null ? guestEx.difficulty : userEx.difficulty;
                 
                 // 4. Prefer newer timestamp
-                const userTs = userEx.timestamp ? (typeof userEx.timestamp === 'number' ? userEx.timestamp : new Date(userEx.timestamp).getTime()) : 0;
-                const guestTs = guestEx.timestamp ? (typeof guestEx.timestamp === 'number' ? guestEx.timestamp : new Date(guestEx.timestamp).getTime()) : 0;
+                const userTs = getTsMs(userEx.timestamp);
+                const guestTs = getTsMs(guestEx.timestamp);
                 const timestamp = guestTs > userTs ? guestEx.timestamp : userEx.timestamp;
 
                 userDay[exId] = {

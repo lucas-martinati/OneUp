@@ -430,17 +430,25 @@ export function Onboarding({ onStart }) {
 
             {/* Progress indicator */}
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                {[1, 2, 3].map(s => (
-                    <div key={s} style={{
-                        width: step === s ? '24px' : '8px', height: '8px', borderRadius: '4px',
-                        background: step === s
-                            ? s === 1 ? 'linear-gradient(90deg, #667eea, #764ba2)'
-                                : s === 2 ? 'linear-gradient(90deg, #f093fb, #f5576c)'
-                                    : 'linear-gradient(90deg, #10b981, #34d399)'
-                            : 'rgba(255,255,255,0.2)',
-                        transition: 'all 0.3s ease'
-                    }} />
-                ))}
+                {[1, 2, 3].map(s => {
+                    let backgroundVal = 'rgba(255,255,255,0.2)';
+                    if (step === s) {
+                        if (s === 1) {
+                            backgroundVal = 'linear-gradient(90deg, #667eea, #764ba2)';
+                        } else if (s === 2) {
+                            backgroundVal = 'linear-gradient(90deg, #f093fb, #f5576c)';
+                        } else {
+                            backgroundVal = 'linear-gradient(90deg, #10b981, #34d399)';
+                        }
+                    }
+                    return (
+                        <div key={s} style={{
+                            width: step === s ? '24px' : '8px', height: '8px', borderRadius: '4px',
+                            background: backgroundVal,
+                            transition: 'all 0.3s ease'
+                        }} />
+                    );
+                })}
             </div>
         </div>
     );

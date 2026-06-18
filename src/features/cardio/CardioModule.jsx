@@ -8,8 +8,7 @@ import { CardioMap } from './CardioMap';
 import { CardioLastSession } from './CardioLastSession';
 import { CardioStreak } from './CardioStreak';
 import { stravaService } from '../../services/stravaService';
-import { Capacitor } from '@capacitor/core';
-import { ChevronRight, Play, Link2, CheckCircle2, LogIn } from '../../utils/icons';
+import { ChevronRight, Link2, CheckCircle2 } from '../../utils/icons';
 import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { GoogleIcon } from '../../components/ui/GoogleIcon';
 import { GoogleSignInButton } from '../../components/ui/GoogleSignInButton';
@@ -351,7 +350,7 @@ export function CardioModule() {
                         display: 'flex', alignItems: 'center', gap: '4px',
                         padding: '4px 8px', borderRadius: '8px',
                         background: lit ? `${step.color}18` : 'var(--surface-subtle)',
-                        border: `1px solid ${lit ? `${step.color}40` : 'var(--border-subtle)'}`,
+                        border: `1px solid ${lit ? step.color + '40' : 'var(--border-subtle)'}`,
                         fontSize: '0.6rem', fontWeight: '700',
                         color: lit ? step.color : 'var(--text-secondary)',
                         opacity: lit ? 1 : 0.5,

@@ -24,8 +24,27 @@ export function LeaderboardPodium({ items, currentUid, todayStr, onSelect, clanD
                 const isMe = entry.uid === currentUid;
                 const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
                 const avatarSize = slot === 0 ? 66 : 52;
-                const pItemCls = slot === 0 ? styles.pItem1 : slot === 1 ? styles.pItem2 : styles.pItem3;
-                const pedCls = slot === 0 ? styles.ped1 : slot === 1 ? styles.ped2 : styles.ped3;
+
+                let pItemCls = styles.pItem3;
+                if (slot === 0) {
+                    pItemCls = styles.pItem1;
+                } else if (slot === 1) {
+                    pItemCls = styles.pItem2;
+                }
+
+                let pedCls = styles.ped3;
+                if (slot === 0) {
+                    pedCls = styles.ped1;
+                } else if (slot === 1) {
+                    pedCls = styles.ped2;
+                }
+
+                let avatarWrapCls = '';
+                if (isPerfect) {
+                    avatarWrapCls = styles.pPerfect;
+                } else if (isMe) {
+                    avatarWrapCls = styles.pMe;
+                }
 
                 return (
                     <div
@@ -36,7 +55,7 @@ export function LeaderboardPodium({ items, currentUid, todayStr, onSelect, clanD
                         tabIndex={0}
                         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(entry); } }}
                     >
-                        <div className={`${styles.pAvatarWrap} ${isPerfect ? styles.pPerfect : isMe ? styles.pMe : ''}`}>
+                        <div className={`${styles.pAvatarWrap} ${avatarWrapCls}`}>
                             {slot === 0 && <Crown className={styles.pCrown} size={24} color="#ffd700" fill="#ffd700" />}
                             {isPerfect && (
                                 <>

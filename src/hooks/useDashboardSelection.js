@@ -19,11 +19,16 @@ export function useDashboardSelection(currentCatKey, customExercises, customExer
         else if (isUserCategory(currentCatKey)) setUserCatSelected(prev => ({ ...prev, [currentCatKey]: id }));
     };
 
-    const globalSelectedId = currentCatKey === CATEGORIES.CARDIO ? 'cardio' 
-        : currentCatKey === CATEGORIES.BODYWEIGHT ? classicSelected 
-        : currentCatKey === CATEGORIES.WEIGHTS ? weightsSelected 
-        : isUserCategory(currentCatKey) ? (userCatSelected[currentCatKey] || (exercisesByUserCategory[currentCatKey]?.[0]?.id || null))
-        : customSelected;
+    let globalSelectedId = customSelected;
+    if (currentCatKey === CATEGORIES.CARDIO) {
+        globalSelectedId = 'cardio';
+    } else if (currentCatKey === CATEGORIES.BODYWEIGHT) {
+        globalSelectedId = classicSelected;
+    } else if (currentCatKey === CATEGORIES.WEIGHTS) {
+        globalSelectedId = weightsSelected;
+    } else if (isUserCategory(currentCatKey)) {
+        globalSelectedId = userCatSelected[currentCatKey] || (exercisesByUserCategory[currentCatKey]?.[0]?.id || null);
+    }
         
     const selectedExercise = useMemo(() => {
         if (currentCatKey === CATEGORIES.CARDIO) return { id: 'cardio', color: '#ef4444', gradient: ['#ef4444', '#dc2626'], icon: 'Heart', name: t('common.cardio') };

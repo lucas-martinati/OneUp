@@ -38,6 +38,48 @@ function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
   );
 }
 
+// Bouton d'upload (caméra / galerie) : même habillage, seuls l'action, l'icône et le label changent.
+function UploadButton({ onClick, label, children }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        flex: 1, padding: '12px', borderRadius: '12px',
+        background: 'rgba(255,255,255,0.03)',
+        border: '1px dashed rgba(255,255,255,0.15)',
+        color: 'var(--text-secondary)',
+        fontSize: '0.7rem', fontWeight: 600,
+        cursor: 'pointer', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', gap: '6px',
+        transition: 'all 0.15s ease',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}>
+        {children}
+      </div>
+      {label}
+    </button>
+  );
+}
+
+// En-tête de section (label majuscule, icône optionnelle, espaceur optionnel).
+function SectionLabel({ icon: Icon, children, spacer = true }) {
+  return (
+    <>
+      {spacer && <div style={{ height: '4px' }} />}
+      <div style={{
+        fontSize: '0.65rem', fontWeight: 700,
+        color: 'var(--text-secondary)',
+        textTransform: 'uppercase', letterSpacing: '1px',
+        padding: '0 4px',
+      }}>
+        {Icon && <Icon size={11} style={{ marginRight: '4px', verticalAlign: 'middle' }} />}
+        {children}
+      </div>
+    </>
+  );
+}
+
 import { buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../../../config/categories';
 import { useExercises } from '../../../contexts/ExercisesContext';
 import { THEMES as GLOBAL_THEMES } from '../../../config/themes';
@@ -99,14 +141,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       display: 'flex', flexDirection: 'column', gap: '8px',
       width: '100%',
     }}>
-      <div style={{
-        fontSize: '0.65rem', fontWeight: 700,
-        color: 'var(--text-secondary)',
-        textTransform: 'uppercase', letterSpacing: '1px',
-        padding: '0 4px',
-      }}>
-        {t('share.metrics')}
-      </div>
+      <SectionLabel spacer={false}>{t('share.metrics')}</SectionLabel>
 
       <OptionRow
         icon={isGlobal ? Award : Clock}
@@ -187,16 +222,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       {/* Category filter for global stats (multi-select) */}
       {isGlobal && (
         <>
-          <div style={{ height: '4px' }} />
-          <div style={{
-            fontSize: '0.65rem', fontWeight: 700,
-            color: 'var(--text-secondary)',
-            textTransform: 'uppercase', letterSpacing: '1px',
-            padding: '0 4px',
-          }}>
-            <Filter size={11} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            {t('share.categoryFilter')}
-          </div>
+          <SectionLabel icon={Filter}>{t('share.categoryFilter')}</SectionLabel>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
             {fullCategoryOrder.map(catKey => {
               const isSelected = selectedCategories.includes(catKey);
@@ -235,16 +261,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       {/* Theme selector (pro only) */}
       {isPro && (
         <>
-          <div style={{ height: '4px' }} />
-          <div style={{
-            fontSize: '0.65rem', fontWeight: 700,
-            color: 'var(--text-secondary)',
-            textTransform: 'uppercase', letterSpacing: '1px',
-            padding: '0 4px',
-          }}>
-            <Palette size={11} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            {t('share.theme')}
-          </div>
+          <SectionLabel icon={Palette}>{t('share.theme')}</SectionLabel>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
             {GLOBAL_THEMES.map(theme => (
               <ThemeSwatch
@@ -262,16 +279,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       {/* Background image (pro only) */}
       {isPro && (
         <>
-          <div style={{ height: '4px' }} />
-          <div style={{
-            fontSize: '0.65rem', fontWeight: 700,
-            color: 'var(--text-secondary)',
-            textTransform: 'uppercase', letterSpacing: '1px',
-            padding: '0 4px',
-          }}>
-            <Image size={11} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            {t('share.backgroundImage')}
-          </div>
+          <SectionLabel icon={Image}>{t('share.backgroundImage')}</SectionLabel>
           
           {options.backgroundImage ? (
             <div style={{
@@ -357,42 +365,12 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
             </div>
           ) : (
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={() => cameraInputRef.current?.click()}
-                style={{
-                  flex: 1, padding: '12px', borderRadius: '12px',
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px dashed rgba(255,255,255,0.15)',
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.7rem', fontWeight: 600,
-                  cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                  alignItems: 'center', gap: '6px',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}>
-                  <span style={{ fontSize: '14px' }}>📸</span>
-                </div>
-                {t('share.takePhoto')}
-              </button>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                style={{
-                  flex: 1, padding: '12px', borderRadius: '12px',
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px dashed rgba(255,255,255,0.15)',
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.7rem', fontWeight: 600,
-                  cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                  alignItems: 'center', gap: '6px',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}>
-                  <Image size={14} style={{ opacity: 0.8 }} />
-                </div>
-                {t('share.uploadGallery')}
-              </button>
+              <UploadButton onClick={() => cameraInputRef.current?.click()} label={t('share.takePhoto')}>
+                <span style={{ fontSize: '14px' }}>📸</span>
+              </UploadButton>
+              <UploadButton onClick={() => fileInputRef.current?.click()} label={t('share.uploadGallery')}>
+                <Image size={14} style={{ opacity: 0.8 }} />
+              </UploadButton>
             </div>
           )}
           <input

@@ -30,7 +30,19 @@ export function LeaderboardRow({
     if (isPerfect) rowCls.push(styles.rowPerfect, 'perfect-day-row');
     else if (isMe) rowCls.push(styles.rowMe);
 
-    const borderColor = isPerfect ? '#ffd700' : isMe ? 'var(--accent-glow)' : null;
+    let borderColor = null;
+    if (isPerfect) {
+        borderColor = '#ffd700';
+    } else if (isMe) {
+        borderColor = 'var(--accent-glow)';
+    }
+
+    let nameCls = '';
+    if (isPerfect) {
+        nameCls = styles.namePerfect;
+    } else if (isMe) {
+        nameCls = styles.nameMe;
+    }
 
     return (
         <div className={rowCls.join(' ')} onClick={() => onSelect(entry)}>
@@ -47,7 +59,7 @@ export function LeaderboardRow({
 
             <div className={styles.nameWrap}>
                 <div className={styles.nameRow}>
-                    <span className={`${styles.name} ${isPerfect ? styles.namePerfect : isMe ? styles.nameMe : ''}`}>
+                    <span className={`${styles.name} ${nameCls}`}>
                         {isMe ? `${entry.pseudo} (${t('common.you')})` : entry.pseudo}
                     </span>
                     {isPerfect && <Star size={13} color="#fbbf24" fill="#fbbf24" className={styles.perfectStar} />}

@@ -38,7 +38,7 @@ export {
   FolderOpen, FolderPlus, GripVertical, Shuffle, ArrowLeft, ArrowRight,
   Trophy, Medal, Award, Star, Crown,
   Users, LogIn, UserPlus, Shield, ShieldAlert, HeartHandshake,
-  LogOut, Hash, Swords,
+  LogOut, Hash,
   Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
   Globe, Gauge, ShoppingBag, PieChart,
   Share2, Download, Image, Palette, Target,

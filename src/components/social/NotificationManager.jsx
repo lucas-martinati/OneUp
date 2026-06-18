@@ -71,73 +71,74 @@ export function NotificationManager() {
         if (!String(key).startsWith('debug-')) cloudSync.deleteNotification(key);
     }, []);
 
+    const handlePokeEvent = useCallback((e) => {
+        const d = e.detail || {};
+        const name = d.fromName || 'Debug';
+        const key = `debug-${name}`;
+        dismissed.current.delete(key);
+        setActiveToasts(prev => {
+            const existing = prev.find(t => t.key === key);
+            if (existing) {
+                return prev.map(t => t.key === key
+                    ? { ...t, count: t.count + 1, message: d.message || t.message }
+                    : t);
+            }
+            return [...prev, {
+                key, fromName: name, fromPhoto: d.fromPhoto || null,
+                message: d.message || '👋 Poke de test !', count: 1,
+            }];
+        });
+        try { sounds.poke(); } catch { /* sound optional */ }
+    }, []);
+
+    const handleNotifs = useCallback((notifs) => {
+        // count defaults to 1 so legacy (pre-aggregation) nodes still show.
+        const unread = notifs.filter(n => !n.read);
+        const liveIds = new Set(unread.map(n => n.id));
+
+        // Forget state for nodes that are gone, so a future poke from the
+        // same person surfaces (and chimes) again.
+        for (const id of [...dismissed.current]) {
+            if (!String(id).startsWith('debug-') && !liveIds.has(id)) dismissed.current.delete(id);
+        }
+        for (const id of [...seenCounts.current.keys()]) {
+            if (!liveIds.has(id)) seenCounts.current.delete(id);
+        }
+
+        // Chime once if any non-dismissed sender is new or poked again.
+        let chime = false;
+        for (const n of unread) {
+            const count = n.count || 1;
+            const prev = seenCounts.current.get(n.id);
+            if (!dismissed.current.has(n.id) && (prev === undefined || count > prev)) chime = true;
+            seenCounts.current.set(n.id, count);
+        }
+        if (chime) { try { sounds.poke(); } catch { /* sound optional */ } }
+
+        // Toasts mirror the live nodes (minus dismissed); debug toasts are
+        // local-only so we preserve them across listener updates.
+        setActiveToasts(prev => {
+            const debugToasts = prev.filter(t => String(t.key).startsWith('debug-'));
+            const dbToasts = unread
+                .filter(n => !dismissed.current.has(n.id))
+                .map(n => ({
+                    key: n.id, fromName: n.fromName, fromPhoto: n.fromPhoto,
+                    message: n.message, count: n.count || 1,
+                }));
+            return [...dbToasts, ...debugToasts];
+        });
+    }, []);
+
     // Debug: window.oneupDebug.poke() injects a fake, local-only poke.
     useEffect(() => {
-        const handler = (e) => {
-            const d = e.detail || {};
-            const name = d.fromName || 'Debug';
-            const key = `debug-${name}`;
-            dismissed.current.delete(key);
-            setActiveToasts(prev => {
-                const existing = prev.find(t => t.key === key);
-                if (existing) {
-                    return prev.map(t => t.key === key
-                        ? { ...t, count: t.count + 1, message: d.message || t.message }
-                        : t);
-                }
-                return [...prev, {
-                    key, fromName: name, fromPhoto: d.fromPhoto || null,
-                    message: d.message || '👋 Poke de test !', count: 1,
-                }];
-            });
-            try { sounds.poke(); } catch { /* sound optional */ }
-        };
-        window.addEventListener('oneup-debug-poke', handler);
-        return () => window.removeEventListener('oneup-debug-poke', handler);
-    }, []);
+        window.addEventListener('oneup-debug-poke', handlePokeEvent);
+        return () => window.removeEventListener('oneup-debug-poke', handlePokeEvent);
+    }, [handlePokeEvent]);
 
     useEffect(() => {
         // A single notifications listener, attached synchronously so the auth
         // state replay can't race us into attaching twice (double sounds).
         let unsubscribe = null;
-
-        const handleNotifs = (notifs) => {
-            // count defaults to 1 so legacy (pre-aggregation) nodes still show.
-            const unread = notifs.filter(n => !n.read);
-            const liveIds = new Set(unread.map(n => n.id));
-
-            // Forget state for nodes that are gone, so a future poke from the
-            // same person surfaces (and chimes) again.
-            for (const id of [...dismissed.current]) {
-                if (!String(id).startsWith('debug-') && !liveIds.has(id)) dismissed.current.delete(id);
-            }
-            for (const id of [...seenCounts.current.keys()]) {
-                if (!liveIds.has(id)) seenCounts.current.delete(id);
-            }
-
-            // Chime once if any non-dismissed sender is new or poked again.
-            let chime = false;
-            for (const n of unread) {
-                const count = n.count || 1;
-                const prev = seenCounts.current.get(n.id);
-                if (!dismissed.current.has(n.id) && (prev === undefined || count > prev)) chime = true;
-                seenCounts.current.set(n.id, count);
-            }
-            if (chime) { try { sounds.poke(); } catch { /* sound optional */ } }
-
-            // Toasts mirror the live nodes (minus dismissed); debug toasts are
-            // local-only so we preserve them across listener updates.
-            setActiveToasts(prev => {
-                const debugToasts = prev.filter(t => String(t.key).startsWith('debug-'));
-                const dbToasts = unread
-                    .filter(n => !dismissed.current.has(n.id))
-                    .map(n => ({
-                        key: n.id, fromName: n.fromName, fromPhoto: n.fromPhoto,
-                        message: n.message, count: n.count || 1,
-                    }));
-                return [...dbToasts, ...debugToasts];
-            });
-        };
 
         const attach = () => {
             if (unsubscribe) return; // already listening
@@ -165,7 +166,7 @@ export function NotificationManager() {
             detach();
             authUnsub();
         };
-    }, []);
+    }, [handleNotifs]);
 
     if (activeToasts.length === 0) return null;
 

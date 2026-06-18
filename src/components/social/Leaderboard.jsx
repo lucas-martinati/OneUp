@@ -251,11 +251,12 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                     showDomainFilter={false}
                     showExerciseTabs={true}
                 />
-                {loading ? (
+                {loading && (
                     <div className={styles.center}>
                         <Spinner label={t('common.loading')} />
                     </div>
-                ) : sorted.length === 0 ? (
+                )}
+                {!loading && sorted.length === 0 && (
                     <div className={styles.center}>
                         <div className={styles.emptyIcon}>
                             <Trophy size={30} color="#fbbf24" />
@@ -273,7 +274,8 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                             </>
                         )}
                     </div>
-                ) : (
+                )}
+                {!loading && sorted.length > 0 && (
                     <>
                         {usePodium && (
                             <LeaderboardPodium

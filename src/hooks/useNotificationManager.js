@@ -110,7 +110,8 @@ function buildIncrementalContent({ dayNum, streak, dayIndex }) {
         body: pickRandom(messages),
       };
     }
-    case 2: {
+    case 2:
+    case 5: {
       const messages = i18n.t('notifications.challenge', { returnObjects: true, ...vars });
       return {
         title: i18n.t('notifications.title', vars),
@@ -126,13 +127,6 @@ function buildIncrementalContent({ dayNum, streak, dayIndex }) {
     }
     case 4: {
       const messages = i18n.t('notifications.motivational', { returnObjects: true, ...vars });
-      return {
-        title: i18n.t('notifications.title', vars),
-        body: pickRandom(messages),
-      };
-    }
-    case 5: {
-      const messages = i18n.t('notifications.challenge', { returnObjects: true, ...vars });
       return {
         title: i18n.t('notifications.title', vars),
         body: pickRandom(messages),

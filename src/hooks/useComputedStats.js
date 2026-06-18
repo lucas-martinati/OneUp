@@ -1,5 +1,6 @@
-import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions, getCurrentWeekNumber } from '../utils/dateUtils';
-import { EXERCISES, getDailyGoal, CARDIO_EXERCISES, getWeeklyGoalKm } from '../config/exercises';
+import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions } from '../utils/dateUtils';
+import { EXERCISES, getDailyGoal } from '../config/exercises';
+import { evaluateCardioWeek } from '../utils/cardioStreak';
 import { WEIGHT_EXERCISES } from '../config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
 import { isGlobalPerfectDay } from '../utils/statUtils';
@@ -148,7 +149,6 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
                 if (exId === 'running' || exId === 'cycling') {
                     // Cardio reps are now computed from distance * 15 in useCardio.js
                     // We don't add daily reps for cardio here to avoid double counting
-                    reps = 0;
                 } else {
                     reps = getDailyGoal(ex, dayNum, diffToUse);
                 }
@@ -276,50 +276,19 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         return false;
     }
 
-    // Import computeCardioStreak logic locally or implement it
+    // Streaks cardio : on ne casse PAS la boucle sur weekNum < 1, car des sessions
+    // Strava peuvent exister avant la date de début du challenge.
     function computeCardioMaxStreak(sessions, mode, challengeStartDate, currentDifficulty, completions) {
         if (!sessions.length) return 0;
         let maxStreak = 0;
         let streak = 0;
-        
-        // Match computeStreak from useCardio.js (walk backwards 52 weeks)
-        // But for maxStreak, we do NOT break early if weekNum < 1, because old sessions
-        // from Strava might exist before challengeStartDate.
         for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
-            const ref = new Date();
-            ref.setDate(ref.getDate() - weekOffset * 7);
-            const { start, end } = getWeekBounds(ref);
-            
-            const weekNum = getCurrentWeekNumber(challengeStartDate) - weekOffset;
-            if (weekNum < 1) {
-                // Strava sessions could exist before userStartDate. We must continue checking them,
-                // but we assume weekNum = 1 for goal calculation to be safe, or just use 1.
-            }
-            const effectiveWeekNum = Math.max(1, weekNum);
-
-            let weekDifficulty = currentDifficulty;
-            const loop = new Date(start);
-            while (loop <= end) {
-                const dateStr = getLocalDateStr(loop);
-                const comp = completions[dateStr]?.[mode];
-                if (comp?.isCompleted && comp.difficulty !== undefined) {
-                    weekDifficulty = comp.difficulty;
-                    break;
-                }
-                loop.setDate(loop.getDate() + 1);
-            }
-
-            const goalKm = getWeeklyGoalKm(mode, effectiveWeekNum) * weekDifficulty;
-            const weekSessions = sessions.filter(
-                s => s.type === mode && s.startTime >= start && s.startTime <= end
-            );
-            const weekDistanceKm = weekSessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
-
-            if (weekDistanceKm >= goalKm - 0.01) {
+            const { achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions);
+            if (achieved) {
                 streak++;
                 if (streak > maxStreak) maxStreak = streak;
             } else if (weekOffset > 0) {
-                // Reset streak if we missed a week (but continue walking backwards to find older max streaks)
+                // Semaine manquée : on remet à zéro mais on continue pour trouver d'anciens streaks.
                 streak = 0;
             }
         }
@@ -330,32 +299,8 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         if (!sessions.length) return 0;
         let streak = 0;
         for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
-            const ref = new Date();
-            ref.setDate(ref.getDate() - weekOffset * 7);
-            const { start, end } = getWeekBounds(ref);
-            
-            const weekNum = getCurrentWeekNumber(challengeStartDate) - weekOffset;
-            const effectiveWeekNum = Math.max(1, weekNum); // Don't break on weekNum < 1
-
-            let weekDifficulty = currentDifficulty;
-            const loop = new Date(start);
-            while (loop <= end) {
-                const dateStr = getLocalDateStr(loop);
-                const comp = completions[dateStr]?.[mode];
-                if (comp?.isCompleted && comp.difficulty !== undefined) {
-                    weekDifficulty = comp.difficulty;
-                    break;
-                }
-                loop.setDate(loop.getDate() + 1);
-            }
-
-            const goalKm = getWeeklyGoalKm(mode, effectiveWeekNum) * weekDifficulty;
-            const weekSessions = sessions.filter(
-                s => s.type === mode && s.startTime >= start && s.startTime <= end
-            );
-            const weekDistanceKm = weekSessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
-
-            if (weekDistanceKm >= goalKm - 0.01) {
+            const { achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions);
+            if (achieved) {
                 streak++;
             } else if (weekOffset > 0) {
                 break;

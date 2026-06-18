@@ -9,7 +9,7 @@ const TICK_MS = 45; // ~22fps scramble — reads as "digital" without flooding r
 /** Replace each digit of a formatted string with a random one (keeps %, separators…). */
 function scramble(str) {
     let out = '';
-    for (const ch of str) out += /[0-9]/.test(ch) ? String(Math.floor(Math.random() * 10)) : ch;
+    for (const ch of str) out += /\d/.test(ch) ? String(Math.floor(Math.random() * 10)) : ch;
     return out;
 }
 
@@ -43,7 +43,7 @@ export function AnimatedNumber({ value, format = (v) => String(v), pending = fal
             // Settle: digits lock left-to-right as progress advances.
             const target = finalStr;
             const digitIdx = [];
-            [...target].forEach((ch, i) => { if (/[0-9]/.test(ch)) digitIdx.push(i); });
+            [...target].forEach((ch, i) => { if (/\d/.test(ch)) digitIdx.push(i); });
             if (digitIdx.length === 0) { setDisplay(target); return; }
 
             const start = performance.now();

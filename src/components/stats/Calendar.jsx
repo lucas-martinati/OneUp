@@ -7,7 +7,7 @@ import { useBackHandler } from '../../hooks/useBackHandler';
 import { getDailyGoal } from '../../config/exercises';
 import { getIcon } from '../../utils/icons';
 import { getExerciseLabel } from '../../utils/exerciseLabel';
-import { isPerfectDay, calculateRepsForDay } from '../../utils/statUtils';
+import { isPerfectDay, calculateRepsForDay, isCaughtUpDay } from '../../utils/statUtils';
 import { getCurrentWeekNumber } from '../../utils/dateUtils';
 import { DifficultyBadge } from '../ui/DifficultyBadge';
 import styles from './Calendar.module.css';
@@ -272,23 +272,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                         const dayCompletions = completions[dateString] || {};
                         const isPerfect = !isCustom && isPerfectDay(dayCompletions, exercises);
                         const isAnyDone = !isPerfect && Object.values(dayCompletions).some(ex => ex?.isCompleted);
-                        const completedExs = Object.values(dayCompletions).filter(ex => {
-                            if (!ex?.isCompleted || !ex?.timestamp) return false;
-                            if (typeof ex.timestamp === 'object') return false;
-                            const timeMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
-                            return !isNaN(timeMs);
-                        });
-                        const isCaughtUp = completedExs.length > 0 && completedExs.every(ex => {
-                            const tsMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
-                            const parts = dateString.split('-');
-                            if (parts.length !== 3) return false;
-                            const yr = parseInt(parts[0], 10);
-                            const mo = parseInt(parts[1], 10) - 1;
-                            const dy = parseInt(parts[2], 10);
-                            const localDayStartUTC = Date.UTC(yr, mo, dy);
-                            const diffHours = (tsMs - localDayStartUTC) / (1000 * 60 * 60);
-                            return diffHours < -15 || diffHours >= 37;
-                        });
+                        const isCaughtUp = isCaughtUpDay(dayCompletions, dateString);
                         // Today is never shown as "missed" — it isn't a failure yet.
                         const isMissed = !isPerfect && !isAnyDone && !isMuted && !isToday;
                         const completedCount = exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length;
@@ -296,7 +280,14 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 
                         // Exercise dots scale down as the day gets busier so they stay inside the cell.
                         const dotCount = completedCount + (isMissed ? 1 : 0);
-                        const dotPx = dotCount > 12 ? 4 : dotCount > 8 ? 5 : dotCount > 5 ? 6 : 7;
+                        let dotPx = 7;
+                        if (dotCount > 12) {
+                            dotPx = 4;
+                        } else if (dotCount > 8) {
+                            dotPx = 5;
+                        } else if (dotCount > 5) {
+                            dotPx = 6;
+                        }
 
                         const cls = [styles.day];
                         if (isMuted) cls.push(styles.muted);
@@ -380,23 +371,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, getConfig, t, startDate }) {
     const dayNum = getDayNumber(dateString);
     const dayCompletions = completions[dateString] || {};
-    const completedExs = Object.values(dayCompletions).filter(ex => {
-        if (!ex?.isCompleted || !ex?.timestamp) return false;
-        if (typeof ex.timestamp === 'object') return false;
-        const timeMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
-        return !isNaN(timeMs);
-    });
-    const isCaughtUp = completedExs.length > 0 && completedExs.every(ex => {
-        const tsMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
-        const parts = dateString.split('-');
-        if (parts.length !== 3) return false;
-        const year = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10) - 1;
-        const day = parseInt(parts[2], 10);
-        const localDayStartUTC = Date.UTC(year, month, day);
-        const diffHours = (tsMs - localDayStartUTC) / (1000 * 60 * 60);
-        return diffHours < -15 || diffHours >= 37;
-    });
+    const isCaughtUp = isCaughtUpDay(dayCompletions, dateString);
     const [isVisible, setIsVisible] = useState(false);
     // Blur is only enabled once the entrance slide finishes. Keeping the
     // backdrop-filter live while the sheet translates forces the browser to
@@ -482,6 +457,11 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
     const successRate = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
     const isPerfectDay = totalCount > 0 && doneCount === totalCount;
 
+    let translateYPct = 100;
+    if (!isClosing && isVisible) {
+        translateYPct = 0;
+    }
+
     return (
         <div className="modal-overlay" style={{
             background: 'transparent', zIndex: 199,
@@ -509,7 +489,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                 WebkitBackdropFilter: showBlur ? 'blur(20px)' : 'none',
                 borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
                 boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
-                transform: `translateY(${isClosing ? 100 : (isVisible ? 0 : 100)}%)`,
+                transform: `translateY(${translateYPct}%)`,
                 transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), backdrop-filter 0.3s ease',
                 willChange: 'transform',
                 maxHeight: '80vh', display: 'flex', flexDirection: 'column',

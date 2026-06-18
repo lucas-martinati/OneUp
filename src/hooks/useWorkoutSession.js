@@ -440,11 +440,23 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
             });
         }
 
+        const slideCategory = fullCategoryOrder[sessionActiveSlide];
+        let sessionType = 'bodyweight';
+        if (slideCategory === CATEGORIES.WEIGHTS) {
+            sessionType = 'weights';
+        } else if (slideCategory === CATEGORIES.CUSTOM) {
+            sessionType = 'custom';
+        } else if (isUserCategory(slideCategory)) {
+            sessionType = slideCategory;
+        } else if (slideCategory === CATEGORIES.CARDIO) {
+            sessionType = 'cardio';
+        }
+
         const session = addSession({
             date: new Date().toISOString(),
             duration,
             name: detectedName,
-            type: fullCategoryOrder[sessionActiveSlide] === CATEGORIES.WEIGHTS ? 'weights' : fullCategoryOrder[sessionActiveSlide] === CATEGORIES.CUSTOM ? 'custom' : isUserCategory(fullCategoryOrder[sessionActiveSlide]) ? fullCategoryOrder[sessionActiveSlide] : (fullCategoryOrder[sessionActiveSlide] === CATEGORIES.CARDIO ? 'cardio' : 'bodyweight'),
+            type: sessionType,
             exercises: completedExercises,
         });
         setSavedSession(session);

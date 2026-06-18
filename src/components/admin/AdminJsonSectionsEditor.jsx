@@ -78,14 +78,26 @@ export function AdminJsonSectionsEditor({
           }
         };
 
+        let borderStyle = '1px solid var(--border-subtle)';
+        if (isExpanded) {
+          borderStyle = '1px solid rgba(167,139,250,0.3)';
+        } else if (isDirty) {
+          borderStyle = '1px solid rgba(245,158,11,0.4)';
+        }
+
+        let titleColor = 'var(--text-primary)';
+        if (isFullDoc) {
+          titleColor = '#ef4444';
+        } else if (isExpanded) {
+          titleColor = '#a78bfa';
+        }
+
         return (
           <div
             key={key}
             style={{
               borderRadius: 'var(--radius-lg)',
-              border: isExpanded
-                ? '1px solid rgba(167,139,250,0.3)'
-                : (isDirty ? '1px solid rgba(245,158,11,0.4)' : '1px solid var(--border-subtle)'),
+              border: borderStyle,
               background: isExpanded ? 'rgba(10, 10, 15, 0.6)' : 'var(--surface-section)',
               transition: 'all 0.2s ease',
               overflow: 'hidden'
@@ -118,7 +130,7 @@ export function AdminJsonSectionsEditor({
                 <span style={{
                   fontFamily: 'monospace',
                   fontWeight: '700',
-                  color: isFullDoc ? '#ef4444' : (isExpanded ? '#a78bfa' : 'var(--text-primary)'),
+                  color: titleColor,
                   fontSize: '0.95rem',
                   whiteSpace: 'nowrap'
                 }}>

@@ -65,13 +65,9 @@ function AppContent() {
     <Suspense fallback={<LoadingScreen />}>
       <ComputedStatsSynchronizer />
       <AppOrchestrator computedStats={computedStats} />
-      {isInitializing ? (
-        <LoadingScreen />
-      ) : !isSetup ? (
-        <Onboarding onStart={startChallenge} />
-      ) : (
-        <Dashboard />
-      )}
+      {isInitializing && <LoadingScreen />}
+      {!isInitializing && !isSetup && <Onboarding onStart={startChallenge} />}
+      {!isInitializing && isSetup && <Dashboard />}
     </Suspense>
   );
 }

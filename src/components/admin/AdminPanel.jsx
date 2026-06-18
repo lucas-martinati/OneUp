@@ -96,11 +96,12 @@ export function AdminPanel({ onClose }) {
         )}
 
         {/* Content Workspace */}
-        {loading ? (
+        {loading && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
             <Spinner size={36} color="#ef4444" label="Chargement de la base de données..." />
           </div>
-        ) : !selectedUid ? (
+        )}
+        {!loading && !selectedUid && (
           <AdminUserList
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -113,7 +114,8 @@ export function AdminPanel({ onClose }) {
             filteredUsers={filteredUsers}
             onSelectUser={handleSelectUser}
           />
-        ) : (
+        )}
+        {!loading && selectedUid && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             {/* Tabs Selector */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: 'var(--spacing-md)', flexShrink: 0 }}>

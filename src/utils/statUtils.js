@@ -40,6 +40,34 @@ export function isPerfectDay(dayCompletions, exercises = []) {
 }
 
 /**
+ * Indique si un jour a été "rattrapé" : tous les exercices complétés et datés
+ * l'ont été en dehors de la fenêtre normale (avant -15h ou au-delà de +37h par
+ * rapport au début du jour local), signe d'une complétion tardive/anticipée.
+ * @param {Object} dayCompletions - Completions for a specific day
+ * @param {string} dateString - The date string (YYYY-MM-DD)
+ * @returns {boolean}
+ */
+export function isCaughtUpDay(dayCompletions, dateString) {
+    const completedExs = Object.values(dayCompletions || {}).filter(ex => {
+        if (!ex?.isCompleted || !ex?.timestamp) return false;
+        if (typeof ex.timestamp === 'object') return false;
+        const timeMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
+        return !isNaN(timeMs);
+    });
+    return completedExs.length > 0 && completedExs.every(ex => {
+        const tsMs = typeof ex.timestamp === 'number' ? ex.timestamp : new Date(ex.timestamp).getTime();
+        const parts = dateString.split('-');
+        if (parts.length !== 3) return false;
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        const localDayStartUTC = Date.UTC(year, month, day);
+        const diffHours = (tsMs - localDayStartUTC) / (1000 * 60 * 60);
+        return diffHours < -15 || diffHours >= 37;
+    });
+}
+
+/**
  * Global perfect day check (Standard OR Weights categories fully completed).
  */
 export function isGlobalPerfectDay(dayCompletions, allExercises = []) {

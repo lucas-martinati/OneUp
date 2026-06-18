@@ -30,7 +30,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
         padding: special ? '7px 15px' : '7px 12px',
         borderRadius: 'var(--radius-full)',
         background: isActive ? `linear-gradient(135deg, ${color}2e, ${color}14)` : 'var(--surface-subtle)',
-        border: `1.5px ${dashed ? 'dashed' : 'solid'} ${isActive ? `${color}66` : 'var(--border-subtle)'}`,
+        border: `1.5px ${dashed ? 'dashed' : 'solid'} ${isActive ? color + '66' : 'var(--border-subtle)'}`,
         color: isActive ? color : 'var(--text-secondary)',
         fontSize: '0.75rem', fontWeight: special ? '800' : '600',
         textTransform: special ? 'uppercase' : 'none',

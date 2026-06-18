@@ -31,9 +31,29 @@ const BadgeItem = React.memo(({ badge, highlighted }) => {
     const { t } = useTranslation();
     const Icon = badge.icon;
     const { unlocked, secret, color } = badge;
-    const title = badge.titleKey ? t(badge.titleKey) : (secret ? t('achievements.badges.secret') : '???');
-    const desc = badge.descKey ? t(badge.descKey) : (secret ? '???' : '');
+
+    let title = '???';
+    if (badge.titleKey) {
+        title = t(badge.titleKey);
+    } else if (secret) {
+        title = t('achievements.badges.secret');
+    }
+
+    let desc = '';
+    if (badge.descKey) {
+        desc = t(badge.descKey);
+    } else if (secret) {
+        desc = '???';
+    }
+
     const showProgress = !unlocked && !secret && badge.goal != null && badge.progress != null;
+
+    let borderStyle = '1px solid var(--border-subtle)';
+    if (highlighted) {
+        borderStyle = `2px solid ${color}`;
+    } else if (unlocked) {
+        borderStyle = `1px solid ${color}55`;
+    }
 
     return (
         <div
@@ -45,7 +65,7 @@ const BadgeItem = React.memo(({ badge, highlighted }) => {
                 borderRadius: 'var(--radius-xl)',
                 textAlign: 'center',
                 background: unlocked ? `linear-gradient(160deg, ${color}26, ${color}0a)` : 'var(--surface-muted)',
-                border: highlighted ? `2px solid ${color}` : (unlocked ? `1px solid ${color}55` : '1px solid var(--border-subtle)'),
+                border: borderStyle,
                 boxShadow: highlighted ? `0 0 0 4px ${color}33, 0 8px 28px ${color}55` : 'none',
                 animation: highlighted ? 'badgeHighlightPulse 1.5s ease-out 2' : 'none',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
@@ -273,6 +293,20 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
         }));
     }, [badges]);
 
+    let overlayOpacity = 0;
+    if (!isClosing && isVisible) {
+        overlayOpacity = 1;
+    }
+
+    let sheetTransform = 'translateY(100%)';
+    if (!isClosing) {
+        if (entered) {
+            sheetTransform = 'none';
+        } else if (isVisible) {
+            sheetTransform = 'translateY(0%)';
+        }
+    }
+
     return (
         <div className="modal-overlay" style={{
             background: 'transparent', zIndex: 199,
@@ -284,7 +318,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                 style={{
                     position: 'fixed', inset: 0,
                     background: 'rgba(0,0,0,0.5)',
-                    opacity: isClosing ? 0 : (isVisible ? 1 : 0),
+                    opacity: overlayOpacity,
                     transition: isClosing ? 'opacity 0.3s ease' : 'opacity 0.4s ease',
                     pointerEvents: 'auto'
                 }} 
@@ -305,7 +339,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                     background: 'var(--sheet-bg)',
                     borderRadius: 'calc(var(--radius-xl) * 1.5) calc(var(--radius-xl) * 1.5) 0 0',
                     boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
-                    transform: isClosing ? 'translateY(100%)' : (entered ? 'none' : (isVisible ? 'translateY(0%)' : 'translateY(100%)')),
+                    transform: sheetTransform,
                     transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     maxHeight: '90vh', display: 'flex', flexDirection: 'column',
                     willChange: entered ? 'auto' : 'transform',

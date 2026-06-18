@@ -174,18 +174,18 @@ export function useCameraPushUpCounter(onRepCounted) {
     useEffect(() => {
         if (calibrateCountdown <= 0) return;
         const timer = setTimeout(() => {
-            setCalibrateCountdown(prev => {
-                if (prev === 1) {
-                    // Slight delay to draw the base frame
-                    setTimeout(() => {
-                        captureBaseFrame();
-                    }, 100);
-                }
-                return prev - 1;
-            });
+            setCalibrateCountdown(prev => prev - 1);
         }, 1000);
         return () => clearTimeout(timer);
-    }, [calibrateCountdown, captureBaseFrame]);
+    }, [calibrateCountdown]);
+
+    // Capture base frame when countdown finishes
+    useEffect(() => {
+        if (isActive && !isCalibrated && calibrateCountdown === 0) {
+            const timer = setTimeout(captureBaseFrame, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [isActive, isCalibrated, calibrateCountdown, captureBaseFrame]);
 
     // Frame processing loop
     useEffect(() => {

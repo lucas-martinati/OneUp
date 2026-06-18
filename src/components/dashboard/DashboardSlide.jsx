@@ -49,6 +49,24 @@ export const DashboardSlide = React.memo(({
     const gridRows = Math.ceil(exercisesList.length / 3);
     const isCompact = gridRows >= 4;
 
+    let dayNumAnimation = '';
+    if (isCounterTransitioning) {
+        dayNumAnimation = isDayPerfect
+            ? 'gradientShift 4s ease infinite, counterSlideUp 1s ease-out'
+            : 'rainbowFlow 6s ease infinite, counterSlideUp 1s ease-out';
+    } else {
+        dayNumAnimation = isDayPerfect
+            ? 'gradientShift 4s ease infinite, numberRoll 0.5s ease-out'
+            : 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out';
+    }
+
+    let prevDayNumAnimation = '';
+    if (isDayPerfect) {
+        prevDayNumAnimation = 'gradientShift 4s ease infinite, counterSlideDown 1s ease-out forwards';
+    } else {
+        prevDayNumAnimation = 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards';
+    }
+
     return (
         <div
             className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative hide-scrollbar gap-responsive dashboard-slide-bg ${isDayPerfect ? styles.goldBg : ''}`}
@@ -137,9 +155,7 @@ export const DashboardSlide = React.memo(({
                             {isCounterTransitioning && prevDayNumber && (
                                 <div className={`day-number-anim ${isDayPerfect ? 'gold-text' : 'rainbow-gradient'}`} style={{
                                     position: 'absolute', fontSize: 'var(--day-num-font-size, clamp(2.2rem, 7.5vh, 6rem))', fontWeight: '800', lineHeight: 1,
-                                    animation: isDayPerfect
-                                            ? 'gradientShift 4s ease infinite, counterSlideDown 1s ease-out forwards'
-                                            : 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards'
+                                    animation: prevDayNumAnimation
                                 }}>
                                     {prevDayNumber}
                                 </div>
@@ -150,9 +166,7 @@ export const DashboardSlide = React.memo(({
                                 data-text={dayNumber}
                                 style={{
                                     fontSize: 'var(--day-num-font-size, clamp(2.2rem, 7.5vh, 6rem))', fontWeight: '800', lineHeight: 1,
-                                    animation: isCounterTransitioning
-                                            ? (isDayPerfect ? 'gradientShift 4s ease infinite, counterSlideUp 1s ease-out' : 'rainbowFlow 6s ease infinite, counterSlideUp 1s ease-out')
-                                            : (isDayPerfect ? 'gradientShift 4s ease infinite, numberRoll 0.5s ease-out' : 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out')
+                                    animation: dayNumAnimation
                                 }}
                             >
                                 {dayNumber}
@@ -340,6 +354,38 @@ const ExerciseButton = React.memo(({
     const exDone = completions[today]?.[ex.id]?.isCompleted || exCount >= exGoal;
     const exPct = exDone ? 100 : Math.min(100, (exCount / Math.max(exGoal, 1)) * 100);
 
+    let btnBg = `linear-gradient(160deg, ${ex.color}0d 0%, var(--surface-subtle) 80%)`;
+    if (exDone) {
+        btnBg = `linear-gradient(160deg, ${ex.color}26 0%, ${ex.gradient[1]}14 100%)`;
+    } else if (isActive) {
+        btnBg = `linear-gradient(160deg, ${ex.color}2e 0%, ${ex.gradient[0]}16 100%)`;
+    }
+
+    let btnBorder = '1.5px solid var(--border-muted)';
+    if (exDone) {
+        btnBorder = `1.5px solid ${ex.color}66`;
+    } else if (isActive) {
+        btnBorder = `1.5px solid ${ex.color}88`;
+    }
+
+    let btnBoxShadow = 'none';
+    if (exDone) {
+        btnBoxShadow = `0 0 8px ${ex.color}33`;
+    } else if (isActive) {
+        btnBoxShadow = `0 4px 16px ${ex.color}22`;
+    }
+
+    const textThemeColor = (exDone || isActive) ? ex.color : 'var(--text-secondary)';
+    const textPrimaryColor = (exDone || isActive) ? ex.color : 'var(--text-primary)';
+    const textOpacity = (exDone || isActive) ? 1 : 0.75;
+
+    let timeOrCountLabel = '';
+    if (ex.type === 'timer') {
+        timeOrCountLabel = exDone ? formatTime(exGoal) : `${formatTime(exCount)}/${formatTime(exGoal)}`;
+    } else {
+        timeOrCountLabel = exDone ? exGoal : `${exCount}/${exGoal}`;
+    }
+
     return (
         <button
             onClick={() => onSelect(ex.id)}
@@ -353,16 +399,8 @@ const ExerciseButton = React.memo(({
                 padding: 'var(--exercise-btn-padding, clamp(8px, 1.2vh, 12px) clamp(4px, 0.8vw, 8px))',
                 borderRadius: 'var(--radius-md)',
                 minHeight: 'var(--exercise-btn-min-height, clamp(44px, 7.2vh, 58px))',
-                background: exDone
-                    ? `linear-gradient(160deg, ${ex.color}26 0%, ${ex.gradient[1]}14 100%)`
-                    : isActive
-                        ? `linear-gradient(160deg, ${ex.color}2e 0%, ${ex.gradient[0]}16 100%)`
-                        : `linear-gradient(160deg, ${ex.color}0d 0%, var(--surface-subtle) 80%)`,
-                border: exDone
-                    ? `1.5px solid ${ex.color}66`
-                    : isActive
-                        ? `1.5px solid ${ex.color}88`
-                        : '1.5px solid var(--border-muted)',
+                background: btnBg,
+                border: btnBorder,
                 cursor: 'pointer',
                 transition: 'all 0.25s ease',
                 position: 'relative',
@@ -370,11 +408,7 @@ const ExerciseButton = React.memo(({
                 '--done-color': `${ex.color}55`,
                 '--done-color-dim': `${ex.color}12`,
                 animation: exDone ? 'doneGlow 3s ease-in-out infinite' : 'none',
-                boxShadow: exDone
-                    ? `0 0 8px ${ex.color}33`
-                    : isActive
-                        ? `0 4px 16px ${ex.color}22`
-                        : 'none'
+                boxShadow: btnBoxShadow
             }}
         >
             {/* Done checkmark (top-right corner) */}
@@ -417,7 +451,7 @@ const ExerciseButton = React.memo(({
             </div>
             <span style={{
                 fontSize: 'var(--tile-label-size, clamp(0.55rem, 1.25vh, 0.78rem))', fontWeight: '600',
-                color: exDone ? ex.color : isActive ? ex.color : 'var(--text-secondary)',
+                color: textThemeColor,
                 textAlign: 'center', lineHeight: '1.1',
                 transition: 'color 0.2s ease'
             }}>
@@ -426,8 +460,8 @@ const ExerciseButton = React.memo(({
             <span style={{
                 fontSize: 'var(--tile-count-size, clamp(0.6rem, 1.35vh, 0.82rem))', fontWeight: '700',
                 lineHeight: 1.2,
-                color: exDone ? ex.color : isActive ? ex.color : 'var(--text-primary)',
-                opacity: exDone ? 1 : isActive ? 1 : 0.75,
+                color: textPrimaryColor,
+                opacity: textOpacity,
                 transition: 'color 0.2s ease',
                 fontVariantNumeric: 'tabular-nums',
                 whiteSpace: 'nowrap'
@@ -436,10 +470,7 @@ const ExerciseButton = React.memo(({
                     textDecorationLine: exDone ? 'line-through' : 'none',
                     textDecorationColor: `${ex.color}88`
                 }}>
-                    {ex.type === 'timer'
-                        ? (exDone ? formatTime(exGoal) : `${formatTime(exCount)}/${formatTime(exGoal)}`)
-                        : (exDone ? exGoal : `${exCount}/${exGoal}`)
-                    }
+                    {timeOrCountLabel}
                 </span>
                 {WEIGHT_EXERCISES_MAP[ex.id] && (
                     <WeightBadge weight={weight} color={ex.color} style={{ marginLeft: '5px' }} />

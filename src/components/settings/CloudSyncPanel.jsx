@@ -38,12 +38,14 @@ export function CloudSyncPanel({
         </div>
       </div>
 
-      {authState.loading ? (
+      {authState.loading && (
         <div className="cloud-sync-loading">
           <Cloud className="pulse-animation" />
           <span>{t('common.loading')}</span>
         </div>
-      ) : authState.isSignedIn ? (
+      )}
+
+      {!authState.loading && authState.isSignedIn && (
         <div className="cloud-sync-content">
           {/* User info */}
             <div className="cloud-user-info">
@@ -125,14 +127,14 @@ export function CloudSyncPanel({
                   </div>
                   <div className="delete-actions">
                     <button 
-                      className="btn-delete-cancel"
+                       className="btn-delete-cancel"
                       onClick={() => setShowDeleteConfirm(false)}
                       disabled={deleting}
                     >
                       {t('common.cancel')}
                     </button>
                     <button 
-                      className="btn-delete-confirm"
+                       className="btn-delete-confirm"
                       onClick={async () => {
                         setDeleting(true);
                         try {
@@ -163,7 +165,9 @@ export function CloudSyncPanel({
             document.body
           )}
         </div>
-      ) : (
+      )}
+
+      {!authState.loading && !authState.isSignedIn && (
         <div className="cloud-sync-content">
           <div className="cloud-promo">
             <p className="cloud-promo-text">

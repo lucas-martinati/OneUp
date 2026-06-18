@@ -118,22 +118,22 @@ export function ExercisePanel({
     const ringCircumference = 2 * Math.PI * ringRadius;
     const displayTime = formatTime(displayCount);
     const goalTime = formatTime(dailyGoal);
-    // Timer text is wider than reps (digits + colons), so size it in `cqw`
-    // (relative to the ring width — see ProgressRing) and shrink it as the
-    // string grows, keeping it inside the circle on any viewport.
-    const timeFontSize = displayTime.length >= 6
-        ? 'clamp(1.6rem, 19cqw, 2.8rem)'
-        : displayTime.length >= 5
-            ? 'clamp(1.9rem, 24cqw, 3.4rem)'
-            : 'clamp(2.2rem, 30cqw, 4.2rem)';
+    let timeFontSize = 'clamp(2.2rem, 30cqw, 4.2rem)';
+    if (displayTime.length >= 6) {
+        timeFontSize = 'clamp(1.6rem, 19cqw, 2.8rem)';
+    } else if (displayTime.length >= 5) {
+        timeFontSize = 'clamp(1.9rem, 24cqw, 3.4rem)';
+    }
+
     // Rep count font scales down with digit count (based on the goal, so the
     // size stays stable while counting up) to keep large values inside the ring.
     const goalDigits = String(dailyGoal || 0).length;
-    const countFontSize = goalDigits >= 4
-        ? 'clamp(2.5rem, 7.5vw, 3.6rem)'
-        : goalDigits === 3
-            ? 'clamp(3.1rem, 9.5vw, 4.6rem)'
-            : 'clamp(4rem, 12vw, 6rem)';
+    let countFontSize = 'clamp(4rem, 12vw, 6rem)';
+    if (goalDigits >= 4) {
+        countFontSize = 'clamp(2.5rem, 7.5vw, 3.6rem)';
+    } else if (goalDigits === 3) {
+        countFontSize = 'clamp(3.1rem, 9.5vw, 4.6rem)';
+    }
 
     const handleValidateWeight = () => {
         const val = parseFloat(localWeightStr.replace(',', '.'));

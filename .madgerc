@@ -1,0 +1,7 @@
+{
+  "fileExtensions": ["js", "jsx"],
+  "webpackConfig": "madge-resolve.config.cjs",
+  "detectiveOptions": {
+    "es6": { "skipTypeImports": true }
+  }
+}

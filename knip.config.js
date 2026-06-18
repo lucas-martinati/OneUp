@@ -9,7 +9,8 @@ const config = {
     "src/services/revenuecatWebStub.js", // Référencé via un alias Vite (NATIVE_BUILD), invisible pour knip
     "coverage/**",
     "scratch/**",
-    "scripts/check-unused-css.cjs",
+    "scripts/**",
+    "madge-resolve.config.cjs", // Référencé en string par .madgerc, invisible pour knip
     "e2e/**"
   ],
   ignoreDependencies: [

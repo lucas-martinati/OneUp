@@ -7,6 +7,7 @@ import { useCloudSyncStore } from '../../store/useCloudSyncStore';
 import { useExerciseConfig } from '../../hooks/useExerciseConfig';
 import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '../../utils/dateUtils';
 import { getWeeklyGoalKm } from '../../config/exercises';
+import { evaluateCardioWeek } from '../../utils/cardioStreak';
 
 /**
  * Compute the cardio streak: number of consecutive weeks (ending at current)
@@ -16,40 +17,14 @@ import { getWeeklyGoalKm } from '../../config/exercises';
 function computeStreak(sessions, mode, challengeStartDate, currentDifficulty, completions = {}) {
   if (!sessions.length) return 0;
 
-  const now = new Date();
   let streak = 0;
 
   // Walk backwards week by week
   for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
-    const ref = new Date(now);
-    ref.setDate(ref.getDate() - weekOffset * 7);
-    const { start, end } = getWeekBounds(ref);
-
-    // Compute what week number this was relative to start
-    const weekNum = getCurrentWeekNumber(challengeStartDate) - weekOffset;
+    const { weekNum, achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions);
     if (weekNum < 1) break;
 
-    // Use recorded difficulty if available in completions for this week
-    let weekDifficulty = currentDifficulty;
-    const loop = new Date(start);
-    while (loop <= end) {
-      const dateStr = getLocalDateStr(loop);
-      const comp = completions[dateStr]?.[mode];
-      if (comp?.isCompleted && comp.difficulty !== undefined) {
-        weekDifficulty = comp.difficulty;
-        break;
-      }
-      loop.setDate(loop.getDate() + 1);
-    }
-
-    const goalKm = getWeeklyGoalKm(mode, weekNum) * weekDifficulty;
-
-    const weekSessions = sessions.filter(
-      s => s.type === mode && s.startTime >= start && s.startTime <= end
-    );
-    const weekDistanceKm = weekSessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
-
-    if (weekDistanceKm >= goalKm - 0.01) { // Small margin for rounding
+    if (achieved) {
       streak++;
     } else if (weekOffset > 0) {
       // Current week can be incomplete, skip it for break detection
@@ -231,7 +206,10 @@ export function useCardio() {
       const weekNum = getCurrentWeekNumber(startDate, new Date(weekStartNum));
       
       const existingComp = getWeeklyCompletion(activeMode, new Date(weekStartNum));
-      const goalDifficulty = existingComp ? (existingComp.difficulty || 1) : (activeMode === 'running' ? runningMultiplier : cyclingMultiplier);
+      let goalDifficulty = activeMode === 'running' ? runningMultiplier : cyclingMultiplier;
+      if (existingComp) {
+        goalDifficulty = existingComp.difficulty || 1;
+      }
       const goalKm = getWeeklyGoalKm(activeMode, weekNum) * goalDifficulty;
 
       const isGoalReached = totalDistanceKm >= goalKm;
@@ -259,7 +237,10 @@ export function useCardio() {
 
   // Weekly goal for current week (in km) - apply difficulty multiplier
   const weeklyGoal = useMemo(() => {
-    const multiplier = existingWeeklyComp ? (existingWeeklyComp.difficulty || 1) : (activeMode === 'running' ? runningMultiplier : cyclingMultiplier);
+    let multiplier = activeMode === 'running' ? runningMultiplier : cyclingMultiplier;
+    if (existingWeeklyComp) {
+      multiplier = existingWeeklyComp.difficulty || 1;
+    }
     const baseGoal = getWeeklyGoalKm(activeMode, weekNumber);
     return baseGoal * multiplier;
   }, [activeMode, weekNumber, runningMultiplier, cyclingMultiplier, existingWeeklyComp]);

@@ -18,9 +18,7 @@ function getFiles(dir, extensions) {
 }
 
 // 1. Find all JS/JSX files in src/
-console.log('\n\x1b[36m┌────────────────────────────────────────────────────────┐');
-console.log('│  \x1b[1m\x1b[37m[css] PROPRETÉ ET CLASSES CSS INUTILISÉES\x1b[0m\x1b[36m             │');
-console.log('└────────────────────────────────────────────────────────┘\x1b[0m\n');
+
 
 const srcDir = path.join(__dirname, '../src');
 const codeFiles = getFiles(srcDir, ['.js', '.jsx', '.html']);
@@ -71,9 +69,11 @@ cssFiles.forEach(cssFile => {
 
   const fileUnused = [];
   uniqueClasses.forEach(cls => {
-    // Check if the class name is used in the codebase
-    // We match as a whole word or as a substring in classNames (e.g. className="my-class")
-    const isUsed = codeContents.includes(cls);
+    // Check if the class name is used in the codebase.
+    // We match on word boundaries so that `.bubble` is NOT considered used
+    // just because `bubbleContainer` exists somewhere in the code.
+    const escaped = cls.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const isUsed = new RegExp(`\\b${escaped}\\b`).test(codeContents);
     if (!isUsed) {
       fileUnused.push(cls);
     }

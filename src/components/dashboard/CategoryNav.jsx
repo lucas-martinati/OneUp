@@ -172,9 +172,12 @@ export const CategoryNav = ({
                     return customCategories.find(c => c.id === id)?.name || id;
                 };
 
-                const dotColor = isActive 
-                    ? (isUserCat ? '#94a3b8' : 'var(--text-primary)') 
-                    : (isUserCat ? '#475569' : 'var(--text-secondary)');
+                let dotColor;
+                if (isActive) {
+                    dotColor = isUserCat ? '#94a3b8' : 'var(--text-primary)';
+                } else {
+                    dotColor = isUserCat ? '#475569' : 'var(--text-secondary)';
+                }
 
                 return (
                     <div 

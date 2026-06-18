@@ -32,6 +32,28 @@ export const FILTER_OPTIONS = [
   { id: 'no_photo', group: 'photo', label: 'Sans photo', test: u => !u.photoURL },
 ];
 
+function matchActiveFilter(u, filterId) {
+  const opt = FILTER_OPTIONS.find(o => o.id === filterId);
+  return opt ? opt.test(u) : true;
+}
+
+const makeQueryFilter = (query) => (u) => {
+  return (
+    u.uid.toLowerCase().includes(query) ||
+    u.email.toLowerCase().includes(query) ||
+    u.displayName.toLowerCase().includes(query)
+  );
+};
+
+const makeActiveFiltersFilter = (activeFilters) => (u) => {
+  return activeFilters.every(id => matchActiveFilter(u, id));
+};
+
+const makeSorter = (sortBy, sortReversed) => (a, b) => {
+  const r = (SORTERS[sortBy] || SORTERS.activity)(a, b);
+  return sortReversed ? -r : r;
+};
+
 /**
  * All state and Firebase logic of the admin panel: user list loading,
  * search filtering, form edition and per-key JSON section edition.
@@ -157,19 +179,10 @@ export function useAdminPanel() {
         lastActiveDay: lbEntry.lastActiveDay || null,
         rawData: data
       };
-    }).filter(u => {
-      return (
-        u.uid.toLowerCase().includes(query) ||
-        u.email.toLowerCase().includes(query) ||
-        u.displayName.toLowerCase().includes(query)
-      );
-    }).filter(u => activeFilters.every(id => {
-      const opt = FILTER_OPTIONS.find(o => o.id === id);
-      return opt ? opt.test(u) : true;
-    })).sort((a, b) => {
-      const r = (SORTERS[sortBy] || SORTERS.activity)(a, b);
-      return sortReversed ? -r : r;
-    });
+    })
+      .filter(makeQueryFilter(query))
+      .filter(makeActiveFiltersFilter(activeFilters))
+      .sort(makeSorter(sortBy, sortReversed));
   }, [dataState, searchQuery, sortBy, sortReversed, activeFilters]);
 
   // Select User

@@ -3,6 +3,8 @@ import { Shield, Flame, Trophy } from '../../utils/icons';
 import { useUIStore } from '../../store/useUIStore';
 import { Card, IconButton } from '../ui';
 
+const filterOutIds = (idsToRemove) => (p) => p.filter(particle => !idsToRemove.has(particle.id));
+
 export const DashboardHeader = React.memo(({
     isAdmin,
     streakActive, displayStreak, selectedExercise, totalReps
@@ -41,8 +43,9 @@ export const DashboardHeader = React.memo(({
         
         setParticles(p => [...p, ...newParticles]);
         
+        const idsToRemove = new Set(newParticles.map(np => np.id));
         setTimeout(() => {
-            setParticles(p => p.filter(particle => !newParticles.find(np => np.id === particle.id)));
+            setParticles(filterOutIds(idsToRemove));
         }, 1200);
     };
 

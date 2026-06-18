@@ -88,7 +88,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
           }}>
             {formatDateTime(session.date, lang)}
           </div>
-          {editingName ? (
+          {editingName && (
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '6px' }}>
               <input
                 autoFocus
@@ -113,7 +113,8 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
                 OK
               </button>
             </div>
-          ) : hasName ? (
+          )}
+          {!editingName && hasName && (
             <button
               onClick={() => setEditingName(true)}
               style={{
@@ -130,7 +131,8 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
               </span>
               <Pencil size={14} style={{ opacity: 0.4, flexShrink: 0 }} />
             </button>
-          ) : exercises.length > 0 && (
+          )}
+          {!editingName && !hasName && exercises.length > 0 && (
             <button
               onClick={() => setEditingName(true)}
               style={{

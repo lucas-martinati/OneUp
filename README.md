@@ -74,6 +74,27 @@ npm run dev
 
 *Note: Les APK se trouvent dans `android/app/build/outputs/apk/release/`.*
 
+### Qualité du Code & Validation Cohérence 🛠️
+
+Pour garantir la stabilité, la cohérence et la propreté de l'ensemble du projet, un script de validation globale est disponible :
+
+```bash
+npm run lint
+```
+
+Ce script regroupe et exécute séquentiellement **8 vérifications critiques** pour s'assurer que tout le code reste robuste et cohérent :
+1. 🔍 **ESLint & SonarJS** : Analyse de la syntaxe JS/React et détection de code spaghetti, de complexité cognitive, ou de bugs potentiels.
+2. ✂️ **Knip** : Identification des fichiers inutilisés, des exports morts et des dépendances orphelines.
+3. 🌐 **check-i18n-keys** : Vérification de la correspondance entre les clés de traduction utilisées dans l'application et celles déclarées dans le fichier de référence `en.json`.
+4. ⚖️ **check-i18n-consistency** : Contrôle de cohérence (structure, clés manquantes, doublons) entre toutes les langues gérées.
+5. 🎨 **check-unused-css** : Scan et détection automatique des classes CSS inutilisées au sein de l'application.
+6. 💅 **Stylelint** : Validation et uniformisation des styles CSS (bonnes pratiques et erreurs de syntaxe).
+7. 🔄 **Dépendances circulaires (Madge)** : Détection et prévention des cycles d'importation dans les modules de l'application.
+8. 👥 **Duplication de code (Jscpd)** : Analyse et détection de blocs de code en double (respect du principe DRY).
+
+Un rapport visuel synthétique s'affiche à la fin, facilitant le diagnostic rapide.
+
+
 ### Configuration Cloud (Firebase)
 
 Afin d'activer la synchronisation temps réel, l'authentification et les clans :

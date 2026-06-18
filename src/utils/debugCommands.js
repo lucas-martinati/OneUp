@@ -67,7 +67,8 @@ export function installDebugCommands() {
         badgeId = null;
       }
       useUIStore.getState().openAchievements(badgeId);
-      console.log(`[OneUp Debug] Opened achievements panel${badgeId ? ` highlighting "${badgeId}"` : ''}.`);
+      const highlightStr = badgeId ? ` highlighting "${badgeId}"` : '';
+      console.log(`[OneUp Debug] Opened achievements panel${highlightStr}.`);
     },
 
     // ── Social ─────────────────────────────────────────────────────────

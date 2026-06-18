@@ -211,14 +211,25 @@ export function ClanManager({ onClanJoined }) {
                         {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
-                            <button onClick={view === 'create' ? handleCreate : handleJoin} disabled={isLoading} className="hover-lift" style={{
-                                width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
-                                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', border: 'none', color: 'black',
-                                fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                                opacity: isLoading ? 0.7 : 1
-                            }}>
-                                {isLoading ? t('common.loading') : view === 'create' ? t('clan.createButton') : t('clan.join')}
-                            </button>
+                            {/* Submit Button */}
+                            {(() => {
+                                let submitLabel = t('clan.join');
+                                if (isLoading) {
+                                    submitLabel = t('common.loading');
+                                } else if (view === 'create') {
+                                    submitLabel = t('clan.createButton');
+                                }
+                                return (
+                                    <button onClick={view === 'create' ? handleCreate : handleJoin} disabled={isLoading} className="hover-lift" style={{
+                                        width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
+                                        background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', border: 'none', color: 'black',
+                                        fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                        opacity: isLoading ? 0.7 : 1
+                                    }}>
+                                        {submitLabel}
+                                    </button>
+                                );
+                            })()}
                             <button onClick={() => setView('menu')} style={{
                                 width: '100%', padding: '14px', background: 'transparent', border: 'none',
                                 color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: '600', cursor: 'pointer'

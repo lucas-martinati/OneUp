@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Zap, Star } from '../../utils/icons';
+import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Star } from '../../utils/icons';
 import { Avatar } from '../ui/Avatar';
 import { Z_INDEX } from '../../utils/zIndex';
 import { DifficultyBadge } from '../ui/DifficultyBadge';
@@ -317,21 +317,21 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                                 <div style={{ ...sectionLabelStyle, marginTop: '4px' }}>
                                     {t('common.cardio')}
                                 </div>
-                                {CARDIO_EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
+                                {CARDIO_EXERCISES.map(renderExerciseRow)}
                             </>
                         )}
 
                         <div style={sectionLabelStyle}>
                             {t('common.bodyweight')}
                         </div>
-                        {EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
+                        {EXERCISES.map(renderExerciseRow)}
                         
                         {canAccessFeature(FEATURES.WEIGHTS, entry) && (
                             <>
                                 <div style={sectionLabelStyle}>
                                     {t('common.weights')}
                                 </div>
-                                {WEIGHT_EXERCISES.map((ex, index) => renderExerciseRow(ex, index))}
+                                {WEIGHT_EXERCISES.map(renderExerciseRow)}
                             </>
                         )}
                     </div>

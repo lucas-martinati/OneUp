@@ -2,11 +2,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   getIcon, EXERCISE_ICONS, SOCIAL_ICONS, SHARE_ICONS,
-  Clock, Award, Flame 
+  Clock, Award, Flame
 } from '../../../utils/icons';
 import { getExerciseLabel, getExerciseColor, isCustomExercise } from '../../../utils/exerciseLabel';
 import { sumExerciseReps } from '../../../utils/stats';
-import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../../../config/categories';
+import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../../../config/categories';
 import { EXERCISES, CARDIO_EXERCISES, getDailyGoal } from '../../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../../config/weights';
 import { formatDuration, getLocalDateStr, getCurrentWeekNumber, parseLocalDate } from '../../../utils/dateUtils';
@@ -81,7 +81,7 @@ function HistoryRow({ session, t, lang }) {
         {formatDate(session.date, lang)}
       </span>
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
-        {hasName ? (
+        {hasName && (
           <>
             <span style={{
               fontSize: '0.6rem', fontWeight: 600, color: 'rgba(255,255,255,0.8)',
@@ -91,9 +91,11 @@ function HistoryRow({ session, t, lang }) {
             </span>
             {session.exercises?.length > 0 && <SessionIcons exercises={session.exercises} />}
           </>
-        ) : session.exercises?.length > 0 ? (
+        )}
+        {!hasName && session.exercises?.length > 0 && (
           <SessionIcons exercises={session.exercises} size={13} />
-        ) : (
+        )}
+        {!hasName && !session.exercises?.length && (
           <span style={{
             fontSize: '0.6rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)',
           }}>
@@ -291,6 +293,15 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
     : allExercises;
   const weightExercises = allExercises.filter(isWeightEx);
   const customExercises = allExercises.filter(isCustomEx);
+
+  // Libellé d'une catégorie : nom personnalisé si défini, sinon clé brute (catégorie
+  // utilisateur) ou traduction (catégorie standard).
+  const getCategoryLabel = (key) => {
+    const catDef = customCategories.find(c => c.id === key);
+    if (catDef?.name) return catDef.name;
+    return isUserCategory(key) ? key : t(`common.${key}`);
+  };
+
   const categories = fullCategoryOrder.map(key => {
     let exList = [];
     if (key === CATEGORIES.BODYWEIGHT) exList = bodyweightExercises;
@@ -298,14 +309,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
     if (key === CATEGORIES.CUSTOM) exList = customExercises;
     if (key === CATEGORIES.CARDIO) exList = allExercises.filter(isCardioEx);
     if (exList.length === 0) return null;
-    let label;
-    if (isUserCategory(key)) {
-      const catDef = customCategories.find(c => c.id === key);
-      label = catDef?.name || key;
-    } else {
-      const catDef = customCategories.find(c => c.id === key);
-      label = catDef?.name || t(`common.${key}`);
-    }
+    const label = getCategoryLabel(key);
     return { 
       key, 
       exercises: exList, 
@@ -345,14 +349,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
     if (key === CATEGORIES.CARDIO) exList = dailyCardio;
     
     if (exList.length === 0) return null;
-    let label;
-    if (isUserCategory(key)) {
-      const catDef = customCategories.find(c => c.id === key);
-      label = catDef?.name || key;
-    } else {
-      const catDef = customCategories.find(c => c.id === key);
-      label = catDef?.name || t(`common.${key}`);
-    }
+    const label = getCategoryLabel(key);
     return {
       key,
       exercises: exList,
@@ -554,7 +551,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
         </div>
 
         {/* Session title or global label */}
-        {isGlobal ? (
+        {isGlobal && (
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{
@@ -616,13 +613,14 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
               </div>
             )}
           </div>
-        ) : sessionData?.name ? (
+        )}
+        {!isGlobal && sessionData?.name && (
           <div style={{
             fontSize: '0.85rem', fontWeight: 700, color: 'rgba(255,255,255,0.9)',
           }}>
             {sessionData.name}
           </div>
-        ) : null}
+        )}
 
         {/* Metrics row */}
         <div style={{

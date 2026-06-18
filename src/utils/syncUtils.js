@@ -2,6 +2,11 @@ import { createLogger } from './logger';
 
 const logger = createLogger('SyncUtils');
 
+function getTimestamp(lcc, isPlaceholder) {
+  if (isPlaceholder || !lcc) return 0;
+  return new Date(lcc).getTime();
+}
+
 export function sanitizeForCloud(data) {
   if (!data || !data.completions) return data;
   const sanitizedCompletions = {};
@@ -23,7 +28,9 @@ export function sanitizeForCloud(data) {
   });
   
   // Remove achievements and hasShared from progress sync (they are handled independently or deprecated)
-  const { achievements: _a, hasShared: _h, ...restOfData } = data;
+  const restOfData = { ...data };
+  delete restOfData.achievements;
+  delete restOfData.hasShared;
   return { ...restOfData, completions: sanitizedCompletions };
 }
 
@@ -61,8 +68,8 @@ export function mergeData(localData, cloudData) {
   const localLCCIsPlaceholder = localLCC && typeof localLCC === 'object' && localLCC['.sv'];
   const cloudLCCIsPlaceholder = cloudLCC && typeof cloudLCC === 'object' && cloudLCC['.sv'];
   
-  const localLCCTs = localLCCIsPlaceholder ? 0 : (localLCC ? new Date(localLCC).getTime() : 0);
-  const cloudLCCTs = cloudLCCIsPlaceholder ? 0 : (cloudLCC ? new Date(cloudLCC).getTime() : 0);
+  const localLCCTs = getTimestamp(localLCC, localLCCIsPlaceholder);
+  const cloudLCCTs = getTimestamp(cloudLCC, cloudLCCIsPlaceholder);
 
   // If cloud data is strictly newer (e.g. updated by admin or another device)
   // and local does not have a pending placeholder write, we treat the cloud
@@ -99,8 +106,8 @@ export function mergeData(localData, cloudData) {
           const localIsPlaceholder = localEx?.timestamp && typeof localEx.timestamp === 'object' && localEx.timestamp['.sv'];
           const cloudIsPlaceholder = cloudEx?.timestamp && typeof cloudEx.timestamp === 'object' && cloudEx.timestamp['.sv'];
           
-          const localTs = localIsPlaceholder ? 0 : (localEx?.timestamp ? new Date(localEx.timestamp).getTime() : 0);
-          const cloudTs = cloudIsPlaceholder ? 0 : (cloudEx?.timestamp ? new Date(cloudEx.timestamp).getTime() : 0);
+          const localTs = getTimestamp(localEx?.timestamp, localIsPlaceholder);
+          const cloudTs = getTimestamp(cloudEx?.timestamp, cloudIsPlaceholder);
           
           const cloudIsNewer = !localIsPlaceholder && cloudTs > localTs;
           const localHasNoTimestamp = (cloudEx?.timestamp && !localEx?.timestamp);

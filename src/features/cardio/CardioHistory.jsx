@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import 'leaflet/dist/leaflet.css';
 import { X, Clock, Target, Footprints } from '../../utils/icons';
 import { IconButton } from '../../components/ui';
-import { Capacitor } from '@capacitor/core';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { CardioMap } from './CardioMap';
 import { CardioFullscreenMap } from './CardioFullscreenMap';

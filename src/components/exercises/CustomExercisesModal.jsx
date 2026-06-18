@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Plus, Settings2, Trash2, Edit2, Swords, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, ChevronDown, Check, Target } from '../../utils/icons';
+import { X, Plus, Settings2, Trash2, Edit2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, Check } from '../../utils/icons';
 import { Button, IconButton } from '../ui';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { Z_INDEX } from '../../utils/zIndex';
@@ -249,6 +249,20 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                   );
                   const isFull = catExs.length >= MAX_EXERCISES_PER_CATEGORY;
                   
+                  let borderStyle = 'rgba(255,255,255,0.1)';
+                  if (isSelected) {
+                      borderStyle = cat.color;
+                  } else if (isFull) {
+                      borderStyle = 'rgba(255,255,255,0.05)';
+                  }
+
+                  let colorStyle = 'white';
+                  if (isSelected) {
+                      colorStyle = cat.color;
+                  } else if (isFull) {
+                      colorStyle = 'var(--text-secondary)';
+                  }
+
                   return (
                     <button
                       key={cat.id}
@@ -257,8 +271,8 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                       style={{
                         padding: '8px 12px', borderRadius: '12px',
                         background: isSelected ? `${cat.color}20` : 'rgba(255,255,255,0.03)',
-                        border: `1px solid ${isSelected ? cat.color : isFull ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)'}`,
-                        color: isSelected ? cat.color : isFull ? 'var(--text-secondary)' : 'white',
+                        border: `1px solid ${borderStyle}`,
+                        color: colorStyle,
                         fontSize: '0.85rem', fontWeight: '700', cursor: isFull ? 'default' : 'pointer',
                         display: 'flex', alignItems: 'center', gap: '6px', opacity: isFull ? 0.4 : 1,
                         transition: 'all 0.2s'

@@ -5,6 +5,24 @@ import { Edit2, Check, X, Trash2, ChevronRight, Plus } from '../../utils/icons';
  *  completions) readable and fast to render. */
 const AUTO_COLLAPSE_THRESHOLD = 15;
 
+/** Bouton "supprimer" (icône poubelle, opacité au survol) réutilisé dans l'arbre. */
+function DeleteButton({ onClick, title }) {
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      style={{
+        background: 'transparent', border: 'none', color: '#ef4444',
+        cursor: 'pointer', padding: '2px 6px', opacity: 0.4, display: 'flex', alignItems: 'center'
+      }}
+      onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
+      onMouseLeave={(e) => e.currentTarget.style.opacity = 0.4}
+    >
+      <Trash2 size={12} />
+    </button>
+  );
+}
+
 /** Parse a raw text value as JSON, falling back to a plain string. */
 function parseLooseValue(raw) {
   const trimmed = raw.trim();
@@ -220,18 +238,7 @@ function JsonTreeNode({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
           {valueElement}
           {onDelete && (
-            <button 
-              onClick={() => onDelete(path)}
-              title="Supprimer cette clé"
-              style={{
-                background: 'transparent', border: 'none', color: '#ef4444',
-                cursor: 'pointer', padding: '2px 6px', opacity: 0.4, display: 'flex', alignItems: 'center'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = 0.4}
-            >
-              <Trash2 size={12} />
-            </button>
+            <DeleteButton onClick={() => onDelete(path)} title="Supprimer cette clé" />
           )}
         </div>
       </div>
@@ -305,18 +312,7 @@ function JsonTreeNode({
           </button>
 
           {onDelete && (
-            <button 
-              onClick={() => onDelete(path)}
-              title="Supprimer"
-              style={{
-                background: 'transparent', border: 'none', color: '#ef4444',
-                cursor: 'pointer', padding: '2px 6px', opacity: 0.4, display: 'flex', alignItems: 'center'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = 0.4}
-            >
-              <Trash2 size={12} />
-            </button>
+            <DeleteButton onClick={() => onDelete(path)} title="Supprimer" />
           )}
         </div>
       </div>
@@ -335,7 +331,7 @@ function JsonTreeNode({
                 type="text"
                 value={newKey}
                 onChange={(e) => setNewKey(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleAddConfirm(); if (e.key === 'Escape') setIsAdding(false); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') { handleAddConfirm(); } if (e.key === 'Escape') { setIsAdding(false); } }}
                 placeholder="nom de la clé"
                 style={{
                   background: '#020204', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '4px',
@@ -349,7 +345,7 @@ function JsonTreeNode({
               type="text"
               value={newVal}
               onChange={(e) => setNewVal(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleAddConfirm(); if (e.key === 'Escape') setIsAdding(false); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') { handleAddConfirm(); } if (e.key === 'Escape') { setIsAdding(false); } }}
               placeholder='valeur (ex: "texte", 42, true, {})'
               style={{
                 background: '#020204', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '4px',

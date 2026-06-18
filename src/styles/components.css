@@ -17,7 +17,7 @@ button:focus:not(:focus-visible) {
   font-size: clamp(1.4rem, 4vw, 1.8rem);
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
   text-align: center;
   background: var(--gradient-glow);
   -webkit-background-clip: text;
@@ -280,10 +280,7 @@ button:focus:not(:focus-visible) {
      which tracks the pointer regardless of position once activated. */
   content: '';
   position: absolute;
-  top: -20px;
-  bottom: -20px;
-  left: -20px;
-  right: -20px;
+  inset: -20px;
   pointer-events: none;
 }
 

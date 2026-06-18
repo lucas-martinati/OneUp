@@ -29,6 +29,13 @@ export function ProgressRing({
 }) {
     const label = isTimer ? t('cardio.duration') : t('common.reps');
 
+    let filterVal = `drop-shadow(0 0 5px ${activeColor}55)`;
+    if (isCompleted) {
+        filterVal = `drop-shadow(0 0 12px ${activeColor}aa)`;
+    } else if (isTimer && isRunning) {
+        filterVal = 'none';
+    }
+
     return (
         <div
             style={{
@@ -90,9 +97,7 @@ export function ProgressRing({
                         // Glow is a paint-time filter. While a timer is actively
                         // running the ring repaints every frame, so we drop the
                         // filter then to avoid per-frame repaints (battery/heat).
-                        filter: isCompleted
-                            ? `drop-shadow(0 0 12px ${activeColor}aa)`
-                            : (isTimer && isRunning ? 'none' : `drop-shadow(0 0 5px ${activeColor}55)`)
+                        filter: filterVal
                     }}
                 />
                 <defs>

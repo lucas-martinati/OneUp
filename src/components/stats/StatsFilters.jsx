@@ -12,6 +12,14 @@ export function StatsFilters({
 }) {
     const { t } = useTranslation();
 
+    const handleToggleCategory = (catId, checked) => {
+        setActiveCategories(prev => {
+            if (checked) return [...prev, catId];
+            if (prev.length === 1) return prev;
+            return prev.filter(id => id !== catId);
+        });
+    };
+
     return (
         <div style={{ marginBottom: 'var(--spacing-md)' }}>
             <button
@@ -50,14 +58,19 @@ export function StatsFilters({
                         }
                         if (!config) return null;
                         const cat = { ...config, color: fullCategoryColors[categoryId] };
+                        let labelColor = '#ffffff';
+                        if (!activeCategories.includes(cat.id)) {
+                            labelColor = cat.locked ? 'var(--text-disabled)' : cat.color;
+                        }
+
                         return (
                             <label key={cat.id} style={{
                                 display: 'flex', alignItems: 'center', gap: '6px',
                                 background: activeCategories.includes(cat.id) ? `linear-gradient(135deg, ${cat.color}, ${cat.color}cc)` : 'rgba(255,255,255,0.05)',
-                                color: activeCategories.includes(cat.id) ? '#ffffff' : (cat.locked ? 'var(--text-disabled)' : cat.color),
+                                color: labelColor,
                                 border: activeCategories.includes(cat.id) ? `1px solid ${cat.color}88` : `1px solid ${cat.color}33`,
                                 padding: '8px 16px', borderRadius: 'var(--radius-full)',
-                                fontSize: '0.8rem', fontWeight: '700', cursor: cat.locked ? 'pointer' : 'pointer',
+                                fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer',
                                 transition: 'all 0.2s',
                                 opacity: cat.locked ? 0.6 : 1
                             }}>
@@ -72,14 +85,7 @@ export function StatsFilters({
                                             type="checkbox"
                                             style={{ display: 'none' }}
                                             checked={activeCategories.includes(cat.id)}
-                                            onChange={(e) => {
-                                                const checked = e.target.checked;
-                                                setActiveCategories(prev => {
-                                                    if (checked) return [...prev, cat.id];
-                                                    if (prev.length === 1) return prev;
-                                                    return prev.filter(id => id !== cat.id);
-                                                });
-                                            }}
+                                            onChange={(e) => handleToggleCategory(cat.id, e.target.checked)}
                                         />
                                         {cat.label}
                                     </>

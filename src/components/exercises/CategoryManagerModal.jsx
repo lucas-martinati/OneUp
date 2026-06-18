@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Plus, Trash2, Edit2, FolderPlus, Check, ChevronRight, Lock, ChevronUp, ChevronDown } from '../../utils/icons';
+import { X, Plus, Trash2, Edit2, Check, ChevronRight, ChevronUp, ChevronDown } from '../../utils/icons';
 import { IconButton } from '../ui';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { Z_INDEX } from '../../utils/zIndex';

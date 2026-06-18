@@ -1,5 +1,10 @@
 import { sumExerciseReps } from './stats';
 
+function ensureIsoString(date) {
+  if (!date) return new Date().toISOString();
+  return typeof date === 'string' ? date : date.toISOString();
+}
+
 /**
  * Determine the time-of-day bucket from an ISO date string.
  * @param {string} dateStr - ISO 8601 date string
@@ -77,7 +82,7 @@ function pickFromPool(t, key, seed) {
  */
 export function generateSessionName(t, { date, totalReps = 0, exerciseCount = 0, isPerfectDay = false }) {
   // Ensure dateStr is always a string, even if a Date object is accidentally passed
-  const dateStr = date ? (typeof date === 'string' ? date : date.toISOString()) : new Date().toISOString();
+  const dateStr = ensureIsoString(date);
   const seed = dateStr.slice(0, 10) + String(totalReps) + String(exerciseCount);
 
   if (isPerfectDay) {
@@ -103,7 +108,7 @@ export function generateSessionName(t, { date, totalReps = 0, exerciseCount = 0,
  */
 function generateShareText(t, { date, totalReps = 0, exerciseCount = 0, isPerfectDay = false, mode = 'session' }) {
   // Ensure dateStr is always a string
-  const dateStr = date ? (typeof date === 'string' ? date : date.toISOString()) : new Date().toISOString();
+  const dateStr = ensureIsoString(date);
   const seed = dateStr.slice(0, 10) + 'share' + String(totalReps);
 
   if (mode === 'global') {

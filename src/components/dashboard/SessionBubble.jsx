@@ -434,6 +434,13 @@ export const SessionBubble = React.memo(({ onResume, onDiscard }) => {
                 const visible = showTrail && !isRetracting;
                 const retracting = isRetracting;
 
+                let delayVal = '0ms';
+                if (visible) {
+                    delayVal = `${i * 50}ms`;
+                } else if (retracting) {
+                    delayVal = `${(visibleExercises.length - 1 - i) * 30}ms`;
+                }
+
                 return (
                     <div
                         key={ex.id}
@@ -452,11 +459,7 @@ export const SessionBubble = React.memo(({ onResume, onDiscard }) => {
                             borderColor: isCurrent ? `${ex.color}80` : `${ex.color}35`,
                             '--sphere-glow': `${ex.color}50`,
                             opacity: visible ? baseOpacity : 0,
-                            transitionDelay: visible
-                                ? `${i * 50}ms`
-                                : retracting
-                                    ? `${(visibleExercises.length - 1 - i) * 30}ms`
-                                    : '0ms',
+                            transitionDelay: delayVal,
                         }}
                     >
                         <DynamicIcon

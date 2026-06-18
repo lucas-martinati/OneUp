@@ -175,20 +175,29 @@ class StravaService {
       });
 
       const activities = await response.json();
-      return activities.map(a => ({
-        id: `strava_${a.id}`,
-        source: 'strava',
-        type: a.type === 'Run' ? 'running' : a.type === 'Ride' ? 'cycling' : 'other',
-        distance: a.distance, // meters
-        duration: a.moving_time, // seconds
-        movingTime: a.moving_time,
-        startTime: new Date(a.start_date).getTime(),
-        name: a.name,
-        gpsTrack: decodePolyline(a.map?.summary_polyline) || decodePolyline(a.map?.polyline) || null,
-        polyline: a.map?.summary_polyline || null,
-        elevation: a.total_elevation_gain,
-        averageSpeed: a.average_speed,
-      })).filter(a => a.type !== 'other');
+      return activities.map(a => {
+        let actType = 'other';
+        if (a.type === 'Run') {
+          actType = 'running';
+        } else if (a.type === 'Ride') {
+          actType = 'cycling';
+        }
+
+        return {
+          id: `strava_${a.id}`,
+          source: 'strava',
+          type: actType,
+          distance: a.distance, // meters
+          duration: a.moving_time, // seconds
+          movingTime: a.moving_time,
+          startTime: new Date(a.start_date).getTime(),
+          name: a.name,
+          gpsTrack: decodePolyline(a.map?.summary_polyline) || decodePolyline(a.map?.polyline) || null,
+          polyline: a.map?.summary_polyline || null,
+          elevation: a.total_elevation_gain,
+          averageSpeed: a.average_speed,
+        };
+      }).filter(a => a.type !== 'other');
     } catch (err) {
       logger.error('Failed to fetch Strava activities', err);
       return [];

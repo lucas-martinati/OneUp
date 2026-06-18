@@ -36,7 +36,7 @@ import { useExerciseConfig } from '../hooks/useExerciseConfig';
 
 import { setSoundSettingsGetter } from '../utils/soundManager';
 import { clearWorkoutSession } from '../utils/workoutSessionStorage';
-import { EXERCISES, getDailyGoal } from '../config/exercises';
+import { getDailyGoal } from '../config/exercises';
 import { canAccessFeature, FEATURES } from '../utils/entitlements';
 import { isAdminEmail } from '../config/admin';
 
@@ -105,22 +105,23 @@ export function Dashboard() {
         return set;
     }, [activeSlide, fullCategoryOrder.length]);
     const scrollContainerRef = useRef(null);
+    const handleIntersection = useCallback((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const slideIndex = parseInt(entry.target.getAttribute('data-slide-index'), 10);
+                if (!isNaN(slideIndex)) {
+                    setActiveSlide(slideIndex);
+                }
+            }
+        });
+    }, []);
 
     // Use IntersectionObserver to track the active slide (more performant than onScroll)
     useEffect(() => {
         const container = scrollContainerRef.current;
         if (!container) return;
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const slideIndex = parseInt(entry.target.getAttribute('data-slide-index'), 10);
-                    if (!isNaN(slideIndex)) {
-                        setActiveSlide(prev => prev !== slideIndex ? slideIndex : prev);
-                    }
-                }
-            });
-        }, {
+        const observer = new IntersectionObserver(handleIntersection, {
             root: container,
             threshold: 0.5
         });
@@ -135,7 +136,7 @@ export function Dashboard() {
 
         observeChildren();
         return () => observer.disconnect();
-    }, [fullCategoryOrder, renderedSlides]);
+    }, [fullCategoryOrder, renderedSlides, handleIntersection]);
 
     // Scroll to default slide (bodyweight) on mount
     useEffect(() => {
