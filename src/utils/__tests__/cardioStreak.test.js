@@ -55,6 +55,15 @@ describe('evaluateCardioWeek', () => {
     expect(achieved).toBe(true); // 0.2 + 0.3 = 0.5 km ≥ 0.45 km
   });
 
+  it('traite une session sans distance comme 0 (pas de NaN)', () => {
+    const sessions = [
+      { type: 'running', startTime: inWeek }, // distance absente
+      runSession(500),
+    ];
+    const { achieved } = evaluateCardioWeek(sessions, 'running', 0, today, 1);
+    expect(achieved).toBe(true); // 0 + 0.5 km ≥ 0.45 km, sans NaN
+  });
+
   it('ignore les sessions d’un autre mode', () => {
     const sessions = [
       { type: 'cycling', distance: 5000, startTime: inWeek },

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getIcon, Dumbbell, Flame } from '../icons';
+import { getIcon, DynamicIcon, Dumbbell, Flame } from '../icons';
 
 describe('getIcon', () => {
   it('returns the requested icon when it exists', () => {
@@ -23,5 +23,22 @@ describe('getIcon', () => {
   it('resolves aliases (Pencil maps to a real component)', () => {
     expect(getIcon('Pencil')).toBeDefined();
     expect(typeof getIcon('Pencil')).not.toBe('undefined');
+  });
+});
+
+describe('DynamicIcon', () => {
+  it('renders the named icon component', () => {
+    expect(DynamicIcon({ icon: 'Flame' }).type).toBe(Flame);
+  });
+
+  it('falls back to Dumbbell for an unknown icon name', () => {
+    expect(DynamicIcon({ icon: 'TotallyNotAnIcon' }).type).toBe(Dumbbell);
+  });
+
+  it('passes extra props through and strips icon/fallback', () => {
+    const el = DynamicIcon({ icon: 'Flame', fallback: 'Star', size: 32, className: 'x' });
+    expect(el.props).toMatchObject({ size: 32, className: 'x' });
+    expect(el.props.icon).toBeUndefined();
+    expect(el.props.fallback).toBeUndefined();
   });
 });
