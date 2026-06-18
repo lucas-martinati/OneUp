@@ -15,6 +15,10 @@ export function useNotificationScheduling() {
   const getDayNumber = useProgressStore(s => s.getDayNumber);
   const settings = useSettingsStore(s => s.settings);
 
+  const notificationsEnabled = settings?.notificationsEnabled;
+  const notificationHour = settings?.notificationTime?.hour;
+  const notificationMinute = settings?.notificationTime?.minute;
+
   const { scheduleNotification, requestNotificationPermission } = useNotificationManager({
     isDayDone,
     getDayNumber,
@@ -22,24 +26,31 @@ export function useNotificationScheduling() {
 
   // ── Permission + scheduling on settings change ─────────────────────────
   useEffect(() => {
-    if (isSetup && settings.notificationsEnabled) {
+    if (isSetup && notificationsEnabled) {
       requestNotificationPermission();
-      scheduleNotification(settings);
+      scheduleNotification({
+        notificationsEnabled,
+        notificationTime: { hour: notificationHour, minute: notificationMinute }
+      });
     }
-  }, [isSetup, settings.notificationsEnabled, requestNotificationPermission, scheduleNotification, settings]);
+  }, [isSetup, notificationsEnabled, requestNotificationPermission, scheduleNotification, notificationHour, notificationMinute]);
 
   // ── Re-schedule at midnight (completion state changes the message) ─────
   useEffect(() => {
-    if (isSetup && settings.notificationsEnabled) {
-      scheduleNotification(settings);
+    if (isSetup && notificationsEnabled) {
+      const lightweightSettings = {
+        notificationsEnabled,
+        notificationTime: { hour: notificationHour, minute: notificationMinute }
+      };
+      scheduleNotification(lightweightSettings);
       const now = new Date();
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(0, 0, 30, 0);
       const midnightTimer = setTimeout(() => {
-        scheduleNotification(settings);
+        scheduleNotification(lightweightSettings);
       }, tomorrow.getTime() - now.getTime());
       return () => clearTimeout(midnightTimer);
     }
-  }, [isSetup, settings.notificationsEnabled, settings.notificationTime, completions, scheduleNotification, settings]);
+  }, [isSetup, notificationsEnabled, notificationHour, notificationMinute, completions, scheduleNotification]);
 }

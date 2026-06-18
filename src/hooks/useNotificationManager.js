@@ -1,3 +1,4 @@
+import { useCallback, useRef, useEffect } from 'react';
 import i18n from '../i18n';
 import { getLocalDateStr } from '../utils/dateUtils';
 
@@ -94,7 +95,15 @@ function buildNotificationContent({ dayNum, streak }) {
 }
 
 export function useNotificationManager({ isDayDone, getDayNumber }) {
-  const scheduleNotification = async (settings) => {
+  const isDayDoneRef = useRef(isDayDone);
+  const getDayNumberRef = useRef(getDayNumber);
+
+  useEffect(() => {
+    isDayDoneRef.current = isDayDone;
+    getDayNumberRef.current = getDayNumber;
+  }, [isDayDone, getDayNumber]);
+
+  const scheduleNotification = useCallback(async (settings) => {
     try {
       const { LocalNotifications } = await getLocalNotificationsModule();
       const permission = await LocalNotifications.checkPermissions();
@@ -117,13 +126,13 @@ export function useNotificationManager({ isDayDone, getDayNumber }) {
           let safetyCounter = 0;
 
           // Skip already-done days
-          while (isDayDone(notificationDateStr) && safetyCounter < 365) {
+          while (isDayDoneRef.current(notificationDateStr) && safetyCounter < 365) {
             notificationTime.setDate(notificationTime.getDate() + 1);
             notificationDateStr = getLocalDateStr(notificationTime);
             safetyCounter++;
           }
 
-          const dayNum = getDayNumber(notificationDateStr);
+          const dayNum = getDayNumberRef.current(notificationDateStr);
 
           // Compute a rough streak up to yesterday to determine context.
           // We check backwards from today (not from notificationDateStr, which
@@ -134,7 +143,7 @@ export function useNotificationManager({ isDayDone, getDayNumber }) {
           for (let i = 0; i < 365; i++) {
             const checkDate = new Date(todayDate);
             checkDate.setDate(checkDate.getDate() - i);
-            if (isDayDone(getLocalDateStr(checkDate))) {
+            if (isDayDoneRef.current(getLocalDateStr(checkDate))) {
               streak++;
             } else {
               break;
@@ -162,9 +171,9 @@ export function useNotificationManager({ isDayDone, getDayNumber }) {
     } catch (error) {
       console.debug('Notification scheduling failed:', error);
     }
-  };
+  }, []);
 
-  const requestNotificationPermission = async () => {
+  const requestNotificationPermission = useCallback(async () => {
     try {
       const { LocalNotifications } = await getLocalNotificationsModule();
       const permission = await LocalNotifications.checkPermissions();
@@ -174,7 +183,7 @@ export function useNotificationManager({ isDayDone, getDayNumber }) {
     } catch (error) {
       console.debug('Permission request failed:', error);
     }
-  };
+  }, []);
 
   return { scheduleNotification, requestNotificationPermission };
 }
