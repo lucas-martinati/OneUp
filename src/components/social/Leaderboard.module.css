@@ -323,14 +323,6 @@
   padding: var(--spacing-xl) var(--spacing-md);
   color: var(--text-secondary);
 }
-.spinner {
-  width: 34px;
-  height: 34px;
-  border: 3px solid color-mix(in srgb, var(--accent-glow) 25%, transparent);
-  border-top-color: var(--accent-glow);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
 .emptyIcon {
   width: 64px;
   height: 64px;

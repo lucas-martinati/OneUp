@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { X, Trophy, LogOut, Activity } from '../../utils/icons';
-import { IconButton } from '../ui';
+import { IconButton, Spinner } from '../ui';
 import { EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
 import { getLocalDateStr } from '../../utils/dateUtils';
@@ -253,8 +253,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                 />
                 {loading ? (
                     <div className={styles.center}>
-                        <div className={styles.spinner} />
-                        <span style={{ fontSize: '0.85rem' }}>{t('common.loading')}</span>
+                        <Spinner label={t('common.loading')} />
                     </div>
                 ) : sorted.length === 0 ? (
                     <div className={styles.center}>

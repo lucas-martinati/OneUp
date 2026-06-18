@@ -8,6 +8,7 @@ export { GoogleIcon } from './GoogleIcon';
 export { IconButton } from './IconButton';
 export { SegmentedControl } from './SegmentedControl';
 export { SettingRow } from './SettingRow';
+export { Spinner } from './Spinner';
 export { Stack } from './Stack';
 export { StreakFlame } from './StreakFlame';
 export { ToggleSwitch } from './ToggleSwitch';

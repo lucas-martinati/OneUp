@@ -354,7 +354,7 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
           }}
         >
           {saveLoading ? (
-            <Loader2 size={18} className="spin-anim" />
+            <Loader2 size={18} className="spin" />
           ) : (
             <Save size={18} />
           )}
@@ -466,7 +466,7 @@ function ConfirmRow({ text, confirmLabel, color, loading, onConfirm, onCancel })
             cursor: loading ? 'not-allowed' : 'pointer'
           }}
         >
-          {loading && <Loader2 size={16} className="spin-anim" />}
+          {loading && <Loader2 size={16} className="spin" />}
           {confirmLabel}
         </button>
       </div>

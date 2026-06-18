@@ -1,6 +1,7 @@
 import React from 'react';
-import { X, Shield, ArrowLeft, Loader2, RefreshCw } from '../../utils/icons';
+import { X, Shield, ArrowLeft, RefreshCw } from '../../utils/icons';
 import { Z_INDEX } from '../../utils/zIndex';
+import { Spinner } from '../ui';
 import { useAdminPanel } from './useAdminPanel';
 import { AdminUserList } from './AdminUserList';
 import { AdminUserForm } from './AdminUserForm';
@@ -68,7 +69,7 @@ export function AdminPanel({ onClose }) {
                 className="hover-lift glass"
                 style={roundButtonStyle}
               >
-                <RefreshCw size={18} className={refreshing ? 'spin-anim' : ''} />
+                <RefreshCw size={18} className={refreshing ? 'spin' : ''} />
               </button>
             )}
             <button onClick={onClose} className="hover-lift glass" style={{ ...roundButtonStyle, flexShrink: 0 }}>
@@ -96,9 +97,8 @@ export function AdminPanel({ onClose }) {
 
         {/* Content Workspace */}
         {loading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '16px' }}>
-            <Loader2 size={36} className="spin-anim" color="#ef4444" />
-            <span style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>Chargement de la base de données...</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+            <Spinner size={36} color="#ef4444" label="Chargement de la base de données..." />
           </div>
         ) : !selectedUid ? (
           <AdminUserList
