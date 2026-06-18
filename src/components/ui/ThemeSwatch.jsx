@@ -31,7 +31,7 @@ export function ThemeSwatch({ theme, isSelected, onClick, title }) {
       <div style={{
         width: '16px', height: '16px', borderRadius: '50%',
         background: isDual
-          ? `linear-gradient(90deg, ${theme.accent} 0 50%, ${theme.accent2} 50% 100%)`
+          ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`
           : theme.accent,
         boxShadow: isSelected ? `0 0 8px ${theme.accent}66` : 'none'
       }} />

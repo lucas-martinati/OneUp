@@ -207,33 +207,6 @@
 }
 
 /* Dual themes — two distinct accent colors blended through the gradients */
-[data-theme="aurora"] {
-  --body-bg: linear-gradient(180deg, rgb(6, 5, 10) 0%, rgb(3, 3, 6) 100%);
-  --bg-color: rgb(3, 3, 6);
-  --surface-muted: rgba(168, 85, 247, 0.05);
-  --surface-subtle: rgba(168, 85, 247, 0.03);
-  --surface-dim: rgba(168, 85, 247, 0.08);
-  --card-bg: rgba(14, 12, 22, 0.4);
-  --surface-section: linear-gradient(135deg, rgba(20, 16, 30, 0.8), rgba(18, 30, 42, 0.8));
-  --surface-elevated: linear-gradient(135deg, rgba(20, 16, 30, 0.6), rgba(18, 30, 42, 0.6));
-  --sheet-bg: rgba(14, 12, 22, 0.97);
-  --overlay-bg: rgb(7, 6, 12);
-  --border-subtle: rgba(168, 85, 247, 0.05);
-  --border-muted: rgba(168, 85, 247, 0.06);
-  --border-default: rgba(168, 85, 247, 0.1);
-  --border-strong: rgba(168, 85, 247, 0.15);
-  --surface-hover: rgba(168, 85, 247, 0.1);
-
-  --accent: rgb(168, 85, 247);
-  --accent-glow: rgb(34, 211, 238);
-  --body-glow-1: rgba(168, 85, 247, 0.1);
-  --body-glow-2: rgba(34, 211, 238, 0.06);
-  --gradient-primary: linear-gradient(135deg, rgb(168, 85, 247) 0%, rgb(34, 211, 238) 100%);
-  --gradient-accent: linear-gradient(135deg, rgb(192, 132, 252) 0%, rgb(103, 232, 249) 100%);
-  --gradient-glow: linear-gradient(135deg, rgb(168, 85, 247) 0%, rgb(99, 102, 241) 50%, rgb(34, 211, 238) 100%);
-  --glow-primary: 0 0 20px rgba(168, 85, 247, 0.4);
-  --glow-accent: 0 0 25px rgba(34, 211, 238, 0.5);
-}
 
 [data-theme="flamingo"] {
   --body-bg: linear-gradient(180deg, rgb(10, 5, 7) 0%, rgb(5, 3, 3) 100%);
