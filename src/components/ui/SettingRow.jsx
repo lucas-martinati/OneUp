@@ -13,7 +13,10 @@ export function SettingRow({ icon: IconComponent, title, description, color, chi
                     background: `linear-gradient(135deg, ${color}20, ${color}08)`,
                     padding: '10px',
                     borderRadius: '12px',
-                    border: `1px solid ${color}30`
+                    border: `1px solid ${color}30`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                 }}>
                     <IconComponent size={20} color={color} />
                 </div>
