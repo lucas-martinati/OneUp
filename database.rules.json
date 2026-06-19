@@ -6,12 +6,12 @@
       "$uid": {
         ".read": "$uid === auth.uid",
         "progress": {
-          // TRANSITOIRE : lecture ouverte à tout utilisateur authentifié, héritée
-          // de l'ancien modèle social. Les nouveaux clients lisent désormais les
-          // stats publiques dérivées dans `publicProfiles` (sans le calendrier ni
-          // les traces GPS privées). À FERMER en `$uid === auth.uid` une fois que
-          // l'adoption de la version migrée est suffisante (ferme la fuite GPS).
-          ".read": "auth != null",
+          // PRIVÉ : seul le propriétaire lit son progress. Les fonctionnalités
+          // sociales lisent les stats publiques dérivées dans `publicProfiles`
+          // (sans le calendrier ni les traces GPS). Auparavant ce nœud était
+          // lisible par tout utilisateur authentifié — ce qui exposait les
+          // traces GPS cardio ; c'est désormais fermé.
+          ".read": "$uid === auth.uid",
           ".write": "$uid === auth.uid"
         },
         "$topic": {
