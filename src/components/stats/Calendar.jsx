@@ -369,6 +369,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 
 /** Day detail bottom sheet */
 function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, isClosing: externalIsClosing, getConfig, t, startDate }) {
+    const { i18n } = useTranslation();
     const dayNum = getDayNumber(dateString);
     const dayCompletions = completions[dateString] || {};
     const isCaughtUp = isCaughtUpDay(dayCompletions, dateString);
@@ -518,7 +519,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
             <div className={styles.detailHead}>
                 <div style={{ minWidth: 0 }}>
                     <div className={styles.detailDate}>
-                        {new Date(`${dateString}T00:00:00`).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}
+                        {new Date(`${dateString}T00:00:00`).toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' })}
                     </div>
                     <div className={styles.detailDay}>{t('calendar.day', { num: dayNum })}</div>
                 </div>
