@@ -87,18 +87,27 @@ describe('Calendar and DayDetail date translation', () => {
 
 describe('Calendar swipe and touch events', () => {
   it('handles horizontal swipe to change month in Calendar', () => {
-    render(<Calendar {...defaultProps} />);
-    const overlay = document.querySelector('.modal-overlay');
+    vi.useFakeTimers();
+    const { container } = render(<Calendar {...defaultProps} />);
+    const overlay = container.querySelector('[class*="grid"]');
     
-    // Simulate swipe left (next month)
-    fireEvent.touchStart(overlay, { touches: [{ clientX: 200, clientY: 200 }] });
-    fireEvent.touchMove(overlay, { touches: [{ clientX: 100, clientY: 200 }] }); // Move left
-    fireEvent.touchEnd(overlay, { changedTouches: [{ clientX: 50, clientY: 200 }] }); // End far left
+    // Swipe left (next month) diff > 0
+    fireEvent.touchStart(overlay, { touches: [{ clientX: 300, clientY: 300 }] });
+    fireEvent.touchMove(overlay, { touches: [{ clientX: 100, clientY: 300 }] }); 
+    fireEvent.touchEnd(overlay, { changedTouches: [{ clientX: 100, clientY: 300 }] });
     
-    // Simulate swipe right (prev month)
-    fireEvent.touchStart(overlay, { touches: [{ clientX: 50, clientY: 200 }] });
-    fireEvent.touchMove(overlay, { touches: [{ clientX: 150, clientY: 200 }] }); // Move right
-    fireEvent.touchEnd(overlay, { changedTouches: [{ clientX: 200, clientY: 200 }] }); // End far right
+    act(() => {
+        vi.advanceTimersByTime(300);
+    });
+
+    // Swipe right (prev month) diff < 0
+    fireEvent.touchStart(overlay, { touches: [{ clientX: 100, clientY: 300 }] });
+    fireEvent.touchMove(overlay, { touches: [{ clientX: 300, clientY: 300 }] }); 
+    fireEvent.touchEnd(overlay, { changedTouches: [{ clientX: 300, clientY: 300 }] });
+    
+    act(() => {
+        vi.advanceTimersByTime(300);
+    });
     
     // Short swipe (snap back)
     fireEvent.touchStart(overlay, { touches: [{ clientX: 100, clientY: 200 }] });
@@ -108,6 +117,8 @@ describe('Calendar swipe and touch events', () => {
     // Vertical move (aborts swipe)
     fireEvent.touchStart(overlay, { touches: [{ clientX: 100, clientY: 200 }] });
     fireEvent.touchMove(overlay, { touches: [{ clientX: 100, clientY: 300 }] }); 
+    
+    vi.useRealTimers();
   });
 
   it('handles vertical swipe to close DayDetail', async () => {
@@ -115,12 +126,12 @@ describe('Calendar swipe and touch events', () => {
     // Click on a day to open DayDetail
     fireEvent.click(screen.getByRole('button', { name: '19 Junio' }));
 
-    // Wait for requestAnimationFrame to set isVisible to true
-    await new Promise((resolve) => requestAnimationFrame(resolve));
-
     // DayDetail
     const sheets = document.querySelectorAll('.modal-overlay');
     const sheet = sheets[1].children[0];
+    
+    // Simulate transition end for entrance
+    fireEvent.transitionEnd(sheet, { propertyName: 'transform' });
     
     // Simulate swipe down (close)
     fireEvent.touchStart(sheet, { touches: [{ clientY: 200 }] });

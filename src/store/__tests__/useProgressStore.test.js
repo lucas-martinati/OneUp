@@ -326,6 +326,38 @@ describe('mergeWithAnonymousData', () => {
     expect(merged.squats.isCompleted).toBe(false);
     expect(merged.dips.isCompleted).toBe(true);
   });
+
+  it('resolves day conflicts correctly for weight and difficulty', async () => {
+    const day = `${currentYear}-02-02`;
+    Preferences._mem.set(STORAGE_KEY_BASE, JSON.stringify({
+      startDate: fixedStart,
+      completions: {
+        [day]: {
+          bench: { isCompleted: true, count: 10, weight: 60, difficulty: 0.8 },
+          pullups: { isCompleted: false, count: 5 } // Guest has no weight/difficulty
+        },
+      },
+    }));
+    
+    useProgressStore.setState({
+      completions: {
+        [day]: {
+          bench: { isCompleted: false, count: 8 }, // User has no weight/difficulty
+          pullups: { isCompleted: true, count: 10, weight: 15, difficulty: 0.5 }, // User has weight/difficulty
+          dips: { isCompleted: false, count: 5 }
+        },
+      },
+    });
+
+    await useProgressStore.getState().mergeWithAnonymousData();
+    const merged = useProgressStore.getState().completions[day];
+
+    expect(merged.bench.weight).toBe(60); // guest wins because user doesn't have it
+    expect(merged.bench.difficulty).toBe(0.8);
+    
+    expect(merged.pullups.weight).toBe(15); // user wins because guest doesn't have it
+    expect(merged.pullups.difficulty).toBe(0.5);
+  });
 });
 
 describe('clearAnonymousData', () => {
@@ -411,6 +443,15 @@ describe('syncWithCloud', () => {
     const s = useProgressStore.getState();
     expect(s.completions[`${currentYear}-03-02`].squats.isCompleted).toBe(true);
     expect(s.achievements).toEqual({ local_badge: true });
+  });
+
+  it('skips applySyncedData if mergedData is null', async () => {
+    const applySpy = vi.spyOn(useProgressStore.getState(), 'applySyncedData');
+    cloudSync.syncData.mockResolvedValueOnce(null);
+    const result = await useProgressStore.getState().syncWithCloud();
+    expect(result.success).toBe(true);
+    expect(applySpy).not.toHaveBeenCalled();
+    applySpy.mockRestore();
   });
 
   it('reports failure when the service throws', async () => {

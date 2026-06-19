@@ -276,27 +276,31 @@ describe('clanService', () => {
   });
 
   describe('sendPoke', () => {
-    it('sends poke successfully and increments count via transaction', async () => {
+    it('sends poke successfully and increments count via transaction, handles null current state', async () => {
       let txCallback;
       vi.mocked(runTransaction).mockImplementationOnce((ref, callback) => {
         txCallback = callback;
         return Promise.resolve({ committed: true });
       });
 
-      // Get sender pseudo from leaderboard
-      vi.mocked(get).mockResolvedValueOnce(snapshot({ pseudo: 'SenderName', photoURL: 'photo-url' }));
+      // Get sender pseudo from leaderboard (missing pseudo)
+      vi.mocked(get).mockResolvedValueOnce(snapshot({ photoURL: 'photo-url' }));
 
       const result = await sendPoke('target-uid', 'nudge', 'Hello Poke');
       expect(result).toBe(true);
       expect(runTransaction).toHaveBeenCalled();
 
-      // Test transaction count increment
+      // Test transaction count increment when current is null
+      const nextTxStateNull = txCallback(null);
+      expect(nextTxStateNull.count).toBe(1);
+      
+      // Test transaction count increment when current has count
       const currentTxState = { count: 3 };
       const nextTxState = txCallback(currentTxState);
       expect(nextTxState.count).toBe(4);
       expect(nextTxState.type).toBe('nudge');
       expect(nextTxState.message).toBe('Hello Poke');
-      expect(nextTxState.fromName).toBe('SenderName');
+      expect(nextTxState.fromName).toBe('common.member'); // Fallback from i18n
       expect(nextTxState.fromPhoto).toBe('photo-url');
     });
 
@@ -354,6 +358,15 @@ describe('clanService', () => {
       const result = await deleteNotification('sender-1');
       expect(result).toBe(true);
       expect(remove).toHaveBeenCalledWith('notifications/test-uid/sender-1');
+    });
+
+    it('returns false if not authenticated', async () => {
+      // Temporarily mock getAuthInstance to return null
+      const originalAuth = await import('../firebase').then(m => m.getAuthInstance);
+      vi.mocked(originalAuth).mockReturnValueOnce(null);
+      
+      const result = await deleteNotification('sender-1');
+      expect(result).toBe(false);
     });
   });
 

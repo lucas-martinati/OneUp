@@ -329,6 +329,38 @@ describe('useExercisesStore', () => {
       expect(useExercisesStore.getState().customCategories).toEqual(cloudData);
       expect(useExercisesStore.getState().customCategoriesMap['c1']).toBeDefined();
     });
+
+    it('moveCategory handles invalid id and out of bounds', () => {
+      useExercisesStore.getState().addCategory('Cat1');
+      const cats = useExercisesStore.getState().customCategories;
+      const cat1Id = cats[0].id;
+
+      // Invalid ID
+      useExercisesStore.getState().moveCategory('nonexistent', 'up');
+      
+      // Out of bounds (up when already at top)
+      useExercisesStore.getState().moveCategory(cat1Id, 'up');
+
+      // Out of bounds (down when already at bottom)
+      useExercisesStore.getState().moveCategory(cat1Id, 'down');
+      
+      // Still only 1 category
+      expect(useExercisesStore.getState().customCategories).toHaveLength(1);
+    });
+
+    it('setCategoriesFromCloud handles non-arrays and exact matches', () => {
+      const cloudData = [{ id: 'c1', name: 'Cloud Cat' }];
+      useExercisesStore.getState().setCategoriesFromCloud(cloudData);
+      
+      // Exact match
+      const prevState = useExercisesStore.getState().customCategories;
+      useExercisesStore.getState().setCategoriesFromCloud(cloudData);
+      expect(useExercisesStore.getState().customCategories).toBe(prevState);
+
+      // Non-array
+      useExercisesStore.getState().setCategoriesFromCloud(null);
+      expect(useExercisesStore.getState().customCategories).toBe(prevState);
+    });
   });
 
   describe('exercise weights', () => {
@@ -361,6 +393,17 @@ describe('useExercisesStore', () => {
     it('clamps negative weight to 0', () => {
       useExercisesStore.getState().setWeight('bench', -10);
       expect(useExercisesStore.getState().exerciseWeights['bench']).toBe(0);
+    });
+
+    it('setWeight cloud sync catches errors', async () => {
+      vi.useFakeTimers();
+      cloudSync.saveExerciseWeightsToCloud.mockRejectedValueOnce(new Error('Network error'));
+      useExercisesStore.getState().setWeight('bench', 60);
+      vi.advanceTimersByTime(1500);
+      await new Promise(r => process.nextTick(r)); // wait for promise rejection
+      vi.useRealTimers();
+      // Should not throw, error is caught implicitly.
+      expect(useExercisesStore.getState().exerciseWeights['bench']).toBe(60);
     });
   });
 
