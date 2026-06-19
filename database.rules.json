@@ -26,7 +26,7 @@
       ".read": "auth != null",
       ".indexOn": ["code"],
       "$clanId": {
-        ".write": "auth != null && (!data.exists() || (!newData.exists() && !data.child('members').exists()))",
+        ".write": "auth != null && ((!data.exists() && newData.child('createdBy').val() === auth.uid) || (!newData.exists() && !data.child('members').exists()))",
         "members": {
           "$memberUid": {
             ".write": "auth != null && $memberUid === auth.uid"
