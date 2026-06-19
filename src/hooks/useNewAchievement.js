@@ -64,12 +64,12 @@ export function useNewAchievement(computedStats, t) {
             
             if (newBadge) {
                 const IconComponent = getBadgeIconFromDef(newBadge);
-                queueMicrotask(() => setNewAchievement({
+                setNewAchievement({
                     id: newBadge.id,
                     title: t(`achievements.badges.${newBadge.id}.title`, newBadge.id),
                     color: newBadge.color,
                     icon: IconComponent
-                }));
+                });
             }
         }
 

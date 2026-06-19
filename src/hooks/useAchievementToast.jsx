@@ -36,7 +36,7 @@ function AchievementNotification({ achievement, count = 1, onClose, onView }) {
             order: 0, // achievements sit on top of the shared toast stack
             // While leaving, drop out of the flex flow so the poke below rises
             // to the top immediately instead of waiting for the exit to finish.
-            ...(exit ? { position: 'absolute', left: 0, right: 0, top: 0 } : null),
+            ...(exit ? { position: 'absolute', left: 0, right: 0, top: 0, margin: '0 auto' } : null),
             transform: `translateY(${isVisible ? '0' : '-24px'})`,
             opacity: isVisible ? 1 : 0,
             transition: 'transform 0.34s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease',

@@ -23,6 +23,7 @@ export function useToastGestures({ onClose, onTap, duration = 5000 }) {
     const [animate, setAnimate] = useState(false);
 
     const startX = useRef(0);
+    const dragXRef = useRef(0);
     const dragging = useRef(false);
     const moved = useRef(false);
     const done = useRef(false);
@@ -57,6 +58,7 @@ export function useToastGestures({ onClose, onTap, duration = 5000 }) {
         if (!dragging.current) return;
         const dx = e.clientX - startX.current;
         if (Math.abs(dx) > 4) moved.current = true;
+        dragXRef.current = dx;
         setDragX(dx);
     };
 
@@ -67,9 +69,10 @@ export function useToastGestures({ onClose, onTap, duration = 5000 }) {
 
         if (!moved.current) { onTap?.(); leave('up'); return; } // tap
 
-        if (Math.abs(dragX) > SWIPE_THRESHOLD) {
-            setExit(dragX < 0 ? 'left' : 'right'); // fling away
+        if (Math.abs(dragXRef.current) > SWIPE_THRESHOLD) {
+            setExit(dragXRef.current < 0 ? 'left' : 'right'); // fling away
         } else {
+            dragXRef.current = 0;
             setDragX(0); // spring back
         }
     };

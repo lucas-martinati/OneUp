@@ -53,7 +53,8 @@ describe('useExercisesStore', () => {
     if (typeof globalThis.crypto === 'undefined') {
       globalThis.crypto = {};
     }
-    globalThis.crypto.randomUUID = () => 'mock-uuid-1234';
+    let uuidCounter = 0;
+    globalThis.crypto.randomUUID = () => `mock-uuid-${++uuidCounter}`;
   });
 
   afterEach(() => {
@@ -133,7 +134,7 @@ describe('useExercisesStore', () => {
       const state = useExercisesStore.getState();
       expect(state.routines).toHaveLength(1);
       expect(state.routines[0]).toEqual({
-        id: 'mock-uuid-1234',
+        id: 'mock-uuid-1',
         name: 'My Routine',
         exerciseIds: ['ex1', 'ex2'],
         createdAt: 'mock-server-timestamp',
@@ -144,7 +145,7 @@ describe('useExercisesStore', () => {
 
     it('updates an existing routine', () => {
       useExercisesStore.getState().saveRoutine('My Routine', ['ex1', 'ex2']);
-      useExercisesStore.getState().updateRoutine('mock-uuid-1234', 'Updated Routine', ['ex3']);
+      useExercisesStore.getState().updateRoutine('mock-uuid-1', 'Updated Routine', ['ex3']);
 
       const state = useExercisesStore.getState();
       expect(state.routines[0].name).toBe('Updated Routine');
@@ -153,10 +154,31 @@ describe('useExercisesStore', () => {
 
     it('deletes a routine', () => {
       useExercisesStore.getState().saveRoutine('My Routine', ['ex1', 'ex2']);
-      useExercisesStore.getState().deleteRoutine('mock-uuid-1234');
+      useExercisesStore.getState().deleteRoutine('mock-uuid-1');
 
       const state = useExercisesStore.getState();
       expect(state.routines).toHaveLength(0);
+    });
+
+    it('refuses to save a routine with an empty name or no exercises', () => {
+      expect(useExercisesStore.getState().saveRoutine('', ['ex1'])).toBe(false);
+      expect(useExercisesStore.getState().saveRoutine('  ', ['ex1'])).toBe(false);
+      expect(useExercisesStore.getState().saveRoutine('Name', [])).toBe(false);
+      expect(useExercisesStore.getState().routines).toHaveLength(0);
+    });
+
+    it('sets routines from cloud properly', () => {
+      useExercisesStore.getState().saveRoutine('Local', ['ex1']);
+      
+      const cloudRoutines = [{ id: 'cloud1', name: 'Cloud', exerciseIds: ['ex2'] }];
+      useExercisesStore.getState().setRoutinesFromCloud(cloudRoutines);
+      
+      expect(useExercisesStore.getState().routines).toEqual(cloudRoutines);
+      
+      // Setting exact same routines should not trigger state change (optimization)
+      const prevState = useExercisesStore.getState().routines;
+      useExercisesStore.getState().setRoutinesFromCloud([{ id: 'cloud1', name: 'Cloud', exerciseIds: ['ex2'] }]);
+      expect(useExercisesStore.getState().routines).toBe(prevState); // exact same reference
     });
   });
 
@@ -175,7 +197,7 @@ describe('useExercisesStore', () => {
       const state = useExercisesStore.getState();
       expect(state.customExercises).toHaveLength(1);
       expect(state.customExercises[0]).toEqual({
-        id: 'custom_mock-uuid-1234',
+        id: 'custom_mock-uuid-1',
         label: 'My Custom Exercise',
         icon: 'Star',
         color: '#8b5cf6',
@@ -201,28 +223,45 @@ describe('useExercisesStore', () => {
 
     it('updates a custom exercise', () => {
       useExercisesStore.getState().saveCustomExercise({ label: 'My Custom Exercise' });
-      useExercisesStore.getState().updateCustomExercise('custom_mock-uuid-1234', { label: 'Updated Exercise Name' });
+      useExercisesStore.getState().updateCustomExercise('custom_mock-uuid-1', { label: 'Updated Exercise Name' });
 
       expect(useExercisesStore.getState().customExercises[0].label).toBe('Updated Exercise Name');
     });
 
     it('deletes a custom exercise, updating routines and clearing history', () => {
       // 1. Create a routine containing the exercise
-      useExercisesStore.getState().saveRoutine('Routine with Custom', ['custom_mock-uuid-1234', 'other_ex']);
+      useExercisesStore.getState().saveRoutine('Routine with Custom', ['custom_mock-uuid-2', 'other_ex']);
       useExercisesStore.getState().saveCustomExercise({ label: 'My Custom Exercise' });
 
       // 2. Delete the exercise
-      useExercisesStore.getState().deleteCustomExercise('custom_mock-uuid-1234');
+      useExercisesStore.getState().deleteCustomExercise('custom_mock-uuid-2');
 
       // 3. Verify deleted from customExercises list
       expect(useExercisesStore.getState().customExercises).toHaveLength(0);
 
       // 4. Verify useProgressStore was called to clear history
-      expect(deleteExerciseHistoryMock).toHaveBeenCalledWith('custom_mock-uuid-1234');
+      expect(deleteExerciseHistoryMock).toHaveBeenCalledWith('custom_mock-uuid-2');
       expect(saveToCloudMock).toHaveBeenCalled();
 
       // 5. Verify exercise removed from routine
       expect(useExercisesStore.getState().routines[0].exerciseIds).toEqual(['other_ex']);
+    });
+
+    it('deletes routine if the deleted custom exercise was the only one in it', () => {
+      useExercisesStore.getState().saveRoutine('Routine', ['custom_mock-uuid-2']);
+      useExercisesStore.getState().saveCustomExercise({ label: 'My Custom Exercise' });
+      
+      useExercisesStore.getState().deleteCustomExercise('custom_mock-uuid-2');
+      
+      // Routine should be deleted entirely because it's now empty
+      expect(useExercisesStore.getState().routines).toHaveLength(0);
+    });
+
+    it('sets custom exercises from cloud properly', () => {
+      const cloudData = [{ id: 'cloud_ex', label: 'Cloud Ex' }];
+      useExercisesStore.getState().setCustomExercisesFromCloud(cloudData);
+      
+      expect(useExercisesStore.getState().customExercises).toEqual(cloudData);
     });
   });
 
@@ -255,6 +294,41 @@ describe('useExercisesStore', () => {
       expect(useExercisesStore.getState().customCategories).toHaveLength(0);
       expect(useExercisesStore.getState().customExercises[0].categoryId).toBe('custom');
     });
+
+    it('updates a custom category', () => {
+      useExercisesStore.getState().addCategory('Yoga', '#ff00ff');
+      const catId = useExercisesStore.getState().customCategories[0].id;
+      
+      useExercisesStore.getState().updateCategory(catId, { name: 'Pilates' });
+      
+      expect(useExercisesStore.getState().customCategories[0].name).toBe('Pilates');
+    });
+
+    it('moves a custom category up and down', () => {
+      useExercisesStore.getState().addCategory('Cat1');
+      useExercisesStore.getState().addCategory('Cat2');
+      useExercisesStore.getState().addCategory('Cat3');
+      
+      const cats = useExercisesStore.getState().customCategories;
+      const cat2Id = cats[1].id;
+      
+      // Move Cat2 up
+      useExercisesStore.getState().moveCategory(cat2Id, 'up');
+      expect(useExercisesStore.getState().customCategories[0].name).toBe('Cat2');
+      expect(useExercisesStore.getState().customCategories[1].name).toBe('Cat1');
+      
+      // Move Cat2 down
+      useExercisesStore.getState().moveCategory(cat2Id, 'down');
+      expect(useExercisesStore.getState().customCategories[0].name).toBe('Cat1');
+      expect(useExercisesStore.getState().customCategories[1].name).toBe('Cat2');
+    });
+
+    it('sets categories from cloud', () => {
+      const cloudData = [{ id: 'c1', name: 'Cloud Cat' }];
+      useExercisesStore.getState().setCategoriesFromCloud(cloudData);
+      expect(useExercisesStore.getState().customCategories).toEqual(cloudData);
+      expect(useExercisesStore.getState().customCategoriesMap['c1']).toBeDefined();
+    });
   });
 
   describe('exercise weights', () => {
@@ -282,6 +356,11 @@ describe('useExercisesStore', () => {
       vi.advanceTimersByTime(1500);
       expect(cloudSync.saveExerciseWeightsToCloud).toHaveBeenCalledWith({ bench: 60 });
       vi.useRealTimers();
+    });
+
+    it('clamps negative weight to 0', () => {
+      useExercisesStore.getState().setWeight('bench', -10);
+      expect(useExercisesStore.getState().exerciseWeights['bench']).toBe(0);
     });
   });
 });

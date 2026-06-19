@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 
 /**
  * A simple hook for detecting swipe gestures.
@@ -9,21 +9,21 @@ import { useState, useCallback } from 'react';
  * @returns {Object} { onTouchStart, onTouchMove, onTouchEnd }
  */
 export function useSwipe({ onSwipeLeft, onSwipeRight, minDistance = 50 }) {
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
+  const touchStart = useRef(null);
+  const touchEnd = useRef(null);
 
-  const onTouchStart = (e) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
+  const onTouchStart = useCallback((e) => {
+    touchEnd.current = null;
+    touchStart.current = e.targetTouches[0].clientX;
+  }, []);
 
-  const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
+  const onTouchMove = useCallback((e) => {
+    touchEnd.current = e.targetTouches[0].clientX;
+  }, []);
 
   const onTouchEnd = useCallback(() => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
+    if (touchStart.current === null || touchEnd.current === null) return;
+    const distance = touchStart.current - touchEnd.current;
     const isLeftSwipe = distance > minDistance;
     const isRightSwipe = distance < -minDistance;
 
@@ -32,7 +32,7 @@ export function useSwipe({ onSwipeLeft, onSwipeRight, minDistance = 50 }) {
     } else if (isRightSwipe && onSwipeRight) {
       onSwipeRight();
     }
-  }, [touchStart, touchEnd, onSwipeLeft, onSwipeRight, minDistance]);
+  }, [onSwipeLeft, onSwipeRight, minDistance]);
 
   return {
     onTouchStart,
