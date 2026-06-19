@@ -3,6 +3,7 @@ const config = {
   ignore: [
     "functions/index.js",
     "functions/shared/badgeRules.js",
+    "functions/shared/exerciseRules.js",
     "src/components/index.js",
     "src/components/*/index.js",
     "src/services/*Service.js",

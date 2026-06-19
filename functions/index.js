@@ -1,66 +1,28 @@
-const { onRequest } = require("firebase-functions/v2/https");
-const { onValueWritten } = require("firebase-functions/v2/database");
-const functionsV1 = require("firebase-functions/v1");
-const admin = require("firebase-admin");
+import { onRequest } from "firebase-functions/v2/https";
+import { onValueWritten } from "firebase-functions/v2/database";
+import functionsV1 from "firebase-functions/v1";
+import admin from "firebase-admin";
+import { BADGE_RULES, isBadgeUnlocked } from "./shared/badgeRules.js";
 
 // Initialize Firebase Admin SDK using Default Compute Service Account
 admin.initializeApp();
 const db = admin.database();
 
 // ══════════════════════════════════════════════════════════════════════════════
-// Exercise definitions — DUPLICATED from client-side config.
-// Source of truth lives in TWO places that MUST stay in sync:
-//   • Client:  src/config/exercises.js  (EXERCISES, getDailyGoal)
-//   •          src/config/weights.js    (WEIGHT_EXERCISES)
-//   • Server:  functions/index.js       (this file)
-// Long-term: extract into a shared package (e.g. /shared/exercises.js)
-// to eliminate duplication risk.
+// Exercise definitions — Single source of truth in functions/shared/exerciseRules.js,
+// imported here AND by the client — no copy-paste.
 // ══════════════════════════════════════════════════════════════════════════════
 
-const EXERCISES = [
-  { id: 'pushups', multiplier: 1 },
-  { id: 'squats', multiplier: 1 },
-  { id: 'pullups', multiplier: 0.4 },
-  { id: 'abs', multiplier: 1 },
-  { id: 'jumpingjacks', multiplier: 1.5 },
-  { id: 'lunges', multiplier: 1 },
-  { id: 'burpees', multiplier: 0.5 },
-  { id: 'planche', multiplier: 2 },
-  { id: 'dips', multiplier: 1 },
-  { id: 'mountain', multiplier: 2 },
-];
+import {
+  EXERCISES,
+  WEIGHT_EXERCISES,
+  CARDIO_EXERCISES,
+  ALL_STANDARD_IDS,
+  ALL_WEIGHT_IDS,
+  ALL_EXERCISE_IDS,
+  getDailyGoal,
+} from "./shared/exerciseRules.js";
 
-const WEIGHT_EXERCISES = [
-  { id: 'biceps_curl', multiplier: 0.5 },
-  { id: 'hammer_curl', multiplier: 0.5 },
-  { id: 'bench_press', multiplier: 0.5 },
-  { id: 'overhead_press', multiplier: 0.4 },
-  { id: 'squat_weights', multiplier: 0.5 },
-  { id: 'deadlift', multiplier: 0.4 },
-  { id: 'barbell_row', multiplier: 0.5 },
-];
-
-const CARDIO_EXERCISES = [
-  { id: 'running' },
-  { id: 'cycling' },
-];
-
-const ALL_STANDARD_IDS = new Set(EXERCISES.map(e => e.id));
-const ALL_WEIGHT_IDS = new Set(WEIGHT_EXERCISES.map(e => e.id));
-const ALL_EXERCISE_IDS = new Set([
-  ...EXERCISES.map(e => e.id),
-  ...WEIGHT_EXERCISES.map(e => e.id),
-  ...CARDIO_EXERCISES.map(e => e.id),
-]);
-
-// ══════════════════════════════════════════════════════════════════════════════
-// Helper functions
-// ══════════════════════════════════════════════════════════════════════════════
-
-function getDailyGoal(exercise, dayNumber, userMultiplier = 1.0) {
-  const mult = exercise.multiplier !== undefined ? exercise.multiplier : 1;
-  return Math.max(1, Math.ceil(dayNumber * mult * userMultiplier));
-}
 
 function getDayNumber(startDate, dateStr) {
   const start = new Date(startDate);
@@ -144,8 +106,6 @@ function getUserLocalDate(completions, serverNow) {
 // imported here AND by the client (src/config/badgeDefinitions.js) — no copy-paste.
 // The stats snapshot below mirrors src/hooks/useComputedStats.js.
 // ══════════════════════════════════════════════════════════════════════════════
-
-const { BADGE_RULES, isBadgeUnlocked } = require('./shared/badgeRules');
 
 const MAX_STREAK_WINDOW = 365;
 

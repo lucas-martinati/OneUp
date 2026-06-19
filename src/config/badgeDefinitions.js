@@ -6,8 +6,7 @@ import {
 // Single source of truth for all 40 achievement badges.
 // test(stats) → boolean determines unlock condition.
 // i18n keys are derived as `achievements.badges.${def.id}.title` / `.desc`
-import '../../functions/shared/badgeRules.js';
-const { BADGE_RULES } = globalThis.BADGE_RULES_PKG;
+import { BADGE_RULES } from '../../functions/shared/badgeRules.js';
 
 export const BADGE_ICONS = {
   Target, Flame, Zap, Calendar, TrendingUp, Trophy, Medal, Gem, Rocket,

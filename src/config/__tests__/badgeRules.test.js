@@ -1,10 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-// Side-effectful CommonJS module (shared with the Cloud Function). Importing it
-// populates globalThis.BADGE_RULES_PKG with the rules + unlock helper.
-import '../../../functions/shared/badgeRules.js';
-
-const { isBadgeUnlocked, BADGE_RULES, BADGE_RULES_BY_ID } = globalThis.BADGE_RULES_PKG;
+import { isBadgeUnlocked, BADGE_RULES, BADGE_RULES_BY_ID } from '../../../functions/shared/badgeRules.js';
 
 describe('badgeRules — isBadgeUnlocked', () => {
   it('exposes a rule for every listed badge id', () => {

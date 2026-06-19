@@ -1,10 +1,10 @@
 /**
  * SINGLE SOURCE OF TRUTH for badge unlock logic (id + test).
  *
- * Dependency-free CommonJS so it can be consumed by BOTH:
+ * ES Module consumed by BOTH:
  *   • the client UI    — src/config/badgeDefinitions.js (bundled by Vite),
  *                        which attaches presentation metadata (icon/colour/…)
- *   • the Cloud Function — functions/index.js (via require), to publish the
+ *   • the Cloud Function — functions/index.js (via import), to publish the
  *                          real badge count to the leaderboard.
  *
  * Keep this file free of any import (no icons, no React) so both runtimes
@@ -12,7 +12,7 @@
  * badgeDefinitions.js only — the server never needs it.
  */
 
-const BADGE_RULES = [
+export const BADGE_RULES = [
   // ── Streak ─────────────────────────────────────────────────────────
   { id: 'first_blood',          test: s => s.totalDays >= 1 },
   { id: 'consistent',           test: s => s.maxStreak >= 3 },
@@ -69,25 +69,17 @@ const BADGE_RULES = [
   { id: 'beast',                test: s => s.totalRepsAll >= 100000 },
 ];
 
-const BADGE_RULES_BY_ID = Object.fromEntries(BADGE_RULES.map(r => [r.id, r]));
+export const BADGE_RULES_BY_ID = Object.fromEntries(BADGE_RULES.map(r => [r.id, r]));
 
 /**
  * Whether a badge is unlocked. A manual override stored in the `achievements`
  * node (true/false) always wins over the computed test (used by first_share /
  * white_hat, and to let admins force a badge).
  */
-function isBadgeUnlocked(badgeId, stats, achievements = {}) {
+export function isBadgeUnlocked(badgeId, stats, achievements = {}) {
   const val = achievements[badgeId];
   if (val === true || val === 'true') return true;
   if (val === false || val === 'false') return false;
   const rule = BADGE_RULES_BY_ID[badgeId];
   return rule ? rule.test(stats) : false;
-}
-
-const exportsObj = { BADGE_RULES, BADGE_RULES_BY_ID, isBadgeUnlocked };
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = exportsObj;
-}
-if (typeof globalThis !== 'undefined') {
-  globalThis.BADGE_RULES_PKG = exportsObj;
 }

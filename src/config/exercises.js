@@ -19,7 +19,13 @@
  * Formula: dailyGoal = Math.max(1, Math.ceil(dayNumber × multiplier))
  */
 
-export const EXERCISES = [
+import {
+  EXERCISES as SHARED_EXERCISES,
+  CARDIO_EXERCISES as SHARED_CARDIO,
+  getDailyGoal as sharedGetDailyGoal,
+} from '../../functions/shared/exerciseRules.js';
+
+const CLIENT_EXERCISES = [
     {
         id: 'pushups',
         icon: 'Dumbbell',          // lucide-react icon name
@@ -27,7 +33,6 @@ export const EXERCISES = [
         colorDim: 'rgba(129,140,248,0.15)',
         gradient: ['#667eea', '#818cf8'],
         confettiColors: ['#667eea', '#818cf8', '#a5b4fc', '#c7d2fe', '#ffffff'],
-        multiplier: 1,
     },
     {
         id: 'squats',
@@ -36,7 +41,6 @@ export const EXERCISES = [
         colorDim: 'rgba(52,211,153,0.15)',
         gradient: ['#10b981', '#34d399'],
         confettiColors: ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#ffffff'],
-        multiplier: 1,
     },
     {
         id: 'pullups',
@@ -45,7 +49,6 @@ export const EXERCISES = [
         colorDim: 'rgba(251,191,36,0.15)',
         gradient: ['#f59e0b', '#fbbf24'],
         confettiColors: ['#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#ffffff'],
-        multiplier: 0.4,            // Math.ceil applied in Dashboard
     },
     {
         id: 'abs',
@@ -54,7 +57,6 @@ export const EXERCISES = [
         colorDim: 'rgba(244,114,182,0.15)',
         gradient: ['#ec4899', '#f472b6'],
         confettiColors: ['#ec4899', '#f472b6', '#f9a8d4', '#fbcfe8', '#ffffff'],
-        multiplier: 1,
     },
     {
         id: 'jumpingjacks',
@@ -63,7 +65,6 @@ export const EXERCISES = [
         colorDim: 'rgba(34,211,238,0.15)',
         gradient: ['#06b6d4', '#22d3ee'],
         confettiColors: ['#06b6d4', '#22d3ee', '#67e8f9', '#a5f3fc', '#ffffff'],
-        multiplier: 1.5,
     },
     {
         id: 'lunges',
@@ -72,7 +73,6 @@ export const EXERCISES = [
         colorDim: 'rgba(251,146,60,0.15)',
         gradient: ['#f97316', '#fb923c'],
         confettiColors: ['#f97316', '#fb923c', '#fdba74', '#fed7aa', '#ffffff'],
-        multiplier: 1,
     },
     {
         id: 'burpees',
@@ -81,7 +81,6 @@ export const EXERCISES = [
         colorDim: 'rgba(239,68,68,0.15)',
         gradient: ['#dc2626', '#ef4444'],
         confettiColors: ['#b91c1c', '#dc2626', '#ef4444', '#f87171', '#ffffff'],
-        multiplier: 0.5,
     },
     {
         id: 'planche',
@@ -91,7 +90,6 @@ export const EXERCISES = [
         colorDim: 'rgba(139,92,246,0.15)',
         gradient: ['#7c3aed', '#8b5cf6'],
         confettiColors: ['#6d28d9', '#7c3aed', '#8b5cf6', '#a78bfa', '#ffffff'],
-        multiplier: 2,
     },
     {
         id: 'dips',
@@ -100,7 +98,6 @@ export const EXERCISES = [
         colorDim: 'rgba(236,72,153,0.15)',
         gradient: ['#db2777', '#ec4899'],
         confettiColors: ['#be185d', '#db2777', '#ec4899', '#f472b6', '#ffffff'],
-        multiplier: 1,
     },
     {
         id: 'mountain',
@@ -109,26 +106,33 @@ export const EXERCISES = [
         colorDim: 'rgba(16,185,129,0.15)',
         gradient: ['#059669', '#10b981'],
         confettiColors: ['#047857', '#059669', '#10b981', '#34d399', '#ffffff'],
-        multiplier: 2,
     }
 ];
 
-export const CARDIO_EXERCISES = [
+export const EXERCISES = CLIENT_EXERCISES.map(ex => {
+  const shared = SHARED_EXERCISES.find(s => s.id === ex.id);
+  return { ...ex, multiplier: shared ? shared.multiplier : 1 };
+});
+
+const CLIENT_CARDIO_EXERCISES = [
     {
         id: 'running',
         icon: 'Footprints',
         color: '#f97316', // Orange
         colorDim: 'rgba(249,115,22,0.15)',
-        multiplier: 1, // Will be overridden by settings
     },
     {
         id: 'cycling',
         icon: 'Bike',
         color: '#06b6d4', // Cyan
         colorDim: 'rgba(6,182,212,0.15)',
-        multiplier: 1,
     }
 ];
+
+export const CARDIO_EXERCISES = CLIENT_CARDIO_EXERCISES.map(ex => {
+  const shared = SHARED_CARDIO.find(s => s.id === ex.id);
+  return { ...ex, multiplier: shared ? shared.multiplier : 1 };
+});
 
 /**
  * Weekly increment in METERS per activity type.
@@ -153,11 +157,5 @@ export function getWeeklyGoalKm(mode, weekNumber) {
 /** Quick lookup by exercise id */
 export const EXERCISES_MAP = Object.fromEntries(EXERCISES.map(e => [e.id, e]));
 
-export const getDailyGoal = (exercise, dayNumber, userMultiplier = 1.0, isWeekly = false) => {
-    if (!exercise) return 1;
-    if (isWeekly) {
-        return Math.max(1, Math.ceil(dayNumber * 7));
-    }
-    const mult = exercise.multiplier !== undefined ? exercise.multiplier : 1;
-    return Math.max(1, Math.ceil(dayNumber * mult * userMultiplier));
-};
+export const getDailyGoal = sharedGetDailyGoal;
+

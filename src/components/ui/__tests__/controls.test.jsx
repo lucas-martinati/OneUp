@@ -180,14 +180,14 @@ describe('Avatar', () => {
   });
 
   it('renders the image when a photo URL is given', () => {
-    const { container } = render(<Avatar name="Lucas" photoURL="http://x/p.png" />);
+    const { container } = render(<Avatar name="Lucas" photoURL="https://x/p.png" />);
     const img = container.querySelector('img');
-    expect(img.getAttribute('src')).toBe('http://x/p.png');
+    expect(img.getAttribute('src')).toBe('https://x/p.png');
     expect(img.getAttribute('referrerpolicy')).toBe('no-referrer');
   });
 
   it('falls back to the initial when the image fails to load', () => {
-    const { container } = render(<Avatar name="Lucas" photoURL="http://x/broken.png" />);
+    const { container } = render(<Avatar name="Lucas" photoURL="https://x/broken.png" />);
     fireEvent.error(container.querySelector('img'));
     expect(container.querySelector('img')).toBe(null);
     expect(container.textContent).toBe('L');

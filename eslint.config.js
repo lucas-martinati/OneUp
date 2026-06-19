@@ -6,15 +6,12 @@ import reactPlugin from 'eslint-plugin-react'
 import sonarjs from 'eslint-plugin-sonarjs'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
-// SonarJS en mode informatif : toutes les règles recommandées passent en "warn"
-// pour ne pas bloquer `npm run lint`. À nettoyer progressivement, puis promouvoir
-// les règles voulues en "error".
-// On ne dégrade que les règles réellement actives dans "recommended" ; celles
-// désactivées par défaut (file-header, conventions de style, complexité…) restent off.
-const sonarjsWarnings = Object.fromEntries(
+// SonarJS en mode strict : toutes les règles recommandées passent en "error"
+// pour s'assurer qu'aucun code spaghetti n'est introduit.
+const sonarjsErrors = Object.fromEntries(
   Object.entries(sonarjs.configs.recommended.rules)
     .filter(([, level]) => (Array.isArray(level) ? level[0] : level) !== 'off')
-    .map(([rule]) => [rule, 'warn']),
+    .map(([rule]) => [rule, 'error']),
 )
 
 export default defineConfig([
@@ -52,7 +49,7 @@ export default defineConfig([
     },
   },
   // SonarJS — détection de code spaghetti (code mort, duplication, bugs).
-  // Scopé à src/, en "warn". Complexité et règles hors-sujet désactivées.
+  // Scopé à src/, en "error". Complexité et règles hors-sujet désactivées.
   {
     ...sonarjs.configs.recommended,
     files: ['src/**/*.{js,jsx}'],
@@ -60,7 +57,7 @@ export default defineConfig([
   {
     files: ['src/**/*.{js,jsx}'],
     rules: {
-      ...sonarjsWarnings,
+      ...sonarjsErrors,
       // Complexité : choix volontaire de ne pas l'imposer.
       'sonarjs/cognitive-complexity': 'off',
       // Sécurité/tests : hors sujet pour la chasse au spaghetti.
