@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { ref, get, set } from 'firebase/database';
 import { getDatabaseInstance } from '../../services/firebase';
 import { fetchAllUsersData, updateUserProfile, updateUserSettings, updateUserProgress, updateUserPurchase, saveUserData, resetUserProgress, deleteUserData } from '../../services/adminService';
+import { paths } from '../../../functions/shared/dbSchema.js';
 
 /** Activity timestamp used for the default sort (most recent first). */
 function activityTs(u) {
@@ -126,7 +127,7 @@ export function useAdminPanel() {
       try {
         const db = getDatabaseInstance();
         if (db) {
-          const snapshot = await get(ref(db, 'leaderboard'));
+          const snapshot = await get(ref(db, paths.leaderboard()));
           if (snapshot.exists()) {
             lbData = snapshot.val();
           }
@@ -367,7 +368,7 @@ export function useAdminPanel() {
         }));
       } else {
         // Save sub-key update
-        await set(ref(db, `users/${selectedUid}/${key}`), finalValue);
+        await set(ref(db, `${paths.user(selectedUid)}/${key}`), finalValue);
 
         // Update local state and '__full__' content
         setDataState(prev => {

@@ -1,5 +1,6 @@
 import { ref, set, get } from 'firebase/database';
 import { getAuthInstance, getDatabaseInstance } from '../../../services/firebase';
+import { paths } from '../../../../functions/shared/dbSchema.js';
 
 const STORAGE_KEY = 'oneup_session_history';
 const MAX_SESSIONS = 20;
@@ -35,7 +36,7 @@ async function saveSessionHistoryToCloud(history) {
     const database = getDatabaseInstance();
     if (!auth?.currentUser || !database) return false;
     
-    await set(ref(database, `users/${auth.currentUser.uid}/progress/sessionHistory`), history);
+    await set(ref(database, paths.userSessionHistory(auth.currentUser.uid)), history);
     return true;
   } catch (error) {
     console.error('Failed to save session history to cloud', error);
@@ -49,7 +50,7 @@ async function loadSessionHistoryFromCloud() {
     const database = getDatabaseInstance();
     if (!auth?.currentUser || !database) return [];
 
-    const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/progress/sessionHistory`));
+    const snapshot = await get(ref(database, paths.userSessionHistory(auth.currentUser.uid)));
     if (snapshot.exists()) {
       const data = snapshot.val();
       return Array.isArray(data) ? data : [];

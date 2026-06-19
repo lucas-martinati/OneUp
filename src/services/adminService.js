@@ -1,6 +1,7 @@
 import { ref, get, set, update } from 'firebase/database';
 import { getDatabaseInstance } from './firebase';
 import { createLogger } from '../utils/logger';
+import { paths } from '../../functions/shared/dbSchema.js';
 
 const logger = createLogger('AdminService');
 
@@ -16,7 +17,7 @@ export async function fetchAllUsersData() {
   }
 
   try {
-    const snapshot = await get(ref(database, 'users'));
+    const snapshot = await get(ref(database, paths.users()));
     if (snapshot.exists()) {
       return snapshot.val();
     }
@@ -38,7 +39,7 @@ export async function saveUserData(uid, data) {
   }
 
   try {
-    await set(ref(database, `users/${uid}`), data);
+    await set(ref(database, paths.user(uid)), data);
     logger.success(`Successfully saved user data for uid: ${uid}`);
     return true;
   } catch (error) {
@@ -53,7 +54,7 @@ export async function saveUserData(uid, data) {
 export async function updateUserProgress(uid, progress) {
   const database = getDatabaseInstance();
   if (!database) throw new Error('Database not initialized');
-  await update(ref(database, `users/${uid}/progress`), progress);
+  await update(ref(database, paths.userProgress(uid)), progress);
   logger.success(`Updated progress for ${uid}`);
   return true;
 }
@@ -64,7 +65,7 @@ export async function updateUserProgress(uid, progress) {
 export async function updateUserSettings(uid, settings) {
   const database = getDatabaseInstance();
   if (!database) throw new Error('Database not initialized');
-  await update(ref(database, `users/${uid}/settings`), settings);
+  await update(ref(database, paths.userSettings(uid)), settings);
   logger.success(`Updated settings for ${uid}`);
   return true;
 }
@@ -75,7 +76,7 @@ export async function updateUserSettings(uid, settings) {
 export async function updateUserProfile(uid, profile) {
   const database = getDatabaseInstance();
   if (!database) throw new Error('Database not initialized');
-  await update(ref(database, `users/${uid}/profile`), profile);
+  await update(ref(database, paths.userProfile(uid)), profile);
   logger.success(`Updated profile for ${uid}`);
   return true;
 }
@@ -86,7 +87,7 @@ export async function updateUserProfile(uid, profile) {
 export async function updateUserPurchase(uid, purchase) {
   const database = getDatabaseInstance();
   if (!database) throw new Error('Database not initialized');
-  await set(ref(database, `users/${uid}/purchase`), purchase);
+  await set(ref(database, paths.userPurchase(uid)), purchase);
   logger.success(`Updated purchase info for ${uid}`);
   return true;
 }
@@ -99,11 +100,11 @@ export async function resetUserProgress(uid) {
   const database = getDatabaseInstance();
   if (!database) throw new Error('Database not initialized');
   await update(ref(database), {
-    [`users/${uid}/progress/completions`]: null,
-    [`users/${uid}/progress/lastCompletionChange`]: new Date().toISOString(),
-    [`leaderboard/${uid}/totalReps`]: 0,
-    [`leaderboard/${uid}/weightsTotalReps`]: 0,
-    [`leaderboard/${uid}/exerciseReps`]: null,
+    [`${paths.userProgress(uid)}/completions`]: null,
+    [`${paths.userProgress(uid)}/lastCompletionChange`]: new Date().toISOString(),
+    [`${paths.leaderboardEntry(uid)}/totalReps`]: 0,
+    [`${paths.leaderboardEntry(uid)}/weightsTotalReps`]: 0,
+    [`${paths.leaderboardEntry(uid)}/exerciseReps`]: null,
   });
   logger.success(`Reset progress for ${uid}`);
   return true;
@@ -118,8 +119,8 @@ export async function deleteUserData(uid) {
   const database = getDatabaseInstance();
   if (!database) throw new Error('Database not initialized');
   await update(ref(database), {
-    [`users/${uid}`]: null,
-    [`leaderboard/${uid}`]: null,
+    [paths.user(uid)]: null,
+    [paths.leaderboardEntry(uid)]: null,
   });
   logger.success(`Deleted user data + leaderboard for ${uid}`);
   return true;

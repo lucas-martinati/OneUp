@@ -3,7 +3,7 @@ import { onValueWritten } from "firebase-functions/v2/database";
 import functionsV1 from "firebase-functions/v1";
 import admin from "firebase-admin";
 import { BADGE_RULES, isBadgeUnlocked } from "./shared/badgeRules.js";
-import { DB_SCHEMA, LEAF } from "./shared/dbSchema.js";
+import { DB_SCHEMA, LEAF, paths } from "./shared/dbSchema.js";
 
 // Initialize Firebase Admin SDK using Default Compute Service Account
 admin.initializeApp();
@@ -254,12 +254,12 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   // (out of `progress` so GPS tracks stay private). Exercise weights live in
   // `users/{uid}/exerciseWeights` (NOT in settings).
   const [settingsSnap, purchaseSnap, existingSnap, achievementsSnap, cardioSnap, weightsSnap] = await Promise.all([
-    db.ref(`users/${uid}/settings`).once('value'),
-    db.ref(`users/${uid}/purchase`).once('value'),
-    db.ref(`leaderboard/${uid}`).once('value'),
-    db.ref(`users/${uid}/achievements`).once('value'),
-    db.ref(`users/${uid}/cardioSessions`).once('value'),
-    db.ref(`users/${uid}/exerciseWeights`).once('value'),
+    db.ref(paths.userSettings(uid)).once('value'),
+    db.ref(paths.userPurchase(uid)).once('value'),
+    db.ref(paths.leaderboardEntry(uid)).once('value'),
+    db.ref(paths.userAchievements(uid)).once('value'),
+    db.ref(paths.userCardioSessions(uid)).once('value'),
+    db.ref(paths.userExerciseWeights(uid)).once('value'),
   ]);
 
   const settings = settingsSnap.val() || {};
@@ -503,7 +503,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   const shieldDate = shieldOrange ? serverTodayUTC : userLocalDate;
 
   // ── Write to leaderboard ───────────────────────────────────────────────
-  await db.ref(`leaderboard/${uid}`).update({
+  await db.ref(paths.leaderboardEntry(uid)).update({
     pseudo,
     photoURL,
     totalReps: totalClassicReps + cardioTotalReps,
@@ -526,7 +526,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   // private completions calendar.
   if (isPublic) {
     const derived = computeExerciseDerived(completions, userLocalDate);
-    await db.ref(`publicProfiles/${uid}`).set({
+    await db.ref(paths.publicProfile(uid)).set({
       // Detail-view-only payload. exerciseReps lives in the leaderboard entry
       // (needed for the list's per-exercise ranking); everything below is only
       // read when opening a user's detail card.
@@ -547,7 +547,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     });
   } else {
     // User went private — drop any stale public profile.
-    await db.ref(`publicProfiles/${uid}`).remove();
+    await db.ref(paths.publicProfile(uid)).remove();
   }
 
   console.log(`[Leaderboard] Recomputed for ${uid}: ${totalClassicReps + cardioTotalReps} reps, last=${lastActiveDay}, perfect=${isPerfectToday}`);
@@ -570,8 +570,8 @@ export const onProgressChange = onValueWritten("users/{uid}/progress", async (ev
     if (beforeProgress) {
       try {
         await Promise.all([
-          db.ref(`leaderboard/${uid}`).remove(),
-          db.ref(`publicProfiles/${uid}`).remove(),
+          db.ref(paths.leaderboardEntry(uid)).remove(),
+          db.ref(paths.publicProfile(uid)).remove(),
         ]);
         console.log(`[Leaderboard] Entry removed for ${uid} (progress deleted)`);
       } catch (error) {
@@ -598,7 +598,7 @@ export const onCardioChange = onValueWritten("users/{uid}/cardioSessions", async
   const uid = event.params.uid;
 
   try {
-    const progressSnap = await db.ref(`users/${uid}/progress`).once('value');
+    const progressSnap = await db.ref(paths.userProgress(uid)).once('value');
     const progress = progressSnap.val();
     if (!progress) return;
 
@@ -616,7 +616,7 @@ export const onSettingsChange = onValueWritten("users/{uid}/settings", async (ev
 
   try {
     // Read progress separately since this trigger is on settings
-    const progressSnap = await db.ref(`users/${uid}/progress`).once('value');
+    const progressSnap = await db.ref(paths.userProgress(uid)).once('value');
     const progress = progressSnap.val();
     if (!progress) return;
 
@@ -635,7 +635,7 @@ export const onPurchaseChange = onValueWritten("users/{uid}/purchase", async (ev
   const uid = event.params.uid;
 
   try {
-    const progressSnap = await db.ref(`users/${uid}/progress`).once('value');
+    const progressSnap = await db.ref(paths.userProgress(uid)).once('value');
     const progress = progressSnap.val();
     if (!progress) return;
 
@@ -655,9 +655,9 @@ export const onAccountDeleted = functionsV1.auth.user().onDelete(async (user) =>
   const uid = user.uid;
   try {
     await Promise.all([
-      db.ref(`users/${uid}`).remove(),
-      db.ref(`leaderboard/${uid}`).remove(),
-      db.ref(`publicProfiles/${uid}`).remove(),
+      db.ref(paths.user(uid)).remove(),
+      db.ref(paths.leaderboardEntry(uid)).remove(),
+      db.ref(paths.publicProfile(uid)).remove(),
     ]);
     console.log(`[AccountCleanup] Removed all data for deleted user ${uid}`);
   } catch (error) {
@@ -688,14 +688,14 @@ export const backfillUserProfiles = onRequest(async (req, res) => {
         const photoURL = userRecord.photoURL || '';
         
         // Fetch current profile to check if it's missing or incomplete
-        const profileSnap = await db.ref(`users/${uid}/profile`).once('value');
+        const profileSnap = await db.ref(paths.userProfile(uid)).once('value');
         const currentProfile = profileSnap.val() || {};
-        
+
         if (!currentProfile.email) {
-          updates[`users/${uid}/profile/email`] = email;
-          updates[`users/${uid}/profile/displayName`] = currentProfile.displayName || displayName;
-          updates[`users/${uid}/profile/photoURL`] = currentProfile.photoURL || photoURL;
-          updates[`users/${uid}/profile/lastSeen`] = currentProfile.lastSeen || new Date().toISOString();
+          updates[`${paths.userProfile(uid)}/email`] = email;
+          updates[`${paths.userProfile(uid)}/displayName`] = currentProfile.displayName || displayName;
+          updates[`${paths.userProfile(uid)}/photoURL`] = currentProfile.photoURL || photoURL;
+          updates[`${paths.userProfile(uid)}/lastSeen`] = currentProfile.lastSeen || new Date().toISOString();
           totalUpdated++;
         }
       }
@@ -949,8 +949,8 @@ export const onRevenueCatWebhook = onRequest({ secrets: ["REVENUECAT_WEBHOOK_SEC
     console.log(`[RevenueCat DB Update] UID ${app_user_id} | Type: ${type} ->`, updatePayload);
 
     // Apply the update selectively to BOTH Firebase nodes
-    const profileRef = db.ref(`users/${app_user_id}/purchase`);
-    const leaderboardRef = db.ref(`leaderboard/${app_user_id}`);
+    const profileRef = db.ref(paths.userPurchase(app_user_id));
+    const leaderboardRef = db.ref(paths.leaderboardEntry(app_user_id));
 
     // Update private profile
     await profileRef.update(updatePayload);

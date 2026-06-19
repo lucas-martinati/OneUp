@@ -1,6 +1,7 @@
 import { ref, get, remove, push, update, onValue, serverTimestamp, runTransaction } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
+import { paths } from '../../functions/shared/dbSchema.js';
 import i18n from '../i18n';
 
 const logger = createLogger('Clan');
@@ -22,16 +23,16 @@ export async function createClan(name) {
       }
 
       // Check if code exists first (cheap local check before write)
-      const codeSnapshot = await get(ref(database, `clanCodes/${code}`));
+      const codeSnapshot = await get(ref(database, paths.clanCode(code)));
       if (!codeSnapshot.exists()) {
         try {
-          const newClanRef = push(ref(database, 'clans'));
+          const newClanRef = push(ref(database, paths.clans()));
           const clanId = newClanRef.key;
 
           const updates = {};
-          updates[`clans/${clanId}`] = { name, code, createdBy: uid, createdAt: serverTimestamp(), members: { [uid]: 'admin' } };
-          updates[`clanCodes/${code}`] = clanId;
-          updates[`users/${uid}/clans/${clanId}`] = 'admin';
+          updates[paths.clan(clanId)] = { name, code, createdBy: uid, createdAt: serverTimestamp(), members: { [uid]: 'admin' } };
+          updates[paths.clanCode(code)] = clanId;
+          updates[paths.userClan(uid, clanId)] = 'admin';
 
           await update(ref(database), updates);
 
@@ -61,21 +62,21 @@ export async function joinClan(code) {
     const cleanCode = code.toUpperCase().trim();
 
     // Direct lookup on the unique mapping table
-    const codeSnapshot = await get(ref(database, `clanCodes/${cleanCode}`));
+    const codeSnapshot = await get(ref(database, paths.clanCode(cleanCode)));
     if (!codeSnapshot.exists()) return { success: false, error: i18n.t('clan.invalidCode') };
 
     const foundClanId = codeSnapshot.val();
 
     // Verify clan exists
-    const clanSnapshot = await get(ref(database, `clans/${foundClanId}`));
+    const clanSnapshot = await get(ref(database, paths.clan(foundClanId)));
     if (!clanSnapshot.exists()) return { success: false, error: i18n.t('clan.invalidCode') };
 
-    const userClanSnapshot = await get(ref(database, `users/${uid}/clans/${foundClanId}`));
+    const userClanSnapshot = await get(ref(database, paths.userClan(uid, foundClanId)));
     if (userClanSnapshot.exists()) return { success: false, error: i18n.t('clan.alreadyMember') };
 
     const updates = {};
-    updates[`clans/${foundClanId}/members/${uid}`] = 'member';
-    updates[`users/${uid}/clans/${foundClanId}`] = 'member';
+    updates[paths.clanMember(foundClanId, uid)] = 'member';
+    updates[paths.userClan(uid, foundClanId)] = 'member';
     await update(ref(database), updates);
 
     logger.success(`Joined clan ${foundClanId}`);
@@ -94,12 +95,12 @@ export async function leaveClan(clanId) {
     if (!clanId) return { success: false, error: i18n.t('clan.missingId') };
 
     const uid = auth.currentUser.uid;
-    const userSnapshot = await get(ref(database, `users/${uid}/clans/${clanId}`));
+    const userSnapshot = await get(ref(database, paths.userClan(uid, clanId)));
     if (!userSnapshot.exists()) return { success: true };
 
-    const clanSnapshot = await get(ref(database, `clans/${clanId}`));
+    const clanSnapshot = await get(ref(database, paths.clan(clanId)));
     const updates = {};
-    updates[`users/${uid}/clans/${clanId}`] = null;
+    updates[paths.userClan(uid, clanId)] = null;
 
     if (clanSnapshot.exists()) {
       const clanData = clanSnapshot.val();
@@ -107,13 +108,13 @@ export async function leaveClan(clanId) {
       delete remainingMembers[uid];
 
       if (Object.keys(remainingMembers).length === 0) {
-        updates[`clans/${clanId}`] = null;
+        updates[paths.clan(clanId)] = null;
         if (clanData.code) {
-          updates[`clanCodes/${clanData.code}`] = null;
+          updates[paths.clanCode(clanData.code)] = null;
         }
         logger.success(`Clan ${clanId} will be deleted because it became empty.`);
       } else {
-        updates[`clans/${clanId}/members/${uid}`] = null;
+        updates[paths.clanMember(clanId, uid)] = null;
       }
     }
 
@@ -133,13 +134,13 @@ export async function getUserClans() {
   if (!auth?.currentUser || !database) return [];
 
   const uid = auth.currentUser.uid;
-  const userClansSnapshot = await get(ref(database, `users/${uid}/clans`));
+  const userClansSnapshot = await get(ref(database, paths.userClans(uid)));
   if (!userClansSnapshot.exists()) return [];
 
   const userClans = userClansSnapshot.val();
   const clansData = [];
   for (const clanId of Object.keys(userClans)) {
-    const clanSnapshot = await get(ref(database, `clans/${clanId}`));
+    const clanSnapshot = await get(ref(database, paths.clan(clanId)));
     if (clanSnapshot.exists()) {
       const data = clanSnapshot.val();
       clansData.push({
@@ -157,11 +158,11 @@ export async function getClanDetails(clanId) {
   if (!auth?.currentUser || !database || !clanId) return null;
 
   const uid = auth.currentUser.uid;
-  const clanSnapshot = await get(ref(database, `clans/${clanId}`));
+  const clanSnapshot = await get(ref(database, paths.clan(clanId)));
   if (!clanSnapshot.exists()) return null;
 
   const clanData = clanSnapshot.val();
-  const lbSnapshot = await get(ref(database, 'leaderboard'));
+  const lbSnapshot = await get(ref(database, paths.leaderboard()));
   const leaderboards = lbSnapshot.exists() ? lbSnapshot.val() : {};
 
   const members = Object.keys(clanData.members || {}).map(memberUid => {
@@ -204,7 +205,7 @@ export async function sendPoke(targetUid, type = 'nudge', message = i18n.t('comm
   let fromName = i18n.t('common.member');
   let fromPhoto = null;
   try {
-    const lb = await get(ref(database, `leaderboard/${fromUid}`));
+    const lb = await get(ref(database, paths.leaderboardEntry(fromUid)));
     if (lb.exists()) {
       const v = lb.val();
       if (v.pseudo) fromName = v.pseudo;
@@ -213,7 +214,7 @@ export async function sendPoke(targetUid, type = 'nudge', message = i18n.t('comm
   } catch { /* keep fallback identity */ }
 
   try {
-    const notifRef = ref(database, `notifications/${targetUid}/${fromUid}`);
+    const notifRef = ref(database, paths.notification(targetUid, fromUid));
     await runTransaction(notifRef, (current) => ({
       type,
       message,
@@ -238,7 +239,7 @@ export function listenToNotifications(callback) {
   if (!auth?.currentUser || !database) return null;
 
   // Children are keyed by sender uid; each carries an aggregated `count`.
-  return onValue(ref(database, `notifications/${auth.currentUser.uid}`), (snapshot) => {
+  return onValue(ref(database, paths.notifications(auth.currentUser.uid)), (snapshot) => {
     if (snapshot.exists()) {
       const notifs = [];
       snapshot.forEach((child) => notifs.push({ id: child.key, ...child.val() }));
@@ -254,6 +255,6 @@ export async function deleteNotification(notifId) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  await remove(ref(database, `notifications/${auth.currentUser.uid}/${notifId}`));
+  await remove(ref(database, paths.notification(auth.currentUser.uid, notifId)));
   return true;
 }

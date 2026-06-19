@@ -1,5 +1,6 @@
 import { ref, get } from 'firebase/database';
 import { getDatabaseInstance, initializeFirebase } from './firebase';
+import { paths } from '../../functions/shared/dbSchema.js';
 import i18n from '../i18n';
 
 // NOTE: publishToLeaderboard has been removed.
@@ -12,7 +13,7 @@ export async function loadLeaderboard() {
   let database = getDatabaseInstance();
   if (!database) { initializeFirebase(); database = getDatabaseInstance(); if (!database) return []; }
 
-  const snapshot = await get(ref(database, 'leaderboard'));
+  const snapshot = await get(ref(database, paths.leaderboard()));
   if (!snapshot.exists()) return [];
 
   const data = snapshot.val();
@@ -50,7 +51,7 @@ export async function loadUserDetails(uid) {
   let database = getDatabaseInstance();
   if (!database) { initializeFirebase(); database = getDatabaseInstance(); if (!database) return null; }
 
-  const publicSnap = await get(ref(database, `publicProfiles/${uid}`));
+  const publicSnap = await get(ref(database, paths.publicProfile(uid)));
   if (!publicSnap.exists()) return null;
 
   const data = publicSnap.val();

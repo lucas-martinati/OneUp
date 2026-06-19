@@ -1,6 +1,7 @@
 import { ref, set, get, onValue } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
+import { paths } from '../../functions/shared/dbSchema.js';
 
 const logger = createLogger('UserData');
 
@@ -11,7 +12,7 @@ export async function saveSettingsToCloud(settings) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  await set(ref(database, `users/${auth.currentUser.uid}/settings`), settings);
+  await set(ref(database, paths.userSettings(auth.currentUser.uid)), settings);
   logger.success('Settings synced to cloud');
   return true;
 }
@@ -21,7 +22,7 @@ export async function loadSettingsFromCloud() {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return null;
 
-  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/settings`));
+  const snapshot = await get(ref(database, paths.userSettings(auth.currentUser.uid)));
   if (snapshot.exists()) { logger.success('Settings loaded from cloud'); return snapshot.val(); }
   return null;
 }
@@ -36,7 +37,7 @@ export function listenToSettingsFromCloud(callback) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return () => {};
 
-  return onValue(ref(database, `users/${auth.currentUser.uid}/settings`), (snapshot) => {
+  return onValue(ref(database, paths.userSettings(auth.currentUser.uid)), (snapshot) => {
     callback(snapshot.exists() ? snapshot.val() : null);
   });
 }
@@ -48,7 +49,7 @@ export async function loadPurchase() {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return null;
 
-  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/purchase`));
+  const snapshot = await get(ref(database, paths.userPurchase(auth.currentUser.uid)));
   if (snapshot.exists()) return snapshot.val();
   return null;
 }
@@ -60,7 +61,7 @@ export async function saveRoutinesToCloud(routines) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  await set(ref(database, `users/${auth.currentUser.uid}/routines`), routines || []);
+  await set(ref(database, paths.userRoutines(auth.currentUser.uid)), routines || []);
   logger.success('Routines synced to cloud');
   return true;
 }
@@ -70,7 +71,7 @@ export async function loadRoutinesFromCloud() {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return null;
 
-  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/routines`));
+  const snapshot = await get(ref(database, paths.userRoutines(auth.currentUser.uid)));
   if (snapshot.exists()) { logger.success('Routines loaded from cloud'); return snapshot.val(); }
   return null;
 }
@@ -80,7 +81,7 @@ export function listenToRoutinesFromCloud(callback) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return () => {};
 
-  return onValue(ref(database, `users/${auth.currentUser.uid}/routines`), (snapshot) => {
+  return onValue(ref(database, paths.userRoutines(auth.currentUser.uid)), (snapshot) => {
     callback(snapshot.exists() ? snapshot.val() : []);
   });
 }
@@ -92,7 +93,7 @@ export async function saveCustomExercisesToCloud(exercises) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  await set(ref(database, `users/${auth.currentUser.uid}/custom/exercises`), exercises || []);
+  await set(ref(database, paths.userCustomExercises(auth.currentUser.uid)), exercises || []);
   logger.success('Custom exercises synced to cloud');
   return true;
 }
@@ -102,7 +103,7 @@ export async function loadCustomExercisesFromCloud() {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return null;
 
-  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/custom/exercises`));
+  const snapshot = await get(ref(database, paths.userCustomExercises(auth.currentUser.uid)));
   if (snapshot.exists()) { logger.success('Custom exercises loaded from cloud'); return snapshot.val(); }
   return null;
 }
@@ -112,7 +113,7 @@ export function listenToCustomExercisesFromCloud(callback) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return () => {};
 
-  return onValue(ref(database, `users/${auth.currentUser.uid}/custom/exercises`), (snapshot) => {
+  return onValue(ref(database, paths.userCustomExercises(auth.currentUser.uid)), (snapshot) => {
     callback(snapshot.exists() ? snapshot.val() : []);
   });
 }
@@ -124,7 +125,7 @@ export async function saveProgramCompletionsToCloud(programId, completions) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  await set(ref(database, `users/${auth.currentUser.uid}/programCompletions/${programId}`), completions || {});
+  await set(ref(database, paths.userProgramCompletion(auth.currentUser.uid, programId)), completions || {});
   return true;
 }
 
@@ -133,7 +134,7 @@ export async function loadProgramCompletionsFromCloud(programId) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return null;
 
-  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/programCompletions/${programId}`));
+  const snapshot = await get(ref(database, paths.userProgramCompletion(auth.currentUser.uid, programId)));
   if (snapshot.exists()) return snapshot.val();
   return null;
 }
@@ -146,7 +147,7 @@ export async function saveAchievementsToCloud(achievements, userId = null) {
   const uid = userId || auth?.currentUser?.uid;
   if (!uid || !database) return false;
 
-  await set(ref(database, `users/${uid}/achievements`), achievements || {});
+  await set(ref(database, paths.userAchievements(uid)), achievements || {});
   logger.success('Achievements synced to cloud');
   return true;
 }
@@ -157,7 +158,7 @@ export async function loadAchievementsFromCloud(userId = null) {
   const uid = userId || auth?.currentUser?.uid;
   if (!uid || !database) return null;
 
-  const snapshot = await get(ref(database, `users/${uid}/achievements`));
+  const snapshot = await get(ref(database, paths.userAchievements(uid)));
   if (snapshot.exists()) { logger.success('Achievements loaded from cloud'); return snapshot.val(); }
   return null;
 }
@@ -169,7 +170,7 @@ export async function saveExerciseWeightsToCloud(weights) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  await set(ref(database, `users/${auth.currentUser.uid}/exerciseWeights`), weights || {});
+  await set(ref(database, paths.userExerciseWeights(auth.currentUser.uid)), weights || {});
   logger.success('Exercise weights synced to cloud');
   return true;
 }
@@ -179,7 +180,7 @@ export async function loadExerciseWeightsFromCloud() {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return null;
 
-  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/exerciseWeights`));
+  const snapshot = await get(ref(database, paths.userExerciseWeights(auth.currentUser.uid)));
   if (snapshot.exists()) { logger.success('Exercise weights loaded from cloud'); return snapshot.val(); }
   return null;
 }
@@ -189,7 +190,7 @@ export async function saveCustomCategoriesToCloud(categories) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  await set(ref(database, `users/${auth.currentUser.uid}/custom/categories`), categories || []);
+  await set(ref(database, paths.userCustomCategories(auth.currentUser.uid)), categories || []);
   logger.success('Custom categories synced to cloud');
   return true;
 }
@@ -199,7 +200,7 @@ export async function loadCustomCategoriesFromCloud() {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return null;
 
-  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/custom/categories`));
+  const snapshot = await get(ref(database, paths.userCustomCategories(auth.currentUser.uid)));
   if (snapshot.exists()) { logger.success('Custom categories loaded from cloud'); return snapshot.val(); }
   return null;
 }
@@ -209,7 +210,7 @@ export function listenToCustomCategoriesFromCloud(callback) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return () => {};
 
-  return onValue(ref(database, `users/${auth.currentUser.uid}/custom/categories`), (snapshot) => {
+  return onValue(ref(database, paths.userCustomCategories(auth.currentUser.uid)), (snapshot) => {
     callback(snapshot.exists() ? snapshot.val() : []);
   });
 }

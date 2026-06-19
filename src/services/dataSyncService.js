@@ -3,6 +3,7 @@ import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
 import { syncSessionHistory } from '../features/share/services/sessionHistoryService';
 import { sanitizeForCloud, mergeData } from '../utils/syncUtils';
+import { paths } from '../../functions/shared/dbSchema.js';
 
 const logger = createLogger('DataSync');
 
@@ -26,7 +27,7 @@ export async function saveToCloud(data) {
   const cleanData = sanitizeForCloud(data);
   
   try {
-    await update(ref(database, `users/${userId}/progress`), { 
+    await update(ref(database, paths.userProgress(userId)), {
       ...cleanData, 
       lastCompletionChange: data.lastCompletionChange || serverTimestamp() 
     });
@@ -43,7 +44,7 @@ export async function loadFromCloud() {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) throw new Error('User not signed in or Firebase not initialized');
 
-  const snapshot = await get(ref(database, `users/${auth.currentUser.uid}/progress`));
+  const snapshot = await get(ref(database, paths.userProgress(auth.currentUser.uid)));
   if (snapshot.exists()) { logger.success('Data loaded from cloud successfully'); return snapshot.val(); }
   logger.info('No cloud data found');
   return null;
@@ -54,7 +55,7 @@ export function listenToCloudChanges(callback) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) { logger.warn('User not signed in or Firebase not initialized'); return null; }
 
-  return onValue(ref(database, `users/${auth.currentUser.uid}/progress`), (snapshot) => {
+  return onValue(ref(database, paths.userProgress(auth.currentUser.uid)), (snapshot) => {
     if (snapshot.exists()) callback(snapshot.val());
   });
 }

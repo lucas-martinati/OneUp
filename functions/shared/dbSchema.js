@@ -106,3 +106,58 @@ export const DB_SCHEMA = {
     },
   },
 };
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Canonical RTDB PATHS — single source of truth for *where* every node lives.
+//
+// `DB_SCHEMA` above describes the SHAPE of the database; `paths` below describes
+// the LOCATION of each node. Together they make this file the one place to look
+// to answer "where is X stored in the cloud?". EVERY read/write — both the client
+// services (src/services/*) and the Cloud Functions (functions/index.js) — must
+// build its `ref(...)` from a builder here instead of hardcoding path strings, so
+// a node can never drift between caller and schema.
+//
+// Each builder returns a string path. For a sub-leaf not worth its own builder
+// (e.g. an individual field inside `profile`), interpolate off its parent:
+//   `${paths.userProfile(uid)}/email`
+// ══════════════════════════════════════════════════════════════════════════════
+
+export const paths = {
+  // ── Top-level, socially-readable nodes ──────────────────────────────────
+  leaderboard:            ()              => 'leaderboard',
+  leaderboardEntry:       (uid)           => `leaderboard/${uid}`,
+  publicProfile:          (uid)           => `publicProfiles/${uid}`,
+
+  // ── Clans ───────────────────────────────────────────────────────────────
+  clans:                  ()              => 'clans',
+  clan:                   (clanId)        => `clans/${clanId}`,
+  clanMember:             (clanId, uid)   => `clans/${clanId}/members/${uid}`,
+  clanCode:               (code)          => `clanCodes/${code}`,
+
+  // ── Notifications (pokes), keyed by recipient then sender ────────────────
+  notifications:          (uid)           => `notifications/${uid}`,
+  notification:           (uid, fromUid)  => `notifications/${uid}/${fromUid}`,
+
+  // ── users/{uid} subtree ─────────────────────────────────────────────────
+  users:                  ()              => 'users',
+  user:                   (uid)           => `users/${uid}`,
+  userProfile:            (uid)           => `users/${uid}/profile`,
+  userPurchase:           (uid)           => `users/${uid}/purchase`,
+  userSettings:           (uid)           => `users/${uid}/settings`,
+  userAchievements:       (uid)           => `users/${uid}/achievements`,
+  userClans:              (uid)           => `users/${uid}/clans`,
+  userClan:               (uid, clanId)   => `users/${uid}/clans/${clanId}`,
+  userCustomExercises:    (uid)           => `users/${uid}/custom/exercises`,
+  userCustomCategories:   (uid)           => `users/${uid}/custom/categories`,
+  userExerciseWeights:    (uid)           => `users/${uid}/exerciseWeights`,
+  userWeightHistory:      (uid)           => `users/${uid}/weightHistory`,
+  userWeightHistoryEx:    (uid, exId)     => `users/${uid}/weightHistory/${exId}`,
+  userWeightEntry:        (uid, exId, d)  => `users/${uid}/weightHistory/${exId}/${d}`,
+  userRoutines:           (uid)           => `users/${uid}/routines`,
+  userProgramCompletions: (uid)           => `users/${uid}/programCompletions`,
+  userProgramCompletion:  (uid, programId)=> `users/${uid}/programCompletions/${programId}`,
+  userCardioSessions:     (uid)           => `users/${uid}/cardioSessions`,
+  userCardioSession:      (uid, id)       => `users/${uid}/cardioSessions/${id}`,
+  userProgress:           (uid)           => `users/${uid}/progress`,
+  userSessionHistory:     (uid)           => `users/${uid}/progress/sessionHistory`,
+};

@@ -1,13 +1,13 @@
 import { ref, set, get, remove, push, serverTimestamp } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
+import { paths } from '../../functions/shared/dbSchema.js';
 
 const logger = createLogger('Cardio');
 
 // Cardio sessions live in their OWN node, decoupled from `progress`, so their
 // (potentially large, location-sensitive) GPS tracks stay private and out of
-// the socially-readable progress subtree.
-const sessionsPath = uid => `users/${uid}/cardioSessions`;
+// the socially-readable progress subtree. See `paths.userCardioSessions`.
 
 // ── Save a cardio session ──────────────────────────────────────────────
 
@@ -17,9 +17,9 @@ export async function saveCardioSession(session) {
   if (!auth?.currentUser || !database) return null;
 
   const uid = auth.currentUser.uid;
-  const sessionsRef = ref(database, sessionsPath(uid));
+  const sessionsRef = ref(database, paths.userCardioSessions(uid));
   const id = session.id || push(sessionsRef).key;
-  const sessionRef = ref(database, `${sessionsPath(uid)}/${id}`);
+  const sessionRef = ref(database, paths.userCardioSession(uid, id));
   const payload = {
     ...session,
     id,
@@ -38,7 +38,7 @@ export async function loadCardioSessions() {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return [];
 
-  const snapshot = await get(ref(database, sessionsPath(auth.currentUser.uid)));
+  const snapshot = await get(ref(database, paths.userCardioSessions(auth.currentUser.uid)));
   if (snapshot.exists()) {
     const data = snapshot.val();
     const sessions = Object.values(data).sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
@@ -55,7 +55,7 @@ export async function deleteCardioSession(sessionId) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  await remove(ref(database, `${sessionsPath(auth.currentUser.uid)}/${sessionId}`));
+  await remove(ref(database, paths.userCardioSession(auth.currentUser.uid, sessionId)));
   logger.success('Cardio session deleted');
   return true;
 }

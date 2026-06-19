@@ -9,6 +9,7 @@ import { ref, remove, update } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { Preferences } from '../utils/preferences';
 import { getAuthInstance, getDatabaseInstance, initializeFirebase } from './firebase';
+import { paths } from '../../functions/shared/dbSchema.js';
 
 const logger = createLogger('Auth');
 
@@ -30,7 +31,7 @@ async function syncProfileToDatabase(user) {
   try {
     const db = getDatabaseInstance();
     if (!db) return;
-    await update(ref(db, `users/${user.uid}/profile`), {
+    await update(ref(db, paths.userProfile(user.uid)), {
       email: user.email || '',
       displayName: user.displayName || '',
       photoURL: user.photoURL || '',
@@ -149,12 +150,12 @@ export async function deleteAccount(listeners, leaveClanFn, getUserClansFn) {
   // the authoritative cleanup once deleteUser() succeeds below.
   const db = getDatabaseInstance();
   try {
-    await remove(ref(db, `users/${userId}`));
+    await remove(ref(db, paths.user(userId)));
   } catch (err) {
     logger.warn('Client-side user data removal denied, deferring to server cleanup:', err);
   }
   try {
-    await remove(ref(db, `leaderboard/${userId}`));
+    await remove(ref(db, paths.leaderboardEntry(userId)));
   } catch (err) {
     logger.warn('Client-side leaderboard removal denied, deferring to server cleanup:', err);
   }

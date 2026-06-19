@@ -1,6 +1,7 @@
 import { ref, set, get } from 'firebase/database';
 import { createLogger } from '../utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
+import { paths } from '../../functions/shared/dbSchema.js';
 
 const logger = createLogger('WeightHistory');
 
@@ -14,7 +15,7 @@ export async function saveWeightEntry(exerciseId, date, weight) {
   if (!auth?.currentUser || !database) return false;
 
   const uid = auth.currentUser.uid;
-  await set(ref(database, `users/${uid}/weightHistory/${exerciseId}/${date}`), weight);
+  await set(ref(database, paths.userWeightEntry(uid, exerciseId, date)), weight);
   logger.success(`Weight entry saved: ${exerciseId} @ ${date} = ${weight}kg`);
   return true;
 }
@@ -29,7 +30,7 @@ export async function loadWeightHistory(exerciseId) {
   if (!auth?.currentUser || !database) return null;
 
   const uid = auth.currentUser.uid;
-  const snapshot = await get(ref(database, `users/${uid}/weightHistory/${exerciseId}`));
+  const snapshot = await get(ref(database, paths.userWeightHistoryEx(uid, exerciseId)));
   if (snapshot.exists()) {
     logger.success(`Weight history loaded for ${exerciseId}`);
     return snapshot.val();
@@ -47,7 +48,7 @@ export async function loadAllWeightHistories() {
   if (!auth?.currentUser || !database) return null;
 
   const uid = auth.currentUser.uid;
-  const snapshot = await get(ref(database, `users/${uid}/weightHistory`));
+  const snapshot = await get(ref(database, paths.userWeightHistory(uid)));
   if (snapshot.exists()) {
     logger.success('All weight histories loaded');
     return snapshot.val();
@@ -65,7 +66,7 @@ export async function loadLatestWeights(uid) {
   if (!database || !uid) return null;
 
   // Read the user's current exerciseWeights (quick snapshot)
-  const snapshot = await get(ref(database, `users/${uid}/exerciseWeights`));
+  const snapshot = await get(ref(database, paths.userExerciseWeights(uid)));
   if (snapshot.exists()) return snapshot.val();
   return null;
 }
