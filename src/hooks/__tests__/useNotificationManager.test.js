@@ -165,10 +165,7 @@ describe('useNotificationManager', () => {
     const tomorrowStr = getLocalDateStr(new Date(Date.now() + 86400000));
     
     // Return true for tomorrow, but false for all other future days
-    const isDayDone = vi.fn((dateStr) => {
-        if (dateStr === tomorrowStr) return true;
-        return false;
-    });
+    const isDayDone = vi.fn((dateStr) => dateStr === tomorrowStr);
 
     const { result } = renderHook(() => useNotificationManager({
       isDayDone,
@@ -218,8 +215,7 @@ describe('useNotificationManager', () => {
       result = renderHook(() => useNotificationManager({
         isDayDone: (dateStr) => {
            const tomorrowStr = getLocalDateStr(new Date(Date.now() + 86400000));
-           if (dateStr >= tomorrowStr) return false;
-           return true;
+           return dateStr < tomorrowStr;
         },
         getDayNumber: () => 7, // 7 is a milestone
       })).result;
@@ -231,8 +227,7 @@ describe('useNotificationManager', () => {
       result = renderHook(() => useNotificationManager({
         isDayDone: (dateStr) => {
            const tomorrowStr = getLocalDateStr(new Date(Date.now() + 86400000));
-           if (dateStr >= tomorrowStr) return false;
-           return true; 
+           return dateStr < tomorrowStr;
         },
         getDayNumber: () => 2,
       })).result;

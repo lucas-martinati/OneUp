@@ -400,7 +400,7 @@ describe('useExercisesStore', () => {
       cloudSync.saveExerciseWeightsToCloud.mockRejectedValueOnce(new Error('Network error'));
       useExercisesStore.getState().setWeight('bench', 60);
       vi.advanceTimersByTime(1500);
-      await new Promise(r => process.nextTick(r)); // wait for promise rejection
+      await new Promise(r => queueMicrotask(r)); // wait for promise rejection
       vi.useRealTimers();
       // Should not throw, error is caught implicitly.
       expect(useExercisesStore.getState().exerciseWeights['bench']).toBe(60);

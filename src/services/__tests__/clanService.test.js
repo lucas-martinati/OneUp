@@ -24,6 +24,13 @@ vi.mock('../firebase', () => ({
   getDatabaseInstance: vi.fn(() => ({})),
 }));
 
+// Mock ../i18n
+vi.mock('../i18n', () => ({
+  default: {
+    t: vi.fn((key) => key),
+  },
+}));
+
 import { get, remove, push, update, onValue, runTransaction } from 'firebase/database';
 import { 
   createClan, 

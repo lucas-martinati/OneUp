@@ -13,11 +13,11 @@ describe('weights config', () => {
         const { WEIGHT_EXERCISES } = await import('../weights.js');
         
         const biceps = WEIGHT_EXERCISES.find(ex => ex.id === 'biceps_curl');
-        expect(biceps.multiplier).toBe(1.2);
+        expect(biceps.multiplier).toBeCloseTo(1.2);
         
         const missing = WEIGHT_EXERCISES.find(ex => ex.id === 'hammer_curl');
         // Falls back to 0.5 because it's missing in the mocked shared config
-        expect(missing.multiplier).toBe(0.5);
+        expect(missing.multiplier).toBeCloseTo(0.5);
     });
 
     it('creates a map of exercises', async () => {

@@ -353,10 +353,10 @@ describe('mergeWithAnonymousData', () => {
     const merged = useProgressStore.getState().completions[day];
 
     expect(merged.bench.weight).toBe(60); // guest wins because user doesn't have it
-    expect(merged.bench.difficulty).toBe(0.8);
+    expect(merged.bench.difficulty).toBeCloseTo(0.8);
     
     expect(merged.pullups.weight).toBe(15); // user wins because guest doesn't have it
-    expect(merged.pullups.difficulty).toBe(0.5);
+    expect(merged.pullups.difficulty).toBeCloseTo(0.5);
   });
 });
 

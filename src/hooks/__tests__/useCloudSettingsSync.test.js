@@ -93,7 +93,7 @@ describe('useCloudSettingsSync', () => {
     
     expect(useCloudAutoSave).toHaveBeenCalled();
     const args = vi.mocked(useCloudAutoSave).mock.calls[0];
-    const [enabled, currentSettings, saveCallback, options] = args;
+    const [enabled, , saveCallback, options] = args;
 
     expect(enabled).toBe(true);
     expect(options.delay).toBe(2000);

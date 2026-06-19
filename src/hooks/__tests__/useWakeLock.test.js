@@ -9,7 +9,7 @@ describe('useWakeLock', () => {
     let mockAddEventListener;
 
     beforeEach(() => {
-        originalNavigator = global.navigator;
+        originalNavigator = globalThis.navigator;
         
         mockRelease = vi.fn().mockResolvedValue();
         mockAddEventListener = vi.fn();
@@ -19,7 +19,7 @@ describe('useWakeLock', () => {
             addEventListener: mockAddEventListener
         });
 
-        global.navigator = {
+        globalThis.navigator = {
             wakeLock: {
                 request: mockRequest
             }
@@ -33,7 +33,7 @@ describe('useWakeLock', () => {
     });
 
     afterEach(() => {
-        global.navigator = originalNavigator;
+        globalThis.navigator = originalNavigator;
         vi.clearAllMocks();
         cleanup();
     });
@@ -89,7 +89,7 @@ describe('useWakeLock', () => {
     });
 
     it('does not crash if navigator.wakeLock is unsupported', () => {
-        global.navigator = {};
+        globalThis.navigator = {};
         
         // Should just return silently
         expect(() => renderHook(() => useWakeLock(true))).not.toThrow();
