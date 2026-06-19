@@ -1,5 +1,5 @@
 import React from 'react';
-import { Crown, Star, HeartHandshake, Check } from '../../utils/icons';
+import { Crown, Star, HeartHandshake, Check, Shield, ShieldAlert } from '../../utils/icons';
 import { Avatar } from '../ui/Avatar';
 import { getTierBadgeConfigs } from '../../utils/entitlements';
 import styles from './Leaderboard.module.css';
@@ -24,6 +24,11 @@ export function LeaderboardPodium({ items, currentUid, todayStr, onSelect, clanD
                 const isMe = entry.uid === currentUid;
                 const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
                 const avatarSize = slot === 0 ? 66 : 52;
+
+                // Shield logic: server-computed (immune to client clock manipulation).
+                const shieldFresh = entry.shieldDate === todayStr;
+                const showVerifiedShield = !!entry.shieldGreen && shieldFresh;
+                const showSuspiciousShield = !!entry.shieldOrange && shieldFresh;
 
                 let pItemCls = styles.pItem3;
                 if (slot === 0) {
@@ -86,6 +91,8 @@ export function LeaderboardPodium({ items, currentUid, todayStr, onSelect, clanD
                                 const BadgeIcon = badge.icon;
                                 return <BadgeIcon key={badge.key} size={11} color={badge.color} fill={badge.fill} />;
                             })}
+                            {showVerifiedShield && <Shield size={12} color="#10b981" />}
+                            {showSuspiciousShield && <ShieldAlert size={12} color="#f59e0b" />}
                         </div>
 
                         <div className={styles.pReps}>
