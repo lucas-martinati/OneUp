@@ -1,14 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Share2, Download, X, Loader2 } from '../../../utils/icons';
-import { IconButton } from '../../../components/ui';
-import { Z_INDEX } from '../../../utils/zIndex';
+import { Share2, Download, X, Loader2 } from '@utils/icons';
+import { IconButton } from'@components/ui';
+import { Z_INDEX } from '@utils/zIndex';
 import { ShareCard } from './ShareCard';
 import { ShareOptions } from './ShareOptions';
 import { CropModal } from './CropModal';
-import { canShareNatively } from '../services/shareService';
-import { useProgressStore } from '../../../store/useProgressStore';
-import { useUIStore } from '../../../store/useUIStore';
+import { canShareNatively } from '@features/share/services/shareService';
+import { useProgressStore } from '@store/useProgressStore';
+import { useUIStore } from '@store/useUIStore';
 
 export function ShareModal({ shareHook, onClose, isPro = false, completions = {}, getDayNumber, settings }) {
   const { t } = useTranslation();

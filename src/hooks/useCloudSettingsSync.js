@@ -1,9 +1,9 @@
 import { useCallback, useEffect } from 'react';
-import { useProgressStore } from '../store/useProgressStore';
-import { useSettingsStore, LOCAL_ONLY_KEYS } from '../store/useSettingsStore';
+import { useProgressStore } from '@store/useProgressStore';
+import { useSettingsStore, LOCAL_ONLY_KEYS } from '@store/useSettingsStore';
 import { useCloudAutoSave } from './useCloudAutoSave';
-import { cloudSync } from '../services/cloudSync';
-import { createLogger } from '../utils/logger';
+import { cloudSync } from '@services/cloudSync';
+import { createLogger } from '@utils/logger';
 
 const logger = createLogger('SettingsSync');
 

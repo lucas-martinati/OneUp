@@ -1,9 +1,9 @@
-import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions } from '../utils/dateUtils';
-import { EXERCISES, getDailyGoal } from '../config/exercises';
-import { evaluateCardioWeek } from '../utils/cardioStreak';
-import { WEIGHT_EXERCISES } from '../config/weights';
-import { BADGE_DEFINITIONS, isBadgeUnlocked } from '../config/badgeDefinitions';
-import { isGlobalPerfectDay } from '../utils/statUtils';
+import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions } from '@utils/dateUtils';
+import { EXERCISES, getDailyGoal } from '@config/exercises';
+import { evaluateCardioWeek } from '@utils/cardioStreak';
+import { WEIGHT_EXERCISES } from '@config/weights';
+import { BADGE_DEFINITIONS, isBadgeUnlocked } from '@config/badgeDefinitions';
+import { isGlobalPerfectDay } from '@utils/statUtils';
 
 /**
  * Pure function that computes all stats in a single pass.

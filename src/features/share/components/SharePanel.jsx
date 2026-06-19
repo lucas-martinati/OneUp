@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react';
-import { Share2 } from '../../../utils/icons';
+import { Share2 } from '@utils/icons';
 import { useTranslation } from 'react-i18next';
-import { useShareCard } from '../hooks/useShareCard';
-import { getSessionHistory } from '../services/sessionHistoryService';
-import { useSubscription } from '../../../contexts/SubscriptionContext';
-import { useProgressStore } from '../../../store/useProgressStore';
-import { useSettingsStore } from '../../../store/useSettingsStore';
-import { useBackHandler } from '../../../hooks/useBackHandler';
-import { CATEGORIES } from '../../../config/categories';
+import { useShareCard } from '@features/share/hooks/useShareCard';
+import { getSessionHistory } from '@features/share/services/sessionHistoryService';
+import { useSubscription } from '@contexts/SubscriptionContext';
+import { useProgressStore } from '@store/useProgressStore';
+import { useSettingsStore } from '@store/useSettingsStore';
+import { useBackHandler } from '@hooks/useBackHandler';
+import { CATEGORIES } from '@config/categories';
 
 const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
 

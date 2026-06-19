@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Dumbbell, Filter, ChevronUp } from '../../utils/icons';
+import { Trophy, Dumbbell, Filter, ChevronUp } from '@utils/icons';
 
 const domainActive = {
     bodyweight: { bg: 'linear-gradient(135deg, rgba(251,191,36,0.22), rgba(245,158,11,0.08))', border: 'rgba(251,191,36,0.45)', color: '#fbbf24' },

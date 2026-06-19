@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { isWorkoutSessionStarted } from '../utils/workoutSessionStorage';
+import { isWorkoutSessionStarted } from '@utils/workoutSessionStorage';
 
 /**
  * UI store — modal visibility and dashboard-level UI state.

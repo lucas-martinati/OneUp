@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { Cloud, AlertCircle, Upload, AlertTriangle } from '../../utils/icons';
+import { Cloud, AlertCircle, Upload, AlertTriangle } from '@utils/icons';
 
 /**
  * Full-screen overlay for anonymous (guest) data merge.

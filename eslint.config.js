@@ -75,7 +75,7 @@ export default defineConfig([
   },
   // Node.js files (Cloud Functions, build scripts)
   {
-    files: ['functions/**/*.js', 'scripts/**/*.js'],
+    files: ['firebase/functions/**/*.js', 'scripts/**/*.js', 'scripts/**/*.cjs'],
     languageOptions: {
       globals: {
         ...globals.node,

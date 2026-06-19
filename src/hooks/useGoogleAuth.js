@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
-import { cloudSync } from '../services/cloudSync';
-import { createLogger } from '../utils/logger';
-import { isNativePlatform } from '../utils/platform';
-import { Preferences } from '../utils/preferences';
+import { cloudSync } from '@services/cloudSync';
+import { createLogger } from '@utils/logger';
+import { isNativePlatform } from '@utils/platform';
+import { Preferences } from '@utils/preferences';
 
 const logger = createLogger('GoogleAuth');
 

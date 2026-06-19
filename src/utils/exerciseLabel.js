@@ -1,6 +1,6 @@
 import i18n from '../i18n';
-import { EXERCISES } from '../config/exercises';
-import { WEIGHT_EXERCISES } from '../config/weights';
+import { EXERCISES } from '@config/exercises';
+import { WEIGHT_EXERCISES } from '@config/weights';
 
 const WEIGHT_ID_SET = new Set(WEIGHT_EXERCISES.map(e => e.id));
 const BW_ID_SET = new Set(EXERCISES.map(e => e.id));

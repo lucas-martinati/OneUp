@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { cloudSync } from '../services/cloudSync';
-import { createLogger } from '../utils/logger';
+import { cloudSync } from '@services/cloudSync';
+import { createLogger } from '@utils/logger';
 
 const logger = createLogger('CloudSyncStore');
 

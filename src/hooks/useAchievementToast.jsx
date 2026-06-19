@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Sparkles } from '../utils/icons';
-import { BADGE_DEFINITIONS, BADGE_ICONS, getBadgeIconFromDef } from '../config/badgeDefinitions';
+import { ChevronRight, Sparkles } from '@utils/icons';
+import { BADGE_DEFINITIONS, BADGE_ICONS, getBadgeIconFromDef } from '@config/badgeDefinitions';
 import { useToastGestures } from './useToastGestures';
-import { getToastRoot } from '../components/feedback/toastRoot';
+import { getToastRoot } from'@components/feedback/toastRoot';
 
 const TOAST_DURATION_MS = 5000;
 

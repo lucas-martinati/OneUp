@@ -1,4 +1,4 @@
-import { Check } from '../../../utils/icons';
+import { Check } from '@utils/icons';
 
 export function WeightSelector({ activeColor, currentWeight, handleValidateWeight, localWeightStr, setLocalWeightStr, t }) {
     const parsedWeight = parseFloat(localWeightStr.replace(',', '.'));

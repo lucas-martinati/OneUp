@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Calendar as CalendarIcon, Play, PieChart, Users, SettingsIcon } from '../../utils/icons';
-import { useUIStore } from '../../store/useUIStore';
-import { useCloudSyncStore } from '../../store/useCloudSyncStore';
+import { Calendar as CalendarIcon, Play, PieChart, Users, SettingsIcon } from '@utils/icons';
+import { useUIStore } from '@store/useUIStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
 
 import styles from './DashboardNavBar.module.css';
 

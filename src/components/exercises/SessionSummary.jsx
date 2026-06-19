@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { Trophy, Check, Pencil } from '../../utils/icons';
+import { Trophy, Check, Pencil } from '@utils/icons';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
-import { getIcon } from '../../utils/icons';
-import { Z_INDEX } from '../../utils/zIndex';
-import { updateSessionName } from '../../features/share/services/sessionHistoryService';
-import { getExerciseLabel } from '../../utils/exerciseLabel';
-import { useBackHandler } from '../../hooks/useBackHandler';
-import { SharePanel } from '../../features/share/components/SharePanel';
+import { getIcon } from '@utils/icons';
+import { Z_INDEX } from '@utils/zIndex';
+import { updateSessionName } from '@features/share/services/sessionHistoryService';
+import { getExerciseLabel } from '@utils/exerciseLabel';
+import { useBackHandler } from '@hooks/useBackHandler';
+import { SharePanel } from '@features/share/components/SharePanel';
 import styles from './SessionSummary.module.css';
 
 function formatDuration(seconds) {

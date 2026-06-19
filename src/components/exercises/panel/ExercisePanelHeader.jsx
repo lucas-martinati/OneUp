@@ -1,4 +1,4 @@
-import { X, ChevronRight, DynamicIcon } from '../../../utils/icons';
+import { X, ChevronRight, DynamicIcon } from '@utils/icons';
 
 export function ExercisePanelHeader({ activeColor, exerciseConfig, exerciseLabel, onClose, onNext, hideNextButton, t }) {
     const showNextButton = onNext && !hideNextButton;

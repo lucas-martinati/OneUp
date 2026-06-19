@@ -23,7 +23,7 @@ import {
   EXERCISES as SHARED_EXERCISES,
   CARDIO_EXERCISES as SHARED_CARDIO,
   getDailyGoal as sharedGetDailyGoal,
-} from '../../functions/shared/exerciseRules.js';
+} from '@shared/exerciseRules.js';
 
 const CLIENT_EXERCISES = [
     {

@@ -1,6 +1,6 @@
 import { ref, set, get } from 'firebase/database';
-import { getAuthInstance, getDatabaseInstance } from '../../../services/firebase';
-import { paths } from '../../../../functions/shared/dbSchema.js';
+import { getAuthInstance, getDatabaseInstance } from '@services/firebase';
+import { paths } from '@shared/dbSchema.js';
 
 const STORAGE_KEY = 'oneup_session_history';
 const MAX_SESSIONS = 20;

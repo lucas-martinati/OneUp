@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { useBackHandler } from '../../hooks/useBackHandler';
+import { useBackHandler } from '@hooks/useBackHandler';
 import { useTranslation, Trans } from 'react-i18next';
 import {
     Calendar, ArrowRight, ArrowLeft, Target, Rocket, History,
     Sparkles, AlertCircle, CheckCircle2, Globe, getIcon
-} from '../../utils/icons';
-import { getExerciseLabel } from '../../utils/exerciseLabel';
-import { getLocalDateStr } from '../../utils/dateUtils';
-import { EXERCISES } from '../../config/exercises';
-import { LANGUAGES, resolveLanguageCode } from '../../config/languages';
-import { useAuth } from '../../contexts/AuthContext';
+} from '@utils/icons';
+import { getExerciseLabel } from '@utils/exerciseLabel';
+import { getLocalDateStr } from '@utils/dateUtils';
+import { EXERCISES } from '@config/exercises';
+import { LANGUAGES, resolveLanguageCode } from '@config/languages';
+import { useAuth } from '@contexts/AuthContext';
 import { Button, GoogleIcon } from '../ui';
 
 const ACCENT = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';

@@ -1,5 +1,5 @@
 import { initializeFirebase, getAuthInstance } from './firebase';
-import { mergeData } from '../utils/syncUtils';
+import { mergeData } from '@utils/syncUtils';
 
 const USER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 

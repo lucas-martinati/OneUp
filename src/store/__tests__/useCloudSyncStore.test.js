@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-vi.mock('../../services/cloudSync', () => ({
+vi.mock('@services/cloudSync', () => ({
   cloudSync: {
     getUserClans: vi.fn(async () => []),
   },
 }));
 
-import { cloudSync } from '../../services/cloudSync';
+import { cloudSync } from '@services/cloudSync';
 import { useCloudSyncStore } from '../useCloudSyncStore';
 
 const makeDeps = (overrides = {}) => ({

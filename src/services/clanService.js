@@ -1,7 +1,7 @@
 import { ref, get, remove, push, update, onValue, serverTimestamp, runTransaction } from 'firebase/database';
-import { createLogger } from '../utils/logger';
+import { createLogger } from '@utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
-import { paths } from '../../functions/shared/dbSchema.js';
+import { paths } from '@shared/dbSchema.js';
 import i18n from '../i18n';
 
 const logger = createLogger('Clan');

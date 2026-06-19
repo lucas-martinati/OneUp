@@ -6,10 +6,10 @@ import {
   deleteUser
 } from 'firebase/auth';
 import { ref, remove, update } from 'firebase/database';
-import { createLogger } from '../utils/logger';
-import { Preferences } from '../utils/preferences';
+import { createLogger } from '@utils/logger';
+import { Preferences } from '@utils/preferences';
 import { getAuthInstance, getDatabaseInstance, initializeFirebase } from './firebase';
-import { paths } from '../../functions/shared/dbSchema.js';
+import { paths } from '@shared/dbSchema.js';
 
 const logger = createLogger('Auth');
 

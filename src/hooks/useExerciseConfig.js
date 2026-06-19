@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import { useProgressStore } from '../store/useProgressStore';
-import { useSettingsStore } from '../store/useSettingsStore';
-import { useExercises } from '../contexts/ExercisesContext';
+import { useProgressStore } from '@store/useProgressStore';
+import { useSettingsStore } from '@store/useSettingsStore';
+import { useExercises } from '@contexts/ExercisesContext';
 
 /**
  * Unifies the configuration aspects of exercises (difficulty and weight).

@@ -10,7 +10,7 @@
  */
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useBackHandler } from '../../hooks/useBackHandler';
+import { useBackHandler } from '@hooks/useBackHandler';
 
 /**
  * Full-screen announcement overlay with smooth enter/exit animations.

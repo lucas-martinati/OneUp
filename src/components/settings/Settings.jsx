@@ -1,20 +1,20 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Z_INDEX } from '../../utils/zIndex';
-import { X, ShoppingBag, ArrowLeft } from '../../utils/icons';
+import { Z_INDEX } from '@utils/zIndex';
+import { X, ShoppingBag, ArrowLeft } from '@utils/icons';
 import { Button, IconButton } from '../ui';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { StoreView } from './StoreView';
 import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection } from './SettingsSections';
 import { DifficultySettings } from './DifficultySettings';
-import { useAuth } from '../../contexts/AuthContext';
-import { useSettingsStore } from '../../store/useSettingsStore';
-import { useCloudSyncStore } from '../../store/useCloudSyncStore';
-import { useProgressStore } from '../../store/useProgressStore';
-import { cloudSync } from '../../services/cloudSync';
-import { useNotificationManager } from '../../hooks/useNotificationManager';
-import { useSubscription } from '../../contexts/SubscriptionContext';
-import { useBackHandler } from '../../hooks/useBackHandler';
+import { useAuth } from '@contexts/AuthContext';
+import { useSettingsStore } from '@store/useSettingsStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { useProgressStore } from '@store/useProgressStore';
+import { cloudSync } from '@services/cloudSync';
+import { useNotificationManager } from '@hooks/useNotificationManager';
+import { useSubscription } from '@contexts/SubscriptionContext';
+import { useBackHandler } from '@hooks/useBackHandler';
 
 export function Settings({ defaultShowStore = false, onClose }) {
 

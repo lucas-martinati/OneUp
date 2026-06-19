@@ -2,11 +2,34 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { readFileSync } from 'fs'
+import { fileURLToPath } from 'url'
+import { dirname, resolve } from 'path'
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Native (Capacitor) builds set NATIVE_BUILD=true: the RevenueCat *web* SDK is
 // never executed on native, so we alias it to a tiny stub to keep ~626 KB out of
 // the Android APK. Web/PWA builds leave it untouched.
 const NATIVE_BUILD = process.env.NATIVE_BUILD === 'true';
+
+// Load path aliases from the single source of truth
+const pathsConfig = JSON.parse(
+  readFileSync(resolve(__dirname, 'jsconfig.paths.json'), 'utf-8')
+);
+const paths = pathsConfig.compilerOptions.paths;
+
+const aliases = {};
+for (const [key, value] of Object.entries(paths)) {
+  const aliasKey = key.replace('/*', '');
+  const aliasValue = value[0].replace('/*', '');
+  aliases[aliasKey] = aliasValue.replace(/^\./, '');
+}
+
+if (NATIVE_BUILD) {
+  aliases['@revenuecat/purchases-js'] = '/src/services/revenuecatWebStub.js';
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -48,17 +71,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000
   },
   resolve: {
-    alias: {
-      // Strip the RevenueCat web SDK from native builds (see NATIVE_BUILD above).
-      ...(NATIVE_BUILD ? { '@revenuecat/purchases-js': '/src/services/revenuecatWebStub.js' } : {}),
-      '@components': '/src/components',
-      '@config': '/src/config',
-      '@contexts': '/src/contexts',
-      '@hooks': '/src/hooks',
-      '@features': '/src/features',
-      '@services': '/src/services',
-      '@utils': '/src/utils',
-    }
+    alias: aliases
   },
   plugins: [
     react(),
@@ -108,6 +121,6 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
-    exclude: ['e2e/**', 'node_modules/**', 'functions/**', 'dist/**']
+    exclude: ['e2e/**', 'node_modules/**', 'firebase/functions/**', 'dist/**']
   }
 })

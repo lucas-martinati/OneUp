@@ -1,14 +1,6 @@
 {
+  "extends": "./jsconfig.paths.json",
   "compilerOptions": {
-    "paths": {
-      "@components/*": ["./src/components/*"],
-      "@config/*": ["./src/config/*"],
-      "@contexts/*": ["./src/contexts/*"],
-      "@hooks/*": ["./src/hooks/*"],
-      "@features/*": ["./src/features/*"],
-      "@services/*": ["./src/services/*"],
-      "@utils/*": ["./src/utils/*"]
-    },
     "module": "esnext",
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

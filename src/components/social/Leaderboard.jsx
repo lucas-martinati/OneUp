@@ -1,25 +1,25 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { X, Trophy, LogOut, Activity } from '../../utils/icons';
+import { X, Trophy, LogOut, Activity } from '@utils/icons';
 import { IconButton, Spinner, GoogleSignInButton } from '../ui';
-import { EXERCISES } from '../../config/exercises';
-import { WEIGHT_EXERCISES } from '../../config/weights';
-import { getLocalDateStr } from '../../utils/dateUtils';
+import { EXERCISES } from '@config/exercises';
+import { WEIGHT_EXERCISES } from '@config/weights';
+import { getLocalDateStr } from '@utils/dateUtils';
 import { ClanInviteCard } from './ClanInviteCard';
 import { LeaderboardTabs } from './LeaderboardTabs';
 import { LeaderboardRow } from './LeaderboardRow';
 import { LeaderboardPodium } from './LeaderboardPodium';
 import styles from './Leaderboard.module.css';
-import { Z_INDEX } from '../../utils/zIndex';
+import { Z_INDEX } from '@utils/zIndex';
 import { UserDetail } from './UserDetail';
-import { getIcon } from '../../utils/icons';
-import { useAuth } from '../../contexts/AuthContext';
-import { useSettingsStore } from '../../store/useSettingsStore';
-import { useCloudSyncStore } from '../../store/useCloudSyncStore';
-import { cloudSync } from '../../services/cloudSync';
-import { useSwipe } from '../../hooks/useSwipe';
+import { getIcon } from '@utils/icons';
+import { useAuth } from '@contexts/AuthContext';
+import { useSettingsStore } from '@store/useSettingsStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { cloudSync } from '@services/cloudSync';
+import { useSwipe } from '@hooks/useSwipe';
 import { ClanManager } from './ClanManager';
-import { useBackHandler } from '../../hooks/useBackHandler';
+import { useBackHandler } from '@hooks/useBackHandler';
 import { SegmentedControl } from '../ui/SegmentedControl';
 
 // Flip to false to disable the top-3 podium and render everyone as plain rows

@@ -1,14 +1,14 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from './AuthContext';
-import { cloudSync } from '../services/cloudSync';
+import { cloudSync } from '@services/cloudSync';
 import {
   initPurchases, checkSupporterStatus, purchaseSupporter, restorePurchases,
   checkProStatus, purchasePro, purchaseProYearly
-} from '../services/purchaseService';
+} from '@services/purchaseService';
 import {
   saveCachedEntitlements, clearCachedEntitlements
-} from '../utils/entitlements';
-import { createLogger } from '../utils/logger';
+} from '@utils/entitlements';
+import { createLogger } from '@utils/logger';
 
 const logger = createLogger('Subscription');
 const SubscriptionContext = createContext(null);

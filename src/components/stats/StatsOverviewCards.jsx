@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { TrendingUp, Award, Flame, Target, Hash, Star } from '../../utils/icons';
+import { TrendingUp, Award, Flame, Target, Hash, Star } from '@utils/icons';
 import { AnimatedNumber } from '../ui/AnimatedNumber';
 
 /**

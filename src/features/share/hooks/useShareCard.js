@@ -1,8 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { captureElement, shareImage, downloadImage } from '../services/shareService';
-import { CATEGORIES } from '../../../config/categories';
+import { captureElement, shareImage, downloadImage } from '@features/share/services/shareService';
+import { CATEGORIES } from '@config/categories';
 import { useTranslation } from 'react-i18next';
-import { generateShareTextFromSession } from '../../../utils/sessionNameGenerator';
+import { generateShareTextFromSession } from '@utils/sessionNameGenerator';
 
 const DEFAULT_OPTIONS = {
   showDuration: true,

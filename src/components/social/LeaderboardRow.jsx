@@ -1,8 +1,8 @@
 import React from 'react';
-import { ChevronRight, Shield, ShieldAlert, HeartHandshake, Check, Star } from '../../utils/icons';
+import { ChevronRight, Shield, ShieldAlert, HeartHandshake, Check, Star } from '@utils/icons';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '../ui/Avatar';
-import { getTierBadgeConfigs } from '../../utils/entitlements';
+import { getTierBadgeConfigs } from '@utils/entitlements';
 import styles from './Leaderboard.module.css';
 
 export function LeaderboardRow({

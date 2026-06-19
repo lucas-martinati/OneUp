@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Z_INDEX } from '../../utils/zIndex';
+import { Z_INDEX } from '@utils/zIndex';
 
 /**
  * Pure CSS confetti — 3D tumbling & realistic parabolic burst.

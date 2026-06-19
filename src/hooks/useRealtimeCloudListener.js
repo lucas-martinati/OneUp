@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useProgressStore } from '../store/useProgressStore';
-import { useCloudSyncStore } from '../store/useCloudSyncStore';
+import { useProgressStore } from '@store/useProgressStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
 
 /**
  * Subscribes to real-time cloud changes once the startup sync is complete.

@@ -1,6 +1,6 @@
-import { getDailyGoal } from '../config/exercises';
-import { EXERCISES } from '../config/exercises';
-import { WEIGHT_EXERCISES } from '../config/weights';
+import { getDailyGoal } from '@config/exercises';
+import { EXERCISES } from '@config/exercises';
+import { WEIGHT_EXERCISES } from '@config/weights';
 
 import { getCurrentWeekNumber } from './dateUtils';
 

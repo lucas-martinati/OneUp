@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useBackHandler } from '../useBackHandler';
-import * as backHandlerUtils from '../../utils/backHandler';
+import * as backHandlerUtils from '@utils/backHandler';
 
 describe('useBackHandler', () => {
     let registerSpy;

@@ -18,7 +18,7 @@ vi.mock('../firebase', () => ({
 }));
 
 // syncData fires session-history sync as a side effect — keep it inert
-vi.mock('../../features/share/services/sessionHistoryService', () => ({
+vi.mock('@features/share/services/sessionHistoryService', () => ({
   syncSessionHistory: vi.fn(() => Promise.resolve()),
 }));
 

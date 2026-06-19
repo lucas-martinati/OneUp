@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Clock, Check, Trash2, Pencil, Dumbbell, Zap } from '../../../utils/icons';
-import { getIcon } from '../../../utils/icons';
-import { IconButton } from '../../../components/ui';
-import { Z_INDEX } from '../../../utils/zIndex';
-import { updateSessionName } from '../services/sessionHistoryService';
-import { getExerciseLabel, getExerciseColor } from '../../../utils/exerciseLabel';
-import { sumExerciseReps } from '../../../utils/stats';
+import { X, Clock, Check, Trash2, Pencil, Dumbbell, Zap } from '@utils/icons';
+import { getIcon } from '@utils/icons';
+import { IconButton } from'@components/ui';
+import { Z_INDEX } from '@utils/zIndex';
+import { updateSessionName } from '@features/share/services/sessionHistoryService';
+import { getExerciseLabel, getExerciseColor } from '@utils/exerciseLabel';
+import { sumExerciseReps } from '@utils/stats';
 import { SharePanel } from './SharePanel';
 
 function formatDuration(seconds) {

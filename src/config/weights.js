@@ -8,7 +8,7 @@
  * movements are typically harder and done with fewer reps.
  */
 
-import { WEIGHT_EXERCISES as SHARED_WEIGHT_EXERCISES } from '../../functions/shared/exerciseRules.js';
+import { WEIGHT_EXERCISES as SHARED_WEIGHT_EXERCISES } from '@shared/exerciseRules.js';
 
 const CLIENT_WEIGHT_EXERCISES = [
   {

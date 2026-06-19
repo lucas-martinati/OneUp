@@ -1,12 +1,12 @@
 import {
   Target, Flame, Zap, Calendar, TrendingUp, Trophy, Medal, Gem, Rocket,
   Star, Award, Crown, Activity, Sun, Moon, Users, Ghost, Share2
-} from '../utils/icons';
+} from '@utils/icons';
 
 // Single source of truth for all 40 achievement badges.
 // test(stats) → boolean determines unlock condition.
 // i18n keys are derived as `achievements.badges.${def.id}.title` / `.desc`
-import { BADGE_RULES } from '../../functions/shared/badgeRules.js';
+import { BADGE_RULES } from '@shared/badgeRules.js';
 
 export const BADGE_ICONS = {
   Target, Flame, Zap, Calendar, TrendingUp, Trophy, Medal, Gem, Rocket,

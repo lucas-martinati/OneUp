@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, ShoppingBag } from '../../utils/icons';
+import { Lock, ShoppingBag } from '@utils/icons';
 import { useTranslation } from 'react-i18next';
 import { Stack, Button } from '../ui';
 

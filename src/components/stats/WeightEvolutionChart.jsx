@@ -1,5 +1,5 @@
 import React from 'react';
-import { WEIGHT_EXERCISES } from '../../config/weights';
+import { WEIGHT_EXERCISES } from '@config/weights';
 import EvolutionChart from './EvolutionChart';
 
 export default function WeightEvolutionChart({ title, t, getConfig, completions }) {

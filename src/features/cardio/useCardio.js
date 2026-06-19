@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { loadCardioSessions, saveCardioSession } from '../../services/cardioService';
-import { stravaService } from '../../services/stravaService';
-import { useAuth } from '../../contexts/AuthContext';
-import { useProgressStore } from '../../store/useProgressStore';
-import { useCloudSyncStore } from '../../store/useCloudSyncStore';
-import { useExerciseConfig } from '../../hooks/useExerciseConfig';
-import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '../../utils/dateUtils';
-import { getWeeklyGoalKm } from '../../config/exercises';
-import { evaluateCardioWeek } from '../../utils/cardioStreak';
+import { loadCardioSessions, saveCardioSession } from '@services/cardioService';
+import { stravaService } from '@services/stravaService';
+import { useAuth } from '@contexts/AuthContext';
+import { useProgressStore } from '@store/useProgressStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { useExerciseConfig } from '@hooks/useExerciseConfig';
+import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '@utils/dateUtils';
+import { getWeeklyGoalKm } from '@config/exercises';
+import { evaluateCardioWeek } from '@utils/cardioStreak';
 
 /**
  * Compute the cardio streak: number of consecutive weeks (ending at current)

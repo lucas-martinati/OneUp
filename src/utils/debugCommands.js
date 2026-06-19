@@ -1,6 +1,6 @@
-import { cloudSync } from '../services/cloudSync';
-import { BADGE_DEFINITIONS } from '../config/badgeDefinitions';
-import { useUIStore } from '../store/useUIStore';
+import { cloudSync } from '@services/cloudSync';
+import { BADGE_DEFINITIONS } from '@config/badgeDefinitions';
+import { useUIStore } from '@store/useUIStore';
 import i18n from '../i18n';
 
 /**

@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CATEGORIES, isUserCategory } from '../config/categories';
-import { EXERCISES, EXERCISES_MAP } from '../config/exercises';
-import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
+import { CATEGORIES, isUserCategory } from '@config/categories';
+import { EXERCISES, EXERCISES_MAP } from '@config/exercises';
+import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '@config/weights';
 
 export function useDashboardSelection(currentCatKey, customExercises, customExercisesMap, exercisesByUserCategory) {
     const { t } = useTranslation();

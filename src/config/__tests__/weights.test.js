@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 
 // Mock the shared rules BEFORE importing the config
-vi.mock('../../../functions/shared/exerciseRules.js', () => ({
+vi.mock('@shared/exerciseRules.js', () => ({
     WEIGHT_EXERCISES: [
         { id: "biceps_curl", multiplier: 1.2 },
         // Intentionally leave out other exercises to test the fallback branch

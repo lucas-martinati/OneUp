@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '../config/badgeDefinitions';
+import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '@config/badgeDefinitions';
 
 /**
  * Hook de détection des nouveaux badges débloqués.

@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-leaflet';
-import { useBackHandler } from '../../hooks/useBackHandler';
+import { useBackHandler } from '@hooks/useBackHandler';
 import { CardioFullscreenMap } from './CardioFullscreenMap';
-import { MAP_TILES } from '../../config/mapTiles';
+import { MAP_TILES } from '@config/mapTiles';
 import 'leaflet/dist/leaflet.css';
 
 // Dark map tiles (CartoDB Dark Matter)

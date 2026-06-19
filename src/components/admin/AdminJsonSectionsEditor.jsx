@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, Lock, Code, Copy, Check, RotateCcw } from '../../utils/icons';
+import { Save, Lock, Code, Copy, Check, RotateCcw } from '@utils/icons';
 import { JsonTreeEditor } from './JsonTreeEditor';
 import { LineNumberTextarea } from './LineNumberTextarea';
 

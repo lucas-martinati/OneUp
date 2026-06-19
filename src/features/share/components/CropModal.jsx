@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { useTranslation } from 'react-i18next';
-import { X, Check } from '../../../utils/icons';
-import { useBackHandler } from '../../../hooks/useBackHandler';
-import { Z_INDEX } from '../../../utils/zIndex';
+import { X, Check } from '@utils/icons';
+import { useBackHandler } from '@hooks/useBackHandler';
+import { Z_INDEX } from '@utils/zIndex';
 
 const createImage = (url) =>
   new Promise((resolve, reject) => {

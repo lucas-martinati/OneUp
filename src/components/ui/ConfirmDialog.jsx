@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle } from '../../utils/icons';
+import { AlertTriangle } from '@utils/icons';
 import { Button } from './Button';
 
 /**

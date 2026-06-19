@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { registerBackHandler } from '../utils/backHandler';
+import { registerBackHandler } from '@utils/backHandler';
 
 /**
  * useBackHandler Hook

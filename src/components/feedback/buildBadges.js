@@ -1,4 +1,4 @@
-import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '../../config/badgeDefinitions';
+import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '@config/badgeDefinitions';
 
 // Visual-only progress metadata: [stat key, goal]. Lets locked numeric badges
 // show how close they are. Unlock logic stays in badgeDefinitions (test()).

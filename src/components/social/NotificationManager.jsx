@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { HeartHandshake, X } from '../../utils/icons';
-import { sounds } from '../../utils/soundManager';
-import { cloudSync } from '../../services/cloudSync';
+import { HeartHandshake, X } from '@utils/icons';
+import { sounds } from '@utils/soundManager';
+import { cloudSync } from '@services/cloudSync';
 import { Avatar } from '../ui/Avatar';
-import { useToastGestures } from '../../hooks/useToastGestures';
+import { useToastGestures } from '@hooks/useToastGestures';
 import { getToastRoot } from '../feedback/toastRoot';
 import styles from './NotificationManager.module.css';
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { set, get } from 'firebase/database';
-import { getAuthInstance, getDatabaseInstance } from '../../../services/firebase';
+import { getAuthInstance, getDatabaseInstance } from '@services/firebase';
 import {
   getSessionHistory,
   saveSessionHistory,
@@ -9,7 +9,7 @@ import {
   updateSessionName,
   syncSessionHistory,
   clearHistory,
-} from '../services/sessionHistoryService';
+} from '@features/share/services/sessionHistoryService';
 
 // ── firebase mocks ─────────────────────────────────────────────────────
 
@@ -19,7 +19,7 @@ vi.mock('firebase/database', () => ({
   get: vi.fn(() => Promise.resolve({ exists: () => false })),
 }));
 
-vi.mock('../../../services/firebase', () => ({
+vi.mock('@services/firebase', () => ({
   getAuthInstance: vi.fn(() => ({ currentUser: { uid: 'u1' } })),
   getDatabaseInstance: vi.fn(() => ({})),
 }));

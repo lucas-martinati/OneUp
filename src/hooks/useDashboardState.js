@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getLocalDateStr } from '../utils/dateUtils';
-import { useProgressStore } from '../store/useProgressStore';
-import { useSettingsStore } from '../store/useSettingsStore';
+import { getLocalDateStr } from '@utils/dateUtils';
+import { useProgressStore } from '@store/useProgressStore';
+import { useSettingsStore } from '@store/useSettingsStore';
 import { useNotificationManager } from './useNotificationManager';
 
 export function useDashboardState() {

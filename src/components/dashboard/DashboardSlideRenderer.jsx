@@ -1,22 +1,22 @@
 import React, { Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CATEGORIES, CATEGORY_COLORS, isUserCategory } from '../../config/categories';
-import { EXERCISES, EXERCISES_MAP } from '../../config/exercises';
-import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../../config/weights';
-import { canAccessFeature, FEATURES } from '../../utils/entitlements';
+import { CATEGORIES, CATEGORY_COLORS, isUserCategory } from '@config/categories';
+import { EXERCISES, EXERCISES_MAP } from '@config/exercises';
+import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '@config/weights';
+import { canAccessFeature, FEATURES } from '@utils/entitlements';
 
 import { DashboardSlide } from './DashboardSlide';
 import { ProPaywall } from './ProPaywall';
 
-import { useProgressStore } from '../../store/useProgressStore';
-import { useCloudSyncStore } from '../../store/useCloudSyncStore';
-import { useComputedStatsStore } from '../../store/useComputedStatsStore';
-import { useUIStore } from '../../store/useUIStore';
-import { useSubscription } from '../../contexts/SubscriptionContext';
-import { useExercises } from '../../contexts/ExercisesContext';
-import { useExerciseConfig } from '../../hooks/useExerciseConfig';
+import { useProgressStore } from '@store/useProgressStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { useComputedStatsStore } from '@store/useComputedStatsStore';
+import { useUIStore } from '@store/useUIStore';
+import { useSubscription } from '@contexts/SubscriptionContext';
+import { useExercises } from '@contexts/ExercisesContext';
+import { useExerciseConfig } from '@hooks/useExerciseConfig';
 
-const CardioModule = lazy(() => import('../../features/cardio/CardioModule').then(m => ({ default: m.CardioModule })));
+const CardioModule = lazy(() => import('@features/cardio/CardioModule').then(m => ({ default: m.CardioModule })));
 
 export function DashboardSlideRenderer({
     fullCategoryOrder,

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { calculateRepsForDay, isPerfectDay, isGlobalPerfectDay, isCaughtUpDay } from '../statUtils';
-import { EXERCISES } from '../../config/exercises';
-import { WEIGHT_EXERCISES } from '../../config/weights';
+import { EXERCISES } from '@config/exercises';
+import { WEIGHT_EXERCISES } from '@config/weights';
 
 const getConfig = () => ({ difficulty: 1, weight: null });
 

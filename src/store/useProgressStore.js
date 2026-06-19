@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { Preferences } from '@capacitor/preferences';
-import { serverTimestamp } from '../utils/firebaseTimestamp';
-import { EXERCISES, getDailyGoal } from '../config/exercises';
-import { createLogger } from '../utils/logger';
-import { getLocalDateStr, parseLocalDate } from '../utils/dateUtils';
-import { STORAGE_KEY_BASE, getDefaultState, parseProgressData, validateProgressData } from '../hooks/useProgressStorage';
-import { cloudSync } from '../services/cloudSync';
+import { serverTimestamp } from '@utils/firebaseTimestamp';
+import { EXERCISES, getDailyGoal } from '@config/exercises';
+import { createLogger } from '@utils/logger';
+import { getLocalDateStr, parseLocalDate } from '@utils/dateUtils';
+import { STORAGE_KEY_BASE, getDefaultState, parseProgressData, validateProgressData } from '@hooks/useProgressStorage';
+import { cloudSync } from '@services/cloudSync';
 
 const logger = createLogger('ProgressStore');
 

@@ -1,7 +1,7 @@
 import { ref, get, set, update } from 'firebase/database';
 import { getDatabaseInstance } from './firebase';
-import { createLogger } from '../utils/logger';
-import { paths } from '../../functions/shared/dbSchema.js';
+import { createLogger } from '@utils/logger';
+import { paths } from '@shared/dbSchema.js';
 
 const logger = createLogger('AdminService');
 

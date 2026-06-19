@@ -1,11 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Play, DynamicIcon } from '../../utils/icons';
-import { EXERCISES } from '../../config/exercises';
-import { WEIGHT_EXERCISES } from '../../config/weights';
-import { useExercises } from '../../contexts/ExercisesContext';
-import { Z_INDEX } from '../../utils/zIndex';
-import { loadWorkoutSession } from '../../utils/workoutSessionStorage';
+import { Play, DynamicIcon } from '@utils/icons';
+import { EXERCISES } from '@config/exercises';
+import { WEIGHT_EXERCISES } from '@config/weights';
+import { useExercises } from '@contexts/ExercisesContext';
+import { Z_INDEX } from '@utils/zIndex';
+import { loadWorkoutSession } from '@utils/workoutSessionStorage';
 import styles from './SessionBubble.module.css';
 
 const MAX_TRAIL_SPHERES = 6;

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { DynamicIcon } from '../../utils/icons';
-import { getExerciseLabel } from '../../utils/exerciseLabel';
+import { DynamicIcon } from '@utils/icons';
+import { getExerciseLabel } from '@utils/exerciseLabel';
 
 /**
  * Graphe d'évolution générique (une métrique par exercice dans le temps).

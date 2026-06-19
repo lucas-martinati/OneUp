@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Clock, ChevronRight, DynamicIcon } from '../../utils/icons';
-import { getExerciseColor } from '../../utils/exerciseLabel';
+import { Clock, ChevronRight, DynamicIcon } from '@utils/icons';
+import { getExerciseColor } from '@utils/exerciseLabel';
 import { sectionTitleStyle } from './statsStyles';
 
 /** Recent workout sessions list (last 10), opens the session detail modal. */

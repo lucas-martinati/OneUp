@@ -1,5 +1,5 @@
 import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from './dateUtils';
-import { getWeeklyGoalKm } from '../config/exercises';
+import { getWeeklyGoalKm } from '@config/exercises';
 
 /**
  * Évalue une semaine de cardio donnée (décalée de `weekOffset` semaines vers le

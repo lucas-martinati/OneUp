@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 
-vi.mock('../../../functions/shared/exerciseRules.js', () => ({
+vi.mock('@shared/exerciseRules.js', () => ({
     EXERCISES: [
         { id: 'pushups', multiplier: 2.0 },
         // Leaving out squats to trigger fallback

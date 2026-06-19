@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Plus, Trash2, Edit2, Check, ChevronRight, ChevronUp, ChevronDown } from '../../utils/icons';
+import { X, Plus, Trash2, Edit2, Check, ChevronRight, ChevronUp, ChevronDown } from '@utils/icons';
 import { IconButton } from '../ui';
-import { useBackHandler } from '../../hooks/useBackHandler';
-import { Z_INDEX } from '../../utils/zIndex';
-import { DynamicIcon } from '../../utils/icons';
-import { MAX_EXERCISES_PER_CATEGORY } from '../../store/useExercisesStore';
+import { useBackHandler } from '@hooks/useBackHandler';
+import { Z_INDEX } from '@utils/zIndex';
+import { DynamicIcon } from '@utils/icons';
+import { MAX_EXERCISES_PER_CATEGORY } from '@store/useExercisesStore';
 
 const PRESET_COLORS = [
   '#ef4444', '#f97316', '#f59e0b', '#10b981',

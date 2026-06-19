@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { useGoogleAuth } from '../hooks/useGoogleAuth';
+import { useGoogleAuth } from '@hooks/useGoogleAuth';
 
 const AuthContext = createContext(null);
 

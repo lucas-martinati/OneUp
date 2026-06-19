@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ref, get, set } from 'firebase/database';
-import { getDatabaseInstance } from '../../services/firebase';
-import { fetchAllUsersData, updateUserProfile, updateUserSettings, updateUserProgress, updateUserPurchase, saveUserData, resetUserProgress, deleteUserData } from '../../services/adminService';
-import { paths } from '../../../functions/shared/dbSchema.js';
+import { getDatabaseInstance } from '@services/firebase';
+import { fetchAllUsersData, updateUserProfile, updateUserSettings, updateUserProgress, updateUserPurchase, saveUserData, resetUserProgress, deleteUserData } from '@services/adminService';
+import { paths } from '@shared/dbSchema.js';
 
 /** Activity timestamp used for the default sort (most recent first). */
 function activityTs(u) {

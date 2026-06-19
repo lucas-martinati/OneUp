@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { useProgressStore } from '../store/useProgressStore';
-import { useCloudSyncStore } from '../store/useCloudSyncStore';
-import { cloudSync } from '../services/cloudSync';
-import { createLogger } from '../utils/logger';
+import { useProgressStore } from '@store/useProgressStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { cloudSync } from '@services/cloudSync';
+import { createLogger } from '@utils/logger';
 
 const logger = createLogger('CloudStartup');
 

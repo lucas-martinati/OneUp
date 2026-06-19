@@ -10,7 +10,7 @@ class ResizeObserverStub {
 vi.stubGlobal('ResizeObserver', ResizeObserverStub);
 
 import { DashboardHeader } from '../DashboardHeader';
-import { useUIStore } from '../../../store/useUIStore';
+import { useUIStore } from '@store/useUIStore';
 
 const selectedExercise = { color: '#8b5cf6', gradient: ['#7c3aed', '#8b5cf6'] };
 

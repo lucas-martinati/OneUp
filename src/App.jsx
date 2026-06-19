@@ -1,26 +1,26 @@
 import { useEffect, Suspense, lazy } from 'react';
-import { THEMES } from './config/themes';
-import { LoadingScreen } from './components/core/LoadingScreen';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { SubscriptionProvider, useSubscription } from './contexts/SubscriptionContext';
-import { ExercisesProvider, useExercises } from './contexts/ExercisesContext';
-import { useProgressStore } from './store/useProgressStore';
-import { useSettingsStore } from './store/useSettingsStore';
-import { useCloudSyncStore } from './store/useCloudSyncStore';
-import { ComputedStatsSynchronizer } from './components/core/ComputedStatsSynchronizer';
-import { useComputedStatsStore } from './store/useComputedStatsStore';
-import { AppOrchestrator } from './components/core/AppOrchestrator';
-import { PWAReloadHandler } from './components/core/PWAReloadHandler';
-import { useHardwareBack } from './hooks/useHardwareBack';
-import { useCloudSyncOrchestration } from './hooks/useCloudSyncOrchestration';
+import { THEMES } from '@config/themes';
+import { LoadingScreen } from'@components/core/LoadingScreen';
+import { AuthProvider, useAuth } from '@contexts/AuthContext';
+import { SubscriptionProvider, useSubscription } from '@contexts/SubscriptionContext';
+import { ExercisesProvider, useExercises } from '@contexts/ExercisesContext';
+import { useProgressStore } from '@store/useProgressStore';
+import { useSettingsStore } from '@store/useSettingsStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { ComputedStatsSynchronizer } from'@components/core/ComputedStatsSynchronizer';
+import { useComputedStatsStore } from '@store/useComputedStatsStore';
+import { AppOrchestrator } from'@components/core/AppOrchestrator';
+import { PWAReloadHandler } from'@components/core/PWAReloadHandler';
+import { useHardwareBack } from '@hooks/useHardwareBack';
+import { useCloudSyncOrchestration } from '@hooks/useCloudSyncOrchestration';
 // Only install debug utilities in development builds
 if (import.meta.env.DEV) {
-  import('./utils/debugCommands').then(({ installDebugCommands }) => installDebugCommands());
-  import('./utils/consoleAchievements');
+  import('@utils/debugCommands').then(({ installDebugCommands }) => installDebugCommands());
+  import('@utils/consoleAchievements');
 }
 
-const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
-const Onboarding = lazy(() => import('./components/settings/Onboarding').then(module => ({ default: module.Onboarding })));
+const Dashboard = lazy(() => import('@components/Dashboard').then(module => ({ default: module.Dashboard })));
+const Onboarding = lazy(() => import('@components/settings/Onboarding').then(module => ({ default: module.Onboarding })));
 
 /**
  * Inner app component — has access to all contexts.

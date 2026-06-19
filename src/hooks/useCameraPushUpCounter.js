@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { isAndroidPlatform } from '../utils/platform';
+import { isAndroidPlatform } from '@utils/platform';
 
 /**
  * Custom hook for camera-based push-up counting using a lightweight,

@@ -1,6 +1,6 @@
 import { ref, get } from 'firebase/database';
 import { getDatabaseInstance, initializeFirebase } from './firebase';
-import { paths } from '../../functions/shared/dbSchema.js';
+import { paths } from '@shared/dbSchema.js';
 import i18n from '../i18n';
 
 // NOTE: publishToLeaderboard has been removed.

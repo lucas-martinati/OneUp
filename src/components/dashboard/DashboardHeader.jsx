@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Shield, Flame, Trophy } from '../../utils/icons';
-import { useUIStore } from '../../store/useUIStore';
+import { Shield, Flame, Trophy } from '@utils/icons';
+import { useUIStore } from '@store/useUIStore';
 import { Card, IconButton } from '../ui';
 
 const filterOutIds = (idsToRemove) => (p) => p.filter(particle => !idsToRemove.has(particle.id));

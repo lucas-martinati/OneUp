@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Star } from '../../utils/icons';
+import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Star } from '@utils/icons';
 import { Avatar } from '../ui/Avatar';
-import { Z_INDEX } from '../../utils/zIndex';
+import { Z_INDEX } from '@utils/zIndex';
 import { DifficultyBadge } from '../ui/DifficultyBadge';
 import { StreakFlame } from '../ui/StreakFlame';
 import { WeightBadge } from '../ui/WeightBadge';
-import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
-import { WEIGHT_EXERCISES } from '../../config/weights';
-import { getLocalDateStr } from '../../utils/dateUtils';
-import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '../../utils/entitlements';
-import { useBackHandler } from '../../hooks/useBackHandler';
-import { getIcon } from '../../utils/icons';
-import { getExerciseLabel } from '../../utils/exerciseLabel';
-import { cloudSync } from '../../services/cloudSync';
-import { useComputedStatsFromStore } from '../../hooks/useComputedStatsFromStore';
+import { EXERCISES, CARDIO_EXERCISES } from '@config/exercises';
+import { WEIGHT_EXERCISES } from '@config/weights';
+import { getLocalDateStr } from '@utils/dateUtils';
+import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '@utils/entitlements';
+import { useBackHandler } from '@hooks/useBackHandler';
+import { getIcon } from '@utils/icons';
+import { getExerciseLabel } from '@utils/exerciseLabel';
+import { cloudSync } from '@services/cloudSync';
+import { useComputedStatsFromStore } from '@hooks/useComputedStatsFromStore';
 
 export function UserDetail({ entry, rank, isMe, onClose }) {
     const { t } = useTranslation();

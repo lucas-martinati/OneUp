@@ -1,14 +1,14 @@
-import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle, ChevronUp, ChevronDown, DynamicIcon } from '../../utils/icons';
+import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle, ChevronUp, ChevronDown, DynamicIcon } from '@utils/icons';
 import { IconButton } from '../ui';
-import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
-import { Z_INDEX } from '../../utils/zIndex';
+import { WEIGHT_EXERCISES_MAP } from '@config/weights';
+import { Z_INDEX } from '@utils/zIndex';
 import { SessionSummary } from './SessionSummary';
 import { ExercisePanel } from './ExercisePanel';
-import { getSessionHistory } from '../../features/share/services/sessionHistoryService';
-import { getExerciseLabel } from '../../utils/exerciseLabel';
-import { CATEGORIES, CATEGORY_ORDER, isUserCategory } from '../../config/categories';
-import { useWorkoutSession } from '../../hooks/useWorkoutSession';
-import { getLocalDateStr } from '../../utils/dateUtils';
+import { getSessionHistory } from '@features/share/services/sessionHistoryService';
+import { getExerciseLabel } from '@utils/exerciseLabel';
+import { CATEGORIES, CATEGORY_ORDER, isUserCategory } from '@config/categories';
+import { useWorkoutSession } from '@hooks/useWorkoutSession';
+import { getLocalDateStr } from '@utils/dateUtils';
 
 // ── Exercise grid item ──────────────────────────────────────────────────
 function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {

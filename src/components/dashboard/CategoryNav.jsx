@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CATEGORIES, isUserCategory } from '../../config/categories';
+import { CATEGORIES, isUserCategory } from '@config/categories';
 
 /**
  * CategoryNav - A high-performance, isolated navigation scrubber.

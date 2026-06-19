@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, Target, TrendingUp } from '../../utils/icons';
+import { Clock, Target, TrendingUp } from '@utils/icons';
 
 /**
  * Format seconds to "Xh Ym" or "Ym Zs"

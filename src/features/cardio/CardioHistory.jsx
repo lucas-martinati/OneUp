@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import 'leaflet/dist/leaflet.css';
-import { X, Clock, Target, Footprints } from '../../utils/icons';
-import { IconButton } from '../../components/ui';
-import { useBackHandler } from '../../hooks/useBackHandler';
+import { X, Clock, Target, Footprints } from '@utils/icons';
+import { IconButton } from'@components/ui';
+import { useBackHandler } from '@hooks/useBackHandler';
 import { CardioMap } from './CardioMap';
 import { CardioFullscreenMap } from './CardioFullscreenMap';
-import { parseTimestamp } from '../../utils/dateUtils';
+import { parseTimestamp } from '@utils/dateUtils';
 
 
 function formatDuration(seconds) {

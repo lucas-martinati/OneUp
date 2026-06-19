@@ -1,21 +1,21 @@
 import { renderHook } from '@testing-library/react';
 import { useCloudSettingsSync } from '../useCloudSettingsSync';
-import { useProgressStore } from '../../store/useProgressStore';
-import { useSettingsStore } from '../../store/useSettingsStore';
-import { cloudSync } from '../../services/cloudSync';
+import { useProgressStore } from '@store/useProgressStore';
+import { useSettingsStore } from '@store/useSettingsStore';
+import { cloudSync } from '@services/cloudSync';
 import { useCloudAutoSave } from '../useCloudAutoSave';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-vi.mock('../../store/useProgressStore', () => ({
+vi.mock('@store/useProgressStore', () => ({
   useProgressStore: vi.fn(),
 }));
 
-vi.mock('../../store/useSettingsStore', () => ({
+vi.mock('@store/useSettingsStore', () => ({
   useSettingsStore: vi.fn(),
   LOCAL_ONLY_KEYS: ['hapticFeedback', 'theme'],
 }));
 
-vi.mock('../../services/cloudSync', () => ({
+vi.mock('@services/cloudSync', () => ({
   cloudSync: {
     listenToSettingsFromCloud: vi.fn(),
     saveSettingsToCloud: vi.fn(),

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { useComputedStatsStore } from '../useComputedStatsStore';
-import * as useComputedStatsModule from '../../hooks/useComputedStats';
+import * as useComputedStatsModule from '@hooks/useComputedStats';
 
 describe('useComputedStatsStore', () => {
     it('has EMPTY_STATS as initial state', () => {

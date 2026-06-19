@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation, Trans } from 'react-i18next';
-import { Cloud, CloudOff, AlertCircle, Trash2, AlertTriangle, Check, Smartphone, RefreshCw } from '../../utils/icons';
+import { Cloud, CloudOff, AlertCircle, Trash2, AlertTriangle, Check, Smartphone, RefreshCw } from '@utils/icons';
 import { Avatar } from '../ui/Avatar';
 import { GoogleSignInButton } from '../ui/GoogleSignInButton';
 

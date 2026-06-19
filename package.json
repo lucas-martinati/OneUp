@@ -87,5 +87,26 @@
     "vite": "^7.2.4",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^4.1.2"
+  },
+  "jscpd": {
+    "path": ["src"],
+    "format": ["javascript", "jsx"],
+    "minLines": 10,
+    "minTokens": 70,
+    "threshold": 2,
+    "ignore": [
+      "**/__tests__/**",
+      "**/*.test.{js,jsx}",
+      "**/*.spec.{js,jsx}"
+    ],
+    "reporters": ["console"],
+    "gitignore": true
+  },
+  "madge": {
+    "fileExtensions": ["js", "jsx"],
+    "webpackConfig": "scripts/madge-resolve.config.cjs",
+    "detectiveOptions": {
+      "es6": { "skipTypeImports": true }
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { useExercisesStore, MAX_EXERCISES_PER_CATEGORY } from '../useExercisesStore';
 import { Preferences } from '@capacitor/preferences';
-import { cloudSync } from '../../services/cloudSync';
+import { cloudSync } from '@services/cloudSync';
 
 // Mock Preferences
 vi.mock('@capacitor/preferences', () => {
@@ -17,7 +17,7 @@ vi.mock('@capacitor/preferences', () => {
 });
 
 // Mock cloudSync
-vi.mock('../../services/cloudSync', () => ({
+vi.mock('@services/cloudSync', () => ({
   cloudSync: {
     loadExerciseWeightsFromCloud: vi.fn(async () => null),
     saveExerciseWeightsToCloud: vi.fn(async () => {}),
@@ -38,7 +38,7 @@ vi.mock('../useProgressStore', () => ({
 }));
 
 // Mock firebaseTimestamp utils
-vi.mock('../../utils/firebaseTimestamp', () => ({
+vi.mock('@utils/firebaseTimestamp', () => ({
   serverTimestamp: () => 'mock-server-timestamp',
 }));
 

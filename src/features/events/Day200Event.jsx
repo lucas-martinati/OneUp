@@ -13,7 +13,7 @@
  * Aucune pression — et si la journée est bouclée, le coucher de soleil arrive.
  */
 import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
-import { EXERCISES, getDailyGoal } from '../../config/exercises';
+import { EXERCISES, getDailyGoal } from '@config/exercises';
 
 // ============================================================================
 // 1. STYLES CSS (Injectés uniquement pour cet événement)

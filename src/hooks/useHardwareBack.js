@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { runBackHandler } from '../utils/backHandler';
-import { isNativePlatform } from '../utils/platform';
+import { runBackHandler } from '@utils/backHandler';
+import { isNativePlatform } from '@utils/platform';
 
 /**
  * useHardwareBack Hook

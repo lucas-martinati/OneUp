@@ -3,10 +3,10 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useBackHandler } from '../../hooks/useBackHandler';
-import { X, Clock, Target, TrendingUp, Footprints } from '../../utils/icons';
-import { IconButton } from '../../components/ui';
-import { MAP_TILES } from '../../config/mapTiles';
+import { useBackHandler } from '@hooks/useBackHandler';
+import { X, Clock, Target, TrendingUp, Footprints } from '@utils/icons';
+import { IconButton } from'@components/ui';
+import { MAP_TILES } from '@config/mapTiles';
 
 const TILE_URL = MAP_TILES.dark;
 

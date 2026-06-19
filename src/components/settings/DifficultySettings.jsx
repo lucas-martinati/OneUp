@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Lock, Unlock } from '../../utils/icons';
-import { useExerciseConfig } from '../../hooks/useExerciseConfig';
-import { useSubscription } from '../../contexts/SubscriptionContext';
-import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
-import { WEIGHT_EXERCISES } from '../../config/weights';
-import { getExerciseLabel } from '../../utils/exerciseLabel';
-import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '../../config/categories';
+import { Lock, Unlock } from '@utils/icons';
+import { useExerciseConfig } from '@hooks/useExerciseConfig';
+import { useSubscription } from '@contexts/SubscriptionContext';
+import { EXERCISES, CARDIO_EXERCISES } from '@config/exercises';
+import { WEIGHT_EXERCISES } from '@config/weights';
+import { getExerciseLabel } from '@utils/exerciseLabel';
+import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '@config/categories';
 import { sectionTitleStyle } from './settingsStyles';
 
 function CategorySeparator({ label, color }) {

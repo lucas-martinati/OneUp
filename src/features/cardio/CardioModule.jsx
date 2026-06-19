@@ -1,17 +1,17 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCardio } from './useCardio';
-import { useSwipe } from '../../hooks/useSwipe';
-import { useAuth } from '../../contexts/AuthContext';
+import { useSwipe } from '@hooks/useSwipe';
+import { useAuth } from '@contexts/AuthContext';
 import { CardioWeeklyGoal } from './CardioWeeklyGoal';
 import { CardioMap } from './CardioMap';
 import { CardioLastSession } from './CardioLastSession';
 import { CardioStreak } from './CardioStreak';
-import { stravaService } from '../../services/stravaService';
-import { ChevronRight, Link2, CheckCircle2 } from '../../utils/icons';
-import { SegmentedControl } from '../../components/ui/SegmentedControl';
-import { GoogleIcon } from '../../components/ui/GoogleIcon';
-import { GoogleSignInButton } from '../../components/ui/GoogleSignInButton';
+import { stravaService } from '@services/stravaService';
+import { ChevronRight, Link2, CheckCircle2 } from '@utils/icons';
+import { SegmentedControl } from'@components/ui/SegmentedControl';
+import { GoogleIcon } from'@components/ui/GoogleIcon';
+import { GoogleSignInButton } from'@components/ui/GoogleSignInButton';
 
 const MODES = [
   { key: 'running', emoji: '🏃' },
@@ -322,7 +322,19 @@ export function CardioModule() {
               }}>
                 {onGoogleStep
                   ? <GoogleIcon size={30} />
-                  : <img src={`${import.meta.env.BASE_URL}strava-icon.svg`} alt="Strava" style={{ width: '38px', height: '38px', objectFit: 'contain' }} />}
+                  : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="38"
+                      height="38"
+                      viewBox="0 0 64 64"
+                      style={{ objectFit: 'contain' }}
+                      aria-label="Strava"
+                    >
+                      <path d="M41.03 47.852l-5.572-10.976h-8.172L41.03 64l13.736-27.124h-8.18" fill="#f9b797" />
+                      <path d="M27.898 21.944l7.564 14.928h11.124L27.898 0 9.234 36.876H20.35" fill="#f05222" />
+                    </svg>
+                  )}
               </div>
 
               <h2 style={{

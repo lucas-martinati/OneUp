@@ -1,13 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Settings, Star, FolderPlus } from '../../utils/icons';
-import { UI_ICONS, DynamicIcon } from '../../utils/icons';
-import { getDailyGoal } from '../../config/exercises';
-import { formatTime, parseTimestamp } from '../../utils/dateUtils';
-import { isPerfectDay } from '../../utils/statUtils';
-import { getExerciseLabel } from '../../utils/exerciseLabel';
+import { Settings, Star, FolderPlus } from '@utils/icons';
+import { UI_ICONS, DynamicIcon } from '@utils/icons';
+import { getDailyGoal } from '@config/exercises';
+import { formatTime, parseTimestamp } from '@utils/dateUtils';
+import { isPerfectDay } from '@utils/statUtils';
+import { getExerciseLabel } from '@utils/exerciseLabel';
 
-import { WEIGHT_EXERCISES_MAP } from '../../config/weights';
+import { WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { StreakFlame, WeightBadge } from '../ui';
 import styles from './DashboardSlide.module.css';
 

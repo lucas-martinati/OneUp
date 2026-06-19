@@ -1,7 +1,7 @@
 import React from 'react';
-import { Crown, Star, HeartHandshake, Check, Shield, ShieldAlert } from '../../utils/icons';
+import { Crown, Star, HeartHandshake, Check, Shield, ShieldAlert } from '@utils/icons';
 import { Avatar } from '../ui/Avatar';
-import { getTierBadgeConfigs } from '../../utils/entitlements';
+import { getTierBadgeConfigs } from '@utils/entitlements';
 import styles from './Leaderboard.module.css';
 
 const MEDALS = {

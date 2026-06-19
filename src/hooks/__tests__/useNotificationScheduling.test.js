@@ -27,11 +27,11 @@ const mockSettingsStore = {
   }
 };
 
-vi.mock('../../store/useProgressStore', () => ({
+vi.mock('@store/useProgressStore', () => ({
   useProgressStore: vi.fn((selector) => selector(mockProgressStore)),
 }));
 
-vi.mock('../../store/useSettingsStore', () => ({
+vi.mock('@store/useSettingsStore', () => ({
   useSettingsStore: vi.fn((selector) => selector(mockSettingsStore)),
 }));
 

@@ -1,4 +1,4 @@
-import { useComputedStatsStore } from '../store/useComputedStatsStore';
+import { useComputedStatsStore } from '@store/useComputedStatsStore';
 
 /**
  * Hook that returns centralized computed stats from the Zustand store.

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
-import { Clock, Filter, X, ChevronDown, ChevronUp } from '../../utils/icons';
+import { Clock, Filter, X, ChevronDown, ChevronUp } from '@utils/icons';
 import { Avatar } from '../ui/Avatar';
 import { FILTER_OPTIONS } from './useAdminPanel';
 

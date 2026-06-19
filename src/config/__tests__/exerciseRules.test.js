@@ -8,7 +8,7 @@ import {
   ALL_WEIGHT_IDS,
   ALL_EXERCISE_IDS,
   getDailyGoal,
-} from '../../../functions/shared/exerciseRules.js';
+} from '@shared/exerciseRules.js';
 
 describe('exerciseRules — shared config integrity', () => {
   it('exposes lists of exercises', () => {

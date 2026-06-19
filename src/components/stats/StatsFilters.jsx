@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Filter, Lock } from '../../utils/icons';
-import { canAccessFeature, FEATURES } from '../../utils/entitlements';
-import { CATEGORIES, isUserCategory } from '../../config/categories';
+import { Filter, Lock } from '@utils/icons';
+import { canAccessFeature, FEATURES } from '@utils/entitlements';
+import { CATEGORIES, isUserCategory } from '@config/categories';
 
 /** Category filter toggle + checkbox chips of the Stats panel. */
 export function StatsFilters({

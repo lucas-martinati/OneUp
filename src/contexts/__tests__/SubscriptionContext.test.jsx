@@ -31,7 +31,7 @@ const authHolder = vi.hoisted(() => ({
 
 vi.mock('../AuthContext', () => ({ useAuth: () => authHolder.value }));
 
-vi.mock('../../services/purchaseService', () => ({
+vi.mock('@services/purchaseService', () => ({
   initPurchases: mocks.initPurchases,
   checkSupporterStatus: mocks.checkSupporterStatus,
   checkProStatus: mocks.checkProStatus,
@@ -41,7 +41,7 @@ vi.mock('../../services/purchaseService', () => ({
   restorePurchases: mocks.restorePurchases,
 }));
 
-vi.mock('../../services/cloudSync', () => ({
+vi.mock('@services/cloudSync', () => ({
   cloudSync: { loadPurchase: mocks.loadPurchase, getCurrentUserId: mocks.getCurrentUserId },
 }));
 

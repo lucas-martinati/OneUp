@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { computeAllStats } from '../hooks/useComputedStats';
-import { EXERCISES } from '../config/exercises';
-import { WEIGHT_EXERCISES } from '../config/weights';
-import { CARDIO_EXERCISES } from '../config/exercises';
+import { computeAllStats } from '@hooks/useComputedStats';
+import { EXERCISES } from '@config/exercises';
+import { WEIGHT_EXERCISES } from '@config/weights';
+import { CARDIO_EXERCISES } from '@config/exercises';
 
 /**
  * Default empty stats shape — used before the first computation.

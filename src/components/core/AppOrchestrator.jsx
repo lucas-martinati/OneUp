@@ -1,15 +1,15 @@
 import { useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useProgressStore } from '../../store/useProgressStore';
-import { useSettingsStore } from '../../store/useSettingsStore';
-import { useCloudSyncStore } from '../../store/useCloudSyncStore';
-import { useExercisesStore } from '../../store/useExercisesStore';
-import { useCloudStartupSync } from '../../hooks/useCloudStartupSync';
-import { useProgressAutoSave } from '../../hooks/useProgressAutoSave';
-import { useCloudSettingsSync } from '../../hooks/useCloudSettingsSync';
-import { useRealtimeCloudListener } from '../../hooks/useRealtimeCloudListener';
-import { useNotificationScheduling } from '../../hooks/useNotificationScheduling';
-import { updateWidgetData } from '../../utils/widgetBridge';
+import { useAuth } from '@contexts/AuthContext';
+import { useProgressStore } from '@store/useProgressStore';
+import { useSettingsStore } from '@store/useSettingsStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { useExercisesStore } from '@store/useExercisesStore';
+import { useCloudStartupSync } from '@hooks/useCloudStartupSync';
+import { useProgressAutoSave } from '@hooks/useProgressAutoSave';
+import { useCloudSettingsSync } from '@hooks/useCloudSettingsSync';
+import { useRealtimeCloudListener } from '@hooks/useRealtimeCloudListener';
+import { useNotificationScheduling } from '@hooks/useNotificationScheduling';
+import { updateWidgetData } from '@utils/widgetBridge';
 
 /**
  * Invisible component that wires all app-level orchestration.

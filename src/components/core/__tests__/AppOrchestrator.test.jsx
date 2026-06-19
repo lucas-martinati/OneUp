@@ -15,16 +15,16 @@ vi.mock('@capacitor/preferences', () => {
   };
 });
 
-vi.mock('../../../services/firebase', () => ({
+vi.mock('@services/firebase', () => ({
   serverTimestamp: vi.fn(() => '2026-06-11T12:00:00.000Z'),
 }));
 
-vi.mock('../../../services/userDataService', () => ({
+vi.mock('@services/userDataService', () => ({
   saveAchievementsToCloud: vi.fn(async () => {}),
   loadAchievementsFromCloud: vi.fn(async () => null),
 }));
 
-vi.mock('../../../services/cloudSync', () => ({
+vi.mock('@services/cloudSync', () => ({
   cloudSync: {
     saveToCloud: vi.fn(async () => {}),
     loadFromCloud: vi.fn(async () => null),
@@ -50,31 +50,31 @@ vi.mock('../../../services/cloudSync', () => ({
 
 // Auth is driven per-test through this mutable holder
 const authState = { value: { isSignedIn: false, loading: false, authConfirmed: true, user: null } };
-vi.mock('../../../contexts/AuthContext', () => ({
+vi.mock('@contexts/AuthContext', () => ({
   useAuth: () => authState.value,
 }));
 
-vi.mock('../../../hooks/useNotificationManager', () => ({
+vi.mock('@hooks/useNotificationManager', () => ({
   useNotificationManager: () => ({
     scheduleNotification: vi.fn(),
     requestNotificationPermission: vi.fn(),
   }),
 }));
 
-vi.mock('../../../hooks/useCloudAutoSave', () => ({
+vi.mock('@hooks/useCloudAutoSave', () => ({
   useCloudAutoSave: vi.fn(),
 }));
 
-vi.mock('../../../utils/widgetBridge', () => ({
+vi.mock('@utils/widgetBridge', () => ({
   updateWidgetData: vi.fn(),
 }));
 
 import { Preferences } from '@capacitor/preferences';
-import { cloudSync } from '../../../services/cloudSync';
+import { cloudSync } from '@services/cloudSync';
 import { AppOrchestrator } from '../AppOrchestrator';
-import { useProgressStore } from '../../../store/useProgressStore';
-import { useCloudSyncStore } from '../../../store/useCloudSyncStore';
-import { STORAGE_KEY_BASE } from '../../../hooks/useProgressStorage';
+import { useProgressStore } from '@store/useProgressStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { STORAGE_KEY_BASE } from '@hooks/useProgressStorage';
 
 const currentYear = new Date().getFullYear();
 const fixedStart = `${currentYear}-01-01`;

@@ -15,20 +15,20 @@ vi.mock('@capacitor/preferences', () => {
 
 // ── Firebase / services mocks ───────────────────────────────────────────
 const FIXED_TS = '2026-06-11T12:00:00.000Z';
-vi.mock('../../services/firebase', () => ({
+vi.mock('@services/firebase', () => ({
   serverTimestamp: vi.fn(() => FIXED_TS),
 }));
-vi.mock('../../utils/firebaseTimestamp', () => ({
+vi.mock('@utils/firebaseTimestamp', () => ({
   serverTimestamp: vi.fn(() => FIXED_TS),
   setServerTimestampFn: vi.fn(),
 }));
 
-vi.mock('../../services/userDataService', () => ({
+vi.mock('@services/userDataService', () => ({
   saveAchievementsToCloud: vi.fn(async () => {}),
   loadAchievementsFromCloud: vi.fn(async () => null),
 }));
 
-vi.mock('../../services/cloudSync', () => ({
+vi.mock('@services/cloudSync', () => ({
   cloudSync: {
     saveToCloud: vi.fn(async () => {}),
     loadFromCloud: vi.fn(async () => null),
@@ -45,10 +45,10 @@ vi.mock('../../services/cloudSync', () => ({
 }));
 
 import { Preferences } from '@capacitor/preferences';
-import { cloudSync } from '../../services/cloudSync';
+import { cloudSync } from '@services/cloudSync';
 import { useProgressStore } from '../useProgressStore';
-import { STORAGE_KEY_BASE } from '../../hooks/useProgressStorage';
-import { getLocalDateStr } from '../../utils/dateUtils';
+import { STORAGE_KEY_BASE } from '@hooks/useProgressStorage';
+import { getLocalDateStr } from '@utils/dateUtils';
 
 const currentYear = new Date().getFullYear();
 const fixedStart = `${currentYear}-01-01`;

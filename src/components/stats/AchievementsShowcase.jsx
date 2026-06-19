@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Award, Lock, ChevronRight } from '../../utils/icons';
+import { Award, Lock, ChevronRight } from '@utils/icons';
 import { buildBadges } from '../feedback/buildBadges';
 
 /** A single clickable badge medallion in the horizontal shelf. */

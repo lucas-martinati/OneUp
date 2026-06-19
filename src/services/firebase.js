@@ -1,8 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getDatabase, serverTimestamp } from 'firebase/database';
-import { createLogger } from '../utils/logger';
-import { setServerTimestampFn } from '../utils/firebaseTimestamp';
+import { createLogger } from '@utils/logger';
+import { setServerTimestampFn } from '@utils/firebaseTimestamp';
 
 const logger = createLogger('Firebase');
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Flame } from '../../utils/icons';
+import { Flame } from '@utils/icons';
 
 export const CardioStreak = React.memo(({ streak }) => {
   const { t } = useTranslation();

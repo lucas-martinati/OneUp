@@ -6,12 +6,12 @@ vi.mock('react-i18next', () => ({
 }));
 
 const pauseCloudSync = vi.fn();
-vi.mock('../../../store/useCloudSyncStore', () => ({
+vi.mock('@store/useCloudSyncStore', () => ({
   useCloudSyncStore: (selector) => selector({ pauseCloudSync }),
 }));
 
 import { DashboardNavBar } from '../DashboardNavBar';
-import { useUIStore } from '../../../store/useUIStore';
+import { useUIStore } from '@store/useUIStore';
 
 const selectedExercise = { color: '#8b5cf6', gradient: ['#7c3aed', '#8b5cf6'] };
 

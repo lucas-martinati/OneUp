@@ -1,4 +1,4 @@
-import { CheckCheck, RotateCcw, Plus, Minus, Play, Pause } from '../../../utils/icons';
+import { CheckCheck, RotateCcw, Plus, Minus, Play, Pause } from '@utils/icons';
 
 export function TimerControls({
     activeColor,

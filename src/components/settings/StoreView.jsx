@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Heart, RotateCcw, Sparkles } from '../../utils/icons';
+import { Heart, RotateCcw, Sparkles } from '@utils/icons';
 import { Button } from '../ui';
-import { getPurchaseHistory } from '../../services/purchaseService';
-import { StoreCard } from '../store/StoreCard';
-import { useAuth } from '../../contexts/AuthContext';
-import { useSubscription } from '../../contexts/SubscriptionContext';
+import { getPurchaseHistory } from '@services/purchaseService';
+import { StoreCard } from '../store//StoreCard';
+import { useAuth } from '@contexts/AuthContext';
+import { useSubscription } from '@contexts/SubscriptionContext';
 
 /** Boutique view inside Settings: supporter/pro store cards, restore button and purchase history. */
 export function StoreView() {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Edit2, Check, X, Trash2, ChevronRight, Plus } from '../../utils/icons';
+import { Edit2, Check, X, Trash2, ChevronRight, Plus } from '@utils/icons';
 
 /** Children beyond this count start collapsed to keep big nodes (e.g. progress
  *  completions) readable and fast to render. */

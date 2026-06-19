@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from 'react';
-import { useExercisesStore } from '../store/useExercisesStore';
-import { EXERCISES, EXERCISES_MAP, CARDIO_EXERCISES } from '../config/exercises';
-import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '../config/weights';
+import { useExercisesStore } from '@store/useExercisesStore';
+import { EXERCISES, EXERCISES_MAP, CARDIO_EXERCISES } from '@config/exercises';
+import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '@config/weights';
 
 /**
  * Backward compatibility facade for the legacy ExercisesContext.

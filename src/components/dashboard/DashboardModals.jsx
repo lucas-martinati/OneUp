@@ -1,16 +1,16 @@
 import React, { Suspense, lazy } from 'react';
-import { CATEGORIES, isUserCategory } from '../../config/categories';
-import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
-import { WEIGHT_EXERCISES } from '../../config/weights';
+import { CATEGORIES, isUserCategory } from '@config/categories';
+import { EXERCISES, CARDIO_EXERCISES } from '@config/exercises';
+import { WEIGHT_EXERCISES } from '@config/weights';
 
-import { useProgressStore } from '../../store/useProgressStore';
-import { useSettingsStore } from '../../store/useSettingsStore';
-import { useCloudSyncStore } from '../../store/useCloudSyncStore';
-import { useComputedStatsStore } from '../../store/useComputedStatsStore';
-import { useUIStore } from '../../store/useUIStore';
-import { useSubscription } from '../../contexts/SubscriptionContext';
-import { useExercises } from '../../contexts/ExercisesContext';
-import { useExerciseConfig } from '../../hooks/useExerciseConfig';
+import { useProgressStore } from '@store/useProgressStore';
+import { useSettingsStore } from '@store/useSettingsStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { useComputedStatsStore } from '@store/useComputedStatsStore';
+import { useUIStore } from '@store/useUIStore';
+import { useSubscription } from '@contexts/SubscriptionContext';
+import { useExercises } from '@contexts/ExercisesContext';
+import { useExerciseConfig } from '@hooks/useExerciseConfig';
 
 const Calendar = lazy(() => import('../stats/Calendar').then(m => ({ default: m.Calendar })));
 const Stats = lazy(() => import('../stats/Stats').then(m => ({ default: m.Stats })));

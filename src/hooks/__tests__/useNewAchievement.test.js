@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useNewAchievement } from '../useNewAchievement';
-import * as badgeDefinitions from '../../config/badgeDefinitions';
+import * as badgeDefinitions from '@config/badgeDefinitions';
 
 describe('useNewAchievement', () => {
     const tMock = vi.fn((key, defaultVal) => defaultVal || key);

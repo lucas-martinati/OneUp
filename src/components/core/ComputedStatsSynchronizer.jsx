@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useCallback } from 'react';
-import { useProgressStore } from '../../store/useProgressStore';
-import { useSettingsStore } from '../../store/useSettingsStore';
-import { useExercises } from '../../contexts/ExercisesContext';
-import { useComputedStatsStore } from '../../store/useComputedStatsStore';
+import { useProgressStore } from '@store/useProgressStore';
+import { useSettingsStore } from '@store/useSettingsStore';
+import { useExercises } from '@contexts/ExercisesContext';
+import { useComputedStatsStore } from '@store/useComputedStatsStore';
 
 /**
  * Invisible component that synchronizes computed stats into the Zustand store.

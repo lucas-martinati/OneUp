@@ -1,5 +1,5 @@
 import React from 'react';
-import { RefreshCw, AlertTriangle } from '../../utils/icons';
+import { RefreshCw, AlertTriangle } from '@utils/icons';
 
 export class ErrorBoundary extends React.Component {
     constructor(props) {

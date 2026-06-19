@@ -1,7 +1,7 @@
 import { ref, set, get, remove, push, serverTimestamp } from 'firebase/database';
-import { createLogger } from '../utils/logger';
+import { createLogger } from '@utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
-import { paths } from '../../functions/shared/dbSchema.js';
+import { paths } from '@shared/dbSchema.js';
 
 const logger = createLogger('Cardio');
 

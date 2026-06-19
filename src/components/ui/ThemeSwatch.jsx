@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { blobRadius } from '../../utils/blobRadius';
+import { blobRadius } from '@utils/blobRadius';
 
 /**
  * A reusable theme color swatch: a rounded square ("cube") tile showing the

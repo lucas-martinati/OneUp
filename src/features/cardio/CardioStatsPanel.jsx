@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, TrendingUp } from '../../utils/icons';
+import { Clock, TrendingUp } from '@utils/icons';
 import { useCardio } from './useCardio';
 
 export function CardioStatsPanel() {

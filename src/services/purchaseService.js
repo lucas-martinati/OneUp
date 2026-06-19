@@ -14,8 +14,8 @@
  * (@revenuecat/purchases-js) on web for Stripe-based Web Billing.
  */
 
-import { createLogger } from '../utils/logger';
-import { isNativePlatform } from '../utils/platform';
+import { createLogger } from '@utils/logger';
+import { isNativePlatform } from '@utils/platform';
 
 const logger = createLogger('Purchases');
 

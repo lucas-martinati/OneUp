@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { Bell, Volume2, Clock, Users, Lock, Gauge, Globe, Smartphone } from '../../utils/icons';
+import { Bell, Volume2, Clock, Users, Lock, Gauge, Globe, Smartphone } from '@utils/icons';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { SettingRow } from '../ui/SettingRow';
 import { ThemeSwatch } from '../ui';
-import { LANGUAGES } from '../../config/languages';
-import { THEMES } from '../../config/themes';
+import { LANGUAGES } from '@config/languages';
+import { THEMES } from '@config/themes';
 import { sectionTitleStyle } from './settingsStyles';
 
 const sectionCardStyle = {

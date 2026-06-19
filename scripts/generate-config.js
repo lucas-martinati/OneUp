@@ -22,7 +22,7 @@ console.log('🔧 Generating configuration files from templates...');
 
 try {
   // Generate capacitor.config.json
-  const capacitorTemplatePath = path.join(__dirname, '..', 'capacitor.config.template.json');
+  const capacitorTemplatePath = path.join(__dirname, '..', 'config', 'capacitor.config.template.json');
   const capacitorTemplate = fs.readFileSync(capacitorTemplatePath, 'utf8');
   const capacitorConfig = capacitorTemplate.replace(/__GOOGLE_CLIENT_ID__/g, GOOGLE_CLIENT_ID);
   const capacitorConfigPath = path.join(__dirname, '..', 'capacitor.config.json');

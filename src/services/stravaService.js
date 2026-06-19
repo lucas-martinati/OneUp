@@ -2,7 +2,7 @@ import { Browser } from '@capacitor/browser';
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
-import { createLogger } from '../utils/logger';
+import { createLogger } from '@utils/logger';
 
 const logger = createLogger('Strava');
 

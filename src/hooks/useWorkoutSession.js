@@ -1,20 +1,20 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EXERCISES, getDailyGoal } from '../config/exercises';
-import { WEIGHT_EXERCISES } from '../config/weights';
-import { CATEGORIES, buildFullCategoryOrder, isUserCategory, buildFullCategoryColors } from '../config/categories';
-import { canAccessFeature, FEATURES } from '../utils/entitlements';
-import { addSession } from '../features/share/services/sessionHistoryService';
-import { getExerciseLabel, isCustomExercise } from '../utils/exerciseLabel';
-import { useProgressStore } from '../store/useProgressStore';
-import { useComputedStatsStore } from '../store/useComputedStatsStore';
-import { useSubscription } from '../contexts/SubscriptionContext';
-import { useExercises } from '../contexts/ExercisesContext';
+import { EXERCISES, getDailyGoal } from '@config/exercises';
+import { WEIGHT_EXERCISES } from '@config/weights';
+import { CATEGORIES, buildFullCategoryOrder, isUserCategory, buildFullCategoryColors } from '@config/categories';
+import { canAccessFeature, FEATURES } from '@utils/entitlements';
+import { addSession } from '@features/share/services/sessionHistoryService';
+import { getExerciseLabel, isCustomExercise } from '@utils/exerciseLabel';
+import { useProgressStore } from '@store/useProgressStore';
+import { useComputedStatsStore } from '@store/useComputedStatsStore';
+import { useSubscription } from '@contexts/SubscriptionContext';
+import { useExercises } from '@contexts/ExercisesContext';
 import { useExerciseConfig } from './useExerciseConfig';
 import { useBackHandler } from './useBackHandler';
-import { getLocalDateStr } from '../utils/dateUtils';
-import { generateSessionName } from '../utils/sessionNameGenerator';
-import { isWorkoutSessionStarted, loadWorkoutSession, saveWorkoutSession, clearWorkoutSession } from '../utils/workoutSessionStorage';
+import { getLocalDateStr } from '@utils/dateUtils';
+import { generateSessionName } from '@utils/sessionNameGenerator';
+import { isWorkoutSessionStarted, loadWorkoutSession, saveWorkoutSession, clearWorkoutSession } from '@utils/workoutSessionStorage';
 
 /**
  * Extracts all state management and business logic from WorkoutSession,

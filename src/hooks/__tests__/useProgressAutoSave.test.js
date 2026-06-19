@@ -1,14 +1,14 @@
 import { renderHook } from '@testing-library/react';
 import { useProgressAutoSave } from '../useProgressAutoSave';
-import { useProgressStore } from '../../store/useProgressStore';
-import { useCloudSyncStore } from '../../store/useCloudSyncStore';
+import { useProgressStore } from '@store/useProgressStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-vi.mock('../../store/useProgressStore', () => ({
+vi.mock('@store/useProgressStore', () => ({
   useProgressStore: vi.fn(),
 }));
 
-vi.mock('../../store/useCloudSyncStore', () => ({
+vi.mock('@store/useCloudSyncStore', () => ({
   useCloudSyncStore: vi.fn(),
 }));
 

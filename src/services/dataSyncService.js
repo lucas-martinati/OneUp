@@ -1,9 +1,9 @@
 import { ref, get, onValue, serverTimestamp, update } from 'firebase/database';
-import { createLogger } from '../utils/logger';
+import { createLogger } from '@utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
-import { syncSessionHistory } from '../features/share/services/sessionHistoryService';
-import { sanitizeForCloud, mergeData } from '../utils/syncUtils';
-import { paths } from '../../functions/shared/dbSchema.js';
+import { syncSessionHistory } from '@features/share/services/sessionHistoryService';
+import { sanitizeForCloud, mergeData } from '@utils/syncUtils';
+import { paths } from '@shared/dbSchema.js';
 
 const logger = createLogger('DataSync');
 

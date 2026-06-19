@@ -28,7 +28,7 @@ import {
   downloadImage,
   shareImage,
   canShareNatively,
-} from '../services/shareService';
+} from '@features/share/services/shareService';
 import { toPng, toJpeg } from 'html-to-image';
 import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core';

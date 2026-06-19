@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Sparkles, Heart, Save, Calendar, Loader2, Crown, Copy, Check, Activity, Award, Clock, Dumbbell, RotateCcw, Trash2, AlertTriangle, Trophy, Bell, Volume2, Palette } from '../../utils/icons';
+import { Sparkles, Heart, Save, Calendar, Loader2, Crown, Copy, Check, Activity, Award, Clock, Dumbbell, RotateCcw, Trash2, AlertTriangle, Trophy, Bell, Volume2, Palette } from '@utils/icons';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
 import { SettingRow } from '../ui/SettingRow';
 import { ThemeSwatch } from '../ui';
-import { THEMES } from '../../config/themes';
+import { THEMES } from '@config/themes';
 
 const sectionTitleStyle = {
   marginBottom: 'var(--spacing-md)', fontSize: '0.85rem', fontWeight: '700',

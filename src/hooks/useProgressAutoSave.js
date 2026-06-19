@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { useProgressStore } from '../store/useProgressStore';
-import { useCloudSyncStore } from '../store/useCloudSyncStore';
-import { createLogger } from '../utils/logger';
+import { useProgressStore } from '@store/useProgressStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { createLogger } from '@utils/logger';
 
 const logger = createLogger('ProgressAutoSave');
 

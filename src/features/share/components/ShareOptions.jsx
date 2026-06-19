@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X, Lock } from '../../../utils/icons';
+import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X, Lock } from '@utils/icons';
 
 function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
   return (
@@ -80,10 +80,10 @@ function SectionLabel({ icon: Icon, children, spacer = true }) {
   );
 }
 
-import { buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../../../config/categories';
-import { useExercises } from '../../../contexts/ExercisesContext';
-import { THEMES as GLOBAL_THEMES } from '../../../config/themes';
-import { ThemeSwatch } from '../../../components/ui/ThemeSwatch';
+import { buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
+import { useExercises } from '@contexts/ExercisesContext';
+import { THEMES as GLOBAL_THEMES } from '@config/themes';
+import { ThemeSwatch } from'@components/ui/ThemeSwatch';
 
 export function ShareOptions({ options, toggleOption, setOption, toggleCategory, clearBackgroundImage, originalImage, openCropModal, mode = 'session', isPro = false, sessionData, onOpenStore }) {
   const { t } = useTranslation();

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useProgressStore } from '../store/useProgressStore';
-import { useSettingsStore } from '../store/useSettingsStore';
+import { useProgressStore } from '@store/useProgressStore';
+import { useSettingsStore } from '@store/useSettingsStore';
 import { useNotificationManager } from './useNotificationManager';
 
 /**

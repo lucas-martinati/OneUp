@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserPlus, Link, Check } from '../../utils/icons';
+import { UserPlus, Link, Check } from '@utils/icons';
 import { useTranslation } from 'react-i18next';
 
 export function ClanInviteCard({ clanData }) {

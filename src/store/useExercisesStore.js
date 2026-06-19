@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { Preferences } from '@capacitor/preferences';
-import { serverTimestamp } from '../utils/firebaseTimestamp';
+import { serverTimestamp } from '@utils/firebaseTimestamp';
 import { useProgressStore } from './useProgressStore';
-import { WEIGHT_EXERCISES_MAP } from '../config/weights';
-import { cloudSync } from '../services/cloudSync';
-import { createLogger } from '../utils/logger';
+import { WEIGHT_EXERCISES_MAP } from '@config/weights';
+import { cloudSync } from '@services/cloudSync';
+import { createLogger } from '@utils/logger';
 
 const logger = createLogger('ExercisesStore');
 

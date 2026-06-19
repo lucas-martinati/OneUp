@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useAuth } from '@contexts/AuthContext';
-import { useCloudSyncStore } from '../store/useCloudSyncStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
 import { useExercises } from '@contexts/ExercisesContext';
 import { useCloudAutoSave } from '@hooks/useCloudAutoSave';
 import { cloudSync } from '@services/cloudSync';

@@ -8,37 +8,37 @@ import { DashboardHeader } from './dashboard/DashboardHeader';
 import { DashboardNavBar } from './dashboard/DashboardNavBar';
 import { SessionBubble } from './dashboard/SessionBubble';
 import { CategoryNav } from './dashboard/CategoryNav';
-import { Day100EventManager } from '../features/events/Day100Event';
-import { Day200EventManager } from '../features/events/Day200Event';
-import { useAchievementToast } from '../hooks/useAchievementToast';
-import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '../config/categories';
-import { useBackHandler } from '../hooks/useBackHandler';
-import { useNewAchievement } from '../hooks/useNewAchievement';
-import { useAnnouncement } from '../features/announcements/useAnnouncement';
-import { AnnouncementOverlay } from '../features/announcements/AnnouncementOverlay';
+import { Day100EventManager } from '@features/events/Day100Event';
+import { Day200EventManager } from '@features/events/Day200Event';
+import { useAchievementToast } from '@hooks/useAchievementToast';
+import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
+import { useBackHandler } from '@hooks/useBackHandler';
+import { useNewAchievement } from '@hooks/useNewAchievement';
+import { useAnnouncement } from '@features/announcements/useAnnouncement';
+import { AnnouncementOverlay } from '@features/announcements/AnnouncementOverlay';
 
 // New Extracted Hooks/Components
-import { useDashboardState } from '../hooks/useDashboardState';
-import { useDashboardSelection } from '../hooks/useDashboardSelection';
+import { useDashboardState } from '@hooks/useDashboardState';
+import { useDashboardSelection } from '@hooks/useDashboardSelection';
 import { DashboardSlideRenderer } from './dashboard/DashboardSlideRenderer';
 import { DashboardModals } from './dashboard/DashboardModals';
 
 // Contexts
-import { useAuth } from '../contexts/AuthContext';
-import { useProgressStore } from '../store/useProgressStore';
-import { useSettingsStore } from '../store/useSettingsStore';
-import { useCloudSyncStore } from '../store/useCloudSyncStore';
-import { useComputedStatsStore } from '../store/useComputedStatsStore';
-import { useUIStore } from '../store/useUIStore';
-import { useSubscription } from '../contexts/SubscriptionContext';
-import { useExercises } from '../contexts/ExercisesContext';
-import { useExerciseConfig } from '../hooks/useExerciseConfig';
+import { useAuth } from '@contexts/AuthContext';
+import { useProgressStore } from '@store/useProgressStore';
+import { useSettingsStore } from '@store/useSettingsStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { useComputedStatsStore } from '@store/useComputedStatsStore';
+import { useUIStore } from '@store/useUIStore';
+import { useSubscription } from '@contexts/SubscriptionContext';
+import { useExercises } from '@contexts/ExercisesContext';
+import { useExerciseConfig } from '@hooks/useExerciseConfig';
 
-import { setSoundSettingsGetter } from '../utils/soundManager';
-import { clearWorkoutSession } from '../utils/workoutSessionStorage';
-import { getDailyGoal } from '../config/exercises';
-import { canAccessFeature, FEATURES } from '../utils/entitlements';
-import { isAdminEmail } from '../config/admin';
+import { setSoundSettingsGetter } from '@utils/soundManager';
+import { clearWorkoutSession } from '@utils/workoutSessionStorage';
+import { getDailyGoal } from '@config/exercises';
+import { canAccessFeature, FEATURES } from '@utils/entitlements';
+import { isAdminEmail } from '@config/admin';
 
 export function Dashboard() {
     const { t } = useTranslation();

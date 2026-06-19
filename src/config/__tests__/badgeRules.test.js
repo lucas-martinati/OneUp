@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { isBadgeUnlocked, BADGE_RULES, BADGE_RULES_BY_ID } from '../../../functions/shared/badgeRules.js';
+import { isBadgeUnlocked, BADGE_RULES, BADGE_RULES_BY_ID } from '@shared/badgeRules.js';
 
 describe('badgeRules — isBadgeUnlocked', () => {
   it('exposes a rule for every listed badge id', () => {
