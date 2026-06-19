@@ -509,8 +509,6 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     totalReps: totalClassicReps + cardioTotalReps,
     weightsTotalReps,
     exerciseReps,
-    exerciseDifficulties: exerciseDifficulties || {},
-    exerciseWeights: settings.exerciseWeights || existing.exerciseWeights || {},
     achievements: badgeCount,
     lastActiveDay,
     difficultyMultiplier: difficultyMultiplier || 1,
@@ -531,11 +529,10 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   if (isPublic) {
     const derived = computeExerciseDerived(completions, userLocalDate);
     await db.ref(`publicProfiles/${uid}`).set({
-      exerciseReps,
-      exerciseWeights: settings.exerciseWeights || existing.exerciseWeights || {},
+      // Detail-view-only payload. exerciseReps / achievements / difficultyMultiplier
+      // live in the leaderboard entry (read from the `entry` prop) — not duplicated here.
+      exerciseWeights: settings.exerciseWeights || {},
       exerciseDifficulties: exerciseDifficulties || {},
-      difficultyMultiplier: difficultyMultiplier || 1,
-      achievements: badgeCount,
       derivedStats: {
         currentStreak: derived.currentStreak,
         maxStreak: badgeStats.maxStreak,

@@ -25,8 +25,6 @@ export async function loadLeaderboard() {
       totalReps: entry.totalReps || 0,
       weightsTotalReps: entry.weightsTotalReps || 0,
       exerciseReps: entry.exerciseReps || {},
-      exerciseWeights: entry.exerciseWeights || {},
-      exerciseDifficulties: entry.exerciseDifficulties || {},
       achievements: entry.achievements || 0,
       lastActiveDay: entry.lastActiveDay || null,
       difficultyMultiplier: entry.difficultyMultiplier || 1,
@@ -43,39 +41,24 @@ export async function loadLeaderboard() {
   return entries;
 }
 
-// Loads the data needed to render another user's detail card.
+// Loads the data needed to render another user's detail card from the small,
+// public, function-computed `publicProfiles/{uid}` node: DERIVED stats (streaks,
+// per-exercise days…) plus the detail-only weights/difficulties maps — WITHOUT
+// ever touching the user's private completions calendar or GPS tracks.
 //
-// Preferred source: `publicProfiles/{uid}` — a small, public, function-computed
-// node that exposes DERIVED stats (streaks, per-exercise days…) WITHOUT the
-// user's private completions calendar or GPS tracks. When it exists, the caller
-// reads `details.derivedStats` directly and never touches private data.
-//
-// Fallback: legacy read of `users/{uid}/progress` (still permitted by rules
-// during the migration window) for users whose public profile hasn't been
-// backfilled yet. Returns `completions` so the caller can compute stats itself.
+// exerciseReps / achievements / difficultyMultiplier are NOT here: the caller
+// already has them from the leaderboard `entry` it holds.
 export async function loadUserDetails(uid) {
   let database = getDatabaseInstance();
   if (!database) { initializeFirebase(); database = getDatabaseInstance(); if (!database) return null; }
 
   const publicSnap = await get(ref(database, `publicProfiles/${uid}`));
-  if (publicSnap.exists()) {
-    const data = publicSnap.val();
-    return {
-      derivedStats: data.derivedStats || null,
-      exerciseReps: data.exerciseReps || {},
-      exerciseWeights: data.exerciseWeights || {},
-      exerciseDifficulties: data.exerciseDifficulties || {},
-    };
-  }
+  if (!publicSnap.exists()) return null;
 
-  // Legacy fallback (pre-migration users).
-  const snapshot = await get(ref(database, `users/${uid}/progress`));
-  if (!snapshot.exists()) return null;
-
-  const data = snapshot.val();
+  const data = publicSnap.val();
   return {
-    completions: data.completions || {},
-    startDate: data.startDate || null,
-    userStartDate: data.userStartDate || null,
+    derivedStats: data.derivedStats || null,
+    exerciseWeights: data.exerciseWeights || {},
+    exerciseDifficulties: data.exerciseDifficulties || {},
   };
 }

@@ -8,7 +8,7 @@ import { StreakFlame } from '../ui/StreakFlame';
 import { WeightBadge } from '../ui/WeightBadge';
 import { EXERCISES, CARDIO_EXERCISES } from '../../config/exercises';
 import { WEIGHT_EXERCISES } from '../../config/weights';
-import { getLocalDateStr, calculateStreak, calculateExerciseStreak, calculateMaxStreak } from '../../utils/dateUtils';
+import { getLocalDateStr } from '../../utils/dateUtils';
 import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '../../utils/entitlements';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { getIcon } from '../../utils/icons';
@@ -57,9 +57,8 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
         return () => { cancelled = true; };
     }, [entry.uid]);
 
-    // Prefer the server-computed derived stats from publicProfiles; fall back to
-    // client-side computation for legacy details that still carry `completions`.
-    const stats = details?.derivedStats || computeStats(details);
+    // Server-computed derived stats from the user's public profile.
+    const stats = details?.derivedStats || {};
 
     const renderExerciseRow = (ex) => {
         const ExIcon = getIcon(ex.icon);
@@ -68,7 +67,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
         const maxReps = Math.max(...allList.map(e => entry.exerciseReps?.[e.id] || 0), 1);
         const barWidth = (reps / maxReps) * 100;
         const exDays = loadingDetails ? null : (stats.exerciseDays?.[ex.id] || 0);
-        const weight = entry.exerciseWeights?.[ex.id] || ex.defaultWeight;
+        const weight = details?.exerciseWeights?.[ex.id] || ex.defaultWeight;
         const isWeightEx = !!WEIGHT_EXERCISES.find(e => e.id === ex.id);
         return (
             <div key={ex.id} style={{
@@ -92,25 +91,8 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                             )}
                             {isWeightEx && <WeightBadge weight={weight} color={ex.color} />}
                             {(() => {
-                                // Prioritize difficulty recorded in the latest completion
-                                let difficulty = 1.0;
-                                let foundInHistory = false;
-                                if (details?.completions) {
-                                    const sortedDates = Object.keys(details.completions).sort().reverse();
-                                    for (const date of sortedDates) {
-                                        const day = details.completions[date];
-                                        if (day[ex.id]?.isCompleted && day[ex.id]?.difficulty !== undefined) {
-                                            difficulty = day[ex.id].difficulty;
-                                            foundInHistory = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                
-                                // Fallback to snapshot if no history found
-                                if (!foundInHistory) {
-                                    difficulty = entry.exerciseDifficulties?.[ex.id] || 1.0;
-                                }
+                                // Difficulty snapshot from the user's public profile.
+                                const difficulty = details?.exerciseDifficulties?.[ex.id] || 1.0;
 
                                 if (difficulty === 1.0) return null;
                                 return <DifficultyBadge difficulty={difficulty} style={{ marginLeft: 0, marginRight: '4px' }} />;
@@ -367,48 +349,4 @@ function StatCard({ icon, label, value, color }) {
             <div style={{ fontSize: '0.56rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-secondary)', textAlign: 'center' }}>{label}</div>
         </div>
     );
-}
-
-function computeStats(details) {
-    if (!details?.completions) return { maxStreak: 0, currentStreak: 0, totalDays: 0, perfectDays: 0, exerciseDays: {} };
-
-    const ALL_EXERCISES = [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES];
-    const completions = details.completions;
-    const today = getLocalDateStr(new Date());
-
-    let totalDays = 0;
-    let perfectDays = 0;
-    const exerciseDays = {};
-    ALL_EXERCISES.forEach(ex => { exerciseDays[ex.id] = 0; });
-
-    for (const date in completions) {
-        const day = completions[date];
-        if (!day || typeof day !== 'object') continue;
-
-        let anyDone = false;
-        let allDone = true;
-
-        for (const ex of ALL_EXERCISES) {
-            if (day[ex.id]?.isCompleted) {
-                anyDone = true;
-                exerciseDays[ex.id]++;
-            } else if (EXERCISES.find(e => e.id === ex.id)) {
-                allDone = false;
-            }
-        }
-        if (anyDone) totalDays++;
-        if (allDone) perfectDays++;
-    }
-
-    const currentStreak = calculateStreak(completions, today);
-    const maxStreak = calculateMaxStreak(completions);
-
-    const exerciseStreaks = {};
-    const exerciseDoneToday = {};
-    ALL_EXERCISES.forEach(ex => {
-        exerciseStreaks[ex.id] = calculateExerciseStreak(completions, today, ex.id);
-        exerciseDoneToday[ex.id] = !!completions[today]?.[ex.id]?.isCompleted;
-    });
-
-    return { totalDays, perfectDays, maxStreak, currentStreak, exerciseDays, exerciseStreaks, exerciseDoneToday };
 }
