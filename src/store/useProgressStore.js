@@ -50,6 +50,7 @@ async function saveToStorage(userId, state) {
     await Preferences.set({ key, value: JSON.stringify(state) });
   } catch (e) {
     logger.error('Failed to persist progress:', e);
+    throw e;
   }
 }
 

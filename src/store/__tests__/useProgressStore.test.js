@@ -634,3 +634,48 @@ describe('achievement setters', () => {
     expect(useProgressStore.getState().achievements.beast).toBe(true);
   });
 });
+
+// ── Error handling / edge cases ─────────────────────────────────────────
+
+describe('error handling / edge cases', () => {
+  it('initForUser -> loadFromStorage handles Preferences.get error', async () => {
+    Preferences.get.mockRejectedValueOnce(new Error('PrefError'));
+    await useProgressStore.getState().initForUser(null);
+    expect(useProgressStore.getState().isStoreInitialized).toBe(true);
+  });
+
+  it('_persist -> saveToStorage handles Preferences.set error', async () => {
+    Preferences.set.mockRejectedValueOnce(new Error('SetError'));
+    useProgressStore.getState()._persist();
+    await flush(); // Should not throw
+  });
+
+  it('initForUser handles loadAchievementsFromCloud error and unblocks', async () => {
+    cloudSync.loadAchievementsFromCloud.mockRejectedValueOnce(new Error('AchError'));
+    await useProgressStore.getState().initForUser('uid2');
+    await flush();
+    expect(useProgressStore.getState()._achievementsLoaded).toBe(true);
+  });
+
+  it('mergeWithAnonymousData handles Preferences.get error', async () => {
+    Preferences.get.mockRejectedValueOnce(new Error('MergePrefError'));
+    const res = await useProgressStore.getState().mergeWithAnonymousData();
+    expect(res.success).toBe(false);
+  });
+
+  it('clearAnonymousData handles Preferences.remove error', async () => {
+    Preferences.remove.mockRejectedValueOnce(new Error('RemovePrefError'));
+    await useProgressStore.getState().clearAnonymousData();
+    await flush(); // Should not throw
+  });
+
+  it('startCloudListener callback applyRealtimeUpdate gets called', () => {
+    cloudSync.listenToCloudChanges.mockImplementationOnce((cb) => {
+        cb({ startDate: '2026-01-01', completions: {} });
+        return () => {};
+    });
+    useProgressStore.getState().startCloudListener();
+    expect(useProgressStore.getState().startDate).toBe('2026-01-01');
+  });
+});
+

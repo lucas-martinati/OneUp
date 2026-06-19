@@ -86,6 +86,22 @@ describe('clanService', () => {
       expect(get).toHaveBeenCalledTimes(2);
       expect(update).toHaveBeenCalled();
     });
+
+    it('catches update errors and retries (collision or write failure)', async () => {
+      // First try: code doesn't exist, but update throws an error
+      // Second try: code doesn't exist, update succeeds
+      vi.mocked(get)
+        .mockResolvedValueOnce(snapshot(null))
+        .mockResolvedValueOnce(snapshot(null));
+
+      vi.mocked(update)
+        .mockRejectedValueOnce(new Error('Write failure'))
+        .mockResolvedValueOnce();
+
+      const result = await createClan('Retry Write Fail Clan');
+      expect(result.success).toBe(true);
+      expect(update).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('joinClan', () => {
@@ -338,6 +354,40 @@ describe('clanService', () => {
       const result = await deleteNotification('sender-1');
       expect(result).toBe(true);
       expect(remove).toHaveBeenCalledWith('notifications/test-uid/sender-1');
+    });
+  });
+
+  describe('error handling / edge cases', () => {
+    it('createClan fails gracefully after max retries or general error', async () => {
+      vi.mocked(get).mockResolvedValue(snapshot('collision')); // always collides
+      const result = await createClan('Retry Fail');
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
+    });
+
+    it('joinClan handles unexpected errors gracefully', async () => {
+      vi.mocked(get).mockRejectedValueOnce(new Error('Firebase error'));
+      const result = await joinClan('CODE');
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
+    });
+
+    it('leaveClan handles unexpected errors gracefully', async () => {
+      vi.mocked(get).mockRejectedValueOnce(new Error('Firebase error'));
+      const result = await leaveClan('clan-1');
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
+    });
+
+    it('listenToNotifications handles empty snapshot', () => {
+      vi.mocked(onValue).mockImplementationOnce((ref, callback) => {
+        callback({ exists: () => false });
+        return () => {};
+      });
+
+      const callback = vi.fn();
+      listenToNotifications(callback);
+      expect(callback).toHaveBeenCalledWith([]);
     });
   });
 });

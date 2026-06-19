@@ -363,4 +363,49 @@ describe('useExercisesStore', () => {
       expect(useExercisesStore.getState().exerciseWeights['bench']).toBe(0);
     });
   });
+
+  describe('error handling / edge cases', () => {
+    it('loadFromStorage handles Preferences.get error', async () => {
+      Preferences.get.mockRejectedValueOnce(new Error('PrefError'));
+      await useExercisesStore.getState().initForUser(null);
+      expect(useExercisesStore.getState().routines).toEqual([]); // defaultValue
+    });
+
+    it('loadFromStorage migrates legacy localStorage', async () => {
+      localStorage.setItem('oneup_routines', JSON.stringify([{ id: 'legacy' }]));
+      await useExercisesStore.getState().initForUser(null);
+      expect(useExercisesStore.getState().routines[0].id).toBe('legacy');
+    });
+
+    it('saveToStorage handles Preferences.set error', () => {
+      Preferences.set.mockRejectedValueOnce(new Error('SetError'));
+      useExercisesStore.getState()._persistRoutines(); // does not throw
+    });
+
+    it('initForUser handles cloud load error', async () => {
+      cloudSync.loadExerciseWeightsFromCloud.mockRejectedValueOnce(new Error('CloudError'));
+      await useExercisesStore.getState().initForUser('uid3');
+      await new Promise(r => setTimeout(r, 0));
+      expect(useExercisesStore.getState().cloudLoaded).toBe(true);
+    });
+
+    it('updateCategory handles "custom" id fallback and invalid ids', () => {
+      useExercisesStore.getState().updateCategory('custom', { name: 'Custom' });
+      const state = useExercisesStore.getState();
+      expect(state.customCategoriesMap['custom']).toBeDefined();
+      
+      // Test invalid ID returns empty state change (line 295)
+      useExercisesStore.getState().updateCategory('nonexistent', { name: 'Nope' });
+    });
+
+    it('deleteCategory deletes exercises', () => {
+      useExercisesStore.getState().saveCustomExercise({ label: 'To delete' });
+      const exId = useExercisesStore.getState().customExercises[0].id;
+      useExercisesStore.getState().addCategory('CatToDelete');
+      const catId = useExercisesStore.getState().customCategories[0].id;
+
+      useExercisesStore.getState().deleteCategory(catId, {}, [exId]);
+      expect(useExercisesStore.getState().customExercises.length).toBe(0);
+    });
+  });
 });

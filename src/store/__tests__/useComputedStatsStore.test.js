@@ -31,4 +31,19 @@ describe('useComputedStatsStore', () => {
 
         computeSpy.mockRestore();
     });
+
+    it('handles falsy customExercises by defaulting to empty array', () => {
+        const computeSpy = vi.spyOn(useComputedStatsModule, 'computeAllStats').mockReturnValue({});
+        
+        useComputedStatsStore.getState().recompute(
+            {}, {}, () => 1, null, false, {}, () => ({}), [], '2026-01-01'
+        );
+
+        // Third argument to computeAllStats is getDayNumber, fourth is allExercises
+        const allExercisesArg = computeSpy.mock.calls[0][3];
+        expect(allExercisesArg).toBeDefined();
+        expect(Array.isArray(allExercisesArg)).toBe(true);
+
+        computeSpy.mockRestore();
+    });
 });

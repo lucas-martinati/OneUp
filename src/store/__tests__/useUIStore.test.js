@@ -107,6 +107,28 @@ describe('openStore / closeSettings', () => {
   });
 });
 
+// ── Achievements modal deep-link ────────────────────────────────────────
+
+describe('openAchievements / closeAchievements', () => {
+  it('openAchievements sets highlightedBadgeId and opens modal', () => {
+    useUIStore.getState().openAchievements('badge_1');
+    expect(useUIStore.getState().modals.achievements).toBe(true);
+    expect(useUIStore.getState().highlightedBadgeId).toBe('badge_1');
+  });
+
+  it('openAchievements defaults to null', () => {
+    useUIStore.getState().openAchievements();
+    expect(useUIStore.getState().highlightedBadgeId).toBeNull();
+  });
+
+  it('closeAchievements resets the highlightedBadgeId', () => {
+    useUIStore.getState().openAchievements('badge_1');
+    useUIStore.getState().closeAchievements();
+    expect(useUIStore.getState().modals.achievements).toBe(false);
+    expect(useUIStore.getState().highlightedBadgeId).toBeNull();
+  });
+});
+
 // ── Custom exercises modal ──────────────────────────────────────────────
 
 describe('openCustomExercises / closeCustomExercises', () => {

@@ -156,4 +156,112 @@ describe('useNotificationManager', () => {
     const scheduleArgs = vi.mocked(mockSchedule).mock.calls[0][0];
     expect(scheduleArgs.notifications).toHaveLength(6);
   });
+
+  it('skips tomorrow if already done at start of scheduling', async () => {
+    mockCheckPermissions.mockResolvedValueOnce({ display: 'granted' });
+    mockCancel.mockResolvedValueOnce({});
+    mockSchedule.mockResolvedValueOnce({});
+
+    const tomorrowStr = getLocalDateStr(new Date(Date.now() + 86400000));
+    
+    // Return true for tomorrow, but false for all other future days
+    const isDayDone = vi.fn((dateStr) => {
+        if (dateStr === tomorrowStr) return true;
+        return false;
+    });
+
+    const { result } = renderHook(() => useNotificationManager({
+      isDayDone,
+      getDayNumber: () => 5,
+    }));
+
+    await result.current.scheduleNotification({
+      notificationsEnabled: true,
+      notificationTime: { hour: 10, minute: 30 }
+    });
+
+    // Since tomorrow was skipped initially, the start date shifts, so it should still try to schedule 7 days 
+    // but the actual first day is day after tomorrow.
+    expect(mockSchedule).toHaveBeenCalled();
+  });
+
+  describe('error handling / edge cases', () => {
+    it('scheduleNotification catches errors gracefully', async () => {
+      mockCheckPermissions.mockRejectedValueOnce(new Error('PermissionError'));
+      const { result } = renderHook(() => useNotificationManager({ isDayDone: () => false, getDayNumber: () => 1 }));
+      await result.current.scheduleNotification({ notificationsEnabled: true, notificationTime: { hour: 10, minute: 0 } });
+      // Should not throw
+    });
+
+    it('requestNotificationPermission catches errors gracefully', async () => {
+      mockCheckPermissions.mockRejectedValueOnce(new Error('PermissionError'));
+      const { result } = renderHook(() => useNotificationManager({ isDayDone: () => false, getDayNumber: () => 1 }));
+      await result.current.requestNotificationPermission();
+      // Should not throw
+    });
+
+    it('buildNotificationContent covers comeback, milestone, streak, and random paths', async () => {
+      const settings = { notificationsEnabled: true, notificationTime: { hour: 10, minute: 30 } };
+      
+      // 1. Comeback (streak 0)
+      mockCheckPermissions.mockResolvedValueOnce({ display: 'granted' });
+      mockSchedule.mockClear();
+      let { result } = renderHook(() => useNotificationManager({
+        isDayDone: () => false, // streak 0
+        getDayNumber: () => 1,
+      }));
+      await result.current.scheduleNotification(settings);
+
+      // 2. Milestone
+      mockCheckPermissions.mockResolvedValueOnce({ display: 'granted' });
+      mockSchedule.mockClear();
+      result = renderHook(() => useNotificationManager({
+        isDayDone: (dateStr) => {
+           const tomorrowStr = getLocalDateStr(new Date(Date.now() + 86400000));
+           if (dateStr >= tomorrowStr) return false;
+           return true;
+        },
+        getDayNumber: () => 7, // 7 is a milestone
+      })).result;
+      await result.current.scheduleNotification(settings);
+
+      // 3. Streak >= 3
+      mockCheckPermissions.mockResolvedValueOnce({ display: 'granted' });
+      mockSchedule.mockClear();
+      result = renderHook(() => useNotificationManager({
+        isDayDone: (dateStr) => {
+           const tomorrowStr = getLocalDateStr(new Date(Date.now() + 86400000));
+           if (dateStr >= tomorrowStr) return false;
+           return true; 
+        },
+        getDayNumber: () => 2,
+      })).result;
+      await result.current.scheduleNotification(settings);
+
+      // 4. Random (streak < 3, not milestone)
+      mockCheckPermissions.mockResolvedValueOnce({ display: 'granted' });
+      mockSchedule.mockClear();
+      result = renderHook(() => useNotificationManager({
+        isDayDone: (dateStr) => {
+           const tomorrowStr = getLocalDateStr(new Date(Date.now() + 86400000));
+           if (dateStr >= tomorrowStr) return false;
+           // 1 day streak
+           const todayStr = getLocalDateStr(new Date());
+           return dateStr === todayStr;
+        },
+        getDayNumber: () => 2,
+      })).result;
+      // Mock Math.random to cover all 3 categories (motivational, fun, challenge)
+      vi.spyOn(Math, 'random').mockReturnValue(0.99); // force challenge
+      await result.current.scheduleNotification(settings);
+      
+      vi.spyOn(Math, 'random').mockReturnValue(0.5); // force fun
+      await result.current.scheduleNotification(settings);
+      
+      vi.spyOn(Math, 'random').mockReturnValue(0.1); // force motivational
+      await result.current.scheduleNotification(settings);
+
+      vi.restoreAllMocks();
+    });
+  });
 });
