@@ -717,61 +717,6 @@ export const backfillUserProfiles = onRequest(async (req, res) => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-// One-shot migration: publicProfiles backfill + cardio decoupling
-// ══════════════════════════════════════════════════════════════════════════════
-
-/**
- * Migrates every user to the new data layout, idempotently:
- *   1. Moves legacy `users/{uid}/progress/cardio/sessions` → `users/{uid}/cardioSessions`
- *      then deletes the legacy `progress/cardio` node (GPS tracks leave the
- *      socially-readable progress subtree).
- *   2. Recomputes the leaderboard + backfills `publicProfiles/{uid}` via the
- *      single source of truth `recomputeLeaderboardEntry` (no logic duplication).
- *
- * Safe to run multiple times. Invoke manually once after deploying functions and
- * BEFORE tightening the `progress` read rule.
- */
-export const migrateToPublicProfiles = onRequest(async (req, res) => {
-  try {
-    let nextPageToken;
-    let processed = 0;
-    let cardioMoved = 0;
-
-    do {
-      const listUsersResult = await admin.auth().listUsers(1000, nextPageToken);
-      for (const userRecord of listUsersResult.users) {
-        const uid = userRecord.uid;
-        const progressSnap = await db.ref(`users/${uid}/progress`).once('value');
-        const progress = progressSnap.val();
-        if (!progress) continue;
-
-        // 1. Move legacy cardio out of progress.
-        const legacySessions = progress.cardio?.sessions;
-        if (legacySessions && Object.keys(legacySessions).length > 0) {
-          await db.ref(`users/${uid}/cardioSessions`).update(legacySessions);
-          await db.ref(`users/${uid}/progress/cardio`).remove();
-          cardioMoved++;
-        }
-
-        // 2. Recompute (writes leaderboard + publicProfiles, merges cardio).
-        try {
-          await recomputeLeaderboardEntry(uid, progress);
-        } catch (err) {
-          console.error(`[Migrate] recompute failed for ${uid}:`, err);
-        }
-        processed++;
-      }
-      nextPageToken = listUsersResult.pageToken;
-    } while (nextPageToken);
-
-    res.status(200).send(`Migration terminée. ${processed} utilisateurs traités, ${cardioMoved} avec cardio déplacé.`);
-  } catch (error) {
-    console.error("Migration failed:", error);
-    res.status(500).send("Erreur lors de la migration : " + error.message);
-  }
-});
-
-// ══════════════════════════════════════════════════════════════════════════════
 // RevenueCat Webhook (existing)
 // ══════════════════════════════════════════════════════════════════════════════
 
