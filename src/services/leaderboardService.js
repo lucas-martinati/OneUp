@@ -43,10 +43,32 @@ export async function loadLeaderboard() {
   return entries;
 }
 
+// Loads the data needed to render another user's detail card.
+//
+// Preferred source: `publicProfiles/{uid}` — a small, public, function-computed
+// node that exposes DERIVED stats (streaks, per-exercise days…) WITHOUT the
+// user's private completions calendar or GPS tracks. When it exists, the caller
+// reads `details.derivedStats` directly and never touches private data.
+//
+// Fallback: legacy read of `users/{uid}/progress` (still permitted by rules
+// during the migration window) for users whose public profile hasn't been
+// backfilled yet. Returns `completions` so the caller can compute stats itself.
 export async function loadUserDetails(uid) {
   let database = getDatabaseInstance();
   if (!database) { initializeFirebase(); database = getDatabaseInstance(); if (!database) return null; }
 
+  const publicSnap = await get(ref(database, `publicProfiles/${uid}`));
+  if (publicSnap.exists()) {
+    const data = publicSnap.val();
+    return {
+      derivedStats: data.derivedStats || null,
+      exerciseReps: data.exerciseReps || {},
+      exerciseWeights: data.exerciseWeights || {},
+      exerciseDifficulties: data.exerciseDifficulties || {},
+    };
+  }
+
+  // Legacy fallback (pre-migration users).
   const snapshot = await get(ref(database, `users/${uid}/progress`));
   if (!snapshot.exists()) return null;
 

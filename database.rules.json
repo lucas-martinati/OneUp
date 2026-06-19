@@ -6,8 +6,11 @@
       "$uid": {
         ".read": "$uid === auth.uid",
         "progress": {
-          // Intentionnel : la lecture est ouverte à tout utilisateur authentifié
-          // pour permettre les fonctionnalités sociales (clans, classement, profils).
+          // TRANSITOIRE : lecture ouverte à tout utilisateur authentifié, héritée
+          // de l'ancien modèle social. Les nouveaux clients lisent désormais les
+          // stats publiques dérivées dans `publicProfiles` (sans le calendrier ni
+          // les traces GPS privées). À FERMER en `$uid === auth.uid` une fois que
+          // l'adoption de la version migrée est suffisante (ferme la fuite GPS).
           ".read": "auth != null",
           ".write": "$uid === auth.uid"
         },
@@ -17,6 +20,16 @@
       }
     },
     "leaderboard": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": false
+      }
+    },
+    "publicProfiles": {
+      // Stats publiques dérivées (par exercice + streaks), calculées et écrites
+      // EXCLUSIVEMENT par la Cloud Function recomputeLeaderboardEntry. Lecture
+      // pour tout utilisateur authentifié, écriture client interdite. Permet la
+      // fiche détail sociale sans lire le `progress` privé d'autrui.
       ".read": "auth != null",
       "$uid": {
         ".write": false

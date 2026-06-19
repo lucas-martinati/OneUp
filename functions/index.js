@@ -189,6 +189,59 @@ function computeAchievementStats(completions, totalRepsAll) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// Public profile — derived per-exercise stats published to `publicProfiles/{uid}`
+// so the social detail view (UserDetail.jsx) never needs to read another user's
+// PRIVATE `users/{uid}/progress` (which holds the full completions calendar AND,
+// historically, GPS tracks). Mirrors computeStats() in src/components/social/UserDetail.jsx.
+// Streaks are anchored on the user's local date (best server-side approximation).
+// ══════════════════════════════════════════════════════════════════════════════
+
+// All known exercise ids (standard + weights + cardio), as a flat list.
+const ALL_EX_OBJECTS = [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES];
+
+function computeExerciseDerived(completions, anchorDateStr) {
+  const pad = n => String(n).padStart(2, '0');
+  const dayStr = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
+  const dayIsDone = day => !!day && typeof day === 'object' &&
+    Object.entries(day).some(([id, e]) => e?.isCompleted && ALL_EXERCISE_IDS.has(id));
+
+  // Per-exercise total days completed.
+  const exerciseDays = {};
+  for (const ex of ALL_EX_OBJECTS) exerciseDays[ex.id] = 0;
+  for (const day of Object.values(completions)) {
+    if (!day || typeof day !== 'object') continue;
+    for (const ex of ALL_EX_OBJECTS) {
+      if (day[ex.id]?.isCompleted) exerciseDays[ex.id]++;
+    }
+  }
+
+  // Streaks counting backwards from the user's local "today".
+  const [ay, am, ad] = anchorDateStr.split('-').map(Number);
+  const anchorMs = Date.UTC(ay, am - 1, ad);
+
+  let currentStreak = 0;
+  for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
+    if (dayIsDone(completions[dayStr(new Date(anchorMs - i * 86400000))])) currentStreak++;
+    else break;
+  }
+
+  const exerciseStreaks = {};
+  const exerciseDoneToday = {};
+  for (const ex of ALL_EX_OBJECTS) {
+    let streak = 0;
+    for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
+      const ds = dayStr(new Date(anchorMs - i * 86400000));
+      if (completions[ds]?.[ex.id]?.isCompleted) streak++;
+      else break;
+    }
+    exerciseStreaks[ex.id] = streak;
+    exerciseDoneToday[ex.id] = !!completions[anchorDateStr]?.[ex.id]?.isCompleted;
+  }
+
+  return { currentStreak, exerciseDays, exerciseStreaks, exerciseDoneToday };
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // Core: recompute leaderboard entry from source of truth
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -196,11 +249,15 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   if (!progress) return;
 
   // ── Read auxiliary data in parallel ─────────────────────────────────────
-  const [settingsSnap, purchaseSnap, existingSnap, achievementsSnap] = await Promise.all([
+  // cardioSessions are read from the decoupled node `users/{uid}/cardioSessions`
+  // (new location, out of `progress` so GPS tracks stay private). During the
+  // migration window we also honour the legacy `progress.cardio.sessions`.
+  const [settingsSnap, purchaseSnap, existingSnap, achievementsSnap, cardioSnap] = await Promise.all([
     db.ref(`users/${uid}/settings`).once('value'),
     db.ref(`users/${uid}/purchase`).once('value'),
     db.ref(`leaderboard/${uid}`).once('value'),
     db.ref(`users/${uid}/achievements`).once('value'),
+    db.ref(`users/${uid}/cardioSessions`).once('value'),
   ]);
 
   const settings = settingsSnap.val() || {};
@@ -289,7 +346,9 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   }
 
   // ── Cardio reps from Strava sessions ───────────────────────────────────
-  const cardioSessions = progress.cardio?.sessions || {};
+  // Merge the decoupled node with the legacy in-progress location (new wins on
+  // id collision) so reps stay correct throughout the migration window.
+  const cardioSessions = { ...(progress.cardio?.sessions || {}), ...(cardioSnap.val() || {}) };
   let runningDistanceM = 0;
   let cyclingDistanceM = 0;
 
@@ -465,6 +524,35 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     lastUpdated: admin.database.ServerValue.TIMESTAMP,
   });
 
+  // ── Write public profile (detail view payload) ──────────────────────────
+  // Only published for users who are visible on the leaderboard. The derived
+  // stats let UserDetail.jsx render streaks/days WITHOUT reading anyone's
+  // private completions calendar.
+  if (isPublic) {
+    const derived = computeExerciseDerived(completions, userLocalDate);
+    await db.ref(`publicProfiles/${uid}`).set({
+      exerciseReps,
+      exerciseWeights: settings.exerciseWeights || existing.exerciseWeights || {},
+      exerciseDifficulties: exerciseDifficulties || {},
+      difficultyMultiplier: difficultyMultiplier || 1,
+      achievements: badgeCount,
+      derivedStats: {
+        currentStreak: derived.currentStreak,
+        maxStreak: badgeStats.maxStreak,
+        totalDays: badgeStats.totalDays,
+        perfectDays: badgeStats.perfectDays,
+        exerciseDays: derived.exerciseDays,
+        exerciseStreaks: derived.exerciseStreaks,
+        exerciseDoneToday: derived.exerciseDoneToday,
+        lastActiveDay,
+      },
+      lastUpdated: admin.database.ServerValue.TIMESTAMP,
+    });
+  } else {
+    // User went private — drop any stale public profile.
+    await db.ref(`publicProfiles/${uid}`).remove();
+  }
+
   console.log(`[Leaderboard] Recomputed for ${uid}: ${totalClassicReps + cardioTotalReps} reps, last=${lastActiveDay}, perfect=${isPerfectToday}`);
 }
 
@@ -481,10 +569,13 @@ export const onProgressChange = onValueWritten("users/{uid}/progress", async (ev
   const beforeProgress = event.data.before.val();
   if (!progress) {
     // Progress wiped (account deletion or admin reset) → remove the orphaned
-    // leaderboard entry. Clients cannot do it (leaderboard writes are denied).
+    // leaderboard + public profile entries. Clients cannot do it (writes denied).
     if (beforeProgress) {
       try {
-        await db.ref(`leaderboard/${uid}`).remove();
+        await Promise.all([
+          db.ref(`leaderboard/${uid}`).remove(),
+          db.ref(`publicProfiles/${uid}`).remove(),
+        ]);
         console.log(`[Leaderboard] Entry removed for ${uid} (progress deleted)`);
       } catch (error) {
         console.error(`[Leaderboard] Failed to remove entry for ${uid}:`, error);
@@ -497,6 +588,26 @@ export const onProgressChange = onValueWritten("users/{uid}/progress", async (ev
     await recomputeLeaderboardEntry(uid, progress, beforeProgress);
   } catch (error) {
     console.error(`[Leaderboard] Error recomputing for ${uid}:`, error);
+  }
+});
+
+/**
+ * Triggered when users/{uid}/cardioSessions changes.
+ * Cardio is decoupled from `progress` (so GPS tracks stay private), therefore
+ * onProgressChange no longer fires on cardio writes — this trigger keeps the
+ * leaderboard/public-profile cardio reps in sync.
+ */
+export const onCardioChange = onValueWritten("users/{uid}/cardioSessions", async (event) => {
+  const uid = event.params.uid;
+
+  try {
+    const progressSnap = await db.ref(`users/${uid}/progress`).once('value');
+    const progress = progressSnap.val();
+    if (!progress) return;
+
+    await recomputeLeaderboardEntry(uid, progress);
+  } catch (error) {
+    console.error(`[Leaderboard] Error recomputing for ${uid} (cardio change):`, error);
   }
 });
 
@@ -549,6 +660,7 @@ export const onAccountDeleted = functionsV1.auth.user().onDelete(async (user) =>
     await Promise.all([
       db.ref(`users/${uid}`).remove(),
       db.ref(`leaderboard/${uid}`).remove(),
+      db.ref(`publicProfiles/${uid}`).remove(),
     ]);
     console.log(`[AccountCleanup] Removed all data for deleted user ${uid}`);
   } catch (error) {
@@ -601,6 +713,61 @@ export const backfillUserProfiles = onRequest(async (req, res) => {
   } catch (error) {
     console.error("Backfill failed:", error);
     res.status(500).send("Erreur lors du backfill : " + error.message);
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// One-shot migration: publicProfiles backfill + cardio decoupling
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Migrates every user to the new data layout, idempotently:
+ *   1. Moves legacy `users/{uid}/progress/cardio/sessions` → `users/{uid}/cardioSessions`
+ *      then deletes the legacy `progress/cardio` node (GPS tracks leave the
+ *      socially-readable progress subtree).
+ *   2. Recomputes the leaderboard + backfills `publicProfiles/{uid}` via the
+ *      single source of truth `recomputeLeaderboardEntry` (no logic duplication).
+ *
+ * Safe to run multiple times. Invoke manually once after deploying functions and
+ * BEFORE tightening the `progress` read rule.
+ */
+export const migrateToPublicProfiles = onRequest(async (req, res) => {
+  try {
+    let nextPageToken;
+    let processed = 0;
+    let cardioMoved = 0;
+
+    do {
+      const listUsersResult = await admin.auth().listUsers(1000, nextPageToken);
+      for (const userRecord of listUsersResult.users) {
+        const uid = userRecord.uid;
+        const progressSnap = await db.ref(`users/${uid}/progress`).once('value');
+        const progress = progressSnap.val();
+        if (!progress) continue;
+
+        // 1. Move legacy cardio out of progress.
+        const legacySessions = progress.cardio?.sessions;
+        if (legacySessions && Object.keys(legacySessions).length > 0) {
+          await db.ref(`users/${uid}/cardioSessions`).update(legacySessions);
+          await db.ref(`users/${uid}/progress/cardio`).remove();
+          cardioMoved++;
+        }
+
+        // 2. Recompute (writes leaderboard + publicProfiles, merges cardio).
+        try {
+          await recomputeLeaderboardEntry(uid, progress);
+        } catch (err) {
+          console.error(`[Migrate] recompute failed for ${uid}:`, err);
+        }
+        processed++;
+      }
+      nextPageToken = listUsersResult.pageToken;
+    } while (nextPageToken);
+
+    res.status(200).send(`Migration terminée. ${processed} utilisateurs traités, ${cardioMoved} avec cardio déplacé.`);
+  } catch (error) {
+    console.error("Migration failed:", error);
+    res.status(500).send("Erreur lors de la migration : " + error.message);
   }
 });
 

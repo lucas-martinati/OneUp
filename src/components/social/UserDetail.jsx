@@ -57,7 +57,9 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
         return () => { cancelled = true; };
     }, [entry.uid]);
 
-    const stats = computeStats(details);
+    // Prefer the server-computed derived stats from publicProfiles; fall back to
+    // client-side computation for legacy details that still carry `completions`.
+    const stats = details?.derivedStats || computeStats(details);
 
     const renderExerciseRow = (ex) => {
         const ExIcon = getIcon(ex.icon);
