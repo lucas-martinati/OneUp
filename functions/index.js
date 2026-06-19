@@ -249,21 +249,23 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   if (!progress) return;
 
   // ── Read auxiliary data in parallel ─────────────────────────────────────
-  // cardioSessions are read from the decoupled node `users/{uid}/cardioSessions`
-  // (new location, out of `progress` so GPS tracks stay private). During the
-  // migration window we also honour the legacy `progress.cardio.sessions`.
-  const [settingsSnap, purchaseSnap, existingSnap, achievementsSnap, cardioSnap] = await Promise.all([
+  // cardioSessions live in their own decoupled node `users/{uid}/cardioSessions`
+  // (out of `progress` so GPS tracks stay private). Exercise weights live in
+  // `users/{uid}/exerciseWeights` (NOT in settings).
+  const [settingsSnap, purchaseSnap, existingSnap, achievementsSnap, cardioSnap, weightsSnap] = await Promise.all([
     db.ref(`users/${uid}/settings`).once('value'),
     db.ref(`users/${uid}/purchase`).once('value'),
     db.ref(`leaderboard/${uid}`).once('value'),
     db.ref(`users/${uid}/achievements`).once('value'),
     db.ref(`users/${uid}/cardioSessions`).once('value'),
+    db.ref(`users/${uid}/exerciseWeights`).once('value'),
   ]);
 
   const settings = settingsSnap.val() || {};
   const purchase = purchaseSnap.val() || {};
   const existing = existingSnap.val() || {};
   const achievements = achievementsSnap.val() || {};
+  const exerciseWeights = weightsSnap.val() || {};
 
   // ── Get user auth info (displayName, photoURL) ─────────────────────────
   let userRecord = null;
@@ -346,9 +348,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   }
 
   // ── Cardio reps from Strava sessions ───────────────────────────────────
-  // Merge the decoupled node with the legacy in-progress location (new wins on
-  // id collision) so reps stay correct throughout the migration window.
-  const cardioSessions = { ...(progress.cardio?.sessions || {}), ...(cardioSnap.val() || {}) };
+  const cardioSessions = cardioSnap.val() || {};
   let runningDistanceM = 0;
   let cyclingDistanceM = 0;
 
@@ -531,7 +531,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     await db.ref(`publicProfiles/${uid}`).set({
       // Detail-view-only payload. exerciseReps / achievements / difficultyMultiplier
       // live in the leaderboard entry (read from the `entry` prop) — not duplicated here.
-      exerciseWeights: settings.exerciseWeights || {},
+      exerciseWeights,
       exerciseDifficulties: exerciseDifficulties || {},
       derivedStats: {
         currentStreak: derived.currentStreak,
@@ -710,6 +710,64 @@ export const backfillUserProfiles = onRequest(async (req, res) => {
   } catch (error) {
     console.error("Backfill failed:", error);
     res.status(500).send("Erreur lors du backfill : " + error.message);
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// One-shot cleanup: purge legacy nodes
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Removes the two legacy nodes that the codebase no longer reads:
+ *   - `users/{uid}/progress/cardio`  → superseded by `users/{uid}/cardioSessions`
+ *   - `users/{uid}/sessionHistory`   → superseded by `users/{uid}/progress/sessionHistory`
+ *
+ * SAFE: any not-yet-migrated data is MOVED to its new home before the legacy
+ * node is deleted (no data loss). Idempotent. Invoke once, then DELETE this
+ * function and redeploy.
+ */
+export const cleanupLegacyNodes = onRequest(async (req, res) => {
+  try {
+    let nextPageToken;
+    let cardioPurged = 0;
+    let historyPurged = 0;
+
+    do {
+      const listUsersResult = await admin.auth().listUsers(1000, nextPageToken);
+      for (const userRecord of listUsersResult.users) {
+        const uid = userRecord.uid;
+
+        // 1. Legacy cardio under progress → move to cardioSessions, then delete.
+        const legacyCardioSnap = await db.ref(`users/${uid}/progress/cardio/sessions`).once('value');
+        if (legacyCardioSnap.exists()) {
+          await db.ref(`users/${uid}/cardioSessions`).update(legacyCardioSnap.val());
+        }
+        const progressCardioSnap = await db.ref(`users/${uid}/progress/cardio`).once('value');
+        if (progressCardioSnap.exists()) {
+          await db.ref(`users/${uid}/progress/cardio`).remove();
+          cardioPurged++;
+        }
+
+        // 2. Legacy root sessionHistory → move to progress/sessionHistory (only if
+        //    the new location is empty), then delete the legacy node.
+        const legacyHistSnap = await db.ref(`users/${uid}/sessionHistory`).once('value');
+        if (legacyHistSnap.exists()) {
+          const newHistSnap = await db.ref(`users/${uid}/progress/sessionHistory`).once('value');
+          if (!newHistSnap.exists()) {
+            const data = legacyHistSnap.val();
+            await db.ref(`users/${uid}/progress/sessionHistory`).set(Array.isArray(data) ? data : []);
+          }
+          await db.ref(`users/${uid}/sessionHistory`).remove();
+          historyPurged++;
+        }
+      }
+      nextPageToken = listUsersResult.pageToken;
+    } while (nextPageToken);
+
+    res.status(200).send(`Purge terminée. cardio legacy: ${cardioPurged}, sessionHistory legacy: ${historyPurged}.`);
+  } catch (error) {
+    console.error("Cleanup failed:", error);
+    res.status(500).send("Erreur lors de la purge : " + error.message);
   }
 });
 

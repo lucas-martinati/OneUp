@@ -222,20 +222,6 @@ describe('sessionHistoryService', () => {
       expect(result[0].name).toBe('NewerLocal');
     });
 
-    it('migrates legacy sessionHistory path to progress/sessionHistory', async () => {
-      const legacy = [{ id: 'old', date: '2024-12-01', name: 'Legacy' }];
-      // 1st get: new path missing → 2nd get: legacy path present
-      vi.mocked(get)
-        .mockResolvedValueOnce(snapshot(null))
-        .mockResolvedValueOnce(snapshot(legacy));
-
-      const result = await syncSessionHistory();
-
-      expect(result.map(s => s.id)).toContain('old');
-      // Migration writes to the new path and clears the legacy one.
-      expect(set).toHaveBeenCalled();
-    });
-
     it('returns [] gracefully when not signed in and no local history', async () => {
       vi.mocked(getAuthInstance).mockReturnValue({ currentUser: null });
       const result = await syncSessionHistory();
@@ -265,14 +251,6 @@ describe('sessionHistoryService', () => {
       vi.mocked(get).mockResolvedValueOnce(snapshot({ not: 'an array' }));
       const result = await syncSessionHistory();
       expect(result.map(s => s.id)).toEqual(['L']);
-    });
-
-    it('treats a non-array legacy payload as empty during migration', async () => {
-      vi.mocked(get)
-        .mockResolvedValueOnce(snapshot(null))        // new path missing
-        .mockResolvedValueOnce(snapshot({ bad: 1 })); // legacy path non-array
-      const result = await syncSessionHistory();
-      expect(result).toEqual([]);
     });
 
     it('skips cloud entirely when there is no database instance', async () => {

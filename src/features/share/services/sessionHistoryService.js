@@ -55,16 +55,6 @@ async function loadSessionHistoryFromCloud() {
       return Array.isArray(data) ? data : [];
     }
 
-    // Migration fallback
-    const oldSnapshot = await get(ref(database, `users/${auth.currentUser.uid}/sessionHistory`));
-    if (oldSnapshot.exists()) {
-      const data = oldSnapshot.val();
-      const parsedData = Array.isArray(data) ? data : [];
-      await set(ref(database, `users/${auth.currentUser.uid}/progress/sessionHistory`), parsedData);
-      await set(ref(database, `users/${auth.currentUser.uid}/sessionHistory`), null);
-      return parsedData;
-    }
-
     return [];
   } catch (error) {
     console.error('Failed to load session history from cloud', error);

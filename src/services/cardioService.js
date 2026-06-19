@@ -8,8 +8,6 @@ const logger = createLogger('Cardio');
 // (potentially large, location-sensitive) GPS tracks stay private and out of
 // the socially-readable progress subtree.
 const sessionsPath = uid => `users/${uid}/cardioSessions`;
-// Legacy location, kept only for read/cleanup during the migration window.
-const legacyPath = uid => `users/${uid}/progress/cardio/sessions`;
 
 // ── Save a cardio session ──────────────────────────────────────────────
 
@@ -40,21 +38,14 @@ export async function loadCardioSessions() {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return [];
 
-  const uid = auth.currentUser.uid;
-  // Merge the new node with any not-yet-migrated legacy sessions (new wins).
-  const [newSnap, legacySnap] = await Promise.all([
-    get(ref(database, sessionsPath(uid))),
-    get(ref(database, legacyPath(uid))),
-  ]);
-
-  const merged = {
-    ...(legacySnap.exists() ? legacySnap.val() : {}),
-    ...(newSnap.exists() ? newSnap.val() : {}),
-  };
-
-  const sessions = Object.values(merged).sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
-  logger.success(`Loaded ${sessions.length} cardio sessions`);
-  return sessions;
+  const snapshot = await get(ref(database, sessionsPath(auth.currentUser.uid)));
+  if (snapshot.exists()) {
+    const data = snapshot.val();
+    const sessions = Object.values(data).sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
+    logger.success(`Loaded ${sessions.length} cardio sessions`);
+    return sessions;
+  }
+  return [];
 }
 
 // ── Delete a cardio session ────────────────────────────────────────────
@@ -64,12 +55,7 @@ export async function deleteCardioSession(sessionId) {
   const database = getDatabaseInstance();
   if (!auth?.currentUser || !database) return false;
 
-  const uid = auth.currentUser.uid;
-  // Remove from both locations to cover not-yet-migrated sessions.
-  await Promise.all([
-    remove(ref(database, `${sessionsPath(uid)}/${sessionId}`)),
-    remove(ref(database, `${legacyPath(uid)}/${sessionId}`)),
-  ]);
+  await remove(ref(database, `${sessionsPath(auth.currentUser.uid)}/${sessionId}`));
   logger.success('Cardio session deleted');
   return true;
 }
