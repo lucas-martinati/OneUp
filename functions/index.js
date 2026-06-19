@@ -475,7 +475,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
 /**
  * Triggered when users/{uid}/progress changes (exercise completions, cardio, etc.)
  */
-exports.onProgressChange = onValueWritten("users/{uid}/progress", async (event) => {
+export const onProgressChange = onValueWritten("users/{uid}/progress", async (event) => {
   const uid = event.params.uid;
   const progress = event.data.after.val();
   const beforeProgress = event.data.before.val();
@@ -503,7 +503,7 @@ exports.onProgressChange = onValueWritten("users/{uid}/progress", async (event) 
 /**
  * Triggered when users/{uid}/settings changes (pseudo, difficulty, visibility, etc.)
  */
-exports.onSettingsChange = onValueWritten("users/{uid}/settings", async (event) => {
+export const onSettingsChange = onValueWritten("users/{uid}/settings", async (event) => {
   const uid = event.params.uid;
 
   try {
@@ -523,7 +523,7 @@ exports.onSettingsChange = onValueWritten("users/{uid}/settings", async (event) 
  * Ensures the leaderboard reflects updated entitlements immediately,
  * without waiting for the next progress or settings write.
  */
-exports.onPurchaseChange = onValueWritten("users/{uid}/purchase", async (event) => {
+export const onPurchaseChange = onValueWritten("users/{uid}/purchase", async (event) => {
   const uid = event.params.uid;
 
   try {
@@ -543,7 +543,7 @@ exports.onPurchaseChange = onValueWritten("users/{uid}/purchase", async (event) 
  * security rules prevent clients from deleting users/{uid} as a whole
  * (the purchase node is write-protected) and from writing to leaderboard.
  */
-exports.onAccountDeleted = functionsV1.auth.user().onDelete(async (user) => {
+export const onAccountDeleted = functionsV1.auth.user().onDelete(async (user) => {
   const uid = user.uid;
   try {
     await Promise.all([
@@ -564,7 +564,7 @@ exports.onAccountDeleted = functionsV1.auth.user().onDelete(async (user) => {
  * Backfills user profiles with email and name from Firebase Auth database.
  * Admin can invoke this manually once to populate missing profile nodes.
  */
-exports.backfillUserProfiles = onRequest(async (req, res) => {
+export const backfillUserProfiles = onRequest(async (req, res) => {
   try {
     let nextPageToken;
     let totalUpdated = 0;
@@ -613,7 +613,7 @@ exports.backfillUserProfiles = onRequest(async (req, res) => {
  * Listens for RevenueCat subscription events and updates Firebase Realtime Database.
  * Endpoint URL: https://<REGION>-<PROJECT_ID>.cloudfunctions.net/onRevenueCatWebhook
  */
-exports.onRevenueCatWebhook = onRequest({ secrets: ["REVENUECAT_WEBHOOK_SECRET"] }, async (req, res) => {
+export const onRevenueCatWebhook = onRequest({ secrets: ["REVENUECAT_WEBHOOK_SECRET"] }, async (req, res) => {
   // Reject non-POST requests immediately
   if (req.method !== "POST") {
     res.status(405).send("Method Not Allowed");
