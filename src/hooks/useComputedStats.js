@@ -10,8 +10,6 @@ import { isGlobalPerfectDay } from '../utils/statUtils';
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
  */
 export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, achievements = {}, getConfig = null, cardioReps = null, userStartDateStr = null) {
-    // Keep global fallback for things not tied to a specific exercise
-    const difficultyMultiplier = settings?.difficultyMultiplier ?? 1.0;
     const todayStr = getLocalDateStr(new Date());
     const today = new Date(todayStr);
 
@@ -143,7 +141,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
                 dayExCount++;
                 completedExIds.add(exId);
 
-                const diffToUse = getConfig ? getConfig(exId, dateStr).difficulty : difficultyMultiplier;
+                const diffToUse = getConfig ? getConfig(exId, dateStr).difficulty : 1.0;
                 
                 let reps = 0;
                 if (exId === 'running' || exId === 'cycling') {
@@ -339,9 +337,9 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         }
     }
 
-    // Inject cardio reps (either from argument or fallback to settings for backward compatibility/leaderboard)
-    const runningReps = cardioReps?.running ?? settings?.runningReps;
-    const cyclingReps = cardioReps?.cycling ?? settings?.cyclingReps;
+    // Inject cardio reps (from the cardioReps argument; cardio lives in its own node now)
+    const runningReps = cardioReps?.running;
+    const cyclingReps = cardioReps?.cycling;
 
     if (runningReps && allExercises.some(e => e.id === 'running')) exerciseReps['running'] = runningReps;
     if (cyclingReps && allExercises.some(e => e.id === 'cycling')) exerciseReps['cycling'] = cyclingReps;

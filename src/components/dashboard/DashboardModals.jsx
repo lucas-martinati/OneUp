@@ -110,7 +110,9 @@ export function DashboardModals({
                         dailyGoal={dailyGoal}
                         currentCount={currentCount}
                         onUpdateCount={(newCount) => {
-                            const { weight, difficulty } = getConfig(selectedExerciseId);
+                            // Pass `today` so an already-completed exercise keeps its
+                            // locked completion-day difficulty/weight instead of the live global one.
+                            const { weight, difficulty } = getConfig(selectedExerciseId, today);
                             updateExerciseCount(today, selectedExerciseId, newCount, dailyGoal, weight, difficulty);
                         }}
                         isCompleted={isExerciseDone}

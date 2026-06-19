@@ -65,6 +65,10 @@ function makeAllDone(selectedExercises = null, difficulties = {}, includeTimesta
     entry[ex.id] = {
       isCompleted: true,
       ...(includeTimestamp ? { timestamp: serverTimestamp() } : {}),
+      // Lock a non-default completion difficulty onto the day so a later global
+      // change can't retroactively alter it. 1.0 is the max (full reps) and needs
+      // no lock — lowering the goal later still leaves the day done — so it is
+      // left unsaved to keep the cloud payload clean.
       ...((diff !== undefined && diff !== null && diff !== 1.0) ? { difficulty: diff } : {}),
     };
   }
@@ -279,12 +283,17 @@ export const useProgressStore = create((set, get) => ({
         timestamp = serverTimestamp();
       }
 
+      // Lock the completion-time difficulty onto the day so later global changes
+      // can't retroactively alter it; preserve the existing value when none is
+      // supplied. 1.0 is the max (full reps) and needs no lock, so it's left
+      // unsaved to keep the cloud payload clean.
+      const lockedDifficulty = (difficulty !== null && difficulty !== undefined) ? difficulty : current.difficulty;
       day[exerciseId] = {
         count: finalCount,
         isCompleted: isNowDone,
         timestamp,
         ...((weight !== null && weight !== undefined) ? { weight } : {}),
-        ...((difficulty !== null && difficulty !== undefined && difficulty !== 1.0) ? { difficulty } : {}),
+        ...((lockedDifficulty !== null && lockedDifficulty !== undefined && lockedDifficulty !== 1.0) ? { difficulty: lockedDifficulty } : {}),
       };
       newCompletions[dateStr] = day;
 

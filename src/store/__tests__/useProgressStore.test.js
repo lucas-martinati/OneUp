@@ -208,15 +208,26 @@ describe('updateExerciseCount', () => {
     expect(getExerciseCount(today, 'pushups')).toBe(0);
   });
 
-  it('stores weight, and difficulty only when not 1.0', () => {
+  it('stores weight, and locks difficulty only when below the 1.0 max', () => {
     const { updateExerciseCount } = useProgressStore.getState();
+    // 1.0 is the max (full reps): no lock needed, left unsaved to keep cloud clean.
     updateExerciseCount(today, 'bench', 10, 100, 42.5, 1.0);
     let ex = useProgressStore.getState().completions[today].bench;
     expect(ex.weight).toBe(42.5);
     expect(ex.difficulty).toBeUndefined();
 
+    // A reduced difficulty is locked onto the day.
     updateExerciseCount(today, 'bench', 20, 100, 42.5, 0.5);
     ex = useProgressStore.getState().completions[today].bench;
+    expect(ex.difficulty).toBe(0.5);
+  });
+
+  it('preserves the locked difficulty when none is supplied on a later edit', () => {
+    const { updateExerciseCount } = useProgressStore.getState();
+    updateExerciseCount(today, 'bench', 20, 100, 42.5, 0.5);
+    // Subsequent edit without a difficulty must keep the recorded 0.5.
+    updateExerciseCount(today, 'bench', 30, 100, 42.5);
+    const ex = useProgressStore.getState().completions[today].bench;
     expect(ex.difficulty).toBe(0.5);
   });
 

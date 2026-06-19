@@ -281,7 +281,6 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   if (!startDate) return; // No start date means no challenge started
 
   const exerciseDifficulties = settings.exerciseDifficulties || {};
-  const difficultyMultiplier = settings.difficultyMultiplier ?? 1.0;
 
   // ── Compute server dates ───────────────────────────────────────────────
   const serverNow = new Date();
@@ -319,7 +318,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
       const exercise = EXERCISES.find(e => e.id === exId) || WEIGHT_EXERCISES.find(e => e.id === exId);
       if (!exercise) continue;
 
-      const diff = exerciseDifficulties[exId] ?? difficultyMultiplier;
+      const diff = exerciseDifficulties[exId] ?? 1.0;
       const reps = getDailyGoal(exercise, dayNum, diff);
 
       exerciseReps[exId] = (exerciseReps[exId] || 0) + reps;
@@ -511,7 +510,6 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     exerciseReps,
     achievements: badgeCount,
     lastActiveDay,
-    difficultyMultiplier: difficultyMultiplier || 1,
     isPublic,
     isPerfectToday,
     shieldGreen,
@@ -529,8 +527,8 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   if (isPublic) {
     const derived = computeExerciseDerived(completions, userLocalDate);
     await db.ref(`publicProfiles/${uid}`).set({
-      // Detail-view-only payload. exerciseReps / achievements / difficultyMultiplier
-      // live in the leaderboard entry (read from the `entry` prop) — not duplicated here.
+      // Detail-view-only payload. exerciseReps / achievements live in the
+      // leaderboard entry (read from the `entry` prop) — not duplicated here.
       exerciseWeights,
       exerciseDifficulties: exerciseDifficulties || {},
       derivedStats: {
@@ -711,65 +709,7 @@ export const backfillUserProfiles = onRequest(async (req, res) => {
     console.error("Backfill failed:", error);
     res.status(500).send("Erreur lors du backfill : " + error.message);
   }
-});
-
-// ══════════════════════════════════════════════════════════════════════════════
-// One-shot cleanup: purge legacy nodes
-// ══════════════════════════════════════════════════════════════════════════════
-
-/**
- * Removes the two legacy nodes that the codebase no longer reads:
- *   - `users/{uid}/progress/cardio`  → superseded by `users/{uid}/cardioSessions`
- *   - `users/{uid}/sessionHistory`   → superseded by `users/{uid}/progress/sessionHistory`
- *
- * SAFE: any not-yet-migrated data is MOVED to its new home before the legacy
- * node is deleted (no data loss). Idempotent. Invoke once, then DELETE this
- * function and redeploy.
- */
-export const cleanupLegacyNodes = onRequest(async (req, res) => {
-  try {
-    let nextPageToken;
-    let cardioPurged = 0;
-    let historyPurged = 0;
-
-    do {
-      const listUsersResult = await admin.auth().listUsers(1000, nextPageToken);
-      for (const userRecord of listUsersResult.users) {
-        const uid = userRecord.uid;
-
-        // 1. Legacy cardio under progress → move to cardioSessions, then delete.
-        const legacyCardioSnap = await db.ref(`users/${uid}/progress/cardio/sessions`).once('value');
-        if (legacyCardioSnap.exists()) {
-          await db.ref(`users/${uid}/cardioSessions`).update(legacyCardioSnap.val());
-        }
-        const progressCardioSnap = await db.ref(`users/${uid}/progress/cardio`).once('value');
-        if (progressCardioSnap.exists()) {
-          await db.ref(`users/${uid}/progress/cardio`).remove();
-          cardioPurged++;
-        }
-
-        // 2. Legacy root sessionHistory → move to progress/sessionHistory (only if
-        //    the new location is empty), then delete the legacy node.
-        const legacyHistSnap = await db.ref(`users/${uid}/sessionHistory`).once('value');
-        if (legacyHistSnap.exists()) {
-          const newHistSnap = await db.ref(`users/${uid}/progress/sessionHistory`).once('value');
-          if (!newHistSnap.exists()) {
-            const data = legacyHistSnap.val();
-            await db.ref(`users/${uid}/progress/sessionHistory`).set(Array.isArray(data) ? data : []);
-          }
-          await db.ref(`users/${uid}/sessionHistory`).remove();
-          historyPurged++;
-        }
-      }
-      nextPageToken = listUsersResult.pageToken;
-    } while (nextPageToken);
-
-    res.status(200).send(`Purge terminée. cardio legacy: ${cardioPurged}, sessionHistory legacy: ${historyPurged}.`);
-  } catch (error) {
-    console.error("Cleanup failed:", error);
-    res.status(500).send("Erreur lors de la purge : " + error.message);
-  }
-});
+}); 
 
 // ══════════════════════════════════════════════════════════════════════════════
 // RevenueCat Webhook (existing)

@@ -670,7 +670,9 @@ export function WorkoutSession(props) {
                     dailyGoal={currentGoal}
                     currentCount={currentCount}
                     onUpdateCount={(newCount) => {
-                        const { weight } = getConfig(currentExId);
+                        // Use `today` so an already-completed exercise keeps its locked
+                        // completion-day weight (currentDifficulty is already date-aware).
+                        const { weight } = getConfig(currentExId, today);
                         updateExerciseCount(today, currentExId, newCount, currentGoal, weight, currentDifficulty);
                     }}
                     isCompleted={currentDone}
