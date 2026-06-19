@@ -4,6 +4,7 @@ const config = {
     "functions/index.js",
     "functions/shared/badgeRules.js",
     "functions/shared/exerciseRules.js",
+    "functions/shared/dbSchema.js",
     "src/components/index.js",
     "src/components/*/index.js",
     "src/services/*Service.js",

@@ -3,6 +3,7 @@ import { onValueWritten } from "firebase-functions/v2/database";
 import functionsV1 from "firebase-functions/v1";
 import admin from "firebase-admin";
 import { BADGE_RULES, isBadgeUnlocked } from "./shared/badgeRules.js";
+import { DB_SCHEMA, LEAF } from "./shared/dbSchema.js";
 
 // Initialize Firebase Admin SDK using Default Compute Service Account
 admin.initializeApp();
@@ -508,7 +509,6 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     totalReps: totalClassicReps + cardioTotalReps,
     weightsTotalReps,
     exerciseReps,
-    achievements: badgeCount,
     lastActiveDay,
     isPublic,
     isPerfectToday,
@@ -527,10 +527,12 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   if (isPublic) {
     const derived = computeExerciseDerived(completions, userLocalDate);
     await db.ref(`publicProfiles/${uid}`).set({
-      // Detail-view-only payload. exerciseReps / achievements live in the
-      // leaderboard entry (read from the `entry` prop) — not duplicated here.
+      // Detail-view-only payload. exerciseReps lives in the leaderboard entry
+      // (needed for the list's per-exercise ranking); everything below is only
+      // read when opening a user's detail card.
       exerciseWeights,
       exerciseDifficulties: exerciseDifficulties || {},
+      achievements: badgeCount,
       derivedStats: {
         currentStreak: derived.currentStreak,
         maxStreak: badgeStats.maxStreak,
@@ -709,7 +711,128 @@ export const backfillUserProfiles = onRequest(async (req, res) => {
     console.error("Backfill failed:", error);
     res.status(500).send("Erreur lors du backfill : " + error.message);
   }
-}); 
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Stale-data tooling — driven by functions/shared/dbSchema.js
+//
+// `auditStaleData` (ACTIVE) is READ-ONLY: it reports every key not declared in
+// DB_SCHEMA but never deletes anything — safe to leave deployed and run anytime.
+// `pruneStaleData` (COMMENTED) is DESTRUCTIVE: uncomment it (+ deploy) only when
+// you actually want to delete, run it, then re-comment and redeploy.
+//
+// Both share the helpers below. Output is colored for the terminal (curl renders
+// the ANSI escapes). NB: these endpoints are unauthenticated — the audit only
+// exposes path/key names, no user content.
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Walks a DB subtree against its schema and collects the paths of every key that
+// is NOT declared in the schema (stale data). Only descends into FIXED-object
+// schema levels; LEAF (and wildcard→LEAF) subtrees are left untouched.
+function collectStalePaths(node, schema, path, out) {
+  if (schema === LEAF) return;                       // free-form: stop
+  if (!node || typeof node !== 'object') return;
+
+  if (schema.$ !== undefined) {                      // wildcard map
+    for (const [key, child] of Object.entries(node)) {
+      collectStalePaths(child, schema.$, `${path}/${key}`, out);
+    }
+    return;
+  }
+
+  for (const [key, child] of Object.entries(node)) { // fixed object
+    const childPath = `${path}/${key}`;
+    if (!(key in schema)) {
+      out.push(childPath);                           // stale → whole key removed
+    } else {
+      collectStalePaths(child, schema[key], childPath, out);
+    }
+  }
+}
+
+// Reads the whole DB once and returns the sorted list of stale paths + a
+// per-key tally. Fine for small/medium databases.
+async function scanStaleData() {
+  const snap = await db.ref('/').once('value');
+  const root = snap.val() || {};
+  const stalePaths = [];
+  collectStalePaths(root, DB_SCHEMA, '', stalePaths);
+  stalePaths.sort();
+  const byKey = {};
+  for (const p of stalePaths) {
+    const name = p.split('/').pop();
+    byKey[name] = (byKey[name] || 0) + 1;
+  }
+  return { stalePaths, byKey };
+}
+
+// Builds a colored, line-by-line report for the terminal (ANSI escapes).
+// `deleted`: true when the paths were actually removed (pruneStaleData),
+// false for the read-only audit.
+function formatStaleReport(deleted, stalePaths, byKey) {
+  const R = '\x1b[0m', B = '\x1b[1m';
+  const RED = '\x1b[31m', GREEN = '\x1b[32m', YELLOW = '\x1b[33m', CYAN = '\x1b[36m', GRAY = '\x1b[90m';
+  const L = [];
+  L.push('');
+  L.push(`${B}${CYAN}══════════ ${deleted ? 'pruneStaleData' : 'auditStaleData (lecture seule)'} ══════════${R}`);
+  L.push(`${B}Total :${R} ${RED}${stalePaths.length}${R} chemin(s)`);
+  L.push('');
+  L.push(`${B}Par clé :${R}`);
+  for (const [k, c] of Object.entries(byKey).sort((a, b) => b[1] - a[1])) {
+    L.push(`  ${YELLOW}${k.padEnd(22)}${R}${GRAY}×${R} ${c}`);
+  }
+  L.push('');
+  L.push(`${B}Chemins :${R}`);
+  for (const p of stalePaths) {
+    const i = p.lastIndexOf('/');
+    L.push(`  ${GRAY}${p.slice(0, i + 1)}${R}${RED}${p.slice(i + 1)}${R}`);
+  }
+  L.push('');
+  L.push(deleted
+    ? `${GREEN}✓ ${stalePaths.length} chemin(s) supprimé(s).${R}`
+    : `${YELLOW}Lecture seule — rien supprimé. Pour supprimer : décommenter ${B}pruneStaleData${R}${YELLOW}.${R}`);
+  L.push('');
+  return L.join('\n');
+}
+
+// READ-ONLY audit: reports stale data, never deletes. Safe to leave deployed.
+export const auditStaleData = onRequest(async (req, res) => {
+  try {
+    const { stalePaths, byKey } = await scanStaleData();
+    res.set('Content-Type', 'text/plain; charset=utf-8');
+    res.status(200).send(formatStaleReport(false, stalePaths, byKey));
+  } catch (error) {
+    console.error("Audit failed:", error);
+    res.status(500).send("Erreur lors de l'audit : " + error.message);
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DESTRUCTIF — décommenter UNIQUEMENT pour supprimer, puis `npm run deploy:functions`,
+// lancer, et enfin recommenter + redéployer.
+// ══════════════════════════════════════════════════════════════════════════════
+/*
+export const pruneStaleData = onRequest(async (req, res) => {
+  try {
+    const { stalePaths } = await scanStaleData();
+    if (stalePaths.length > 0) {
+      const updates = {};
+      for (const p of stalePaths) updates[p.replace(/^\//, '')] = null;
+      await db.ref().update(updates);
+    }
+    const byKey = {};
+    for (const p of stalePaths) {
+      const name = p.split('/').pop();
+      byKey[name] = (byKey[name] || 0) + 1;
+    }
+    res.set('Content-Type', 'text/plain; charset=utf-8');
+    res.status(200).send(formatStaleReport(true, stalePaths, byKey));
+  } catch (error) {
+    console.error("Prune failed:", error);
+    res.status(500).send("Erreur lors de la purge : " + error.message);
+  }
+});
+*/
 
 // ══════════════════════════════════════════════════════════════════════════════
 // RevenueCat Webhook (existing)

@@ -25,7 +25,6 @@ export async function loadLeaderboard() {
       totalReps: entry.totalReps || 0,
       weightsTotalReps: entry.weightsTotalReps || 0,
       exerciseReps: entry.exerciseReps || {},
-      achievements: entry.achievements || 0,
       lastActiveDay: entry.lastActiveDay || null,
       lastUpdated: entry.lastUpdated || null,
       isSupporter: !!entry.isSupporter,
@@ -45,8 +44,8 @@ export async function loadLeaderboard() {
 // per-exercise days…) plus the detail-only weights/difficulties maps — WITHOUT
 // ever touching the user's private completions calendar or GPS tracks.
 //
-// exerciseReps / achievements are NOT here: the caller already has them from
-// the leaderboard `entry` it holds.
+// exerciseReps is NOT here: the caller already has it from the leaderboard
+// `entry` it holds (the list needs it for per-exercise ranking).
 export async function loadUserDetails(uid) {
   let database = getDatabaseInstance();
   if (!database) { initializeFirebase(); database = getDatabaseInstance(); if (!database) return null; }
@@ -59,5 +58,6 @@ export async function loadUserDetails(uid) {
     derivedStats: data.derivedStats || null,
     exerciseWeights: data.exerciseWeights || {},
     exerciseDifficulties: data.exerciseDifficulties || {},
+    achievements: data.achievements || 0,
   };
 }

@@ -170,7 +170,7 @@ export async function getClanDetails(clanId) {
       uid: memberUid, role: clanData.members[memberUid],
       pseudo: lbData.pseudo || i18n.t('common.anonymous'), photoURL: lbData.photoURL || null,
       totalReps: lbData.totalReps || 0, weightsTotalReps: lbData.weightsTotalReps || 0,
-      exerciseReps: lbData.exerciseReps || {}, achievements: lbData.achievements || 0,
+      exerciseReps: lbData.exerciseReps || {},
       lastActiveDay: lbData.lastActiveDay || null,
       lastUpdated: lbData.lastUpdated || null,
       isSupporter: !!lbData.isSupporter, isPro: !!lbData.isPro,

@@ -43,15 +43,18 @@ describe('sanitizeForCloud', () => {
     expect(out.completions.d.push.isCompleted).toBe(true);
   });
 
-  it('strips achievements and hasShared from the payload', () => {
+  it('strips achievements, hasShared and cardio from the payload', () => {
     const out = sanitizeForCloud({
       completions: {},
       achievements: ['a'],
       hasShared: true,
+      cardio: { sessions: { s1: { id: 's1' } } },
       startDate: '2026-01-01',
     });
     expect(out.achievements).toBeUndefined();
     expect(out.hasShared).toBeUndefined();
+    // cardio lives in users/{uid}/cardioSessions — never written under progress.
+    expect(out.cardio).toBeUndefined();
     expect(out.startDate).toBe('2026-01-01');
   });
 });

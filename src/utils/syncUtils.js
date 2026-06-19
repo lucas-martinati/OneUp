@@ -27,10 +27,16 @@ export function sanitizeForCloud(data) {
     sanitizedCompletions[dateStr] = sanitizedDay;
   });
   
-  // Remove achievements and hasShared from progress sync (they are handled independently or deprecated)
+  // Strip fields that must never be written under `users/{uid}/progress`:
+  // - achievements / hasShared: handled independently or deprecated.
+  // - cardio: sessions live in their own `users/{uid}/cardioSessions` node; the
+  //   store keeps an in-memory `cardio` mirror (fed by useCardio for stats), but
+  //   it must NOT be synced back into progress (that recreated the legacy
+  //   `progress/cardio` node).
   const restOfData = { ...data };
   delete restOfData.achievements;
   delete restOfData.hasShared;
+  delete restOfData.cardio;
   return { ...restOfData, completions: sanitizedCompletions };
 }
 
