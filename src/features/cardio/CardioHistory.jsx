@@ -17,13 +17,13 @@ function formatDuration(seconds) {
   return `${m}min`;
 }
 
-function formatDate(timestamp) {
+function formatDate(timestamp, lang) {
   if (!timestamp) return '—';
   const d = parseTimestamp(timestamp);
-  return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+  return d.toLocaleDateString(lang || undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function SessionCard({ session, mode, t }) {
+function SessionCard({ session, mode, t, lang }) {
   const [expanded, setExpanded] = useState(false);
   const hasGps = session.gpsTrack && session.gpsTrack.length > 1;
 
@@ -62,7 +62,7 @@ function SessionCard({ session, mode, t }) {
             color: 'var(--text-primary)',
             marginBottom: '3px',
           }}>
-            {formatDate(session.startTime)}
+            {formatDate(session.startTime, lang)}
           </div>
           <div style={{
             display: 'flex', gap: '12px',
@@ -136,7 +136,7 @@ function SessionCard({ session, mode, t }) {
 }
 
 export function CardioHistory({ sessions, mode, onClose }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [fullscreenSession, setFullscreenSession] = useState(null);
 
   // Listen for fullscreen events from child CardioMap
@@ -193,6 +193,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
                 session={session}
                 mode={mode}
                 t={t}
+                lang={i18n.language}
               />
             ))
           )}
@@ -204,7 +205,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
       {fullscreenSession && (
         <CardioFullscreenMap
           gpsTrack={fullscreenSession.gpsTrack}
-          title={formatDate(fullscreenSession.session.startTime)}
+          title={formatDate(fullscreenSession.session.startTime, i18n.language)}
           session={fullscreenSession.session}
           onClose={() => setFullscreenSession(null)}
         />

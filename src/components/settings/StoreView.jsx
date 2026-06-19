@@ -9,7 +9,7 @@ import { useSubscription } from '../../contexts/SubscriptionContext';
 
 /** Boutique view inside Settings: supporter/pro store cards, restore button and purchase history. */
 export function StoreView() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const cloudAuth = useAuth();
     const {
         isSupporter, isPro,
@@ -149,7 +149,7 @@ export function StoreView() {
                                                 {t('store.purchaseDate')}
                                             </span>
                                             <span style={{ color: 'var(--text-secondary)', fontWeight: '700' }}>
-                                                {new Date(receipt.date).toLocaleDateString()}
+                                                {new Date(receipt.date).toLocaleDateString(i18n.language)}
                                             </span>
                                         </div>
                                     )}
@@ -167,7 +167,7 @@ export function StoreView() {
                                                 color: receipt.isActive ? '#10b981' : '#ef4444',
                                                 fontWeight: '700'
                                             }}>
-                                                {new Date(receipt.expirationDate).toLocaleDateString()}
+                                                {new Date(receipt.expirationDate).toLocaleDateString(i18n.language)}
                                             </span>
                                         </div>
                                     )}
