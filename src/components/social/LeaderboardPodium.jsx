@@ -71,6 +71,17 @@ export function LeaderboardPodium({ items, currentUid, todayStr, onSelect, clanD
                             )}
                             <Avatar photoURL={entry.photoURL} name={entry.pseudo} size={avatarSize} borderColor={isPerfect ? '#ffd700' : medal.border} />
 
+                            {showVerifiedShield && (
+                                <span className={styles.pShield} style={{ background: '#10b981' }}>
+                                    <Shield size={11} color="#fff" />
+                                </span>
+                            )}
+                            {showSuspiciousShield && (
+                                <span className={styles.pShield} style={{ background: '#f59e0b' }}>
+                                    <ShieldAlert size={11} color="#fff" />
+                                </span>
+                            )}
+
                             {clanData && !isMe && (
                                 <button
                                     onClick={(e) => onNudge(e, entry.uid)}
@@ -87,19 +98,27 @@ export function LeaderboardPodium({ items, currentUid, todayStr, onSelect, clanD
                             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{entry.pseudo}</span>
                             {isMe && <span className={styles.pYou}>({t('common.you')})</span>}
                             {isPerfect && <Star size={12} color="#fbbf24" fill="#fbbf24" className={styles.perfectStar} />}
-                            {getTierBadgeConfigs(entry).map(badge => {
-                                const BadgeIcon = badge.icon;
-                                return <BadgeIcon key={badge.key} size={11} color={badge.color} fill={badge.fill} />;
-                            })}
-                            {showVerifiedShield && <Shield size={12} color="#10b981" />}
-                            {showSuspiciousShield && <ShieldAlert size={12} color="#f59e0b" />}
                         </div>
 
                         <div className={styles.pReps}>
                             {reps.toLocaleString()}<span className={styles.pRepsUnit}>{t('common.reps')}</span>
                         </div>
 
-                        <div className={`${styles.pedestal} ${pedCls} ${medal.cls}`}>{rank}</div>
+                        <div className={`${styles.pedestal} ${pedCls} ${medal.cls}`}>
+                            {rank}
+                            {getTierBadgeConfigs(entry).length > 0 && (
+                                <div className={styles.pTierBadges}>
+                                    {getTierBadgeConfigs(entry).map(badge => {
+                                        const BadgeIcon = badge.icon;
+                                        return (
+                                            <span key={badge.key} className={styles.pTierBadge} style={{ borderColor: badge.color }}>
+                                                <BadgeIcon size={10} color={badge.color} fill={badge.fill} />
+                                            </span>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 );
             })}
