@@ -108,6 +108,54 @@ describe('initForUser', () => {
     expect(s.hasShared).toBe(true);
     expect(s._achievementsLoaded).toBe(true);
   });
+
+  it('immediately clears achievements and resets to defaults when initialization starts', () => {
+    useProgressStore.setState({
+      isStoreInitialized: true,
+      _userId: 'uid1',
+      achievements: { first_share: true, white_hat: true, custom: true },
+      hasShared: true,
+      completions: { '2026-03-01': { pushups: { isCompleted: true } } }
+    });
+
+    const initPromise = useProgressStore.getState().initForUser(null);
+    const s = useProgressStore.getState();
+
+    // Verify synchronous cleanup
+    expect(s.isStoreInitialized).toBe(false);
+    expect(s._userId).toBe(null);
+    expect(s.achievements).toEqual({});
+    expect(s.hasShared).toBe(false);
+    expect(s.completions).toEqual({});
+
+    return initPromise; // keep vitest happy by waiting for completion
+  });
+
+  it('guards against race conditions by discarding late-resolving cloud achievements', async () => {
+    let resolveCloud;
+    const cloudPromise = new Promise((resolve) => {
+      resolveCloud = () => resolve({ first_share: true, my_badge: true });
+    });
+    cloudSync.loadAchievementsFromCloud.mockReturnValueOnce(cloudPromise);
+
+    // 1. Trigger initialization for user 1
+    const p1 = useProgressStore.getState().initForUser('uid1');
+    await flush(); // let loadFromStorage resolve
+
+    // 2. Trigger logout / initialization for guest before cloud load resolves
+    const p2 = useProgressStore.getState().initForUser(null);
+    await p2; // wait for guest storage load to complete
+
+    // 3. Resolve the user 1 cloud load
+    resolveCloud();
+    await p1; // let p1 finish
+
+    // 4. Verify user 1's achievements were discarded and not applied to guest
+    const s = useProgressStore.getState();
+    expect(s._userId).toBe(null);
+    expect(s.achievements.my_badge).toBeUndefined();
+    expect(s.achievements.first_share).toBe(false);
+  });
 });
 
 // ── Day helpers ─────────────────────────────────────────────────────────

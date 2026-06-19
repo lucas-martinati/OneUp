@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X } from '../../../utils/icons';
+import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X, Lock } from '../../../utils/icons';
 
 function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
   return (
@@ -85,7 +85,7 @@ import { useExercises } from '../../../contexts/ExercisesContext';
 import { THEMES as GLOBAL_THEMES } from '../../../config/themes';
 import { ThemeSwatch } from '../../../components/ui/ThemeSwatch';
 
-export function ShareOptions({ options, toggleOption, setOption, toggleCategory, clearBackgroundImage, originalImage, openCropModal, mode = 'session', isPro = false, sessionData }) {
+export function ShareOptions({ options, toggleOption, setOption, toggleCategory, clearBackgroundImage, originalImage, openCropModal, mode = 'session', isPro = false, sessionData, onOpenStore }) {
   const { t } = useTranslation();
   const isGlobal = mode === 'global';
   const { customCategories } = useExercises();
@@ -258,11 +258,17 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
         </>
       )}
 
-      {/* Theme selector (pro only) */}
-      {isPro && (
-        <>
-          <SectionLabel icon={Palette}>{t('share.theme')}</SectionLabel>
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+      {/* Theme selector */}
+      <>
+        <SectionLabel icon={Palette}>
+          {t('share.theme')} {!isPro && <Lock size={11} color="var(--accent)" style={{ marginLeft: '4px', verticalAlign: 'middle', opacity: 0.8 }} />}
+        </SectionLabel>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '12px' }}>
+          <div style={{
+            display: 'flex', gap: '6px', flexWrap: 'wrap',
+            opacity: isPro ? 1 : 0.6,
+            pointerEvents: isPro ? 'auto' : 'none'
+          }}>
             {GLOBAL_THEMES.map(theme => (
               <ThemeSwatch
                 key={theme.key}
@@ -273,8 +279,30 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
               />
             ))}
           </div>
-        </>
-      )}
+          {!isPro && (
+            <div
+              onClick={onOpenStore}
+              style={{
+                position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(0,0,0,0.1)', backdropFilter: 'blur(1.5px)',
+                cursor: 'pointer', zIndex: 2
+              }}
+            >
+              <div style={{
+                background: 'var(--surface-elevated)', color: 'var(--text-primary)',
+                padding: '6px 12px', borderRadius: '20px',
+                fontSize: '0.75rem', fontWeight: 'bold',
+                display: 'flex', alignItems: 'center', gap: '6px',
+                border: '1px solid var(--border-default)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+              }}>
+                <Lock size={12} color="var(--accent)" /> PRO
+              </div>
+            </div>
+          )}
+        </div>
+      </>
 
       {/* Background image (pro only) */}
       {isPro && (

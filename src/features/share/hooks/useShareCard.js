@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { captureElement, shareImage, downloadImage } from '../services/shareService';
 import { CATEGORIES } from '../../../config/categories';
 import { useTranslation } from 'react-i18next';
@@ -42,9 +42,10 @@ function loadSavedOptions() {
  * @param {Array} params.sessionHistory - last 10 sessions from sessionHistoryService
  * @param {string} params.mode - 'session' | 'global'
  * @param {Array} params.initialCategories - initial categories to select ['bodyweight', 'weights', 'custom']
+ * @param {boolean} params.isPro - whether the user has pro access
  * @returns {Object} { cardRef, options, setOption, toggleOption, exportCard, shareCard, isExporting, mode }
  */
-export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mode = 'session', initialCategories } = {}) {
+export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mode = 'session', initialCategories, isPro = false } = {}) {
   const { t } = useTranslation();
   const cardRef = useRef(null);
   
@@ -52,6 +53,10 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
   const getInitialOptions = () => {
     const saved = loadSavedOptions();
     saved.globalDate = new Date().toISOString().split('T')[0]; // Always reset date to today
+    if (!isPro) {
+      saved.theme = 'dark';
+      saved.backgroundImage = null;
+    }
     if (initialCategories && initialCategories.length > 0) {
       return { ...saved, statsCategories: initialCategories };
     }
@@ -69,6 +74,18 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
     delete safeOpts.backgroundImage;
     localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(safeOpts));
   }, []);
+
+  // Reset theme and background image if Pro is lost/inactive (e.g. user signs out)
+  useEffect(() => {
+    if (!isPro) {
+      setOptions(prev => {
+        if (prev.theme === 'dark' && prev.backgroundImage === null) return prev;
+        const next = { ...prev, theme: 'dark', backgroundImage: null };
+        saveOptionsToStorage(next);
+        return next;
+      });
+    }
+  }, [isPro, saveOptionsToStorage]);
 
   const openCropModal = useCallback((imgBase64) => {
     if (imgBase64) setOriginalImage(imgBase64);

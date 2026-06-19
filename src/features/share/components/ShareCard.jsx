@@ -193,7 +193,7 @@ THEMES.gold = {
  *   - 'session': current workout session data
  *   - 'global': global stats from Stats screen
  */
-export function ShareCard({ cardRef, sessionData, stats, sessionHistory, completions, getDayNumber, settings, options, mode = 'session' }) {
+export function ShareCard({ cardRef, sessionData, stats, sessionHistory, completions, getDayNumber, settings, options, mode = 'session', isPro = false }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const { getConfig } = useExerciseConfig();
@@ -209,7 +209,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
   }));
   const sessionType = sessionData?.type || CATEGORIES.BODYWEIGHT;
 
-  let activeThemeKey = options.theme || 'dark';
+  let activeThemeKey = (isPro && options.theme) || 'dark';
   let dailyExercises = [];
   let dailyStandardDone = false;
   let dailyWeightsDone = false;

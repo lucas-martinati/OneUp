@@ -91,6 +91,7 @@ export const useProgressStore = create((set, get) => ({
   _userId: null,
   _achievementsLoaded: false,
   _isSaving: false,
+  _initRequestId: null,
 
   // ── Initialisation ───────────────────────────────────────────────────
 
@@ -99,26 +100,44 @@ export const useProgressStore = create((set, get) => ({
    * Loads progress from localStorage and achievements from cloud.
    */
   initForUser: async (userId) => {
-    set({ isStoreInitialized: false });
+    const requestId = Symbol('init');
+    const defaults = getDefaultState();
+    set({
+      ...defaults,
+      hasShared: false,
+      lastCompletionChange: null,
+      _userId: userId,
+      _achievementsLoaded: false,
+      isStoreInitialized: false,
+      _initRequestId: requestId,
+    });
+
     const loaded = await loadFromStorage(userId);
+    if (get()._initRequestId !== requestId) return;
+
+    const finalAch = { ...(loaded.achievements || {}) };
+    if (!userId) {
+      finalAch.first_share = false;
+      finalAch.white_hat = false;
+    }
     set({
       startDate: loaded.startDate,
       userStartDate: loaded.userStartDate || loaded.startDate,
       completions: loaded.completions || {},
       isSetup: loaded.isSetup || false,
-      achievements: loaded.achievements || {},
+      achievements: finalAch,
       cardio: loaded.cardio || {},
-      hasShared: !!loaded.achievements?.first_share,
+      hasShared: !!finalAch.first_share,
       lastCompletionChange: loaded.lastCompletionChange || null,
-      _userId: userId,
-      _achievementsLoaded: false,
       isStoreInitialized: true,
     });
 
     // Load achievements from cloud (async, non-blocking)
     if (userId) {
       cloudSync.loadAchievementsFromCloud(userId).then(cloudAch => {
-        const finalAch = cloudAch || {};
+        if (get()._initRequestId !== requestId) return;
+
+        const finalAch = { ...(cloudAch || {}) };
         let changed = false;
 
         if (finalAch.first_share === undefined) { finalAch.first_share = false; changed = true; }
@@ -135,7 +154,9 @@ export const useProgressStore = create((set, get) => ({
         });
       }).catch(err => {
         logger.error('Failed to load achievements:', err);
-        set({ _achievementsLoaded: true });
+        if (get()._initRequestId === requestId) {
+          set({ _achievementsLoaded: true });
+        }
       });
     }
   },
@@ -152,6 +173,7 @@ export const useProgressStore = create((set, get) => ({
       _userId: null,
       _achievementsLoaded: false,
       isStoreInitialized: false,
+      _initRequestId: null,
     });
   },
 
