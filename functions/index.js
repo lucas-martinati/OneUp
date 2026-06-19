@@ -807,10 +807,10 @@ export const auditStaleData = onRequest(async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 // DESTRUCTIF — décommenter UNIQUEMENT pour supprimer, puis `npm run deploy:functions`,
 // lancer, et enfin recommenter + redéployer.
-// ══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 /*
 export const pruneStaleData = onRequest(async (req, res) => {
   try {
