@@ -37,6 +37,14 @@ vi.mock('../../../services/cloudSync', () => ({
     getUserClans: vi.fn(async () => []),
     loadAchievementsFromCloud: vi.fn(async () => null),
     saveAchievementsToCloud: vi.fn(async () => {}),
+    loadExerciseWeightsFromCloud: vi.fn(async () => null),
+    saveExerciseWeightsToCloud: vi.fn(async () => {}),
+    loadCustomExercisesFromCloud: vi.fn(async () => null),
+    saveCustomExercisesToCloud: vi.fn(async () => {}),
+    loadCustomCategoriesFromCloud: vi.fn(async () => null),
+    saveCustomCategoriesToCloud: vi.fn(async () => {}),
+    loadRoutinesFromCloud: vi.fn(async () => null),
+    saveRoutinesToCloud: vi.fn(async () => {}),
   },
 }));
 

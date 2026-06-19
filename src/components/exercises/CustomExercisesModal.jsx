@@ -4,7 +4,7 @@ import { X, Plus, Settings2, Trash2, Edit2, Star, Dumbbell, Activity, CUSTOM_EXE
 import { Button, IconButton } from '../ui';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { Z_INDEX } from '../../utils/zIndex';
-import { MAX_EXERCISES_PER_CATEGORY } from '../../hooks/useCustomExercises';
+import { MAX_EXERCISES_PER_CATEGORY } from '../../store/useExercisesStore';
 
 const PRESET_COLORS = [
   '#ef4444', '#f97316', '#f59e0b', '#10b981', 

@@ -5,7 +5,7 @@ import { IconButton } from '../ui';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { Z_INDEX } from '../../utils/zIndex';
 import { DynamicIcon } from '../../utils/icons';
-import { MAX_EXERCISES_PER_CATEGORY } from '../../hooks/useCustomExercises';
+import { MAX_EXERCISES_PER_CATEGORY } from '../../store/useExercisesStore';
 
 const PRESET_COLORS = [
   '#ef4444', '#f97316', '#f59e0b', '#10b981',

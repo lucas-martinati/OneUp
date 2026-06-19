@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useProgressStore } from '../../store/useProgressStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useCloudSyncStore } from '../../store/useCloudSyncStore';
+import { useExercisesStore } from '../../store/useExercisesStore';
 import { useCloudStartupSync } from '../../hooks/useCloudStartupSync';
 import { useProgressAutoSave } from '../../hooks/useProgressAutoSave';
 import { useCloudSettingsSync } from '../../hooks/useCloudSettingsSync';
@@ -29,6 +30,7 @@ export function AppOrchestrator({ computedStats }) {
   const completions = useProgressStore(s => s.completions);
   const initProgressForUser = useProgressStore(s => s.initForUser);
   const initSettingsForUser = useSettingsStore(s => s.initForUser);
+  const initExercisesForUser = useExercisesStore(s => s.initForUser);
   const settings = useSettingsStore(s => s.settings);
   const refreshUserClans = useCloudSyncStore(s => s.refreshUserClans);
 
@@ -37,11 +39,13 @@ export function AppOrchestrator({ computedStats }) {
     if (auth.user?.uid) {
       initSettingsForUser(auth.user.uid);
       initProgressForUser(auth.user.uid);
+      initExercisesForUser(auth.user.uid);
     } else if (!auth.loading) {
       initSettingsForUser(null);
       initProgressForUser(null);
+      initExercisesForUser(null);
     }
-  }, [auth.user?.uid, auth.loading, initSettingsForUser, initProgressForUser]);
+  }, [auth.user?.uid, auth.loading, initSettingsForUser, initProgressForUser, initExercisesForUser]);
 
   // ── Cloud synchronization ──────────────────────────────────────────
   useCloudStartupSync(auth);

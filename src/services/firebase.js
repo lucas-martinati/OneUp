@@ -42,4 +42,3 @@ export function initializeFirebase() {
 
 export function getAuthInstance() { return auth; }
 export function getDatabaseInstance() { return database; }
-export { serverTimestamp };
