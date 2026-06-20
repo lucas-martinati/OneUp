@@ -106,7 +106,7 @@ export function WorkoutSession(props) {
         moveItem, clearQueue,
         handleDragStart, handleDragOver, handleDragEnd,
         handleTouchStart, handleTouchMove, handleTouchEnd,
-        today, dayNumber, activeSlide, onClose,
+        today, dayNumber, activeSlide, onClose, isStarted,
     } = ws;
 
 
@@ -121,12 +121,9 @@ export function WorkoutSession(props) {
                 }}>
                     <h2 className="panel-title" style={{ 
                         margin: 0, 
-                        textAlign: 'left',
-                        background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
-                        WebkitBackgroundClip: 'text', backgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
+                        textAlign: 'left'
                     }}>
-                        {t('dashboard.session')}
+                        {isStarted ? t('dashboard.editSession') : t('dashboard.session')}
                     </h2>
                     <div style={{ display: 'flex', gap: '6px' }}>
                         {/* Load Routine button */}

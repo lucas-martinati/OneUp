@@ -491,6 +491,6 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         handleTouchStart, handleTouchMove, handleTouchEnd,
 
         // Context
-        today, dayNumber, activeSlide: sessionActiveSlide, onClose,
+        today, dayNumber, activeSlide: sessionActiveSlide, onClose, isStarted,
     };
 }

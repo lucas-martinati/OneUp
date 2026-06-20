@@ -33,7 +33,8 @@ const BOX_WIDTH = 64;
 const INNER = BOX_WIDTH - 2;
 
 function visualWidth(str) {
-  const clean = str.replace(/\x1b\[[0-9;]*m/g, '');
+  // eslint-disable-next-line no-control-regex
+  const clean = str.replace(/\u001b\[[0-9;]*m/g, '');
   let w = 0;
   for (const ch of clean) {
     const cp = ch.codePointAt(0);
