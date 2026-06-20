@@ -6,6 +6,10 @@ import { useWorkoutSession } from '@hooks/useWorkoutSession';
 // Mock react-i18next
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key) => key }),
+  initReactI18next: {
+    type: '3rdParty',
+    init: () => {},
+  }
 }));
 
 // Mock the useWorkoutSession hook

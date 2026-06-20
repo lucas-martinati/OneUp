@@ -25,7 +25,7 @@ vi.mock('../firebase', () => ({
 }));
 
 // Mock ../i18n
-vi.mock('../i18n', () => ({
+vi.mock('../../i18n', () => ({
   default: {
     t: vi.fn((key) => key),
   },
