@@ -33,6 +33,28 @@ export const test = base.extend({
 export { expect };
 
 /**
+ * Wait for the onboarding step card's entrance animation to finish.
+ *
+ * Each step is a `key={step}` element, so advancing a step REMOUNTS the card
+ * with a fresh `.flip-enter` (`flipIn` 0.6s rotateY). Clicking a control inside
+ * the card mid-flip is racy: the node is freshly mounted and transforming, which
+ * surfaces as "element is not stable" / "element was detached from the DOM".
+ * Playwright auto-waits for stability on a simple click, but selecting a mode
+ * card and then continuing chains two interactions on the same animating card,
+ * so we settle the animation explicitly first. Resolves immediately when no card
+ * is animating (e.g. reduced motion).
+ */
+export async function settleStepCard(page) {
+  await page
+    .waitForFunction(() => {
+      const card = document.querySelector('.flip-enter');
+      if (!card) return true;
+      return card.getAnimations().every(a => a.playState === 'finished');
+    }, { timeout: 5000 })
+    .catch(() => {});
+}
+
+/**
  * Drive the 3-step onboarding to completion (default "start now" mode) and
  * land on the dashboard. No-op if onboarding was already completed.
  *
@@ -45,11 +67,9 @@ export async function completeOnboarding(page) {
   if (!(await letsGo.isVisible().catch(() => false))) return;
 
   await letsGo.click();
-
-  // Each step card flips in (rotateY) for 0.6s — Playwright's click auto-waits
-  // for the element to be visible AND animation-stable, so click directly rather
-  // than asserting visibility on a mid-flip (zero-width) element.
+  await settleStepCard(page);
   await page.getByRole('button', { name: /^continue$|^continuer$/i }).click();
+  await settleStepCard(page);
   await page.getByRole('button', { name: /start challenge|lancer le défi/i }).click();
 
   // Dashboard is ready once the first exercise counter button is mounted.

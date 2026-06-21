@@ -1,4 +1,4 @@
-import { test, expect, gotoDashboard } from './helpers';
+import { test, expect, gotoDashboard, settleStepCard } from './helpers';
 
 // End-to-end coverage of the core user journey: onboarding (both modes),
 // completing an exercise, the counter controls, switching exercises and
@@ -19,10 +19,12 @@ test.describe('Onboarding', () => {
     await page.waitForLoadState('networkidle');
 
     await page.getByRole('button', { name: /let's go|c'est parti/i }).click();
+    await settleStepCard(page);
 
     // Step 2: pick the "I already started this year" mode, then continue.
     await page.getByRole('button', { name: /already started|déjà commencé/i }).click();
     await page.getByRole('button', { name: /^continue$|^continuer$/i }).click();
+    await settleStepCard(page);
 
     // Step 3: a date input + exercise pickers appear; pushups is preselected so
     // "Start Challenge" is enabled with the default (yesterday) date.

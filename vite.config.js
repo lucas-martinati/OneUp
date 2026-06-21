@@ -80,7 +80,32 @@ export default defineConfig({
       workbox: {
         cleanupOutdatedCaches: true,
         skipWaiting: true,
-        clientsClaim: true
+        clientsClaim: true,
+        // Heavy, feature-specific vendor chunks are loaded on demand (purchase
+        // flow, stats charts, maps, admin). Keeping them OUT of the precache
+        // manifest avoids eagerly downloading ~1 MB on a visitor's FIRST load
+        // for features many users never open. The runtimeCaching rule below
+        // still caches each chunk after its first real use, so offline keeps
+        // working once a feature has been visited.
+        globIgnores: [
+          '**/revenuecat-web-vendor-*.js',
+          '**/charts-vendor-*.js',
+          '**/map-vendor-*.js',
+          '**/AdminPanel-*.js'
+        ],
+        runtimeCaching: [
+          {
+            // Filenames are content-hashed (immutable) → CacheFirst is safe and
+            // avoids a revalidation round-trip on every load.
+            urlPattern: /\/assets\/(revenuecat-web-vendor|charts-vendor|map-vendor|AdminPanel)-[^/]+\.js$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'on-demand-vendors',
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 60 },
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          }
+        ]
       },
       devOptions: {
         enabled: false
@@ -121,6 +146,30 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
-    exclude: ['e2e/**', 'node_modules/**', 'firebase/functions/**', 'dist/**']
+    exclude: ['e2e/**', 'node_modules/**', 'firebase/functions/**', 'dist/**'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary', 'html'],
+      reportsDirectory: './coverage',
+      include: ['src/**/*.{js,jsx}'],
+      exclude: [
+        'src/**/*.{test,spec}.{js,jsx}',
+        'src/**/__tests__/**',
+        'src/main.jsx',
+        'src/i18n/**',
+        'src/**/*.module.css'
+      ],
+      // Measured across the WHOLE src tree (not just test-touched files), so the
+      // numbers reflect real coverage including untested UI (ExercisePanel,
+      // WorkoutSession, share flow…). Floor set just below today's baseline so it
+      // guards against regressions without blocking the suite. Raise as coverage
+      // grows — the gap to a 50–60 % target is the untested interactive panels.
+      thresholds: {
+        statements: 28,
+        branches: 22,
+        functions: 22,
+        lines: 28
+      }
+    }
   }
 })
