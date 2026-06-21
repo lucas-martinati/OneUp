@@ -203,10 +203,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         if (dayHasAfternoon) afternoonWorkouts++;
         if (dayHasEvening) eveningWorkouts++;
 
-        // Daily reps for line chart
-        if (dayReps > 0) {
-            dailyRepsData.push({ date: dateStr, reps: dayReps });
-        }
+        // Daily reps for line chart (computed at the end with a stable date range)
 
         // Best day
         if (dayReps > bestDayReps || (dayReps === bestDayReps && dayExCount > bestDayExCount)) {
@@ -394,6 +391,32 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     const champion = exerciseStats.length > 0
         ? exerciseStats.reduce((best, ex) => ex.totalReps > (best?.totalReps || 0) ? ex : best, exerciseStats[0])
         : null;
+
+    // Compute stable daily reps data for line chart
+    const globalCompletedDates = Object.keys(completions).filter(dateStr => {
+        const day = completions[dateStr];
+        return day && typeof day === 'object' && Object.values(day).some(exData => exData?.isCompleted);
+    }).sort();
+
+    globalCompletedDates.forEach(dateStr => {
+        const day = completions[dateStr] || {};
+        let dayReps = 0;
+        const dayNum = getDayNumber(dateStr);
+        for (const [exId, exData] of Object.entries(day)) {
+            if (!exData?.isCompleted) continue;
+            const ex = allExercises.find(e => e.id === exId);
+            if (ex) {
+                let reps = 0;
+                if (exId === 'running' || exId === 'cycling') {
+                    // Cardio reps are handled in useCardio.js, not counted in daily reps
+                } else {
+                    reps = getDailyGoal(ex, dayNum, getConfig ? getConfig(exId, dateStr).difficulty : 1.0);
+                }
+                dayReps += reps;
+            }
+        }
+        dailyRepsData.push({ date: dateStr, reps: dayReps });
+    });
 
     // Stats snapshot for badge testing
     const statsSnapshot = {

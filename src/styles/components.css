@@ -84,7 +84,7 @@ button:focus:not(:focus-visible) {
 
 /* --- Chart Components --- */
 .chart-card {
-    padding: var(--spacing-md);
+    padding: 12px 14px;
     border-radius: var(--radius-xl);
     display: flex;
     flex-direction: column;
@@ -141,6 +141,269 @@ button:focus:not(:focus-visible) {
     height: 200px;
     min-height: 200px;
 }
+
+/* --- Lightweight SVG charts (replaces recharts) --- */
+.svg-chart {
+    position: relative;
+    width: 100%;
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.svg-chart svg {
+    display: block;
+    overflow: visible;
+}
+
+/* One-shot entrance — drawing/reveal animations */
+.svg-chart-line {
+    clip-path: inset(0 0 0 0);
+    animation: svg-chart-reveal-line 0.85s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+@keyframes svg-chart-reveal-line {
+    from {
+        clip-path: inset(0 100% 0 0);
+    }
+    to {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+.svg-chart-area {
+    clip-path: inset(0 0 0 0);
+    animation: svg-chart-reveal-area 0.85s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+@keyframes svg-chart-reveal-area {
+    from {
+        clip-path: inset(0 100% 0 0);
+    }
+    to {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+.svg-radar-line {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 0;
+    animation: svg-radar-draw-line 0.7s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+@keyframes svg-radar-draw-line {
+    from {
+        stroke-dashoffset: 1000;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.svg-radar-area {
+    animation: svg-radar-fade-area 0.4s ease-out 0.7s both;
+}
+
+@keyframes svg-radar-fade-area {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.svg-chart-dot,
+.svg-radar-dot {
+    transform-origin: center;
+    transform-box: fill-box;
+    animation: svg-chart-dot-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes svg-chart-dot-pop {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .svg-chart-line {
+        clip-path: none;
+        animation: none;
+    }
+    .svg-chart-area {
+        clip-path: none;
+        animation: none;
+    }
+    .svg-radar-line {
+        stroke-dasharray: none;
+        stroke-dashoffset: 0;
+        animation: none;
+    }
+    .svg-radar-area {
+        opacity: 1;
+        animation: none;
+    }
+    .svg-chart-dot,
+    .svg-radar-dot {
+        transform: none;
+        animation: none;
+    }
+}
+
+.svg-chart-tooltip {
+    position: absolute;
+    top: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: var(--tooltip-bg);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    padding: 6px 8px;
+    min-width: 90px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.svg-chart-tooltip-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.svg-chart-tooltip-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    line-height: 1.5;
+}
+
+.svg-chart-tooltip-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.svg-chart-tooltip-name {
+    color: var(--text-secondary);
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.svg-chart-tooltip-val {
+    margin-left: auto;
+    font-weight: 800;
+    padding-left: 6px;
+    white-space: nowrap;
+}
+
+/* Donut */
+.svg-donut {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.svg-donut svg {
+    width: 100%;
+    max-width: 220px;
+    display: block;
+}
+
+.svg-donut-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 12px;
+    margin-top: 10px;
+}
+
+.svg-donut-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    padding: 2px 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: opacity 0.2s ease;
+}
+
+.svg-donut-legend-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+}
+
+/* Radar */
+.svg-radar {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.svg-radar svg {
+    width: 100%;
+    max-width: 380px;
+    display: block;
+}
+
+/* Premium entrance animation for SVGs */
+.svg-chart svg,
+.svg-donut svg,
+.svg-radar svg {
+    animation: svg-chart-fade-premium 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    transform-origin: center;
+}
+
+@keyframes svg-chart-fade-premium {
+    from {
+        opacity: 0;
+        transform: scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Premium smooth transitions for SVG chart updates */
+.svg-chart-line,
+.svg-chart-area {
+    transition: d 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.svg-chart circle {
+    transition: cx 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                cy 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                r 0.2s ease,
+                opacity 0.2s ease;
+}
+
+.svg-chart line,
+.svg-chart text {
+    transition: x1 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                x2 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                y1 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                y2 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                x 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                y 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.3s ease;
+}
+
 
 /* Premium Slider */
 .premium-slider {

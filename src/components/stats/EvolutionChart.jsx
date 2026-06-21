@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import LineChart from './charts/LineChart';
 import { DynamicIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 
@@ -67,6 +67,19 @@ export default function EvolutionChart({
         });
         return max;
     }, [chartData, selectedExIds, initialMax]);
+
+    const yRange = useMemo(() => yDomain(maxValue), [yDomain, maxValue]);
+
+    const selectedSeries = useMemo(() => selectedExIds
+        .map(id => {
+            const ex = exercises.find(e => e.id === id);
+            return ex ? { key: id, color: ex.color, name: getExerciseLabel(ex, t) } : null;
+        })
+        .filter(Boolean), [selectedExIds, exercises, t]);
+
+    let formatYTick = (v) => `${v}`;
+    if (yAxisExtra?.tickFormatter) formatYTick = yAxisExtra.tickFormatter;
+    else if (yAxisExtra?.unit) formatYTick = (v) => `${v}${yAxisExtra.unit}`;
 
     return (
         <div className="glass-premium chart-card" style={{ background: gradient }}>
@@ -142,60 +155,15 @@ export default function EvolutionChart({
                     </span>
                 </div>
             ) : (
-                <div className="chart-wrapper-overflow">
-                    <ResponsiveContainer width="100%" height={200} debounce={100}>
-                        <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                            <XAxis
-                                dataKey="label"
-                                tick={{ fill: 'var(--text-secondary)', fontSize: 9, fontWeight: 500 }}
-                                axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
-                                tickLine={false}
-                                interval="preserveStartEnd"
-                            />
-                            <YAxis
-                                domain={yDomain(maxValue)}
-                                tick={{ fill: 'var(--text-secondary)', fontSize: 10 }}
-                                axisLine={false}
-                                tickLine={false}
-                                width={38}
-                                {...yAxisExtra}
-                            />
-                            <Tooltip
-                                contentStyle={{
-                                    background: 'var(--tooltip-bg)',
-                                    border: '1px solid var(--border-default)',
-                                    borderRadius: '8px'
-                                }}
-                                labelStyle={{ color: 'var(--text-secondary)', fontWeight: 600, fontSize: '0.7rem' }}
-                                formatter={(value, name) => {
-                                    const ex = exercises.find(e => e.id === name);
-                                    const label = ex ? getExerciseLabel(ex, t) : name;
-                                    return [formatTooltip(value), label];
-                                }}
-                                labelFormatter={(label) => label}
-                            />
-                            {selectedExIds.map(id => {
-                                const ex = exercises.find(e => e.id === id);
-                                if (!ex) return null;
-                                return (
-                                    <Line
-                                        key={id}
-                                        type="monotone"
-                                        dataKey={id}
-                                        name={id}
-                                        stroke={ex.color}
-                                        strokeWidth={2.5}
-                                        dot={{ r: 4, fill: ex.color, stroke: '#fff', strokeWidth: 2 }}
-                                        activeDot={{ r: 6, fill: ex.color, stroke: '#fff', strokeWidth: 2 }}
-                                        animationDuration={800}
-                                        connectNulls
-                                    />
-                                );
-                            })}
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
+                <LineChart
+                    data={chartData}
+                    series={selectedSeries}
+                    yMin={yRange[0]}
+                    yMax={yRange[1]}
+                    formatValue={formatTooltip}
+                    formatYTick={formatYTick}
+                    dots={true}
+                />
             )}
         </div>
     );

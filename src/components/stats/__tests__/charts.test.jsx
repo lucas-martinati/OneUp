@@ -7,17 +7,6 @@ vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
-// Recharts relies on layout APIs jsdom lacks — replace it with light stand-ins.
-vi.mock('recharts', () => {
-  const Pass = ({ children }) => <div>{children}</div>;
-  const names = [
-    'CartesianGrid', 'Cell', 'Legend', 'Line', 'LineChart', 'Pie', 'PieChart',
-    'PolarAngleAxis', 'PolarGrid', 'PolarRadiusAxis', 'Radar', 'RadarChart',
-    'ResponsiveContainer', 'Tooltip', 'XAxis', 'YAxis',
-  ];
-  return Object.fromEntries(names.map(n => [n, Pass]));
-});
-
 import ConsistencyPieChart from '../ConsistencyPieChart';
 import DailyRepsChart from '../DailyRepsChart';
 import DifficultyEvolutionChart from '../DifficultyEvolutionChart';

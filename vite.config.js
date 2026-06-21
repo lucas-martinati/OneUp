@@ -58,7 +58,6 @@ export default defineConfig({
             if (id.includes('@revenuecat/purchases-js')) return 'revenuecat-web-vendor';
             if (id.includes('@revenuecat/purchases-capacitor')) return 'revenuecat-native-vendor';
             if (id.includes('@capacitor')) return 'capacitor-vendor';
-            if (id.includes('recharts') || id.includes('d3')) return 'charts-vendor';
             if (id.includes('lucide-react')) return 'ui-vendor';
             if (id.includes('leaflet')) return 'map-vendor';
             if (id.includes('react-easy-crop') || id.includes('tslib')) return 'crop-vendor';
