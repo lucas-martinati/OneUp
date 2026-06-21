@@ -81,6 +81,43 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         onClose();
     }, [onClose]);
 
+    // Touch gesture handlers for mobile swipe category switching
+    const touchStartRef = useRef({ x: 0, y: 0, time: 0 });
+
+    const handleTouchStart = useCallback((e) => {
+        const touch = e.touches[0];
+        touchStartRef.current = {
+            x: touch.clientX,
+            y: touch.clientY,
+            time: Date.now()
+        };
+    }, []);
+
+    const handleTouchEnd = useCallback((e) => {
+        const touch = e.changedTouches[0];
+        const start = touchStartRef.current;
+        const diffX = start.x - touch.clientX;
+        const diffY = start.y - touch.clientY;
+        const duration = Date.now() - start.time;
+
+        // Swipe horizontal threshold: 60px, vertical deviation < horizontal * 0.6, duration < 300ms
+        if (Math.abs(diffX) > 60 && Math.abs(diffY) < Math.abs(diffX) * 0.6 && duration < 300) {
+            const tabs = ['overview', 'charts', 'details'];
+            const currentIndex = tabs.indexOf(activeTab);
+            if (diffX > 0) {
+                // Swipe left -> Next tab
+                if (currentIndex < tabs.length - 1) {
+                    setActiveTab(tabs[currentIndex + 1]);
+                }
+            } else {
+                // Swipe right -> Previous tab
+                if (currentIndex > 0) {
+                    setActiveTab(tabs[currentIndex - 1]);
+                }
+            }
+        }
+    }, [activeTab]);
+
     // Handle back button
     useBackHandler(() => {
         if (selectedSession) {
@@ -184,7 +221,10 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
     return (
         <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.MODAL }}>
-            <div className="modal-content">
+            <div className="modal-content"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+            >
                 {/* ── Header ──────────────────────────────────────────────── */}
                 <div style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',

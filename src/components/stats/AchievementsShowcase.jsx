@@ -98,7 +98,6 @@ export function AchievementsShowcase({ stats, onOpen }) {
             <button
                 type="button"
                 onClick={() => onOpen()}
-                className="hover-lift"
                 style={{
                     width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer',
                     display: 'flex', alignItems: 'center', gap: '12px', textAlign: 'left',
@@ -136,11 +135,16 @@ export function AchievementsShowcase({ stats, onOpen }) {
             </div>
 
             {/* Badge shelf */}
-            <div className="no-scrollbar" style={{
-                display: 'flex', gap: '6px', overflowX: 'auto',
-                marginTop: '14px', paddingBottom: '2px',
-                scrollSnapType: 'x proximity',
-            }}>
+            <div className="no-scrollbar"
+                onTouchStart={e => e.stopPropagation()}
+                onTouchMove={e => e.stopPropagation()}
+                onTouchEnd={e => e.stopPropagation()}
+                style={{
+                    display: 'flex', gap: '6px', overflowX: 'auto',
+                    marginTop: '14px', paddingBottom: '2px',
+                    scrollSnapType: 'x proximity',
+                }}
+            >
                 {ordered.map(badge => (
                     <Medallion key={badge.id} badge={badge} onSelect={onOpen} t={t} />
                 ))}
