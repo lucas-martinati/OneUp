@@ -129,19 +129,6 @@ button:focus:not(:focus-visible) {
     max-width: 240px;
 }
 
-.chart-wrapper {
-    width: 100%;
-    height: 200px;
-    min-height: 200px;
-}
-
-.chart-wrapper-overflow {
-    width: calc(100% + 16px);
-    margin-left: -16px;
-    height: 200px;
-    min-height: 200px;
-}
-
 /* --- Lightweight SVG charts (replaces recharts) --- */
 .svg-chart {
     position: relative;
