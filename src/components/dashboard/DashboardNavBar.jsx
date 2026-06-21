@@ -4,7 +4,7 @@ import { Calendar as CalendarIcon, Play, PieChart, Users, SettingsIcon } from '@
 import { useUIStore } from '@store/useUIStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
 
-import styles from './DashboardNavBar.module.css';
+import styles from '@styles/DashboardNavBar.module.css';
 
 /**
  * Bottom navigation bar of the dashboard — all primary destinations in

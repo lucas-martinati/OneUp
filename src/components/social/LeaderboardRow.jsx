@@ -3,7 +3,7 @@ import { ChevronRight, Shield, ShieldAlert, HeartHandshake, Check, Star } from '
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '@components/ui/Avatar';
 import { getTierBadgeConfigs } from '@utils/entitlements';
-import styles from './Leaderboard.module.css';
+import styles from '@styles/Leaderboard.module.css';
 
 export function LeaderboardRow({
     entry,

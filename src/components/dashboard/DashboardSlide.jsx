@@ -9,7 +9,7 @@ import { getExerciseLabel } from '@utils/exerciseLabel';
 
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { StreakFlame, WeightBadge } from '@components/ui';
-import styles from './DashboardSlide.module.css';
+import styles from '@styles/DashboardSlide.module.css';
 
 export const DashboardSlide = React.memo(({
     isFuture, effectiveStart, dayNumber, today, getExerciseCount, completions, computedStats,
@@ -304,12 +304,12 @@ export const DashboardSlide = React.memo(({
                                 : null;
                             const showDoneText = isExerciseDone && !!timeStr;
                             return (
-                                <div 
-                                    className={showDoneText ? "scale-in" : ""} 
+                                <div
+                                    className={showDoneText ? "scale-in" : ""}
                                     style={{
-                                        color: 'var(--text-secondary)', 
+                                        color: 'var(--text-secondary)',
                                         fontWeight: '500',
-                                        marginTop: 'var(--done-text-margin, clamp(4px, 0.8vh, 6px))', 
+                                        marginTop: 'var(--done-text-margin, clamp(4px, 0.8vh, 6px))',
                                         opacity: showDoneText ? 0.75 : 0,
                                         visibility: showDoneText ? 'visible' : 'hidden',
                                         fontSize: 'var(--done-text-size, clamp(0.65rem, 2.5vw, 0.85rem))',

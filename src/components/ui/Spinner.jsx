@@ -1,4 +1,4 @@
-import styles from './Spinner.module.css';
+import styles from '@styles/Spinner.module.css';
 
 /**
  * Centralized loading indicator: a spinning ring with optional adaptable text.

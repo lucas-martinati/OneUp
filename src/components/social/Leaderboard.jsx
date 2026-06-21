@@ -9,7 +9,7 @@ import { ClanInviteCard } from './ClanInviteCard';
 import { LeaderboardTabs } from './LeaderboardTabs';
 import { LeaderboardRow } from './LeaderboardRow';
 import { LeaderboardPodium } from './LeaderboardPodium';
-import styles from './Leaderboard.module.css';
+import styles from '@styles/Leaderboard.module.css';
 import { Z_INDEX } from '@utils/zIndex';
 import { UserDetail } from './UserDetail';
 import { getIcon } from '@utils/icons';
@@ -37,16 +37,16 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     const [domain, setDomain] = useState(activeSlide === 2 ? 'weights' : 'bodyweight');
 
     const VISIBLE_TABS = useMemo(() => {
-        const combinedTab = { 
-            id: 'global_combined', 
-            labelKey: 'common.global', 
-            color: '#ec4899', 
+        const combinedTab = {
+            id: 'global_combined',
+            labelKey: 'common.global',
+            color: '#ec4899',
             icon: Activity,
             isSpecial: true,
             isGlobal: true
         };
 
-        if (domain === 'weights') { 
+        if (domain === 'weights') {
             return [
                 combinedTab,
                 { id: 'weights', customLabel: `${t('common.global')} ${t('common.weights')}`, color: '#8b5cf6', icon: getIcon('Dumbbell'), isGlobal: true },
@@ -66,7 +66,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     const [selectedUser, setSelectedUser] = useState(null);
     const [nudgedMember, setNudgedMember] = useState(null);
     const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
-    
+
     // Community context state
     const [communityContext, setCommunityContext] = useState(initialClanData ? initialClanData.id : 'global'); // 'global' | 'manage' | clanId
 
@@ -180,8 +180,8 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     const restEntries = sorted.slice(podiumCount);
 
     return (
-        <div 
-            className="fade-in modal-overlay" 
+        <div
+            className="fade-in modal-overlay"
             {...swipeHandlers}
             style={{ zIndex: Z_INDEX.MODAL }}
         >
@@ -230,7 +230,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                     {clanData && <ClanInviteCard clanData={clanData} />}
 
             {/* Domain filter - stays fixed */}
-            <LeaderboardTabs 
+            <LeaderboardTabs
                 domain={domain}
                 setDomain={setDomain}
                 activeTab={activeTab}
@@ -353,14 +353,14 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                                 background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white',
                                 fontWeight: '600', cursor: 'pointer', minHeight: 'var(--touch-min)'
                             }}>{t('common.cancel')}</button>
-                            <button onClick={async () => { 
-                                setShowLeaveConfirm(false); 
+                            <button onClick={async () => {
+                                setShowLeaveConfirm(false);
                                 const res = await cloudSync.leaveClan(clanData.id);
                                 if (res.success) {
                                     await refreshUserClans();
                                     setCommunityContext('global');
                                 }
-                                if (onLeaveClan) onLeaveClan(); 
+                                if (onLeaveClan) onLeaveClan();
                             }} className="hover-lift" style={{
                                 flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
                                 background: '#ef4444', border: 'none', color: 'white',

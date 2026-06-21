@@ -8,7 +8,7 @@ import { updateSessionName } from '@features/share/services/sessionHistoryServic
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { SharePanel } from '@features/share/components/SharePanel';
-import styles from './SessionSummary.module.css';
+import styles from '@styles/SessionSummary.module.css';
 
 function formatDuration(seconds) {
     if (!seconds || seconds <= 0) return '0:00';

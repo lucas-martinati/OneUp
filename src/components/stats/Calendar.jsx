@@ -10,7 +10,7 @@ import { getExerciseLabel } from '@utils/exerciseLabel';
 import { isPerfectDay, calculateRepsForDay, isCaughtUpDay } from '@utils/statUtils';
 import { getCurrentWeekNumber } from '@utils/dateUtils';
 import { DifficultyBadge } from '@components/ui/DifficultyBadge';
-import styles from './Calendar.module.css';
+import styles from '@styles/Calendar.module.css';
 
 export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, getConfig }) {
     const { t } = useTranslation();

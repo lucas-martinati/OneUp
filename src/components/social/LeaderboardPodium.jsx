@@ -2,7 +2,7 @@ import React from 'react';
 import { Crown, Star, HeartHandshake, Check, Shield, ShieldAlert } from '@utils/icons';
 import { Avatar } from '@components/ui/Avatar';
 import { getTierBadgeConfigs } from '@utils/entitlements';
-import styles from './Leaderboard.module.css';
+import styles from '@styles/Leaderboard.module.css';
 
 const MEDALS = {
     1: { cls: styles.gold, border: '#ffd700' },

@@ -6,7 +6,7 @@ import { WEIGHT_EXERCISES } from '@config/weights';
 import { useExercises } from '@contexts/ExercisesContext';
 import { Z_INDEX } from '@utils/zIndex';
 import { loadWorkoutSession } from '@utils/workoutSessionStorage';
-import styles from './SessionBubble.module.css';
+import styles from '@styles/SessionBubble.module.css';
 
 const MAX_TRAIL_SPHERES = 6;
 const LONG_PRESS_DURATION = 500;

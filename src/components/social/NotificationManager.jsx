@@ -6,7 +6,7 @@ import { cloudSync } from '@services/cloudSync';
 import { Avatar } from '@components/ui/Avatar';
 import { useToastGestures } from '@hooks/useToastGestures';
 import { getToastRoot } from '../feedback/toastRoot';
-import styles from './NotificationManager.module.css';
+import styles from '@styles/NotificationManager.module.css';
 
 /**
  * A single poke toast — one per sender. The auto-dismiss timer + swipe gesture

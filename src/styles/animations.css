@@ -48,11 +48,11 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    90deg, 
-    transparent, 
-    rgba(255, 215, 0, 0.03), 
-    rgba(255, 215, 0, 0.05), 
-    rgba(255, 215, 0, 0.03), 
+    90deg,
+    transparent,
+    rgba(255, 215, 0, 0.03),
+    rgba(255, 215, 0, 0.05),
+    rgba(255, 215, 0, 0.03),
     transparent
   );
   background-size: 200% 100%;
@@ -369,7 +369,6 @@
 
 /* Exercise selector done effects */
 @keyframes doneGlow {
-
   0%,
   100% {
     box-shadow: 0 0 6px var(--done-color, rgba(16, 185, 129, 0.3)), inset 0 0 8px var(--done-color-dim, rgba(16, 185, 129, 0.06));
@@ -381,7 +380,6 @@
 }
 
 @keyframes donePulse {
-
   0%,
   100% {
     opacity: 0.5;

@@ -6,11 +6,11 @@
  * Order matters: tokens first (custom properties), overrides (perf/responsive)
  * after the rules they override. Keep this sequence when adding modules.
  */
-@import './styles/tokens.css';        /* :root design tokens + theme variants            */
-@import './styles/base.css';          /* reset, scrollbars, html/body/#root, button base  */
-@import './styles/utilities.css';     /* glass, layout & spacing utility classes          */
-@import './styles/animations.css';    /* @keyframes + animation helper classes            */
-@import './styles/responsive.css';    /* exercise grid, low-perf mode, breakpoints, a11y  */
-@import './styles/components.css';    /* modals, sheets, charts, slider, category-nav…    */
-@import './styles/panels.css';        /* delete modal, cloud-sync, conflict overlay       */
-@import './styles/features.css';      /* toggle, announcement, cardio, camera, calibration */
+@import '@styles/tokens.css';        /* :root design tokens + theme variants            */
+@import '@styles/base.css';          /* reset, scrollbars, html/body/#root, button base  */
+@import '@styles/utilities.css';     /* glass, layout & spacing utility classes          */
+@import '@styles/animations.css';    /* @keyframes + animation helper classes            */
+@import '@styles/responsive.css';    /* exercise grid, low-perf mode, breakpoints, a11y  */
+@import '@styles/components.css';    /* modals, sheets, charts, slider, category-nav…    */
+@import '@styles/panels.css';        /* delete modal, cloud-sync, conflict overlay       */
+@import '@styles/features.css';      /* toggle, announcement, cardio, camera, calibration */
