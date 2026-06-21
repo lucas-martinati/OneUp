@@ -7,7 +7,8 @@ import { createLogger } from '@utils/logger';
 const logger = createLogger('Strava');
 
 const STRAVA_CLIENT_ID = import.meta.env.VITE_STRAVA_CLIENT_ID || '';
-const STRAVA_CLIENT_SECRET = import.meta.env.VITE_STRAVA_CLIENT_SECRET || '';
+const FUNCTIONS_BASE_URL = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL
+  || `https://us-central1-${import.meta.env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net`;
 
 function decodePolyline(encoded) {
   if (!encoded) return null;
@@ -112,15 +113,10 @@ class StravaService {
 
   async exchangeToken(code) {
     try {
-      const response = await fetch('https://www.strava.com/oauth/token', {
+      const response = await fetch(`${FUNCTIONS_BASE_URL}/stravaExchangeToken`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          client_id: STRAVA_CLIENT_ID,
-          client_secret: STRAVA_CLIENT_SECRET,
-          code,
-          grant_type: 'authorization_code',
-        }),
+        body: JSON.stringify({ code }),
       });
 
       const data = await response.json();
@@ -138,15 +134,10 @@ class StravaService {
   async refreshToken() {
     if (!this.token?.refresh_token) return false;
     try {
-      const response = await fetch('https://www.strava.com/oauth/token', {
+      const response = await fetch(`${FUNCTIONS_BASE_URL}/stravaRefreshToken`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          client_id: STRAVA_CLIENT_ID,
-          client_secret: STRAVA_CLIENT_SECRET,
-          refresh_token: this.token.refresh_token,
-          grant_type: 'refresh_token',
-        }),
+        body: JSON.stringify({ refresh_token: this.token.refresh_token }),
       });
 
       const data = await response.json();

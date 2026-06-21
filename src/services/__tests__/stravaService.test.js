@@ -72,6 +72,11 @@ describe('exchangeToken', () => {
     expect(stravaService.token.access_token).toBe('x');
     expect(prefStore.strava_token).toContain('x');
     expect(spy).toHaveBeenCalled();
+    // Verify the call goes to Cloud Functions, not Strava directly
+    expect(globalThis.fetch.mock.calls[0][0]).toContain('/stravaExchangeToken');
+    const body = JSON.parse(globalThis.fetch.mock.calls[0][1].body);
+    expect(body).toEqual({ code: 'code123' });
+    expect(body).not.toHaveProperty('client_secret');
     window.removeEventListener('strava-connected', spy);
   });
 
@@ -99,6 +104,11 @@ describe('refreshToken', () => {
     expect(await stravaService.refreshToken()).toBe(true);
     expect(stravaService.token.access_token).toBe('fresh');
     expect(stravaService.token.refresh_token).toBe('r');
+    // Verify the call goes to Cloud Functions, not Strava directly
+    expect(globalThis.fetch.mock.calls[0][0]).toContain('/stravaRefreshToken');
+    const body = JSON.parse(globalThis.fetch.mock.calls[0][1].body);
+    expect(body).toEqual({ refresh_token: 'r' });
+    expect(body).not.toHaveProperty('client_secret');
   });
 
   it('returns false on a failed refresh response', async () => {

@@ -27,6 +27,13 @@ vi.mock('../userDataService', () => ({
   loadSettingsFromCloud: vi.fn(() => Promise.resolve({ s: 1 })),
   listenToSettingsFromCloud: vi.fn(() => unsubMarker),
   loadPurchase: vi.fn(() => Promise.resolve(null)),
+  loadRoutinesFromCloud: vi.fn(() => Promise.resolve(['r'])),
+  loadCustomExercisesFromCloud: vi.fn(() => Promise.resolve(['ce'])),
+  saveProgramCompletionsToCloud: vi.fn(() => Promise.resolve(true)),
+  loadProgramCompletionsFromCloud: vi.fn(() => Promise.resolve({ pc: 1 })),
+  saveExerciseWeightsToCloud: vi.fn(() => Promise.resolve(true)),
+  loadExerciseWeightsFromCloud: vi.fn(() => Promise.resolve({ bench: 60 })),
+  loadCustomCategoriesFromCloud: vi.fn(() => Promise.resolve(['cc'])),
 }));
 vi.mock('../weightHistoryService', () => ({
   saveWeightHistoryToCloud: vi.fn(() => Promise.resolve(true)),
@@ -41,6 +48,7 @@ vi.mock('../clanService', () => ({
   joinClan: vi.fn(() => Promise.resolve()),
   leaveClan: vi.fn(() => Promise.resolve()),
   getUserClans: vi.fn(() => Promise.resolve([{ id: 'c' }])),
+  getClanDetails: vi.fn(() => Promise.resolve({ id: 'c', members: [] })),
   sendPoke: vi.fn(() => Promise.resolve()),
   listenToNotifications: vi.fn(() => unsubMarker),
   deleteNotification: vi.fn(() => Promise.resolve()),
@@ -165,8 +173,31 @@ describe('data + clan proxies', () => {
     ['saveCardioSessionsToCloud', true],
     ['createClan', { id: 'c' }],
     ['getUserClans', [{ id: 'c' }]],
+    ['leaveClan', undefined],
+    ['joinClan', undefined],
+    ['getClanDetails', { id: 'c', members: [] }],
+    ['sendPoke', undefined],
+    ['deleteNotification', undefined],
+    ['loadRoutinesFromCloud', ['r']],
+    ['loadCustomExercisesFromCloud', ['ce']],
+    ['saveProgramCompletionsToCloud', true],
+    ['loadProgramCompletionsFromCloud', { pc: 1 }],
+    ['saveExerciseWeightsToCloud', true],
+    ['loadExerciseWeightsFromCloud', { bench: 60 }],
+    ['loadCustomCategoriesFromCloud', ['cc']],
   ])('%s resolves through the delegated service', async (method, expected) => {
     await expect(cloudSync[method]('arg')).resolves.toEqual(expected);
+  });
+});
+
+describe('listenToNotifications wrapper', () => {
+  it('subscribes after init and tears down on unsubscribe', async () => {
+    const unsub = cloudSync.listenToNotifications(vi.fn());
+    expect(typeof unsub).toBe('function');
+    await cloudSync.ensureInitialized();
+    await Promise.resolve();
+    unsub();
+    expect(unsubMarker).toHaveBeenCalled();
   });
 });
 

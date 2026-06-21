@@ -2,6 +2,7 @@ import { onRequest } from "firebase-functions/v2/https";
 import { onValueWritten } from "firebase-functions/v2/database";
 import functionsV1 from "firebase-functions/v1";
 import admin from "firebase-admin";
+import crypto from "crypto";
 import { BADGE_RULES, isBadgeUnlocked } from "./shared/badgeRules.js";
 import { DB_SCHEMA, LEAF, paths } from "./shared/dbSchema.js";
 
@@ -716,14 +717,13 @@ export const backfillUserProfiles = onRequest(async (req, res) => {
 // ══════════════════════════════════════════════════════════════════════════════
 // Stale-data tooling — driven by functions/shared/dbSchema.js
 //
-// `auditStaleData` (ACTIVE) is READ-ONLY: it reports every key not declared in
-// DB_SCHEMA but never deletes anything — safe to leave deployed and run anytime.
-// `pruneStaleData` (COMMENTED) is DESTRUCTIVE: uncomment it (+ deploy) only when
-// you actually want to delete, run it, then re-comment and redeploy.
+// `auditStaleData` and `pruneStaleData` are COMMENTED OUT by default to prevent
+// DoS attacks and Firebase billing abuse (they perform full database reads).
+// Uncomment them (+ deploy) ONLY when you need to run an audit or prune,
+// run them via curl, then re-comment and redeploy.
 //
 // Both share the helpers below. Output is colored for the terminal (curl renders
-// the ANSI escapes). NB: these endpoints are unauthenticated — the audit only
-// exposes path/key names, no user content.
+// the ANSI escapes).
 // ══════════════════════════════════════════════════════════════════════════════
 
 // Walks a DB subtree against its schema and collects the paths of every key that
@@ -795,7 +795,13 @@ function formatStaleReport(deleted, stalePaths, byKey) {
   return L.join('\n');
 }
 
-// READ-ONLY audit: reports stale data, never deletes. Safe to leave deployed.
+// ══════════════════════════════════════════════════════════════════════
+// UTILITAIRES D'AUDIT ET PURGE (DÉCOMMENTER UNIQUEMENT POUR UTILISATION)
+// Ne laissez pas ces fonctions déployées en permanence pour éviter les 
+// abus (lecture intégrale de la DB = risque d'explosion de la facture).
+// ══════════════════════════════════════════════════════════════════════
+/*
+// READ-ONLY audit: reports stale data, never deletes.
 export const auditStaleData = onRequest(async (req, res) => {
   try {
     const { stalePaths, byKey } = await scanStaleData();
@@ -807,11 +813,7 @@ export const auditStaleData = onRequest(async (req, res) => {
   }
 });
 
-// ═══════════════════════════════════════
-// DESTRUCTIF — décommenter UNIQUEMENT pour supprimer, puis `npm run deploy:functions`,
-// lancer, et enfin recommenter + redéployer.
-// ═══════════════════════════════════════
-/*
+// DESTRUCTIF — supprime les données obsolètes.
 export const pruneStaleData = onRequest(async (req, res) => {
   try {
     const { stalePaths } = await scanStaleData();
@@ -864,7 +866,10 @@ export const onRevenueCatWebhook = onRequest({ secrets: ["REVENUECAT_WEBHOOK_SEC
   // Simple signature verification: compare the Authorization header
   // Format: "RevenueCat <secret>" or raw secret depending on setup
   const authValue = signature?.replace(/^RevenueCat\s+/i, '') || '';
-  if (authValue !== expectedSecret) {
+  const authBuffer = Buffer.from(authValue);
+  const secretBuffer = Buffer.from(expectedSecret);
+  
+  if (authBuffer.length !== secretBuffer.length || !crypto.timingSafeEqual(authBuffer, secretBuffer)) {
     console.log(`[RevenueCat Webhook] Invalid signature rejected. Expected secret present: ${!!expectedSecret}`);
     res.status(401).send("Unauthorized: Invalid signature");
     return;
@@ -967,5 +972,115 @@ export const onRevenueCatWebhook = onRequest({ secrets: ["REVENUECAT_WEBHOOK_SEC
   } catch (error) {
     console.error("Critical Webhook Error:", error);
     res.status(500).send("Internal Server Error");
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Strava OAuth Token Proxy
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// The client sends ONLY the authorization code (or refresh_token). The secret
+// never leaves the server. Both functions read STRAVA_CLIENT_ID and
+// STRAVA_CLIENT_SECRET from Firebase Cloud Secret Manager (set via
+// `firebase functions:secrets:set STRAVA_CLIENT_SECRET`).
+// ══════════════════════════════════════════════════════════════════════════════
+
+const STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token";
+
+const STRAVA_SECRETS_CONFIG = {
+  secrets: ["STRAVA_CLIENT_ID", "STRAVA_CLIENT_SECRET"],
+  cors: [
+    "https://lucas-martinati.github.io",
+    /^http:\/\/localhost(:\d+)?$/,
+  ],
+};
+
+/**
+ * stravaExchangeToken
+ * Exchanges an OAuth authorization code for tokens.
+ * Client sends: { code: string }
+ * Returns:      The full Strava token response (access_token, refresh_token, expires_at, athlete, …)
+ */
+export const stravaExchangeToken = onRequest(STRAVA_SECRETS_CONFIG, async (req, res) => {
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  const { code } = req.body || {};
+  if (!code || typeof code !== "string") {
+    res.status(400).json({ error: "Missing or invalid 'code' parameter" });
+    return;
+  }
+
+  try {
+    const response = await fetch(STRAVA_TOKEN_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        client_id: process.env.STRAVA_CLIENT_ID,
+        client_secret: process.env.STRAVA_CLIENT_SECRET,
+        code,
+        grant_type: "authorization_code",
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("[Strava] Token exchange failed:", data);
+      res.status(response.status).json(data);
+      return;
+    }
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("[Strava] Token exchange error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/**
+ * stravaRefreshToken
+ * Refreshes an expired access token.
+ * Client sends: { refresh_token: string }
+ * Returns:      The refreshed Strava token response (access_token, refresh_token, expires_at, …)
+ */
+export const stravaRefreshToken = onRequest(STRAVA_SECRETS_CONFIG, async (req, res) => {
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  const { refresh_token } = req.body || {};
+  if (!refresh_token || typeof refresh_token !== "string") {
+    res.status(400).json({ error: "Missing or invalid 'refresh_token' parameter" });
+    return;
+  }
+
+  try {
+    const response = await fetch(STRAVA_TOKEN_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        client_id: process.env.STRAVA_CLIENT_ID,
+        client_secret: process.env.STRAVA_CLIENT_SECRET,
+        refresh_token,
+        grant_type: "refresh_token",
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("[Strava] Token refresh failed:", data);
+      res.status(response.status).json(data);
+      return;
+    }
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("[Strava] Token refresh error:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
