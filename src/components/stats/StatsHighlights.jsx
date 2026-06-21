@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Trophy, Crown, DynamicIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
-import { AnimatedNumber } from '../ui/AnimatedNumber';
+import { AnimatedNumber } from '@components/ui/AnimatedNumber';
 
 const intFormat = (v) => v.toLocaleString();
 

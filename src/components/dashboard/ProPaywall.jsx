@@ -1,7 +1,7 @@
 import React from 'react';
 import { Lock, ShoppingBag } from '@utils/icons';
 import { useTranslation } from 'react-i18next';
-import { Stack, Button } from '../ui';
+import { Stack, Button } from '@components/ui';
 
 export const ProPaywall = ({ title, onOpenStore }) => {
     const { t } = useTranslation();

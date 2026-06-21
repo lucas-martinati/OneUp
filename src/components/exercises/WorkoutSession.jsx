@@ -1,5 +1,5 @@
 import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle, ChevronUp, ChevronDown, DynamicIcon } from '@utils/icons';
-import { IconButton } from '../ui';
+import { IconButton } from '@components/ui';
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { Z_INDEX } from '@utils/zIndex';
 import { SessionSummary } from './SessionSummary';

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Sparkles, Heart, Save, Calendar, Loader2, Crown, Copy, Check, Activity, Award, Clock, Dumbbell, RotateCcw, Trash2, AlertTriangle, Trophy, Bell, Volume2, Palette } from '@utils/icons';
-import { ToggleSwitch } from '../ui/ToggleSwitch';
-import { SettingRow } from '../ui/SettingRow';
-import { ThemeSwatch } from '../ui';
+import { ToggleSwitch } from '@components/ui/ToggleSwitch';
+import { SettingRow } from '@components/ui/SettingRow';
+import { ThemeSwatch } from '@components/ui';
 import { THEMES } from '@config/themes';
 
 const sectionTitleStyle = {

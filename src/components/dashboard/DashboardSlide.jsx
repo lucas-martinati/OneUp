@@ -8,7 +8,7 @@ import { isPerfectDay } from '@utils/statUtils';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
-import { StreakFlame, WeightBadge } from '../ui';
+import { StreakFlame, WeightBadge } from '@components/ui';
 import styles from './DashboardSlide.module.css';
 
 export const DashboardSlide = React.memo(({

@@ -29,7 +29,7 @@ const authHolder = vi.hoisted(() => ({
   value: { isSignedIn: true, authConfirmed: true, user: { uid: 'u1' } },
 }));
 
-vi.mock('../AuthContext', () => ({ useAuth: () => authHolder.value }));
+vi.mock('@contexts/AuthContext', () => ({ useAuth: () => authHolder.value }));
 
 vi.mock('@services/purchaseService', () => ({
   initPurchases: mocks.initPurchases,
@@ -47,7 +47,7 @@ vi.mock('@services/cloudSync', () => ({
 
 // entitlements.js (localStorage) is intentionally NOT mocked — the anti-cheat
 // test relies on the real cache.
-import { SubscriptionProvider, useSubscription } from '../SubscriptionContext';
+import { SubscriptionProvider, useSubscription } from '@contexts/SubscriptionContext';
 
 // ── Test harness ─────────────────────────────────────────────────────────
 // `result.current` always reflects the latest context value across rerenders.

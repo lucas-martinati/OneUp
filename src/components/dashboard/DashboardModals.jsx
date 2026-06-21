@@ -12,16 +12,16 @@ import { useSubscription } from '@contexts/SubscriptionContext';
 import { useExercises } from '@contexts/ExercisesContext';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 
-const Calendar = lazy(() => import('../stats/Calendar').then(m => ({ default: m.Calendar })));
-const Stats = lazy(() => import('../stats/Stats').then(m => ({ default: m.Stats })));
-const Settings = lazy(() => import('../settings/Settings').then(m => ({ default: m.Settings })));
-const ExercisePanel = lazy(() => import('../exercises/ExercisePanel').then(m => ({ default: m.ExercisePanel })));
-const Leaderboard = lazy(() => import('../social/Leaderboard').then(m => ({ default: m.Leaderboard })));
-const Achievements = lazy(() => import('../feedback/Achievements').then(m => ({ default: m.Achievements })));
-const WorkoutSession = lazy(() => import('../exercises/WorkoutSession').then(m => ({ default: m.WorkoutSession })));
-const CustomExercisesModal = lazy(() => import('../exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
-const CategoryManagerModal = lazy(() => import('../exercises/CategoryManagerModal').then(m => ({ default: m.CategoryManagerModal })));
-const AdminPanel = lazy(() => import('../admin/AdminPanel').then(m => ({ default: m.AdminPanel })));
+const Calendar = lazy(() => import('@components/stats/Calendar').then(m => ({ default: m.Calendar })));
+const Stats = lazy(() => import('@components/stats/Stats').then(m => ({ default: m.Stats })));
+const Settings = lazy(() => import('@components/settings/Settings').then(m => ({ default: m.Settings })));
+const ExercisePanel = lazy(() => import('@components/exercises/ExercisePanel').then(m => ({ default: m.ExercisePanel })));
+const Leaderboard = lazy(() => import('@components/social/Leaderboard').then(m => ({ default: m.Leaderboard })));
+const Achievements = lazy(() => import('@components/feedback/Achievements').then(m => ({ default: m.Achievements })));
+const WorkoutSession = lazy(() => import('@components/exercises/WorkoutSession').then(m => ({ default: m.WorkoutSession })));
+const CustomExercisesModal = lazy(() => import('@components/exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
+const CategoryManagerModal = lazy(() => import('@components/exercises/CategoryManagerModal').then(m => ({ default: m.CategoryManagerModal })));
+const AdminPanel = lazy(() => import('@components/admin/AdminPanel').then(m => ({ default: m.AdminPanel })));
 
 export function DashboardModals({
     currentCatKey, effectiveSlide,

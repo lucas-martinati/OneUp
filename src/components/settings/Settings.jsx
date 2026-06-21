@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Z_INDEX } from '@utils/zIndex';
 import { X, ShoppingBag, ArrowLeft } from '@utils/icons';
-import { Button, IconButton } from '../ui';
+import { Button, IconButton } from '@components/ui';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { StoreView } from './StoreView';
 import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection } from './SettingsSections';

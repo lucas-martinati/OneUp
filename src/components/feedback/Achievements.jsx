@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next';
 import { Award, Lock } from '@utils/icons';
 import { useBackHandler } from '@hooks/useBackHandler';
-import { SegmentedControl } from '../ui/SegmentedControl';
+import { SegmentedControl } from '@components/ui/SegmentedControl';
 import { buildBadges } from './buildBadges';
 
 const CATEGORY_COLORS = {

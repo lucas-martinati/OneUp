@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BADGE_DEFINITIONS, isBadgeUnlocked, getBadgeIconFromDef } from '../badgeDefinitions';
+import { BADGE_DEFINITIONS, isBadgeUnlocked, getBadgeIconFromDef } from '@config/badgeDefinitions';
 
 // A stats snapshot with every tracked metric at zero. Individual tests bump
 // only the field they care about, mirroring how computeAllStats feeds the

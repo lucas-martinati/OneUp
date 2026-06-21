@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SegmentedControl } from '../ui/SegmentedControl';
+import { SegmentedControl } from '@components/ui/SegmentedControl';
 
 export function StoreCard({
     isActive,

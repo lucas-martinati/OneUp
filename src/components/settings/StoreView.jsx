@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Heart, RotateCcw, Sparkles } from '@utils/icons';
-import { Button } from '../ui';
+import { Button } from '@components/ui';
 import { getPurchaseHistory } from '@services/purchaseService';
 import { StoreCard } from '../store//StoreCard';
 import { useAuth } from '@contexts/AuthContext';

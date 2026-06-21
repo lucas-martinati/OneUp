@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { TrendingUp, Award, Flame, Target, Hash, Star } from '@utils/icons';
-import { AnimatedNumber } from '../ui/AnimatedNumber';
+import { AnimatedNumber } from '@components/ui/AnimatedNumber';
 
 /**
  * A single refined stat card: a tinted icon chip, a bold value and a label,

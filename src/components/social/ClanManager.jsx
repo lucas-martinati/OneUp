@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Users, LogIn, Plus, Shield } from '@utils/icons';
 import { CSSConfetti } from '../feedback/CSSConfetti';
-import { GoogleSignInButton } from '../ui/GoogleSignInButton';
+import { GoogleSignInButton } from '@components/ui/GoogleSignInButton';
 import { useAuth } from '@contexts/AuthContext';
 import { useSettingsStore } from '@store/useSettingsStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';

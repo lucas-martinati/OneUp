@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { X, Trophy, LogOut, Activity } from '@utils/icons';
-import { IconButton, Spinner, GoogleSignInButton } from '../ui';
+import { IconButton, Spinner, GoogleSignInButton } from '@components/ui';
 import { EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { getLocalDateStr } from '@utils/dateUtils';
@@ -20,7 +20,7 @@ import { cloudSync } from '@services/cloudSync';
 import { useSwipe } from '@hooks/useSwipe';
 import { ClanManager } from './ClanManager';
 import { useBackHandler } from '@hooks/useBackHandler';
-import { SegmentedControl } from '../ui/SegmentedControl';
+import { SegmentedControl } from '@components/ui/SegmentedControl';
 
 // Flip to false to disable the top-3 podium and render everyone as plain rows
 // (handy to preview how rows look — e.g. a perfect day outside the podium).

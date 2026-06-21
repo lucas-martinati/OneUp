@@ -10,7 +10,7 @@ import { getLocalDateStr } from '@utils/dateUtils';
 import { EXERCISES } from '@config/exercises';
 import { LANGUAGES, resolveLanguageCode } from '@config/languages';
 import { useAuth } from '@contexts/AuthContext';
-import { Button, GoogleIcon } from '../ui';
+import { Button, GoogleIcon } from '@components/ui';
 
 const ACCENT = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
 

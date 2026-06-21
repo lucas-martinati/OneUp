@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref, get, set, update } from 'firebase/database';
-import { getDatabaseInstance } from '../firebase';
+import { getDatabaseInstance } from '@services/firebase';
 import {
   fetchAllUsersData,
   saveUserData,
@@ -10,7 +10,7 @@ import {
   updateUserPurchase,
   resetUserProgress,
   deleteUserData
-} from '../adminService';
+} from '@services/adminService';
 
 // Mock firebase/database
 vi.mock('firebase/database', () => ({
@@ -20,8 +20,8 @@ vi.mock('firebase/database', () => ({
   update: vi.fn(),
 }));
 
-// Mock ./firebase
-vi.mock('../firebase', () => ({
+// Mock @services/firebase
+vi.mock('@services/firebase', () => ({
   getDatabaseInstance: vi.fn(() => ({})),
 }));
 

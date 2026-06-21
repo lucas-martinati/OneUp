@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { DynamicIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { CATEGORIES, isUserCategory } from '@config/categories';
-import { StreakFlame } from '../ui';
+import { StreakFlame } from '@components/ui';
 
 /** Per-exercise breakdown list, grouped by category. */
 export function ExerciseBreakdown({

@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useDeferredValue, Suspense, lazy } from 'react';
 import { X, Award } from '@utils/icons';
-import { IconButton } from '../ui';
-import { SegmentedControl } from '../ui/SegmentedControl';
+import { IconButton } from '@components/ui';
+import { SegmentedControl } from '@components/ui/SegmentedControl';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '@hooks/useComputedStats';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';

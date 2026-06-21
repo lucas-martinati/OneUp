@@ -159,16 +159,15 @@ export default defineConfig({
         'src/i18n/**',
         'src/**/*.module.css'
       ],
-      // Measured across the WHOLE src tree (not just test-touched files), so the
-      // numbers reflect real coverage including untested UI (ExercisePanel,
-      // WorkoutSession, share flow…). Floor set just below today's baseline so it
-      // guards against regressions without blocking the suite. Raise as coverage
-      // grows — the gap to a 50–60 % target is the untested interactive panels.
+      // Measured across the WHOLE src tree (not just test-touched files). Floor
+      // ratchets up as coverage grows so it can only move forward; set just below
+      // the current numbers. Target is 80% across the board — the remaining gap
+      // is the React component layer (dashboard/social/share/stats views).
       thresholds: {
-        statements: 28,
-        branches: 22,
-        functions: 22,
-        lines: 28
+        statements: 47,
+        branches: 35,
+        functions: 38,
+        lines: 49
       }
     }
   }

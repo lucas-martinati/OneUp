@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Plus, Settings2, Trash2, Edit2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, Check } from '@utils/icons';
-import { Button, IconButton } from '../ui';
+import { Button, IconButton } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { MAX_EXERCISES_PER_CATEGORY } from '@store/useExercisesStore';

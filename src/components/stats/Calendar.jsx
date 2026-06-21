@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2, ShieldAlert, Star } from '@utils/icons';
-import { IconButton } from '../ui';
+import { IconButton } from '@components/ui';
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr } from '@utils/dateUtils';
 import { useBackHandler } from '@hooks/useBackHandler';
@@ -9,7 +9,7 @@ import { getIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { isPerfectDay, calculateRepsForDay, isCaughtUpDay } from '@utils/statUtils';
 import { getCurrentWeekNumber } from '@utils/dateUtils';
-import { DifficultyBadge } from '../ui/DifficultyBadge';
+import { DifficultyBadge } from '@components/ui/DifficultyBadge';
 import styles from './Calendar.module.css';
 
 export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, getConfig }) {

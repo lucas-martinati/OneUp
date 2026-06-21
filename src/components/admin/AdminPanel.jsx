@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Shield, ArrowLeft, RefreshCw } from '@utils/icons';
 import { Z_INDEX } from '@utils/zIndex';
-import { Spinner } from '../ui';
+import { Spinner } from '@components/ui';
 import { useAdminPanel } from './useAdminPanel';
 import { AdminUserList } from './AdminUserList';
 import { AdminUserForm } from './AdminUserForm';
