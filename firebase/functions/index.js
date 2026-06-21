@@ -674,7 +674,8 @@ export const onAccountDeleted = functionsV1.auth.user().onDelete(async (user) =>
  * Backfills user profiles with email and name from Firebase Auth database.
  * Admin can invoke this manually once to populate missing profile nodes.
  */
-export const backfillUserProfiles = onRequest(async (req, res) => {
+export const backfillUserProfiles = onRequest({ secrets: ["ADMIN_API_KEY"] }, async (req, res) => {
+  if (!checkAdminAuth(req, res, process.env.ADMIN_API_KEY)) return;
   try {
     let nextPageToken;
     let totalUpdated = 0;
@@ -750,6 +751,28 @@ function collectStalePaths(node, schema, path, out) {
   }
 }
 
+// Helper to timing-safely verify admin API key auth
+function checkAdminAuth(req, res, expectedSecret) {
+  if (!expectedSecret) {
+    console.error("CRITICAL: ADMIN_API_KEY not configured");
+    res.status(500).send("Server Configuration Error");
+    return false;
+  }
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).send("Unauthorized: Missing or invalid Authorization header");
+    return false;
+  }
+  const token = authHeader.substring(7);
+  const expectedBuffer = Buffer.from(expectedSecret);
+  const tokenBuffer = Buffer.from(token);
+  if (tokenBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(tokenBuffer, expectedBuffer)) {
+    res.status(401).send("Unauthorized: Invalid API Key");
+    return false;
+  }
+  return true;
+}
+
 // Reads the whole DB once and returns the sorted list of stale paths + a
 // per-key tally. Fine for small/medium databases.
 async function scanStaleData() {
@@ -796,13 +819,12 @@ function formatStaleReport(deleted, stalePaths, byKey) {
 }
 
 // ══════════════════════════════════════════════════════════════════════
-// UTILITAIRES D'AUDIT ET PURGE (DÉCOMMENTER UNIQUEMENT POUR UTILISATION)
-// Ne laissez pas ces fonctions déployées en permanence pour éviter les 
-// abus (lecture intégrale de la DB = risque d'explosion de la facture).
+// UTILITAIRES D'AUDIT ET PURGE (DÉCOMMENTÉS ET SÉCURISÉS)
 // ══════════════════════════════════════════════════════════════════════
-/*
+
 // READ-ONLY audit: reports stale data, never deletes.
-export const auditStaleData = onRequest(async (req, res) => {
+export const auditStaleData = onRequest({ secrets: ["ADMIN_API_KEY"] }, async (req, res) => {
+  if (!checkAdminAuth(req, res, process.env.ADMIN_API_KEY)) return;
   try {
     const { stalePaths, byKey } = await scanStaleData();
     res.set('Content-Type', 'text/plain; charset=utf-8');
@@ -814,7 +836,8 @@ export const auditStaleData = onRequest(async (req, res) => {
 });
 
 // DESTRUCTIF — supprime les données obsolètes.
-export const pruneStaleData = onRequest(async (req, res) => {
+export const pruneStaleData = onRequest({ secrets: ["ADMIN_API_KEY"] }, async (req, res) => {
+  if (!checkAdminAuth(req, res, process.env.ADMIN_API_KEY)) return;
   try {
     const { stalePaths } = await scanStaleData();
     if (stalePaths.length > 0) {
@@ -834,7 +857,6 @@ export const pruneStaleData = onRequest(async (req, res) => {
     res.status(500).send("Erreur lors de la purge : " + error.message);
   }
 });
-*/
 
 // ══════════════════════════════════════════════════════════════════════════════
 // RevenueCat Webhook (existing)
