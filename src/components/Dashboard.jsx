@@ -230,7 +230,7 @@ export function Dashboard() {
             />
             {AchievementToastComponent}
             <DashboardEvents
-                dayNumber={300}
+                dayNumber={dayNumber}
                 today={today}
                 getExerciseCount={getExerciseCount}
                 getConfig={getConfig}
