@@ -8,8 +8,7 @@ import { DashboardHeader } from './dashboard/DashboardHeader';
 import { DashboardNavBar } from './dashboard/DashboardNavBar';
 import { SessionBubble } from './dashboard/SessionBubble';
 import { CategoryNav } from './dashboard/CategoryNav';
-import { Day100EventManager } from '@features/events/Day100Event';
-import { Day200EventManager } from '@features/events/Day200Event';
+import { DashboardEvents } from '@features/events';
 import { useAchievementToast } from '@hooks/useAchievementToast';
 import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
 import { useBackHandler } from '@hooks/useBackHandler';
@@ -230,15 +229,8 @@ export function Dashboard() {
                 reducedParticles={settings?.performanceMode === 'low'}
             />
             {AchievementToastComponent}
-            <Day100EventManager
-                dayNumber={dayNumber}
-                today={today}
-                getExerciseCount={getExerciseCount}
-                getConfig={getConfig}
-                completions={completions}
-            />
-            <Day200EventManager
-                dayNumber={dayNumber}
+            <DashboardEvents
+                dayNumber={300}
                 today={today}
                 getExerciseCount={getExerciseCount}
                 getConfig={getConfig}

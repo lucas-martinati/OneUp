@@ -208,16 +208,6 @@ export const DashboardSlide = React.memo(({
                                 pointerEvents: 'none',
                                 transition: 'background 0.6s ease'
                             }} />
-                            {/* Year progress ring — a conic-gradient band that shares the
-                                button's morphing blob shape so it hugs the organic outline.
-                                The filled arc represents day/365 progress. */}
-                            <div
-                                className="counter-ring"
-                                style={{
-                                    background: `conic-gradient(from 0deg, ${safeSelectedExercise.gradient[0]} 0deg, ${safeSelectedExercise.gradient[1]} ${(progress / 100) * 360}deg, ${safeSelectedExercise.color}26 ${(progress / 100) * 360}deg, ${safeSelectedExercise.color}26 360deg)`
-                                }}
-                            />
-
                             {/* Counter open button */}
                             <button
                                 aria-label={`${getExerciseLabel(safeSelectedExercise)} counter`}
@@ -242,6 +232,22 @@ export const DashboardSlide = React.memo(({
                                     overflow: 'hidden'
                                 }}
                             >
+                                {/* Year progress ring — child of the button so it inherits the
+                                    exact blob shape (border-radius: inherit). Filled arc = day/365.
+                                    Hidden once the exercise is done (no longer relevant). Colors via
+                                    CSS variables (per-exercise; event themes may override them). */}
+                                {!isExerciseDone && (
+                                    <div
+                                        className="counter-ring"
+                                        aria-hidden="true"
+                                        style={{
+                                            '--ring-c1': safeSelectedExercise.gradient[0],
+                                            '--ring-c2': safeSelectedExercise.gradient[1],
+                                            '--ring-track': `${safeSelectedExercise.color}26`,
+                                            '--ring-progress': `${Math.min(progress, 100)}%`
+                                        }}
+                                    />
+                                )}
                                 {isExerciseDone ? (
                                     <>
                                         <div style={{

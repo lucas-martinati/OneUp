@@ -7,8 +7,8 @@
  * ajouter ou retirer cet événement de l'app se fait en un seul import,
  * sans dépendances dispersées dans le projet.
  */
-import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
-import { EXERCISES, getDailyGoal } from '@config/exercises';
+import React, { useState, useEffect, memo } from 'react';
+import { makeEventManager, seeded } from './eventEngine';
 
 // ============================================================================
 // 1. STYLES CSS (Injectés uniquement pour cet événement)
@@ -270,12 +270,17 @@ const Day100Styles = () => (
           85% { opacity: 1; }
         }
 
-        /* ── Central button hacked style ── */
+        /* ── Central button hacked style (le border est laissé à l'anneau) ── */
         .day100-global .counter-button {
-          border: 3px solid #ef4444 !important;
           background: repeating-radial-gradient(circle, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.1) 4px, transparent 4px, transparent 8px) !important;
           box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), inset 0 0 25px rgba(239, 68, 68, 0.4) !important;
-          animation: buttonGlitch 3s infinite !important;
+          animation: counterBlobMorph 9s ease-in-out infinite, buttonGlitch 3s infinite !important;
+        }
+        /* ── Year-progress ring: glitch-red tint ── */
+        .day100-global .counter-ring {
+          --ring-c1: #ef4444 !important;
+          --ring-c2: #f87171 !important;
+          --ring-track: rgba(239, 68, 68, 0.15) !important;
         }
 
         .day100-global .counter-button span {
@@ -558,75 +563,7 @@ const Day100Styles = () => (
 
 
 // ============================================================================
-// 2. HOOK LOGIQUE PRINCIPAL
-// ============================================================================
-function useDay100Logic(dayNumber, isDayPerfectStandard) {
-    const isDay100 = dayNumber === 100;
-    
-    const [day100ModalShown, setDay100ModalShown] = useState(
-        () => isDay100 && !!sessionStorage.getItem('day100_modal_shown')
-    );
-    const [day100Unhacked, setDay100Unhacked] = useState(
-        () => isDay100 && !!localStorage.getItem('day100_unhacked')
-    );
-    const [showUnhackAnim, setShowUnhackAnim] = useState(false);
-
-    // If stats load and indicate perfect day BEFORE the modal is dismissed,
-    // it implies it was completed in a previous session. Mark it unhacked silently.
-    useEffect(() => {
-        if (isDay100 && isDayPerfectStandard && !day100Unhacked && !day100ModalShown) {
-            setTimeout(() => {
-                setDay100Unhacked(true);
-                localStorage.setItem('day100_unhacked', '1');
-            }, 0);
-        }
-    }, [isDay100, isDayPerfectStandard, day100ModalShown, day100Unhacked]);
-
-    // The modal should be shown if it's day 100, we haven't unhacked, and it hasn't been shown in this session
-    // We already evaluated sessionStorage in useState, so day100ModalShown accurately tracks it for this session.
-    const showDay100Modal = isDay100 && !day100ModalShown && !day100Unhacked;
-
-    // The hack is active when: it's day 100, modal has been dismissed, and not yet unhacked
-    const hackActive = isDay100 && day100ModalShown && !day100Unhacked && !showUnhackAnim;
-
-    const handleDay100ModalDismiss = useCallback(() => {
-        setDay100ModalShown(true);
-        sessionStorage.setItem('day100_modal_shown', '1');
-    }, []);
-
-    const perfectDayCompletedRef = useRef(false);
-    useEffect(() => {
-        if (!hackActive || !isDayPerfectStandard || perfectDayCompletedRef.current) return;
-        perfectDayCompletedRef.current = true;
-        let cancelled = false;
-        queueMicrotask(() => {
-            if (!cancelled) {
-                setShowUnhackAnim(true);
-            }
-        });
-        return () => { cancelled = true; };
-    }, [hackActive, isDayPerfectStandard]);
-
-    const handleUnhackComplete = useCallback(() => {
-        setShowUnhackAnim(false);
-        setDay100Unhacked(true);
-        localStorage.setItem('day100_unhacked', '1');
-    }, []);
-
-    return {
-        isDay100,
-        hackActive,
-        showDay100Modal,
-        showUnhackAnim,
-        day100Unhacked,
-        handleDay100ModalDismiss,
-        handleUnhackComplete
-    };
-}
-
-
-// ============================================================================
-// 3. OVERLAY DASHBOARD HACKÉ
+// 2. OVERLAY DASHBOARD HACKÉ
 // ============================================================================
 const MATRIX_CHARS = '01アイウエオカキクケコABCDEF0123456789';
 const HACKED_MSGS = [
@@ -643,11 +580,6 @@ const HACKED_MSGS = [
     'PROTOCOL: BEAST_MODE',
     '> sudo unlock --power',
 ];
-
-const seeded = (i, salt = 0) => {
-    const x = Math.sin((i + 1) * 9301 + salt * 4957) * 49297;
-    return x - Math.floor(x);
-};
 
 const generateMatrixStr = (len, seed) => {
     let s = '';
@@ -1063,52 +995,14 @@ function Day100UnhackAnimation({ onComplete }) {
 // ============================================================================
 // 6. MANAGER D'ÉVÉNEMENT (PLUG & PLAY)
 // ============================================================================
-export function Day100EventManager({ dayNumber, today, getExerciseCount, getConfig, completions }) {
-    const isDay100 = dayNumber === 100;
-
-    const isDayPerfectStandard = useMemo(() => {
-        if (!isDay100) return false;
-        return EXERCISES.length > 0 && EXERCISES.every(ex => {
-            const count = getExerciseCount(today, ex.id);
-            const exDiff = getConfig(ex.id, today).difficulty;
-            const goal = getDailyGoal(ex, dayNumber, exDiff);
-            return completions[today]?.[ex.id]?.isCompleted || count >= goal;
-        });
-    }, [isDay100, today, completions, dayNumber, getExerciseCount, getConfig]);
-
-    const {
-        hackActive, showDay100Modal, showUnhackAnim, day100Unhacked,
-        handleDay100ModalDismiss, handleUnhackComplete
-    } = useDay100Logic(dayNumber, isDayPerfectStandard);
-
-    useEffect(() => {
-        const root = document.getElementById('root');
-        if (!root) return;
-        
-        if (hackActive) {
-            root.classList.add('day100-global', 'day100-flicker');
-        } else {
-            root.classList.remove('day100-global', 'day100-flicker');
-        }
-        
-        if (day100Unhacked) {
-            root.classList.add('day100-unhacking');
-        } else {
-            root.classList.remove('day100-unhacking');
-        }
-
-        return () => {
-            root.classList.remove('day100-global', 'day100-flicker', 'day100-unhacking');
-        };
-    }, [hackActive, day100Unhacked]);
-
-    if (!isDay100) return null;
-
-    return (
-        <>
-            {showDay100Modal && <Day100HackModal onDismiss={handleDay100ModalDismiss} />}
-            {showUnhackAnim && <Day100UnhackAnimation onComplete={handleUnhackComplete} />}
-            {hackActive && <Day100Overlay />}
-        </>
-    );
-}
+export const Day100EventManager = makeEventManager({
+    isActive: ({ dayNumber }) => dayNumber === 100,
+    introKey: 'day100_modal_shown',
+    doneKey: 'day100_unhacked',
+    keepAmbianceAfterReward: false, // une fois « unhacked », l'ambiance s'éteint
+    activeClasses: ['day100-global', 'day100-flicker'],
+    doneClass: 'day100-unhacking',
+    Intro: Day100HackModal,
+    Overlay: Day100Overlay,
+    Reward: Day100UnhackAnimation,
+});

@@ -278,9 +278,9 @@
   height: 300px;
 }
 
-/* Dashboard counter button — organic, slightly misshapen "blob" that morphs
-   gently. Only border-radius is animated (no transform) so it never clobbers
-   the inline scale used for the completed state. */
+/* Dashboard counter button — organic "blob" that morphs gently. Only
+   border-radius is animated (no transform) so it never clobbers the inline
+   scale used for the completed state. */
 .counter-button {
   border-radius: 58% 42% 56% 44% / 53% 47%;
   animation: counterBlobMorph 9s ease-in-out infinite;
@@ -293,18 +293,27 @@
   75%      { border-radius: 44% 56% 57% 43% / 49% 52% 48% 51%; }
 }
 
-/* Year-progress ring that follows the blob: same shape + same morph keyframes,
-   so it stays in phase with the button. A conic-gradient (set inline) carries
-   the progress arc; the mask trick turns it into a thin band. */
+/* Year-progress ring — a CHILD of the button that borrows its EXACT shape via
+   `border-radius: inherit`, so it always hugs the blob's current outline. This
+   is what kills the old phase-drift: whatever the button does (morph, or a
+   theme that freezes/replaces its animation), the ring inherits that very shape.
+   A conic-gradient carries the progress arc; padding + the xor-mask turn it into
+   a thin band of uniform thickness. Colors come from CSS variables (per-exercise
+   by default, overridable by event themes via `.dayXXX-global .counter-ring`);
+   --ring-progress (0%–100%) drives how far the arc is filled. */
 .counter-ring {
   position: absolute;
-  /* Same box as the button so the % border-radius produces an identical blob,
-     perfectly congruent with the button's edge (no scale-induced drift). */
   inset: 0;
-  padding: 3.5px;
+  z-index: 2;
   pointer-events: none;
-  border-radius: 58% 42% 56% 44% / 53% 47%;
-  animation: counterBlobMorph 9s ease-in-out infinite;
+  border-radius: inherit;
+  padding: 4px;
+  background: conic-gradient(
+    from 0deg,
+    var(--ring-c1, var(--accent)) 0deg,
+    var(--ring-c2, var(--accent-glow)) var(--ring-progress, 0%),
+    var(--ring-track, rgba(255, 255, 255, 0.12)) var(--ring-progress, 0%) 360deg
+  );
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -316,8 +325,7 @@
 }
 
 /* Hold a static blob shape (no per-frame morph) on low-end devices. */
-[data-perf="low"] .counter-button,
-[data-perf="low"] .counter-ring {
+[data-perf="low"] .counter-button {
   animation: none !important;
 }
 

@@ -12,8 +12,8 @@
  * est une récompense : 200 jours de régularité, on pose le sac, on respire.
  * Aucune pression — et si la journée est bouclée, le coucher de soleil arrive.
  */
-import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
-import { EXERCISES, getDailyGoal } from '@config/exercises';
+import React, { useState, useEffect, memo } from 'react';
+import { makeEventManager, seeded } from './eventEngine';
 
 // ============================================================================
 // 1. STYLES CSS (Injectés uniquement pour cet événement)
@@ -326,10 +326,15 @@ const Day200Styles = () => (
         }
 
         .day200-global .counter-button {
-          border: 3px solid rgba(251, 146, 60, 0.7) !important;
           background: radial-gradient(circle at 50% 35%, rgba(254, 240, 138, 0.25), rgba(45, 212, 191, 0.12)) !important;
           box-shadow: 0 4px 18px rgba(251, 146, 60, 0.25), inset 0 0 25px rgba(254, 240, 138, 0.35) !important;
-          animation: buoyGlow 5s ease-in-out infinite !important;
+          animation: counterBlobMorph 9s ease-in-out infinite, buoyGlow 5s ease-in-out infinite !important;
+        }
+        /* ── Anneau de progression de l'année : turquoise → soleil ── */
+        .day200-global .counter-ring {
+          --ring-c1: #2dd4bf !important;
+          --ring-c2: #fbbf24 !important;
+          --ring-track: rgba(254, 240, 138, 0.18) !important;
         }
         .day200-global .counter-button span {
           color: #fff7e0 !important;
@@ -515,81 +520,8 @@ const Day200Styles = () => (
 
 
 // ============================================================================
-// 2. HOOK LOGIQUE PRINCIPAL
+// 2. OVERLAY DASHBOARD VACANCES (décor de plage)
 // ============================================================================
-function useDay200Logic(dayNumber, isDayPerfectStandard) {
-    const isDay200 = dayNumber === 200;
-
-    const [welcomeShown, setWelcomeShown] = useState(
-        () => isDay200 && !!sessionStorage.getItem('day200_welcome_shown')
-    );
-    const [sunsetSeen, setSunsetSeen] = useState(
-        () => isDay200 && !!localStorage.getItem('day200_sunset_seen')
-    );
-    const [showSunsetAnim, setShowSunsetAnim] = useState(false);
-
-    // Si la journée parfaite a été bouclée lors d'une session précédente
-    // (avant même d'avoir vu la carte postale), on marque le coucher de soleil
-    // comme déjà offert : on n'a pas à le rejouer, on garde juste l'ambiance plage.
-    useEffect(() => {
-        if (isDay200 && isDayPerfectStandard && !sunsetSeen && !welcomeShown) {
-            setTimeout(() => {
-                setSunsetSeen(true);
-                localStorage.setItem('day200_sunset_seen', '1');
-            }, 0);
-        }
-    }, [isDay200, isDayPerfectStandard, welcomeShown, sunsetSeen]);
-
-    // La carte postale d'accueil ne s'affiche qu'une fois par session,
-    // et jamais si le coucher de soleil a déjà été vécu.
-    const showWelcome = isDay200 && !welcomeShown && !sunsetSeen;
-
-    // L'ambiance vacances reste active toute la journée, sans condition de réussite.
-    const vacationActive = isDay200 && (welcomeShown || sunsetSeen) && !showSunsetAnim;
-
-    const handleWelcomeDismiss = useCallback(() => {
-        setWelcomeShown(true);
-        sessionStorage.setItem('day200_welcome_shown', '1');
-    }, []);
-
-    // Déclenche le coucher de soleil une seule fois, quand la journée devient parfaite.
-    const sunsetTriggeredRef = useRef(false);
-    useEffect(() => {
-        const themeOn = isDay200 && welcomeShown && !sunsetSeen;
-        if (!themeOn || !isDayPerfectStandard || sunsetTriggeredRef.current) return;
-        sunsetTriggeredRef.current = true;
-        let cancelled = false;
-        queueMicrotask(() => {
-            if (!cancelled) setShowSunsetAnim(true);
-        });
-        return () => { cancelled = true; };
-    }, [isDay200, welcomeShown, sunsetSeen, isDayPerfectStandard]);
-
-    const handleSunsetComplete = useCallback(() => {
-        setShowSunsetAnim(false);
-        setSunsetSeen(true);
-        localStorage.setItem('day200_sunset_seen', '1');
-    }, []);
-
-    return {
-        isDay200,
-        vacationActive,
-        showWelcome,
-        showSunsetAnim,
-        handleWelcomeDismiss,
-        handleSunsetComplete
-    };
-}
-
-
-// ============================================================================
-// 3. OVERLAY DASHBOARD VACANCES (décor de plage)
-// ============================================================================
-const seeded = (i, salt = 0) => {
-    const x = Math.sin((i + 1) * 9301 + salt * 4957) * 49297;
-    return x - Math.floor(x);
-};
-
 const POSTCARD_MSGS = [
     'Jour 200 ☀️',
     'Mode vacances activé',
@@ -990,46 +922,14 @@ function Day200SunsetAnimation({ onComplete }) {
 // ============================================================================
 // 6. MANAGER D'ÉVÉNEMENT (PLUG & PLAY)
 // ============================================================================
-export function Day200EventManager({ dayNumber, today, getExerciseCount, getConfig, completions }) {
-    const isDay200 = dayNumber === 200;
-
-    const isDayPerfectStandard = useMemo(() => {
-        if (!isDay200) return false;
-        return EXERCISES.length > 0 && EXERCISES.every(ex => {
-            const count = getExerciseCount(today, ex.id);
-            const exDiff = getConfig(ex.id, today).difficulty;
-            const goal = getDailyGoal(ex, dayNumber, exDiff);
-            return completions[today]?.[ex.id]?.isCompleted || count >= goal;
-        });
-    }, [isDay200, today, completions, dayNumber, getExerciseCount, getConfig]);
-
-    const {
-        vacationActive, showWelcome, showSunsetAnim,
-        handleWelcomeDismiss, handleSunsetComplete
-    } = useDay200Logic(dayNumber, isDayPerfectStandard);
-
-    useEffect(() => {
-        const root = document.getElementById('root');
-        if (!root) return;
-
-        if (vacationActive) {
-            root.classList.add('day200-global');
-        } else {
-            root.classList.remove('day200-global');
-        }
-
-        return () => {
-            root.classList.remove('day200-global');
-        };
-    }, [vacationActive]);
-
-    if (!isDay200) return null;
-
-    return (
-        <>
-            {showWelcome && <Day200WelcomeModal onDismiss={handleWelcomeDismiss} />}
-            {showSunsetAnim && <Day200SunsetAnimation onComplete={handleSunsetComplete} />}
-            {vacationActive && <Day200Overlay />}
-        </>
-    );
-}
+export const Day200EventManager = makeEventManager({
+    isActive: ({ dayNumber }) => dayNumber === 200,
+    introKey: 'day200_welcome_shown',
+    doneKey: 'day200_sunset_seen',
+    keepAmbianceAfterReward: true, // l'ambiance plage perdure même après le coucher de soleil
+    activeClasses: ['day200-global'],
+    doneClass: null,
+    Intro: Day200WelcomeModal,
+    Overlay: Day200Overlay,
+    Reward: Day200SunsetAnimation,
+});
