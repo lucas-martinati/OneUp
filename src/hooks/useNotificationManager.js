@@ -182,12 +182,19 @@ export function useNotificationManager({ isDayDone, getDayNumber }) {
 
           const notificationsList = [];
 
-          // Compute a rough streak up to yesterday once (avoids redundant 7 x 365 iterations)
+          // Compute the active streak once (avoids redundant 7 x 365 iterations).
+          // Anchor the count on today only if it's already done; otherwise count
+          // up to yesterday. Not having done today yet does NOT break the streak —
+          // that's precisely what the reminder is for. Mirrors the canonical
+          // `todayDone ? currentStreak : yesterdayStreak` logic in useComputedStats.
           const todayStr = getLocalDateStr(new Date());
           let streak = 0;
-          const todayDate = new Date(todayStr);
+          const streakAnchor = new Date(todayStr);
+          if (!isDayDoneRef.current(todayStr)) {
+            streakAnchor.setDate(streakAnchor.getDate() - 1);
+          }
           for (let j = 0; j < 365; j++) {
-            const checkDate = new Date(todayDate);
+            const checkDate = new Date(streakAnchor);
             checkDate.setDate(checkDate.getDate() - j);
             if (isDayDoneRef.current(getLocalDateStr(checkDate))) {
               streak++;

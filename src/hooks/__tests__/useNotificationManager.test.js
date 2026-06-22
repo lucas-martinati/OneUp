@@ -258,5 +258,26 @@ describe('useNotificationManager', () => {
 
       vi.restoreAllMocks();
     });
+
+    it('does not use the comeback message when today is not done yet but the streak is still active', async () => {
+      // Regression: previously the streak was counted from today, which is never
+      // done when the reminder fires, so streak was always 0 → comeback message.
+      const settings = { notificationsEnabled: true, notificationTime: { hour: 10, minute: 30 } };
+      mockCheckPermissions.mockResolvedValueOnce({ display: 'granted' });
+      mockSchedule.mockClear();
+
+      const { result } = renderHook(() => useNotificationManager({
+        // Yesterday and earlier are done; today (and future) not done yet.
+        isDayDone: (dateStr) => dateStr < getLocalDateStr(new Date()),
+        getDayNumber: () => 5, // non-milestone
+      }));
+      await result.current.scheduleNotification(settings);
+
+      const scheduled = mockSchedule.mock.calls[0][0].notifications;
+      // The imminent reminder (dayIndex 0) must reflect the active streak,
+      // not the comeback path.
+      expect(scheduled[0].body).toBe('Keep going!');
+      expect(scheduled[0].body).not.toBe('Come back!');
+    });
   });
 });
