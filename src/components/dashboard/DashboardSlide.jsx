@@ -208,32 +208,15 @@ export const DashboardSlide = React.memo(({
                                 pointerEvents: 'none',
                                 transition: 'background 0.6s ease'
                             }} />
-                            {/* Year progress ring */}
-                            <svg viewBox="0 0 100 100" className="progress-ring-svg" style={{
-                                position: 'absolute', top: '50%', left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: '100%', height: '100%',
-                                pointerEvents: 'none',
-                                overflow: 'visible'
-                            }}>
-                                <circle cx="50" cy="50" r="52" fill="none" stroke="var(--progress-track)" strokeWidth="3.5" />
-                                <circle
-                                    className="progress-ring-circle"
-                                    cx="50" cy="50" r="51" fill="none"
-                                    stroke={`url(#dashGrad-${activeExerciseId})`}
-                                    strokeWidth="4"
-                                    strokeDasharray={2 * Math.PI * 52}
-                                    strokeDashoffset={2 * Math.PI * 52 - (progress / 100) * 2 * Math.PI * 52}
-                                    strokeLinecap="round"
-                                    transform="rotate(-90 50 50)"
-                                />
-                                <defs>
-                                    <linearGradient id={`dashGrad-${activeExerciseId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stopColor={safeSelectedExercise.gradient[0]} />
-                                        <stop offset="100%" stopColor={safeSelectedExercise.gradient[1]} />
-                                    </linearGradient>
-                                </defs>
-                            </svg>
+                            {/* Year progress ring — a conic-gradient band that shares the
+                                button's morphing blob shape so it hugs the organic outline.
+                                The filled arc represents day/365 progress. */}
+                            <div
+                                className="counter-ring"
+                                style={{
+                                    background: `conic-gradient(from 0deg, ${safeSelectedExercise.gradient[0]} 0deg, ${safeSelectedExercise.gradient[1]} ${(progress / 100) * 360}deg, ${safeSelectedExercise.color}26 ${(progress / 100) * 360}deg, ${safeSelectedExercise.color}26 360deg)`
+                                }}
+                            />
 
                             {/* Counter open button */}
                             <button
@@ -241,11 +224,11 @@ export const DashboardSlide = React.memo(({
                                 onClick={() => { pauseCloudSync?.(); setShowCounter(true); }}
                                 className="ripple counter-button"
                                 style={{
-                                    width: '100%', height: '100%', borderRadius: '50%',
+                                    width: '100%', height: '100%',
                                     background: isExerciseDone
                                         ? `linear-gradient(135deg, ${safeSelectedExercise.color} 0%, ${safeSelectedExercise.gradient[1]} 100%)`
                                         : 'transparent',
-                                    border: isExerciseDone ? 'none' : `2.5px solid ${safeSelectedExercise.color}`,
+                                    border: 'none',
                                     display: 'flex', flexDirection: 'column',
                                     alignItems: 'center', justifyContent: 'center', gap: '1px',
                                     transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',

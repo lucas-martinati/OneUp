@@ -354,15 +354,6 @@ export const SessionBubble = React.memo(({ onResume, onDiscard }) => {
         };
     }, []);
 
-    // ── SVG ring calculations ──
-    const ringRadius = 26;
-    const ringCircumference = 2 * Math.PI * ringRadius;
-    const ringOffset = ringCircumference * (1 - progress);
-
-    const lpRingRadius = 26;
-    const lpRingCircumference = 2 * Math.PI * lpRingRadius;
-    const lpRingOffset = lpRingCircumference * (1 - longPressProgress);
-
     const portal = (
         <>
             {/* ── Main bubble container (translated via rAF) ── */}
@@ -384,18 +375,12 @@ export const SessionBubble = React.memo(({ onResume, onDiscard }) => {
 
                 {/* Long press progressive ring */}
                 {longPressProgress > 0 && (
-                    <svg className={styles.longPressRingSvg} viewBox="0 0 56 56">
-                        <circle
-                            className={styles.longPressRingTrack}
-                            cx="28" cy="28" r={lpRingRadius}
-                        />
-                        <circle
-                            className={styles.longPressRingFill}
-                            cx="28" cy="28" r={lpRingRadius}
-                            strokeDasharray={lpRingCircumference}
-                            strokeDashoffset={lpRingOffset}
-                        />
-                    </svg>
+                    <div
+                        className={styles.longPressRingBlob}
+                        style={{
+                            background: `conic-gradient(from 0deg, #ef4444 0deg, #ef4444 ${longPressProgress * 360}deg, rgba(239,68,68,0.08) ${longPressProgress * 360}deg, rgba(239,68,68,0.08) 360deg)`
+                        }}
+                    />
                 )}
 
                 {/* Main bubble */}
@@ -408,15 +393,12 @@ export const SessionBubble = React.memo(({ onResume, onDiscard }) => {
                     onPointerCancel={handlePointerUp}
                 >
                     {/* Session progress ring */}
-                    <svg className={styles.progressRing} viewBox="0 0 56 56">
-                        <circle className={styles.progressTrack} cx="28" cy="28" r={ringRadius} />
-                        <circle
-                            className={styles.progressFill}
-                            cx="28" cy="28" r={ringRadius}
-                            strokeDasharray={ringCircumference}
-                            strokeDashoffset={ringOffset}
-                        />
-                    </svg>
+                    <div
+                        className={styles.progressRingBlob}
+                        style={{
+                            background: `conic-gradient(from 0deg, #a78bfa 0deg, #a78bfa ${progress * 360}deg, rgba(255,255,255,0.06) ${progress * 360}deg, rgba(255,255,255,0.06) 360deg)`
+                        }}
+                    />
 
                     <div className={styles.liveIndicator} />
 
