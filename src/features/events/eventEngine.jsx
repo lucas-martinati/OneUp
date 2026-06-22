@@ -12,6 +12,7 @@
  */
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { EXERCISES, getDailyGoal } from '@config/exercises';
+import { useEventHudStore } from './eventHudStore';
 
 /** PRNG déterministe (mêmes décors d'un rendu à l'autre, sans état). */
 export const seeded = (i, salt = 0) => {
@@ -23,7 +24,7 @@ export const seeded = (i, salt = 0) => {
  * Vrai si TOUS les exercices du jour ont atteint leur objectif (journée parfaite).
  * Calcul identique pour tous les événements ; ne tourne que si l'event est actif.
  */
-export function useIsDayPerfect(active, { today, dayNumber, getExerciseCount, getConfig, completions }) {
+function useIsDayPerfect(active, { today, dayNumber, getExerciseCount, getConfig, completions }) {
     return useMemo(() => {
         if (!active) return false;
         return EXERCISES.length > 0 && EXERCISES.every(ex => {
@@ -110,7 +111,12 @@ const resolveKey = (key, ctx) => (typeof key === 'function' ? key(ctx) : key);
  *     introKey / doneKey         → clés de stockage (string ou (ctx) => string)
  *     keepAmbianceAfterReward    → l'ambiance survit-elle à la récompense ?
  *     activeClasses / doneClass  → classes posées sur #root
- *     Intro / Overlay / Reward   → les 3 vues (onDismiss / — / onComplete)
+ *     Intro / Reward             → vues plein écran (onDismiss / onComplete)
+ *     Decor                      → ambiance de fond (overlay fixe, atmosphère)
+ *     Hud                        → widget INTÉGRÉ (thermomètre, constellation…),
+ *                                  publié dans le store et rendu par les hôtes
+ *                                  (Dashboard / ExercisePanel) via <EventHud />.
+ *     hudProps(ctx)              → props live (reps, validés…) passées au Hud.
  *   }
  */
 export function makeEventManager(descriptor) {
@@ -122,12 +128,11 @@ export function makeEventManager(descriptor) {
         autoReward = true,
         activeClasses = [],
         doneClass = null,
-        // Props supplémentaires (live) injectées dans l'Overlay — ex. l'avancée
-        // d'un défi de répétitions. Fonction pure (ctx) => props ; n'est appelée
-        // que lorsque l'event est actif pour ne rien calculer inutilement.
-        overlayProps,
+        // Avancée live (ex. reps/exercices validés). Fonction pure (ctx) => props.
+        hudProps: hudPropsFn,
         Intro,
-        Overlay,
+        Decor,
+        Hud,
         Reward,
     } = descriptor;
 
@@ -164,15 +169,33 @@ export function makeEventManager(descriptor) {
             };
         }, [ambianceActive, done]);
 
-        if (!active) return null;
+        // ── HUD intégré : on le publie dans le store ; ce sont le Dashboard et
+        //    l'ExercisePanel qui le rendent dans leur layout (via <EventHud />). ──
+        const hudLive = ambianceActive && Hud && hudPropsFn ? hudPropsFn(ctx) : null;
+        const hudKey = hudLive ? JSON.stringify(hudLive) : '';
 
-        const extraOverlayProps = overlayProps ? overlayProps(ctx) : null;
+        useEffect(() => {
+            if (!ambianceActive || !Hud) return;
+            useEventHudStore.getState().setHud({
+                Component: Hud,
+                props: { onSolve: triggerReward, ...(hudLive || {}) },
+            });
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [ambianceActive, hudKey, triggerReward]);
+
+        // Retire le HUD quand l'ambiance s'éteint (ou au démontage).
+        useEffect(() => {
+            if (!ambianceActive || !Hud) return undefined;
+            return () => useEventHudStore.getState().setHud(null);
+        }, [ambianceActive]);
+
+        if (!active) return null;
 
         return (
             <>
                 {showIntro && <Intro onDismiss={dismissIntro} />}
                 {showReward && <Reward onComplete={completeReward} />}
-                {ambianceActive && <Overlay onSolve={triggerReward} {...extraOverlayProps} />}
+                {ambianceActive && Decor && <Decor />}
             </>
         );
     };

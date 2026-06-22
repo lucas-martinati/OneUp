@@ -16,6 +16,7 @@ import { ProgressRing } from './panel/ProgressRing';
 import { StatusLine } from './panel/StatusLine';
 import { TimerControls, CounterControls } from './panel/Controls';
 import { CameraModeBar, CameraLiveStats } from './panel/CameraControls';
+import { EventHud } from '@features/events';
 import styles from './panel/ExercisePanel.module.css';
 
 export function ExercisePanel({
@@ -230,6 +231,9 @@ export function ExercisePanel({
                 t={t}
             />
             </div>
+
+            {/* HUD d'événement spécial (thermomètre / constellation) intégré au panneau */}
+            <EventHud placement="panel" />
 
             {isWeightExercise && currentWeight !== null && (
                 <WeightSelector

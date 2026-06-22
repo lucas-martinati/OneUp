@@ -7,23 +7,29 @@
  * étoiles filantes, une comète qui s'élève. Volontairement TRÈS différent du
  * Jour 100 (glitch rouge) et du Jour 200 (plage / coucher de soleil).
  *
- * ✦ MÉCANIQUE INÉDITE ✦
- * Pas de « journée parfaite » ici. Le défi du Jour 300, c'est un COMPTEUR DE
- * RÉPÉTITIONS : il faut cumuler REP_GOAL répétitions dans la journée (tous
- * exercices confondus). Une jauge-fusée verticale se remplit en temps réel à
- * mesure que tu enchaînes les reps ; à 300, la fusée décolle, le ciel s'embrase,
- * et l'event se termine. C'est l'action réelle (faire des reps) qui le résout.
+ * ✦ MÉCANIQUE — VALIDER DES EXERCICES (reliée à l'app, libre) ✦
+ * Ni « journée parfaite » (Jour 100), ni volume de reps (Jour 200). Ici, il faut
+ * VALIDER VALIDATE_GOAL exercices — CEUX QUE TU VEUX (on ne force pas lesquels).
+ * Un exercice est « validé » quand il atteint son objectif du jour. Chaque exercice
+ * validé rallume une étoile ; la constellation complète déclenche la supernova.
+ * L'avancée est lue en temps réel depuis les compteurs de l'app.
  */
 import React, { useState, useEffect, memo } from 'react';
-import { EXERCISES } from '@config/exercises';
+import { EXERCISES, getDailyGoal } from '@config/exercises';
 import { makeEventManager, seeded } from './eventEngine';
 
-// Objectif de répétitions à cumuler dans la journée pour relever le défi.
-export const REP_GOAL = 3000;
+// Nombre d'exercices à valider (au choix) pour rallumer la constellation.
+export const VALIDATE_GOAL = 9;
 
-// Total des reps du jour, tous exercices standard confondus.
-const totalRepsToday = ({ today, getExerciseCount }) =>
-    EXERCISES.reduce((sum, ex) => sum + (getExerciseCount(today, ex.id) || 0), 0);
+// Compte les exercices VALIDÉS aujourd'hui (objectif du jour atteint), peu importe lesquels.
+const validatedCount = ({ today, dayNumber, getExerciseCount, getConfig, completions }) =>
+    EXERCISES.reduce((n, ex) => {
+        const count = getExerciseCount(today, ex.id) || 0;
+        const diff = getConfig(ex.id, today).difficulty;
+        const goal = getDailyGoal(ex, dayNumber, diff);
+        const done = completions?.[today]?.[ex.id]?.isCompleted || count >= goal;
+        return n + (done ? 1 : 0);
+    }, 0);
 
 // ============================================================================
 // 1. STYLES CSS (Injectés uniquement pour cet événement)
@@ -260,74 +266,67 @@ const Day300Styles = () => (
         .day300-global .progress-ring-svg { filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.55)) !important; }
         .day300-global .progress-ring-svg circle { stroke: #38bdf8 !important; }
 
-        /* ── ✦ JAUGE-FUSÉE verticale (mécanique) ── */
-        .d300-gauge {
-          position: fixed;
-          right: clamp(8px, 2.5vw, 22px);
-          top: 50%;
-          transform: translateY(-50%);
-          z-index: 9995;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 8px;
+        /* ── ✦ CONSTELLATION (HUD intégré) ──
+           Une étoile par exercice à valider ; chaque exercice validé l'allume.
+           Mobile : pastille DANS le flux (placée par l'hôte). Desktop : épinglée
+           dans la gouttière GAUCHE, en colonne. Jamais en superposition. */
+        .d300-constellation {
+          display: flex; flex-direction: column; align-items: center; gap: 5px;
+          margin: 6px auto;
+          width: fit-content; max-width: 92vw;
           pointer-events: none;
-          animation: d300GaugeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+          padding: 7px 14px;
+          border-radius: 16px;
+          background: rgba(8, 10, 28, 0.55);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(129, 140, 248, 0.28);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+          animation: d300ConstellationIn 0.5s ease-out;
         }
-        .d300-gauge-track {
-          position: relative;
-          width: clamp(26px, 6vw, 34px);
-          height: clamp(150px, 40vh, 300px);
-          border-radius: 999px;
-          background: rgba(6, 8, 24, 0.7);
-          border: 1px solid rgba(129, 140, 248, 0.3);
-          box-shadow: inset 0 0 18px rgba(56, 189, 248, 0.15), 0 6px 18px rgba(0, 0, 0, 0.5);
-          overflow: hidden;
+        @media (min-width: 768px) {
+          .d300-constellation {
+            position: fixed; left: 12px; top: 50%; transform: translateY(-50%);
+            margin: 0;
+          }
+          .d300-constellation--dashboard { z-index: 50; }
+          .d300-constellation--panel { z-index: 1100; }
+          .d300-constellation .d300-constellation-stars { flex-direction: column; }
         }
-        .d300-gauge-fill {
-          position: absolute;
-          left: 0; right: 0; bottom: 0;
-          border-radius: 999px;
-          background: linear-gradient(180deg, #38bdf8 0%, #818cf8 55%, #c084fc 100%);
-          box-shadow: 0 0 16px rgba(56, 189, 248, 0.7);
-          transition: height 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        .d300-constellation-label {
+          font-family: 'Inter', system-ui, sans-serif;
+          font-size: 11px; font-weight: 700; letter-spacing: 1px;
+          color: #7dd3fc;
+          text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
         }
-        /* Graduations */
-        .d300-gauge-tick {
-          position: absolute; left: 0; right: 0;
-          height: 1px; background: rgba(255, 255, 255, 0.12);
+        .d300-constellation-stars { display: flex; gap: 10px; }
+        .d300-cstar {
+          width: clamp(16px, 5vw, 22px);
+          height: clamp(16px, 5vw, 22px);
+          clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+          background: rgba(129, 140, 248, 0.30);
+          transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
         }
-        /* La fusée qui monte le long de la jauge */
-        .d300-rocket {
-          position: absolute;
-          left: 50%;
-          transform: translate(-50%, 50%);
-          font-size: clamp(20px, 5vw, 28px);
-          line-height: 1;
-          filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.8));
-          transition: bottom 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-          animation: d300RocketBob 2.2s ease-in-out infinite;
+        .d300-cstar-lit {
+          background: #fbbf24;
+          box-shadow: 0 0 8px #fbbf24, 0 0 16px rgba(251, 191, 36, 0.6);
+          transform: scale(1.2);
+          animation: d300StarPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        @keyframes d300RocketBob {
-          0%, 100% { margin-left: -1px; }
-          50%      { margin-left: 1px; }
+        @keyframes d300StarPop {
+          0%   { transform: scale(0.6); }
+          60%  { transform: scale(1.35); }
+          100% { transform: scale(1.2); }
         }
-        .d300-gauge-readout {
+        .d300-constellation-count {
           font-family: 'Inter', system-ui, sans-serif;
           font-size: 12px; font-weight: 800;
           color: #e0f2fe;
           text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
-          letter-spacing: 0.5px;
-          white-space: nowrap;
         }
-        .d300-gauge-readout small { color: #7dd3fc; font-weight: 600; }
-        .d300-gauge-cap {
-          font-size: 18px; line-height: 1;
-          filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8));
-        }
-        @keyframes d300GaugeIn {
-          0%   { opacity: 0; transform: translateY(-50%) translateX(30px); }
-          100% { opacity: 1; transform: translateY(-50%) translateX(0); }
+        @keyframes d300ConstellationIn {
+          0%   { opacity: 0; }
+          100% { opacity: 1; }
         }
 
         /* ── Carte d'accueil (splash cinématique, PAS un terminal) ── */
@@ -384,7 +383,8 @@ const Day300Styles = () => (
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .d300-star, .d300-shooting, .d300-aurora, .d300-rocket { animation: none !important; }
+          .d300-star, .d300-shooting, .d300-aurora { animation: none !important; }
+          .d300-cstar-lit { animation: none !important; }
           .day300-global::before { animation: none !important; }
           .day300-global .day-number, .day300-global .day-number-anim,
           .day300-global .app-logo-text, .day300-global .counter-button { animation: none !important; }
@@ -441,43 +441,48 @@ const Day300Decor = memo(() => (
 
 
 // ============================================================================
-// 3. JAUGE-FUSÉE : la mécanique vivante (reps → ascension)
+// 3. CONSTELLATION : la mécanique vivante (valider des exercices → ciel rallumé)
 // ============================================================================
-const GAUGE_TICKS = [0.25, 0.5, 0.75];
+function ExerciseConstellation({ validated = 0, goal = VALIDATE_GOAL, onSolve, placement = 'dashboard' }) {
+    const lit = Math.min(validated, goal);
+    const complete = goal > 0 && validated >= goal;
 
-function RocketGauge({ reps = 0, target = REP_GOAL, onSolve }) {
-    const pct = Math.min(reps / target, 1);
-    const reached = reps >= target;
-
-    // Dès que l'objectif est atteint, on déclenche la récompense (une seule fois,
-    // garanti par le verrou interne du moteur).
+    // Assez d'exercices validés → constellation rallumée → supernova.
     useEffect(() => {
-        if (reached) onSolve();
-    }, [reached, onSolve]);
+        if (complete) onSolve?.();
+    }, [complete, onSolve]);
 
     return (
-        <div className="d300-gauge">
-            <div className="d300-gauge-cap" aria-hidden="true">✦</div>
-            <div className="d300-gauge-track" role="progressbar" aria-valuemin={0} aria-valuemax={target} aria-valuenow={Math.min(reps, target)}>
-                {GAUGE_TICKS.map(t => (
-                    <div key={t} className="d300-gauge-tick" style={{ bottom: `${t * 100}%` }} />
+        <div className={`d300-constellation d300-constellation--${placement}`}>
+            <div className="d300-constellation-label">
+                {complete ? 'Constellation rallumée ✦' : 'Valide des exercices'}
+            </div>
+            <div className="d300-constellation-stars" aria-hidden="true">
+                {Array.from({ length: goal }).map((_, i) => (
+                    <span key={i} className={i < lit ? 'd300-cstar d300-cstar-lit' : 'd300-cstar'} />
                 ))}
-                <div className="d300-gauge-fill" style={{ height: `${pct * 100}%` }} />
-                <div className="d300-rocket" aria-hidden="true" style={{ bottom: `${pct * 100}%` }}>🚀</div>
             </div>
-            <div className="d300-gauge-readout">
-                {Math.min(reps, target)}<small>/{target}</small>
-            </div>
+            <div className="d300-constellation-count">{lit} / {goal} exercices validés</div>
         </div>
     );
 }
 
-function Day300Overlay({ onSolve, reps, target }) {
+// Décor ambiant (overlay de fond) — séparé du HUD intégré.
+function Day300DecorOverlay() {
     return (
         <>
             <Day300Styles />
             <Day300Decor />
-            <RocketGauge reps={reps} target={target} onSolve={onSolve} />
+        </>
+    );
+}
+
+// HUD intégré (rendu par le Dashboard / l'ExercisePanel via <EventHud />).
+function Day300Hud({ onSolve, validated, goal, placement }) {
+    return (
+        <>
+            <Day300Styles />
+            <ExerciseConstellation validated={validated} goal={goal} onSolve={onSolve} placement={placement} />
         </>
     );
 }
@@ -559,17 +564,17 @@ function Day300IntroModal({ onDismiss }) {
                     marginTop: '8px',
                     animation: 'd300Rise 0.6s ease-out 0.7s both',
                 }}>
-                    {REP_GOAL} répétitions à conquérir
+                    {VALIDATE_GOAL} exercices à valider
                 </div>
                 <div style={{
                     fontFamily: "'Inter', system-ui, sans-serif",
                     fontSize: 'clamp(0.85rem, 3.4vw, 1rem)',
                     color: 'rgba(186, 230, 253, 0.75)', lineHeight: 1.5,
-                    maxWidth: '320px', margin: '10px auto 0',
+                    maxWidth: '330px', margin: '10px auto 0',
                     animation: 'd300Rise 0.6s ease-out 0.9s both',
                 }}>
-                    Cumule {REP_GOAL} reps aujourd'hui, tous exercices confondus.
-                    La fusée s'élève à chaque effort — fais-la décoller. 🚀
+                    Valide {VALIDATE_GOAL} exercices — ceux que tu veux. Chaque
+                    objectif du jour atteint rallume une étoile de la constellation. ✦
                 </div>
 
                 <button
@@ -682,7 +687,7 @@ function Day300RewardAnimation({ onComplete }) {
                         animation: 'd300RewardReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), d300StarFlow 5s ease infinite',
                         letterSpacing: '2px',
                     }}>
-                        300 ATTEINT
+                        CIEL RALLUMÉ
                     </div>
                     <div style={{
                         marginTop: '16px',
@@ -691,7 +696,7 @@ function Day300RewardAnimation({ onComplete }) {
                         color: 'rgba(224, 242, 254, 0.92)', fontWeight: 600,
                         animation: 'd300Rise 0.5s ease-out 0.5s both',
                     }}>
-                        300 répétitions, le ciel est à toi. ✦🚀
+                        {VALIDATE_GOAL} exercices validés — la constellation s'embrase. ✦🚀
                     </div>
                 </div>
             )}
@@ -730,13 +735,14 @@ export const Day300EventManager = makeEventManager({
     isActive: ({ dayNumber }) => dayNumber === 300,
     introKey: 'day300_intro_shown',
     doneKey: 'day300_challenge_done',
-    keepAmbianceAfterReward: false, // une fois le défi relevé, l'ambiance s'éteint
-    autoReward: false,              // ✦ mécanique propre : c'est la jauge de reps qui résout
+    keepAmbianceAfterReward: false, // une fois la constellation complète, l'ambiance s'éteint
+    autoReward: false,              // ✦ c'est la constellation (Overlay) qui résout via onSolve
     activeClasses: ['day300-global'],
     doneClass: 'day300-lifting',
-    // Avancée live du défi injectée dans l'Overlay (jauge-fusée).
-    overlayProps: (ctx) => ({ reps: totalRepsToday(ctx), target: REP_GOAL }),
+    // Avancée live du défi (exercices validés aujourd'hui) injectée dans le HUD.
+    hudProps: (ctx) => ({ validated: validatedCount(ctx), goal: VALIDATE_GOAL }),
     Intro: Day300IntroModal,
-    Overlay: Day300Overlay,
+    Decor: Day300DecorOverlay,
+    Hud: Day300Hud,
     Reward: Day300RewardAnimation,
 });

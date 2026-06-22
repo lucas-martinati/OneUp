@@ -54,12 +54,6 @@
   display: none !important;
 }
 
-
-
-[data-perf="low"] .progress-ring-circle {
-  transition: none !important;
-}
-
 [data-perf="low"] .hover-lift {
   transition: none !important;
 }

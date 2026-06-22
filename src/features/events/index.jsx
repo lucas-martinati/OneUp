@@ -10,6 +10,10 @@ import { Day100EventManager } from './Day100Event';
 import { Day200EventManager } from './Day200Event';
 import { Day300EventManager } from './Day300Event';
 
+// Emplacement du HUD d'événement (thermomètre, constellation…) à placer dans le
+// layout des hôtes qui doivent l'afficher (Dashboard, ExercisePanel).
+export { EventHud } from './EventHud';
+
 const EVENT_MANAGERS = [
     Day100EventManager,
     Day200EventManager,

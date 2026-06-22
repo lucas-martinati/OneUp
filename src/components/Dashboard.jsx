@@ -8,7 +8,7 @@ import { DashboardHeader } from './dashboard/DashboardHeader';
 import { DashboardNavBar } from './dashboard/DashboardNavBar';
 import { SessionBubble } from './dashboard/SessionBubble';
 import { CategoryNav } from './dashboard/CategoryNav';
-import { DashboardEvents } from '@features/events';
+import { DashboardEvents, EventHud } from '@features/events';
 import { useAchievementToast } from '@hooks/useAchievementToast';
 import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
 import { useBackHandler } from '@hooks/useBackHandler';
@@ -254,6 +254,10 @@ export function Dashboard() {
                         onDiscard={handleDiscardSession}
                     />
                 )}
+
+                {/* HUD d'événement intégré (thermomètre / constellation), masqué
+                    quand une modale est ouverte — l'ExercisePanel affiche le sien. */}
+                {!anyModalOpen && <EventHud placement="dashboard" />}
 
                 <main className="flex-1 flex-col pos-relative" style={{ minHeight: 0 }}>
                     <div

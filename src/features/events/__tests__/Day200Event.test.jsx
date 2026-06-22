@@ -1,26 +1,32 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, act, cleanup } from '@testing-library/react';
-import { Day200EventManager } from '../Day200Event';
-import { EXERCISES } from '@config/exercises';
+import { Day200EventManager, SWEAT_GOAL } from '../Day200Event';
+import { EventHud } from '../EventHud';
+import { useEventHudStore } from '../eventHudStore';
 
 const today = '2026-07-19';
 
-const notPerfect = {
-  getExerciseCount: () => 0,
+// getExerciseCount renvoie `perEx` reps pour chaque exercice → total = perEx × nbExercices.
+const ctx = (perEx) => ({
+  getExerciseCount: () => perEx,
   getConfig: () => ({ difficulty: 1 }),
   completions: {},
-};
-const perfect = {
-  getExerciseCount: () => 99999,
-  getConfig: () => ({ difficulty: 1 }),
-  completions: { [today]: Object.fromEntries(EXERCISES.map(e => [e.id, { isCompleted: true }])) },
-};
+});
+
+// Le HUD (thermomètre) est publié dans le store et rendu par <EventHud/> (comme dans l'app).
+const Harness = (props) => (
+  <>
+    <Day200EventManager {...props} />
+    <EventHud placement="dashboard" />
+  </>
+);
 
 beforeEach(() => {
   vi.useFakeTimers();
   document.body.innerHTML = '<div id="root"></div>';
   sessionStorage.clear();
   localStorage.clear();
+  useEventHudStore.setState({ hud: null });
 });
 afterEach(() => {
   cleanup();
@@ -29,43 +35,44 @@ afterEach(() => {
 });
 
 const root = () => document.getElementById('root');
+const dismissIntro = (getByText) => {
+  act(() => { getByText(/faire tomber la pluie/i).click(); });
+  act(() => { vi.advanceTimersByTime(500); });
+};
 
 describe('Day200EventManager', () => {
   it('renders nothing when it is not day 200', () => {
-    const { container } = render(<Day200EventManager dayNumber={150} today={today} {...notPerfect} />);
-    expect(container.firstChild).toBeNull();
+    const { container } = render(<Harness dayNumber={150} today={today} {...ctx(0)} />);
+    expect(container.querySelector('.d200-thermo')).toBeNull();
   });
 
-  it('shows the welcome postcard and reveals its dismiss button', () => {
-    const { container } = render(<Day200EventManager dayNumber={200} today={today} {...notPerfect} />);
-    act(() => { vi.advanceTimersByTime(10000); });
-    expect(container.querySelector('button')).toBeTruthy();
+  it('shows the heatwave alert card with the sweat-challenge pretext', () => {
+    const { getByText } = render(<Harness dayNumber={200} today={today} {...ctx(0)} />);
+    expect(getByText(/Alerte Canicule/i)).toBeTruthy();
+    expect(getByText(/faire tomber la pluie/i)).toBeTruthy();
   });
 
-  it('enables the vacation theme after the welcome card is dismissed', () => {
-    const { container } = render(<Day200EventManager dayNumber={200} today={today} {...notPerfect} />);
-    act(() => { vi.advanceTimersByTime(10000); });
-    act(() => { container.querySelector('button').click(); });
-    act(() => { vi.advanceTimersByTime(500); });
+  it('enables the heatwave theme and shows the integrated thermometer once dismissed', () => {
+    const { getByText } = render(<Harness dayNumber={200} today={today} {...ctx(0)} />);
+    dismissIntro(getByText);
     expect(root().classList.contains('day200-global')).toBe(true);
+    expect(getByText(new RegExp(`/${SWEAT_GOAL}`))).toBeTruthy();
   });
 
-  it('silently marks the sunset as seen when the day is already perfect', () => {
-    render(<Day200EventManager dayNumber={200} today={today} {...perfect} />);
-    act(() => { vi.advanceTimersByTime(50); });
-    expect(localStorage.getItem('day200_sunset_seen')).toBe('1');
+  it('does NOT complete while reps are below the sweat goal', () => {
+    const { getByText } = render(<Harness dayNumber={200} today={today} {...ctx(1)} />);
+    dismissIntro(getByText);
+    act(() => { vi.advanceTimersByTime(2000); });
+    expect(localStorage.getItem('day200_challenge_done')).toBeNull();
   });
 
-  it('plays the sunset animation when the day becomes perfect after the welcome', async () => {
-    sessionStorage.setItem('day200_welcome_shown', '1');
-    const { rerender } = render(<Day200EventManager dayNumber={200} today={today} {...notPerfect} />);
-    act(() => { vi.advanceTimersByTime(10); });
-    expect(root().classList.contains('day200-global')).toBe(true);
-    await act(async () => {
-      rerender(<Day200EventManager dayNumber={200} today={today} {...perfect} />);
-      await Promise.resolve();
-    });
-    act(() => { vi.advanceTimersByTime(12000); });
-    expect(localStorage.getItem('day200_sunset_seen')).toBe('1');
+  it('completes when the sweat goal is reached → storm reward then done', () => {
+    const { getByText, rerender } = render(<Harness dayNumber={200} today={today} {...ctx(0)} />);
+    dismissIntro(getByText);
+    expect(localStorage.getItem('day200_challenge_done')).toBeNull();
+
+    act(() => { rerender(<Harness dayNumber={200} today={today} {...ctx(99999)} />); });
+    act(() => { vi.advanceTimersByTime(SWEAT_GOAL + 12000); });
+    expect(localStorage.getItem('day200_challenge_done')).toBe('1');
   });
 });

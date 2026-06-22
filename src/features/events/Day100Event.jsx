@@ -1003,6 +1003,6 @@ export const Day100EventManager = makeEventManager({
     activeClasses: ['day100-global', 'day100-flicker'],
     doneClass: 'day100-unhacking',
     Intro: Day100HackModal,
-    Overlay: Day100Overlay,
+    Decor: Day100Overlay, // Jour 100 : pas de HUD intégré (mécanique « journée parfaite »)
     Reward: Day100UnhackAnimation,
 });
