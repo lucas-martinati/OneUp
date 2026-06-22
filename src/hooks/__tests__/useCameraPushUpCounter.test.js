@@ -93,45 +93,74 @@ describe('stopCamera & recalibrate', () => {
 });
 
 describe('calibration countdown and frame processing', () => {
+  // rAF is scheduled via a 60ms timer (not 0ms) so that, under fake timers,
+  // virtual time — and thus Date.now() — advances between frames. The detector
+  // now requires the descent to last at least MIN_DOWN_MS (150ms), so a few
+  // 60ms-spaced frames are needed to satisfy it. The spacing also lets React
+  // commit the pushup-state change between frames so stateRef flips correctly.
+  const setupRaf = (cap) => {
+    let frames = 0;
+    globalThis.requestAnimationFrame = (cb) => { if (frames < cap) { frames++; setTimeout(cb, 60); } return frames; };
+    globalThis.cancelAnimationFrame = vi.fn();
+  };
+
+  const fakeVideo = () => ({ readyState: 2, paused: false, ended: false, play: () => Promise.resolve(), srcObject: null, onloadeddata: null });
+
+  const driveCalibration = async (result) => {
+    result.current.videoRef.current = fakeVideo();
+    await act(async () => { await result.current.startCamera(); });
+    result.current.videoRef.current = fakeVideo();
+    // Drive the 3s countdown one second at a time: each decrement reschedules
+    // the next timer from a React effect (microtask), so a single large jump
+    // would skip the not-yet-scheduled ticks.
+    for (let i = 0; i < 4; i++) {
+      await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    }
+    // Capture base frame (100ms) then run the spaced frame loop to completion.
+    await act(async () => { await vi.advanceTimersByTimeAsync(700); });
+  };
+
   it('counts down, captures a base frame, then counts a rep through the processing loop', async () => {
     vi.useFakeTimers();
     try {
-      // rAF scheduled asynchronously (via a 0ms timer) so React commits the
-      // pushup-state change between frames — that lets stateRef flip to 'down'
-      // before the 'up' frame, which is what counts a rep. Capped so the loop
-      // terminates instead of rescheduling forever.
-      let frames = 0;
-      globalThis.requestAnimationFrame = (cb) => { if (frames < 3) { frames++; setTimeout(cb, 0); } return frames; };
-      globalThis.cancelAnimationFrame = vi.fn();
+      setupRaf(8);
 
-      // base = zeros, down = bright (big diff), up = back to base (rep on return)
+      // base = zeros, sustained bright descent (big diff), then back to base.
+      // The descent spans two frames so it lasts long enough to count, and the
+      // return spans two frames so the EMA-smoothed score falls below threshold.
       const base = new Uint8ClampedArray(32 * 24 * 4);
       const down = new Uint8ClampedArray(32 * 24 * 4).fill(220);
       const up = new Uint8ClampedArray(32 * 24 * 4);
-      frameQueue = [base, down, up];
+      frameQueue = [base, down, down, up, up];
 
       const onRep = vi.fn();
       const { result } = renderHook(() => useCameraPushUpCounter(onRep));
-
-      // Attach a fake video element the hook's internal ref points at.
-      result.current.videoRef.current = { readyState: 2, paused: false, ended: false, play: () => Promise.resolve(), srcObject: null, onloadeddata: null };
-
-      await act(async () => { await result.current.startCamera(); });
-      result.current.videoRef.current = { readyState: 2, paused: false, ended: false, play: () => Promise.resolve(), srcObject: null, onloadeddata: null };
-
-      // Drive the 3s countdown one second at a time: each decrement reschedules
-      // the next timer from a React effect (microtask), so a single large jump
-      // would skip the not-yet-scheduled ticks.
-      for (let i = 0; i < 4; i++) {
-        await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
-      }
-      await act(async () => { await vi.advanceTimersByTimeAsync(200); });
-      // Let the async frame loop (down → up) run to completion.
-      await act(async () => { await vi.advanceTimersByTimeAsync(50); });
+      await driveCalibration(result);
 
       expect(result.current.isCalibrated).toBe(true);
-      // The processing loop transitioned up→down→up and counted one rep.
-      expect(onRep).toHaveBeenCalled();
+      // The processing loop transitioned up→down→up and counted exactly one rep.
+      expect(onRep).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not count a small movement that never reaches the descent threshold', async () => {
+    vi.useFakeTimers();
+    try {
+      setupRaf(8);
+
+      // Tiny pixel diff (noise / fidgeting) — stays below DOWN_ENTER, no rep.
+      const base = new Uint8ClampedArray(32 * 24 * 4);
+      const tiny = new Uint8ClampedArray(32 * 24 * 4).fill(15);
+      frameQueue = [base, tiny, tiny, base, base];
+
+      const onRep = vi.fn();
+      const { result } = renderHook(() => useCameraPushUpCounter(onRep));
+      await driveCalibration(result);
+
+      expect(result.current.isCalibrated).toBe(true);
+      expect(onRep).not.toHaveBeenCalled();
     } finally {
       vi.useRealTimers();
     }

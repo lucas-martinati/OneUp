@@ -1,10 +1,39 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { isAndroidPlatform } from '@utils/platform';
 
+// ── Detection tuning ──────────────────────────────────────────────────────
+// Per-frame score smoothing (EMA factor): damps sensor noise so a single
+// noisy frame can't trigger a false rep. Higher = more responsive, less smooth.
+const SCORE_SMOOTHING = 0.5;
+// Resting-baseline adaptation rate: slowly tracks ambient light / camera
+// auto-exposure drift while the user is in the 'up' position, so that drift
+// never accumulates into phantom motion. Only adapts at rest, never mid-rep.
+const BASELINE_ADAPT = 0.02;
+// Movement above the resting baseline needed to register the descent ('down').
+const DOWN_ENTER = 0.07;
+// Floor for the return ('up') threshold; the effective threshold is the max of
+// this and a fraction (40%) of the depth actually reached during the descent.
+const UP_EXIT = 0.04;
+// A counted rep must descend at least this deep — rejects small wobbles.
+const MIN_REP_DEPTH = 0.08;
+// Minimum time spent in the 'down' phase for a rep to count (ms) — rejects
+// fast flickers that aren't real push-ups.
+const MIN_DOWN_MS = 150;
+// Range mapping the effective score to the 0–100 proximity gauge.
+const PROXIMITY_RANGE = 0.18;
+// Minimum delay between two counted reps (ms).
+const REP_COOLDOWN_MS = 400;
+
 /**
  * Custom hook for camera-based push-up counting using a lightweight,
  * zero-dependency pixel-difference motion and proximity detection.
- * 
+ *
+ * Reliability relies on three things on top of the raw pixel diff:
+ *  - EMA smoothing of the per-frame score (rejects single-frame noise spikes),
+ *  - an adaptive resting baseline that cancels gradual lighting / auto-exposure
+ *    drift so the absolute thresholds stay meaningful over a long set, and
+ *  - minimum descent depth + dwell time so jitter is never counted as a rep.
+ *
  * @param {Function} onRepCounted Callback triggered when a push-up is validated.
  */
 export function useCameraPushUpCounter(onRepCounted) {
@@ -24,7 +53,10 @@ export function useCameraPushUpCounter(onRepCounted) {
     const audioCtxRef = useRef(null);
     const peakScoreRef = useRef(0);
     const lastRepTimeRef = useRef(0);
-    
+    const smoothScoreRef = useRef(0); // EMA-smoothed combined score
+    const restBaselineRef = useRef(0); // slow baseline tracking ambient/exposure drift
+    const downStartRef = useRef(0); // timestamp the current descent began
+
     // Stable callback reference to avoid stale closures in frame loops
     const onRepCountedRef = useRef(onRepCounted);
     useEffect(() => {
@@ -65,6 +97,9 @@ export function useCameraPushUpCounter(onRepCounted) {
         setCalibrateCountdown(3);
         peakScoreRef.current = 0;
         lastRepTimeRef.current = 0;
+        smoothScoreRef.current = 0;
+        restBaselineRef.current = 0;
+        downStartRef.current = 0;
     }, []);
 
     const startCamera = useCallback(async () => {
@@ -124,6 +159,9 @@ export function useCameraPushUpCounter(onRepCounted) {
         baseFrameRef.current = null;
         peakScoreRef.current = 0;
         lastRepTimeRef.current = 0;
+        smoothScoreRef.current = 0;
+        restBaselineRef.current = 0;
+        downStartRef.current = 0;
     }, []);
 
     // Polling mount check to reliably bind the media stream as soon as React renders the video tag
@@ -162,6 +200,12 @@ export function useCameraPushUpCounter(onRepCounted) {
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 baseFrameRef.current = new Uint8ClampedArray(imgData.data);
+                // Fresh reference frame → restart the smoothing/baseline state so
+                // detection starts from a clean rest point.
+                smoothScoreRef.current = 0;
+                restBaselineRef.current = 0;
+                peakScoreRef.current = 0;
+                downStartRef.current = 0;
                 setIsCalibrated(true);
                 playBeep(880, 0.2); // Success high pitch beep
             }
@@ -257,36 +301,57 @@ export function useCameraPushUpCounter(onRepCounted) {
                         : 0;
  
                     // Combined score: center changes weighted higher, plus light blocking (shadow)
-                    const combinedScore = (avgCenterDiff * 0.5) + (avgGlobalDiff * 0.2) + (centerLumaDrop * 0.3);
- 
-                    // Map score to proximity % (target full range is 0.18)
-                    const proxPct = Math.min(100, Math.max(0, Math.round((combinedScore / 0.18) * 100)));
-                    setProximity(proxPct);
- 
-                    // State machine checks
+                    const rawScore = (avgCenterDiff * 0.5) + (avgGlobalDiff * 0.2) + (centerLumaDrop * 0.3);
+
+                    // 1. Smooth out per-frame sensor noise (EMA).
+                    const smoothScore = smoothScoreRef.current + SCORE_SMOOTHING * (rawScore - smoothScoreRef.current);
+                    smoothScoreRef.current = smoothScore;
+
+                    // 2. Adapt the resting baseline only while at rest ('up'), so gradual
+                    //    lighting / auto-exposure drift is cancelled instead of accumulating.
+                    //    It is frozen during a descent so it can't eat the rep signal.
                     const currentState = stateRef.current;
-                    // Transition to DOWN: when combined score is high (body/chest close to camera)
-                    if (currentState === 'up' && combinedScore > 0.12) {
+                    if (currentState === 'up') {
+                        restBaselineRef.current += BASELINE_ADAPT * (smoothScore - restBaselineRef.current);
+                    }
+
+                    // 3. Effective movement = how far above the resting baseline we are.
+                    const effScore = Math.max(0, smoothScore - restBaselineRef.current);
+
+                    // Map effective score to proximity % (full range is PROXIMITY_RANGE)
+                    const proxPct = Math.min(100, Math.max(0, Math.round((effScore / PROXIMITY_RANGE) * 100)));
+                    setProximity(proxPct);
+
+                    const now = Date.now();
+
+                    // State machine
+                    // Transition to DOWN: effective movement is high (body/chest near camera)
+                    if (currentState === 'up' && effScore > DOWN_ENTER) {
                         setPushupState('down');
-                        peakScoreRef.current = combinedScore;
+                        peakScoreRef.current = effScore;
+                        downStartRef.current = now;
                         playBeep(440, 0.08); // Short low pitch beep for bottom phase
-                    } 
-                    // Transition to UP: when combined score is low again (body pushed back up)
+                    }
+                    // Transition to UP: effective movement is low again (body pushed back up)
                     else if (currentState === 'down') {
-                        if (combinedScore > peakScoreRef.current) {
-                            peakScoreRef.current = combinedScore;
+                        if (effScore > peakScoreRef.current) {
+                            peakScoreRef.current = effScore;
                         }
-                        // Must drop below 0.07 OR below 40% of the peak score reached during this down phase
-                        const returnThreshold = Math.max(0.07, peakScoreRef.current * 0.4);
-                        if (combinedScore < returnThreshold) {
-                            // Cooldown security: 400ms minimum between successive counted reps
-                            const now = Date.now();
-                            if (now - lastRepTimeRef.current > 400) {
+                        // Must drop below the floor OR below 40% of the depth reached this descent
+                        const returnThreshold = Math.max(UP_EXIT, peakScoreRef.current * 0.4);
+                        if (effScore < returnThreshold) {
+                            // Count a rep only when the descent was deep enough and lasted long
+                            // enough, with a cooldown — this rejects jitter and double counts.
+                            const deepEnough = peakScoreRef.current >= MIN_REP_DEPTH;
+                            const longEnough = now - downStartRef.current >= MIN_DOWN_MS;
+                            const cooledDown = now - lastRepTimeRef.current > REP_COOLDOWN_MS;
+                            if (deepEnough && longEnough && cooledDown) {
                                 lastRepTimeRef.current = now;
-                                setPushupState('up');
                                 playBeep(660, 0.12); // Clear confirmation beep
                                 onRepCountedRef.current();
                             }
+                            // Always return to 'up' so a shallow/short wobble resets cleanly.
+                            setPushupState('up');
                         }
                     }
                 } catch (e) {
