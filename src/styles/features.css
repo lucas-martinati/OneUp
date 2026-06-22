@@ -393,6 +393,147 @@ input:checked + .slider:before { transform: translateX(20px); }
   .cardio-wall-glow { animation: none; }
 }
 
+/* ── Cardio History ────────────────────────────────────────────────────
+   Motivating session log: a summary banner, month dividers and richer
+   session cards with stat chips and an expandable map. */
+
+/* Summary banner with aggregate stats. */
+.cardio-hist-summary {
+  display: flex;
+  align-items: stretch;
+  gap: 1px;
+  padding: 2px;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-lg);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.cardio-hist-summary-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: clamp(10px, 1.6vh, 15px) 6px;
+  text-align: center;
+}
+
+.cardio-hist-summary-value {
+  font-size: clamp(1.05rem, 2.4vh, 1.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--text-primary);
+}
+
+.cardio-hist-summary-value > span {
+  font-size: 0.62em;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-left: 2px;
+}
+
+.cardio-hist-summary-label {
+  font-size: clamp(0.55rem, 1.1vh, 0.68rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.cardio-hist-summary-divider {
+  width: 1px;
+  align-self: center;
+  height: 56%;
+  background: var(--border-default);
+}
+
+/* Month section label. */
+.cardio-hist-month {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 2px 2px;
+  font-size: clamp(0.62rem, 1.2vh, 0.74rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.cardio-hist-month::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-default), transparent);
+}
+
+/* Session card. */
+.cardio-session-card {
+  position: relative;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.cardio-session-card.is-tappable { cursor: pointer; }
+.cardio-session-card.is-tappable:hover { border-color: var(--border-strong); }
+
+/* Stat chip inside a session card. */
+.cardio-stat-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cardio-stat-chip-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: clamp(0.55rem, 1.05vh, 0.66rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.cardio-stat-chip-value {
+  font-size: clamp(0.84rem, 1.7vh, 1.05rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.cardio-session-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  background: var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+  transition: transform 0.25s var(--ease-panel-in), color 0.2s ease, background-color 0.2s ease;
+}
+
+.cardio-session-card.is-open .cardio-session-chevron {
+  transform: rotate(180deg);
+  color: var(--text-primary);
+  background: var(--surface-hover);
+}
+
 /* --- Camera Push-up Counter Premium Styles --- */
 
 /* ── Mode toggle row ───────────────────────────────────────────────────── */
