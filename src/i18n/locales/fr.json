@@ -381,7 +381,11 @@
     "cameraNoPermission": "Accès caméra refusé",
     "cameraLoading": "Démarrage caméra...",
     "cameraCalibrating": "Calibrage dans {{count}}s...",
-    "cameraModeDesc": "Pose le téléphone au sol sous ton visage. La caméra compte tes pompes automatiquement."
+    "cameraModeDesc": "Pose le téléphone au sol sous ton visage. La caméra compte tes pompes automatiquement.",
+    "cameraHoldStill": "Reste immobile",
+    "cameraStateDown": "Bas",
+    "cameraStateUp": "Haut",
+    "cameraDepth": "Profondeur"
   },
   "customCategories": {
     "colorLabel": "Couleur de la catégorie",

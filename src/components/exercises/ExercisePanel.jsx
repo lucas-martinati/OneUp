@@ -286,13 +286,13 @@ export function ExercisePanel({
                     cameraError={cameraError}
                     isCalibrated={isCalibrated}
                     calibrateCountdown={calibrateCountdown}
+                    pushupState={pushupState}
                     t={t}
                 />
 
                 {isCameraActive ? (
                     <CameraLiveStats
                         activeColor={activeColor}
-                        exerciseConfig={exerciseConfig}
                         displayCount={displayCount}
                         dailyGoal={dailyGoal}
                         proximity={proximity}

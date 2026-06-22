@@ -381,7 +381,11 @@
     "cameraNoPermission": "Camera access denied",
     "cameraLoading": "Starting camera...",
     "cameraCalibrating": "Calibrating in {{count}}s...",
-    "cameraModeDesc": "Posiziona il telefono sul pavimento sotto il viso. La fotocamera conta automaticamente i piegamenti."
+    "cameraModeDesc": "Posiziona il telefono sul pavimento sotto il viso. La fotocamera conta automaticamente i piegamenti.",
+    "cameraHoldStill": "Resta fermo",
+    "cameraStateDown": "Giù",
+    "cameraStateUp": "Su",
+    "cameraDepth": "Profondità"
   },
   "customExercises": {
     "categoryLabel": "Categoria",

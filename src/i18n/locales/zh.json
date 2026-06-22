@@ -381,7 +381,11 @@
     "cameraNoPermission": "Camera access denied",
     "cameraLoading": "Starting camera...",
     "cameraCalibrating": "Calibrating in {{count}}s...",
-    "cameraModeDesc": "将手机放在脸下方的地面上。相机会自动记录您的俯卧撑次数。"
+    "cameraModeDesc": "将手机放在脸下方的地面上。相机会自动记录您的俯卧撑次数。",
+    "cameraHoldStill": "保持静止",
+    "cameraStateDown": "向下",
+    "cameraStateUp": "向上",
+    "cameraDepth": "深度"
   },
   "customExercises": {
     "categoryLabel": "类别",

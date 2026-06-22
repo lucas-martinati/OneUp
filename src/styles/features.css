@@ -290,21 +290,82 @@ input:checked + .slider:before { transform: translateX(20px); }
 .cardio-strava-btn:active { transform: scale(0.97) !important; }
 
 /* --- Camera Push-up Counter Premium Styles --- */
-.camera-active-ring-pulse {
-  animation: cameraPulse 2s infinite ease-in-out;
+
+/* ── Mode toggle row ───────────────────────────────────────────────────── */
+.camera-mode-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-@keyframes cameraPulse {
-  0%, 100% {
-    filter: drop-shadow(0 0 4px var(--exercise-color, #818cf8));
-    opacity: 0.9;
-  }
-  50% {
-    filter: drop-shadow(0 0 16px var(--exercise-color, #818cf8));
-    opacity: 1;
-  }
+.camera-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 18px 9px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  min-height: var(--touch-min);
 }
 
+.camera-mode-toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.camera-mode-toggle.is-active {
+  background: color-mix(in srgb, var(--exercise-color) 16%, transparent);
+  border-color: color-mix(in srgb, var(--exercise-color) 55%, transparent);
+  color: var(--exercise-color);
+}
+
+.camera-mode-toggle.is-active .camera-mode-toggle-icon {
+  background: color-mix(in srgb, var(--exercise-color) 28%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--exercise-color) 45%, transparent);
+}
+
+.camera-recal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: background 0.2s ease, color 0.2s ease;
+  min-height: var(--touch-min);
+}
+
+.camera-mode-hint {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: -4px 0 4px;
+  text-align: center;
+  max-width: 280px;
+  line-height: 1.4;
+  opacity: 0.75;
+}
+
+/* ── Circular live video ───────────────────────────────────────────────── */
 .camera-video-wrapper {
   position: absolute;
   top: 50%;
@@ -315,8 +376,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   border-radius: 50%;
   overflow: hidden;
   background: #0d0d13;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-  border: 2px solid rgba(255,255,255,0.05);
+  box-shadow: inset 0 0 24px rgba(0,0,0,0.85);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -324,14 +384,8 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 @keyframes cameraVideoEnter {
-  from {
-    transform: translate(-50%, -50%) scale(0);
-    opacity: 0;
-  }
-  to {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
+  from { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
 }
 
 .camera-video-feed {
@@ -339,71 +393,221 @@ input:checked + .slider:before { transform: translateX(20px); }
   height: 100%;
   object-fit: cover;
   transform: scaleX(-1); /* Mirror camera feed */
-  opacity: 0.85;
-  transition: opacity 0.3s;
+  opacity: 0.9;
 }
 
+/* Accent rim drawn over the video edge; brightens on the 'down' phase.
+   Transition is state-driven (twice per rep), not per-frame — keeps the panel cool. */
+.camera-video-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 2px solid color-mix(in srgb, var(--exercise-color) 30%, transparent);
+  box-shadow:
+    inset 0 0 22px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(255,255,255,0.04);
+  transition: border-color 0.22s ease, box-shadow 0.22s ease;
+  z-index: 5;
+}
+
+.camera-video-wrapper.is-down .camera-video-rim {
+  border-color: var(--exercise-color);
+  box-shadow:
+    inset 0 0 30px color-mix(in srgb, var(--exercise-color) 35%, transparent),
+    0 0 18px color-mix(in srgb, var(--exercise-color) 55%, transparent);
+}
+
+/* Scanning sweep — only rendered during calibration */
 .camera-scanning-line {
   position: absolute;
-  left: 0;
-  width: 100%;
-  height: 3px;
+  left: 8%;
+  right: 8%;
+  top: 0;
+  height: 2px;
+  border-radius: 2px;
   background: linear-gradient(90deg, transparent, var(--exercise-color, #818cf8), transparent);
-  box-shadow: 0 0 8px var(--exercise-color, #818cf8);
-  animation: cameraScan 2.5s infinite ease-in-out;
+  box-shadow: 0 0 10px var(--exercise-color, #818cf8);
+  animation: cameraScan 2.2s infinite ease-in-out;
   pointer-events: none;
   z-index: 10;
+  will-change: transform;
 }
 
+/* Travel via transform (compositor-only) rather than animating `top` */
 @keyframes cameraScan {
-  0%, 100% { top: 10%; }
-  50% { top: 90%; }
+  0%, 100% { transform: translateY(18px); opacity: 0.3; }
+  50%      { transform: translateY(120px); opacity: 1; }
 }
 
 .camera-calibration-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: radial-gradient(circle at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.78) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   text-align: center;
   padding: 16px;
   z-index: 20;
 }
 
 .camera-countdown-num {
-  font-size: 3.5rem;
+  font-size: 4.5rem;
   font-weight: 800;
-  color: var(--exercise-color, #818cf8);
-  animation: countdownPulse 1s infinite ease-in-out;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 24px color-mix(in srgb, var(--exercise-color) 70%, transparent);
+  animation: countdownPop 1s infinite ease-out;
 }
 
-@keyframes countdownPulse {
-  0% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(0.8); opacity: 0.3; }
+@keyframes countdownPop {
+  0%   { transform: scale(1.15); opacity: 1; }
+  70%  { transform: scale(0.9);  opacity: 0.55; }
+  100% { transform: scale(0.9);  opacity: 0.55; }
 }
 
-.camera-proximity-container {
+.camera-overlay-hint {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.82);
+}
+
+.camera-overlay-error {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #f87171;
+}
+
+.camera-spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255,255,255,0.18);
+  border-top-color: var(--exercise-color, #818cf8);
+  animation: cameraSpin 0.8s linear infinite;
+}
+
+@keyframes cameraSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Live stats card (reps + depth gauge) ──────────────────────────────── */
+.camera-live-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   width: 100%;
-  max-width: 240px;
-  height: 6px;
+  max-width: 300px;
+  min-height: 52px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.camera-live-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.camera-state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.camera-state-pill.is-down {
+  color: var(--exercise-color);
+  background: color-mix(in srgb, var(--exercise-color) 18%, transparent);
+  border-color: color-mix(in srgb, var(--exercise-color) 45%, transparent);
+}
+
+.camera-live-reps {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.camera-live-reps-num {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 0.9;
+  color: var(--exercise-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.camera-live-reps-goal {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.camera-depth {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.camera-depth-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.camera-depth-track {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
   background: rgba(255,255,255,0.08);
-  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.05);
   overflow: hidden;
-  margin: 6px 0;
-  border: 1px solid rgba(255,255,255,0.04);
 }
 
-.camera-proximity-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--exercise-color-dim, rgba(129,140,248,0.2)), var(--exercise-color, #818cf8));
-  border-radius: 3px;
-  transition: width 0.1s ease-out;
+.camera-depth-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--exercise-color) 35%, transparent),
+    var(--exercise-color));
+  /* transform is compositor-only; cheap to update every frame */
+  transition: transform 0.08s linear;
 }
 
-
+.camera-live-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--text-secondary);
+}
 
 /* Responsive adjustments for devices with shorter viewport heights (e.g. Xiaomi 15T Pro, zoomed views) */
 @media (max-height: 740px) {

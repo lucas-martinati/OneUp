@@ -381,7 +381,11 @@
     "cameraNoPermission": "Camera access denied",
     "cameraLoading": "Starting camera...",
     "cameraCalibrating": "Calibrating in {{count}}s...",
-    "cameraModeDesc": "Place the phone on the floor under your face. The camera counts your push-ups automatically."
+    "cameraModeDesc": "Place the phone on the floor under your face. The camera counts your push-ups automatically.",
+    "cameraHoldStill": "Hold still",
+    "cameraStateDown": "Down",
+    "cameraStateUp": "Up",
+    "cameraDepth": "Depth"
   },
   "customCategories": {
     "colorLabel": "Category color",

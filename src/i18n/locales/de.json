@@ -381,7 +381,11 @@
     "cameraNoPermission": "Camera access denied",
     "cameraLoading": "Starting camera...",
     "cameraCalibrating": "Calibrating in {{count}}s...",
-    "cameraModeDesc": "Legen Sie das Telefon unter Ihr Gesicht auf den Boden. Die Kamera zählt Ihre Liegestütze automatisch."
+    "cameraModeDesc": "Legen Sie das Telefon unter Ihr Gesicht auf den Boden. Die Kamera zählt Ihre Liegestütze automatisch.",
+    "cameraHoldStill": "Stillhalten",
+    "cameraStateDown": "Unten",
+    "cameraStateUp": "Oben",
+    "cameraDepth": "Tiefe"
   },
   "customExercises": {
     "categoryLabel": "Kategorie",

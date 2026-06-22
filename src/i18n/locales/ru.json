@@ -381,7 +381,11 @@
     "cameraNoPermission": "Camera access denied",
     "cameraLoading": "Starting camera...",
     "cameraCalibrating": "Calibrating in {{count}}s...",
-    "cameraModeDesc": "Положите телефон на пол под лицо. Камера автоматически считает отжимания."
+    "cameraModeDesc": "Положите телефон на пол под лицо. Камера автоматически считает отжимания.",
+    "cameraHoldStill": "Не двигайтесь",
+    "cameraStateDown": "Вниз",
+    "cameraStateUp": "Вверх",
+    "cameraDepth": "Глубина"
   },
   "customExercises": {
     "categoryLabel": "Категория",

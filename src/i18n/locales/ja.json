@@ -381,7 +381,11 @@
     "cameraNoPermission": "Camera access denied",
     "cameraLoading": "Starting camera...",
     "cameraCalibrating": "Calibrating in {{count}}s...",
-    "cameraModeDesc": "顔の下の床にスマートフォンを置いてください。カメラが自動的に腕立て伏せをカウントします。"
+    "cameraModeDesc": "顔の下の床にスマートフォンを置いてください。カメラが自動的に腕立て伏せをカウントします。",
+    "cameraHoldStill": "じっとしていてください",
+    "cameraStateDown": "下",
+    "cameraStateUp": "上",
+    "cameraDepth": "深さ"
   },
   "customExercises": {
     "categoryLabel": "カテゴリー",

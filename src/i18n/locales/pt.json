@@ -381,7 +381,11 @@
     "cameraNoPermission": "Camera access denied",
     "cameraLoading": "Starting camera...",
     "cameraCalibrating": "Calibrating in {{count}}s...",
-    "cameraModeDesc": "Coloque o telefone no chão sob o seu rosto. A câmera conta as suas flexões automaticamente."
+    "cameraModeDesc": "Coloque o telefone no chão sob o seu rosto. A câmera conta as suas flexões automaticamente.",
+    "cameraHoldStill": "Fique parado",
+    "cameraStateDown": "Abaixo",
+    "cameraStateUp": "Acima",
+    "cameraDepth": "Profundidade"
   },
   "customExercises": {
     "categoryLabel": "Categoria",

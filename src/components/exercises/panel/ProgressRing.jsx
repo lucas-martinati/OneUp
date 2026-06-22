@@ -25,6 +25,7 @@ export function ProgressRing({
     cameraError = null,
     isCalibrated = false,
     calibrateCountdown = 0,
+    pushupState = 'up',
     t
 }) {
     const label = isTimer ? t('cardio.duration') : t('common.reps');
@@ -91,7 +92,6 @@ export function ProgressRing({
                     strokeDashoffset={ringCircumference * (1 - progress / 100)}
                     strokeLinecap="round"
                     transform="rotate(-90 110 110)"
-                    className={isCameraActive ? 'camera-active-ring-pulse' : ''}
                     style={{
                         transition: `${isTimer && isRunning ? 'stroke-dashoffset 1s linear' : 'stroke-dashoffset 0.45s ease'}, stroke 0.45s ease, filter 0.45s ease`,
                         // Glow is a paint-time filter. While a timer is actively
@@ -109,7 +109,10 @@ export function ProgressRing({
             </svg>
 
             {isCameraActive && (
-                <div className="camera-video-wrapper" style={{ width: `calc(${ringSize} - 24px)`, height: `calc(${ringSize} - 24px)` }}>
+                <div
+                    className={`camera-video-wrapper${isCalibrated && pushupState === 'down' ? ' is-down' : ''}`}
+                    style={{ width: `calc(${ringSize} - 24px)`, height: `calc(${ringSize} - 24px)`, '--exercise-color': activeColor }}
+                >
                     <video
                         ref={videoRef}
                         className="camera-video-feed"
@@ -117,11 +120,18 @@ export function ProgressRing({
                         muted
                         autoPlay
                     />
-                    <div className="camera-scanning-line" style={{ '--exercise-color': activeColor }} />
+
+                    {/* Accent rim that reacts to the rep state (cheap: toggles on state, not per-frame) */}
+                    <div className="camera-video-rim" />
+
+                    {/* Scanning sweep only while calibrating — keeps the active phase cool */}
+                    {!cameraError && !isCalibrated && (
+                        <div className="camera-scanning-line" />
+                    )}
 
                     {cameraError === 'permission_denied' && (
                         <div className="camera-calibration-overlay">
-                            <span style={{ fontSize: '0.8rem', color: '#f87171', fontWeight: '700' }}>
+                            <span className="camera-overlay-error">
                                 {t('counter.cameraNoPermission')}
                             </span>
                         </div>
@@ -129,15 +139,15 @@ export function ProgressRing({
 
                     {!cameraError && !isCalibrated && calibrateCountdown > 0 && (
                         <div className="camera-calibration-overlay">
-                            <div className="camera-countdown-num" style={{ '--exercise-color': activeColor, fontSize: '4.5rem' }}>{calibrateCountdown}</div>
+                            <div className="camera-countdown-num">{calibrateCountdown}</div>
+                            <span className="camera-overlay-hint">{t('counter.cameraHoldStill')}</span>
                         </div>
                     )}
 
                     {!cameraError && !isCalibrated && calibrateCountdown === 0 && (
                         <div className="camera-calibration-overlay">
-                            <span style={{ fontSize: '0.75rem', color: 'white', opacity: 0.8 }}>
-                                {t('counter.cameraLoading')}
-                            </span>
+                            <span className="camera-spinner" />
+                            <span className="camera-overlay-hint">{t('counter.cameraLoading')}</span>
                         </div>
                     )}
                 </div>
