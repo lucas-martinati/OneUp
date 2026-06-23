@@ -1,61 +1,148 @@
 <div align="center">
-  <img src="./public/pwa-512x512.png" alt="OneUp Logo" width="50" style="border-radius: 10%;" />
-  <h1>OneUp: Le Défi Fitness Ultime sur 365 Jours 🚀</h1>
-  <p><b>Transformez votre corps et votre mental avec une progression jour après jour.</b></p>
+  <img src="./public/pwa-512x512.png" alt="OneUp Logo" width="80" style="border-radius: 16px;" />
+  <h1>🔥 OneUp</h1>
+  <p><b>The 365-Day Progressive Fitness Challenge</b></p>
+  <p>
+    <a href="https://play.google.com/store/apps/details?id=com.lucasm548.oneup">
+      <img src="https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white" alt="Google Play" />
+    </a>
+    <img src="https://img.shields.io/badge/version-3.2.0-blue?style=for-the-badge" alt="Version" />
+    <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License" />
+  </p>
 </div>
 
-**OneUp** n'est pas qu'une simple application de fitness. C'est un défi quotidien sur 365 jours conçu pour bâtir la discipline. Chaque jour, le nombre de répétitions de vos exercices augmente progressivement. L'objectif ? Ne jamais briser la chaîne et tenir toute l'année.
+🚀 **OneUp** is a progressive fitness challenge where your daily rep goal increases over 365 days. Complete your exercises every day, build an unbreakable streak, and track your transformation with rich analytics. Compete with friends in Clans, earn achievements, and push your limits — one day at a time.
 
-Avec un savant mélange de gamification, d'aspects sociaux (Clans) et de statistiques poussées, OneUp vous aide à devenir la meilleure version de vous-même.
-
-Built with **Vibe Coding**.
+Available as a **PWA** 🌐 and **Android app** 📱 (Capacitor).
 
 ---
 
-## 🔥 Fonctionnalités Principales
+## ✨ Features
 
-### 🏋️‍♂️ Exercices Progressifs
-- **Plusieurs Exercices au Poids du Corps** : Pompes, Squats, Tractions, Abdos, Jumping Jacks, Fentes, Burpees, Gainage (s), Dips, Mountain Climbers.
-- **Le Concept** : Le nombre de répétitions augmente chaque jour pendant 365 jours selon un multiplicateur adapté à chaque exercice.
-- **Exercices Lestés (Premium)** : Intégration d'exercices avec haltères et barres (Biceps Curl, Hammer Curl, Bench Press, Overhead Press, Squats, Deadlift, Barbell Row) pour aller encore plus loin.
+### 🏋️ Exercise System
+- **10 bodyweight exercises** — Pushups, Squats, Pullups, Abs, Jumping Jacks, Lunges, Burpees, Plank, Dips, Mountain Climbers
+- **7 weight exercises** (Premium) — Biceps Curl, Hammer Curl, Bench Press, Overhead Press, Squat, Deadlift, Barbell Row
+- **2 cardio activities** — Running & Cycling with Strava integration
+- **Custom exercises & categories** — Create your own exercises and organize them
+- **Camera-based push-up counter** — AI-powered rep counting via your camera
+- **Progressive difficulty** — Each exercise has its own multiplier; daily goal = `ceil(day × multiplier × user_difficulty)`
+- **Difficulty adjustment** — Per-exercise multiplier override (0.1× to 3×)
 
-### 🎮 Gamification & Motivation
-- **Streak** : Maintenez votre flamme en vie ! Elle s'affiche fièrement sur votre Dashboard.
-- **Système de Clans** : Ne souffrez pas seul. Créez ou rejoignez un clan, affrontez vos amis, et envoyez des "pokes" (notifications) aux membres de votre clan pour les motiver ! 
+### 🎯 Workout Sessions & Routines
+- **Session queue** — Build a workout queue with drag-and-drop reordering
+- **Routines** — Save and load workout presets (Premium: unlimited, Free: 3 max)
+- **Auto-naming** — Smart session names generated from your exercises
+- **Session history** — Last 20 sessions synced to the cloud
+- **Timer exercises** — Plank and other duration-based movements
 
-### 📊 Statistiques & Suivi (Data-Driven)
-- **Tableau de Bord Complet** : Répétitions totales, exercice champion, meilleur jour, moyenne hebdomadaire, etc.
-- **Calendrier Visuel** : Suivez votre régularité et votre taux de complétion d'un coup d'œil.
-- **Suivi Avancé de la Performance** : Graphiques, répartition de l'effort et métriques approfondies pour ajuster vos entraînements.
+### 👥 Social & Gamification
+- **Clans** — Create or join clans with a 6-letter code, view member leaderboards, send pokes
+- **Global leaderboard** — Ranked by total reps, per-exercise rankings, shield status
+- **Shield system** — 🟢 Green = active today, 🟠 Orange = suspicious timestamp (anti-cheat)
+- **40 achievement badges** — Streak, volume, perfection, schedule, social & secret categories
+- **Special events** — Day 100, 200, 300 milestone celebrations with HUD
+- **Share cards** — Generate and share beautiful workout stat cards
+- **Pro & Supporter tiers** — Unlock weight exercises, themes, unlimited routines
 
-## 📱 Installer l'Application
+### 📊 Analytics & Tracking
+- **Visual calendar** — See your consistency at a glance with color-coded dots
+- **Statistics dashboard** — Total reps, champion exercise, best day, weekly averages
+- **Evolution charts** — Per-exercise progress over time
+- **Radar chart** — Balanced effort visualization
+- **Consistency pie chart** — Workout frequency breakdown
+- **Monthly activity chart** — Track your monthly volume
+- **Weight progression** — Track weight used per exercise over time
+- **Session history** — Browse past workouts with details
 
-L'application est cross-platform (PWA / Android). Vous pouvez la télécharger directement depuis le Play Store :
+### 💎 Premium Features (Pro)
+- Weight exercises (barbell/dumbbell movements)
+- Unlimited custom routines
+- Premium themes (light, colored variants)
+- Custom exercise categories
+- Priority support
 
-[![Disponible sur Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.lucasm548.oneup&pcampaignid=web_share)
+### ☁️ Data & Sync
+- **Offline-first** — All data stored locally, synced to cloud when signed in
+- **Firebase Realtime Database** — Real-time sync across devices
+- **Conflict resolution** — Smart merge of local and cloud data
+- **Cloud auto-save** — Changes saved automatically
+- **Strava integration** — Sync running/cycling activities with GPS maps
 
 ---
 
-## 🛠 Technique & Architecture
+## 🛠️ Tech Stack
 
-OneUp mise sur une architecture moderne, fluide et sécurisée :
+| Layer | Technology |
+|-------|-----------|
+| **Framework** | React 19 |
+| **Build** | Vite 7 |
+| **Mobile** | Capacitor 8 (Android) |
+| **State** | Zustand 5 |
+| **i18n** | i18next (10 languages) |
+| **Icons** | Lucide React |
+| **Charts** | Custom SVG + CSS |
+| **Maps** | Leaflet + React-Leaflet |
+| **Backend** | Firebase Realtime Database |
+| **Auth** | Firebase Auth (Google) |
+| **Payments** | RevenueCat |
+| **Server** | Firebase Cloud Functions |
+| **PWA** | vite-plugin-pwa (Workbox) |
+| **E2E** | Playwright |
+| **Tests** | Vitest + Testing Library |
 
-- **Front-end** : **React 19 + Vite** pour une UI ultra-réactive.
-- **Mobile** : **Capacitor** pour un runtime natif fluide sur Android.
-- **Interface & Design** : Design "Dark Premium" avec animations fluides, confettis CSS, UI adaptative en onglets sur mobile, et composants réalisés avec Tailwind CSS / Lucide React.
-- **Backend & Données** : **Firebase Realtime Database** avec un système robuste de *Security Rules* granulaires (pour protéger les Clans, Profils et Données Premium).
-- **Authentification** : Authentification Google via Firebase Auth.
-- **Paiements** : Intégration RevenueCat renforcée par des webhooks serveur pour vérifier et sécuriser les abonnements.
+### 🌍 Supported Languages
+English, French, German, Spanish, Italian, Portuguese, Russian, Japanese, Korean, Chinese
 
 ---
 
-## 🧑‍💻 Installation & Build (Pour les développeurs)
+## 🏗️ Architecture
 
-### Prérequis
-- Node.js (v18+)
-- Android SDK (pour le build via Capacitor)
+```
+src/
+├── components/         # UI components (core, dashboard, exercises, stats, social, settings, admin, feedback)
+│   ├── core/           # App orchestrator, error boundary, loading, PWA
+│   ├── dashboard/      # Main dashboard, navigation, slides, session bubbles
+│   ├── exercises/      # Exercise panel, workout session, custom exercises
+│   ├── stats/          # Calendar, charts, highlights, filters
+│   ├── social/         # Clans, leaderboard, pokes, user details
+│   ├── settings/       # Onboarding, settings panels, store, cloud sync
+│   └── admin/          # Admin panel, JSON editor, user management
+├── features/           # Domain features
+│   ├── cardio/         # Running/cycling with GPS maps
+│   ├── events/         # Day 100/200/300 special events
+│   ├── announcements/  # In-app announcement system
+│   └── share/          # Share card generation
+├── hooks/              # Custom React hooks (25+)
+├── services/           # Firebase services (auth, dataSync, clan, cardio, strava, purchases)
+├── store/              # Zustand stores (progress, settings, exercise, cloud sync, UI)
+├── config/             # Exercise definitions, categories, badges, themes, languages
+├── contexts/           # React contexts (Auth, Subscription, Exercises)
+├── utils/              # Utilities (stats, sync, platform, icons, sound, logger)
+├── styles/             # CSS modules + design tokens
+└── i18n/locales/       # Translation files (10 languages)
 
-### Démarrage Rapide
+firebase/
+└── functions/          # Cloud Functions (leaderboard, revenuecat webhook, strava proxy, admin)
+    └── shared/         # Shared code (exercise rules, badge rules, DB schema)
+```
+
+### ☁️ Cloud Functions
+- **onProgressChange** — Recomputes leaderboard entries when workouts change
+- **onCardioChange** — Syncs cardio sessions to leaderboard
+- **onSettingsChange** — Updates leaderboard on pseudo/difficulty/visibility changes
+- **onPurchaseChange** — Reflects Pro/Supporter status immediately
+- **onRevenueCatWebhook** — Verifies and applies subscription changes
+- **stravaExchangeToken / stravaRefreshToken** — OAuth proxy (secrets never leave server)
+- **onAccountDeleted** — Cleans up all user data on account deletion
+- **auditStaleData / pruneStaleData** — Schema-driven stale data management
+- **backfillUserProfiles** — Admin utility for profile data recovery
+
+### 🗄️ Database Schema
+Firebase RTDB structure is defined and documented in `firebase/functions/shared/dbSchema.js` with a dedicated path builder (`paths`) used by both client and server — no hardcoded path strings.
+
+---
+
+## 🚀 Getting Started
 
 ```bash
 git clone https://github.com/LucasM548/OneUp.git
@@ -64,61 +151,96 @@ npm install
 npm run dev
 ```
 
-### Commandes de Build
+### 📋 Prerequisites
+- Node.js 18+
+- Android SDK (for native build)
 
-| Commande | Description |
-|----------|-------------|
-| `npm run build` | Build l'application web (dossier `dist/`) idéale pour l'hébergement PWA |
-| `npm run build:bundle` | Génère un Android App Bundle (AAB) signé pour le Google Play Store |
-| `npm run build:apk` | Génère un APK natif installable manuellement pour les tests Android |
-
-*Note: Les APK se trouvent dans `android/app/build/outputs/apk/release/`.*
-
-### Qualité du Code & Validation Cohérence 🛠️
-
-Pour garantir la stabilité, la cohérence et la propreté de l'ensemble du projet, un script de validation globale est disponible :
-
-```bash
-npm run lint
-```
-
-Ce script regroupe et exécute séquentiellement **8 vérifications critiques** pour s'assurer que tout le code reste robuste et cohérent :
-1. 🔍 **ESLint & SonarJS** : Analyse de la syntaxe JS/React et détection de code spaghetti, de complexité cognitive, ou de bugs potentiels.
-2. ✂️ **Knip** : Identification des fichiers inutilisés, des exports morts et des dépendances orphelines.
-3. 🌐 **check-i18n-keys** : Vérification de la correspondance entre les clés de traduction utilisées dans l'application et celles déclarées dans le fichier de référence `en.json`.
-4. ⚖️ **check-i18n-consistency** : Contrôle de cohérence (structure, clés manquantes, doublons) entre toutes les langues gérées.
-5. 🎨 **check-unused-css** : Scan et détection automatique des classes CSS inutilisées au sein de l'application.
-6. 💅 **Stylelint** : Validation et uniformisation des styles CSS (bonnes pratiques et erreurs de syntaxe).
-7. 🔄 **Dépendances circulaires (Madge)** : Détection et prévention des cycles d'importation dans les modules de l'application.
-8. 👥 **Duplication de code (Jscpd)** : Analyse et détection de blocs de code en double (respect du principe DRY).
-
-Un rapport visuel synthétique s'affiche à la fin, facilitant le diagnostic rapide.
-
-
-### Configuration Cloud (Firebase)
-
-Afin d'activer la synchronisation temps réel, l'authentification et les clans :
-1. Créez un projet sur la console Firebase.
-2. Activez Google Auth, Realtime Database et configurez vos [Règles de Sécurité](./database.rules.json).
-3. Adaptez vos variables d'environnement dans le fichier `.env` (inspirez-vous du `.env example`).
-4. Suivez le guide détaillé dans [`CLOUD_SETUP.md`](./CLOUD_SETUP.md).
+### 🔐 Environment Variables
+Copy `example.env` to `.env` and configure:
+- Firebase project config
+- RevenueCat API keys
+- Strava client ID
 
 ---
 
-## ✍️ Auteur
+## 📦 Available Commands
 
-Conçu, développé et maintenu par **[Lucas Martinati](https://github.com/lucas-martinati)**.
-N'hésitez pas à me suivre ou à me contacter pour toute question, idée ou retour !
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Vite dev server |
+| `npm run build` | Build web app (PWA) to `dist/` |
+| `npm run build:bundle` | Build signed Android App Bundle (AAB) |
+| `npm run build:apk` | Build debug APK |
+| `npm run build:apk:dev` | Build dev flavor APK |
+| `npm run deploy:android` | Deploy to connected Android device |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Run all 8 quality checks |
+| `npm test` | Run unit/integration tests |
+| `npm run test:coverage` | Run tests with coverage report |
+| `npm run test:e2e` | Run Playwright E2E tests |
+| `npm run deploy` | Deploy to GitHub Pages |
+| `npm run deploy:functions` | Deploy Firebase Cloud Functions |
+| `npm run deploy:hosting` | Deploy Firebase Hosting |
 
-## 🤝 Contribuer
+---
 
-Les contributions, issues, et pull requests sont les bienvenues. L'application évoluant rapidement (nouveaux exercices, optimisations UI, nouvelles features back-end), toute aide est appréciée :
-1. **Fork** le repo
-2. Créez une branche feature (`git checkout -b feature/AmazingIdea`)
-3. Commitez vos ajouts (`git commit -m 'Add: feature AmazingIdea'`)
-4. Poussez sur la branche (`git push origin feature/AmazingIdea`)
-5. Ouvrez une **Pull Request** descriptives !
+## Code Quality
 
-## 📄 Licence
+Eight automated checks run in sequence via a single `npm run lint`:
 
-Distribué sous la licence **MIT**. Vous êtes libre d'utiliser et modifier ce projet, à condition de citer explicitement l'auteur original (**Lucas Martinati**) dans toute copie ou modification. Voir [LICENSE](LICENSE) pour plus de détails.
+```
+╔════════════════════════════════════════════════════════════════════════╗
+║                      RAPPORT GLOBAL DE VALIDATION                      ║
+╠════════════════════════════════════════════════════════════════════════╣
+║  1. 🔍 ESLint                                        ✓ SUCCÈS (23.89s) ║
+║  2. ✂️ Knip (Code mort/Fichiers inutilisés)            ✓ SUCCÈS (1.54s) ║
+║  3. 🌐 check-i18n-keys                                ✓ SUCCÈS (0.05s) ║
+║  4. ⚖️ check-i18n-consistency                          ✓ SUCCÈS (0.04s) ║
+║  5. 🎨 check-unused-css                               ✓ SUCCÈS (0.12s) ║
+║  6. 💅 Stylelint (lint:css)                           ✓ SUCCÈS (0.68s) ║
+║  7. 🔄 Dépendances circulaires (lint:circular)        ✓ SUCCÈS (1.21s) ║
+║  8. 👥 Duplication de code (lint:dup)                 ✓ SUCCÈS (0.16s) ║
+╠════════════════════════════════════════════════════════════════════════╣
+║  ✅ TOUS LES TESTS SONT AU VERT !                                      ║
+╚════════════════════════════════════════════════════════════════════════╝
+```
+
+| # | Tool | What it checks |
+|---|------|----------------|
+| 1 | 🔍 **ESLint + SonarJS** | JS/React syntax, bugs, cognitive complexity |
+| 2 | ✂️ **Knip** | Unused files, dead exports, orphaned dependencies |
+| 3 | 🌐 **check-i18n-keys** | Translation key coverage vs reference (`en.json`) |
+| 4 | ⚖️ **check-i18n-consistency** | Structural consistency across all 10 languages |
+| 5 | 🎨 **check-unused-css** | Dead CSS class detection |
+| 6 | 💅 **Stylelint** | CSS best practices & syntax |
+| 7 | 🔄 **Madge** | Circular import detection |
+| 8 | 👥 **Jscpd** | Code duplication (DRY enforcement) |
+
+## 🧪 Testing
+- **Unit/Integration**: Vitest + Testing Library (80%+ coverage required)
+- **E2E**: Playwright covering critical user flows (navigation, onboarding, workout, social)
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-idea`)
+3. Commit your changes (`git commit -m 'feat: add amazing idea'`)
+4. Push to the branch (`git push origin feature/amazing-idea`)
+5. Open a Pull Request
+
+All contributions are welcome — new exercises, UI improvements, features, or bug fixes.
+
+---
+
+## 📄 License
+
+Distributed under the **MIT License**. See [LICENSE](./LICENSE) for details.
+
+---
+
+<div align="center">
+  <p>Built by <a href="https://github.com/lucas-martinati">Lucas Martinati</a>
+  with <b>Vibe Coding</b></p>
+</div>
