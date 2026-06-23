@@ -241,6 +241,5 @@ Distributed under the **MIT License**. See [LICENSE](./LICENSE) for details.
 ---
 
 <div align="center">
-  <p>Built by <a href="https://github.com/lucas-martinati">Lucas Martinati</a>
-  with <b>Vibe Coding</b></p>
+  <p>Built with ❤️ by <a href="https://github.com/lucas-martinati">Lucas Martinati</a> — Vibe Coded 🎧✨</p>
 </div>
