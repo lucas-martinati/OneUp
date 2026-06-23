@@ -233,11 +233,11 @@ public class StreakWidgetProvider extends AppWidgetProvider {
             R.id.label_thu, R.id.label_fri, R.id.label_sat, R.id.label_sun
         };
 
-        // Colors: green done, orange today, dim default, icy for sad
-        int colorDone = 0xFF10b981;
-        int colorToday = 0xFFf97316;
+        // Label colors mirror the dots: violet done, cyan today, dim default, cool for sad
+        int colorDone = 0xFFa78bfa;
+        int colorToday = 0xFF22d3ee;
         int colorDefault = 0x60FFFFFF;
-        int colorSad = 0x3064a0c8;
+        int colorSad = 0x305b8fc0;
 
         for (int i = 0; i < 7; i++) {
             int drawableRes;
