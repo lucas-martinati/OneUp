@@ -179,7 +179,13 @@ const ANDROID_BACKGROUND = [
 
 const FAVICON = { name: 'Favicon 96x96 rounded', emoji: '🔖', output: 'public/favicon.png', size: 96, radius: 20 };
 
-const ALL_ICON_DEFS = [...ICONS, ...ANDROID_FOREGROUND, ...ANDROID_BACKGROUND, FAVICON];
+// Single density-independent splash logo. The splash itself is a vector
+// layer-list (drawable/splash.xml = solid background color + this logo centered),
+// so one PNG replaces the 26 per-density/orientation splash.png variants.
+// The layer-list scales it to a fixed dp size, so a generous source is enough.
+const SPLASH = { name: 'Android splash logo', emoji: '🚀', output: 'android/app/src/main/res/drawable-nodpi/splash_logo.png', size: 512, format: 'png' };
+
+const ALL_ICON_DEFS = [...ICONS, ...ANDROID_FOREGROUND, ...ANDROID_BACKGROUND, FAVICON, SPLASH];
 
 // ─── Core logic ─────────────────────────────────────────────────────────────
 
@@ -561,12 +567,12 @@ async function main() {
     console.log(`  ${c.gray}  Source : ${relativePath(SOURCE_ICON)} (${formatBytes(fs.statSync(SOURCE_ICON).size)})${c.reset}`);
     console.log(`  ${c.gray}${'─'.repeat(BOX_WIDTH - 4)}${c.reset}`);
 
-    const totalIcons = ALL_ICON_DEFS.length;
     const allDefs = [
       ...ICONS.map(d => ({ ...d, gen: generateIconAsync })),
       ...ANDROID_FOREGROUND.map(d => ({ ...d, gen: generateForegroundAsync })),
       ...ANDROID_BACKGROUND.map(d => ({ ...d, gen: generateBackgroundAsync })),
       { ...FAVICON, gen: generateFaviconAsync },
+      { ...SPLASH, gen: generateIconAsync },
     ];
 
     for (let i = 0; i < allDefs.length; i++) {

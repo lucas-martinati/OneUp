@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash screen : fond uni (auto jour/nuit via values/ + values-night/)
+  et logo centré. Le logo (splash_logo.png) est régénéré depuis assets/icon.png
+  par scripts/generate-config.js. Remplace les anciens 26 splash.png par densité.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/splash_background" />
+    <item
+        android:width="160dp"
+        android:height="160dp"
+        android:drawable="@drawable/splash_logo"
+        android:gravity="center" />
+</layer-list>
