@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import sharp from 'sharp';
 
 // ─── ESM __dirname ──────────────────────────────────────────────────────────
 const __filename = fileURLToPath(import.meta.url);
@@ -38,26 +39,18 @@ function visualWidth(str) {
   let w = 0;
   for (const ch of clean) {
     const cp = ch.codePointAt(0);
-    // Variation selectors & combining diacritics: zero width
     if ((cp >= 0xFE00 && cp <= 0xFE0F) || (cp >= 0x0300 && cp <= 0x036F)) continue;
-    // Zero-width joiners (used in emoji sequences)
     if (cp === 0x200D) continue;
     if (
-      // Supplementary planes (all emojis >= U+1F000)
       cp >= 0x1F000 ||
-      // Misc Symbols (⚡⚙☀♻ etc.)
       (cp >= 0x2600 && cp <= 0x26FF) ||
-      // Dingbats (✅❌✨ etc.) — exclude text-style marks ✓✗ (U+2713-U+2717)
       (cp >= 0x2702 && cp <= 0x2712) ||
       (cp >= 0x2718 && cp <= 0x27BF) ||
-      // Common wide emoji in BMP
       [0x2705, 0x274C, 0x2728, 0x2753, 0x2757, 0x2B50, 0x2B55,
-       0x2714, 0x2716, 0x2744, 0x2764, 0x2934, 0x2935, 0x3030, 0x303D].includes(cp) ||
-      // Hourglass, watch, etc.
+        0x2714, 0x2716, 0x2744, 0x2764, 0x2934, 0x2935, 0x3030, 0x303D].includes(cp) ||
       (cp >= 0x231A && cp <= 0x231B) ||
       (cp >= 0x23E9 && cp <= 0x23F3) ||
       (cp >= 0x23F8 && cp <= 0x23FA) ||
-      // CJK & Hangul
       (cp >= 0x1100 && cp <= 0x115F) ||
       (cp >= 0x2E80 && cp <= 0x2FFF) ||
       (cp >= 0x3000 && cp <= 0xA4CF) ||
@@ -120,7 +113,6 @@ function relativePath(absPath) {
 
 // ─── Configuration ──────────────────────────────────────────────────────────
 
-// Load environment variables
 dotenv.config({ path: path.join(ROOT, '.env') });
 
 const REPLACEMENTS = {
@@ -144,13 +136,57 @@ const TASKS = [
   },
 ];
 
+// ─── Icon Generation ────────────────────────────────────────────────────────
+
+const SOURCE_ICON = path.join(ROOT, 'assets', 'icon.png');
+
+const ICONS = [
+  { name: 'PWA 192x192 PNG',   emoji: '🌐', output: 'public/pwa-192x192.png',   size: 192, format: 'png' },
+  { name: 'PWA 512x512 PNG',   emoji: '🌐', output: 'public/pwa-512x512.png',   size: 512, format: 'png' },
+  { name: 'PWA 192x192 WebP',  emoji: '🌐', output: 'public/pwa-192x192.webp',  size: 192, format: 'webp' },
+  { name: 'PWA 512x512 WebP',  emoji: '🌐', output: 'public/pwa-512x512.webp',  size: 512, format: 'webp' },
+  { name: 'Logo 64x64 WebP',   emoji: '🌐', output: 'public/logo-64x64.webp',  size: 64,  format: 'webp' },
+
+  { name: 'Android ldpi',      emoji: '📱', output: 'android/app/src/main/res/mipmap-ldpi/ic_launcher.png',         size: 48,  format: 'png' },
+  { name: 'Android mdpi',      emoji: '📱', output: 'android/app/src/main/res/mipmap-mdpi/ic_launcher.png',         size: 48,  format: 'png' },
+  { name: 'Android hdpi',      emoji: '📱', output: 'android/app/src/main/res/mipmap-hdpi/ic_launcher.png',         size: 72,  format: 'png' },
+  { name: 'Android xhdpi',     emoji: '📱', output: 'android/app/src/main/res/mipmap-xhdpi/ic_launcher.png',        size: 96,  format: 'png' },
+  { name: 'Android xxhdpi',    emoji: '📱', output: 'android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png',       size: 144, format: 'png' },
+  { name: 'Android xxxhdpi',   emoji: '📱', output: 'android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png',      size: 192, format: 'png' },
+];
+
+// Android adaptive icon foregrounds: resize source to FULL viewport size.
+// The XML applies android:inset="16.7%" which handles padding automatically.
+// No manual padding needed — that would double the inset.
+const ANDROID_FOREGROUND = [
+  { name: 'Android ldpi fg',   emoji: '🎨', output: 'android/app/src/main/res/mipmap-ldpi/ic_launcher_foreground.png',   size: 81  },
+  { name: 'Android mdpi fg',   emoji: '🎨', output: 'android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png',   size: 108 },
+  { name: 'Android hdpi fg',   emoji: '🎨', output: 'android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png',   size: 162 },
+  { name: 'Android xhdpi fg',  emoji: '🎨', output: 'android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png',  size: 216 },
+  { name: 'Android xxhdpi fg', emoji: '🎨', output: 'android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png', size: 324 },
+  { name: 'Android xxxhdpi fg',emoji: '🎨', output: 'android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png',size: 432 },
+];
+
+// Regenerate background PNGs from source (tinted dark) for a clean adaptive icon look
+const ANDROID_BACKGROUND = [
+  { name: 'Android ldpi bg',   emoji: '🎨', output: 'android/app/src/main/res/mipmap-ldpi/ic_launcher_background.png',   size: 81  },
+  { name: 'Android mdpi bg',   emoji: '🎨', output: 'android/app/src/main/res/mipmap-mdpi/ic_launcher_background.png',   size: 108 },
+  { name: 'Android hdpi bg',   emoji: '🎨', output: 'android/app/src/main/res/mipmap-hdpi/ic_launcher_background.png',   size: 162 },
+  { name: 'Android xhdpi bg',  emoji: '🎨', output: 'android/app/src/main/res/mipmap-xhdpi/ic_launcher_background.png',  size: 216 },
+  { name: 'Android xxhdpi bg', emoji: '🎨', output: 'android/app/src/main/res/mipmap-xxhdpi/ic_launcher_background.png', size: 324 },
+  { name: 'Android xxxhdpi bg',emoji: '🎨', output: 'android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_background.png',size: 432 },
+];
+
+const FAVICON = { name: 'Favicon 96x96 rounded', emoji: '🔖', output: 'public/favicon.png', size: 96, radius: 20 };
+
+const ALL_ICON_DEFS = [...ICONS, ...ANDROID_FOREGROUND, ...ANDROID_BACKGROUND, FAVICON];
+
 // ─── Core logic ─────────────────────────────────────────────────────────────
 
 function validateEnvVars() {
   const missing = [];
   for (const [placeholder, value] of Object.entries(REPLACEMENTS)) {
     if (!value) {
-      // Map placeholder to env var name
       const envVar = placeholder.replace(/^__/, 'VITE_').replace(/__$/, '');
       missing.push({ placeholder, envVar });
     }
@@ -162,7 +198,6 @@ function processTemplate(task) {
   const startTime = Date.now();
   const errors = [];
 
-  // Check template exists
   if (!fs.existsSync(task.template)) {
     return {
       success: false,
@@ -173,11 +208,9 @@ function processTemplate(task) {
   }
 
   try {
-    // Read template
     const templateContent = fs.readFileSync(task.template, 'utf8');
     let outputContent = templateContent;
 
-    // Apply replacements
     let replacementCount = 0;
     for (const placeholder of task.replacements) {
       const value = REPLACEMENTS[placeholder];
@@ -193,13 +226,11 @@ function processTemplate(task) {
       }
     }
 
-    // Ensure output directory exists
     const outputDir = path.dirname(task.output);
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    // Write output
     fs.writeFileSync(task.output, outputContent);
     const outputSize = fs.statSync(task.output).size;
 
@@ -218,6 +249,143 @@ function processTemplate(task) {
       duration: Date.now() - startTime,
       error: error.message,
       hint: 'Vérifiez les permissions et le contenu du template.',
+    };
+  }
+}
+
+// ─── Icon processing ────────────────────────────────────────────────────────
+
+async function generateIconAsync(iconDef) {
+  const startTime = Date.now();
+  const outputPath = path.join(ROOT, iconDef.output);
+
+  try {
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+
+    let pipeline = sharp(SOURCE_ICON).resize(iconDef.size, iconDef.size, { fit: 'cover' });
+
+    if (iconDef.format === 'webp') {
+      pipeline = pipeline.webp({ quality: 90 });
+    } else {
+      pipeline = pipeline.png();
+    }
+
+    await pipeline.toFile(outputPath);
+    const outputSize = fs.statSync(outputPath).size;
+
+    return {
+      success: true,
+      duration: Date.now() - startTime,
+      outputSize,
+      outputPath: relativePath(outputPath),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      duration: Date.now() - startTime,
+      error: error.message,
+    };
+  }
+}
+
+async function generateForegroundAsync(fgDef) {
+  const startTime = Date.now();
+  const outputPath = path.join(ROOT, fgDef.output);
+
+  try {
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+
+    // Resize source to fill the full viewport size.
+    // The 16.7% inset in the adaptive-icon XML handles the safe-zone clipping.
+    await sharp(SOURCE_ICON)
+      .resize(fgDef.size, fgDef.size, { fit: 'cover' })
+      .png()
+      .toFile(outputPath);
+
+    const outputSize = fs.statSync(outputPath).size;
+
+    return {
+      success: true,
+      duration: Date.now() - startTime,
+      outputSize,
+      outputPath: relativePath(outputPath),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      duration: Date.now() - startTime,
+      error: error.message,
+    };
+  }
+}
+
+async function generateBackgroundAsync(bgDef) {
+  const startTime = Date.now();
+  const outputPath = path.join(ROOT, bgDef.output);
+
+  try {
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+
+    // Dark tinted background that matches the icon's dominant colors
+    await sharp(SOURCE_ICON)
+      .resize(bgDef.size, bgDef.size, { fit: 'cover' })
+      .blur(30)
+      .modulate({ brightness: 0.3, saturation: 0.5 })
+      .png()
+      .toFile(outputPath);
+
+    const outputSize = fs.statSync(outputPath).size;
+
+    return {
+      success: true,
+      duration: Date.now() - startTime,
+      outputSize,
+      outputPath: relativePath(outputPath),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      duration: Date.now() - startTime,
+      error: error.message,
+    };
+  }
+}
+
+async function generateFaviconAsync(favDef) {
+  const startTime = Date.now();
+  const outputPath = path.join(ROOT, favDef.output);
+  const size = favDef.size;
+  const radius = favDef.radius;
+
+  try {
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+
+    // Create a rounded rectangle mask
+    const mask = Buffer.from(
+      `<svg width="${size}" height="${size}">
+        <rect x="0" y="0" width="${size}" height="${size}" rx="${radius}" ry="${radius}" fill="white"/>
+      </svg>`
+    );
+
+    await sharp(SOURCE_ICON)
+      .resize(size, size, { fit: 'cover' })
+      .png()
+      .composite([{ input: mask, blend: 'dest-in' }])
+      .toFile(outputPath);
+
+    const outputSize = fs.statSync(outputPath).size;
+
+    return {
+      success: true,
+      duration: Date.now() - startTime,
+      outputSize,
+      outputPath: relativePath(outputPath),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      duration: Date.now() - startTime,
+      error: error.message,
     };
   }
 }
@@ -254,7 +422,7 @@ function printTaskResult(index, total, task, result) {
   const status = result.success ? `${c.green}✓${c.reset}` : `${c.red}✗${c.reset}`;
 
   console.log('');
-  console.log(`  ${c.cyan}${c.bold}${step}${c.reset} ${task.icon}  ${c.white}${c.bold}${task.name}${c.reset}`);
+  console.log(`  ${c.cyan}${c.bold}${step}${c.reset} ${task.icon || ''}  ${c.white}${c.bold}${task.name}${c.reset}`);
   console.log(`  ${c.gray}${'─'.repeat(BOX_WIDTH - 4)}${c.reset}`);
 
   if (result.error) {
@@ -265,22 +433,43 @@ function printTaskResult(index, total, task, result) {
     return;
   }
 
-  // Template → Output
-  console.log(`  ${c.gray}   Template  →${c.reset}  ${c.dim}${result.templatePath}${c.reset}`);
+  if (result.templatePath) {
+    console.log(`  ${c.gray}   Template  →${c.reset}  ${c.dim}${result.templatePath}${c.reset}`);
+  }
   console.log(`  ${c.gray}   Sortie    →${c.reset}  ${c.white}${result.outputPath}${c.reset}`);
 
-  // Stats
   const sizeStr = formatBytes(result.outputSize);
-  const replStr = `${result.replacementCount} substitution${result.replacementCount > 1 ? 's' : ''}`;
+  const replStr = result.replacementCount !== undefined
+    ? `${result.replacementCount} substitution${result.replacementCount > 1 ? 's' : ''}`
+    : `${result.outputSize > 0 ? 'généré' : ''}`;
   const timeStr = formatTime(result.duration);
   console.log(`  ${status}  ${c.green}${sizeStr}${c.reset}  ${c.gray}│${c.reset}  ${c.magenta}${replStr}${c.reset}  ${c.gray}│${c.reset}  ${c.blue}${timeStr}${c.reset}`);
 
-  // Warnings
   if (result.warnings && result.warnings.length > 0) {
     for (const warn of result.warnings) {
       console.log(`  ${c.yellow}⚠  ${warn}${c.reset}`);
     }
   }
+}
+
+function printIconResult(index, total, iconDef, result) {
+  const step = `[${index}/${total}]`;
+  const status = result.success ? `${c.green}✓${c.reset}` : `${c.red}✗${c.reset}`;
+
+  console.log('');
+  console.log(`  ${c.cyan}${c.bold}${step}${c.reset} ${iconDef.emoji}  ${c.white}${c.bold}${iconDef.name}${c.reset}`);
+  console.log(`  ${c.gray}${'─'.repeat(BOX_WIDTH - 4)}${c.reset}`);
+
+  if (result.error) {
+    console.log(`  ${c.red}✗  Erreur : ${result.error}${c.reset}`);
+    return;
+  }
+
+  console.log(`  ${c.gray}   Sortie    →${c.reset}  ${c.white}${result.outputPath}${c.reset}`);
+
+  const sizeStr = formatBytes(result.outputSize);
+  const timeStr = formatTime(result.duration);
+  console.log(`  ${status}  ${c.green}${sizeStr}${c.reset}  ${c.gray}│${c.reset}  ${c.magenta}${iconDef.size ? iconDef.size + 'px' : ''}${c.reset}  ${c.gray}│${c.reset}  ${c.blue}${timeStr}${c.reset}`);
 }
 
 function printSummary(results, totalDuration) {
@@ -300,7 +489,7 @@ function printSummary(results, totalDuration) {
       ? `${c.green}OK${c.reset}`
       : `${c.red}ÉCHEC${c.reset}`;
     const timeStr = `${c.gray}${formatTime(result.duration)}${c.reset}`;
-    const label = `${icon}  ${task.icon} ${task.name}`;
+    const label = `${icon}  ${task.icon || ''} ${task.name}`;
     const right = `${statusText}  ${timeStr}`;
 
     const spacerWidth = INNER - 2 - visualWidth(label) - visualWidth(right);
@@ -330,7 +519,7 @@ function printSummary(results, totalDuration) {
 
 // ─── Main ───────────────────────────────────────────────────────────────────
 
-function main() {
+async function main() {
   const globalStart = Date.now();
 
   printBanner();
@@ -364,6 +553,41 @@ function main() {
     results.push({ task, result });
   }
 
+  // Process icons
+  if (fs.existsSync(SOURCE_ICON)) {
+    const iconResults = [];
+    console.log('');
+    console.log(`  ${c.cyan}${c.bold}▸ Génération des icônes${c.reset}`);
+    console.log(`  ${c.gray}  Source : ${relativePath(SOURCE_ICON)} (${formatBytes(fs.statSync(SOURCE_ICON).size)})${c.reset}`);
+    console.log(`  ${c.gray}${'─'.repeat(BOX_WIDTH - 4)}${c.reset}`);
+
+    const totalIcons = ALL_ICON_DEFS.length;
+    const allDefs = [
+      ...ICONS.map(d => ({ ...d, gen: generateIconAsync })),
+      ...ANDROID_FOREGROUND.map(d => ({ ...d, gen: generateForegroundAsync })),
+      ...ANDROID_BACKGROUND.map(d => ({ ...d, gen: generateBackgroundAsync })),
+      { ...FAVICON, gen: generateFaviconAsync },
+    ];
+
+    for (let i = 0; i < allDefs.length; i++) {
+      const def = allDefs[i];
+      const result = await def.gen(def);
+      printIconResult(i + 1, allDefs.length, def, result);
+      iconResults.push(result);
+    }
+
+    const iconSuccessCount = iconResults.filter(r => r.success).length;
+    const iconFailCount = iconResults.length - iconSuccessCount;
+    const allIconsOk = iconFailCount === 0;
+
+    console.log('');
+    console.log(`  ${allIconsOk ? c.green : c.red}${allIconsOk ? '✅' : '❌'} ${iconSuccessCount}/${iconResults.length} icônes générées${allIconsOk ? '' : ` (${iconFailCount} échec${iconFailCount > 1 ? 's' : ''})`}${c.reset}`);
+  } else {
+    console.log('');
+    console.log(`  ${c.yellow}⚠  Icône source introuvable : ${relativePath(SOURCE_ICON)}${c.reset}`);
+    console.log(`  ${c.yellow}   Ajoutez un fichier assets/icon.png pour la génération automatique.${c.reset}`);
+  }
+
   // Summary
   const totalDuration = Date.now() - globalStart;
   const allSuccess = printSummary(results, totalDuration);
@@ -373,4 +597,7 @@ function main() {
   }
 }
 
-main();
+main().catch(error => {
+  console.error(`\n  ${c.bgRed}${c.white} CRITICAL ERROR ${c.reset} ${c.red}${error.message}${c.reset}\n`);
+  process.exit(1);
+});

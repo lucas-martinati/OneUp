@@ -83,13 +83,13 @@ export const DashboardHeader = React.memo(({
                 padding: 'clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 20px)',
                 minWidth: 0, position: 'relative', zIndex: 10
             }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1 }}>
                 {showLogo && (
                     <img
                         onClick={() => window.location.reload()}
                         src={`${import.meta.env.BASE_URL}logo-64x64.webp`} alt="OneUp Logo"
                         className="bounce-on-hover"
-                        style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', objectFit: 'cover', cursor: 'pointer', transition: 'transform 0.3s ease' }}
+                        style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', cursor: 'pointer', transition: 'transform 0.3s ease' }}
                     />
                 )}
                 {showText && (
