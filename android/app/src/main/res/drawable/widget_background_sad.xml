@@ -1,35 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Dimmed/dormant widget background when streak is 0 — desaturated, cool, low energy -->
+<!-- Broken streak background — dark and dormant with a faint dying-ember warmth at the base -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Cold dark base -->
+    <!-- Neutral near-black base -->
     <item>
         <shape android:shape="rectangle">
             <corners android:radius="24dp" />
             <gradient
-                android:startColor="#FF090b11"
-                android:centerColor="#FF0a0d14"
-                android:endColor="#FF080a0f"
+                android:startColor="#FF0c0a0b"
+                android:centerColor="#FF0a0909"
+                android:endColor="#FF080707"
                 android:angle="135" />
         </shape>
     </item>
 
-    <!-- Faint icy sheen from the top -->
+    <!-- Faint ember glow rising from the bottom -->
     <item>
         <shape android:shape="rectangle">
             <corners android:radius="24dp" />
             <gradient
-                android:startColor="#120ea5e9"
+                android:startColor="#1ad9622e"
                 android:endColor="#00000000"
+                android:angle="90" />
+        </shape>
+    </item>
+
+    <!-- Soft top highlight for depth -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <gradient
+                android:startColor="#0cFFFFFF"
+                android:endColor="#00FFFFFF"
                 android:angle="270" />
         </shape>
     </item>
 
-    <!-- Dim cool border -->
+    <!-- Dim warm-neutral border -->
     <item>
         <shape android:shape="rectangle">
             <corners android:radius="24dp" />
-            <stroke android:width="1dp" android:color="#1a38bdf8" />
+            <stroke android:width="1dp" android:color="#1aa07860" />
             <solid android:color="#00000000" />
         </shape>
     </item>

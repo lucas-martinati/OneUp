@@ -172,14 +172,14 @@ public class StreakWidgetProvider extends AppWidgetProvider {
         views.setTextViewText(R.id.widget_streak_count, String.valueOf(streak));
         views.setTextViewText(R.id.widget_streak_label, streakLabel);
 
-        // Sad state when streak is 0: frozen/icy look
+        // Sad state when streak is 0: dormant, dim, extinguished-ember look
         boolean isSad = streak == 0;
         views.setInt(R.id.widget_small_root, "setBackgroundResource",
             isSad ? R.drawable.widget_background_sad : R.drawable.widget_background);
         views.setTextColor(R.id.widget_streak_count,
-            isSad ? 0x80a0c4e8 : 0xFFFFFFFF);
+            isSad ? 0x99b0a596 : 0xFFFFFFFF);
         views.setTextColor(R.id.widget_streak_label,
-            isSad ? 0x507b9cc0 : 0x80FFFFFF);
+            isSad ? 0x66a3978a : 0x80FFFFFF);
 
         // Flame icon: sad (frozen) / active (fire) / inactive (gray)
         if (isSad) {
@@ -202,7 +202,7 @@ public class StreakWidgetProvider extends AppWidgetProvider {
                                     String streakLabel, String daysLabel, String[] weekdayLabels) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_streak_large);
 
-        // Sad state when streak is 0: frozen/icy look
+        // Sad state when streak is 0: dormant, dim, extinguished-ember look
         boolean isSad = streak == 0;
         views.setInt(R.id.widget_large_root, "setBackgroundResource",
             isSad ? R.drawable.widget_background_sad : R.drawable.widget_background);
@@ -211,9 +211,9 @@ public class StreakWidgetProvider extends AppWidgetProvider {
         views.setTextViewText(R.id.widget_large_streak_label, daysLabel);
 
         views.setTextColor(R.id.widget_large_streak_count,
-            isSad ? 0x80a0c4e8 : 0xFFFFFFFF);
+            isSad ? 0x99b0a596 : 0xFFFFFFFF);
         views.setTextColor(R.id.widget_large_streak_label,
-            isSad ? 0x507b9cc0 : 0x60FFFFFF);
+            isSad ? 0x66a3978a : 0x60FFFFFF);
 
         // Flame icon: sad (frozen) / active (fire) / inactive (gray)
         if (isSad) {
@@ -233,20 +233,18 @@ public class StreakWidgetProvider extends AppWidgetProvider {
             R.id.label_thu, R.id.label_fri, R.id.label_sat, R.id.label_sun
         };
 
-        // Label colors mirror the dots: violet done, cyan today, dim default, cool for sad
+        // Label colors mirror the dots: violet done, cyan today, dim default
         int colorDone = 0xFFa78bfa;
         int colorToday = 0xFF22d3ee;
         int colorDefault = 0x60FFFFFF;
-        int colorSad = 0x305b8fc0;
 
+        // Always reflect the real per-day completion, even when the streak is broken
+        // (isSad). A day that was validated this week must keep its "done" dot — losing
+        // the streak dims the background/flame, not the history of completed days.
         for (int i = 0; i < 7; i++) {
             int drawableRes;
             int labelColor;
-            if (isSad) {
-                // Everything dimmed in sad state
-                drawableRes = R.drawable.dot_pending;
-                labelColor = colorSad;
-            } else if (weekDays[i]) {
+            if (weekDays[i]) {
                 drawableRes = R.drawable.dot_done;
                 labelColor = colorDone;
             } else if (i == todayIndex) {
