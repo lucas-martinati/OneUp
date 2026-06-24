@@ -6,7 +6,6 @@
     <a href="https://play.google.com/store/apps/details?id=com.lucasm548.oneup">
       <img src="https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white" alt="Google Play" />
     </a>
-    <img src="https://img.shields.io/badge/version-3.2.0-blue?style=for-the-badge" alt="Version" />
     <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License" />
   </p>
 </div>
