@@ -243,6 +243,7 @@
   "cardio": {
     "avgSpeed": "Avg speed",
     "connectTitle": "Connected Services",
+    "healthConnect": "Google Health",
     "difficultyMismatchDesc": "Difficulty has changed ({{saved}}x → {{current}}x). Do you want to continue with this new setting?",
     "difficultyModified": "Difficulty Modified",
     "distance": "Distance",
@@ -252,7 +253,7 @@
     "goalReached": "Goal reached!",
     "googleWallDesc": "Sign in with your Google account to access the Cardio module and sync your data.",
     "googleWallStep1": "Google Sign-in",
-    "googleWallStep2": "Link Strava",
+    "googleWallStep2": "Link an app",
     "googleWallStep3": "Auto Sync",
     "googleWallTitle": "Account Required",
     "gpsTrack": "GPS Track",
@@ -919,51 +920,6 @@
       "Always reaching higher with OneUp! 🚀"
     ]
   },
-  "wrapped": {
-    "title": "OneUp Wrapped",
-    "entrySubtitle": "Relive your journey as a story",
-    "entryCta": "View",
-    "introSubtitle": "Let's relive your journey",
-    "repsTitle": "You crushed",
-    "repsUnit": "total reps",
-    "repsCaption": "Rep after rep, you kept showing up.",
-    "daysTitle": "You showed up for",
-    "daysUnit": "active days",
-    "daysCaption": "Consistency is your superpower.",
-    "streakTitle": "Your hottest streak hit",
-    "streakUnit": "days in a row",
-    "streakCaption": "Pure, unstoppable momentum.",
-    "championTitle": "Your signature move",
-    "championCaption": "{{reps}} reps and counting.",
-    "persona": {
-      "title": "Your training vibe",
-      "morning": {
-        "name": "The Early Bird",
-        "desc": "You own the sunrise grind."
-      },
-      "afternoon": {
-        "name": "The Midday Mover",
-        "desc": "You power through the day."
-      },
-      "evening": {
-        "name": "The Night Owl",
-        "desc": "You finish strong after dark."
-      }
-    },
-    "perfectTitle": "You nailed",
-    "perfectUnit": "perfect days",
-    "perfectCaption": "Every goal on the list, smashed.",
-    "outroTitle": "What a journey!",
-    "outroSubtitle": "Share your Wrapped",
-    "cardReps": "Reps",
-    "cardDays": "Days",
-    "cardStreak": "Best streak",
-    "cardPerfect": "Perfect days",
-    "cardBadges": "badges",
-    "cardSignature": "Signature move",
-    "hint": "Tap to continue",
-    "shareText": "Check out my OneUp Wrapped! 🔥"
-  },
   "streakFreeze": {
     "toastTitle": "Streak saved!",
     "toastBody": "{{count}} freeze used to keep your streak alive",
@@ -971,6 +927,7 @@
     "available": "{{count}} streak freeze in reserve",
     "title": "Streak Freeze",
     "intro": "Miss a day and a freeze is used automatically to keep your streak alive. Freezes refill every month.",
+    "guestDesc": "Sign in to earn streak freezes and protect your streak when you miss a day.",
     "statAvailable": "In reserve",
     "statPerMonth": "Per month",
     "statReserve": "Max",

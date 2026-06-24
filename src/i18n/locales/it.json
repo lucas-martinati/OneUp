@@ -243,6 +243,7 @@
   "cardio": {
     "avgSpeed": "Velocità media",
     "connectTitle": "Servizi connessi",
+    "healthConnect": "Google Health",
     "difficultyMismatchDesc": "La difficoltà è cambiata ({{saved}}x → {{current}}x). Vuoi continuare con questa nuova impostazione?",
     "difficultyModified": "Difficoltà modificata",
     "distance": "Distanza",
@@ -919,51 +920,6 @@
       "Sempre più in alto con OneUp! 🚀"
     ]
   },
-  "wrapped": {
-    "title": "OneUp Wrapped",
-    "entrySubtitle": "Rivivi il tuo percorso come una storia",
-    "entryCta": "Vedi",
-    "introSubtitle": "Riviviamo il tuo percorso",
-    "repsTitle": "Hai polverizzato",
-    "repsUnit": "ripetizioni totali",
-    "repsCaption": "Ripetizione dopo ripetizione, c'eri sempre.",
-    "daysTitle": "Ti sei allenato per",
-    "daysUnit": "giorni attivi",
-    "daysCaption": "La costanza è il tuo superpotere.",
-    "streakTitle": "La tua serie più lunga ha raggiunto",
-    "streakUnit": "giorni di fila",
-    "streakCaption": "Slancio puro e inarrestabile.",
-    "championTitle": "La tua mossa simbolo",
-    "championCaption": "{{reps}} ripetizioni e si continua.",
-    "persona": {
-      "title": "Il tuo stile di allenamento",
-      "morning": {
-        "name": "Il Mattiniero",
-        "desc": "Domini l'alba."
-      },
-      "afternoon": {
-        "name": "Il Pilastro del mezzogiorno",
-        "desc": "Vai avanti per tutto il giorno."
-      },
-      "evening": {
-        "name": "Il Nottambulo",
-        "desc": "Chiudi alla grande dopo il tramonto."
-      }
-    },
-    "perfectTitle": "Hai centrato",
-    "perfectUnit": "giorni perfetti",
-    "perfectCaption": "Ogni obiettivo della lista, demolito.",
-    "outroTitle": "Che percorso!",
-    "outroSubtitle": "Condividi il tuo Wrapped",
-    "cardReps": "Ripetizioni",
-    "cardDays": "Giorni",
-    "cardStreak": "Serie migliore",
-    "cardPerfect": "Giorni perfetti",
-    "cardBadges": "badge",
-    "cardSignature": "Mossa simbolo",
-    "hint": "Tocca per continuare",
-    "shareText": "Guarda il mio OneUp Wrapped! 🔥"
-  },
   "streakFreeze": {
     "toastTitle": "Serie salvata!",
     "toastBody": "{{count}} congelamento usato per mantenere la tua serie",
@@ -971,6 +927,7 @@
     "available": "{{count}} congelamento serie in riserva",
     "title": "Congelamento serie",
     "intro": "Se salti un giorno, un congelamento viene usato automaticamente per salvare la tua serie. Si ricaricano ogni mese.",
+    "guestDesc": "Accedi per guadagnare congelamenti serie e proteggere la tua serie quando salti un giorno.",
     "statAvailable": "In riserva",
     "statPerMonth": "Al mese",
     "statReserve": "Max",

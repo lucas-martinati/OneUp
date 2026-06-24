@@ -1034,12 +1034,18 @@ export const onRevenueCatWebhook = onRequest({ secrets: ["REVENUECAT_WEBHOOK_SEC
 
 const STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token";
 
+// Allowed origins for the OAuth token proxies. The Capacitor Android webview
+// serves the app from https://localhost, so we must allow BOTH http (web dev)
+// and https (native) localhost. iOS/older Capacitor uses the capacitor:// scheme.
+const OAUTH_PROXY_CORS = [
+  "https://lucas-martinati.github.io",
+  /^https?:\/\/localhost(:\d+)?$/,
+  "capacitor://localhost",
+];
+
 const STRAVA_SECRETS_CONFIG = {
   secrets: ["STRAVA_CLIENT_ID", "STRAVA_CLIENT_SECRET"],
-  cors: [
-    "https://lucas-martinati.github.io",
-    /^http:\/\/localhost(:\d+)?$/,
-  ],
+  cors: OAUTH_PROXY_CORS,
 };
 
 /**
@@ -1130,4 +1136,103 @@ export const stravaRefreshToken = onRequest(STRAVA_SECRETS_CONFIG, async (req, r
     console.error("[Strava] Token refresh error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Google Health API OAuth Token Proxy (web cardio source)
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// The web app reads recorded exercises from the Google Health API. Auth is
+// standard Google OAuth 2.0: the browser gets an authorization code, and these
+// functions exchange/refresh it against Google's token endpoint with the client
+// secret (kept in Cloud Secret Manager via
+// `firebase functions:secrets:set GOOGLE_HEALTH_CLIENT_SECRET`).
+// ══════════════════════════════════════════════════════════════════════════════
+
+const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+
+const GOOGLE_HEALTH_SECRETS_CONFIG = {
+  secrets: ["GOOGLE_HEALTH_CLIENT_ID", "GOOGLE_HEALTH_CLIENT_SECRET"],
+  cors: OAUTH_PROXY_CORS,
+};
+
+/** POST a form-encoded body to Google's token endpoint and relay the result. */
+async function googleTokenRequest(res, extraParams, context) {
+  try {
+    const body = new URLSearchParams({
+      client_id: process.env.GOOGLE_HEALTH_CLIENT_ID,
+      client_secret: process.env.GOOGLE_HEALTH_CLIENT_SECRET,
+      ...extraParams,
+    });
+
+    const response = await fetch(GOOGLE_TOKEN_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error(`[GoogleHealth] ${context} failed:`, data);
+      res.status(response.status).json(data);
+      return;
+    }
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error(`[GoogleHealth] ${context} error:`, error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+/**
+ * googleHealthExchangeToken
+ * Exchanges an OAuth authorization code for tokens.
+ * Client sends: { code: string, redirect_uri: string }
+ */
+export const googleHealthExchangeToken = onRequest(GOOGLE_HEALTH_SECRETS_CONFIG, async (req, res) => {
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  const { code, redirect_uri: redirectUri } = req.body || {};
+  if (!code || typeof code !== "string") {
+    res.status(400).json({ error: "Missing or invalid 'code' parameter" });
+    return;
+  }
+  if (!redirectUri || typeof redirectUri !== "string") {
+    res.status(400).json({ error: "Missing or invalid 'redirect_uri' parameter" });
+    return;
+  }
+
+  await googleTokenRequest(res, {
+    grant_type: "authorization_code",
+    code,
+    redirect_uri: redirectUri,
+  }, "Token exchange");
+});
+
+/**
+ * googleHealthRefreshToken
+ * Refreshes an expired access token.
+ * Client sends: { refresh_token: string }
+ */
+export const googleHealthRefreshToken = onRequest(GOOGLE_HEALTH_SECRETS_CONFIG, async (req, res) => {
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  const { refresh_token: refreshToken } = req.body || {};
+  if (!refreshToken || typeof refreshToken !== "string") {
+    res.status(400).json({ error: "Missing or invalid 'refresh_token' parameter" });
+    return;
+  }
+
+  await googleTokenRequest(res, {
+    grant_type: "refresh_token",
+    refresh_token: refreshToken,
+  }, "Token refresh");
 });

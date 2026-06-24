@@ -9,6 +9,12 @@ class ResizeObserverStub {
 }
 vi.stubGlobal('ResizeObserver', ResizeObserverStub);
 
+// DashboardHeader reads auth to decide the streak-freeze badge; signed-in with 0
+// freezes keeps the badge hidden, matching these tests' expectations.
+vi.mock('@contexts/AuthContext', () => ({
+  useAuth: () => ({ isSignedIn: true }),
+}));
+
 import { DashboardHeader } from '../DashboardHeader';
 import { useUIStore } from '@store/useUIStore';
 

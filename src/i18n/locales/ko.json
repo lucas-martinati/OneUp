@@ -243,6 +243,7 @@
   "cardio": {
     "avgSpeed": "평균 속도",
     "connectTitle": "연결된 서비스",
+    "healthConnect": "Google Health",
     "difficultyMismatchDesc": "난이도가 변경되었습니다({{saved}}x → {{current}}x). 이 새로운 설정을 계속하시겠습니까?",
     "difficultyModified": "난이도가 수정되었습니다.",
     "distance": "거리",
@@ -919,51 +920,6 @@
       "OneUp과 함께 항상 더 높이! 🚀"
     ]
   },
-  "wrapped": {
-    "title": "OneUp Wrapped",
-    "entrySubtitle": "당신의 여정을 스토리로 다시 보기",
-    "entryCta": "보기",
-    "introSubtitle": "당신의 여정을 다시 살펴봐요",
-    "repsTitle": "당신이 해낸 횟수",
-    "repsUnit": "총 반복 횟수",
-    "repsCaption": "한 번 한 번, 당신은 늘 함께였어요.",
-    "daysTitle": "함께한 날",
-    "daysUnit": "활동한 날",
-    "daysCaption": "꾸준함이 당신의 초능력이에요.",
-    "streakTitle": "최고 연속 기록",
-    "streakUnit": "일 연속",
-    "streakCaption": "멈출 수 없는 순수한 추진력.",
-    "championTitle": "당신의 시그니처 동작",
-    "championCaption": "{{reps}}회, 그리고 계속.",
-    "persona": {
-      "title": "당신의 운동 스타일",
-      "morning": {
-        "name": "아침형 인간",
-        "desc": "새벽을 지배하는 사람."
-      },
-      "afternoon": {
-        "name": "한낮의 강자",
-        "desc": "하루 종일 밀어붙이죠."
-      },
-      "evening": {
-        "name": "밤형 인간",
-        "desc": "해가 진 뒤 강하게 마무리해요."
-      }
-    },
-    "perfectTitle": "당신이 달성한",
-    "perfectUnit": "완벽한 날",
-    "perfectCaption": "목록의 모든 목표를 달성했어요.",
-    "outroTitle": "멋진 여정이었어요!",
-    "outroSubtitle": "당신의 Wrapped를 공유하세요",
-    "cardReps": "반복",
-    "cardDays": "일수",
-    "cardStreak": "최고 연속",
-    "cardPerfect": "완벽한 날",
-    "cardBadges": "배지",
-    "cardSignature": "시그니처 동작",
-    "hint": "탭하여 계속",
-    "shareText": "내 OneUp Wrapped를 확인해 보세요! 🔥"
-  },
   "streakFreeze": {
     "toastTitle": "연속 기록을 지켰어요!",
     "toastBody": "연속 기록을 지키기 위해 얼리기 {{count}}개 사용",
@@ -971,6 +927,7 @@
     "available": "보유 중인 스트릭 얼리기: {{count}}",
     "title": "스트릭 얼리기",
     "intro": "하루를 놓치면 연속 기록을 지키기 위해 얼리기가 자동으로 사용됩니다. 매달 충전됩니다.",
+    "guestDesc": "로그인하여 스트릭 얼리기를 획득하고 하루를 놓쳐도 스트릭을 보호하세요。",
     "statAvailable": "보유",
     "statPerMonth": "매달",
     "statReserve": "최대",

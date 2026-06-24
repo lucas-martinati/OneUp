@@ -4,6 +4,7 @@ import { Shield, Flame, Trophy, Snowflake } from '@utils/icons';
 import { FrozenFlame } from '@components/ui';
 import { useUIStore } from '@store/useUIStore';
 import { useProgressStore } from '@store/useProgressStore';
+import { useAuth } from '@contexts/AuthContext';
 import { Card, IconButton } from '@components/ui';
 import { StreakFreezeInfo } from './StreakFreezeInfo';
 
@@ -15,8 +16,13 @@ export const DashboardHeader = React.memo(({
 }) => {
     const openModal = useUIStore(s => s.openModal);
     const { t } = useTranslation();
+    const auth = useAuth();
     const freezeCount = useProgressStore(s => s.streakFreezes?.count || 0);
     const [showFreezeInfo, setShowFreezeInfo] = useState(false);
+    // Guests see a "0" badge that invites them to sign in; signed-in users see
+    // their count and the badge hides at zero.
+    const showFreezeBadge = !auth.isSignedIn || freezeCount > 0;
+    const displayFreezeCount = auth.isSignedIn ? freezeCount : 0;
 
     // "Frozen but safe": streak preserved by a freeze, not active today. Computed
     // in the stats layer (keeps date math out of render). Falls back to false.
@@ -160,21 +166,26 @@ export const DashboardHeader = React.memo(({
 
                 {/* Streak Freeze inventory — tap to learn how freezes are earned
                     (and that Pro earns 3× more). Hidden at zero. */}
-                {freezeCount > 0 && (
+                {showFreezeBadge && (
                     <button
                         type="button"
                         onClick={() => setShowFreezeInfo(true)}
-                        aria-label={t('streakFreeze.available', { count: freezeCount })}
-                        title={t('streakFreeze.available', { count: freezeCount })}
+                        aria-label={t('streakFreeze.available', { count: displayFreezeCount })}
+                        title={t('streakFreeze.available', { count: displayFreezeCount })}
                         style={{
                             background: 'linear-gradient(135deg, rgba(56,189,248,0.20), rgba(14,165,233,0.20))',
-                            padding: 'clamp(4px, 0.7vh, 8px) clamp(7px, 1vw, 11px)', borderRadius: '16px',
+                            padding: 'clamp(4px, 0.7vh, 8px) clamp(8px, 1.2vw, 14px)', borderRadius: '16px',
                             fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)', display: 'flex', alignItems: 'center',
-                            gap: '4px', fontWeight: '700', border: '1px solid rgba(56,189,248,0.3)', flexShrink: 0,
-                            cursor: 'pointer', color: 'inherit', font: 'inherit'
+                            gap: '5px', fontWeight: '700', border: '1px solid rgba(56,189,248,0.3)', flexShrink: 0,
+                            cursor: 'pointer', color: 'inherit', fontFamily: 'inherit',
+                            // Match the sibling <div> badges' height exactly: neutralise the
+                            // native button box that makes it render taller. Line-height is
+                            // left to inherit so the text box matches the sibling divs.
+                            boxSizing: 'border-box', margin: 0,
+                            appearance: 'none', WebkitAppearance: 'none'
                         }}>
-                        <Snowflake size={15} color="#38bdf8" />
-                        <span style={{ color: '#38bdf8' }}>{freezeCount}</span>
+                        <Snowflake size={16} color="#38bdf8" />
+                        <span style={{ color: '#38bdf8' }}>{displayFreezeCount}</span>
                     </button>
                 )}
 

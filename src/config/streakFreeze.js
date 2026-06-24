@@ -48,8 +48,10 @@ export function applyMonthlyRefill(streakFreezes, isPro, todayStr) {
 
   let count;
   if (prevCount === null || !lastRefill) {
-    // First-ever initialisation — grant a starter allotment.
-    count = limits.perMonth;
+    // First-ever initialisation — a single welcome freeze (NOT the full monthly
+    // allotment), so a freshly created account never starts loaded. Monthly
+    // refills top up by `perMonth` from there.
+    count = Math.min(1, limits.maxStock);
   } else if (lastRefill !== curMonth) {
     // New month — top up, capped at the bankable maximum.
     count = Math.min(limits.maxStock, prevCount + limits.perMonth);

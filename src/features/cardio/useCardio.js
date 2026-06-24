@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { loadCardioSessions, saveCardioSession } from '@services/cardioService';
-import { stravaService } from '@services/stravaService';
+import { getAllActivities } from '@services/cardioProviders';
 import { useAuth } from '@contexts/AuthContext';
 import { useProgressStore } from '@store/useProgressStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
@@ -100,16 +100,16 @@ export function useCardio() {
         afterTimestamp = rawFirebase.reduce((max, s) => Math.max(max, s.startTime || 0), 0);
       }
 
-      // Fetch new activities from Strava
-      const stravaActivities = await stravaService.getActivities(afterTimestamp);
+      // Fetch new activities from all connected cardio providers (Strava, Health Connect)
+      const providerActivities = await getAllActivities(afterTimestamp);
 
       // Merge and deduplicate (by ID)
       const all = [...rawFirebase];
       const existingIds = new Set(rawFirebase.map(s => s.id));
 
-      // Save new Strava activities to Firebase (with difficulty at time of save)
+      // Save new provider activities to Firebase (with difficulty at time of save)
       const newSessions = [];
-      stravaActivities.forEach(act => {
+      providerActivities.forEach(act => {
         if (!existingIds.has(act.id)) {
           all.push(act);
           existingIds.add(act.id);

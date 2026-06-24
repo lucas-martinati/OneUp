@@ -62,17 +62,33 @@ class StravaService {
     }
 
     if (Capacitor.isNativePlatform()) {
-      // Listen for app opens (deep links)
+      // Listen for app opens (deep links) while the app is already running.
       App.addListener('appUrlOpen', async (data) => {
         if (data.url.startsWith(getRedirectUri())) {
           await this.handleCallback(data.url);
         }
       });
+
+      // Cold-start safety net: if the OAuth return relaunched the app (singleTask
+      // can recreate the webview), the `appUrlOpen` event may fire before this
+      // listener is registered and be lost — which is exactly why the app would
+      // "reopen but never connect". getLaunchUrl() recovers the launch intent URL.
+      try {
+        const launch = await App.getLaunchUrl();
+        if (launch?.url && launch.url.startsWith(getRedirectUri())) {
+          await this.handleCallback(launch.url);
+        }
+      } catch (err) {
+        logger.error('Failed to read Strava launch URL', err);
+      }
     } else {
-      // On web, check if we just returned from OAuth
+      // On web, check if we just returned from OAuth. The web origin is shared
+      // with Fitbit, so only claim the code when the `state` is ours (or absent,
+      // for backward compatibility with older Strava links).
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
-      if (code) {
+      const state = params.get('state');
+      if (code && (state === 'strava' || !state)) {
         // Clean up URL
         window.history.replaceState({}, document.title, window.location.pathname);
         await this.exchangeToken(code);
@@ -92,7 +108,7 @@ class StravaService {
   async connect() {
     const scope = 'activity:read_all';
     const redirectUri = getRedirectUri();
-    const authUrl = `https://www.strava.com/oauth/mobile/authorize?client_id=${STRAVA_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&approval_prompt=auto&scope=${scope}`;
+    const authUrl = `https://www.strava.com/oauth/mobile/authorize?client_id=${STRAVA_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&approval_prompt=auto&scope=${scope}&state=strava`;
     
     if (Capacitor.getPlatform() === 'web') {
       window.location.assign(authUrl);

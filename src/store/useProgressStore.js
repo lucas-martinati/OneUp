@@ -297,6 +297,16 @@ export const useProgressStore = create((set, get) => ({
     return result.frozeDates;
   },
 
+  // Streak freezes are a signed-in-only feature. When the user is a guest (or
+  // signs out) we wipe the local inventory so guests never hold freezes. Cloud
+  // data is re-merged on the next sign-in, so this only clears the local view.
+  clearStreakFreezes: () => {
+    const state = get();
+    if (!state.streakFreezes?.count && !state.streakFreezes?.lastRefill) return;
+    set({ streakFreezes: { count: 0, lastRefill: null } });
+    get()._persist();
+  },
+
   // ── Exercise-level helpers ──────────────────────────────────────────
 
   getExerciseCount: (dateStr, exerciseId) => {

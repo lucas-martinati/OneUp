@@ -3,9 +3,11 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Snowflake, Crown, X } from '@utils/icons';
 import { Button, IconButton } from '@components/ui';
+import { GoogleSignInButton } from '@components/ui/GoogleSignInButton';
 import { useUIStore } from '@store/useUIStore';
 import { useProgressStore } from '@store/useProgressStore';
 import { useSubscription } from '@contexts/SubscriptionContext';
+import { useAuth } from '@contexts/AuthContext';
 import { STREAK_FREEZE_LIMITS, getFreezeLimits } from '@config/streakFreeze';
 
 const FREEZE_COLOR = '#38bdf8';
@@ -28,6 +30,7 @@ function FreezeStat({ value, label }) {
 export function StreakFreezeInfo({ open, onClose }) {
     const { t } = useTranslation();
     const { isPro } = useSubscription();
+    const auth = useAuth();
     const openStore = useUIStore(s => s.openStore);
     const freezeCount = useProgressStore(s => s.streakFreezes?.count || 0);
     const overlayRef = useRef(null);
@@ -92,10 +95,21 @@ export function StreakFreezeInfo({ open, onClose }) {
                 </h3>
 
                 <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center', lineHeight: 1.5 }}>
-                    {t('streakFreeze.intro')}
+                    {auth.isSignedIn ? t('streakFreeze.intro') : t('streakFreeze.guestDesc')}
                 </p>
 
-                {/* Current allotment for the user's tier */}
+                {/* Guests don't earn freezes — invite them to sign in instead of
+                    showing the (empty) allotment. */}
+                {!auth.isSignedIn && (
+                    <GoogleSignInButton
+                        onClick={() => auth.signIn()}
+                        className="hover-lift"
+                        style={{ width: 'auto', marginTop: '2px' }}
+                    />
+                )}
+
+                {/* Current allotment for the user's tier (signed-in only) */}
+                {auth.isSignedIn && (
                 <div style={{
                     display: 'flex', width: '100%', gap: '10px', padding: '14px',
                     borderRadius: '14px', background: `${FREEZE_COLOR}12`, border: `1px solid ${FREEZE_COLOR}22`,
@@ -106,9 +120,10 @@ export function StreakFreezeInfo({ open, onClose }) {
                     <div style={{ width: '1px', background: 'var(--border-subtle)' }} />
                     <FreezeStat value={limits.maxStock} label={t('streakFreeze.statReserve')} />
                 </div>
+                )}
 
-                {/* Pro upsell — only for non-Pro users */}
-                {!isPro && (
+                {/* Pro upsell — only for signed-in non-Pro users */}
+                {auth.isSignedIn && !isPro && (
                     <div style={{
                         width: '100%', display: 'flex', flexDirection: 'column', gap: '12px',
                         padding: '14px', borderRadius: '14px',

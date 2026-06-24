@@ -112,6 +112,7 @@ export function useStreakFreeze() {
     const isSetup = useProgressStore(s => s.isSetup);
     const isStoreInitialized = useProgressStore(s => s.isStoreInitialized);
     const reconcileStreakFreezes = useProgressStore(s => s.reconcileStreakFreezes);
+    const clearStreakFreezes = useProgressStore(s => s.clearStreakFreezes);
     const isInitialSyncDone = useCloudSyncStore(s => s.isInitialSyncDone);
 
     const [toast, setToast] = useState(null);
@@ -125,11 +126,18 @@ export function useStreakFreeze() {
         }
     }, [reconcileStreakFreezes, isPro]);
 
-    // Gate: store loaded, challenge set up, subscription resolved, and — for
-    // signed-in users — the initial cloud sync done (so we reconcile against the
-    // merged calendar, not stale local data).
-    const ready = isStoreInitialized && isSetup && !isSubscriptionLoading
-        && (!auth.isSignedIn || isInitialSyncDone);
+    // Streak freezes are exclusive to signed-in users: guests never earn or hold
+    // them. Once the store is loaded, wipe any local inventory while signed out
+    // (e.g. left over after a sign-out) so the badge disappears for guests.
+    useEffect(() => {
+        if (isStoreInitialized && !auth.isSignedIn) clearStreakFreezes();
+    }, [isStoreInitialized, auth.isSignedIn, clearStreakFreezes]);
+
+    // Gate: signed in, store loaded, challenge set up, subscription resolved, and
+    // the initial cloud sync done (so we reconcile against the merged calendar,
+    // not stale local data).
+    const ready = auth.isSignedIn && isStoreInitialized && isSetup
+        && !isSubscriptionLoading && isInitialSyncDone;
 
     useEffect(() => {
         if (!ready) return undefined;

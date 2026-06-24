@@ -243,6 +243,7 @@
   "cardio": {
     "avgSpeed": "平均速度",
     "connectTitle": "接続されたサービス",
+    "healthConnect": "Google Health",
     "difficultyMismatchDesc": "難易度が変更されました ({{saved}}x → {{current}}x)。この新しい設定を続行しますか?",
     "difficultyModified": "難易度変更",
     "distance": "距離",
@@ -919,51 +920,6 @@
       "OneUpで常に高みへ！ 🚀"
     ]
   },
-  "wrapped": {
-    "title": "OneUp Wrapped",
-    "entrySubtitle": "あなたの歩みをストーリーで振り返ろう",
-    "entryCta": "見る",
-    "introSubtitle": "あなたの歩みを振り返ろう",
-    "repsTitle": "達成した回数は",
-    "repsUnit": "合計レップ数",
-    "repsCaption": "一回また一回、あなたは続けてきた。",
-    "daysTitle": "取り組んだ日数は",
-    "daysUnit": "活動日数",
-    "daysCaption": "継続こそあなたの超能力。",
-    "streakTitle": "最長連続記録は",
-    "streakUnit": "日連続",
-    "streakCaption": "止まらない純粋な勢い。",
-    "championTitle": "あなたの代名詞の種目",
-    "championCaption": "{{reps}} レップ、まだまだ続く。",
-    "persona": {
-      "title": "あなたのトレーニングの傾向",
-      "morning": {
-        "name": "早起きタイプ",
-        "desc": "朝の時間を制する人。"
-      },
-      "afternoon": {
-        "name": "昼の頑張り屋",
-        "desc": "一日を通して動き続ける。"
-      },
-      "evening": {
-        "name": "夜型タイプ",
-        "desc": "日没後に力を発揮する。"
-      }
-    },
-    "perfectTitle": "達成したのは",
-    "perfectUnit": "パーフェクトな日",
-    "perfectCaption": "リストの目標を、すべて達成。",
-    "outroTitle": "素晴らしい歩み！",
-    "outroSubtitle": "あなたのWrappedをシェア",
-    "cardReps": "レップ",
-    "cardDays": "日数",
-    "cardStreak": "最高連続記録",
-    "cardPerfect": "完璧な日",
-    "cardBadges": "バッジ",
-    "cardSignature": "代名詞の種目",
-    "hint": "タップで続ける",
-    "shareText": "私のOneUp Wrappedを見てね！🔥"
-  },
   "streakFreeze": {
     "toastTitle": "連続記録を守った！",
     "toastBody": "連続記録を守るために凍結を{{count}}回使用しました",
@@ -971,6 +927,7 @@
     "available": "ストリーク凍結の残り: {{count}}",
     "title": "ストリーク凍結",
     "intro": "1日サボると、連続記録を守るために凍結が自動で使われます。凍結は毎月補充されます。",
+    "guestDesc": "サインインしてストリーク凍結を獲得し、1日逃してもストリークを守りましょう。",
     "statAvailable": "残り",
     "statPerMonth": "毎月",
     "statReserve": "上限",

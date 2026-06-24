@@ -24,9 +24,12 @@
     "test:e2e": "npm run build && playwright test",
     "preview": "vite preview",
     "deploy": "GITHUB_PAGES=true npm run build && gh-pages -d dist -b gh-pages --dotfiles",
-    "deploy:functions": "npx firebase-tools deploy --only functions --project oneup-1c3f5",
-    "deploy:database": "npx firebase-tools deploy --only database --project oneup-1c3f5",
-    "deploy:hosting": "npx firebase-tools deploy --only hosting --project oneup-1c3f5"
+    "deploy:functions": "firebase deploy --only functions --project oneup-1c3f5",
+    "deploy:database": "firebase deploy --only database --project oneup-1c3f5",
+    "deploy:hosting": "firebase deploy --only hosting --project oneup-1c3f5",
+    "secrets:set": "bash scripts/set-secrets.sh",
+    "db:audit": "node scripts/firebase-helper.js audit",
+    "db:prune": "node scripts/firebase-helper.js prune"
   },
   "dependencies": {
     "@capacitor/android": "^8.2.0",
@@ -42,6 +45,7 @@
     "@react-oauth/google": "^0.13.4",
     "@revenuecat/purchases-capacitor": "^12.3.0",
     "@revenuecat/purchases-js": "^1.13.2",
+    "capacitor-health": "^8.1.2",
     "firebase": "^12.7.0",
     "html-to-image": "^1.11.13",
     "i18next": "^25.10.5",
@@ -75,6 +79,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "eslint-plugin-sonarjs": "^4.1.0",
+    "firebase-tools": "^15.22.1",
     "gh-pages": "^6.3.0",
     "globals": "^16.5.0",
     "jscpd": "^5.0.10",

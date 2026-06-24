@@ -26,9 +26,14 @@ describe('getFreezeLimits', () => {
 });
 
 describe('applyMonthlyRefill', () => {
-    it('grants the starter allotment on first init (no lastRefill)', () => {
+    it('grants a single welcome freeze on first init (no lastRefill)', () => {
         const r = applyMonthlyRefill({ count: 0, lastRefill: null }, false, '2026-06-23');
         expect(r).toEqual({ count: 1, lastRefill: '2026-06', changed: true });
+    });
+
+    it('grants only 1 on first init even for Pro (welcome freeze is tier-independent)', () => {
+        const r = applyMonthlyRefill({ count: 0, lastRefill: null }, true, '2026-06-23');
+        expect(r.count).toBe(1);
     });
 
     it('tops up by perMonth on a new month, capped at maxStock', () => {
