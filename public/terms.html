@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>OneUp | Terms of Service</title>
+  <meta name="description" content="Conditions d'Utilisation pour l'application OneUp." />
+  <meta name="robots" content="index,follow" />
+  <link rel="icon" type="image/png" href="./favicon.png" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: rgb(5, 5, 5);
+      --card-bg: rgba(10, 10, 15, 0.6);
+      --text-primary: rgb(255, 255, 255);
+      --text-secondary: rgb(176, 176, 186);
+      --accent: rgb(109, 40, 217);
+      --accent-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --border-default: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(109, 40, 217, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(245, 87, 108, 0.08) 0%, transparent 45%);
+      color: var(--text-primary);
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-default);
+      border-radius: 24px;
+      padding: 48px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    header {
+      margin-bottom: 40px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-default);
+      padding-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .last-updated {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      opacity: 0.7;
+      margin-top: 8px;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      border-left: 3px solid #f5576c;
+      padding-left: 12px;
+      margin-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 8px;
+    }
+
+    p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 400;
+    }
+
+    ul {
+      color: var(--text-secondary);
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    pre {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: 20px;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    a {
+      color: #f093fb;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(240, 147, 251, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    a:hover {
+      color: #f5576c;
+      border-bottom-color: #f5576c;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 48px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      opacity: 0.7;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-default);
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background: var(--accent-gradient);
+      border-color: transparent;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 87, 108, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 20px 12px;
+      }
+
+      .container {
+        padding: 24px;
+        border-radius: 16px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>Terms of Service</h1>
+      <p class="subtitle">Conditions d'Utilisation</p>
+      <p class="last-updated">Last updated: June 24, 2026</p>
+    </header>
+
+    <main>
+      <section>
+        <h2 id="1-description-of-service">1. Description of Service</h2>
+        <p>OneUp is a workout and habit tracking service designed to help users maintain discipline and consistency in their fitness routine. Access and use of the application are subject to these Terms of Service.</p>
+      </section>
+      <hr style="border: 0; border-top: 1px solid var(--border-default); margin: 8px 0;" />
+      <section>
+        <h2 id="2-license-terms">2. License Terms</h2>
+        <p>OneUp is an open-source project distributed under the MIT License. You are free to use, modify, and distribute the code in accordance with the terms of the license below:</p>
+        <pre>MIT License
+
+Copyright (c) 2026 Lucas Martinati
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</pre>
+      </section>
+      <hr style="border: 0; border-top: 1px solid var(--border-default); margin: 8px 0;" />
+      <section>
+        <h2 id="3-acceptable-use">3. Acceptable Use</h2>
+        <p>By using OneUp, you agree to:</p>
+        <ul>
+          <li>Not attempt to disrupt or compromise the security of the application's cloud services (Firebase).</li>
+          <li>Not impersonate other users on the public leaderboard.</li>
+          <li>Use the application in an honest and respectful manner, particularly when logging your performance and choosing your display name.</li>
+        </ul>
+      </section>
+      <hr style="border: 0; border-top: 1px solid var(--border-default); margin: 8px 0;" />
+      <section>
+        <h2 id="4-disclaimer-of-warranties">4. Disclaimer of Warranties</h2>
+        <p>As stipulated by the MIT License, the application is provided "as is", without warranty of any kind. While we strive to maintain service availability and the security of your cloud backups via Firebase, we cannot be held responsible for any data loss or damage resulting from the use of the application.</p>
+      </section>
+      <hr style="border: 0; border-top: 1px solid var(--border-default); margin: 8px 0;" />
+      <section>
+        <h2 id="5-contact-us">5. Contact Us</h2>
+        <p>If you have any questions or require assistance regarding the OneUp application or these terms, please contact us at:</p>
+        <p><strong>Email:</strong> <a href="mailto:lucasm54800@gmail.com">lucasm54800@gmail.com</a></p>
+      </section>
+    </main>
+
+    <div class="footer-note">
+      <a href="./" class="back-btn" id="btn-back">
+        Retour à l'accueil
+      </a>
+      <p>© 2026 OneUp. Tous droits réservés.</p>
+    </div>
+  </div>
+</body>
+
+</html>

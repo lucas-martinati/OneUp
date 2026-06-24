@@ -552,7 +552,8 @@
     "backfillExplain": "We'll mark every day from then until yesterday as done, each with that day's real goal.",
     "honestTitle": "Keep it honest",
     "honestDesc": "Only tick the exercises you truly did each day — otherwise you inflate your year's total. You can always do more starting today.",
-    "whichExercisesReal": "Which exercises did you really do?"
+    "whichExercisesReal": "Which exercises did you really do?",
+    "legalDisclaimer": "By signing in, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
   },
   "paywall": {
     "proRequired": "Pro Mode Required",
@@ -617,7 +618,9 @@
     "soundEffects": "Sound Effects",
     "soundsDescription": "Sounds on actions",
     "title": "Settings",
-    "unlockSettings": "UNLOCK SETTINGS"
+    "unlockSettings": "UNLOCK SETTINGS",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
   },
   "share": {
     "backgroundImage": "Background image",

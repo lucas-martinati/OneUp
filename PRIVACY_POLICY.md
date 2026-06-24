@@ -88,4 +88,4 @@ To exercise any of these rights, contact us at the email address below.
 
 If you have any questions about this Privacy Policy or wish to exercise your data rights, please contact us at:
 
-**Email:** [lucas@lucasm548.com](mailto:lucas@lucasm548.com)
+**Email:** [lucasm54800@gmail.com](mailto:lucasm54800@gmail.com)

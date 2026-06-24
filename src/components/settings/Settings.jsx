@@ -7,6 +7,7 @@ import { CloudSyncPanel } from './CloudSyncPanel';
 import { StoreView } from './StoreView';
 import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection } from './SettingsSections';
 import { DifficultySettings } from './DifficultySettings';
+import { openLegalPage } from '@utils/navigation';
 import { useAuth } from '@contexts/AuthContext';
 import { useSettingsStore } from '@store/useSettingsStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
@@ -134,6 +135,52 @@ export function Settings({ defaultShowStore = false, onClose }) {
                         )}
 
                         <DifficultySettings />
+
+                        {/* Legal footer */}
+                        <div style={{
+                            display: 'flex',
+                            gap: '16px',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginTop: 'var(--spacing-lg)',
+                            marginBottom: 'var(--spacing-md)',
+                            opacity: 0.6,
+                            fontSize: '0.78rem'
+                        }}>
+                            <button
+                                onClick={() => openLegalPage('terms')}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'var(--text-secondary)',
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                    padding: '4px 8px',
+                                    fontSize: 'inherit',
+                                    fontFamily: 'inherit'
+                                }}
+                                className="hover-lift"
+                            >
+                                {t('settings.termsOfService')}
+                            </button>
+                            <span style={{ color: 'var(--text-secondary)', opacity: 0.5 }}>•</span>
+                            <button
+                                onClick={() => openLegalPage('privacy')}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'var(--text-secondary)',
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                    padding: '4px 8px',
+                                    fontSize: 'inherit',
+                                    fontFamily: 'inherit'
+                                }}
+                                className="hover-lift"
+                            >
+                                {t('settings.privacyPolicy')}
+                            </button>
+                        </div>
                     </>
                 )}
             </div>

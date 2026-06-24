@@ -134,6 +134,28 @@ const TASKS = [
     output: path.join(ROOT, 'android', 'app', 'src', 'main', 'res', 'values', 'strings.xml'),
     replacements: ['__GOOGLE_CLIENT_ID__'],
   },
+  {
+    name: 'Privacy Policy HTML',
+    icon: '📄',
+    type: 'legal',
+    source: path.join(ROOT, 'PRIVACY_POLICY.md'),
+    output: path.join(ROOT, 'public', 'privacy.html'),
+    title: 'Privacy Policy',
+    subtitle: 'Règles de Confidentialité',
+    lastUpdated: 'Dernière mise à jour : 13 mars 2026',
+    legalType: 'privacy',
+  },
+  {
+    name: 'Terms of Service HTML',
+    icon: '📄',
+    type: 'legal',
+    source: path.join(ROOT, 'TERMS.md'),
+    output: path.join(ROOT, 'public', 'terms.html'),
+    title: 'Terms of Service',
+    subtitle: "Conditions d'Utilisation",
+    lastUpdated: 'Last updated: June 24, 2026',
+    legalType: 'terms',
+  },
 ];
 
 // ─── Icon Generation ────────────────────────────────────────────────────────
@@ -523,6 +545,442 @@ function printSummary(results, totalDuration) {
   return allSuccess;
 }
 
+// Helper to escape HTML characters
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Slugify headings for scroll anchors
+function slugify(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+// Parse inline markdown formatting (**bold** and [link](url))
+function parseInline(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+}
+
+// Strip title and last-updated headers from the markdown contents to avoid duplicates
+function stripMetadata(md) {
+  const lines = md.split('\n');
+  const result = [];
+  let strippedTitle = false;
+  let strippedDate = false;
+
+  for (let line of lines) {
+    const trimmed = line.trim();
+    if (!strippedTitle && trimmed.startsWith('# ')) {
+      strippedTitle = true;
+      continue;
+    }
+    if (!strippedDate && (trimmed.toLowerCase().includes('last updated') || trimmed.toLowerCase().includes('mise à jour'))) {
+      strippedDate = true;
+      continue;
+    }
+    // Skip empty lines or dividers at the very beginning of content
+    if (result.length === 0 && (trimmed === '' || trimmed === '---')) {
+      continue;
+    }
+    result.push(line);
+  }
+  return result.join('\n').trim();
+}
+
+// Custom Markdown to HTML parser
+function mdToHtml(md) {
+  const lines = md.split('\n');
+  const result = [];
+  let inList = false;
+  let inSection = false;
+
+  for (let line of lines) {
+    line = line.trim();
+    
+    if (!line) {
+      if (inList) {
+        result.push('        </ul>');
+        inList = false;
+      }
+      continue;
+    }
+
+    // Horizontal Rule
+    if (line === '---') {
+      if (inList) { result.push('        </ul>'); inList = false; }
+      if (inSection) { result.push('      </section>'); inSection = false; }
+      result.push('      <hr style="border: 0; border-top: 1px solid var(--border-default); margin: 8px 0;" />');
+      continue;
+    }
+
+    // Headings
+    if (line.startsWith('# ')) {
+      if (inList) { result.push('        </ul>'); inList = false; }
+      if (inSection) { result.push('      </section>'); inSection = false; }
+      const content = line.slice(2);
+      result.push(`      <h1 id="${slugify(content)}">${parseInline(content)}</h1>`);
+      continue;
+    }
+    
+    if (line.startsWith('## ')) {
+      if (inList) { result.push('        </ul>'); inList = false; }
+      if (inSection) { result.push('      </section>'); inSection = false; }
+      const content = line.slice(3);
+      result.push(`      <section>\n        <h2 id="${slugify(content)}">${parseInline(content)}</h2>`);
+      inSection = true;
+      continue;
+    }
+
+    if (line.startsWith('### ')) {
+      if (inList) { result.push('        </ul>'); inList = false; }
+      const content = line.slice(4);
+      result.push(`        <h3>${parseInline(content)}</h3>`);
+      continue;
+    }
+
+    // Preformatted blocks (like license placeholder)
+    if (line.startsWith('[LICENSE_TEXT]')) {
+      if (inList) { result.push('        </ul>'); inList = false; }
+      result.push('        [LICENSE_TEXT]');
+      continue;
+    }
+
+    // List items
+    if (line.startsWith('- ') || line.startsWith('* ')) {
+      if (!inList) {
+        result.push('        <ul>');
+        inList = true;
+      }
+      const content = line.slice(2);
+      result.push(`          <li>${parseInline(content)}</li>`);
+      continue;
+    }
+
+    // Paragraphs
+    if (inList) {
+      result.push('        </ul>');
+      inList = false;
+    }
+    result.push(`        <p>${parseInline(line)}</p>`);
+  }
+
+  if (inList) {
+    result.push('        </ul>');
+  }
+  if (inSection) {
+    result.push('      </section>');
+  }
+
+  return result.join('\n');
+}
+
+// Main template wrapper
+function getHtmlTemplate(title, subtitle, lastUpdated, mainContent) {
+  return `<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>OneUp | ${title}</title>
+  <meta name="description" content="${subtitle} pour l'application OneUp." />
+  <meta name="robots" content="index,follow" />
+  <link rel="icon" type="image/png" href="./favicon.png" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: rgb(5, 5, 5);
+      --card-bg: rgba(10, 10, 15, 0.6);
+      --text-primary: rgb(255, 255, 255);
+      --text-secondary: rgb(176, 176, 186);
+      --accent: rgb(109, 40, 217);
+      --accent-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --border-default: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(109, 40, 217, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(245, 87, 108, 0.08) 0%, transparent 45%);
+      color: var(--text-primary);
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-default);
+      border-radius: 24px;
+      padding: 48px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    header {
+      margin-bottom: 40px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-default);
+      padding-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .last-updated {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      opacity: 0.7;
+      margin-top: 8px;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      border-left: 3px solid #f5576c;
+      padding-left: 12px;
+      margin-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 8px;
+    }
+
+    p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 400;
+    }
+
+    ul {
+      color: var(--text-secondary);
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    pre {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: 20px;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    a {
+      color: #f093fb;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(240, 147, 251, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    a:hover {
+      color: #f5576c;
+      border-bottom-color: #f5576c;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 48px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      opacity: 0.7;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-default);
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background: var(--accent-gradient);
+      border-color: transparent;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 87, 108, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 20px 12px;
+      }
+
+      .container {
+        padding: 24px;
+        border-radius: 16px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>${title}</h1>
+      <p class="subtitle">${subtitle}</p>
+      <p class="last-updated">${lastUpdated}</p>
+    </header>
+
+    <main>
+${mainContent}
+    </main>
+
+    <div class="footer-note">
+      <a href="./" class="back-btn" id="btn-back">
+        Retour à l'accueil
+      </a>
+      <p>© ${new Date().getFullYear()} OneUp. Tous droits réservés.</p>
+    </div>
+  </div>
+</body>
+
+</html>
+`;
+}
+
+function processLegalTask(task) {
+  const startTime = Date.now();
+
+  if (!fs.existsSync(task.source)) {
+    return {
+      success: false,
+      duration: Date.now() - startTime,
+      error: `Fichier source introuvable : ${relativePath(task.source)}`,
+    };
+  }
+
+  try {
+    const rawContent = fs.readFileSync(task.source, 'utf8');
+    const cleanContent = stripMetadata(rawContent);
+    let mainContentHtml = mdToHtml(cleanContent);
+
+    if (task.legalType === 'terms') {
+      const licensePath = path.join(ROOT, 'LICENSE');
+      if (!fs.existsSync(licensePath)) {
+        return {
+          success: false,
+          duration: Date.now() - startTime,
+          error: `Fichier LICENSE introuvable`,
+        };
+      }
+      const licenseText = fs.readFileSync(licensePath, 'utf8');
+      const escapedLicense = `<pre>${escapeHtml(licenseText)}</pre>`;
+      mainContentHtml = mainContentHtml.replace('[LICENSE_TEXT]', escapedLicense);
+    }
+
+    const html = getHtmlTemplate(task.title, task.subtitle, task.lastUpdated, mainContentHtml);
+
+    const outputDir = path.dirname(task.output);
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    fs.writeFileSync(task.output, html, 'utf8');
+    const outputSize = fs.statSync(task.output).size;
+
+    return {
+      success: true,
+      duration: Date.now() - startTime,
+      outputSize,
+      outputPath: relativePath(task.output),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      duration: Date.now() - startTime,
+      error: error.message,
+    };
+  }
+}
+
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -554,7 +1012,7 @@ async function main() {
   const results = [];
   for (let i = 0; i < TASKS.length; i++) {
     const task = TASKS[i];
-    const result = processTemplate(task);
+    const result = task.type === 'legal' ? processLegalTask(task) : processTemplate(task);
     printTaskResult(i + 1, TASKS.length, task, result);
     results.push({ task, result });
   }

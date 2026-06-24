@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { useTranslation, Trans } from 'react-i18next';
+import { openLegalPage } from '@utils/navigation';
 import {
     Calendar, ArrowRight, ArrowLeft, Target, Rocket, History,
     Sparkles, AlertCircle, CheckCircle2, Globe, getIcon
@@ -215,6 +216,46 @@ export function Onboarding({ onStart }) {
                                         </>
                                     )}
                                 </button>
+                                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '4px', opacity: 0.85, lineHeight: '1.4' }}>
+                                    <Trans i18nKey="onboarding.legalDisclaimer">
+                                        En vous connectant, vous acceptez nos{' '}
+                                        <button
+                                            onClick={(e) => { e.preventDefault(); openLegalPage('terms'); }}
+                                            style={{
+                                                background: 'none',
+                                                border: 'none',
+                                                color: 'var(--text-primary)',
+                                                textDecoration: 'underline',
+                                                cursor: 'pointer',
+                                                padding: 0,
+                                                fontSize: 'inherit',
+                                                fontWeight: 'inherit',
+                                                fontFamily: 'inherit',
+                                                display: 'inline'
+                                            }}
+                                        >
+                                            Conditions d'Utilisation
+                                        </button>{' '}
+                                        et nos{' '}
+                                        <button
+                                            onClick={(e) => { e.preventDefault(); openLegalPage('privacy'); }}
+                                            style={{
+                                                background: 'none',
+                                                border: 'none',
+                                                color: 'var(--text-primary)',
+                                                textDecoration: 'underline',
+                                                cursor: 'pointer',
+                                                padding: 0,
+                                                fontSize: 'inherit',
+                                                fontWeight: 'inherit',
+                                                fontFamily: 'inherit',
+                                                display: 'inline'
+                                            }}
+                                        >
+                                            Règles de Confidentialité
+                                        </button>.
+                                    </Trans>
+                                </div>
                                 {auth.error && (
                                     <div className="sync-message error" style={{ width: '100%', boxSizing: 'border-box' }}>
                                         <AlertCircle size={16} />
@@ -449,6 +490,51 @@ export function Onboarding({ onStart }) {
                         }} />
                     );
                 })}
+            </div>
+
+            {/* Legal footer */}
+            <div style={{
+                display: 'flex',
+                gap: '12px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 'var(--spacing-xs)',
+                opacity: 0.6,
+                fontSize: '0.75rem'
+            }}>
+                <button
+                    onClick={() => openLegalPage('terms')}
+                    style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-secondary)',
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                        padding: '4px 8px',
+                        fontSize: 'inherit',
+                        fontFamily: 'inherit'
+                    }}
+                    className="hover-lift"
+                >
+                    {t('settings.termsOfService')}
+                </button>
+                <span style={{ color: 'var(--text-secondary)', opacity: 0.5 }}>•</span>
+                <button
+                    onClick={() => openLegalPage('privacy')}
+                    style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-secondary)',
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                        padding: '4px 8px',
+                        fontSize: 'inherit',
+                        fontFamily: 'inherit'
+                    }}
+                    className="hover-lift"
+                >
+                    {t('settings.privacyPolicy')}
+                </button>
             </div>
         </div>
     );

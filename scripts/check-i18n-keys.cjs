@@ -58,7 +58,7 @@ function isLikelyI18nKey(key) {
   if (/\/(components|hooks|services|utils|pages|contexts)/.test(key))  return false;
 
   // Extensions de fichiers
-  if (/\.(png|jpg|svg|gif|webp|ico|json|cjs|ts|tsx|js|jsx)$/.test(key)) return false;
+  if (/\.(png|jpg|svg|gif|webp|ico|json|cjs|ts|tsx|js|jsx|html|css|mp3|wav)$/.test(key)) return false;
 
   // Valeurs CSS : commence par un chiffre ou signe négatif + chiffre
   if (/^-?\d/.test(key))                                               return false;

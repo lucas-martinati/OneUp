@@ -537,7 +537,8 @@
     "backfillExplain": "Marcaremos cada día desde entonces hasta ayer como hecho, cada uno con el objetivo real de ese día.",
     "honestTitle": "Mantenlo honesto",
     "honestDesc": "Marque únicamente los ejercicios que realmente hizo cada día; de lo contrario, inflará el total del año. Siempre puedes hacer más a partir de hoy.",
-    "whichExercisesReal": "¿Qué ejercicios hiciste realmente?"
+    "whichExercisesReal": "¿Qué ejercicios hiciste realmente?",
+    "legalDisclaimer": "Al iniciar sesión, aceptas nuestros <0>Términos de servicio</0> y nuestra <1>Política de privacidad</1>."
   },
   "paywall": {
     "proRequired": "Modo Pro Requerido",
@@ -602,7 +603,9 @@
     "soundEffects": "Efectos de sonido",
     "soundsDescription": "Sonidos en acciones",
     "title": "Ajustes",
-    "unlockSettings": "DESBLOQUEAR AJUSTES"
+    "unlockSettings": "DESBLOQUEAR AJUSTES",
+    "privacyPolicy": "Política de privacidad",
+    "termsOfService": "Términos de servicio"
   },
   "share": {
     "backgroundImage": "Imagen de fondo",

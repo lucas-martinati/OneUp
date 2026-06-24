@@ -537,7 +537,8 @@
     "backfillExplain": "Segneremo ogni giorno da allora fino a ieri come completato, ognuno con il vero obiettivo di quel giorno.",
     "honestTitle": "Sii onesto",
     "honestDesc": "Seleziona solo gli esercizi che hai veramente fatto ogni giorno, altrimenti gonfi il totale dell'anno. Puoi sempre fare di più a partire da oggi.",
-    "whichExercisesReal": "Quali esercizi hai fatto veramente?"
+    "whichExercisesReal": "Quali esercizi hai fatto veramente?",
+    "legalDisclaimer": "Accedendo, accetti i nostri <0>Termini di servizio</0> e la <1>Informativa sulla privacy</1>."
   },
   "paywall": {
     "proRequired": "Modalità Pro richiesta",
@@ -602,7 +603,9 @@
     "soundEffects": "Effetti sonori",
     "soundsDescription": "Suoni sulle azioni",
     "title": "Impostazioni",
-    "unlockSettings": "SBLOCCA IMPOSTAZIONI"
+    "unlockSettings": "SBLOCCA IMPOSTAZIONI",
+    "privacyPolicy": "Informativa sulla privacy",
+    "termsOfService": "Termini di servizio"
   },
   "share": {
     "backgroundImage": "Immagine di sfondo",

@@ -346,3 +346,7 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
         </div>
     );
 }
+
+
+
+

@@ -537,7 +537,8 @@
     "backfillExplain": "Von da an bis gestern markieren wir jeden Tag als erledigt, jeweils mit dem eigentlichen Ziel dieses Tages.",
     "honestTitle": "Bleiben Sie ehrlich",
     "honestDesc": "Kreuzen Sie nur die Übungen an, die Sie jeden Tag wirklich gemacht haben – sonst erhöhen Sie die Gesamtzahl Ihres Jahres. Ab heute können Sie immer noch mehr tun.",
-    "whichExercisesReal": "Welche Übungen hast du wirklich gemacht?"
+    "whichExercisesReal": "Welche Übungen hast du wirklich gemacht?",
+    "legalDisclaimer": "Mit der Anmeldung stimmst du unseren <0>Nutzungsbedingungen</0> und unserer <1>Datenschutzerklärung</1> zu."
   },
   "paywall": {
     "proRequired": "Pro-Modus erforderlich",
@@ -602,7 +603,9 @@
     "soundEffects": "Soundeffekte",
     "soundsDescription": "Geräusche bei Aktionen",
     "title": "Einstellungen",
-    "unlockSettings": "EINSTELLUNGEN ENTSPERREN"
+    "unlockSettings": "EINSTELLUNGEN ENTSPERREN",
+    "privacyPolicy": "Datenschutzerklärung",
+    "termsOfService": "Nutzungsbedingungen"
   },
   "share": {
     "backgroundImage": "Hintergrundbild",

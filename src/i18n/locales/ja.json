@@ -537,7 +537,8 @@
     "backfillExplain": "それから昨日までの毎日を完了としてマークし、それぞれにその日の本当の目標を付けます。",
     "honestTitle": "正直に言ってください",
     "honestDesc": "毎日実際に行ったエクササイズにのみチェックを入れてください。そうでないと、年間の合計が膨らむことになります。今日からいつでももっとできるようになります。",
-    "whichExercisesReal": "実際にやった練習はどれですか?"
+    "whichExercisesReal": "実際にやった練習はどれですか?",
+    "legalDisclaimer": "ログインすると、<0>利用規約</0>および<1>プライバシーポリシー</1>に同意したことになります。"
   },
   "paywall": {
     "proRequired": "プロモードが必要です",
@@ -602,7 +603,9 @@
     "soundEffects": "効果音",
     "soundsDescription": "アクション時のサウンド",
     "title": "設定",
-    "unlockSettings": "設定のロックを解除する"
+    "unlockSettings": "設定のロックを解除する",
+    "privacyPolicy": "プライバシーポリシー",
+    "termsOfService": "利用規約"
   },
   "share": {
     "backgroundImage": "背景画像",
