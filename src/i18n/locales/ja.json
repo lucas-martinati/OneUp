@@ -320,6 +320,8 @@
     "connectedGooglePlay": "Google Playに接続しました",
     "dataConflict": "データの競合",
     "deleteAccount": "私のアカウントを削除する",
+    "deleteAllData": "すべてのデータを削除",
+    "deleteAllWarning": "進捗、設定、ルーティンを含むすべてのローカルデータが完全に削除されます。アプリは最初からやり直します。",
     "deleteCannotUndo": "この操作は元に戻せません",
     "deleteWarning": "この操作は<1>元に戻すことができません</1>。進行状況や設定を含むすべてのデータは完全に削除されます。",
     "deleting": "削除中...",

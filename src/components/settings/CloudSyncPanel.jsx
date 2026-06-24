@@ -10,11 +10,14 @@ export function CloudSyncPanel({
   onSignIn,
   onSignOut,
   conflictData,
-  onDeleteAccount
+  onDeleteAccount,
+  onDeleteAllData
 }) {
   const { t } = useTranslation();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
+  const [deletingAll, setDeletingAll] = useState(false);
 
 
   return (
@@ -196,6 +199,80 @@ export function CloudSyncPanel({
               <AlertCircle />
               <span>{authState.error}</span>
             </div>
+          )}
+
+          {/* Delete all local data button (offline mode) */}
+          {onDeleteAllData && (
+            <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
+              <button
+                className="btn-cloud-delete"
+                onClick={() => setShowDeleteAllConfirm(true)}
+              >
+                <Trash2 size={16} />
+                {t('cloud.deleteAllData')}
+              </button>
+            </div>
+          )}
+
+          {/* Delete all data confirmation modal */}
+          {showDeleteAllConfirm && createPortal(
+            <div className="delete-overlay" onClick={() => setShowDeleteAllConfirm(false)}>
+              <div className="delete-modal" onClick={e => e.stopPropagation()}>
+                <div className="delete-bg-effects">
+                  <div className="delete-glow delete-glow-1"></div>
+                  <div className="delete-glow delete-glow-2"></div>
+                </div>
+                <div className="delete-content">
+                  <div className="delete-icon-wrapper">
+                    <div className="delete-icon-pulse"></div>
+                    <div className="delete-icon">
+                      <Trash2 />
+                    </div>
+                  </div>
+                  <h3>{t('cloud.deleteAllData')}</h3>
+                  <p>{t('cloud.deleteAllWarning')}</p>
+                  <div className="delete-warning">
+                    <AlertTriangle size={14} />
+                    <span>{t('cloud.deleteCannotUndo')}</span>
+                  </div>
+                  <div className="delete-actions">
+                    <button
+                      className="btn-delete-cancel"
+                      onClick={() => setShowDeleteAllConfirm(false)}
+                      disabled={deletingAll}
+                    >
+                      {t('common.cancel')}
+                    </button>
+                    <button
+                      className="btn-delete-confirm"
+                      onClick={async () => {
+                        setDeletingAll(true);
+                        try {
+                          await onDeleteAllData();
+                        } finally {
+                          setDeletingAll(false);
+                          setShowDeleteAllConfirm(false);
+                        }
+                      }}
+                      disabled={deletingAll}
+                    >
+                      {deletingAll ? (
+                        <>
+                          <span className="delete-spinner"></span>
+                          {t('cloud.deleting')}
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 size={16} />
+                          {t('common.delete')}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>,
+            document.body
           )}
         </div>
       )}

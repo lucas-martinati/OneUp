@@ -320,6 +320,8 @@
     "connectedGooglePlay": "已连接 Google Play",
     "dataConflict": "数据冲突",
     "deleteAccount": "删除我的账户",
+    "deleteAllData": "删除所有数据",
+    "deleteAllWarning": "所有本地数据将被永久删除，包括进度、设置和训练计划。应用将重新开始。",
     "deleteCannotUndo": "此操作无法撤销",
     "deleteWarning": "此操作<1>不可逆</1>。你的所有数据将被永久删除，包括你的进度和设置。",
     "deleting": "删除中...",

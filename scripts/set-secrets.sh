@@ -133,7 +133,12 @@ test_token() {
 
 # ─── Variables ───────────────────────────────────────────────────────────────
 PROJECT_ID=$(get_env "VITE_FIREBASE_PROJECT_ID")
-PROJECT_ID=${PROJECT_ID:-"oneup-1c3f5"}
+
+# Si PROJECT_ID est vide, on arrête tout proprement
+if [ -z "$PROJECT_ID" ]; then
+  echo -e "${RED}❌ ERREUR : VITE_FIREBASE_PROJECT_ID est manquant dans le .env${RESET}" >&2
+  exit 1
+fi
 
 SM_API="https://secretmanager.googleapis.com/v1"
 

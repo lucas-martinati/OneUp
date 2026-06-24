@@ -123,6 +123,12 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                         onClose();
                                     }}
                                     conflictData={conflictData}
+                                    onDeleteAllData={!cloudAuth.isSignedIn ? async () => {
+                                        const { Preferences } = await import('@capacitor/preferences');
+                                        await Preferences.clear();
+                                        localStorage.clear();
+                                        window.location.reload();
+                                    } : undefined}
                                 />
                             </div>
                         )}

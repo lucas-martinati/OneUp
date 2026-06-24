@@ -320,6 +320,8 @@
     "connectedGooglePlay": "Conectado ao Google Play",
     "dataConflict": "Conflito de dados",
     "deleteAccount": "Excluir minha conta",
+    "deleteAllData": "Excluir todos os dados",
+    "deleteAllWarning": "Todos os seus dados locais serão excluídos permanentemente, incluindo progresso, configurações e rotinas. O aplicativo será reiniciado.",
     "deleteCannotUndo": "Esta ação não pode ser desfeita",
     "deleteWarning": "Esta ação é <1>irreversível</1>. Todos os seus dados serão excluídos permanentemente, incluindo seu progresso e configurações.",
     "deleting": "Excluindo...",
