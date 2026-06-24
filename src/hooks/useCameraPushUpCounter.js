@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { isAndroidPlatform } from '@utils/platform';
+import { getWidgetBridge } from '@utils/widgetBridge';
 
 // ── Detection tuning ──────────────────────────────────────────────────────
 // Per-frame score smoothing (EMA factor): damps sensor noise so a single
@@ -112,8 +113,7 @@ export function useCameraPushUpCounter(onRepCounted) {
         try {
             // Check & request camera permission on Android natively first
             if (isAndroidPlatform()) {
-                const { registerPlugin } = await import('@capacitor/core');
-                const WidgetBridge = registerPlugin('WidgetBridge');
+                const WidgetBridge = await getWidgetBridge();
                 const permCheck = await WidgetBridge.checkCameraPermission();
                 if (permCheck.status !== 'GRANTED') {
                     const permReq = await WidgetBridge.requestCameraPermission();

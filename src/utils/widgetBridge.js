@@ -31,6 +31,21 @@ async function getPreferencesModule() {
 }
 
 /**
+ * Get the singleton WidgetBridge plugin instance.
+ * registerPlugin must only be called once per plugin name — calling it
+ * again throws "Capacitor plugin already registered". Any other module
+ * needing the plugin must go through this accessor.
+ * @returns {Promise<Object>} The registered WidgetBridge plugin
+ */
+export async function getWidgetBridge() {
+  if (!widgetBridgeInstance) {
+    const { registerPlugin } = await getCoreModule();
+    widgetBridgeInstance = registerPlugin('WidgetBridge');
+  }
+  return widgetBridgeInstance;
+}
+
+/**
  * Compute the week days status (Mon→Sun) for the current week.
  * @param {Object} completions - { [dateStr]: { [exerciseId]: { isCompleted } } }
  * @returns {boolean[]} Array of 7 booleans [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
@@ -77,10 +92,7 @@ export async function updateWidgetData(computedStats, completions) {
   if (!isAndroidPlatform()) return;
 
   try {
-    if (!widgetBridgeInstance) {
-      const { registerPlugin } = await getCoreModule();
-      widgetBridgeInstance = registerPlugin('WidgetBridge');
-    }
+    await getWidgetBridge();
     const { Preferences } = await getPreferencesModule();
 
     const widgetData = {
