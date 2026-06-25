@@ -604,6 +604,8 @@
     "sensitiveWarning": "Wenn Sie dies ändern, ändern sich Ihre täglichen Wiederholungsziele. Eine Einstellung von 0,5 halbiert Ihre Ziele.",
     "soundEffects": "Soundeffekte",
     "soundsDescription": "Geräusche bei Aktionen",
+    "hapticFeedback": "Haptisches Feedback",
+    "hapticsDescription": "Vibrationen bei Aktionen",
     "title": "Einstellungen",
     "unlockSettings": "EINSTELLUNGEN ENTSPERREN",
     "privacyPolicy": "Datenschutzerklärung",

@@ -619,6 +619,8 @@
     "sensitiveWarning": "Changing this will modify your daily rep targets. A setting of 0.5 halves your targets.",
     "soundEffects": "Sound Effects",
     "soundsDescription": "Sounds on actions",
+    "hapticFeedback": "Haptic feedback",
+    "hapticsDescription": "Vibrations on actions",
     "title": "Settings",
     "unlockSettings": "UNLOCK SETTINGS",
     "privacyPolicy": "Privacy Policy",

@@ -12,7 +12,7 @@ import {
   Users, User, LogIn, UserPlus, Shield, ShieldAlert, HeartHandshake,
   LogOut, Hash, Swords,
   // Navigation & settings
-  Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
+  Settings, Settings2, Bell, Volume2, Vibrate, Clock, Lock, Unlock,
   Globe, Gauge, ShoppingBag, PieChart,
   // Sharing & media
   Share2, Download, Image, Palette, Target,
@@ -39,7 +39,7 @@ export {
   Trophy, Medal, Award, Star, Crown,
   Users, LogIn, UserPlus, Shield, ShieldAlert, HeartHandshake,
   LogOut, Hash,
-  Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
+  Settings, Settings2, Bell, Volume2, Vibrate, Clock, Lock, Unlock,
   Globe, Gauge, ShoppingBag, PieChart,
   Share2, Download, Image, Palette, Target,
   History, Weight, Filter, Loader2, Smartphone,

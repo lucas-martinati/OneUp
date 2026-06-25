@@ -604,6 +604,8 @@
     "sensitiveWarning": "更改此设置将修改你的每日目标。设为0.5会将目标减半。",
     "soundEffects": "音效",
     "soundsDescription": "操作音效",
+    "hapticFeedback": "触觉反馈",
+    "hapticsDescription": "操作时震动",
     "title": "设置",
     "unlockSettings": "解锁设置",
     "privacyPolicy": "隐私政策",

@@ -35,6 +35,7 @@ import { useExercises } from '@contexts/ExercisesContext';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 
 import { setSoundSettingsGetter } from '@utils/soundManager';
+import { setHapticsSettingsGetter } from '@utils/hapticsManager';
 import { clearWorkoutSession } from '@utils/workoutSessionStorage';
 import { getDailyGoal } from '@config/exercises';
 import { canAccessFeature, FEATURES } from '@utils/entitlements';
@@ -169,6 +170,7 @@ export function Dashboard() {
 
     useEffect(() => {
         setSoundSettingsGetter(() => settings);
+        setHapticsSettingsGetter(() => settings);
     }, [settings]);
 
     const { showAchievement, AchievementToast: AchievementToastComponent } = useAchievementToast((badgeId) => {

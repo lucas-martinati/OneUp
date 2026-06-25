@@ -1,4 +1,5 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useCallback, useMemo } from 'react';
+import { haptics } from '@utils/hapticsManager';
 
 /**
  * Canonical button primitive for the whole app.
@@ -77,11 +78,20 @@ export const Button = forwardRef(function Button(
     children,
     style,
     type = 'button',
+    onClick,
     ...rest
   },
   ref,
 ) {
   const isDisabled = disabled || loading;
+  // Light physical tap on every press (no-op on web / when haptics are off).
+  const handleClick = useCallback(
+    (e) => {
+      haptics.light();
+      onClick?.(e);
+    },
+    [onClick],
+  );
   const composed = useMemo(
     () => ({
       ...BASE,
@@ -98,7 +108,7 @@ export const Button = forwardRef(function Button(
   const iconPx = ICON_SIZE[size];
 
   return (
-    <button ref={ref} type={type} disabled={isDisabled} style={composed} {...rest}>
+    <button ref={ref} type={type} disabled={isDisabled} onClick={handleClick} style={composed} {...rest}>
       {loading ? (
         <span
           aria-hidden

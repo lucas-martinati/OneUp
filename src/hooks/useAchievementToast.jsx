@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, Sparkles } from '@utils/icons';
 import { BADGE_DEFINITIONS, BADGE_ICONS, getBadgeIconFromDef } from '@config/badgeDefinitions';
+import { haptics } from '@utils/hapticsManager';
 import { useToastGestures } from './useToastGestures';
 import { getToastRoot } from'@components/feedback/toastRoot';
 
@@ -154,6 +155,7 @@ export function useAchievementToast(onViewAchievement, onValidateBadge) {
     const { t } = useTranslation();
 
     const pushAchievement = useCallback((achievement) => {
+        haptics.celebrate();
         setToast(prev => ({
             achievement,
             count: prev ? prev.count + 1 : 1,

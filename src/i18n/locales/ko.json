@@ -604,6 +604,8 @@
     "sensitiveWarning": "이를 변경하면 일일 담당자 목표가 수정됩니다. 0.5로 설정하면 목표가 절반으로 줄어듭니다.",
     "soundEffects": "음향 효과",
     "soundsDescription": "행동에 대한 소리",
+    "hapticFeedback": "햅틱 피드백",
+    "hapticsDescription": "행동에 대한 진동",
     "title": "설정",
     "unlockSettings": "잠금 해제 설정",
     "privacyPolicy": "개인정보 처리방침",

@@ -113,7 +113,7 @@ export function useCameraPushUpCounter(onRepCounted) {
         try {
             // Check & request camera permission on Android natively first
             if (isAndroidPlatform()) {
-                const WidgetBridge = await getWidgetBridge();
+                const { plugin: WidgetBridge } = await getWidgetBridge();
                 const permCheck = await WidgetBridge.checkCameraPermission();
                 if (permCheck.status !== 'GRANTED') {
                     const permReq = await WidgetBridge.requestCameraPermission();

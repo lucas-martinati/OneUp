@@ -604,6 +604,8 @@
     "sensitiveWarning": "これを変更すると、毎日の担当者目標が変更されます。 0.5 に設定すると、ターゲットが半分になります。",
     "soundEffects": "効果音",
     "soundsDescription": "アクション時のサウンド",
+    "hapticFeedback": "触覚フィードバック",
+    "hapticsDescription": "アクション時のバイブレーション",
     "title": "設定",
     "unlockSettings": "設定のロックを解除する",
     "privacyPolicy": "プライバシーポリシー",

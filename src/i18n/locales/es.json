@@ -604,6 +604,8 @@
     "sensitiveWarning": "Cambiar esto modificará tus objetivos diarios de repeticiones. Un ajuste de 0.5 reduce tus objetivos a la mitad.",
     "soundEffects": "Efectos de sonido",
     "soundsDescription": "Sonidos en acciones",
+    "hapticFeedback": "Respuesta háptica",
+    "hapticsDescription": "Vibraciones en acciones",
     "title": "Ajustes",
     "unlockSettings": "DESBLOQUEAR AJUSTES",
     "privacyPolicy": "Política de privacidad",

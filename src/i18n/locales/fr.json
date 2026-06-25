@@ -619,6 +619,8 @@
     "sensitiveWarning": "Modifier ceci changera tes objectifs de répétitions quotidiens. Un réglage à 0.5 divise tes objectifs par deux.",
     "soundEffects": "Effets sonores",
     "soundsDescription": "Sons lors des actions",
+    "hapticFeedback": "Retours haptiques",
+    "hapticsDescription": "Vibrations lors des actions",
     "title": "Paramètres",
     "unlockSettings": "DÉBLOQUER LES PARAMÈTRES",
     "privacyPolicy": "Règles de Confidentialité",

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Bell, Volume2, Clock, Users, Lock, Gauge, Globe, Smartphone } from '@utils/icons';
+import { Bell, Volume2, Vibrate, Clock, Users, Lock, Gauge, Globe, Smartphone } from '@utils/icons';
 import { ToggleSwitch } from '@components/ui/ToggleSwitch';
 import { SettingRow } from '@components/ui/SettingRow';
 import { ThemeSwatch } from '@components/ui';
@@ -109,6 +109,20 @@ export function PreferencesSection({ settings, onSave }) {
                     enabled={settings.soundsEnabled}
                     onClick={() => onSave({ ...settings, soundsEnabled: !settings.soundsEnabled })}
                     activeGradient="linear-gradient(135deg, #0ea5e9, #0284c7)"
+                />
+            </SettingRow>
+
+            <SettingRow
+                icon={Vibrate}
+                title={t('settings.hapticFeedback')}
+                description={t('settings.hapticsDescription')}
+                color="#a855f7"
+                isLast={false}
+            >
+                <ToggleSwitch
+                    enabled={settings.hapticsEnabled ?? true}
+                    onClick={() => onSave({ ...settings, hapticsEnabled: !(settings.hapticsEnabled ?? true) })}
+                    activeGradient="linear-gradient(135deg, #a855f7, #9333ea)"
                 />
             </SettingRow>
 

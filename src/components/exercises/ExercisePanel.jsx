@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import { sounds } from '@utils/soundManager';
+import { haptics } from '@utils/hapticsManager';
 import { formatTime } from '@utils/dateUtils';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
@@ -92,6 +93,7 @@ export function ExercisePanel({
                 setHasCelebrated(true);
                 setShowConfetti(true);
                 sounds.success();
+                haptics.success();
             });
 
             if (onNext) setTimeout(() => onNext(), 1500);
@@ -147,6 +149,7 @@ export function ExercisePanel({
 
     const handleIncrement = (amount) => {
         setIsAnimating(true);
+        haptics.light();
         onUpdateCount(Math.min(currentCount + amount, dailyGoal));
         setTimeout(() => setIsAnimating(false), 200);
     };

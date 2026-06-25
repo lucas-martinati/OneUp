@@ -6,6 +6,7 @@ const logger = createLogger('SettingsStore');
 const defaultSettings = {
   notificationsEnabled: false,
   soundsEnabled: true,
+  hapticsEnabled: true,
   notificationTime: { hour: 9, minute: 0 },
   leaderboardEnabled: false,
   leaderboardPseudo: '',

@@ -35,14 +35,22 @@ async function getPreferencesModule() {
  * registerPlugin must only be called once per plugin name — calling it
  * again throws "Capacitor plugin already registered". Any other module
  * needing the plugin must go through this accessor.
- * @returns {Promise<Object>} The registered WidgetBridge plugin
+ *
+ * Returns a wrapper `{ plugin }` rather than the raw proxy on purpose: a
+ * Capacitor plugin proxy is "thenable" on native (any property access,
+ * including `.then`, resolves to a callable that forwards to native). Returning
+ * it directly from an async function — or awaiting it — makes the JS runtime
+ * adopt it as a thenable and call native `WidgetBridge.then()`, which throws
+ * "WidgetBridge.then() is not implemented on android". Wrapping keeps the proxy
+ * out of the promise-resolution path.
+ * @returns {Promise<{plugin: Object}>} Wrapper around the registered plugin
  */
 export async function getWidgetBridge() {
   if (!widgetBridgeInstance) {
     const { registerPlugin } = await getCoreModule();
     widgetBridgeInstance = registerPlugin('WidgetBridge');
   }
-  return widgetBridgeInstance;
+  return { plugin: widgetBridgeInstance };
 }
 
 /**
