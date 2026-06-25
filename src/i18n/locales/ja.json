@@ -336,7 +336,9 @@
     "restoreDesc": "クラウドからデータを取得する",
     "signInWithGoogle": "Googleでサインイン",
     "signOut": "サインアウト",
-    "user": "ユーザー"
+    "user": "ユーザー",
+    "offlineMessage": "オフラインモード — ネットワーク復帰時にセッションを同期します",
+    "backOnline": "オンラインに復帰しました"
   },
   "common": {
     "anonymous": "匿名",

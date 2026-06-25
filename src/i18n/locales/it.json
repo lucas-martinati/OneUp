@@ -336,7 +336,9 @@
     "restoreDesc": "Ottieni i miei dati dal cloud",
     "signInWithGoogle": "Accedi con Google",
     "signOut": "Disconnessione",
-    "user": "Utente"
+    "user": "Utente",
+    "offlineMessage": "Modalità offline — le tue sessioni si sincronizzeranno al ritorno della rete",
+    "backOnline": "Di nuovo online"
   },
   "common": {
     "anonymous": "Anonimo",

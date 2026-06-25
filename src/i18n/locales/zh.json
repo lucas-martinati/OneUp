@@ -336,7 +336,9 @@
     "restoreDesc": "从云端获取我的数据",
     "signInWithGoogle": "用 Google 登录",
     "signOut": "退出登录",
-    "user": "用户"
+    "user": "用户",
+    "offlineMessage": "离线模式 — 网络恢复后将自动同步你的训练",
+    "backOnline": "已恢复连接"
   },
   "common": {
     "anonymous": "匿名",

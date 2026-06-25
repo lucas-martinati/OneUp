@@ -336,7 +336,9 @@
     "restoreDesc": "클라우드에서 내 데이터 가져오기",
     "signInWithGoogle": "Google로 로그인",
     "signOut": "로그아웃",
-    "user": "사용자"
+    "user": "사용자",
+    "offlineMessage": "오프라인 모드 — 네트워크가 복구되면 세션이 동기화됩니다",
+    "backOnline": "다시 온라인 상태입니다"
   },
   "common": {
     "anonymous": "익명의",

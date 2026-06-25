@@ -78,6 +78,31 @@ export function installDebugCommands() {
       console.log(`[OneUp Debug] Injected poke from "${fromName}".`);
     },
 
+    // ── Network ────────────────────────────────────────────────────────
+    /**
+     * Emulate the offline indicator without touching the real network.
+     * Pass `false` (default) to drop offline, `true` to come back online.
+     * `offline()` / `online()` below are convenience wrappers.
+     */
+    setOnline(online = false) {
+      window.dispatchEvent(new CustomEvent('oneup-debug-network', { detail: { online: !!online } }));
+      console.log(`[OneUp Debug] Emulated network ${online ? 'ONLINE' : 'OFFLINE'}.`);
+    },
+    /** Show the discreet "offline" banner at the top. */
+    offline() {
+      this.setOnline(false);
+    },
+    /** Restore the connection — banner flashes green, then slides away. */
+    online() {
+      this.setOnline(true);
+    },
+    /** Drop offline, then auto-reconnect after `ms` (default 3s) — full demo. */
+    flapNetwork(ms = 3000) {
+      this.setOnline(false);
+      setTimeout(() => this.setOnline(true), ms);
+      console.log(`[OneUp Debug] Offline now, back online in ${ms}ms.`);
+    },
+
     // ── Resets ─────────────────────────────────────────────────────────
     resetExercises() {
       const key = getActiveKey('pushup_challenge_data');
@@ -140,6 +165,9 @@ export function installDebugCommands() {
       ["showCustomAchievement('Title', '#fbbf24')", 'Show a custom achievement toast'],
       ["openAchievements('first_blood')", 'Open the panel (optionally highlighting a badge)'],
       ["poke('Coach', 'Hello!')", 'Inject a fake poke toast'],
+      ['offline()', 'Show the discreet offline banner'],
+      ['online()', 'Restore connection (green flash, then hides)'],
+      ['flapNetwork(3000)', 'Go offline then auto-reconnect after Nms'],
       ['resetExercises()', "Reset today's exercises"],
       ['resetHistory()', 'Clear session history'],
       ['resetSettings()', 'Reset settings'],

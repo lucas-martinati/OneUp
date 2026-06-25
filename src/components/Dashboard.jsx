@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from './feedback/CSSConfetti';
+import { OfflineBanner } from './feedback/OfflineBanner';
 import { NotificationManager } from './social/NotificationManager';
 import { ConflictOverlay } from './ui/ConflictOverlay';
 import { ConfirmDialog } from './ui/ConfirmDialog';
@@ -240,6 +241,8 @@ export function Dashboard() {
             <div className="flex-col full-height fade-in gap-responsive" style={{
                 paddingBottom: 'clamp(1px, 0.3vh, 6px)'
             }}>
+                <OfflineBanner />
+
                 <DashboardHeader
                     isAdmin={isAdmin}
                     streakActive={computedStats.streakActive}

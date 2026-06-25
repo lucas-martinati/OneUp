@@ -336,7 +336,9 @@
     "restoreDesc": "Holen Sie sich meine Daten aus der Cloud",
     "signInWithGoogle": "Melden Sie sich mit Google an",
     "signOut": "Abmelden",
-    "user": "Benutzer"
+    "user": "Benutzer",
+    "offlineMessage": "Offline-Modus — deine Einheiten werden synchronisiert, sobald das Netz zurück ist",
+    "backOnline": "Wieder online"
   },
   "common": {
     "anonymous": "Anonym",
