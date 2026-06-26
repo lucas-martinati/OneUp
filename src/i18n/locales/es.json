@@ -918,5 +918,63 @@
       "Mi progreso en OneUp habla por sí solo 📈",
       "¡Siempre más alto con OneUp! 🚀"
     ]
+  },
+  "wrapped": {
+    "title": "OneUp Wrapped",
+    "entrySubtitle": "Revive tu camino como una historia",
+    "entryCta": "Ver",
+    "introSubtitle": "Revivamos tu camino",
+    "repsTitle": "Lograste",
+    "repsUnit": "repeticiones en total",
+    "repsCaption": "Repetición tras repetición, ahí estuviste.",
+    "daysTitle": "Entrenaste durante",
+    "daysUnit": "días activos",
+    "daysCaption": "La constancia es tu superpoder.",
+    "streakTitle": "Tu mejor racha llegó a",
+    "streakUnit": "días seguidos",
+    "streakCaption": "Puro impulso imparable.",
+    "championTitle": "Tu movimiento estrella",
+    "championCaption": "{{reps}} repeticiones y subiendo.",
+    "persona": {
+      "title": "Tu estilo de entrenamiento",
+      "morning": {
+        "name": "El Madrugador",
+        "desc": "Dominas el amanecer."
+      },
+      "afternoon": {
+        "name": "El Incansable del mediodía",
+        "desc": "Avanzas durante todo el día."
+      },
+      "evening": {
+        "name": "El Búho nocturno",
+        "desc": "Terminas fuerte al anochecer."
+      }
+    },
+    "perfectTitle": "Conseguiste",
+    "perfectUnit": "días perfectos",
+    "perfectCaption": "Cada objetivo de la lista, arrasado.",
+    "outroTitle": "¡Vaya camino!",
+    "outroSubtitle": "Comparte tu Wrapped",
+    "cardReps": "Repeticiones",
+    "cardDays": "Días",
+    "cardStreak": "Mejor racha",
+    "cardPerfect": "Días perfectos",
+    "cardBadges": "insignias",
+    "cardSignature": "Movimiento estrella",
+    "hint": "Toca para continuar",
+    "shareText": "¡Mira mi OneUp Wrapped! 🔥"
+  },
+  "streakFreeze": {
+    "toastTitle": "¡Racha salvada!",
+    "toastBody": "{{count}} congelación usada para mantener tu racha",
+    "frozen": "Congelado",
+    "available": "{{count}} congelación de racha en reserva",
+    "title": "Congelación de racha",
+    "intro": "Si te saltas un día, se usa una congelación automáticamente para mantener tu racha. Se recargan cada mes.",
+    "statAvailable": "En reserva",
+    "statPerMonth": "Al mes",
+    "statReserve": "Máx",
+    "proPitch": "Los miembros Pro ganan {{multiplier}}× más: {{count}} congelaciones al mes.",
+    "proCta": "Desbloquear Pro"
   }
 }

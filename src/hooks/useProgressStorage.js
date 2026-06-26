@@ -10,6 +10,30 @@ export function getDefaultState() {
     isSetup: false,
     achievements: {},
     cardio: {},
+    // Streak Freeze: days protected from breaking the streak, + the freeze
+    // inventory. `lastRefill: null` makes the first reconcile grant the starter
+    // allotment. See src/config/streakFreeze.js.
+    frozenDays: {},
+    streakFreezes: { count: 0, lastRefill: null },
+  };
+}
+
+/** Sanitize a persisted frozenDays map into `{ 'YYYY-MM-DD': true }`. */
+function validateFrozenDays(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
+  const out = {};
+  for (const [dateStr, val] of Object.entries(raw)) {
+    if (val) out[dateStr] = true;
+  }
+  return out;
+}
+
+/** Sanitize a persisted streak-freeze inventory. */
+function validateStreakFreezes(raw) {
+  if (!raw || typeof raw !== 'object') return { count: 0, lastRefill: null };
+  return {
+    count: Number.isFinite(raw.count) ? Math.max(0, raw.count) : 0,
+    lastRefill: typeof raw.lastRefill === 'string' ? raw.lastRefill : null,
   };
 }
 
@@ -88,6 +112,8 @@ export function validateProgressData(data) {
     })(),
     lastCompletionChange: data.lastCompletionChange || null,
     cardio: data.cardio || {},
+    frozenDays: validateFrozenDays(data.frozenDays),
+    streakFreezes: validateStreakFreezes(data.streakFreezes),
   };
 }
 

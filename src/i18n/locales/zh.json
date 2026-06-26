@@ -918,5 +918,63 @@
       "我在 OneUp 上的进步不言而喻 📈",
       "与 OneUp 一起不断攀登！ 🚀"
     ]
+  },
+  "wrapped": {
+    "title": "OneUp Wrapped",
+    "entrySubtitle": "以故事形式回顾你的历程",
+    "entryCta": "查看",
+    "introSubtitle": "一起回顾你的历程",
+    "repsTitle": "你完成了",
+    "repsUnit": "总次数",
+    "repsCaption": "一次又一次，你始终坚持。",
+    "daysTitle": "你坚持了",
+    "daysUnit": "活跃天数",
+    "daysCaption": "坚持就是你的超能力。",
+    "streakTitle": "你最长的连续纪录达到",
+    "streakUnit": "连续天数",
+    "streakCaption": "纯粹而不可阻挡的势头。",
+    "championTitle": "你的招牌动作",
+    "championCaption": "{{reps}} 次，还在继续。",
+    "persona": {
+      "title": "你的训练风格",
+      "morning": {
+        "name": "早起鸟",
+        "desc": "你主宰清晨。"
+      },
+      "afternoon": {
+        "name": "午间猛将",
+        "desc": "你全天保持动力。"
+      },
+      "evening": {
+        "name": "夜猫子",
+        "desc": "入夜后强势收尾。"
+      }
+    },
+    "perfectTitle": "你达成了",
+    "perfectUnit": "完美的天数",
+    "perfectCaption": "清单上的每个目标，全部拿下。",
+    "outroTitle": "多么棒的历程！",
+    "outroSubtitle": "分享你的 Wrapped",
+    "cardReps": "次数",
+    "cardDays": "天数",
+    "cardStreak": "最佳连续",
+    "cardPerfect": "完美天数",
+    "cardBadges": "徽章",
+    "cardSignature": "招牌动作",
+    "hint": "点击继续",
+    "shareText": "来看看我的 OneUp Wrapped！🔥"
+  },
+  "streakFreeze": {
+    "toastTitle": "连续记录已保住！",
+    "toastBody": "已使用 {{count}} 次冻结来保持你的连续记录",
+    "frozen": "已冻结",
+    "available": "剩余连续记录冻结：{{count}}",
+    "title": "连续记录冻结",
+    "intro": "如果你漏掉一天，会自动使用一次冻结来保持连续记录。冻结每月补充。",
+    "statAvailable": "剩余",
+    "statPerMonth": "每月",
+    "statReserve": "上限",
+    "proPitch": "Pro 会员获得 {{multiplier}}× 更多——每月 {{count}} 次冻结。",
+    "proCta": "解锁 Pro"
   }
 }

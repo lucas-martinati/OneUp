@@ -13,6 +13,7 @@ import { AppOrchestrator } from'@components/core/AppOrchestrator';
 import { PWAReloadHandler } from'@components/core/PWAReloadHandler';
 import { useHardwareBack } from '@hooks/useHardwareBack';
 import { useCloudSyncOrchestration } from '@hooks/useCloudSyncOrchestration';
+import { useStreakFreeze } from '@hooks/useStreakFreeze';
 // Only install debug utilities in development builds
 if (import.meta.env.DEV) {
   import('@utils/debugCommands').then(({ installDebugCommands }) => installDebugCommands());
@@ -50,6 +51,9 @@ function AppContent() {
   // Initialize global hardware back button listener
   useHardwareBack(resumeCloudSync);
 
+  // Streak Freeze: monthly refill + auto-protect the streak across missed days.
+  const { StreakFreezeToast } = useStreakFreeze();
+
   // Reset theme if Pro is lost
   useEffect(() => {
     if (!isSubscriptionLoading && isPro === false && settings.appTheme && THEMES.some(t => t.key === settings.appTheme && t.key !== 'dark')) {
@@ -64,6 +68,7 @@ function AppContent() {
   return (
     <Suspense fallback={<LoadingScreen />}>
       <ComputedStatsSynchronizer />
+      <StreakFreezeToast />
       <AppOrchestrator computedStats={computedStats} />
       {isInitializing && <LoadingScreen />}
       {!isInitializing && !isSetup && <Onboarding onStart={startChallenge} />}

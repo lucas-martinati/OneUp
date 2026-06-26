@@ -3,6 +3,8 @@
  * Centralizes date formatting and streak calculation logic.
  */
 
+import { walkStreak } from '@shared/streakFreeze.js';
+
 export const MAX_STREAK_WINDOW = 365;
 
 /**
@@ -76,22 +78,22 @@ export function getLocalDateStr(d) {
  * globally "done" (any exercise completed), counting backwards from todayStr.
  * @param {Object} completions - { [dateStr]: { [exerciseId]: { isCompleted, ... } } }
  * @param {string} todayStr - Today's date as YYYY-MM-DD
+ * @param {Object} [frozenDays] - { [dateStr]: true } days protected by a Streak Freeze
  * @returns {number}
  */
-export function calculateStreak(completions, todayStr) {
-    let streak = 0;
+export function calculateStreak(completions, todayStr, frozenDays = {}) {
     const todayDate = parseLocalDate(todayStr);
-    for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
+    const dateAt = (offset) => {
         const checkDate = new Date(todayDate);
-        checkDate.setDate(checkDate.getDate() - i);
-        const dateStr = getLocalDateStr(checkDate);
-        if (isDayDoneFromCompletions(completions, dateStr)) {
-            streak++;
-        } else {
-            break;
-        }
-    }
-    return streak;
+        checkDate.setDate(checkDate.getDate() - offset);
+        return getLocalDateStr(checkDate);
+    };
+    return walkStreak(
+        dateAt,
+        (dateStr) => isDayDoneFromCompletions(completions, dateStr),
+        (dateStr) => !!frozenDays[dateStr],
+        MAX_STREAK_WINDOW
+    );
 }
 
 /**
@@ -156,22 +158,25 @@ export function isDayDoneFromCompletions(completions, dateStr) {
  * Calculate the maximum streak of consecutive days where at least one exercise
  * was completed, looking back at the last 365 days.
  * @param {Object} completions
+ * @param {Object} [frozenDays] - { [dateStr]: true } days protected by a Streak Freeze
  * @returns {number}
  */
-export function calculateMaxStreak(completions) {
+export function calculateMaxStreak(completions, frozenDays = {}) {
     let max = 0;
     let temp = 0;
     const today = new Date();
-    
+
     // We check last MAX_STREAK_WINDOW days to find the longest sequence
     for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const d = new Date(today);
         d.setDate(d.getDate() - i);
         const dateStr = getLocalDateStr(d);
-        
+
         if (isDayDoneFromCompletions(completions, dateStr)) {
             temp++;
             if (temp > max) max = temp;
+        } else if (frozenDays[dateStr]) {
+            // Protected day — keep the run alive without counting it.
         } else {
             temp = 0;
         }

@@ -4,6 +4,7 @@ import { serverTimestamp } from '@utils/firebaseTimestamp';
 import { EXERCISES, getDailyGoal } from '@config/exercises';
 import { createLogger } from '@utils/logger';
 import { getLocalDateStr, parseLocalDate } from '@utils/dateUtils';
+import { reconcileStreakFreezeState } from '@config/streakFreeze';
 import { STORAGE_KEY_BASE, getDefaultState, parseProgressData, validateProgressData } from '@hooks/useProgressStorage';
 import { cloudSync } from '@services/cloudSync';
 
@@ -90,6 +91,8 @@ export const useProgressStore = create((set, get) => ({
   isSetup: false,
   achievements: {},
   cardio: {},
+  frozenDays: {},
+  streakFreezes: { count: 0, lastRefill: null },
   hasShared: false,
   lastCompletionChange: null,
   isStoreInitialized: false,
@@ -132,6 +135,8 @@ export const useProgressStore = create((set, get) => ({
       isSetup: loaded.isSetup || false,
       achievements: finalAch,
       cardio: loaded.cardio || {},
+      frozenDays: loaded.frozenDays || {},
+      streakFreezes: loaded.streakFreezes || { count: 0, lastRefill: null },
       hasShared: !!finalAch.first_share,
       lastCompletionChange: loaded.lastCompletionChange || null,
       isStoreInitialized: true,
@@ -194,6 +199,8 @@ export const useProgressStore = create((set, get) => ({
       isSetup: s.isSetup,
       achievements: s.achievements,
       cardio: s.cardio,
+      frozenDays: s.frozenDays,
+      streakFreezes: s.streakFreezes,
       lastCompletionChange: s.lastCompletionChange,
     }).catch(err => logger.error('Async background persist failed:', err));
   },
@@ -257,6 +264,37 @@ export const useProgressStore = create((set, get) => ({
       return { completions: newCompletions, lastCompletionChange: serverTimestamp() };
     });
     get()._persist();
+  },
+
+  // ── Streak Freeze ───────────────────────────────────────────────────
+
+  /**
+   * Apply the monthly freeze refill and auto-consume freezes to protect the
+   * streak across a gap of missed days ending yesterday. Idempotent and safe to
+   * call repeatedly (on load and at each day rollover). Returns the list of days
+   * newly frozen this run, so the caller can surface a notification/toast.
+   */
+  reconcileStreakFreezes: (isPro = false) => {
+    const state = get();
+    if (!state.isSetup) return [];
+    const result = reconcileStreakFreezeState({
+      completions: state.completions,
+      frozenDays: state.frozenDays,
+      streakFreezes: state.streakFreezes,
+      startDate: state.startDate,
+      isPro,
+      todayStr: getLocalDateStr(new Date()),
+    });
+    if (!result.changed) return [];
+    set({
+      frozenDays: result.frozenDays,
+      streakFreezes: result.streakFreezes,
+      // Bump the change marker only when a day was actually frozen, so the cloud
+      // (and thus the server-recomputed leaderboard streak) picks it up.
+      ...(result.frozeDates.length > 0 ? { lastCompletionChange: serverTimestamp() } : {}),
+    });
+    get()._persist();
+    return result.frozeDates;
   },
 
   // ── Exercise-level helpers ──────────────────────────────────────────
@@ -438,6 +476,8 @@ export const useProgressStore = create((set, get) => ({
       completions: validated.completions || {},
       isSetup: validated.isSetup,
       cardio: validated.cardio || {},
+      frozenDays: validated.frozenDays || {},
+      streakFreezes: validated.streakFreezes || { count: 0, lastRefill: null },
     }));
     get()._persist();
   },
@@ -475,6 +515,8 @@ export const useProgressStore = create((set, get) => ({
         isSetup: merged.isSetup ?? state.isSetup,
         lastCompletionChange: merged.lastCompletionChange,
         cardio: { ...state.cardio, sessions: nextSessions },
+        frozenDays: merged.frozenDays || state.frozenDays,
+        streakFreezes: merged.streakFreezes || state.streakFreezes,
       };
     });
     get()._persist();
@@ -544,6 +586,11 @@ export const useProgressStore = create((set, get) => ({
           userStartDate: validated.userStartDate || state.userStartDate,
           completions: mergedCompletions,
           isSetup: validated.isSetup || state.isSetup,
+          // Union frozen days; keep the inventory with the most recent refill.
+          frozenDays: { ...(validated.frozenDays || {}), ...(state.frozenDays || {}) },
+          streakFreezes: (state.streakFreezes?.lastRefill || '') >= (validated.streakFreezes?.lastRefill || '')
+            ? state.streakFreezes
+            : validated.streakFreezes,
           lastCompletionChange: serverTimestamp(),
         };
       });
@@ -591,6 +638,8 @@ export const useProgressStore = create((set, get) => ({
         isSetup: state.isSetup,
         lastCompletionChange: state.lastCompletionChange,
         cardio: state.cardio,
+        frozenDays: state.frozenDays,
+        streakFreezes: state.streakFreezes,
       });
       return { success: true };
     } catch (error) {
@@ -625,6 +674,8 @@ export const useProgressStore = create((set, get) => ({
         isSetup: state.isSetup,
         lastCompletionChange: state.lastCompletionChange,
         cardio: state.cardio,
+        frozenDays: state.frozenDays,
+        streakFreezes: state.streakFreezes,
       });
       if (mergedData) {
         get().applySyncedData(mergedData);

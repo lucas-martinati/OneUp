@@ -4,6 +4,7 @@ export { Card } from './Card';
 export { ConfirmDialog } from './ConfirmDialog';
 export { ConflictOverlay } from './ConflictOverlay';
 export { DifficultyBadge } from './DifficultyBadge';
+export { FrozenFlame } from './FrozenFlame';
 export { GoogleIcon } from './GoogleIcon';
 export { GoogleSignInButton } from './GoogleSignInButton';
 export { IconButton } from './IconButton';

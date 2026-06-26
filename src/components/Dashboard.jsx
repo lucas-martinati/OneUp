@@ -243,6 +243,7 @@ export function Dashboard() {
                 <DashboardHeader
                     isAdmin={isAdmin}
                     streakActive={computedStats.streakActive}
+                    streakFrozen={computedStats.streakFrozen}
                     displayStreak={computedStats.displayStreak}
                     selectedExercise={selectedExercise}
                     totalReps={totalReps}

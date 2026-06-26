@@ -5,6 +5,7 @@ import admin from "firebase-admin";
 import crypto from "crypto";
 import { BADGE_RULES, isBadgeUnlocked } from "./shared/badgeRules.js";
 import { DB_SCHEMA, LEAF, paths } from "./shared/dbSchema.js";
+import { walkStreak, normalizeFrozenDays } from "./shared/streakFreeze.js";
 
 // Initialize Firebase Admin SDK using Default Compute Service Account
 admin.initializeApp();
@@ -117,7 +118,7 @@ const MAX_STREAK_WINDOW = 365;
 // the UTC timestamp + the local date string). We approximate the local hour as
 // the offset from the recorded local day's UTC midnight — accurate for users
 // near UTC, slightly off for far timezones. All date-based badges are exact.
-function computeAchievementStats(completions, totalRepsAll) {
+function computeAchievementStats(completions, totalRepsAll, frozenDays = {}) {
   const pad = n => String(n).padStart(2, '0');
   const toStr = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
   const dayIsDone = day => !!day && typeof day === 'object' &&
@@ -174,9 +175,13 @@ function computeAchievementStats(completions, totalRepsAll) {
   const todayUTCms = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
   let maxStreak = 0, tempStreak = 0, perfectStreak = 0, tempPerfect = 0;
   for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
-    const day = completions[toStr(new Date(todayUTCms - i * 86400000))];
+    const dateStr = toStr(new Date(todayUTCms - i * 86400000));
+    const day = completions[dateStr];
     if (dayIsDone(day)) { tempStreak++; if (tempStreak > maxStreak) maxStreak = tempStreak; }
+    else if (frozenDays[dateStr]) { /* protected — keep the run alive */ }
     else tempStreak = 0;
+    // A Streak Freeze protects the daily streak, not perfect days (a frozen day
+    // wasn't trained, so it can't be perfect) — perfect streak breaks as usual.
     if (day && (isStandardPerfect(day) || isWeightsPerfect(day))) {
       tempPerfect++; if (tempPerfect > perfectStreak) perfectStreak = tempPerfect;
     } else tempPerfect = 0;
@@ -201,7 +206,7 @@ function computeAchievementStats(completions, totalRepsAll) {
 // All known exercise ids (standard + weights + cardio), as a flat list.
 const ALL_EX_OBJECTS = [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES];
 
-function computeExerciseDerived(completions, anchorDateStr) {
+function computeExerciseDerived(completions, anchorDateStr, frozenDays = {}) {
   const pad = n => String(n).padStart(2, '0');
   const dayStr = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
   const dayIsDone = day => !!day && typeof day === 'object' &&
@@ -221,11 +226,13 @@ function computeExerciseDerived(completions, anchorDateStr) {
   const [ay, am, ad] = anchorDateStr.split('-').map(Number);
   const anchorMs = Date.UTC(ay, am - 1, ad);
 
-  let currentStreak = 0;
-  for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
-    if (dayIsDone(completions[dayStr(new Date(anchorMs - i * 86400000))])) currentStreak++;
-    else break;
-  }
+  // Frozen days are transparent in the global streak walk (see @shared/streakFreeze).
+  const currentStreak = walkStreak(
+    (offset) => dayStr(new Date(anchorMs - offset * 86400000)),
+    (ds) => dayIsDone(completions[ds]),
+    (ds) => !!frozenDays[ds],
+    MAX_STREAK_WINDOW
+  );
 
   const exerciseStreaks = {};
   const exerciseDoneToday = {};
@@ -279,6 +286,24 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
 
   // ── Extract data ───────────────────────────────────────────────────────
   const completions = progress.completions || {};
+  const rawFrozenDays = normalizeFrozenDays(progress.frozenDays);
+
+  // ── Server-side frozenDays validation ──────────────────────────────────
+  // A frozen day must be a MISSED day — if the user completed it, the
+  // freeze entry is bogus (possibly injected). Cap at MAX_STREAK_WINDOW: the
+  // streak walk never looks further back than that, so keeping the most recent
+  // window's worth of entries can't truncate a day that affects the streak,
+  // while still bounding the abuse surface. The client prunes older entries too.
+  const MAX_FROZEN_DAYS = MAX_STREAK_WINDOW;
+  const dayIsDoneForValidation = (day) => !!day && typeof day === 'object' &&
+    Object.entries(day).some(([id, e]) => e?.isCompleted && ALL_EXERCISE_IDS.has(id));
+  const validatedEntries = Object.keys(rawFrozenDays)
+    .filter(ds => !dayIsDoneForValidation(completions[ds]))
+    .sort()
+    .slice(-MAX_FROZEN_DAYS);
+  const frozenDays = {};
+  for (const ds of validatedEntries) frozenDays[ds] = true;
+
   const startDate = progress.startDate;
   if (!startDate) return; // No start date means no challenge started
 
@@ -382,7 +407,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   // ── Badge count — computed from stats (derived badges) + the manual flags
   //    stored in the achievements node (first_share / white_hat) ────────────
   const totalRepsAll = totalClassicReps + weightsTotalReps + cardioTotalReps;
-  const badgeStats = computeAchievementStats(completions, totalRepsAll);
+  const badgeStats = computeAchievementStats(completions, totalRepsAll, frozenDays);
   const badgeCount = BADGE_RULES.filter(b => isBadgeUnlocked(b.id, badgeStats, achievements)).length;
 
   // ── Determine pseudo and visibility ────────────────────────────────────
@@ -526,7 +551,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   // stats let UserDetail.jsx render streaks/days WITHOUT reading anyone's
   // private completions calendar.
   if (isPublic) {
-    const derived = computeExerciseDerived(completions, userLocalDate);
+    const derived = computeExerciseDerived(completions, userLocalDate, frozenDays);
     await db.ref(paths.publicProfile(uid)).set({
       // Detail-view-only payload. exerciseReps lives in the leaderboard entry
       // (needed for the list's per-exercise ranking); everything below is only

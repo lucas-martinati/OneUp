@@ -99,6 +99,8 @@ export const DB_SCHEMA = {
         userStartDate: LEAF,
         isSetup: LEAF,
         hasShared: LEAF,
+        frozenDays: LEAF,          // date -> true (Streak Freeze protected days)
+        streakFreezes: LEAF,       // { count, lastRefill } freeze inventory
         lastSyncedAt: LEAF,
         lastCompletionChange: LEAF,
         // NB: legacy `cardio` is intentionally absent → pruned as stale.

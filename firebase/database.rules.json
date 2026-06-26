@@ -12,7 +12,20 @@
           // lisible par tout utilisateur authentifié — ce qui exposait les
           // traces GPS cardio ; c'est désormais fermé.
           ".read": "$uid === auth.uid",
-          ".write": "$uid === auth.uid"
+          ".write": "$uid === auth.uid",
+          "streakFreezes": {
+            // Gel de série : count borné à [0, 6] (max Pro) et lastRefill au
+            // format 'YYYY-MM' (7 caractères). Empêche un utilisateur de
+            // s'attribuer un nombre arbitraire de gels via l'API.
+            ".validate": "newData.hasChildren(['count', 'lastRefill']) && newData.child('count').isNumber() && newData.child('count').val() >= 0 && newData.child('count').val() <= 6 && newData.child('lastRefill').isString() && newData.child('lastRefill').val().length === 7"
+          },
+          "frozenDays": {
+            // Jours gelés : chaque clé doit être une date YYYY-MM-DD (10 chars)
+            // et chaque valeur doit être le booléen true.
+            "$date": {
+              ".validate": "newData.val() === true && $date.length === 10"
+            }
+          }
         },
         "$topic": {
           ".write": "$uid === auth.uid && $topic !== 'purchase'"

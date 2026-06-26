@@ -918,5 +918,63 @@
       "O meu progresso no OneUp fala por si 📈",
       "Sempre mais alto com o OneUp! 🚀"
     ]
+  },
+  "wrapped": {
+    "title": "OneUp Wrapped",
+    "entrySubtitle": "Reviva sua jornada como uma história",
+    "entryCta": "Ver",
+    "introSubtitle": "Vamos reviver sua jornada",
+    "repsTitle": "Você arrasou com",
+    "repsUnit": "repetições no total",
+    "repsCaption": "Repetição após repetição, você apareceu.",
+    "daysTitle": "Você treinou por",
+    "daysUnit": "dias ativos",
+    "daysCaption": "A constância é o seu superpoder.",
+    "streakTitle": "Sua maior sequência chegou a",
+    "streakUnit": "dias seguidos",
+    "streakCaption": "Puro impulso imparável.",
+    "championTitle": "Seu movimento marcante",
+    "championCaption": "{{reps}} repetições e contando.",
+    "persona": {
+      "title": "Seu estilo de treino",
+      "morning": {
+        "name": "O Madrugador",
+        "desc": "Você domina o amanhecer."
+      },
+      "afternoon": {
+        "name": "O Incansável da tarde",
+        "desc": "Você avança o dia todo."
+      },
+      "evening": {
+        "name": "A Coruja da noite",
+        "desc": "Você termina forte ao anoitecer."
+      }
+    },
+    "perfectTitle": "Você cravou",
+    "perfectUnit": "dias perfeitos",
+    "perfectCaption": "Cada meta da lista, arrasada.",
+    "outroTitle": "Que jornada!",
+    "outroSubtitle": "Compartilhe seu Wrapped",
+    "cardReps": "Repetições",
+    "cardDays": "Dias",
+    "cardStreak": "Melhor sequência",
+    "cardPerfect": "Dias perfeitos",
+    "cardBadges": "emblemas",
+    "cardSignature": "Movimento marcante",
+    "hint": "Toque para continuar",
+    "shareText": "Veja o meu OneUp Wrapped! 🔥"
+  },
+  "streakFreeze": {
+    "toastTitle": "Sequência salva!",
+    "toastBody": "{{count}} congelamento usado para manter sua sequência",
+    "frozen": "Congelado",
+    "available": "{{count}} congelamento de sequência em reserva",
+    "title": "Congelamento de sequência",
+    "intro": "Se você perder um dia, um congelamento é usado automaticamente para manter sua sequência. Eles recarregam todo mês.",
+    "statAvailable": "Em reserva",
+    "statPerMonth": "Por mês",
+    "statReserve": "Máx",
+    "proPitch": "Membros Pro ganham {{multiplier}}× mais — {{count}} congelamentos por mês.",
+    "proCta": "Desbloquear Pro"
   }
 }

@@ -23,6 +23,7 @@ export function ComputedStatsSynchronizer() {
     const hasShared = useProgressStore(s => s.hasShared);
     const achievements = useProgressStore(s => s.achievements);
     const cardio = useProgressStore(s => s.cardio);
+    const frozenDays = useProgressStore(s => s.frozenDays);
 
     const { customExercises } = useExercises();
     const recompute = useComputedStatsStore(s => s.recompute);
@@ -65,9 +66,9 @@ export function ComputedStatsSynchronizer() {
         recompute(
             completions, { exerciseDifficulties }, getDayNumber,
             customExercises, hasShared, achievements,
-            getConfig, cardioData, userStartDate
+            getConfig, cardioData, userStartDate, frozenDays
         );
-    }, [completions, exerciseDifficulties, getDayNumber, customExercises, hasShared, achievements, getConfig, cardioData, userStartDate, recompute]);
+    }, [completions, exerciseDifficulties, getDayNumber, customExercises, hasShared, achievements, getConfig, cardioData, userStartDate, frozenDays, recompute]);
 
     return null; // Invisible component
 }

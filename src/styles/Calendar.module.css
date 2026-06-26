@@ -246,6 +246,13 @@
 }
 .missed .dayNum { color: rgba(248, 113, 113, 0.85); }
 
+/* Streak Freeze: a missed day protected so it doesn't break the streak. */
+.frozen {
+  background: rgba(56, 189, 248, 0.10);
+  border-color: rgba(56, 189, 248, 0.40);
+}
+.frozen .dayNum { color: #7dd3fc; }
+
 .today {
   border-color: var(--accent-glow);
   box-shadow: 0 0 0 1px var(--accent-glow), 0 0 15px -4px var(--accent-glow);
@@ -291,6 +298,7 @@
 .swDone { background: var(--success); box-shadow: 0 0 7px color-mix(in srgb, var(--success) 60%, transparent); }
 .swCaught { background: var(--warning); }
 .swMissed { background: rgba(239, 68, 68, 0.55); border: 1px solid rgba(239, 68, 68, 0.7); }
+.swFrozen { background: rgba(56, 189, 248, 0.55); border: 1px solid rgba(56, 189, 248, 0.75); }
 
 /* ── Day detail sheet ────────────────────────────────────────────────── */
 .detailHead {

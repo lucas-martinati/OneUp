@@ -172,4 +172,28 @@ describe('mergeData', () => {
     const cloud = { completions: {}, lastCompletionChange: 1000 };
     expect(mergeData(local, cloud).lastCompletionChange).toBe(5000);
   });
+
+  it('unions frozen days from both sides', () => {
+    const local = { startDate: 'L', completions: {}, lastCompletionChange: 5000, frozenDays: { a: true } };
+    const cloud = { completions: {}, lastCompletionChange: 1000, frozenDays: { b: true } };
+    expect(mergeData(local, cloud).frozenDays).toEqual({ a: true, b: true });
+  });
+
+  it('unions frozen days even when the cloud is newer and overwrites', () => {
+    const local = { startDate: 'L', completions: {}, lastCompletionChange: 1000, frozenDays: { a: true } };
+    const cloud = { startDate: 'C', completions: {}, lastCompletionChange: 5000, frozenDays: { b: true } };
+    expect(mergeData(local, cloud).frozenDays).toEqual({ a: true, b: true });
+  });
+
+  it('keeps the freeze inventory with the most recent refill', () => {
+    const local = { startDate: 'L', completions: {}, lastCompletionChange: 5000, streakFreezes: { count: 2, lastRefill: '2026-06' } };
+    const cloud = { completions: {}, lastCompletionChange: 1000, streakFreezes: { count: 0, lastRefill: '2026-05' } };
+    expect(mergeData(local, cloud).streakFreezes).toEqual({ count: 2, lastRefill: '2026-06' });
+  });
+
+  it('takes the lower freeze count when refills tie (no double-spend)', () => {
+    const local = { startDate: 'L', completions: {}, lastCompletionChange: 5000, streakFreezes: { count: 2, lastRefill: '2026-06' } };
+    const cloud = { completions: {}, lastCompletionChange: 1000, streakFreezes: { count: 1, lastRefill: '2026-06' } };
+    expect(mergeData(local, cloud).streakFreezes).toEqual({ count: 1, lastRefill: '2026-06' });
+  });
 });

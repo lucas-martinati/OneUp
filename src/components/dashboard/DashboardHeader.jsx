@@ -1,15 +1,26 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Shield, Flame, Trophy } from '@utils/icons';
+import { useTranslation } from 'react-i18next';
+import { Shield, Flame, Trophy, Snowflake } from '@utils/icons';
+import { FrozenFlame } from '@components/ui';
 import { useUIStore } from '@store/useUIStore';
+import { useProgressStore } from '@store/useProgressStore';
 import { Card, IconButton } from '@components/ui';
+import { StreakFreezeInfo } from './StreakFreezeInfo';
 
 const filterOutIds = (idsToRemove) => (p) => p.filter(particle => !idsToRemove.has(particle.id));
 
 export const DashboardHeader = React.memo(({
     isAdmin,
-    streakActive, displayStreak, selectedExercise, totalReps
+    streakActive, streakFrozen, displayStreak, selectedExercise, totalReps
 }) => {
     const openModal = useUIStore(s => s.openModal);
+    const { t } = useTranslation();
+    const freezeCount = useProgressStore(s => s.streakFreezes?.count || 0);
+    const [showFreezeInfo, setShowFreezeInfo] = useState(false);
+
+    // "Frozen but safe": streak preserved by a freeze, not active today. Computed
+    // in the stats layer (keeps date math out of render). Falls back to false.
+    const isStreakFrozen = !streakActive && !!streakFrozen;
 
     const headerRef = useRef(null);
     const rightSideRef = useRef(null);
@@ -75,6 +86,25 @@ export const DashboardHeader = React.memo(({
     const showText = availableSpace >= 93; // Need at least ~90px for Logo + Gap + Text
     const showLogo = availableSpace >= 35;  // Need at least ~35px for Logo alone
 
+    // Streak badge palette by state (avoids nested ternaries in the JSX).
+    let streakBadge;
+    if (streakActive) {
+        streakBadge = {
+            bg: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(239,68,68,0.22))',
+            border: '1px solid rgba(249,115,22,0.3)', shadow: '0 2px 8px rgba(249,115,22,0.15)', fg: '#f97316',
+        };
+    } else if (isStreakFrozen) {
+        streakBadge = {
+            bg: 'linear-gradient(135deg, rgba(56,189,248,0.22), rgba(14,165,233,0.22))',
+            border: '1px solid rgba(56,189,248,0.35)', shadow: '0 2px 8px rgba(56,189,248,0.18)', fg: '#38bdf8',
+        };
+    } else {
+        streakBadge = {
+            bg: 'linear-gradient(135deg, rgba(120,120,120,0.18), rgba(90,90,90,0.18))',
+            border: '1px solid rgba(120,120,120,0.25)', shadow: 'none', fg: '#888',
+        };
+    }
+
     return (
         <Card as="header" ref={headerRef} variant="glass" padding="none"
             className="dashboard-header"
@@ -110,22 +140,46 @@ export const DashboardHeader = React.memo(({
                     />
                 )}
 
-                {/* Global streak badge */}
-                <div 
+                {/* Global streak badge — three states: active (fire), frozen but
+                    safe (snowflake/blue), or pending today (grey). */}
+                <div
                     onClick={handleStreakClick}
                     style={{
-                    background: streakActive
-                        ? 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(239,68,68,0.22))'
-                        : 'linear-gradient(135deg, rgba(120,120,120,0.18), rgba(90,90,90,0.18))',
+                    background: streakBadge.bg,
                     padding: 'clamp(4px, 0.7vh, 8px) clamp(8px, 1.2vw, 14px)', borderRadius: '16px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)',
                     display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '700',
-                    border: streakActive ? '1px solid rgba(249,115,22,0.3)' : '1px solid rgba(120,120,120,0.25)',
-                    boxShadow: streakActive ? '0 2px 8px rgba(249,115,22,0.15)' : 'none',
-                    opacity: streakActive ? 1 : 0.7, flexShrink: 0, cursor: 'pointer'
+                    border: streakBadge.border,
+                    boxShadow: streakBadge.shadow,
+                    opacity: streakActive || isStreakFrozen ? 1 : 0.7, flexShrink: 0, cursor: 'pointer'
                 }}>
-                    <Flame size={16} color={streakActive ? '#f97316' : '#888'} />
-                    <span style={{ color: streakActive ? '#f97316' : '#888' }}>{displayStreak}</span>
+                    {isStreakFrozen
+                        ? <FrozenFlame size={16} color={streakBadge.fg} />
+                        : <Flame size={16} color={streakBadge.fg} />}
+                    <span style={{ color: streakBadge.fg }}>{displayStreak}</span>
                 </div>
+
+                {/* Streak Freeze inventory — tap to learn how freezes are earned
+                    (and that Pro earns 3× more). Hidden at zero. */}
+                {freezeCount > 0 && (
+                    <button
+                        type="button"
+                        onClick={() => setShowFreezeInfo(true)}
+                        aria-label={t('streakFreeze.available', { count: freezeCount })}
+                        title={t('streakFreeze.available', { count: freezeCount })}
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(56,189,248,0.20), rgba(14,165,233,0.20))',
+                            padding: 'clamp(4px, 0.7vh, 8px) clamp(7px, 1vw, 11px)', borderRadius: '16px',
+                            fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)', display: 'flex', alignItems: 'center',
+                            gap: '4px', fontWeight: '700', border: '1px solid rgba(56,189,248,0.3)', flexShrink: 0,
+                            cursor: 'pointer', color: 'inherit', font: 'inherit'
+                        }}>
+                        <Snowflake size={15} color="#38bdf8" />
+                        <span style={{ color: '#38bdf8' }}>{freezeCount}</span>
+                    </button>
+                )}
+
+                {showFreezeInfo && <StreakFreezeInfo open={showFreezeInfo} onClose={() => setShowFreezeInfo(false)} />}
+
 
                 {/* Total reps badge */}
                 <div className="shimmer" style={{

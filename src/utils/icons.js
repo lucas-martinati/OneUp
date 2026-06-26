@@ -45,7 +45,7 @@ export {
   History, Weight, Filter, Loader2, Smartphone,
   Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
   Copy, RefreshCw, Heart, Sparkles, Link, Link2, Calendar, TrendingUp,
-  Gem, Ghost, Moon, Rocket, Sun
+  Gem, Ghost, Moon, Rocket, Sun, Snowflake
 };
 
 // ============ ALIASES ============

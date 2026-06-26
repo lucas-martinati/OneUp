@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { X, ChevronLeft, ChevronRight, CheckCircle2, ShieldAlert, Star } from '@utils/icons';
+import { X, ChevronLeft, ChevronRight, CheckCircle2, ShieldAlert, Star, Snowflake } from '@utils/icons';
 import { IconButton } from '@components/ui';
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr } from '@utils/dateUtils';
@@ -10,10 +10,12 @@ import { getExerciseLabel } from '@utils/exerciseLabel';
 import { isPerfectDay, calculateRepsForDay, isCaughtUpDay } from '@utils/statUtils';
 import { getCurrentWeekNumber } from '@utils/dateUtils';
 import { DifficultyBadge } from '@components/ui/DifficultyBadge';
+import { useProgressStore } from '@store/useProgressStore';
 import styles from '@styles/Calendar.module.css';
 
 export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, getConfig }) {
     const { t } = useTranslation();
+    const frozenDays = useProgressStore(s => s.frozenDays);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
     const [isClosing, setIsClosing] = useState(false);
@@ -273,8 +275,12 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                         const isPerfect = !isCustom && isPerfectDay(dayCompletions, exercises);
                         const isAnyDone = !isPerfect && Object.values(dayCompletions).some(ex => ex?.isCompleted);
                         const isCaughtUp = isCaughtUpDay(dayCompletions, dateString);
+                        // A missed day protected by a Streak Freeze (only shown on the
+                        // global calendar; per-exercise/custom views don't freeze).
+                        const isFrozen = !isCustom && !isAnyDone && !isPerfect && !isCaughtUp
+                            && !!frozenDays?.[dateString] && !isMuted && !isToday;
                         // Today is never shown as "missed" — it isn't a failure yet.
-                        const isMissed = !isPerfect && !isAnyDone && !isMuted && !isToday;
+                        const isMissed = !isPerfect && !isAnyDone && !isFrozen && !isMuted && !isToday;
                         const completedCount = exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length;
                         const isSelected = selectedDay === dateString;
 
@@ -294,6 +300,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                         else if (isPerfect) cls.push(styles.perfect);
                         else if (isCaughtUp) cls.push(styles.caught);
                         else if (isAnyDone) cls.push(styles.done);
+                        else if (isFrozen) cls.push(styles.frozen);
                         else if (isMissed) cls.push(styles.missed);
                         if (isToday) cls.push(styles.today);
                         if (isSelected) cls.push(styles.selected);
@@ -327,6 +334,9 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                                         {isMissed && (
                                             <X size={dotPx + 6} color="#ef4444" strokeWidth={3} style={{ filter: 'drop-shadow(0 0 3px rgba(239,68,68,0.5))' }} />
                                         )}
+                                        {isFrozen && (
+                                            <Snowflake size={dotPx + 6} color="#38bdf8" strokeWidth={2.5} style={{ filter: 'drop-shadow(0 0 3px rgba(56,189,248,0.55))' }} />
+                                        )}
                                     </span>
                                 )}
                             </button>
@@ -340,6 +350,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                     <div className={styles.legendItem}><span className={`${styles.swatch} ${styles.swDone}`} />{t('calendar.completed')}</div>
                     <div className={styles.legendItem}><span className={`${styles.swatch} ${styles.swCaught}`} />{t('calendar.caughtUpDayLegend')}</div>
                     <div className={styles.legendItem}><span className={`${styles.swatch} ${styles.swMissed}`} />{t('calendar.missed')}</div>
+                    <div className={styles.legendItem}><span className={`${styles.swatch} ${styles.swFrozen}`} />{t('streakFreeze.frozen')}</div>
                 </div>
 
                 {/* Detail popup */}

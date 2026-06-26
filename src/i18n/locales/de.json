@@ -918,5 +918,63 @@
       "Mein Fortschritt auf OneUp spricht für sich 📈",
       "Immer höher mit OneUp! 🚀"
     ]
+  },
+  "wrapped": {
+    "title": "OneUp Wrapped",
+    "entrySubtitle": "Erlebe deine Reise als Story",
+    "entryCta": "Ansehen",
+    "introSubtitle": "Lass uns deine Reise noch einmal erleben",
+    "repsTitle": "Du hast geschafft",
+    "repsUnit": "Wiederholungen insgesamt",
+    "repsCaption": "Wiederholung für Wiederholung warst du da.",
+    "daysTitle": "Du warst dabei an",
+    "daysUnit": "aktiven Tagen",
+    "daysCaption": "Beständigkeit ist deine Superkraft.",
+    "streakTitle": "Deine längste Serie erreichte",
+    "streakUnit": "Tage in Folge",
+    "streakCaption": "Pure, unaufhaltsame Dynamik.",
+    "championTitle": "Deine Paradeübung",
+    "championCaption": "{{reps}} Wiederholungen und es geht weiter.",
+    "persona": {
+      "title": "Dein Trainings-Vibe",
+      "morning": {
+        "name": "Der Frühaufsteher",
+        "desc": "Dir gehört der Sonnenaufgang."
+      },
+      "afternoon": {
+        "name": "Der Mittagsmacher",
+        "desc": "Du ziehst den ganzen Tag durch."
+      },
+      "evening": {
+        "name": "Die Nachteule",
+        "desc": "Du beendest den Tag stark."
+      }
+    },
+    "perfectTitle": "Du hast erreicht",
+    "perfectUnit": "perfekte Tage",
+    "perfectCaption": "Jedes Ziel auf der Liste, geknackt.",
+    "outroTitle": "Was für eine Reise!",
+    "outroSubtitle": "Teile dein Wrapped",
+    "cardReps": "Wdh.",
+    "cardDays": "Tage",
+    "cardStreak": "Beste Serie",
+    "cardPerfect": "Perfekte Tage",
+    "cardBadges": "Abzeichen",
+    "cardSignature": "Paradeübung",
+    "hint": "Zum Fortfahren tippen",
+    "shareText": "Schau dir mein OneUp Wrapped an! 🔥"
+  },
+  "streakFreeze": {
+    "toastTitle": "Serie gerettet!",
+    "toastBody": "{{count}} Einfrierung genutzt, um deine Serie zu erhalten",
+    "frozen": "Eingefroren",
+    "available": "{{count}} Serien-Einfrierung in Reserve",
+    "title": "Serien-Einfrieren",
+    "intro": "Verpasst du einen Tag, wird automatisch eine Einfrierung genutzt, um deine Serie zu retten. Einfrierungen füllen sich jeden Monat auf.",
+    "statAvailable": "Im Vorrat",
+    "statPerMonth": "Pro Monat",
+    "statReserve": "Max",
+    "proPitch": "Pro-Mitglieder erhalten {{multiplier}}× mehr — {{count}} Einfrierungen pro Monat.",
+    "proCta": "Pro freischalten"
   }
 }

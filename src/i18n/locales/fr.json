@@ -918,5 +918,63 @@
       "Ma progression sur OneUp parle d'elle-même 📈",
       "Toujours plus haut avec OneUp ! 🚀"
     ]
+  },
+  "wrapped": {
+    "title": "OneUp Wrapped",
+    "entrySubtitle": "Revivez votre parcours en story",
+    "entryCta": "Voir",
+    "introSubtitle": "Revivons votre parcours",
+    "repsTitle": "Vous avez explosé",
+    "repsUnit": "répétitions au total",
+    "repsCaption": "Répétition après répétition, vous étiez là.",
+    "daysTitle": "Vous étiez présent",
+    "daysUnit": "jours actifs",
+    "daysCaption": "La régularité est votre superpouvoir.",
+    "streakTitle": "Votre plus longue série a atteint",
+    "streakUnit": "jours d'affilée",
+    "streakCaption": "Un élan pur et inarrêtable.",
+    "championTitle": "Votre mouvement signature",
+    "championCaption": "{{reps}} répétitions et ça continue.",
+    "persona": {
+      "title": "Votre vibe d'entraînement",
+      "morning": {
+        "name": "Le Lève-tôt",
+        "desc": "Vous régnez sur les matins."
+      },
+      "afternoon": {
+        "name": "Le Pilier du midi",
+        "desc": "Vous tenez bon toute la journée."
+      },
+      "evening": {
+        "name": "Le Couche-tard",
+        "desc": "Vous finissez fort à la nuit tombée."
+      }
+    },
+    "perfectTitle": "Vous avez réussi",
+    "perfectUnit": "jours parfaits",
+    "perfectCaption": "Chaque objectif de la liste, pulvérisé.",
+    "outroTitle": "Quel parcours !",
+    "outroSubtitle": "Partagez votre Wrapped",
+    "cardReps": "Répétitions",
+    "cardDays": "Jours",
+    "cardStreak": "Meilleure série",
+    "cardPerfect": "Jours parfaits",
+    "cardBadges": "badges",
+    "cardSignature": "Mouvement signature",
+    "hint": "Touchez pour continuer",
+    "shareText": "Découvrez mon OneUp Wrapped ! 🔥"
+  },
+  "streakFreeze": {
+    "toastTitle": "Série sauvée !",
+    "toastBody": "{{count}} gel utilisé pour préserver ta série",
+    "frozen": "Gelé",
+    "available": "{{count}} gel de série en réserve",
+    "title": "Gel de série",
+    "intro": "Si tu rates un jour, un gel est utilisé automatiquement pour préserver ta série. Les gels se rechargent chaque mois.",
+    "statAvailable": "En réserve",
+    "statPerMonth": "Par mois",
+    "statReserve": "Max",
+    "proPitch": "Les membres Pro en gagnent {{multiplier}}× plus — {{count}} gels chaque mois.",
+    "proCta": "Passer Pro"
   }
 }

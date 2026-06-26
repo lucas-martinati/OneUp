@@ -159,11 +159,12 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
     }, [cardioData.allSessions]);
 
     const userStartDate = useProgressStore(s => s.userStartDate);
+    const frozenDays = useProgressStore(s => s.frozenDays);
 
     const computedStats = React.useMemo(() => {
         if (canAccessFeature(FEATURES.MERGED_STATS, { isPro: hasProAccess }) && deferredCategories.length === 4) return globalStats;
-        return computeAllStats(completions, settings, getDayNumber, exercises, false, {}, getConfig, localCardioData, userStartDate);
-    }, [deferredCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess, getConfig, localCardioData, userStartDate]);
+        return computeAllStats(completions, settings, getDayNumber, exercises, false, {}, getConfig, localCardioData, userStartDate, frozenDays);
+    }, [deferredCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess, getConfig, localCardioData, userStartDate, frozenDays]);
 
     // All values come from computedStats
     const {

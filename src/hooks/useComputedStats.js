@@ -1,4 +1,5 @@
 import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions } from '@utils/dateUtils';
+import { walkStreak } from '@shared/streakFreeze.js';
 import { EXERCISES, getDailyGoal } from '@config/exercises';
 import { evaluateCardioWeek } from '@utils/cardioStreak';
 import { WEIGHT_EXERCISES } from '@config/weights';
@@ -9,31 +10,30 @@ import { isGlobalPerfectDay } from '@utils/statUtils';
  * Pure function that computes all stats in a single pass.
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
  */
-export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, achievements = {}, getConfig = null, cardioReps = null, userStartDateStr = null) {
+export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, achievements = {}, getConfig = null, cardioReps = null, userStartDateStr = null, frozenDays = {}) {
     const todayStr = getLocalDateStr(new Date());
     const today = new Date(todayStr);
 
     const isDayDoneLocal = (dateStr) => {
         const day = completions[dateStr];
         if (!day) return false;
-        return Object.entries(day).some(([exId, exData]) => 
+        return Object.entries(day).some(([exId, exData]) =>
             exData?.isCompleted && allExercises.some(e => e.id === exId)
         );
     };
 
+    // A Streak Freeze protects the GLOBAL daily streak: a frozen day is
+    // transparent in the walk (neither breaks nor counts). See @shared/streakFreeze.
+    const isFrozenDay = (dateStr) => !!frozenDays[dateStr];
+
     const calculateLocalStreak = (dateStr) => {
-        let streak = 0;
         const checkDate = new Date(dateStr);
-        for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
+        const dateAt = (offset) => {
             const d = new Date(checkDate);
-            d.setDate(d.getDate() - i);
-            if (isDayDoneLocal(getLocalDateStr(d))) {
-                streak++;
-            } else {
-                break;
-            }
-        }
-        return streak;
+            d.setDate(d.getDate() - offset);
+            return getLocalDateStr(d);
+        };
+        return walkStreak(dateAt, isDayDoneLocal, isFrozenDay, MAX_STREAK_WINDOW);
     };
 
     // ─── Accumulators ────────────────────────────────────────────────────
@@ -219,9 +219,12 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const d = new Date(today);
         d.setDate(d.getDate() - i);
-        if (isDayDoneLocal(getLocalDateStr(d))) {
+        const dStr = getLocalDateStr(d);
+        if (isDayDoneLocal(dStr)) {
             tempStreak++;
             if (tempStreak > maxStreak) maxStreak = tempStreak;
+        } else if (isFrozenDay(dStr)) {
+            // Protected day — keep the run alive without counting it.
         } else {
             tempStreak = 0;
         }
@@ -362,6 +365,15 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
 
     const streakActive = todayDone || (isOnlyCardio && finalCurrentStreak > 0);
 
+    // The streak is alive only because yesterday was protected by a Streak Freeze
+    // (today not trained yet) — lets the UI show a "frozen but safe" state.
+    // NOTE: cardio streak freeze is intentionally NOT supported — cardio uses a
+    // weekly streak with its own logic, so `isOnlyCardio` deliberately
+    // short-circuits this to false. Revisit this branch if freezes are ever
+    // extended to cardio.
+    const streakFrozen = !isOnlyCardio && !todayDone && finalDisplayStreak > 0
+        && isFrozenDay(getLocalDateStr(yesterdayDate));
+
     // Exercise stats array (for Stats.jsx)
     const exerciseStats = allExercises.map(ex => {
         const exDoneToday = exerciseDoneToday[ex.id];
@@ -438,6 +450,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         yesterdayStreak,
         displayStreak: finalDisplayStreak,
         streakActive,
+        streakFrozen,
         todayDone,
         globalTotalReps,
         perfectDays,
