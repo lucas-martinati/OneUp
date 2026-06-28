@@ -115,8 +115,15 @@ function relativePath(absPath) {
 
 dotenv.config({ path: path.join(ROOT, '.env') });
 
+// Strip protocol + trailing slash to keep only the host (e.g.
+// "https://oneupme.me/" → "oneupme.me"), used as the Strava OAuth deep-link host.
+function urlToHost(url) {
+  return (url || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
+}
+
 const REPLACEMENTS = {
   __GOOGLE_CLIENT_ID__: process.env.VITE_GOOGLE_CLIENT_ID,
+  __APP_URL__: urlToHost(process.env.VITE_APP_URL),
 };
 
 const TASKS = [
@@ -132,7 +139,7 @@ const TASKS = [
     icon: '🤖',
     template: path.join(ROOT, 'android', 'strings.template.xml'),
     output: path.join(ROOT, 'android', 'app', 'src', 'main', 'res', 'values', 'strings.xml'),
-    replacements: ['__GOOGLE_CLIENT_ID__'],
+    replacements: ['__GOOGLE_CLIENT_ID__', '__APP_URL__'],
   },
   {
     name: 'Privacy Policy HTML',

@@ -3,6 +3,7 @@ import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { createLogger } from '@utils/logger';
+import { APP_URL_DISPLAY } from '@config/app';
 
 const logger = createLogger('Strava');
 
@@ -43,10 +44,12 @@ function getRedirectUri() {
     const fullUrl = (origin + baseUrl).replace(/\/$/, '') || origin;
     return fullUrl;
   }
-  // Now that Strava dashboard has ONLY lucas-martinati.github.io,
-  // we can use our custom scheme with that exact domain as the host!
+  // Custom-scheme deep link whose host is the app domain (from VITE_APP_URL).
+  // This host MUST match the Strava dashboard's Authorization Callback Domain
+  // and the @string/strava_redirect_host used in AndroidManifest.xml (both come
+  // from the same VITE_APP_URL via generate-config.js).
   // This bypasses Android 12+ App Links requirements.
-  return 'com.lucasm548.oneup://lucas-martinati.github.io/strava-auth';
+  return `com.lucasm548.oneup://${APP_URL_DISPLAY}/strava-auth`;
 }
 
 class StravaService {

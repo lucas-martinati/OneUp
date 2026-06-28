@@ -1034,11 +1034,17 @@ export const onRevenueCatWebhook = onRequest({ secrets: ["REVENUECAT_WEBHOOK_SEC
 
 const STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token";
 
+// Public web origin allowed to call the OAuth proxies. Read from the APP_URL
+// env var (set via the functions .env / deploy environment) so the domain is
+// not hardcoded; falls back to the production URL so CORS stays valid even if
+// the var is missing at deploy time.
+const APP_URL = process.env.APP_URL || "https://oneupme.me";
+
 // Allowed origins for the OAuth token proxies. The Capacitor Android webview
 // serves the app from https://localhost, so we must allow BOTH http (web dev)
 // and https (native) localhost. iOS/older Capacitor uses the capacitor:// scheme.
 const OAUTH_PROXY_CORS = [
-  "https://lucas-martinati.github.io",
+  APP_URL,
   /^https?:\/\/localhost(:\d+)?$/,
   "capacitor://localhost",
 ];

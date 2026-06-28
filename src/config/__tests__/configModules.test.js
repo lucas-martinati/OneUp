@@ -63,3 +63,26 @@ describe('admin config', () => {
     expect(isAdminEmail('anyone@oneup.app')).toBe(false);
   });
 });
+
+describe('app config', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it('uses VITE_APP_URL and derives a protocol-less display form', async () => {
+    vi.stubEnv('VITE_APP_URL', 'https://custom.example.com/');
+    vi.resetModules();
+    const { APP_URL, APP_URL_DISPLAY } = await import('@config/app');
+    expect(APP_URL).toBe('https://custom.example.com');
+    expect(APP_URL_DISPLAY).toBe('custom.example.com');
+  });
+
+  it('resolves to an empty string when VITE_APP_URL is missing', async () => {
+    vi.stubEnv('VITE_APP_URL', '');
+    vi.resetModules();
+    const { APP_URL, APP_URL_DISPLAY } = await import('@config/app');
+    expect(APP_URL).toBe('');
+    expect(APP_URL_DISPLAY).toBe('');
+  });
+});

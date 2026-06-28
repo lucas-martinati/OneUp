@@ -5,6 +5,9 @@
     <string name="package_name">com.lucasm548.oneup</string>
     <string name="custom_url_scheme">com.lucasm548.oneup</string>
     <string name="server_client_id">__GOOGLE_CLIENT_ID__</string>
+    <!-- Strava OAuth deep-link host (from VITE_APP_URL). Must match the Strava
+         dashboard's Authorization Callback Domain and stravaService.js. -->
+    <string name="strava_redirect_host">__APP_URL__</string>
 
     <!-- Widget strings -->
     <string name="widget_small_name">OneUp Streak</string>

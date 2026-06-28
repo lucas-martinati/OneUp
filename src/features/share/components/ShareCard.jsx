@@ -9,6 +9,7 @@ import { sumExerciseReps } from '@utils/stats';
 import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
 import { EXERCISES, CARDIO_EXERCISES, getDailyGoal } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
+import { APP_URL_DISPLAY } from '@config/app';
 import { formatDuration, getLocalDateStr, getCurrentWeekNumber, parseLocalDate } from '@utils/dateUtils';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { DifficultyBadge } from'@components/ui/DifficultyBadge';
@@ -758,7 +759,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
             fontSize: '0.5rem', color: 'rgba(255,255,255,0.25)',
             fontWeight: 500,
           }}>
-            oneup.app
+            {APP_URL_DISPLAY}
           </span>
           <div style={{
             display: 'flex', gap: '3px',
