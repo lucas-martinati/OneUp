@@ -609,7 +609,17 @@
     "title": "设置",
     "unlockSettings": "解锁设置",
     "privacyPolicy": "隐私政策",
-    "termsOfService": "服务条款"
+    "termsOfService": "服务条款",
+    "dataTitle": "数据",
+    "exportData": "导出我的数据",
+    "exportDataDesc": "下载本地数据（进度、设置、训练计划）的备份文件。",
+    "exportButton": "导出",
+    "importData": "导入数据",
+    "importDataDesc": "从备份文件恢复你的数据。",
+    "importButton": "导入",
+    "importConfirm": "用此备份替换当前所有数据？此操作无法撤销。",
+    "exportSuccess": "备份已下载（{{count}} 项）",
+    "importError": "备份文件无效或无法读取。"
   },
   "share": {
     "backgroundImage": "背景图片",
@@ -944,5 +954,10 @@
     "statReserve": "上限",
     "proPitch": "Pro 会员获得 {{multiplier}}× 更多——每月 {{count}} 次冻结。",
     "proCta": "解锁 Pro"
+  },
+  "migration": {
+    "title": "OneUp 已迁移至 {{host}}",
+    "message": "此页面不再更新，请前往新网站继续使用。",
+    "button": "前往"
   }
 }

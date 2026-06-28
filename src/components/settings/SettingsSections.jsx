@@ -1,10 +1,13 @@
+import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bell, Volume2, Vibrate, Clock, Users, Lock, Gauge, Globe, Smartphone } from '@utils/icons';
+import { Bell, Volume2, Vibrate, Clock, Users, Lock, Gauge, Globe, Smartphone, Download, Upload } from '@utils/icons';
 import { ToggleSwitch } from '@components/ui/ToggleSwitch';
 import { SettingRow } from '@components/ui/SettingRow';
 import { ThemeSwatch } from '@components/ui';
 import { LANGUAGES } from '@config/languages';
 import { THEMES } from '@config/themes';
+import { isNativePlatform } from '@utils/platform';
+import { downloadBackup, parseBackup, restoreBackup, readFileText } from '@utils/dataBackup';
 import { sectionTitleStyle } from './settingsStyles';
 
 const sectionCardStyle = {
@@ -361,6 +364,103 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
     );
 }
 
+/**
+ * Export / import the full local data store as a JSON backup file.
+ *
+ * Web-only: local data is origin-scoped (see {@link downloadBackup}), so this
+ * lets a signed-out user carry their data to a new domain. On native there is no
+ * "old domain" and the real data lives in native Preferences, so it is hidden.
+ */
+export function DataSection() {
+    const { t } = useTranslation();
+    const fileInputRef = useRef(null);
+    const [status, setStatus] = useState(null); // { type: 'success' | 'error', msg }
 
+    if (isNativePlatform()) return null;
 
+    const handleExport = () => {
+        try {
+            const count = downloadBackup();
+            setStatus({ type: 'success', msg: t('settings.exportSuccess', { count }) });
+        } catch {
+            setStatus({ type: 'error', msg: t('settings.importError') });
+        }
+    };
+
+    const handleFile = async (e) => {
+        const file = e.target.files?.[0];
+        e.target.value = ''; // let the user re-pick the same file later
+        if (!file) return;
+        try {
+            const parsed = parseBackup(await readFileText(file));
+            const count = Object.keys(parsed.data).length;
+            if (!window.confirm(t('settings.importConfirm', { count }))) return;
+            restoreBackup(parsed);
+            window.location.reload();
+        } catch {
+            setStatus({ type: 'error', msg: t('settings.importError') });
+        }
+    };
+
+    const actionButtonStyle = {
+        padding: '8px 16px',
+        borderRadius: 'var(--radius-md)',
+        border: '1px solid var(--border-subtle)',
+        background: 'var(--surface-muted)',
+        color: 'var(--text-primary)',
+        fontWeight: 700,
+        fontSize: '0.85rem',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        whiteSpace: 'nowrap',
+    };
+
+    return (
+        <div className="glass-premium" style={sectionCardStyle}>
+            <h3 style={sectionTitleStyle}>{t('settings.dataTitle')}</h3>
+
+            <SettingRow
+                icon={Download}
+                title={t('settings.exportData')}
+                description={t('settings.exportDataDesc')}
+                color="#34d399"
+            >
+                <button type="button" style={actionButtonStyle} className="hover-lift" onClick={handleExport}>
+                    {t('settings.exportButton')}
+                </button>
+            </SettingRow>
+
+            <SettingRow
+                icon={Upload}
+                title={t('settings.importData')}
+                description={t('settings.importDataDesc')}
+                color="#60a5fa"
+                isLast
+            >
+                <button type="button" style={actionButtonStyle} className="hover-lift" onClick={() => fileInputRef.current?.click()}>
+                    {t('settings.importButton')}
+                </button>
+            </SettingRow>
+
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/json,.json"
+                onChange={handleFile}
+                style={{ display: 'none' }}
+            />
+
+            {status && (
+                <div style={{
+                    marginTop: '10px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    color: status.type === 'error' ? '#ef4444' : '#34d399',
+                }}>
+                    {status.msg}
+                </div>
+            )}
+        </div>
+    );
+}
 

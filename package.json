@@ -23,7 +23,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "npm run build && playwright test",
     "preview": "vite preview",
-    "deploy": "GITHUB_PAGES=true npm run build && gh-pages -d dist -b gh-pages --dotfiles",
+    "deploy": "npm run build && gh-pages -d dist -b gh-pages --dotfiles",
     "deploy:functions": "firebase deploy --only functions --project oneup-1c3f5",
     "deploy:database": "firebase deploy --only database --project oneup-1c3f5",
     "deploy:hosting": "firebase deploy --only hosting --project oneup-1c3f5",

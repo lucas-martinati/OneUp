@@ -609,7 +609,17 @@
     "title": "Einstellungen",
     "unlockSettings": "EINSTELLUNGEN ENTSPERREN",
     "privacyPolicy": "Datenschutzerklärung",
-    "termsOfService": "Nutzungsbedingungen"
+    "termsOfService": "Nutzungsbedingungen",
+    "dataTitle": "Daten",
+    "exportData": "Meine Daten exportieren",
+    "exportDataDesc": "Lade eine Sicherung deiner lokalen Daten herunter (Fortschritt, Einstellungen, Routinen).",
+    "exportButton": "Exportieren",
+    "importData": "Daten importieren",
+    "importDataDesc": "Stelle deine Daten aus einer Sicherungsdatei wieder her.",
+    "importButton": "Importieren",
+    "importConfirm": "Alle aktuellen Daten durch diese Sicherung ersetzen? Das kann nicht rückgängig gemacht werden.",
+    "exportSuccess": "Sicherung heruntergeladen ({{count}} Einträge)",
+    "importError": "Ungültige oder unlesbare Sicherungsdatei."
   },
   "share": {
     "backgroundImage": "Hintergrundbild",
@@ -944,5 +954,10 @@
     "statReserve": "Max",
     "proPitch": "Pro-Mitglieder erhalten {{multiplier}}× mehr — {{count}} Einfrierungen pro Monat.",
     "proCta": "Pro freischalten"
+  },
+  "migration": {
+    "title": "OneUp ist auf {{host}} umgezogen",
+    "message": "Diese Seite wird nicht mehr aktualisiert — mach auf der neuen Seite weiter.",
+    "button": "Jetzt öffnen"
   }
 }

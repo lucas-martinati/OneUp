@@ -609,7 +609,17 @@
     "title": "Impostazioni",
     "unlockSettings": "SBLOCCA IMPOSTAZIONI",
     "privacyPolicy": "Informativa sulla privacy",
-    "termsOfService": "Termini di servizio"
+    "termsOfService": "Termini di servizio",
+    "dataTitle": "Dati",
+    "exportData": "Esporta i miei dati",
+    "exportDataDesc": "Scarica un backup dei tuoi dati locali (progressi, impostazioni, routine).",
+    "exportButton": "Esporta",
+    "importData": "Importa dati",
+    "importDataDesc": "Ripristina i tuoi dati da un file di backup.",
+    "importButton": "Importa",
+    "importConfirm": "Sostituire tutti i dati attuali con questo backup? Operazione irreversibile.",
+    "exportSuccess": "Backup scaricato ({{count}} elementi)",
+    "importError": "File di backup non valido o illeggibile."
   },
   "share": {
     "backgroundImage": "Immagine di sfondo",
@@ -944,5 +954,10 @@
     "statReserve": "Max",
     "proPitch": "Gli utenti Pro ne ottengono {{multiplier}}× di più — {{count}} congelamenti al mese.",
     "proCta": "Sblocca Pro"
+  },
+  "migration": {
+    "title": "OneUp si è spostato su {{host}}",
+    "message": "Questa pagina non viene più aggiornata — continua sul nuovo sito.",
+    "button": "Vai ora"
   }
 }

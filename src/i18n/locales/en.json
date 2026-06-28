@@ -624,7 +624,17 @@
     "title": "Settings",
     "unlockSettings": "UNLOCK SETTINGS",
     "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service"
+    "termsOfService": "Terms of Service",
+    "dataTitle": "Data",
+    "exportData": "Export my data",
+    "exportDataDesc": "Download a backup file of your local data (progress, settings, routines).",
+    "exportButton": "Export",
+    "importData": "Import data",
+    "importDataDesc": "Restore your data from a backup file.",
+    "importButton": "Import",
+    "importConfirm": "Replace all current data with this backup? This cannot be undone.",
+    "exportSuccess": "Backup downloaded ({{count}} items)",
+    "importError": "Invalid or unreadable backup file."
   },
   "share": {
     "backgroundImage": "Background image",
@@ -944,5 +954,10 @@
     "statReserve": "Max",
     "proPitch": "Pro members earn {{multiplier}}× more — {{count}} freezes every month.",
     "proCta": "Unlock Pro"
+  },
+  "migration": {
+    "title": "OneUp has moved to {{host}}",
+    "message": "This page is no longer updated — continue on the new site.",
+    "button": "Go now"
   }
 }

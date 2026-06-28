@@ -5,7 +5,7 @@ import { X, ShoppingBag, ArrowLeft } from '@utils/icons';
 import { Button, IconButton } from '@components/ui';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { StoreView } from './StoreView';
-import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection } from './SettingsSections';
+import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection, DataSection } from './SettingsSections';
 import { DifficultySettings } from './DifficultySettings';
 import { openLegalPage } from '@utils/navigation';
 import { useAuth } from '@contexts/AuthContext';
@@ -133,6 +133,8 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                 />
                             </div>
                         )}
+
+                        <DataSection />
 
                         <DifficultySettings />
 

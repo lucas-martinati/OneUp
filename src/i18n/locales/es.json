@@ -609,7 +609,17 @@
     "title": "Ajustes",
     "unlockSettings": "DESBLOQUEAR AJUSTES",
     "privacyPolicy": "Política de privacidad",
-    "termsOfService": "Términos de servicio"
+    "termsOfService": "Términos de servicio",
+    "dataTitle": "Datos",
+    "exportData": "Exportar mis datos",
+    "exportDataDesc": "Descarga una copia de seguridad de tus datos locales (progreso, ajustes, rutinas).",
+    "exportButton": "Exportar",
+    "importData": "Importar datos",
+    "importDataDesc": "Restaura tus datos desde un archivo de copia de seguridad.",
+    "importButton": "Importar",
+    "importConfirm": "¿Reemplazar todos los datos actuales con esta copia? Esta acción no se puede deshacer.",
+    "exportSuccess": "Copia descargada ({{count}} elementos)",
+    "importError": "Archivo de copia no válido o ilegible."
   },
   "share": {
     "backgroundImage": "Imagen de fondo",
@@ -944,5 +954,10 @@
     "statReserve": "Máx",
     "proPitch": "Los miembros Pro ganan {{multiplier}}× más: {{count}} congelaciones al mes.",
     "proCta": "Desbloquear Pro"
+  },
+  "migration": {
+    "title": "OneUp se ha mudado a {{host}}",
+    "message": "Esta página ya no se actualiza — continúa en el nuevo sitio.",
+    "button": "Ir ahora"
   }
 }

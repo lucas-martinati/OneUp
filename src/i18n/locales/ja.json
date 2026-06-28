@@ -609,7 +609,17 @@
     "title": "設定",
     "unlockSettings": "設定のロックを解除する",
     "privacyPolicy": "プライバシーポリシー",
-    "termsOfService": "利用規約"
+    "termsOfService": "利用規約",
+    "dataTitle": "データ",
+    "exportData": "データをエクスポート",
+    "exportDataDesc": "ローカルデータ（進捗・設定・ルーティン）のバックアップをダウンロードします。",
+    "exportButton": "エクスポート",
+    "importData": "データをインポート",
+    "importDataDesc": "バックアップファイルからデータを復元します。",
+    "importButton": "インポート",
+    "importConfirm": "現在のすべてのデータをこのバックアップで置き換えますか？この操作は元に戻せません。",
+    "exportSuccess": "バックアップをダウンロードしました（{{count}}件）",
+    "importError": "バックアップファイルが無効か読み取れません。"
   },
   "share": {
     "backgroundImage": "背景画像",
@@ -944,5 +954,10 @@
     "statReserve": "上限",
     "proPitch": "Proなら{{multiplier}}倍——毎月{{count}}回の凍結を獲得できます。",
     "proCta": "Proを解除"
+  },
+  "migration": {
+    "title": "OneUp は {{host}} に移転しました",
+    "message": "このページはもう更新されません。新しいサイトに移動してください。",
+    "button": "移動する"
   }
 }
