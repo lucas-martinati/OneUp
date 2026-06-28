@@ -487,26 +487,6 @@ function printTaskResult(index, total, task, result) {
   }
 }
 
-function printIconResult(index, total, iconDef, result) {
-  const step = `[${index}/${total}]`;
-  const status = result.success ? `${c.green}✓${c.reset}` : `${c.red}✗${c.reset}`;
-
-  console.log('');
-  console.log(`  ${c.cyan}${c.bold}${step}${c.reset} ${iconDef.emoji}  ${c.white}${c.bold}${iconDef.name}${c.reset}`);
-  console.log(`  ${c.gray}${'─'.repeat(BOX_WIDTH - 4)}${c.reset}`);
-
-  if (result.error) {
-    console.log(`  ${c.red}✗  Erreur : ${result.error}${c.reset}`);
-    return;
-  }
-
-  console.log(`  ${c.gray}   Sortie    →${c.reset}  ${c.white}${result.outputPath}${c.reset}`);
-
-  const sizeStr = formatBytes(result.outputSize);
-  const timeStr = formatTime(result.duration);
-  console.log(`  ${status}  ${c.green}${sizeStr}${c.reset}  ${c.gray}│${c.reset}  ${c.magenta}${iconDef.size ? iconDef.size + 'px' : ''}${c.reset}  ${c.gray}│${c.reset}  ${c.blue}${timeStr}${c.reset}`);
-}
-
 function printSummary(results, totalDuration) {
   const successCount = results.filter(r => r.result.success).length;
   const failCount = results.length - successCount;
@@ -1040,11 +1020,13 @@ async function main() {
       { ...SPLASH, gen: generateIconAsync },
     ];
 
-    for (let i = 0; i < allDefs.length; i++) {
-      const def = allDefs[i];
+    for (const def of allDefs) {
       const result = await def.gen(def);
-      printIconResult(i + 1, allDefs.length, def, result);
       iconResults.push(result);
+      // Stay quiet on success; only surface failures so they don't get lost.
+      if (!result.success) {
+        console.log(`  ${c.red}✗  ${def.name} : ${result.error || 'échec'}${c.reset}`);
+      }
     }
 
     const iconSuccessCount = iconResults.filter(r => r.success).length;
