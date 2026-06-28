@@ -1,5 +1,6 @@
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
+import { APP_URL } from '@config/app';
 
 /**
  * Cleanly opens a legal page (privacy policy or terms of service) inside the Capacitor app browser,
@@ -14,8 +15,17 @@ export async function openLegalPage(type) {
     }
 
     const filename = type === 'privacy' ? 'privacy.html' : 'terms.html';
-    // Clean, robust URL resolution relative to the current app origin/path
-    const url = new URL(filename, window.location.href).href;
+    
+    // On native platforms, resolve against the configured public APP_URL to avoid opening localhost
+    let base = window.location.href;
+    if (Capacitor.isNativePlatform()) {
+        if (!APP_URL) {
+            console.warn('Configuration warning: APP_URL is not defined. Falling back to window.location.href.');
+        } else {
+            base = APP_URL.endsWith('/') ? APP_URL : `${APP_URL}/`;
+        }
+    }
+    const url = new URL(filename, base).href;
 
     if (Capacitor.isNativePlatform()) {
         try {
