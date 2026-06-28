@@ -109,7 +109,7 @@ export default defineConfig({
       devOptions: {
         enabled: false
       },
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.png'],
       manifest: {
         name: 'OneUp : Le Défi Fitness Ultime',
         short_name: 'OneUp',
