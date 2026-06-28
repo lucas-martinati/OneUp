@@ -957,7 +957,7 @@
   },
   "migration": {
     "title": "O OneUp mudou para {{host}}",
-    "message": "Esta página já não é atualizada — continua no novo site.",
+    "message": "O endereço do site mudou. Não tens sessão iniciada com Google? Exporta os teus dados em Definições › Dados e volta a importá-los no novo site para não perderes nada.",
     "button": "Ir agora"
   }
 }

@@ -957,7 +957,7 @@
   },
   "migration": {
     "title": "OneUp ist auf {{host}} umgezogen",
-    "message": "Diese Seite wird nicht mehr aktualisiert — mach auf der neuen Seite weiter.",
+    "message": "Die Adresse der Seite hat sich geändert. Nicht mit Google angemeldet? Exportiere deine Daten unter Einstellungen › Daten und importiere sie auf der neuen Seite, damit nichts verloren geht.",
     "button": "Jetzt öffnen"
   }
 }

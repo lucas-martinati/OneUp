@@ -957,7 +957,7 @@
   },
   "migration": {
     "title": "OneUp has moved to {{host}}",
-    "message": "This page is no longer updated — continue on the new site.",
+    "message": "The site address has changed. Not signed in with Google? Export your data from Settings › Data, then re-import it on the new site so nothing is lost.",
     "button": "Go now"
   }
 }
