@@ -692,7 +692,9 @@
     "recordDay": "기록일",
     "tabOverview": "개요",
     "tabCharts": "차트",
-    "tabDetails": "세부정보"
+    "tabDetails": "세부정보",
+    "selectAll": "모두 선택",
+    "deselectAll": "모두 해제"
   },
   "store": {
     "historyDesc": "원업 거래",

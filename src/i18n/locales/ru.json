@@ -692,7 +692,9 @@
     "recordDay": "Рекордный день",
     "tabOverview": "Обзор",
     "tabCharts": "Графики",
-    "tabDetails": "Детали"
+    "tabDetails": "Детали",
+    "selectAll": "Выбрать все",
+    "deselectAll": "Снять выделение"
   },
   "store": {
     "historyDesc": "Транзакция OneUp",

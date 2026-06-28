@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState, useId, useCallback } from 'react';
-import { scaleX, scaleY, niceTicks, smoothLinePath, pickLabelIndices } from './chartMath';
+import { scaleX, scaleY, niceTicks, smoothLinePath, stepLinePath, pickLabelIndices } from './chartMath';
 
 const VBW = 320;
 const VBH = 150;
@@ -27,6 +27,7 @@ export default function LineChart({
     formatValue = (v) => `${v}`,
     formatYTick = (v) => `${v}`,
     dots = 'auto',
+    step = false,
 }) {
     const gradId = useId().replace(/:/g, '');
     const wrapRef = useRef(null);
@@ -49,8 +50,9 @@ export default function LineChart({
                 v,
             });
         });
-        return { ...s, pts, line: smoothLinePath(pts, PLOT.top, PLOT.bottom) };
-    }), [data, series, yMin, yMax]);
+        const line = step ? stepLinePath(pts) : smoothLinePath(pts, PLOT.top, PLOT.bottom);
+        return { ...s, pts, line };
+    }), [data, series, yMin, yMax, step]);
 
     const getSeriesValueAtActive = useCallback((s, activeIdx) => {
         const pts = s.pts;
@@ -70,9 +72,11 @@ export default function LineChart({
             }
         }
         if (prev.i === next.i) return prev.v;
+        // Mode escalier : on maintient la dernière valeur enregistrée au lieu d'interpoler.
+        if (step) return prev.v;
         const frac = (activeIdx - prev.i) / (next.i - prev.i);
         return prev.v + frac * (next.v - prev.v);
-    }, []);
+    }, [step]);
 
     const labelIndices = useMemo(() => pickLabelIndices(data.length, 5), [data.length]);
 

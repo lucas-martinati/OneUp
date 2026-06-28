@@ -692,7 +692,9 @@
     "recordDay": "記録日",
     "tabOverview": "概要",
     "tabCharts": "グラフ",
-    "tabDetails": "詳細"
+    "tabDetails": "詳細",
+    "selectAll": "すべて選択",
+    "deselectAll": "すべて解除"
   },
   "store": {
     "historyDesc": "ワンアップトランザクション",

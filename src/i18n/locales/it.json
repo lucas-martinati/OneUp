@@ -692,7 +692,9 @@
     "recordDay": "Giorno record",
     "tabOverview": "Panoramica",
     "tabCharts": "Grafici",
-    "tabDetails": "Dettagli"
+    "tabDetails": "Dettagli",
+    "selectAll": "Seleziona tutto",
+    "deselectAll": "Deseleziona tutto"
   },
   "store": {
     "historyDesc": "Transazione OneUp",

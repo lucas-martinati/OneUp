@@ -11,6 +11,7 @@ export default function WeightEvolutionChart({ title, t, getConfig, completions 
             completions={completions}
             valueKey="weight"
             defaultValue={0}
+            carryForward
             initialMax={1}
             gradient="linear-gradient(135deg, rgba(245,158,11,0.1), rgba(234,88,12,0.08))"
             emptyTitle={t('weight.noData')}

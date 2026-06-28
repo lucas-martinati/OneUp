@@ -25,6 +25,7 @@ export default function DifficultyEvolutionChart({ title, t, getConfig, completi
             completions={completions}
             valueKey="difficulty"
             defaultValue={1.0}
+            carryForward
             initialMax={1.0}
             gradient="linear-gradient(135deg, rgba(239,68,68,0.1), rgba(220,38,38,0.08))"
             emptyTitle={t('stats.difficultyNoData')}

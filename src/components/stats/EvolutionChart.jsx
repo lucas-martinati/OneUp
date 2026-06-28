@@ -23,6 +23,7 @@ export default function EvolutionChart({
     yAxisExtra,      // props additionnelles passées au YAxis (tickFormatter / unit)
     formatBadge,     // (ex) => texte du badge "valeur actuelle"
     formatTooltip,   // (value) => texte de la valeur dans le tooltip
+    carryForward = false, // tracé en escalier : maintient la dernière valeur jusqu'à la saisie suivante au lieu d'interpoler
 }) {
     const defaultId = exercises[0]?.id;
     const [selectedExIds, setSelectedExIds] = useState(defaultId ? [defaultId] : []);
@@ -32,6 +33,11 @@ export default function EvolutionChart({
             if (prev.includes(id)) return prev.filter(x => x !== id);
             return [...prev, id];
         });
+    };
+
+    const allSelected = exercises.length > 0 && selectedExIds.length === exercises.length;
+    const toggleAll = () => {
+        setSelectedExIds(allSelected ? [] : exercises.map(e => e.id));
     };
 
     const chartData = useMemo(() => {
@@ -92,6 +98,25 @@ export default function EvolutionChart({
                 display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center',
                 paddingBottom: '8px', marginBottom: '12px'
             }}>
+                {exercises.length > 1 && (
+                    <button
+                        onClick={toggleAll}
+                        className="hover-lift"
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: '5px',
+                            padding: '6px 12px', borderRadius: 'var(--radius-full)',
+                            background: 'rgba(255,255,255,0.07)',
+                            border: '1.5px dashed rgba(255,255,255,0.22)',
+                            color: 'var(--text-primary)',
+                            cursor: 'pointer', whiteSpace: 'nowrap',
+                            fontSize: '0.7rem', fontWeight: '700',
+                            transition: 'all 0.2s ease'
+                        }}
+                    >
+                        <DynamicIcon icon={allSelected ? 'CheckCheck' : 'Check'} size={12} color="var(--text-primary)" />
+                        {allSelected ? t('stats.deselectAll') : t('stats.selectAll')}
+                    </button>
+                )}
                 {exercises.map(ex => {
                     const isActive = selectedExIds.includes(ex.id);
                     return (
@@ -163,6 +188,7 @@ export default function EvolutionChart({
                     formatValue={formatTooltip}
                     formatYTick={formatYTick}
                     dots={true}
+                    step={carryForward}
                 />
             )}
         </div>

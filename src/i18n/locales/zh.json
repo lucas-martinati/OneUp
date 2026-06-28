@@ -692,7 +692,9 @@
     "recordDay": "纪录日",
     "tabOverview": "概览",
     "tabCharts": "图表",
-    "tabDetails": "详情"
+    "tabDetails": "详情",
+    "selectAll": "全选",
+    "deselectAll": "取消全选"
   },
   "store": {
     "historyDesc": "OneUp 交易",

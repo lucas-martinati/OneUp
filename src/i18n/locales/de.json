@@ -692,7 +692,9 @@
     "recordDay": "Rekordtag",
     "tabOverview": "Übersicht",
     "tabCharts": "Diagramme",
-    "tabDetails": "Details"
+    "tabDetails": "Details",
+    "selectAll": "Alle auswählen",
+    "deselectAll": "Alle abwählen"
   },
   "store": {
     "historyDesc": "OneUp-Transaktion",

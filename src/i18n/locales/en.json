@@ -707,7 +707,9 @@
     "recordDay": "Record day",
     "tabOverview": "Overview",
     "tabCharts": "Charts",
-    "tabDetails": "Details"
+    "tabDetails": "Details",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all"
   },
   "store": {
     "historyDesc": "OneUp Transaction",
