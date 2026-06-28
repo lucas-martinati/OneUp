@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">OneUp Dev</string>
-    <string name="title_activity_main">OneUp Dev</string>
-    <string name="widget_small_name">OneUp Dev Streak</string>
-    <string name="widget_large_name">OneUp Dev Semaine</string>
-</resources>
