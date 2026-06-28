@@ -103,6 +103,16 @@ export default defineConfig({
               expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 60 },
               cacheableResponse: { statuses: [0, 200] }
             }
+          },
+          {
+            // Sound files are static and change rarely → CacheFirst is safe
+            urlPattern: /\/sounds\/[^/]+\.mp3$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'app-sounds',
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 90 }, // 90 days
+              cacheableResponse: { statuses: [0, 200] }
+            }
           }
         ]
       },
