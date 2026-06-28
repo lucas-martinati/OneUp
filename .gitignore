@@ -34,6 +34,7 @@ android/app/src/main/assets/public/
 # Firebase Configuration
 android/app/google-services.json
 google-services.json
+.firebase/
 
 # Android Signing
 *.jks

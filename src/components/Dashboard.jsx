@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import React, { useEffect, useLayoutEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from './feedback/CSSConfetti';
 import { OfflineBanner } from './feedback/OfflineBanner';
@@ -140,11 +140,13 @@ export function Dashboard() {
         return () => observer.disconnect();
     }, [fullCategoryOrder, renderedSlides, handleIntersection]);
 
-    // Scroll to default slide (bodyweight) on mount
-    useEffect(() => {
+    // Scroll to default slide (bodyweight) on mount.
+    // useLayoutEffect fires synchronously before the browser paints, so the
+    // user never sees the scroll from index 0 (Cardio) to the default slide.
+    useLayoutEffect(() => {
         const el = scrollContainerRef.current;
         if (el) {
-            requestAnimationFrame(() => el.scrollTo({ top: el.clientHeight * defaultSlide, behavior: 'instant' }));
+            el.scrollTo({ top: el.clientHeight * defaultSlide, behavior: 'instant' });
         }
     }, [defaultSlide]);
 
