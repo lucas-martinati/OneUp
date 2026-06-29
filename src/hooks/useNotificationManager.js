@@ -159,6 +159,18 @@ export function useNotificationManager({ isDayDone, getDayNumber }) {
         const cancelIds = Array.from({ length: 7 }, (_, idx) => ({ id: NOTIFICATION_ID + idx }));
         await LocalNotifications.cancel({ notifications: cancelIds });
 
+        // cancel() only drops *pending* (scheduled) notifications. A reminder that
+        // has already been delivered — e.g. re-fired at boot by the plugin's restore
+        // receiver, which reschedules past-due notifications to "now + 15s" — stays
+        // in the notification shade and reappears every time it's swiped away. Clear
+        // our reserved slots from the tray explicitly. Best-effort: ignore if the
+        // platform/plugin doesn't support it.
+        try {
+          await LocalNotifications.removeDeliveredNotifications({ notifications: cancelIds });
+        } catch (removeError) {
+          console.debug('removeDeliveredNotifications failed:', removeError);
+        }
+
         if (settings?.notificationsEnabled) {
           const { hour, minute } = settings.notificationTime;
 

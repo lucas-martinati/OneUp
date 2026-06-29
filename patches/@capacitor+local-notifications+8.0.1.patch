@@ -1,0 +1,42 @@
+diff --git a/node_modules/@capacitor/local-notifications/android/src/main/java/com/capacitorjs/plugins/localnotifications/LocalNotificationRestoreReceiver.java b/node_modules/@capacitor/local-notifications/android/src/main/java/com/capacitorjs/plugins/localnotifications/LocalNotificationRestoreReceiver.java
+index 8e0390f..316b780 100644
+--- a/node_modules/@capacitor/local-notifications/android/src/main/java/com/capacitorjs/plugins/localnotifications/LocalNotificationRestoreReceiver.java
++++ b/node_modules/@capacitor/local-notifications/android/src/main/java/com/capacitorjs/plugins/localnotifications/LocalNotificationRestoreReceiver.java
+@@ -20,7 +20,6 @@ public class LocalNotificationRestoreReceiver extends BroadcastReceiver {
+         List<String> ids = storage.getSavedNotificationIds();
+ 
+         ArrayList<LocalNotification> notifications = new ArrayList<>(ids.size());
+-        ArrayList<LocalNotification> updatedNotifications = new ArrayList<>();
+         for (String id : ids) {
+             LocalNotification notification = storage.getSavedNotification(id);
+             if (notification == null) {
+@@ -31,21 +30,20 @@ public class LocalNotificationRestoreReceiver extends BroadcastReceiver {
+             if (schedule != null) {
+                 Date at = schedule.getAt();
+                 if (at != null && at.before(new Date())) {
+-                    // modify the scheduled date in order to show notifications that would have been delivered while device was off.
+-                    long newDateTime = new Date().getTime() + 15 * 1000;
+-                    schedule.setAt(new Date(newDateTime));
+-                    notification.setSchedule(schedule);
+-                    updatedNotifications.add(notification);
++                    // PATCH (OneUp): do NOT re-fire one-shot reminders whose time
++                    // already passed while the device was off. The upstream plugin
++                    // reschedules them to "now + 15s", which on aggressive OEMs (e.g.
++                    // MIUI) gets re-triggered repeatedly and makes the reminder keep
++                    // reappearing in the tray. Drop the stale notification instead and
++                    // purge it from storage so it cannot pile up.
++                    storage.deleteNotification(notification.getId().toString());
++                    continue;
+                 }
+             }
+ 
+             notifications.add(notification);
+         }
+ 
+-        if (updatedNotifications.size() > 0) {
+-            storage.appendNotifications(updatedNotifications);
+-        }
+-
+         CapConfig config = CapConfig.loadDefault(context);
+         LocalNotificationManager localNotificationManager = new LocalNotificationManager(storage, null, context, config);
+ 

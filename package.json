@@ -4,6 +4,7 @@
   "version": "3.3.0",
   "type": "module",
   "scripts": {
+    "postinstall": "patch-package",
     "generate:config": "node scripts/generate-config.js",
     "predev": "npm run generate:config",
     "dev": "vite",
@@ -87,6 +88,7 @@
     "jsdom": "^29.0.1",
     "knip": "^6.9.0",
     "madge": "^8.0.0",
+    "patch-package": "^8.0.1",
     "playwright": "^1.59.1",
     "stylelint": "^17.13.0",
     "vite": "^7.2.4",
