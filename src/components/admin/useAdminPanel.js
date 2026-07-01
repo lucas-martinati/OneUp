@@ -61,7 +61,7 @@ const makeSorter = (sortBy, sortReversed) => (a, b) => {
  */
 export function useAdminPanel() {
   // Store both the users list and leaderboard fallbacks
-  const [dataState, setDataState] = useState({ usersData: null, leaderboardData: null });
+  const [dataState, setDataState] = useState({ usersData: null, leaderboardData: null, publicProfilesData: null });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -124,21 +124,28 @@ export function useAdminPanel() {
       const uData = await fetchAllUsersData();
 
       let lbData = {};
+      let publicProfilesData = {};
       try {
         const db = getDatabaseInstance();
         if (db) {
-          const snapshot = await get(ref(db, paths.leaderboard()));
-          if (snapshot.exists()) {
-            lbData = snapshot.val();
-          }
+          // The badge count is published by the Cloud Function to
+          // `publicProfiles/{uid}.achievements`, NOT to the leaderboard entry —
+          // load both so the user detail sheet can show the real success count.
+          const [lbSnap, ppSnap] = await Promise.all([
+            get(ref(db, paths.leaderboard())),
+            get(ref(db, 'publicProfiles')),
+          ]);
+          if (lbSnap.exists()) lbData = lbSnap.val();
+          if (ppSnap.exists()) publicProfilesData = ppSnap.val();
         }
       } catch (lbErr) {
-        console.warn('Could not load leaderboard for fallback details', lbErr);
+        console.warn('Could not load leaderboard/publicProfiles for details', lbErr);
       }
 
       setDataState({
         usersData: uData || {},
-        leaderboardData: lbData
+        leaderboardData: lbData,
+        publicProfilesData
       });
     } catch {
       setMessage({ type: 'error', text: 'Erreur lors du chargement des utilisateurs. Vérifiez vos permissions.' });
@@ -250,13 +257,15 @@ export function useAdminPanel() {
     if (!selectedUid || !dataState.usersData) return null;
     const data = dataState.usersData[selectedUid] || {};
     const lbEntry = (dataState.leaderboardData && dataState.leaderboardData[selectedUid]) || {};
+    const publicProfile = (dataState.publicProfilesData && dataState.publicProfilesData[selectedUid]) || {};
     return {
       uid: selectedUid,
       lastSeen: data.profile?.lastSeen || null,
       completionsCount: data.progress?.completions ? Object.keys(data.progress.completions).length : 0,
       totalReps: lbEntry.totalReps || 0,
       weightsTotalReps: lbEntry.weightsTotalReps || 0,
-      achievements: lbEntry.achievements || 0,
+      // Badge count lives in publicProfiles (function-computed), not the leaderboard entry.
+      achievements: publicProfile.achievements || 0,
       lastActiveDay: lbEntry.lastActiveDay || null,
       lastCompletionChange: data.progress?.lastCompletionChange || null,
     };

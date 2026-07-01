@@ -7,12 +7,17 @@ vi.mock('@hooks/useBackHandler', () => ({ useBackHandler: vi.fn() }));
 import { Achievements } from '../Achievements';
 import { buildBadges } from '../buildBadges';
 
-const STATS = {
+// Badge inputs live in the shared `badgeStats` snapshot; `achievements` carries
+// the manual overrides. The grid reads exactly these (see Achievements.jsx).
+const BADGE_STATS = {
   totalDays: 12, maxStreak: 7, totalRepsAll: 1200, perfectDays: 5,
   hasCompletedAllExercisesOnce: true, weekdayWorkouts: 26, weekendWorkouts: 2,
   morningWorkouts: 6, afternoonWorkouts: 3, eveningWorkouts: 3,
-  ghostWorkout: false, perfectStreak: 3, hasShared: true, achievements: {},
+  ghostWorkout: false, perfectStreak: 3,
 };
+const STATS = { badgeStats: BADGE_STATS, achievements: {} };
+// The snapshot buildBadges consumes = badge stats + the manual override map.
+const BADGE_INPUT = { ...BADGE_STATS, achievements: {} };
 
 function renderPanel(props = {}) {
   const onClose = vi.fn();
@@ -25,7 +30,7 @@ afterEach(() => cleanup()); // no global auto-cleanup configured → unmount bet
 
 describe('Achievements', () => {
   it('renders the unlocked count from buildBadges', () => {
-    const expectedUnlocked = buildBadges(STATS).filter(b => b.unlocked).length;
+    const expectedUnlocked = buildBadges(BADGE_INPUT).filter(b => b.unlocked).length;
     const { container } = renderPanel();
     // hero shows the unlocked count
     expect(container.textContent).toContain(String(expectedUnlocked));
@@ -38,7 +43,7 @@ describe('Achievements', () => {
     const totalBadges = container.querySelectorAll('[data-badge-id]').length;
     fireEvent.click(getByRole('button', { name: 'achievements.filterUnlocked' }));
     const shown = container.querySelectorAll('[data-badge-id]').length;
-    const unlocked = buildBadges(STATS).filter(b => b.unlocked).length;
+    const unlocked = buildBadges(BADGE_INPUT).filter(b => b.unlocked).length;
     expect(shown).toBe(unlocked);
     expect(shown).toBeLessThanOrEqual(totalBadges);
   });
@@ -47,7 +52,7 @@ describe('Achievements', () => {
     const { getByRole, container } = renderPanel();
     fireEvent.click(getByRole('button', { name: 'achievements.filterLocked' }));
     const ids = [...container.querySelectorAll('[data-badge-id]')].map(e => e.getAttribute('data-badge-id'));
-    const lockedIds = buildBadges(STATS).filter(b => !b.unlocked).map(b => b.id);
+    const lockedIds = buildBadges(BADGE_INPUT).filter(b => !b.unlocked).map(b => b.id);
     expect(ids.every(id => lockedIds.includes(id))).toBe(true);
   });
 
@@ -68,7 +73,7 @@ describe('Achievements', () => {
   });
 
   it('highlights the deep-linked badge', () => {
-    const firstId = buildBadges(STATS)[0].id;
+    const firstId = buildBadges(BADGE_INPUT)[0].id;
     const { container } = renderPanel({ highlightedBadgeId: firstId });
     const el = container.querySelector(`[data-badge-id="${firstId}"]`);
     expect(el).toBeTruthy();

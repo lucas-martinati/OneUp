@@ -16,7 +16,7 @@ describe('useNewAchievement', () => {
     });
 
     it('does not detect badges during initial hydration phase (<2500ms)', () => {
-        const stats = { totalDays: 0 };
+        const stats = { badgeStats: { totalDays: 0 } };
         // We mock isBadgeUnlocked to always return true for 'first_blood' just for test
         vi.spyOn(badgeDefinitions, 'isBadgeUnlocked').mockImplementation((id) => id === 'first_blood');
 
@@ -26,14 +26,14 @@ describe('useNewAchievement', () => {
         );
 
         expect(result.current.achievement).toBeNull();
-        
+
         // Fast forward 1000ms, still not ready
         act(() => {
             vi.advanceTimersByTime(1000);
         });
-        
-        rerender({ computedStats: { ...stats, totalDays: 1 } });
-        
+
+        rerender({ computedStats: { badgeStats: { totalDays: 1 } } });
+
         expect(result.current.achievement).toBeNull();
     });
 
@@ -42,7 +42,7 @@ describe('useNewAchievement', () => {
         let mockedUnlocked = new Set();
         vi.spyOn(badgeDefinitions, 'isBadgeUnlocked').mockImplementation((id) => mockedUnlocked.has(id));
 
-        const stats = { totalDays: 0 };
+        const stats = { badgeStats: { totalDays: 0 } };
         const { result, rerender } = renderHook(
             ({ computedStats }) => useNewAchievement(computedStats, tMock),
             { initialProps: { computedStats: stats } }
@@ -57,11 +57,11 @@ describe('useNewAchievement', () => {
         rerender({ computedStats: stats });
         expect(result.current.achievement).toBeNull();
 
-        // Now unlock a badge and rerender
+        // Now unlock a badge and rerender (new badgeStats reference re-runs the effect)
         mockedUnlocked.add('first_blood');
-        
+
         act(() => {
-            rerender({ computedStats: { ...stats, totalDays: 1 } });
+            rerender({ computedStats: { badgeStats: { totalDays: 1 } } });
         });
 
         // Since setNewAchievement uses queueMicrotask, we need to wait a tick
@@ -74,7 +74,7 @@ describe('useNewAchievement', () => {
         let mockedUnlocked = new Set();
         vi.spyOn(badgeDefinitions, 'isBadgeUnlocked').mockImplementation((id) => mockedUnlocked.has(id));
 
-        const stats = { totalDays: 0 };
+        const stats = { badgeStats: { totalDays: 0 } };
         const { result, rerender } = renderHook(
             ({ computedStats }) => useNewAchievement(computedStats, tMock),
             { initialProps: { computedStats: stats } }
@@ -85,9 +85,9 @@ describe('useNewAchievement', () => {
         });
 
         mockedUnlocked.add('hundred_sessions');
-        
+
         act(() => {
-            rerender({ computedStats: { ...stats, totalDays: 100 } });
+            rerender({ computedStats: { badgeStats: { totalDays: 100 } } });
         });
 
         expect(result.current.achievement).not.toBeNull();

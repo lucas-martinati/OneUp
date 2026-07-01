@@ -26,6 +26,11 @@ const EMPTY_STATS = {
     trackedCount: 0,
     hasCompletedAllExercisesOnce: false, ghostWorkout: false,
     perfectStreak: 0, hasShared: false, achievements: {},
+    badgeStats: {
+        totalDays: 0, perfectDays: 0, weekdayWorkouts: 0, weekendWorkouts: 0,
+        morningWorkouts: 0, afternoonWorkouts: 0, eveningWorkouts: 0, ghostWorkout: false,
+        hasCompletedAllExercisesOnce: false, maxStreak: 0, perfectStreak: 0, totalRepsAll: 0,
+    },
     badgeCount: 0, totalRepsAll: 0, totalExerciseReps: {},
     bestDayDate: null, bestDayReps: 0, bestDayExCount: 0, bestDayExReps: {},
     monthlyActivityByExercise: [], monthlyActivityTotal: Array(12).fill(0),

@@ -264,21 +264,17 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
         }
     };
 
-    // Extract stats
-    const {
-        totalDays, maxStreak, totalRepsAll, perfectDays,
-        hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts,
-        morningWorkouts, afternoonWorkouts, eveningWorkouts,
-        ghostWorkout, perfectStreak, hasShared, achievements
-    } = computedStats;
+    // Extract stats. Badge unlock/progress reads from `badgeStats` — the shared
+    // snapshot (@shared/achievementStats.js) also used by the Cloud Function — so
+    // this grid and its unlocked count match the number published to the
+    // leaderboard/admin exactly. `achievements` still carries the manual overrides.
+    const { badgeStats, achievements } = computedStats;
 
     // Memoize the badge list from the single source of truth
-    const statsSnapshot = useMemo(() => ({
-        totalDays, maxStreak, totalRepsAll, perfectDays,
-        hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts,
-        morningWorkouts, afternoonWorkouts, eveningWorkouts,
-        ghostWorkout, perfectStreak, hasShared, achievements
-    }), [totalDays, maxStreak, totalRepsAll, perfectDays, hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts, morningWorkouts, afternoonWorkouts, eveningWorkouts, ghostWorkout, perfectStreak, hasShared, achievements]);
+    const statsSnapshot = useMemo(
+        () => ({ ...(badgeStats || {}), achievements }),
+        [badgeStats, achievements]
+    );
 
     const badges = useMemo(() => buildBadges(statsSnapshot), [statsSnapshot]);
 

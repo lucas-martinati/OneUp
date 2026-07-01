@@ -22,22 +22,9 @@ export function useNewAchievement(computedStats, t) {
     }, []);
 
     useEffect(() => {
-        // Collect current stats needed for badge testing
-        const statsSnapshot = {
-            totalDays: computedStats.totalDays,
-            maxStreak: computedStats.maxStreak,
-            totalRepsAll: computedStats.totalRepsAll,
-            perfectDays: computedStats.perfectDays,
-            hasCompletedAllExercisesOnce: computedStats.hasCompletedAllExercisesOnce,
-            weekdayWorkouts: computedStats.weekdayWorkouts,
-            weekendWorkouts: computedStats.weekendWorkouts,
-            morningWorkouts: computedStats.morningWorkouts,
-            afternoonWorkouts: computedStats.afternoonWorkouts,
-            eveningWorkouts: computedStats.eveningWorkouts,
-            ghostWorkout: computedStats.ghostWorkout,
-            perfectStreak: computedStats.perfectStreak,
-            hasShared: computedStats.hasShared,
-        };
+        // Badge testing reads the shared snapshot (@shared/achievementStats.js) so
+        // the toast fires for exactly the badges the leaderboard count reflects.
+        const statsSnapshot = computedStats.badgeStats || {};
 
         const currentManual = computedStats.achievements || {};
         
@@ -75,13 +62,7 @@ export function useNewAchievement(computedStats, t) {
 
         // Update the ref for next comparison
         prevUnlockedIdsRef.current = currentUnlockedIds;
-    }, [
-        computedStats.badgeCount, computedStats.totalDays, computedStats.maxStreak, computedStats.totalRepsAll,
-        computedStats.perfectDays, computedStats.hasCompletedAllExercisesOnce, computedStats.weekdayWorkouts,
-        computedStats.weekendWorkouts, computedStats.morningWorkouts, computedStats.afternoonWorkouts,
-        computedStats.eveningWorkouts, computedStats.ghostWorkout, computedStats.perfectStreak,
-        computedStats.hasShared, computedStats.achievements, t, isReady
-    ]);
+    }, [computedStats.badgeCount, computedStats.badgeStats, computedStats.achievements, t, isReady]);
 
     // Callback pour fermer le toast
     const clearAchievement = useCallback(() => setNewAchievement(null), []);

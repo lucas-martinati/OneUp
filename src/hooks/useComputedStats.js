@@ -4,6 +4,7 @@ import { EXERCISES, getDailyGoal } from '@config/exercises';
 import { evaluateCardioWeek } from '@utils/cardioStreak';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '@config/badgeDefinitions';
+import { computeAchievementStats } from '@shared/achievementStats.js';
 import { isGlobalPerfectDay } from '@utils/statUtils';
 
 /**
@@ -430,16 +431,16 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         dailyRepsData.push({ date: dateStr, reps: dayReps });
     });
 
-    // Stats snapshot for badge testing
-    const statsSnapshot = {
-        totalDays, maxStreak: finalMaxStreak, totalRepsAll: globalTotalReps, perfectDays,
-        hasCompletedAllExercisesOnce, weekdayWorkouts, weekendWorkouts,
-        morningWorkouts, afternoonWorkouts, eveningWorkouts,
-        ghostWorkout, perfectStreak: maxPerfectStreak, hasShared,
-    };
+    // Badge stats snapshot — computed by the SAME shared function the Cloud
+    // Function uses (@shared/achievementStats.js). This is the single source of
+    // truth for badge inputs, so the count on the Stats page matches the count
+    // published to publicProfiles (leaderboard detail + admin) instead of drifting
+    // between two separate implementations. The local counters above (weekday/
+    // time-of-day…) still feed the charts, which stay device-local by design.
+    const badgeStats = computeAchievementStats(completions, globalTotalReps, frozenDays);
 
-    // Badge count (supports manual overrides)
-    const badgeCount = BADGE_DEFINITIONS.filter(b => isBadgeUnlocked(b.id, statsSnapshot, achievements)).length;
+    // Badge count (supports manual overrides via the achievements node)
+    const badgeCount = BADGE_DEFINITIONS.filter(b => isBadgeUnlocked(b.id, badgeStats, achievements)).length;
 
     // ─── Return everything ───────────────────────────────────────────────
     return {
@@ -484,6 +485,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         perfectStreak: maxPerfectStreak,
         hasShared,
         achievements,
+        badgeStats,
         badgeCount,
         totalRepsAll: globalTotalReps,
         totalExerciseReps: exerciseReps,
