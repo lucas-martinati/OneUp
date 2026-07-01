@@ -14,12 +14,14 @@
  * snapshot they consume. Keep it import-light (only exerciseRules) so both the
  * Node function runtime and the Vite client bundle can load it unchanged.
  *
- * IMPORTANT — time-of-day derivation: workout timestamps are stored in UTC while
- * the badge day key (`dateStr`) is the user's LOCAL date. We derive the hour as
- * the offset from the local day's UTC-midnight so client and server compute the
- * EXACT same value from the EXACT same inputs. It is not the true wall-clock hour
- * for users far from UTC, but it is deterministic and — crucially — consistent
- * across both runtimes, which is what keeps the badge count in sync everywhere.
+ * IMPORTANT — time-of-day badges (morning/afternoon/evening + the 3-4am "ghost"):
+ * each completion stores `localHour`, the device's wall-clock hour captured at
+ * completion time (see useProgressStore.js). Both runtimes read it, so these
+ * badges are BOTH correct AND identical everywhere. Legacy entries that predate
+ * the field fall back to `badgeLocalHour` — the hour derived from the UTC
+ * timestamp vs the local day's UTC-midnight: deterministic and consistent across
+ * runtimes, but only an approximation of the true local hour (unrecoverable for
+ * old data). The narrow 1-hour ghost window is why the exact field matters.
  */
 
 import {
@@ -76,14 +78,16 @@ export function computeAchievementStats(completions, totalRepsAll, frozenDays = 
     for (const [exId, exData] of Object.entries(day)) {
       if (!exData?.isCompleted) continue;
       if (ALL_STANDARD_IDS.has(exId)) completedStandard.add(exId);
-      if (exData.timestamp) {
-        const h = badgeLocalHour(dateStr, exData.timestamp);
-        if (h !== null) {
-          if (h < 12) hasMorning = true;
-          else if (h < 18) hasAfternoon = true;
-          else hasEvening = true;
-          if (h >= 3 && h < 4) ghostWorkout = true;
-        }
+      // Prefer the true local hour captured at completion time; fall back to the
+      // UTC-derived approximation only for legacy entries that predate the field.
+      const h = Number.isInteger(exData.localHour)
+        ? exData.localHour
+        : (exData.timestamp ? badgeLocalHour(dateStr, exData.timestamp) : null);
+      if (h !== null) {
+        if (h < 12) hasMorning = true;
+        else if (h < 18) hasAfternoon = true;
+        else hasEvening = true;
+        if (h >= 3 && h < 4) ghostWorkout = true;
       }
     }
     if (hasMorning) morningWorkouts++;

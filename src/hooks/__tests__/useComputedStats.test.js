@@ -266,3 +266,30 @@ describe('computeAllStats — cardio-only dashboard (weekly streaks)', () => {
     expect(stats.exerciseMaxStreaks.running).toBe(0);
   });
 });
+
+describe('computeAllStats — badge time-of-day from stored localHour', () => {
+  // Each completion carries `localHour` (the real wall-clock hour captured at
+  // completion time). badgeStats must read it, so time-of-day badges — including
+  // the narrow 3-4am "ghost" — are correct regardless of the UTC timestamp.
+  const dayAt = (day, hour) => ({
+    pushups: { isCompleted: true, count: 10, timestamp: `${day}T00:00:00`, localHour: hour },
+    squats: { isCompleted: true, count: 10, timestamp: `${day}T00:00:00`, localHour: hour },
+  });
+
+  it('fires the ghost badge from a 3am localHour even when the UTC timestamp is midnight', () => {
+    const completions = { [dateStr(0)]: dayAt(dateStr(0), 3) };
+    const stats = computeAllStats(completions, settings, getDayNumber, allExercises, false, {}, getConfig);
+    expect(stats.badgeStats.ghostWorkout).toBe(true);
+    expect(stats.badgeStats.morningWorkouts).toBe(1);
+  });
+
+  it('buckets afternoon and evening hours from localHour', () => {
+    const afternoon = dateStr(1);
+    const evening = dateStr(2);
+    const completions = { [afternoon]: dayAt(afternoon, 14), [evening]: dayAt(evening, 21) };
+    const stats = computeAllStats(completions, settings, getDayNumber, allExercises, false, {}, getConfig);
+    expect(stats.badgeStats.afternoonWorkouts).toBe(1);
+    expect(stats.badgeStats.eveningWorkouts).toBe(1);
+    expect(stats.badgeStats.ghostWorkout).toBe(false);
+  });
+});

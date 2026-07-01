@@ -20,6 +20,10 @@ export function sanitizeForCloud(data) {
       sanitizedDay[exerciseId] = {
         isCompleted: ex.isCompleted || false,
         timestamp: ex.timestamp || null,
+        // Sync the local completion hour so the Cloud Function can compute the
+        // time-of-day badges (incl. the 3-4am ghost) from the user's real hour
+        // rather than an unrecoverable UTC approximation — see @shared/achievementStats.
+        ...(Number.isInteger(ex.localHour) ? { localHour: ex.localHour } : {}),
         ...(ex.weight !== undefined ? { weight: ex.weight } : {}),
         ...(ex.difficulty !== undefined ? { difficulty: ex.difficulty } : {})
       };

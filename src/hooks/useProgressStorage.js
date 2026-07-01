@@ -67,6 +67,7 @@ function migrateLegacyEntry(entry) {
       migrated[key] = {
         isCompleted: val.isCompleted !== undefined ? val.isCompleted : (val.done || false),
         timestamp: val.timestamp || null,
+        ...(Number.isInteger(val.localHour) ? { localHour: val.localHour } : {}),
         ...(val.count !== undefined ? { count: val.count } : {}),
         ...(val.weight !== undefined ? { weight: val.weight } : {}),
         ...(val.difficulty !== undefined ? { difficulty: val.difficulty } : {})

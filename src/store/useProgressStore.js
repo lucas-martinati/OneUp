@@ -66,7 +66,13 @@ function makeAllDone(selectedExercises = null, difficulties = {}, includeTimesta
     const diff = difficulties[ex.id];
     entry[ex.id] = {
       isCompleted: true,
-      ...(includeTimestamp ? { timestamp: serverTimestamp() } : {}),
+      // Capture the device's local hour at completion time. Time-of-day badges
+      // (morning/afternoon/evening + the 3-4am "ghost") need the real wall-clock
+      // hour, which can't be recovered from the stored UTC timestamp server-side.
+      // Both the client and the Cloud Function read this field — see
+      // @shared/achievementStats.js — falling back to a UTC approximation only for
+      // legacy entries that predate it.
+      ...(includeTimestamp ? { timestamp: serverTimestamp(), localHour: new Date().getHours() } : {}),
       // Lock a non-default completion difficulty onto the day so a later global
       // change can't retroactively alter it. 1.0 is the max (full reps) and needs
       // no lock — lowering the goal later still leaves the day done — so it is
@@ -327,9 +333,13 @@ export const useProgressStore = create((set, get) => ({
       const isNowDone = finalCount >= dailyGoal;
       const wasDone = current.isCompleted || false;
       let timestamp = current.timestamp;
+      // Preserve the local hour across count edits; refresh it only when the
+      // exercise transitions to done (see makeAllDone for the rationale).
+      let localHour = current.localHour;
 
       if (wasDone !== isNowDone) {
         timestamp = serverTimestamp();
+        if (isNowDone) localHour = new Date().getHours();
       }
 
       // Lock the completion-time difficulty onto the day so later global changes
@@ -341,6 +351,7 @@ export const useProgressStore = create((set, get) => ({
         count: finalCount,
         isCompleted: isNowDone,
         timestamp,
+        ...(Number.isInteger(localHour) ? { localHour } : {}),
         ...((weight !== null && weight !== undefined) ? { weight } : {}),
         ...((lockedDifficulty !== null && lockedDifficulty !== undefined && lockedDifficulty !== 1.0) ? { difficulty: lockedDifficulty } : {}),
       };
@@ -573,10 +584,15 @@ export const useProgressStore = create((set, get) => ({
                 const weight = guestEx.weight !== undefined && guestEx.weight !== null ? guestEx.weight : userEx.weight;
                 const difficulty = guestEx.difficulty !== undefined && guestEx.difficulty !== null ? guestEx.difficulty : userEx.difficulty;
                 
-                // 4. Prefer newer timestamp
+                // 4. Prefer newer timestamp — and keep the localHour that was
+                // captured alongside it so time-of-day badges stay coherent.
                 const userTs = getTsMs(userEx.timestamp);
                 const guestTs = getTsMs(guestEx.timestamp);
-                const timestamp = guestTs > userTs ? guestEx.timestamp : userEx.timestamp;
+                const preferGuest = guestTs > userTs;
+                const timestamp = preferGuest ? guestEx.timestamp : userEx.timestamp;
+                const primaryLocalHour = preferGuest ? guestEx.localHour : userEx.localHour;
+                const fallbackLocalHour = preferGuest ? userEx.localHour : guestEx.localHour;
+                const localHour = Number.isInteger(primaryLocalHour) ? primaryLocalHour : fallbackLocalHour;
 
                 userDay[exId] = {
                   isCompleted,
@@ -584,6 +600,7 @@ export const useProgressStore = create((set, get) => ({
                   ...(weight !== undefined && weight !== null ? { weight } : {}),
                   ...(difficulty !== undefined && difficulty !== null ? { difficulty } : {}),
                   ...(timestamp ? { timestamp } : {}),
+                  ...(Number.isInteger(localHour) ? { localHour } : {}),
                 };
               }
             }
