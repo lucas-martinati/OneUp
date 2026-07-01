@@ -122,6 +122,10 @@ describe('Calendar swipe and touch events', () => {
   });
 
   it('handles vertical swipe to close DayDetail', async () => {
+    // Pin "today" to June so the calendar opens on the month holding 2026-06-19,
+    // independent of the real clock (otherwise it drifts once the month changes).
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-06-20'));
     render(<Calendar {...defaultProps} />);
     // Click on a day to open DayDetail
     fireEvent.click(screen.getByRole('button', { name: '19 Junio' }));
