@@ -79,15 +79,19 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
         expect(r.changed).toBe(true);
     });
 
-    it('does NOT waste a freeze when the gap is bigger than the stock', () => {
+    it('consumes sequentially and breaks when the gap outlasts the stock', () => {
+        // Passive 2-day absence with a single freeze: protect the FIRST missed day
+        // (06-21), then break the streak on the second (06-22, left unfrozen).
         const completions = { '2026-06-20': done() }; // 06-21 & 06-22 both missed
         const r = reconcileStreakFreezeState({
             ...base, completions,
             frozenDays: {}, streakFreezes: { count: 1, lastRefill: '2026-06' },
         });
-        expect(r.frozeDates).toEqual([]);
-        expect(r.streakFreezes.count).toBe(1);
-        expect(r.changed).toBe(false);
+        expect(r.frozeDates).toEqual(['2026-06-21']); // oldest missed day only
+        expect(r.frozenDays['2026-06-21']).toBe(true);
+        expect(r.frozenDays['2026-06-22']).toBeUndefined(); // second day breaks the streak
+        expect(r.streakFreezes.count).toBe(0);
+        expect(r.changed).toBe(true);
     });
 
     it('bridges a 2-day gap when enough freezes are stocked', () => {
@@ -145,10 +149,53 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
             ...base, completions,
             frozenDays: {}, streakFreezes: { count: 1, lastRefill: '2026-05' },
         });
-        // free refill 0→1 then 1→1+1=... wait: starts at 1, new month tops up to 2, then spends 1.
+        // Consume first (spend the 1 banked freeze on 06-22 → 0), THEN refill for
+        // the new month: min(maxStock 2, 0 + perMonth 1) = 1.
         expect(r.streakFreezes.lastRefill).toBe('2026-06');
         expect(r.frozeDates).toEqual(['2026-06-22']);
-        expect(r.streakFreezes.count).toBe(1); // min(2, 1+1)=2, minus 1 spent
+        expect(r.streakFreezes.count).toBe(1);
+    });
+
+    it('never rescues a previous month with the new month\'s fresh allotment', () => {
+        // Pro user, streak up to 05-29, then 05-30 & 05-31 missed with an EMPTY
+        // stock. Opening on 06-01 must NOT let the June refill bridge May's misses.
+        const completions = { '2026-05-29': done() };
+        const r = reconcileStreakFreezeState({
+            ...base, isPro: true, todayStr: '2026-06-01',
+            completions, frozenDays: {},
+            streakFreezes: { count: 0, lastRefill: '2026-05' },
+        });
+        expect(r.frozeDates).toEqual([]);                 // nothing frozen retroactively
+        expect(r.frozenDays['2026-05-30']).toBeUndefined();
+        expect(r.frozenDays['2026-05-31']).toBeUndefined();
+        expect(r.streakFreezes.count).toBe(3);            // just the normal Pro top-up
+        expect(r.streakFreezes.lastRefill).toBe('2026-06');
+    });
+
+    it('spends only banked freezes across a month boundary, then tops up', () => {
+        // Same boundary but the user held 1 freeze in May: it protects the FIRST
+        // missed day (05-30), the second breaks the streak, THEN June tops up.
+        const completions = { '2026-05-29': done() };
+        const r = reconcileStreakFreezeState({
+            ...base, isPro: true, todayStr: '2026-06-01',
+            completions, frozenDays: {},
+            streakFreezes: { count: 1, lastRefill: '2026-05' },
+        });
+        expect(r.frozeDates).toEqual(['2026-05-30']);
+        expect(r.frozenDays['2026-05-31']).toBeUndefined();
+        expect(r.streakFreezes.count).toBe(3);            // min(6, 0 + 3) after spending the 1
+    });
+
+    it('bridges a full multi-day passive gap when the stock covers it (Pro)', () => {
+        // Pro absent 3 days with 3 freezes: every missed day is protected in order.
+        const completions = { '2026-06-19': done() };
+        const r = reconcileStreakFreezeState({
+            ...base, isPro: true,
+            completions, frozenDays: {},
+            streakFreezes: { count: 3, lastRefill: '2026-06' },
+        });
+        expect(r.frozeDates.sort()).toEqual(['2026-06-20', '2026-06-21', '2026-06-22']);
+        expect(r.streakFreezes.count).toBe(0);
     });
 });
 
