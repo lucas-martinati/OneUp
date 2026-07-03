@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Plus, Settings2, Trash2, Edit2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, Check } from '@utils/icons';
-import { Button, IconButton } from '@components/ui';
+import { Button, IconButton, Slider } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { MAX_EXERCISES_PER_CATEGORY } from '@store/useExercisesStore';
@@ -401,21 +401,18 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '16px', marginTop: 0, lineHeight: 1.4 }}>
                   {t('customExercises.multiplierHint', { value: multiplier.toFixed(1), unit: type === 'timer' ? `(${t('customExercises.seconds')})` : `(${t('customExercises.repetitions')})` })}
                 </p>
-                <input
-                  type="range"
-                  className="premium-slider"
-                  min="0.1" max="5" step="0.1"
+                <Slider
+                  min={0.1}
+                  max={5}
+                  step={0.1}
                   value={multiplier}
+                  color={color}
+                  onChange={setMultiplier}
                   // On release, take focus out of the name field (and dismiss the
                   // mobile keyboard) if it was being edited — done on pointer-up so
                   // the keyboard doesn't close mid-drag and shift the layout.
                   onPointerUp={() => nameInputRef.current?.blur()}
-                  onChange={e => setMultiplier(parseFloat(e.target.value))}
-                  style={{ 
-                    width: '100%', 
-                    '--slider-color': color,
-                    background: `linear-gradient(to right, ${color} ${((multiplier - 0.1) / 4.9) * 100}%, var(--surface-muted) ${((multiplier - 0.1) / 4.9) * 100}%)`
-                  }}
+                  style={{ width: '100%' }}
                 />
               </div>
             )}

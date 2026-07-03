@@ -10,6 +10,7 @@ export { GoogleSignInButton } from './GoogleSignInButton';
 export { IconButton } from './IconButton';
 export { SegmentedControl } from './SegmentedControl';
 export { SettingRow } from './SettingRow';
+export { Slider } from './Slider';
 export { Spinner } from './Spinner';
 export { Stack } from './Stack';
 export { StreakFlame } from './StreakFlame';

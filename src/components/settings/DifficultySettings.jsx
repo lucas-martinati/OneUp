@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Lock, Unlock } from '@utils/icons';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
+import { Slider } from '@components/ui';
 import { useSubscription } from '@contexts/SubscriptionContext';
 import { EXERCISES, CARDIO_EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
@@ -114,7 +115,6 @@ export function DifficultySettings() {
                                     {exList.map(ex => {
                                         const val = getConfig(ex.id).difficulty;
                                         const exColor = ex.color || CATEGORY_COLORS[catKey];
-                                        const percentage = ((val - 0.1) / 0.9) * 100;
                                         return (
                                             <div key={ex.id} className="flex-col gap-8">
                                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -125,19 +125,13 @@ export function DifficultySettings() {
                                                         x{val.toFixed(1)}
                                                     </span>
                                                 </div>
-                                                <input
-                                                    type="range"
-                                                    className="premium-slider"
-                                                    min="0.1" max="1.0" step="0.1"
+                                                <Slider
+                                                    min={0.1}
+                                                    max={1}
+                                                    step={0.1}
                                                     value={val}
-                                                    onChange={(e) => {
-                                                        const newVal = Math.min(1.0, Math.max(0.1, parseFloat(e.target.value)));
-                                                        updateConfig(ex.id, { difficulty: newVal });
-                                                    }}
-                                                    style={{
-                                                        '--slider-color': exColor,
-                                                        background: `linear-gradient(to right, ${exColor} ${percentage}%, var(--surface-muted) ${percentage}%)`
-                                                    }}
+                                                    color={exColor}
+                                                    onChange={(newVal) => updateConfig(ex.id, { difficulty: newVal })}
                                                 />
                                             </div>
                                         );

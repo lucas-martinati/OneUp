@@ -6,6 +6,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 import { SegmentedControl } from '../SegmentedControl';
+import { Slider } from '../Slider';
 import { ToggleSwitch } from '../ToggleSwitch';
 import { ThemeSwatch } from '../ThemeSwatch';
 import { SettingRow } from '../SettingRow';
@@ -85,6 +86,50 @@ describe('ToggleSwitch', () => {
     rerender(<ToggleSwitch enabled onClick={() => {}} />);
     expect(getByRole('switch').className).toContain('toggle--on');
     expect(container.querySelector('.toggle-knob').className).toContain('squish');
+  });
+});
+
+// ── Slider ──────────────────────────────────────────────────────────────
+
+describe('Slider', () => {
+  it('tracks the drag continuously but commits values snapped to the step', () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Slider min={0.1} max={1} step={0.1} value={0.5} onChange={onChange} />
+    );
+    const input = container.querySelector('input[type="range"]');
+    fireEvent.change(input, { target: { value: '0.5678' } });
+    expect(onChange).toHaveBeenCalledWith(0.6);
+    // The thumb itself follows the raw (unsnapped) drag position
+    expect(input.value).toBe('0.5678');
+  });
+
+  it('does not re-commit when the snapped value is unchanged', () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Slider min={0.1} max={1} step={0.1} value={0.5} onChange={onChange} />
+    );
+    fireEvent.change(container.querySelector('input'), { target: { value: '0.52' } });
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('clamps the committed value to [min, max]', () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Slider min={0.1} max={1} step={0.1} value={0.5} onChange={onChange} />
+    );
+    fireEvent.change(container.querySelector('input'), { target: { value: '0.04' } });
+    expect(onChange).toHaveBeenCalledWith(0.1);
+  });
+
+  it('settles back onto the committed value on release', () => {
+    const { container } = render(
+      <Slider min={0.1} max={1} step={0.1} value={0.5} onChange={() => {}} />
+    );
+    const input = container.querySelector('input');
+    fireEvent.change(input, { target: { value: '0.5678' } });
+    fireEvent.pointerUp(input);
+    expect(input.value).toBe('0.5');
   });
 });
 

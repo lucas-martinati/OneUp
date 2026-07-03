@@ -72,7 +72,21 @@ We do not sell, trade, or rent your personal information to third parties. We ma
 
 ---
 
-## 6. Your Rights
+## 6. Data Security & Protection
+
+We take the security of your data seriously, especially sensitive data such as health and fitness information obtained from Google APIs. We employ the following data protection mechanisms:
+
+- **Encryption in Transit:** All data transmitted between the OneUp app, our servers, and third-party APIs is encrypted using industry-standard HTTPS/TLS protocols.
+- **Encryption at Rest:** Your data is securely stored in Firebase Firestore, which encrypts all data at rest by default.
+- **Access Control:** Access to your personal and sensitive data is strictly limited to your authenticated session, secured via robust OAuth 2.0 protocols.
+
+### Google API Services Usage & Limited Use
+
+OneUp's use and transfer to any other app of information received from Google APIs will adhere to the [Google API Services User Data Policy](https://developers.google.com/terms/api-services-user-data-policy), including the Limited Use requirements. We do not use your sensitive health data for advertising, and we do not share it with data brokers.
+
+---
+
+## 7. Your Rights
 
 Depending on your location, you may have the right to:
 - Access the personal data we hold about you.
@@ -84,7 +98,7 @@ To exercise any of these rights, contact us at the email address below.
 
 ---
 
-## 7. Contact Us
+## 8. Contact Us
 
 If you have any questions about this Privacy Policy or wish to exercise your data rights, please contact us at:
 
