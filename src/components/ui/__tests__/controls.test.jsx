@@ -57,21 +57,34 @@ describe('SegmentedControl', () => {
 describe('ToggleSwitch', () => {
   it('uses the "disable" label and active gradient when enabled', () => {
     const { getByRole } = render(<ToggleSwitch enabled onClick={() => {}} activeGradient="linear-gradient(1deg, #000, #111)" />);
-    const btn = getByRole('button');
+    const btn = getByRole('switch');
     expect(btn.getAttribute('aria-label')).toBe('settings.disable');
+    expect(btn.getAttribute('aria-checked')).toBe('true');
+    expect(btn.className).toContain('toggle--on');
     expect(btn.style.background).toContain('linear-gradient');
   });
 
   it('uses the "enable" label when disabled', () => {
     const { getByRole } = render(<ToggleSwitch enabled={false} onClick={() => {}} />);
-    expect(getByRole('button').getAttribute('aria-label')).toBe('settings.enable');
+    const btn = getByRole('switch');
+    expect(btn.getAttribute('aria-label')).toBe('settings.enable');
+    expect(btn.getAttribute('aria-checked')).toBe('false');
+    expect(btn.className).not.toContain('toggle--on');
   });
 
   it('fires onClick', () => {
     const onClick = vi.fn();
     const { getByRole } = render(<ToggleSwitch enabled={false} onClick={onClick} />);
-    fireEvent.click(getByRole('button'));
+    fireEvent.click(getByRole('switch'));
     expect(onClick).toHaveBeenCalled();
+  });
+
+  it('replays the squish animation when the state flips', () => {
+    const { getByRole, container, rerender } = render(<ToggleSwitch enabled={false} onClick={() => {}} />);
+    expect(container.querySelector('.toggle-knob').className).not.toContain('squish');
+    rerender(<ToggleSwitch enabled onClick={() => {}} />);
+    expect(getByRole('switch').className).toContain('toggle--on');
+    expect(container.querySelector('.toggle-knob').className).toContain('squish');
   });
 });
 

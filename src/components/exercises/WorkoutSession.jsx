@@ -1,5 +1,5 @@
 import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle, ChevronUp, ChevronDown, DynamicIcon } from '@utils/icons';
-import { IconButton } from '@components/ui';
+import { IconButton, ToggleSwitch } from '@components/ui';
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { Z_INDEX } from '@utils/zIndex';
 import { SessionSummary } from './SessionSummary';
@@ -261,21 +261,17 @@ export function WorkoutSession(props) {
                                     {t('workout.interDashboardDesc')}
                                 </div>
                             </div>
-                            <label className="toggle-switch">
-                                <input 
-                                    type="checkbox" 
-                                    checked={showAll} 
-                                    onChange={(e) => {
-                                        const checked = e.target.checked;
-                                        setShowAll(checked);
-                                        if (!checked) {
-                                            const localIds = new Set(localExercises.map(ex => ex.id));
-                                            setQueue(prev => prev.filter(id => localIds.has(id)));
-                                        }
-                                    }} 
-                                />
-                                <span className="slider"></span>
-                            </label>
+                            <ToggleSwitch
+                                enabled={showAll}
+                                onClick={() => {
+                                    const checked = !showAll;
+                                    setShowAll(checked);
+                                    if (!checked) {
+                                        const localIds = new Set(localExercises.map(ex => ex.id));
+                                        setQueue(prev => prev.filter(id => localIds.has(id)));
+                                    }
+                                }}
+                            />
                         </div>
                     )}
 
