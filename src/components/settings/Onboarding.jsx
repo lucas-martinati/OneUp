@@ -87,15 +87,19 @@ export function Onboarding({ onStart }) {
     return (
         <div className="fade-in" style={{
             position: 'relative',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
             height: '100%', textAlign: 'center',
-            gap: 'clamp(16px, 3vh, 32px)', padding: 'var(--spacing-md)'
+            gap: 'clamp(12px, 2.5vh, 32px)',
+            // Top padding clears the fixed language switcher when content scrolls
+            padding: '48px var(--spacing-md) var(--spacing-sm)',
+            overflowY: 'auto', overflowX: 'hidden'
         }}>
             {/* Discreet language switcher */}
             <LanguageSwitcher i18n={i18n} />
 
-            {/* Title + sub-header */}
-            <div style={{ maxWidth: '380px' }}>
+            {/* Title + sub-header — marginTop auto pairs with the footer's
+                marginBottom auto: centers the group when it fits, scrolls when not */}
+            <div style={{ maxWidth: '380px', marginTop: 'auto', flexShrink: 0 }}>
                 <h1 className="rainbow-gradient" style={{
                     fontSize: 'clamp(2.4rem, 7vw, 3.5rem)',
                     marginBottom: 'var(--spacing-xs)', fontWeight: '800', letterSpacing: '-1px'
@@ -117,10 +121,10 @@ export function Onboarding({ onStart }) {
                 key={step}
                 className={step === 1 ? 'glass-premium scale-in' : 'glass-premium flip-enter'}
                 style={{
-                    padding: 'clamp(16px, 3vw, 28px)', borderRadius: 'var(--radius-xl)',
-                    width: '100%', maxWidth: '420px',
-                    display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)',
-                    minHeight: 'clamp(240px, 40vh, 320px)', justifyContent: 'center',
+                    padding: 'clamp(14px, 3vw, 28px)', borderRadius: 'var(--radius-xl)',
+                    width: '100%', maxWidth: '420px', flexShrink: 0,
+                    display: 'flex', flexDirection: 'column', gap: 'clamp(12px, 2vh, 24px)',
+                    minHeight: 'clamp(220px, 36vh, 320px)', justifyContent: 'center',
                     boxShadow: 'var(--shadow-lg)'
                 }}
             >
@@ -137,7 +141,7 @@ export function Onboarding({ onStart }) {
                         {/* Progressive ramp visual */}
                         <div style={{
                             display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-                            gap: 'clamp(6px, 2vw, 12px)', height: '104px', padding: '4px 0'
+                            gap: 'clamp(6px, 2vw, 12px)', height: 'clamp(72px, 12vh, 104px)', padding: '4px 0'
                         }}>
                             {[
                                 { label: '1', h: '24%' },
@@ -343,7 +347,7 @@ export function Onboarding({ onStart }) {
                 {/* ───────────────── STEP 3b — Import history (past) ───────────────── */}
                 {step === 3 && mode === 'past' && (
                     <>
-                        <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)', maxHeight: '62vh', overflowY: 'auto', paddingRight: '2px' }}>
+                        <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
                             {/* Start date */}
                             <div>
                                 <label style={{
@@ -470,7 +474,7 @@ export function Onboarding({ onStart }) {
             </div>
 
             {/* Progress indicator */}
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexShrink: 0 }}>
                 {[1, 2, 3].map(s => {
                     let backgroundVal = 'rgba(255,255,255,0.2)';
                     if (step === s) {
@@ -498,7 +502,8 @@ export function Onboarding({ onStart }) {
                 gap: '12px',
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginTop: 'var(--spacing-xs)',
+                marginBottom: 'auto',
+                flexShrink: 0,
                 opacity: 0.6,
                 fontSize: '0.75rem'
             }}>
@@ -556,7 +561,7 @@ function LanguageSwitcher({ i18n }) {
             className="hover-lift"
             title={label}
             style={{
-                position: 'absolute',
+                position: 'fixed',
                 top: 'max(8px, env(safe-area-inset-top))',
                 right: 'max(8px, env(safe-area-inset-right))',
                 zIndex: 3,
