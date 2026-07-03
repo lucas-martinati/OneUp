@@ -27,8 +27,8 @@ export function ConflictOverlay({ conflictData, onResolveConflict }) {
   };
 
   return createPortal(
-    <div className="conflict-fullscreen-overlay">
-      <div className="conflict-modal">
+    <div className="conflict-fullscreen-overlay dialog-backdrop dialog-backdrop--heavy">
+      <div className="conflict-modal dialog-card">
         <div className="conflict-header">
           <AlertCircle className="conflict-icon" />
           <h2 className="panel-title">{t('cloud.anonymousMergeTitle')}</h2>
@@ -59,7 +59,6 @@ export function ConflictOverlay({ conflictData, onResolveConflict }) {
               }
             }}
             disabled={resolving}
-            style={confirmRestore ? { background: 'linear-gradient(135deg, #ef4444, #dc2626)' } : {}}
           >
             {confirmRestore ? <AlertTriangle /> : <Cloud />}
             <div>

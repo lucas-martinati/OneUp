@@ -111,7 +111,7 @@ export function AchievementsShowcase({ stats, onOpen }) {
                 }}>
                     <Award size={22} color="#fff" />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="flex-1-min0">
                     <div style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--text-primary)' }}>
                         {t('achievements.title', 'Succès')}
                     </div>

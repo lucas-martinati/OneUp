@@ -115,7 +115,7 @@ function HistoryRow({ session, t, lang }) {
 
 function ExerciseList({ exercises, t }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+    <div className="flex-col gap-4">
       {exercises.map((ex, i) => {
         const Icon = getIcon(ex.icon);
         return (
@@ -554,7 +554,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
         {/* Session title or global label */}
         {isGlobal && (
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="flex-1-min0">
               <div style={{
                 fontSize: '0.75rem', fontWeight: 700,
                 color: activeThemeKey === 'gold' ? '#fbbf24' : 'rgba(255,255,255,0.6)',

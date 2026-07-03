@@ -21,7 +21,7 @@ export function SessionHistoryList({ sessionHistory, onSelectSession }) {
                 <Clock size={14} />
                 {t('share.recentSessions')}
             </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div className="flex-col gap-4">
                 {sessionHistory.slice(0, 10).map((session, i) => {
                     const exercises = session.exercises || [];
                     const hasName = session.name && session.name.trim().length > 0;

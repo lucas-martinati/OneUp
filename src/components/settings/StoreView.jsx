@@ -106,7 +106,7 @@ export function StoreView() {
                     }}>
                         {t('supporter.history')}
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div className="flex-col gap-8">
                         {displayHistory.map((receipt, index) => (
                             <div key={index} style={{
                                 display: 'flex', flexDirection: 'column',

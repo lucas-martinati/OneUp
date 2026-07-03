@@ -8,12 +8,13 @@ export function SettingRow({ icon: IconComponent, title, description, color, chi
             justifyContent: 'space-between',
             gap: '16px'
         }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="row gap-12">
                 <div style={{
-                    background: `linear-gradient(135deg, ${color}20, ${color}08)`,
+                    /* color-mix (pas de concat alpha) : accepte hex ET var(--token) */
+                    background: `linear-gradient(135deg, color-mix(in srgb, ${color} 13%, transparent), color-mix(in srgb, ${color} 3%, transparent))`,
                     padding: '10px',
                     borderRadius: '12px',
-                    border: `1px solid ${color}30`,
+                    border: `1px solid color-mix(in srgb, ${color} 19%, transparent)`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'

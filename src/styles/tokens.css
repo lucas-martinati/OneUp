@@ -11,6 +11,27 @@
   --warning: rgb(245, 158, 11);
   --font-main: 'Outfit', sans-serif;
 
+  /* Fixed palette — theme-independent, do NOT override in themes.
+     For decorative colors (badge rarities, podium medals, chart series…)
+     that must stay identical across the 8 themes. JS twin: @styles/palette.js */
+  --color-gold: #ffd700;
+  --color-silver: #e2e8f0;
+  --color-bronze: #cd9b6a;
+  --color-amber: #fbbf24;
+  --color-orange: #f97316;
+  --color-pink: #ec4899;
+  --color-blue: #3b82f6;
+  --color-indigo: #6366f1;
+  --color-indigo-light: #818cf8;
+  --color-cyan: #06b6d4;
+  --color-violet: #a78bfa;
+  --color-emerald: #34d399;
+
+  /* Type scale (secondary text sizes) */
+  --text-xs: 0.7rem;
+  --text-sm: 0.8rem;
+  --text-md: 0.9rem;
+
   /* Touch targets */
   --touch-min: 40px;
 
@@ -45,6 +66,8 @@
   --glow-success: 0 0 30px rgba(16, 185, 129, 0.4);
   --glow-accent: 0 0 25px rgba(109, 40, 217, 0.6);
   --glow-gold: 0 0 15px rgba(255, 215, 0, 0.3);
+  --glow-error: 0 4px 16px rgba(239, 68, 68, 0.3);
+  --glow-success-sm: 0 4px 16px rgba(16, 185, 129, 0.3);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);

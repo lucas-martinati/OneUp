@@ -13,7 +13,7 @@ import { LANGUAGES, resolveLanguageCode } from '@config/languages';
 import { useAuth } from '@contexts/AuthContext';
 import { Button, GoogleIcon } from '@components/ui';
 
-const ACCENT = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+const ACCENT = 'var(--gradient-accent)';
 
 export function Onboarding({ onStart }) {
     const { t, i18n } = useTranslation();
@@ -77,11 +77,11 @@ export function Onboarding({ onStart }) {
     };
 
     const headerFor = {
-        1: { icon: <Target size={18} color="#8b5cf6" />, label: t('onboarding.concept') },
-        2: { icon: <Rocket size={18} color="#f59e0b" />, label: t('onboarding.yourJourney') },
+        1: { icon: <Target size={18} color="var(--accent-glow)" />, label: t('onboarding.concept') },
+        2: { icon: <Rocket size={18} color="var(--warning)" />, label: t('onboarding.yourJourney') },
         3: mode === 'past'
-            ? { icon: <History size={18} color="#10b981" />, label: t('onboarding.yourExercises') }
-            : { icon: <Sparkles size={18} color="#10b981" />, label: t('onboarding.almostThere') },
+            ? { icon: <History size={18} color="var(--success)" />, label: t('onboarding.yourExercises') }
+            : { icon: <Sparkles size={18} color="var(--success)" />, label: t('onboarding.almostThere') },
     }[step];
 
     return (
@@ -210,7 +210,7 @@ export function Onboarding({ onStart }) {
                                 >
                                     {auth.loading ? (
                                         <>
-                                            <span className="delete-spinner" style={{ width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff' }} />
+                                            <span className="btn-spinner" />
                                             <span>{t('common.loading')}</span>
                                         </>
                                     ) : (
@@ -281,7 +281,7 @@ export function Onboarding({ onStart }) {
                             {t('onboarding.whereToStart')}
                         </p>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div className="flex-col gap-12">
                             <ModeCard
                                 active={mode === 'today'}
                                 onClick={() => setMode('today')}
@@ -294,8 +294,8 @@ export function Onboarding({ onStart }) {
                             <ModeCard
                                 active={mode === 'past'}
                                 onClick={() => setMode('past')}
-                                icon={<History size={22} color="#8b5cf6" />}
-                                accent="#8b5cf6"
+                                icon={<History size={22} color="var(--accent-glow)" />}
+                                accent="var(--accent-glow)"
                                 title={t('onboarding.modePastTitle')}
                                 desc={t('onboarding.modePastDesc')}
                             />
@@ -318,7 +318,7 @@ export function Onboarding({ onStart }) {
                             display: 'grid', placeItems: 'center',
                             background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16,185,129,0.25)'
                         }}>
-                            <CheckCircle2 size={34} color="#10b981" />
+                            <CheckCircle2 size={34} color="var(--success)" />
                         </div>
                         <p style={{
                             fontSize: 'clamp(1.05rem, 3vw, 1.3rem)', fontWeight: '800',
@@ -331,7 +331,7 @@ export function Onboarding({ onStart }) {
                             color: 'var(--text-secondary)', margin: 0
                         }}>
                             <Trans i18nKey="onboarding.todayRecap" values={{ day: dayOfYear }}>
-                                <strong style={{ color: '#10b981' }}>PLACEHOLDER</strong>
+                                <strong style={{ color: 'var(--success)' }}>PLACEHOLDER</strong>
                             </Trans>
                         </p>
 
@@ -368,7 +368,7 @@ export function Onboarding({ onStart }) {
                                     padding: 'var(--spacing-sm) var(--spacing-md)', borderRadius: 'var(--radius-lg)',
                                     border: '2px solid rgba(139, 92, 246, 0.3)', minHeight: 'var(--touch-min)'
                                 }}>
-                                    <Calendar size={22} style={{ color: '#8b5cf6', marginRight: '12px', flexShrink: 0 }} />
+                                    <Calendar size={22} style={{ color: 'var(--accent-glow)', marginRight: '12px', flexShrink: 0 }} />
                                     <input
                                         type="date"
                                         value={date}
@@ -391,9 +391,9 @@ export function Onboarding({ onStart }) {
                                 background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)',
                                 borderRadius: 'var(--radius-md)', padding: 'var(--spacing-sm)'
                             }}>
-                                <AlertCircle size={18} color="#f59e0b" style={{ flexShrink: 0, marginTop: '1px' }} />
+                                <AlertCircle size={18} color="var(--warning)" style={{ flexShrink: 0, marginTop: '1px' }} />
                                 <div style={{ fontSize: 'clamp(0.76rem, 1.9vw, 0.86rem)', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
-                                    <strong style={{ color: '#f59e0b', display: 'block', marginBottom: '2px' }}>
+                                    <strong style={{ color: 'var(--warning)', display: 'block', marginBottom: '2px' }}>
                                         {t('onboarding.honestTitle')}
                                     </strong>
                                     {t('onboarding.honestDesc')}
@@ -479,11 +479,11 @@ export function Onboarding({ onStart }) {
                     let backgroundVal = 'rgba(255,255,255,0.2)';
                     if (step === s) {
                         if (s === 1) {
-                            backgroundVal = 'linear-gradient(90deg, #667eea, #764ba2)';
+                            backgroundVal = 'var(--gradient-primary)';
                         } else if (s === 2) {
-                            backgroundVal = 'linear-gradient(90deg, #f093fb, #f5576c)';
+                            backgroundVal = 'linear-gradient(90deg, var(--accent-glow), var(--accent))';
                         } else {
-                            backgroundVal = 'linear-gradient(90deg, #10b981, #34d399)';
+                            backgroundVal = 'linear-gradient(90deg, var(--success), var(--color-emerald))';
                         }
                     }
                     return (
@@ -602,18 +602,18 @@ function ModeCard({ active, onClick, icon, accent, title, desc, badge }) {
             style={{
                 position: 'relative', textAlign: 'left', display: 'flex', gap: '12px', alignItems: 'center',
                 padding: 'var(--spacing-sm) var(--spacing-md)', borderRadius: 'var(--radius-lg)',
-                background: active ? `${accent}1f` : 'rgba(255,255,255,0.04)',
+                background: active ? `color-mix(in srgb, ${accent} 12%, transparent)` : 'rgba(255,255,255,0.04)',
                 border: `2px solid ${active ? accent : 'rgba(255,255,255,0.1)'}`,
                 cursor: 'pointer', transition: 'all 0.2s ease', minHeight: 'var(--touch-min)'
             }}
         >
             <div style={{
                 width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0,
-                display: 'grid', placeItems: 'center', background: `${accent}26`
+                display: 'grid', placeItems: 'center', background: `color-mix(in srgb, ${accent} 15%, transparent)`
             }}>
                 {icon}
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="flex-1-min0">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span style={{ fontWeight: '800', fontSize: 'clamp(0.92rem, 2.4vw, 1.02rem)', color: 'var(--text-primary)' }}>
                         {title}
@@ -622,7 +622,7 @@ function ModeCard({ active, onClick, icon, accent, title, desc, badge }) {
                         <span style={{
                             fontSize: '0.62rem', fontWeight: '800', letterSpacing: '0.04em',
                             textTransform: 'uppercase', color: accent,
-                            background: `${accent}26`, border: `1px solid ${accent}55`,
+                            background: `color-mix(in srgb, ${accent} 15%, transparent)`, border: `1px solid color-mix(in srgb, ${accent} 33%, transparent)`,
                             borderRadius: '999px', padding: '2px 8px'
                         }}>
                             {badge}

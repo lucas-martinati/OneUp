@@ -27,13 +27,13 @@ export function ClanInviteCard({ clanData }) {
                     <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <UserPlus size={14} /> {t('leaderboard.inviteCode')}
                     </div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '2px', color: '#fbbf24' }}>
+                    <div style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '2px', color: 'var(--color-amber)' }}>
                         {clanData.code}
                     </div>
                 </div>
                 <button onClick={handleCopyCode} className="hover-lift" style={{
                     padding: '10px 16px', borderRadius: 'var(--radius-md)',
-                    background: copied ? '#10b981' : 'rgba(255,255,255,0.1)',
+                    background: copied ? 'var(--success)' : 'rgba(255,255,255,0.1)',
                     border: copied ? 'none' : '1px solid rgba(255,255,255,0.1)',
                     color: 'white', fontSize: '0.85rem', fontWeight: '600',
                     display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer'

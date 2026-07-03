@@ -76,7 +76,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
             <div className={styles.card}>
                 {/* ── Header (fixed) ── */}
                 <div className={styles.header}>
-                    <div className={styles.trophy}><Trophy size={34} color="#fbbf24" /></div>
+                    <div className={styles.trophy}><Trophy size={34} color="var(--color-amber)" /></div>
                     <div className={styles.title}>{t('workout.sessionDone')}</div>
                     <div className={styles.subtitle}>{t('workout.allCompleted')}</div>
 

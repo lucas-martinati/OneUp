@@ -324,7 +324,6 @@
     "deleteAllWarning": "Toutes tes données locales seront supprimées définitivement, y compris ta progression, tes paramètres et tes routines. L'application redémarrera à zéro.",
     "deleteCannotUndo": "Cette action est définitive.",
     "deleteWarning": "Cette action est <1>irréversible</1>. Toutes tes données seront supprimées définitivement, y compris ta progression et tes paramètres.",
-    "deleting": "Suppression...",
     "merge": "Fusionner",
     "mergeDesc": "Conserver local + cloud",
     "multiDevice": "Synchronisation multi-appareils",

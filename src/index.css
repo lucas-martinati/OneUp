@@ -9,6 +9,7 @@
 @import '@styles/tokens.css';        /* :root design tokens + theme variants            */
 @import '@styles/base.css';          /* reset, scrollbars, html/body/#root, button base  */
 @import '@styles/utilities.css';     /* glass, layout & spacing utility classes          */
+@import '@styles/button.css';        /* .btn primitive (Button.jsx variants & sizes)     */
 @import '@styles/animations.css';    /* @keyframes + animation helper classes            */
 @import '@styles/responsive.css';    /* exercise grid, low-perf mode, breakpoints, a11y  */
 @import '@styles/components.css';    /* modals, sheets, charts, slider, category-nav…    */

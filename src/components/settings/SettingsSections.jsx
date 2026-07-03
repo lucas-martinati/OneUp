@@ -42,13 +42,13 @@ export function PreferencesSection({ settings, onSave }) {
                 icon={Bell}
                 title={t('settings.notifications')}
                 description={t('settings.reminder')}
-                color="#8b5cf6"
+                color="var(--accent-glow)"
                 isLast={!settings.notificationsEnabled}
             >
                 <ToggleSwitch
                     enabled={settings.notificationsEnabled}
                     onClick={() => onSave({ ...settings, notificationsEnabled: !settings.notificationsEnabled })}
-                    activeGradient="linear-gradient(135deg, #8b5cf6, #6d28d9)"
+                    activeGradient="linear-gradient(135deg, var(--accent-glow), var(--accent))"
                 />
             </SettingRow>
 
@@ -133,13 +133,13 @@ export function PreferencesSection({ settings, onSave }) {
                 icon={Smartphone}
                 title={t('settings.keepScreenOn')}
                 description={t('settings.keepScreenOnDesc')}
-                color="#f59e0b"
+                color="var(--warning)"
                 isLast={true}
             >
                 <ToggleSwitch
                     enabled={settings.keepScreenOn ?? true}
                     onClick={() => onSave({ ...settings, keepScreenOn: !settings.keepScreenOn })}
-                    activeGradient="linear-gradient(135deg, #f59e0b, #d97706)"
+                    activeGradient="linear-gradient(135deg, var(--warning), #d97706)"
                 />
             </SettingRow>
         </div>
@@ -208,13 +208,13 @@ export function PerformanceSection({ settings, onSave }) {
                         ? t('settings.reducedEffects')
                         : t('settings.allEffects')
                 }
-                color="#10b981"
+                color="var(--success)"
                 isLast={true}
             >
                 <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
                     {[
-                        { value: 'low', label: t('settings.eco'), color: '#f59e0b' },
-                        { value: 'high', label: t('settings.max'), color: '#8b5cf6' }
+                        { value: 'low', label: t('settings.eco'), color: 'var(--warning)' },
+                        { value: 'high', label: t('settings.max'), color: 'var(--accent-glow)' }
                     ].map(opt => (
                         <button
                             key={opt.value}
@@ -226,7 +226,7 @@ export function PerformanceSection({ settings, onSave }) {
                                     ? `2px solid ${opt.color}`
                                     : '2px solid var(--border-subtle)',
                                 background: settings.performanceMode === opt.value
-                                    ? `${opt.color}20`
+                                    ? `color-mix(in srgb, ${opt.color} 13%, transparent)`
                                     : 'transparent',
                                 color: settings.performanceMode === opt.value
                                     ? opt.color
@@ -259,13 +259,13 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
                 icon={Users}
                 title={t('leaderboard.title')}
                 description={t('settings.leaderboardDesc')}
-                color="#fbbf24"
+                color="var(--color-amber)"
                 isLast={!settings.leaderboardEnabled}
             >
                 <ToggleSwitch
                     enabled={settings.leaderboardEnabled}
                     onClick={() => onSave({ ...settings, leaderboardEnabled: !settings.leaderboardEnabled })}
-                    activeGradient="linear-gradient(135deg, #fbbf24, #d97706)"
+                    activeGradient="linear-gradient(135deg, var(--color-amber), #d97706)"
                 />
             </SettingRow>
 
@@ -295,7 +295,7 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
                             transition: 'all 0.2s ease'
                         }}
                         onFocus={(e) => {
-                            e.target.style.borderColor = '#fbbf24';
+                            e.target.style.borderColor = 'var(--color-amber)';
                             e.target.style.background = 'var(--surface-hover)';
                         }}
                     />
@@ -423,7 +423,7 @@ export function DataSection() {
                 icon={Download}
                 title={t('settings.exportData')}
                 description={t('settings.exportDataDesc')}
-                color="#34d399"
+                color="var(--color-emerald)"
             >
                 <button type="button" style={actionButtonStyle} className="hover-lift" onClick={handleExport}>
                     {t('settings.exportButton')}
@@ -455,7 +455,7 @@ export function DataSection() {
                     marginTop: '10px',
                     fontSize: '0.8rem',
                     fontWeight: 600,
-                    color: status.type === 'error' ? '#ef4444' : '#34d399',
+                    color: status.type === 'error' ? 'var(--error)' : 'var(--color-emerald)',
                 }}>
                     {status.msg}
                 </div>

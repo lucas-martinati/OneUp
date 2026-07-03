@@ -23,6 +23,32 @@
     "selector-pseudo-element-no-unknown": [
       true,
       { "ignorePseudoElements": ["global", "local"] }
+    ],
+    "declaration-property-value-disallowed-list": [
+      { "/^transition$/": ["/\\ball\\b/"] },
+      {
+        "message": "transition: all anime des propriétés de layout inutilement — lister explicitement les propriétés."
+      }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/**/*.css"],
+      "rules": {
+        "color-no-hex": [
+          true,
+          {
+            "message": "Couleur hex en dur — utiliser un token de tokens.css (var(--…)).",
+            "severity": "warning"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/styles/tokens.css"],
+      "rules": {
+        "color-no-hex": null
+      }
+    }
+  ]
 }

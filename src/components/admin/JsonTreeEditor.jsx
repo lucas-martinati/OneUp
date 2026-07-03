@@ -12,7 +12,7 @@ function DeleteButton({ onClick, title }) {
       onClick={onClick}
       title={title}
       style={{
-        background: 'transparent', border: 'none', color: '#ef4444',
+        background: 'transparent', border: 'none', color: 'var(--error)',
         cursor: 'pointer', padding: '2px 6px', opacity: 0.4, display: 'flex', alignItems: 'center'
       }}
       onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
@@ -136,14 +136,14 @@ function JsonTreeNode({
     return (
       <div style={{ ...indentStyle, marginTop: '8px', marginBottom: '8px', padding: '12px', background: '#07070a', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-          <span style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#a78bfa', fontWeight: 'bold' }}>
+          <span style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: 'var(--color-violet)', fontWeight: 'bold' }}>
             {name ? `"${name}": ` : ''} (JSON brut)
           </span>
           <div style={{ display: 'flex', gap: '6px' }}>
             <button 
               onClick={handleRawSave} 
               style={{
-                padding: '4px 8px', fontSize: '0.72rem', background: '#10b981', color: 'white',
+                padding: '4px 8px', fontSize: '0.72rem', background: 'var(--success)', color: 'white',
                 border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px'
               }}
             >
@@ -172,7 +172,7 @@ function JsonTreeNode({
           }}
         />
         {rawError && (
-          <div style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '4px', fontFamily: 'monospace', padding: '4px 8px', background: 'rgba(239, 68, 68, 0.08)', borderRadius: '4px' }}>
+          <div style={{ color: 'var(--error)', fontSize: '0.75rem', marginTop: '4px', fontFamily: 'monospace', padding: '4px 8px', background: 'rgba(239, 68, 68, 0.08)', borderRadius: '4px' }}>
             ⚠️ {rawError}
           </div>
         )}
@@ -189,7 +189,7 @@ function JsonTreeNode({
           type="checkbox" 
           checked={value} 
           onChange={(e) => handlePrimitiveChange(e.target.checked)}
-          style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#a78bfa' }}
+          style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: 'var(--color-violet)' }}
         />
       );
     } else if (typeof value === 'number') {
@@ -216,7 +216,7 @@ function JsonTreeNode({
           onChange={(e) => handlePrimitiveChange(e.target.value)}
           style={{
             background: '#07070a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '4px',
-            color: '#34d399', fontFamily: 'monospace', width: '100%', maxWidth: '350px', outline: 'none', fontSize: '0.8rem',
+            color: 'var(--color-emerald)', fontFamily: 'monospace', width: '100%', maxWidth: '350px', outline: 'none', fontSize: '0.8rem',
             padding: '2px 6px', boxSizing: 'border-box'
           }}
         />
@@ -290,7 +290,7 @@ function JsonTreeNode({
             title={isObject ? 'Ajouter une clé' : 'Ajouter un élément'}
             style={{
               background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)',
-              borderRadius: '4px', color: '#34d399', fontSize: '0.65rem',
+              borderRadius: '4px', color: 'var(--color-emerald)', fontSize: '0.65rem',
               padding: '2px 6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px'
             }}
           >
@@ -349,14 +349,14 @@ function JsonTreeNode({
               placeholder='valeur (ex: "texte", 42, true, {})'
               style={{
                 background: '#020204', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '4px',
-                color: '#34d399', fontFamily: 'monospace', fontSize: '0.8rem', padding: '4px 8px',
+                color: 'var(--color-emerald)', fontFamily: 'monospace', fontSize: '0.8rem', padding: '4px 8px',
                 outline: 'none', flex: 1, minWidth: '160px', boxSizing: 'border-box'
               }}
             />
             <button
               onClick={handleAddConfirm}
               style={{
-                padding: '4px 8px', fontSize: '0.72rem', background: '#10b981', color: 'white',
+                padding: '4px 8px', fontSize: '0.72rem', background: 'var(--success)', color: 'white',
                 border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '800',
                 display: 'flex', alignItems: 'center', gap: '4px'
               }}
@@ -374,7 +374,7 @@ function JsonTreeNode({
             </button>
           </div>
           {addError && (
-            <div style={{ color: '#ef4444', fontSize: '0.72rem', fontFamily: 'monospace' }}>⚠️ {addError}</div>
+            <div style={{ color: 'var(--error)', fontSize: '0.72rem', fontFamily: 'monospace' }}>⚠️ {addError}</div>
           )}
           <div style={{ color: '#6b7280', fontSize: '0.68rem', fontStyle: 'italic' }}>
             La valeur est interprétée en JSON (nombre, booléen, objet, tableau…), sinon traitée comme texte.

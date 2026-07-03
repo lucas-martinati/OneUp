@@ -378,7 +378,7 @@ const ExerciseButton = React.memo(({
     return (
         <button
             onClick={() => onSelect(ex.id)}
-            className="hover-lift exercise-button"
+            className={`hover-lift exercise-button${exDone ? ' exercise-done' : ''}`}
             style={{
                 flex: '1 1 calc(33.333% - 8px)',
                 minWidth: 'clamp(60px, 18vw, 100px)',
@@ -391,12 +391,11 @@ const ExerciseButton = React.memo(({
                 background: btnBg,
                 border: btnBorder,
                 cursor: 'pointer',
-                transition: 'all 0.25s ease',
+                transition: 'background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease',
                 position: 'relative',
                 overflow: 'hidden',
                 '--done-color': `${ex.color}55`,
                 '--done-color-dim': `${ex.color}12`,
-                animation: exDone ? 'doneGlow 3s ease-in-out infinite' : 'none',
                 boxShadow: btnBoxShadow
             }}
         >

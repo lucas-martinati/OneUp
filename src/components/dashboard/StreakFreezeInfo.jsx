@@ -63,12 +63,7 @@ export function StreakFreezeInfo({ open, onClose }) {
         <div
             ref={overlayRef}
             onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
-            style={{
-                position: 'fixed', inset: 0, zIndex: 9999,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px',
-                background: 'rgba(0, 0, 0, 0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-                animation: 'confirmOverlayIn 0.2s ease-out',
-            }}
+            className="dialog-backdrop"
         >
             <div style={{
                 position: 'relative', width: '100%', maxWidth: '340px', borderRadius: '20px',
@@ -76,7 +71,7 @@ export function StreakFreezeInfo({ open, onClose }) {
                 border: `1px solid ${FREEZE_COLOR}33`,
                 boxShadow: `0 24px 64px rgba(0, 0, 0, 0.5), 0 0 40px ${FREEZE_COLOR}14`,
                 padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px',
-                animation: 'confirmPanelIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                animation: 'dialogPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
             }}>
                 <IconButton icon={X} variant="glass" onClick={onClose} aria-label={t('common.close')}
                     style={{ position: 'absolute', top: '12px', right: '12px' }} />
@@ -130,7 +125,7 @@ export function StreakFreezeInfo({ open, onClose }) {
                         background: 'linear-gradient(135deg, rgba(139,92,246,0.14), rgba(129,140,248,0.10))',
                         border: '1px solid rgba(139,92,246,0.3)',
                     }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div className="row gap-8">
                             <Crown size={18} color="#a78bfa" />
                             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.4 }}>
                                 {t('streakFreeze.proPitch', { multiplier: proMultiplier, count: STREAK_FREEZE_LIMITS.pro.perMonth })}

@@ -83,7 +83,7 @@ function SessionCard({ session, mode, t, lang }) {
           {type === 'running' ? '🏃' : '🚴'}
         </div>
 
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="flex-1-min0">
           <div style={{
             fontSize: 'clamp(0.82rem, 1.55vh, 0.98rem)',
             fontWeight: '800',

@@ -324,7 +324,6 @@
     "deleteAllWarning": "All your local data will be permanently deleted, including your progress, settings, and routines. The app will restart fresh.",
     "deleteCannotUndo": "This action cannot be undone",
     "deleteWarning": "This action is <1>irreversible</1>. All your data will be permanently deleted, including your progress and settings.",
-    "deleting": "Deleting...",
     "merge": "Merge",
     "mergeDesc": "Combine local + cloud data",
     "multiDevice": "Multi-device sync",

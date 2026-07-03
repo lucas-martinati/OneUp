@@ -169,7 +169,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                       padding: '16px', borderRadius: 'var(--radius-lg)',
                       background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)'
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div className="row gap-12">
                         <div style={{
                           width: '40px', height: '40px', borderRadius: '50%',
                           background: `${ex.color}20`, color: ex.color,
@@ -192,7 +192,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                           <Edit2 size={20} />
                         </button>
                         <button onClick={() => handleDelete(ex)} style={{
-                          background: 'transparent', border: 'none', color: '#ef4444',
+                          background: 'transparent', border: 'none', color: 'var(--error)',
                           padding: '8px', cursor: 'pointer', opacity: 0.8
                         }}>
                           <Trash2 size={20} />
@@ -217,7 +217,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                 setView('create');
               }} className="hover-lift" style={{
                 width: '100%', padding: '16px', borderRadius: 'var(--radius-lg)',
-                background: 'linear-gradient(135deg, #8b5cf6, #6366f1)', border: 'none', color: 'white',
+                background: 'linear-gradient(135deg, var(--accent-glow), var(--color-indigo))', border: 'none', color: 'white',
                 fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}>
                 <Plus size={20} /> {t('customExercises.create')}
@@ -235,7 +235,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
           <div className="fade-in" style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {/* CATEGORY SELECTOR */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <label className="section-label" style={{ marginBottom: '8px' }}>
                 {t('customExercises.categoryLabel')}
               </label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -288,7 +288,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
             </div>
             {/* NAME */}
             <div style={{ position: 'relative' }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <label className="section-label" style={{ marginBottom: '8px' }}>
                 {t('customExercises.nameLabel')}
               </label>
               <div style={{ position: 'relative' }}>
@@ -316,7 +316,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
 
             {/* COLOR */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <label className="section-label">
                 {t('customExercises.colorLabel')}
               </label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', justifyContent: 'space-between' }}>
@@ -333,7 +333,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
 
             {/* ICON */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <label className="section-label">
                 {t('customExercises.iconLabel')}
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', maxHeight: '240px', overflowY: 'auto', padding: '4px', paddingRight: '8px' }}>
@@ -358,7 +358,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
 
             {/* TYPE */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <label className="section-label">
                 {t('customExercises.typeLabel')}
               </label>
               <div style={{ display: 'flex', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-lg)', padding: '4px' }}>
@@ -420,7 +420,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
               </div>
             )}
 
-            {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
+            {error && <div style={{ color: 'var(--error)', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
 
             <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
               <Button
@@ -459,7 +459,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
           }}>
             <div style={{
               width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(239,68,68,0.1)',
-              color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto'
+              color: 'var(--error)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto'
             }}>
               <Trash2 size={32} />
             </div>
@@ -471,7 +471,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
             <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
               {t('customExercises.deleteConfirm', { name: confirmDeleteEx.label })}
               {computedStats?.exerciseReps?.[confirmDeleteEx.id] > 0 && (
-                <span style={{ display: 'block', marginTop: '12px', color: '#fbbf24', fontSize: '0.85rem', fontWeight: '700', padding: '8px', background: 'rgba(251,191,36,0.1)', borderRadius: '8px' }}>
+                <span style={{ display: 'block', marginTop: '12px', color: 'var(--color-amber)', fontSize: '0.85rem', fontWeight: '700', padding: '8px', background: 'rgba(251,191,36,0.1)', borderRadius: '8px' }}>
                   {t('customExercises.deleteWarning', { count: computedStats.exerciseReps[confirmDeleteEx.id].toLocaleString(i18n.language), unit: confirmDeleteEx.type === 'timer' ? t('customExercises.seconds') : t('customExercises.repetitions') })}
                 </span>
               )}
@@ -497,7 +497,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                 className="hover-lift"
                 style={{
                   flex: 1, padding: '12px', borderRadius: 'var(--radius-md)',
-                  background: '#ef4444', border: 'none', color: 'white', fontWeight: '700'
+                  background: 'var(--error)', border: 'none', color: 'white', fontWeight: '700'
                 }}
               >
                 {t('common.delete')}

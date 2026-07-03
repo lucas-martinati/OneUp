@@ -63,7 +63,7 @@
 
 .sparkle-icon {
   position: absolute;
-  color: #FFD700;
+  color: var(--color-gold);
   animation: sparkle 5s infinite ease-in-out;
   pointer-events: none;
   z-index: 1;
@@ -119,23 +119,20 @@
   to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 }
 
-@keyframes modalOverlayFadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-/* ConfirmDialog (moved out of a per-render JSX \3c style> tag) */
-@keyframes confirmOverlayIn {
+/* Canonical pure-opacity fades for overlays/backdrops (modals, announcements,
+   confirm dialogs…). Timing lives in the `animation` property of each consumer. */
+@keyframes overlayFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-@keyframes confirmPanelIn {
+@keyframes overlayFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Canonical dialog-card entry (scale-pop from slightly below). */
+@keyframes dialogPop {
   from { opacity: 0; transform: scale(0.85) translateY(12px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
@@ -213,21 +210,8 @@
 
 
 
-@keyframes pulseGlowExercise {
-
-  0%,
-  100% {
-    box-shadow: 0 0 20px var(--exercise-glow-color, rgba(129, 140, 248, 0.3));
-  }
-
-  50% {
-    box-shadow: 0 0 35px var(--exercise-glow-color, rgba(129, 140, 248, 0.5));
-  }
-}
-
 .bounce-on-hover {
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  will-change: transform;
 }
 
 .bounce-on-hover:hover {
@@ -334,10 +318,10 @@
   transform: rotate(-90deg);
 }
 
-/* Hover lift effect */
+/* Hover lift effect. No permanent will-change here — it's applied to dozens
+   of always-mounted tiles and would pin a composited layer for each. */
 .hover-lift {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  will-change: transform;
 }
 
 @media (hover: hover) {
@@ -414,7 +398,16 @@
   animation: successGlow 0.8s ease-out;
 }
 
-/* Exercise selector done effects */
+/* Exercise selector done effects. Class-based (not inline) so the low-perf
+   override below can neutralise the infinite box-shadow repaints. */
+.exercise-done {
+  animation: doneGlow 3s ease-in-out infinite;
+}
+
+[data-perf="low"] .exercise-done {
+  animation: none !important;
+}
+
 @keyframes doneGlow {
   0%,
   100% {

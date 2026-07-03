@@ -245,7 +245,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                       padding: '16px', borderRadius: 'var(--radius-lg)',
                       background: 'var(--surface-muted)', border: `1px solid ${cat.color}30`
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div className="row gap-12">
                         <div style={{
                           width: '40px', height: '40px', borderRadius: '12px',
                           background: `${cat.color}20`, border: `2px solid ${cat.color}50`,
@@ -307,7 +307,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                         </button>
                         {!isBuiltIn && (
                           <button onClick={() => handleStartDelete(cat)} style={{
-                            background: 'transparent', border: 'none', color: '#ef4444',
+                            background: 'transparent', border: 'none', color: 'var(--error)',
                             padding: '8px', cursor: 'pointer', opacity: 0.8
                           }}>
                             <Trash2 size={20} />
@@ -328,7 +328,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                   setView('create');
                 }} className="hover-lift" style={{
                   width: '100%', padding: '16px', borderRadius: 'var(--radius-lg)',
-                  background: 'linear-gradient(135deg, #8b5cf6, #6366f1)', border: 'none', color: 'white',
+                  background: 'linear-gradient(135deg, var(--accent-glow), var(--color-indigo))', border: 'none', color: 'white',
                   fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
                 }}>
                   <Plus size={20} /> {t('customCategories.create')}
@@ -347,7 +347,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
             <div className="fade-in" style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {/* NAME */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                <label className="section-label" style={{ marginBottom: '8px' }}>
                   {t('customCategories.nameLabel')}
                 </label>
                 <input
@@ -370,7 +370,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
 
               {/* COLOR */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                <label className="section-label">
                   {t('customCategories.colorLabel')}
                 </label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', justifyContent: 'space-between' }}>
@@ -413,7 +413,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                 </div>
               )}
 
-              {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
+              {error && <div style={{ color: 'var(--error)', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
 
               <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
                 <button onClick={() => {
@@ -449,10 +449,10 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                   background: `${deletingCat.color}20`, border: `2px solid ${deletingCat.color}50`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}>
-                  <Trash2 size={20} color="#ef4444" />
+                  <Trash2 size={20} color="var(--error)" />
                 </div>
                 <div>
-                  <div style={{ fontWeight: '700', color: '#ef4444', fontSize: '0.95rem' }}>
+                  <div style={{ fontWeight: '700', color: 'var(--error)', fontSize: '0.95rem' }}>
                     {t('customCategories.deleteConfirm', { name: deletingCat.name })}
                   </div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
@@ -462,7 +462,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
               </div>
 
               {/* Exercise list with checkboxes and target selector */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div className="flex-col gap-8">
                 {deletingExercises.map(ex => {
                   const isSelected = selectedExercises[ex.id];
                   const targetCatId = exerciseTargets[ex.id] || 'custom';
@@ -485,8 +485,8 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                       >
                         <div style={{
                           width: '24px', height: '24px', borderRadius: '6px',
-                          background: isSelected ? '#10b981' : 'transparent',
-                          border: isSelected ? '2px solid #10b981' : '2px solid var(--border-subtle)',
+                          background: isSelected ? 'var(--success)' : 'transparent',
+                          border: isSelected ? '2px solid var(--success)' : '2px solid var(--border-subtle)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           transition: 'all 0.2s', flexShrink: 0
                         }}>
@@ -563,7 +563,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
               <div style={{
                 padding: '12px 16px', borderRadius: 'var(--radius-md)',
                 background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)',
-                fontSize: '0.8rem', color: '#fbbf24', fontWeight: '600', textAlign: 'center'
+                fontSize: '0.8rem', color: 'var(--color-amber)', fontWeight: '600', textAlign: 'center'
               }}>
                 {selectedCount > 0
                   ? t('customCategories.deleteSummaryKeep', { keep: selectedCount, del: deletingExercises.length - selectedCount })
@@ -588,7 +588,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                   className="hover-lift"
                   style={{
                     flex: 1, padding: '14px', borderRadius: 'var(--radius-md)',
-                    background: '#ef4444', border: 'none', color: 'white',
+                    background: 'var(--error)', border: 'none', color: 'white',
                     fontWeight: '700', fontSize: '0.95rem'
                   }}
                 >

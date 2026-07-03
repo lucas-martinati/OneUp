@@ -54,7 +54,7 @@ button:focus:not(:focus-visible) {
 }
 
 .modal-overlay.fade-in {
-  animation: modalOverlayFadeIn var(--motion-fast) ease-out;
+  animation: overlayFadeIn var(--motion-fast) ease-out;
 }
 
 .modal-overlay.fade-in > .modal-content {
@@ -78,6 +78,72 @@ button:focus:not(:focus-visible) {
 .modal-overlay .glass-premium {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+}
+
+/* ── Shared Centered Dialog ─────────────────────────────────────────────
+   Dim blurred backdrop + centered card: the canonical pattern for every
+   small confirmation/alert dialog (ConfirmDialog, ConflictOverlay,
+   announcements, StreakFreezeInfo…). Theme-aware via tokens — replaces the
+   hard-coded purple/blue copies that ignored the active theme. */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999; /* matches Z_INDEX.DELETE_OVERLAY (utils/zIndex.js) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: overlayFadeIn 0.2s ease-out;
+}
+
+/* Darker variant for destructive or blocking flows. */
+.dialog-backdrop--heavy {
+  background: var(--overlay-bg-heavy);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.dialog-card {
+  width: 100%;
+  max-width: 340px;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  background: var(--sheet-bg);
+  border: 1px solid color-mix(in srgb, var(--accent-glow) 20%, transparent);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.5),
+    0 0 40px color-mix(in srgb, var(--accent-glow) 8%, transparent);
+  animation: dialogPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dialog-card--danger {
+  border-color: color-mix(in srgb, var(--error) 25%, transparent);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.5),
+    0 0 40px color-mix(in srgb, var(--error) 10%, transparent);
+}
+
+/* Error-tinted notice strip inside a dialog ("this cannot be undone"). */
+.dialog-warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--error) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--error) 20%, transparent);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.dialog-warning svg {
+  flex-shrink: 0;
+  color: var(--error);
 }
 
 /* ── Shared Bottom Sheet ────────────────────────────────────────────── */
@@ -521,7 +587,10 @@ button:focus:not(:focus-visible) {
   -webkit-user-select: none;
   touch-action: pan-y;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition:
+    background 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .category-nav-container::before {
@@ -546,7 +615,13 @@ button:focus:not(:focus-visible) {
   border-radius: 10px;
   background: var(--text-secondary);
   opacity: 0.35;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Apple-style Bump */
+  /* Apple-style Bump */
+  transition:
+    width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
   display: flex;
   align-items: center;
@@ -618,7 +693,9 @@ button:focus:not(:focus-visible) {
   opacity: 0;
   transform: translateX(10px) scale(0.9);
   pointer-events: none;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition:
+    opacity 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   border: 1px solid var(--border-default);
   box-shadow: var(--shadow-lg);
   letter-spacing: 0.5px;

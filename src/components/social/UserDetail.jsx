@@ -15,16 +15,19 @@ import { getIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { cloudSync } from '@services/cloudSync';
 import { useComputedStatsFromStore } from '@hooks/useComputedStatsFromStore';
+import { PALETTE } from '@styles/palette';
 
 export function UserDetail({ entry, rank, isMe, onClose }) {
     const { t } = useTranslation();
     // For the current user, trust the locally-computed badge count so the value
     // matches the Stats page exactly (the server count can be stale/approximate).
     const myStats = useComputedStatsFromStore();
-    const rankColors = { 1: '#fbbf24', 2: '#c0c0c0', 3: '#cd7f32' };
+    // Medal colors shared with LeaderboardPodium via the fixed palette
+    // (kept as hex strings because they get alpha-suffixed below).
+    const rankColors = { 1: PALETTE.amber, 2: PALETTE.silver, 3: PALETTE.bronze };
     const todayStr = getLocalDateStr(new Date());
     const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
-    const rankColor = rankColors[rank] || '#818cf8';
+    const rankColor = rankColors[rank] || PALETTE.indigoLight;
 
     const [details, setDetails] = useState(null);
     const [loadingDetails, setLoadingDetails] = useState(true);
@@ -76,7 +79,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                 border: `1px solid ${ex.color}22`
             }}>
                 <ExIcon size={16} color={ex.color} style={{ flexShrink: 0 }} />
-                <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="flex-1-min0">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
                         <span style={{ fontSize: '0.75rem', fontWeight: '600', color: ex.color }}>{getExerciseLabel(ex, t)}</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -152,7 +155,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                                 key={idx}
                                 className="sparkle-icon" 
                                 size={s.size} 
-                                fill="#FFD700" 
+                                fill={PALETTE.gold} 
                                 style={{ 
                                     top: s.top, left: s.left, right: s.right, bottom: s.bottom, 
                                     animationDelay: s.delay 
@@ -185,12 +188,12 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                     }}>
                         {isPerfect && (
                             <>
-                                <Star className="sparkle-icon" size={13} fill="#FFD700" style={{ top: '-4px', left: '-2px', animationDelay: '0s' }} />
-                                <Star className="sparkle-icon" size={10} fill="#FFD700" style={{ bottom: '2px', right: '-4px', animationDelay: '1.6s' }} />
-                                <Star className="sparkle-icon" size={11} fill="#FFD700" style={{ top: '46%', right: '-8px', animationDelay: '2.9s' }} />
+                                <Star className="sparkle-icon" size={13} fill={PALETTE.gold} style={{ top: '-4px', left: '-2px', animationDelay: '0s' }} />
+                                <Star className="sparkle-icon" size={10} fill={PALETTE.gold} style={{ bottom: '2px', right: '-4px', animationDelay: '1.6s' }} />
+                                <Star className="sparkle-icon" size={11} fill={PALETTE.gold} style={{ top: '46%', right: '-8px', animationDelay: '2.9s' }} />
                             </>
                         )}
-                        <Avatar photoURL={entry.photoURL} name={entry.pseudo} size={76} borderColor={isPerfect ? '#ffd700' : rankColor} />
+                        <Avatar photoURL={entry.photoURL} name={entry.pseudo} size={76} borderColor={isPerfect ? PALETTE.gold : rankColor} />
                     </div>
 
                     <div style={{ textAlign: 'center' }}>
@@ -273,10 +276,10 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                         )}
 
                         <StatCard 
-                            icon={<Trophy size={16} color="#fbbf24" />} 
+                            icon={<Trophy size={16} color={PALETTE.amber} />} 
                             label={t('common.bodyweight')}
                             value={entry.totalReps.toLocaleString()} 
-                            color="#fbbf24" 
+                            color={PALETTE.amber} 
                         />
                         
                         {canAccessFeature(FEATURES.WEIGHTS, entry) && entry.weightsTotalReps > 0 && (
@@ -289,10 +292,10 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                         )}
 
                         <StatCard icon={<Award size={16} color="#a855f7" />} label={t('leaderboard.achievements')} value={(isMe && myStats?.badgeCount != null ? myStats.badgeCount : details?.achievements) || 0} color="#a855f7" />
-                        <StatCard icon={<Flame size={16} color="#f97316" />} label={t('common.bestStreak')} value={loadingDetails ? '…' : (stats.maxStreak || 0)} color="#f97316" />
+                        <StatCard icon={<Flame size={16} color={PALETTE.orange} />} label={t('common.bestStreak')} value={loadingDetails ? '…' : (stats.maxStreak || 0)} color={PALETTE.orange} />
                         <StatCard icon={<Calendar size={16} color="#22d3ee" />} label={t('leaderboard.activeDays')} value={loadingDetails ? '…' : (stats.totalDays || 0)} color="#22d3ee" />
                         <StatCard icon={<TrendingUp size={16} color="#10b981" />} label={t('leaderboard.currentStreak')} value={loadingDetails ? '…' : (stats.currentStreak || 0)} color="#10b981" />
-                        <StatCard icon={<Activity size={16} color="#ec4899" />} label={t('common.perfectDays')} value={loadingDetails ? '…' : (stats.perfectDays || 0)} color="#ec4899" />
+                        <StatCard icon={<Activity size={16} color={PALETTE.pink} />} label={t('common.perfectDays')} value={loadingDetails ? '…' : (stats.perfectDays || 0)} color={PALETTE.pink} />
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0, paddingBottom: '16px' }}>

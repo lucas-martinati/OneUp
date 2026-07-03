@@ -46,9 +46,9 @@ export function AnnouncementOverlay({ announcement, onDismiss }) {
 
   return (
     <div
-      className="ann-backdrop"
+      className="dialog-backdrop dialog-backdrop--heavy"
       style={{
-        animation: exiting ? 'ann-fade-out 0.4s ease forwards' : 'ann-fade-in 0.4s ease',
+        animation: exiting ? 'overlayFadeOut 0.4s ease forwards' : 'overlayFadeIn 0.4s ease',
       }}
       onClick={handleDismiss}
     >

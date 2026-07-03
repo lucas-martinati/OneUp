@@ -104,7 +104,7 @@ export function OfflineBanner() {
             color: '#fff',
             background: reconnected
               ? 'linear-gradient(135deg, #16a34a, #22c55e)'
-              : 'linear-gradient(135deg, #dc2626, #ef4444)',
+              : 'linear-gradient(135deg, #dc2626, var(--error))',
             boxShadow: reconnected
               ? '0 4px 14px rgba(34,197,94,0.35)'
               : '0 4px 14px rgba(239,68,68,0.32)',

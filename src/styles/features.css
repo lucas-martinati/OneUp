@@ -4,12 +4,11 @@
 .toggle-switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; inset: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 24px; }
 .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-input:checked + .slider { background-color: #8b5cf6; }
+input:checked + .slider { background-color: var(--accent); }
 input:checked + .slider:before { transform: translateX(20px); }
 
 /* ── ShareModal: Spinner ──────────────────────────────────────────────── */
 
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .spin { animation: spin 1s linear infinite; }
 
 /* ── AnnouncementOverlay ───────────────────────────────────────────────
@@ -17,18 +16,7 @@ input:checked + .slider:before { transform: translateX(20px); }
    active theme tokens (--accent, --accent-glow, --gradient-glow) so the
    panel adapts to default / ocean / sunset / forest / purple themes. */
 
-.ann-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
+/* Backdrop = shared .dialog-backdrop.dialog-backdrop--heavy (components.css). */
 
 .ann-card {
   position: relative;
@@ -239,16 +227,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 .ann-cta-label { position: relative; }
-
-@keyframes ann-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes ann-fade-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
 
 @keyframes ann-card-in {
   from { opacity: 0; transform: scale(0.85) translateY(30px); }
@@ -734,11 +712,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   border-radius: 50%;
   border: 2.5px solid rgba(255,255,255,0.18);
   border-top-color: var(--exercise-color, #818cf8);
-  animation: cameraSpin 0.8s linear infinite;
-}
-
-@keyframes cameraSpin {
-  to { transform: rotate(360deg); }
+  animation: spin 0.8s linear infinite;
 }
 
 /* ── Live stats card (reps + depth gauge) ──────────────────────────────── */

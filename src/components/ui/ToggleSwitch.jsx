@@ -14,7 +14,7 @@ export function ToggleSwitch({ enabled, onClick, activeGradient }) {
                 border: 'none',
                 cursor: 'pointer',
                 position: 'relative',
-                transition: 'all 0.3s ease',
+                transition: 'background 0.3s ease, box-shadow 0.3s ease',
                 boxShadow: enabled ? '0 4px 12px rgba(0,0,0,0.15)' : 'none',
                 flexShrink: 0,
                 display: 'flex',

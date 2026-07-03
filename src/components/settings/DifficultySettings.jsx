@@ -80,7 +80,7 @@ export function DifficultySettings() {
             ) : (
                 <div className="scale-in">
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div className="row gap-8">
                             <span style={{ fontWeight: '700', color: 'white', fontSize: '0.9rem' }}>{t('settings.multiplier')}</span>
                             <button
                                 onClick={() => setIsMultiplierUnlocked(false)}
@@ -116,7 +116,7 @@ export function DifficultySettings() {
                                         const exColor = ex.color || CATEGORY_COLORS[catKey];
                                         const percentage = ((val - 0.1) / 0.9) * 100;
                                         return (
-                                            <div key={ex.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                            <div key={ex.id} className="flex-col gap-8">
                                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                                     <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: '600' }}>
                                                         {getExerciseLabel(ex, t)}

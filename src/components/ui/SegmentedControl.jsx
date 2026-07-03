@@ -56,7 +56,7 @@ export function SegmentedControl({ options, value, onChange, style = {} }) {
           width: `calc(${100 / options.length}% - ${6 / options.length}px)`,
           background: activeOption.activeBg || 'var(--gradient-glow)',
           borderRadius: 'var(--radius-full)',
-          transition: 'all 0.30s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          transition: 'left 0.30s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.30s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.30s ease',
           zIndex: 0,
           boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
         }}
@@ -83,7 +83,7 @@ export function SegmentedControl({ options, value, onChange, style = {} }) {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              transition: 'all 0.35s ease',
+              transition: 'color 0.35s ease',
               background: 'transparent', // Indicator handles the background
               color: isActive 
                 ? (option.activeColor || '#fff') 

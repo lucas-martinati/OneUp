@@ -31,21 +31,26 @@ import {
 
 // ============ INDIVIDUAL EXPORTS ============
 export {
-  Dumbbell, Zap, Footprints,
-  Flame, Activity,
-  X, Check, CheckCheck, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Plus, Minus,
-  Play, Pause, RotateCcw, Save, Trash2, Edit2, Code,
-  FolderOpen, FolderPlus, GripVertical, Shuffle, ArrowLeft, ArrowRight,
-  Trophy, Medal, Award, Star, Crown,
-  Users, LogIn, UserPlus, Shield, ShieldAlert, HeartHandshake,
-  LogOut, Hash,
-  Settings, Settings2, Bell, Volume2, Vibrate, Clock, Lock, Unlock,
-  Globe, Gauge, ShoppingBag, PieChart,
-  Share2, Download, Image, Palette, Target,
-  History, Weight, Filter, Loader2, Smartphone,
-  Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
-  Copy, RefreshCw, Heart, Sparkles, Link, Link2, Calendar, TrendingUp,
-  Gem, Ghost, Moon, Rocket, Sun, Snowflake
+  Activity, AlertCircle, AlertTriangle, ArrowLeft, ArrowRight, Award,
+  Bell,
+  Calendar, Check, CheckCheck, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, Cloud, CloudOff, Code, Copy, Crown,
+  Download, Dumbbell,
+  Edit2,
+  Filter, Flame, FolderOpen, FolderPlus, Footprints,
+  Gauge, Gem, Ghost, Globe, GripVertical,
+  Hash, Heart, HeartHandshake, History,
+  Image,
+  Link, Link2, Loader2, Lock, LogIn, LogOut,
+  Medal, Minus, Moon,
+  Palette, Pause, PieChart, Play, Plus,
+  RefreshCw, Rocket, RotateCcw,
+  Save, Settings, Settings2, Share2, Shield, ShieldAlert, ShoppingBag, Shuffle, Smartphone, Snowflake, Sparkles, Star, Sun,
+  Target, Trash2, TrendingUp, Trophy,
+  Unlock, Upload, UserPlus, Users,
+  Vibrate, Volume2,
+  Weight,
+  X,
+  Zap
 };
 
 // ============ ALIASES ============

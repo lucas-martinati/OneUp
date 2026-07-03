@@ -53,7 +53,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     marginBottom: 'var(--spacing-md)'
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div className="row gap-12">
                         {showStore && (
                             <IconButton
                                 icon={ArrowLeft}

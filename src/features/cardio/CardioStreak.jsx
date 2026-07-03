@@ -35,7 +35,7 @@ export const CardioStreak = React.memo(({ streak }) => {
         />
       </div>
 
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="flex-1-min0">
         <div style={{
           fontSize: 'clamp(0.65rem, 1.2vh, 0.8rem)',
           color: 'var(--text-secondary)', fontWeight: '600',

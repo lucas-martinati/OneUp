@@ -1,9 +1,27 @@
 import { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useTranslation, Trans } from 'react-i18next';
-import { Cloud, CloudOff, AlertCircle, Trash2, AlertTriangle, Check, Smartphone, RefreshCw } from '@utils/icons';
+import { Cloud, CloudOff, AlertCircle, Trash2, Check, Smartphone, RefreshCw } from '@utils/icons';
 import { Avatar } from '@components/ui/Avatar';
+import { Button } from '@components/ui/Button';
+import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { GoogleSignInButton } from '@components/ui/GoogleSignInButton';
+
+function DeleteConfirmationModal({ isOpen, onClose, onConfirm, isDeleting, title, description, t }) {
+  return (
+    <ConfirmDialog
+      open={isOpen}
+      destructive
+      icon={Trash2}
+      title={title}
+      message={description}
+      warning={t('cloud.deleteCannotUndo')}
+      loading={isDeleting}
+      confirmLabel={t('common.delete')}
+      onCancel={onClose}
+      onConfirm={onConfirm}
+    />
+  );
+}
 
 export function CloudSyncPanel({
   authState,
@@ -84,89 +102,50 @@ export function CloudSyncPanel({
 
           {/* Account management */}
           <div className="cloud-account-actions">
-            <button
-              className="btn-cloud-signout"
+            <Button
+              variant="secondary"
+              fullWidth
               onClick={onSignOut}
               disabled={authState.loading}
             >
               {t('cloud.signOut')}
-            </button>
+            </Button>
 
-            <button
-              className="btn-cloud-delete"
+            <Button
+              variant="danger-ghost"
+              size="sm"
+              fullWidth
+              icon={Trash2}
               onClick={() => setShowDeleteConfirm(true)}
               disabled={authState.loading}
             >
-              <Trash2 size={16} />
               {t('cloud.deleteAccount')}
-            </button>
+            </Button>
           </div>
 
           {/* Delete confirmation modal */}
-          {showDeleteConfirm && createPortal(
-            <div className="delete-overlay" onClick={() => setShowDeleteConfirm(false)}>
-              <div className="delete-modal" onClick={e => e.stopPropagation()}>
-                <div className="delete-bg-effects">
-                  <div className="delete-glow delete-glow-1"></div>
-                  <div className="delete-glow delete-glow-2"></div>
-                </div>
-                <div className="delete-content">
-                  <div className="delete-icon-wrapper">
-                    <div className="delete-icon-pulse"></div>
-                    <div className="delete-icon">
-                      <Trash2 />
-                    </div>
-                  </div>
-                  <h3>{t('cloud.deleteAccount')}</h3>
-                  <p>
-                    <Trans i18nKey="cloud.deleteWarning">
-                      Cette action est <strong>irréversible</strong>. Toutes vos données seront
-                      supprimées définitivement, y compris votre progression et vos paramètres.
-                    </Trans>
-                  </p>
-                  <div className="delete-warning">
-                    <AlertTriangle size={14} />
-                    <span>{t('cloud.deleteCannotUndo')}</span>
-                  </div>
-                  <div className="delete-actions">
-                    <button 
-                       className="btn-delete-cancel"
-                      onClick={() => setShowDeleteConfirm(false)}
-                      disabled={deleting}
-                    >
-                      {t('common.cancel')}
-                    </button>
-                    <button 
-                       className="btn-delete-confirm"
-                      onClick={async () => {
-                        setDeleting(true);
-                        try {
-                          await onDeleteAccount();
-                        } finally {
-                          setDeleting(false);
-                          setShowDeleteConfirm(false);
-                        }
-                      }}
-                      disabled={deleting}
-                    >
-                      {deleting ? (
-                        <>
-                          <span className="delete-spinner"></span>
-                          {t('cloud.deleting')}
-                        </>
-                      ) : (
-                        <>
-                          <Trash2 size={16} />
-                          {t('common.delete')}
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-                </div>
-            </div>,
-            document.body
-          )}
+          <DeleteConfirmationModal
+            isOpen={showDeleteConfirm}
+            onClose={() => setShowDeleteConfirm(false)}
+            onConfirm={async () => {
+              setDeleting(true);
+              try {
+                await onDeleteAccount();
+              } finally {
+                setDeleting(false);
+                setShowDeleteConfirm(false);
+              }
+            }}
+            isDeleting={deleting}
+            title={t('cloud.deleteAccount')}
+            description={
+              <Trans i18nKey="cloud.deleteWarning">
+                Cette action est <strong>irréversible</strong>. Toutes vos données seront
+                supprimées définitivement, y compris votre progression et vos paramètres.
+              </Trans>
+            }
+            t={t}
+          />
         </div>
       )}
 
@@ -204,76 +183,36 @@ export function CloudSyncPanel({
           {/* Delete all local data button (offline mode) */}
           {onDeleteAllData && (
             <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
-              <button
-                className="btn-cloud-delete"
+              <Button
+                variant="danger-ghost"
+                size="sm"
+                fullWidth
+                icon={Trash2}
                 onClick={() => setShowDeleteAllConfirm(true)}
               >
-                <Trash2 size={16} />
                 {t('cloud.deleteAllData')}
-              </button>
+              </Button>
             </div>
           )}
 
           {/* Delete all data confirmation modal */}
-          {showDeleteAllConfirm && createPortal(
-            <div className="delete-overlay" onClick={() => setShowDeleteAllConfirm(false)}>
-              <div className="delete-modal" onClick={e => e.stopPropagation()}>
-                <div className="delete-bg-effects">
-                  <div className="delete-glow delete-glow-1"></div>
-                  <div className="delete-glow delete-glow-2"></div>
-                </div>
-                <div className="delete-content">
-                  <div className="delete-icon-wrapper">
-                    <div className="delete-icon-pulse"></div>
-                    <div className="delete-icon">
-                      <Trash2 />
-                    </div>
-                  </div>
-                  <h3>{t('cloud.deleteAllData')}</h3>
-                  <p>{t('cloud.deleteAllWarning')}</p>
-                  <div className="delete-warning">
-                    <AlertTriangle size={14} />
-                    <span>{t('cloud.deleteCannotUndo')}</span>
-                  </div>
-                  <div className="delete-actions">
-                    <button
-                      className="btn-delete-cancel"
-                      onClick={() => setShowDeleteAllConfirm(false)}
-                      disabled={deletingAll}
-                    >
-                      {t('common.cancel')}
-                    </button>
-                    <button
-                      className="btn-delete-confirm"
-                      onClick={async () => {
-                        setDeletingAll(true);
-                        try {
-                          await onDeleteAllData();
-                        } finally {
-                          setDeletingAll(false);
-                          setShowDeleteAllConfirm(false);
-                        }
-                      }}
-                      disabled={deletingAll}
-                    >
-                      {deletingAll ? (
-                        <>
-                          <span className="delete-spinner"></span>
-                          {t('cloud.deleting')}
-                        </>
-                      ) : (
-                        <>
-                          <Trash2 size={16} />
-                          {t('common.delete')}
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>,
-            document.body
-          )}
+          <DeleteConfirmationModal
+            isOpen={showDeleteAllConfirm}
+            onClose={() => setShowDeleteAllConfirm(false)}
+            onConfirm={async () => {
+              setDeletingAll(true);
+              try {
+                await onDeleteAllData();
+              } finally {
+                setDeletingAll(false);
+                setShowDeleteAllConfirm(false);
+              }
+            }}
+            isDeleting={deletingAll}
+            title={t('cloud.deleteAllData')}
+            description={t('cloud.deleteAllWarning')}
+            t={t}
+          />
         </div>
       )}
 

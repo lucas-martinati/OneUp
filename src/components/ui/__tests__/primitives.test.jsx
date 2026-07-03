@@ -34,8 +34,6 @@ describe('Button', () => {
     const { getByRole } = render(<Button disabled onClick={onClick}>X</Button>);
     const btn = getByRole('button');
     expect(btn.disabled).toBe(true);
-    expect(btn.style.opacity).toBe('0.6');
-    expect(btn.style.pointerEvents).toBe('none');
     fireEvent.click(btn);
     expect(onClick).not.toHaveBeenCalled();
   });
@@ -60,14 +58,17 @@ describe('Button', () => {
 
   it('stretches to full width when fullWidth is set', () => {
     const { getByRole, rerender } = render(<Button fullWidth>X</Button>);
-    expect(getByRole('button').style.width).toBe('100%');
+    expect(getByRole('button').className).toContain('btn--full');
     rerender(<Button>X</Button>);
-    expect(getByRole('button').style.width).toBe('');
+    expect(getByRole('button').className).not.toContain('btn--full');
   });
 
-  it('applies the danger variant styling', () => {
-    const { getByRole } = render(<Button variant="danger">X</Button>);
-    expect(getByRole('button').style.color).toBe('rgb(255, 255, 255)');
+  it('applies the variant and size classes and merges className', () => {
+    const { getByRole } = render(<Button variant="danger" size="lg" className="extra">X</Button>);
+    const cls = getByRole('button').className;
+    expect(cls).toContain('btn--danger');
+    expect(cls).toContain('btn--lg');
+    expect(cls).toContain('extra');
   });
 });
 

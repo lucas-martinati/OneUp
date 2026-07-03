@@ -149,7 +149,6 @@
   gap: clamp(4px, 1.3vw, 9px);
   align-content: start;
   flex: 1;
-  will-change: transform, opacity;
 }
 .weekday {
   text-align: center;
@@ -341,7 +340,7 @@
 }
 .pillCaught {
   background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
+  color: var(--warning);
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 

@@ -14,7 +14,7 @@ afterEach(cleanup);
 
 describe('ConfirmDialog', () => {
   const base = { open: true, message: 'Sûr ?', onConfirm: () => {}, onCancel: () => {} };
-  const overlay = () => [...document.body.children].find((el) => el.style.zIndex === '9999');
+  const overlay = () => document.body.querySelector('.dialog-backdrop');
 
   it('renders nothing when closed', () => {
     render(<ConfirmDialog {...base} open={false} />);

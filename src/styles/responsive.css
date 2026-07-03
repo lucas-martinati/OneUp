@@ -70,6 +70,18 @@
   display: none !important;
 }
 
+/* Remaining infinite decorative animations (leaderboard gold effects,
+   cardio login glow, gold text). Module-scoped classes handle their own
+   overrides via :global([data-perf='low']) in their *.module.css. */
+[data-perf="low"] .gold-text,
+[data-perf="low"] .cardio-wall-glow,
+[data-perf="low"] .sparkle-icon,
+[data-perf="low"] .perfect-day-row::before,
+[data-perf="low"] .ann-ring,
+[data-perf="low"] .ann-cta-shine {
+  animation: none !important;
+}
+
 /* ── Responsive Breakpoints ─────────────────────────────────────────── */
 /* Tablet+ adjustments for full-screen modals and grids */
 

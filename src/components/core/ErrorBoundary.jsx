@@ -29,7 +29,7 @@ export class ErrorBoundary extends React.Component {
                     padding: '20px',
                     textAlign: 'center'
                 }}>
-                    <AlertTriangle size={48} color="#ef4444" style={{ marginBottom: '20px' }} />
+                    <AlertTriangle size={48} color="var(--error)" style={{ marginBottom: '20px' }} />
                     <h1 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Something went wrong</h1>
                     <p style={{ color: '#94a3b8', marginBottom: '20px', maxWidth: '400px' }}>
                         {this.state.error?.message || 'An unexpected error occurred.'}

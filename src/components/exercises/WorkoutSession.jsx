@@ -57,7 +57,7 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
             {ex.done && (
                 <div style={{
                     position: 'absolute', top: '6px', right: '6px',
-                    background: '#10b981', borderRadius: '50%',
+                    background: 'var(--success)', borderRadius: '50%',
                     width: '16px', height: '16px', display: 'flex',
                     alignItems: 'center', justifyContent: 'center'
                 }}>
@@ -136,7 +136,7 @@ export function WorkoutSession(props) {
                                 borderRadius: '20px', height: '40px',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 gap: '5px', padding: '0 14px',
-                                color: showRoutineList ? '#f59e0b' : 'white', cursor: 'pointer',
+                                color: showRoutineList ? 'var(--warning)' : 'white', cursor: 'pointer',
                                 fontSize: '0.75rem', fontWeight: '600'
                             }}
                         >
@@ -174,7 +174,7 @@ export function WorkoutSession(props) {
                                         background: 'rgba(255,255,255,0.04)',
                                         border: '1px solid rgba(255,255,255,0.06)'
                                     }}>
-                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div className="flex-1-min0">
                                             <div style={{
                                                 fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)',
                                                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
@@ -194,7 +194,7 @@ export function WorkoutSession(props) {
                                                 <button onClick={() => { deleteRoutine?.(routine.id); setConfirmDeleteId(null); }}
                                                     style={{
                                                         width: '30px', height: '30px', borderRadius: '50%',
-                                                        background: '#ef4444', border: 'none', color: 'white',
+                                                        background: 'var(--error)', border: 'none', color: 'white',
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                         cursor: 'pointer'
                                                     }}><Check size={14} /></button>
@@ -213,7 +213,7 @@ export function WorkoutSession(props) {
                                                     style={{
                                                         width: '30px', height: '30px', borderRadius: '50%',
                                                         background: 'rgba(239,68,68,0.08)', border: 'none',
-                                                        color: '#ef4444',
+                                                        color: 'var(--error)',
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                         cursor: 'pointer'
                                                     }}><Trash2 size={12} /></button>
@@ -221,7 +221,7 @@ export function WorkoutSession(props) {
                                                     style={{
                                                         width: '30px', height: '30px', borderRadius: '50%',
                                                         background: 'rgba(245,158,11,0.1)', border: 'none',
-                                                        color: '#f59e0b',
+                                                        color: 'var(--warning)',
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                         cursor: 'pointer'
                                                     }}><Pencil size={12} /></button>
@@ -229,7 +229,7 @@ export function WorkoutSession(props) {
                                                     className="hover-lift"
                                                     style={{
                                                         height: '30px', borderRadius: '16px',
-                                                        background: 'linear-gradient(135deg, #818cf8, #6366f1)',
+                                                        background: 'linear-gradient(135deg, var(--color-indigo-light), var(--color-indigo))',
                                                         border: 'none', color: 'white',
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                         gap: '4px', padding: '0 12px', cursor: 'pointer',
@@ -257,7 +257,7 @@ export function WorkoutSession(props) {
                                 <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                                     {t('workout.interDashboard')}
                                 </div>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                <div className="hint-text">
                                     {t('workout.interDashboardDesc')}
                                 </div>
                             </div>
@@ -316,7 +316,7 @@ export function WorkoutSession(props) {
                                 }
 
                                 return (
-                                    <div key={catId} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <div key={catId} className="flex-col gap-8">
                                         <div style={{
                                             fontSize: '0.8rem', fontWeight: '700', color: fullCategoryColors[catId] || 'var(--text-secondary)',
                                             textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '4px'
@@ -371,7 +371,7 @@ export function WorkoutSession(props) {
                                                 padding: '6px 12px', borderRadius: '20px',
                                                 background: 'rgba(139,92,246,0.12)',
                                                 border: '1px solid rgba(139,92,246,0.25)',
-                                                color: '#a78bfa', cursor: 'pointer',
+                                                color: 'var(--color-violet)', cursor: 'pointer',
                                                 fontSize: '0.7rem', fontWeight: '600'
                                             }}
                                         >
@@ -578,7 +578,7 @@ export function WorkoutSession(props) {
                             disabled={!routineName.trim()}
                             style={{
                                 padding: '10px 16px', borderRadius: 'var(--radius-md)',
-                                background: routineName.trim() ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'rgba(255,255,255,0.05)',
+                                background: routineName.trim() ? 'linear-gradient(135deg, var(--warning), #d97706)' : 'rgba(255,255,255,0.05)',
                                 border: 'none', color: 'white', fontWeight: '700',
                                 cursor: routineName.trim() ? 'pointer' : 'default',
                                 opacity: routineName.trim() ? 1 : 0.4,
@@ -619,7 +619,7 @@ export function WorkoutSession(props) {
                                     ? 'rgba(255,255,255,0.05)'
                                     : 'rgba(245,158,11,0.15)',
                                 border: routines.length >= maxRoutines ? 'none' : '1px solid rgba(245,158,11,0.3)',
-                                color: routines.length >= maxRoutines ? 'var(--text-secondary)' : '#f59e0b',
+                                color: routines.length >= maxRoutines ? 'var(--text-secondary)' : 'var(--warning)',
                                 cursor: routines.length >= maxRoutines ? 'default' : 'pointer',
                                 opacity: routines.length >= maxRoutines ? 0.4 : 1,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -638,7 +638,7 @@ export function WorkoutSession(props) {
                         style={{
                             flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
                             background: queue.length >= 1
-                                ? 'linear-gradient(135deg, #818cf8, #6366f1)'
+                                ? 'linear-gradient(135deg, var(--color-indigo-light), var(--color-indigo))'
                                 : 'rgba(255,255,255,0.05)',
                             border: 'none', color: 'white',
                             fontSize: '1rem', fontWeight: '700',

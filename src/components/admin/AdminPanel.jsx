@@ -46,7 +46,7 @@ export function AdminPanel({ onClose }) {
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           marginBottom: 'var(--spacing-md)', flexShrink: 0
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="row gap-12">
             {selectedUid && (
               <button onClick={() => setSelectedUid(null)} className="hover-lift glass" style={{
                 ...roundButtonStyle,

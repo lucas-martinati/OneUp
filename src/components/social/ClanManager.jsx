@@ -93,10 +93,10 @@ export function ClanManager({ onClanJoined }) {
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--spacing-lg)', gap: '24px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                    <Users size={56} color="#f59e0b" />
+                    <Users size={56} color="var(--warning)" />
                     <h2 className="panel-title" style={{
                         margin: 0,
-                        background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                        background: 'linear-gradient(135deg, var(--color-amber), var(--warning))',
                         WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent'
                     }}>{t('clan.title')}</h2>
                 </div>
@@ -113,7 +113,7 @@ export function ClanManager({ onClanJoined }) {
                         ) : (
                             <>
                                 {userClans.length > 0 && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    <div className="flex-col gap-12">
                                         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800', textAlign: 'center' }}>
                                             {t('clan.yourClans', { count: userClans.length })}
                                         </div>
@@ -128,14 +128,14 @@ export function ClanManager({ onClanJoined }) {
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', overflow: 'hidden' }}>
                                                     <div style={{ 
                                                         width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0,
-                                                        background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                                                        background: 'linear-gradient(135deg, var(--color-amber), var(--warning))',
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'black'
                                                     }}>
                                                         <Shield size={16} />
                                                     </div>
                                                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{clan.name}</span>
                                                 </div>
-                                                <span style={{ flexShrink: 0, fontSize: '0.85rem', color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '700' }}>
+                                                <span style={{ flexShrink: 0, fontSize: '0.85rem', color: 'var(--color-amber)', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '700' }}>
                                                     <Users size={14} /> {clan.memberCount}
                                                 </span>
                                             </button>
@@ -150,7 +150,7 @@ export function ClanManager({ onClanJoined }) {
                                     </p>
                                 )}
 
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                <div className="flex-col gap-12">
                                     <button onClick={() => { setView('join'); setError(''); setInputValue(''); }} className="hover-lift" style={{
                                         width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
                                         background: 'linear-gradient(135deg, #818cf8, #6366f1)', border: 'none', color: 'white',
@@ -171,7 +171,7 @@ export function ClanManager({ onClanJoined }) {
                 {(view === 'create' || view === 'join') && (
                     <div className="scale-in" style={{ width: '100%', maxWidth: '300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {!settings?.leaderboardPseudo && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <div className="flex-col gap-8">
                                 <p style={{ margin: 0, color: 'var(--text-secondary)', textAlign: 'center', fontSize: '0.85rem' }}>
                                     {t('clan.choosePseudo')}
                                 </p>
@@ -190,7 +190,7 @@ export function ClanManager({ onClanJoined }) {
                             </div>
                         )}
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div className="flex-col gap-8">
                             <p style={{ margin: 0, color: 'var(--text-secondary)', textAlign: 'center', fontSize: '0.85rem' }}>
                                 {view === 'create' ? t('clan.clanNamePrompt') : t('clan.enterCode')}
                             </p>
@@ -208,7 +208,7 @@ export function ClanManager({ onClanJoined }) {
                             />
                         </div>
                         
-                        {error && <div style={{ color: '#ef4444', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
+                        {error && <div style={{ color: 'var(--error)', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
                             {/* Submit Button */}
@@ -222,7 +222,7 @@ export function ClanManager({ onClanJoined }) {
                                 return (
                                     <button onClick={view === 'create' ? handleCreate : handleJoin} disabled={isLoading} className="hover-lift" style={{
                                         width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
-                                        background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', border: 'none', color: 'black',
+                                        background: 'linear-gradient(135deg, var(--color-amber), var(--warning))', border: 'none', color: 'black',
                                         fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                                         opacity: isLoading ? 0.7 : 1
                                     }}>

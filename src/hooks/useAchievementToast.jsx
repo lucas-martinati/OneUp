@@ -6,6 +6,7 @@ import { BADGE_DEFINITIONS, BADGE_ICONS, getBadgeIconFromDef } from '@config/bad
 import { haptics } from '@utils/hapticsManager';
 import { useToastGestures } from './useToastGestures';
 import { getToastRoot } from'@components/feedback/toastRoot';
+import { getToastContainerStyle, getToastCardStyle } from '@utils/toastStyles';
 
 const TOAST_DURATION_MS = 5000;
 
@@ -33,32 +34,11 @@ function AchievementNotification({ achievement, count = 1, onClose, onView }) {
     const Icon = achievement.icon;
 
     return createPortal(
-        <div style={{
-            order: 0, // achievements sit on top of the shared toast stack
-            // While leaving, drop out of the flex flow so the poke below rises
-            // to the top immediately instead of waiting for the exit to finish.
-            ...(exit ? { position: 'absolute', left: 0, right: 0, top: 0, margin: '0 auto' } : null),
-            transform: `translateY(${isVisible ? '0' : '-24px'})`,
-            opacity: isVisible ? 1 : 0,
-            transition: 'transform 0.34s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease',
-            pointerEvents: isVisible && !exit ? 'auto' : 'none',
-            maxWidth: 'min(360px, calc(100vw - 32px))', width: '100%',
-            display: 'flex', justifyContent: 'center'
-        }}>
+        <div style={getToastContainerStyle(0, isVisible, exit)}>
             <div
                 {...gestureHandlers}
                 className="hover-lift"
-                style={{
-                    position: 'relative', overflow: 'hidden',
-                    display: 'flex', alignItems: 'center', gap: '14px',
-                    padding: '14px 18px 16px 14px', borderRadius: '18px',
-                    background: `linear-gradient(135deg, ${achievement.color}26, rgba(0,0,0,0)) , var(--tooltip-bg)`,
-                    border: `1px solid ${achievement.color}55`,
-                    boxShadow: `0 10px 34px rgba(0,0,0,0.45), 0 6px 22px ${achievement.color}3a`,
-                    backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)',
-                    minWidth: '290px', cursor: 'pointer',
-                    ...gestureStyle,
-                }}
+                style={getToastCardStyle(achievement.color, gestureStyle, { cursor: 'pointer' })}
             >
                 {/* One-shot light sweep on appear */}
                 <span aria-hidden style={{

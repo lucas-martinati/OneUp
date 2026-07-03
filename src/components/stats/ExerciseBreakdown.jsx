@@ -21,7 +21,7 @@ export function ExerciseBreakdown({
             marginBottom: 'var(--spacing-md)',
             background: 'var(--surface-section)'
         }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="flex-col gap-8">
                 {fullCategoryOrder.map((catId, index) => {
                     const catStats = enrichedExerciseStats.filter(ex => ex.categoryId === catId);
                     if (catStats.length === 0) return null;
@@ -102,25 +102,25 @@ export function ExerciseBreakdown({
                                                 }}>
                                                     {hasCardio && (ex.id === 'running' || ex.id === 'cycling') ? (
                                                         <>
-                                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                            <span className="hint-text">
                                                                 {((cardioSessions.filter(s => s.type === ex.id).reduce((sum, s) => sum + (s.distance || 0), 0)) / 1000).toFixed(1)} {t('cardio.units.km')}
                                                             </span>
                                                             <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
-                                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                            <span className="hint-text">
                                                                 {t('cardio.sessionsCount', { count: cardioSessions.filter(s => s.type === ex.id).length })}
                                                             </span>
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                            <span className="hint-text">
                                                                 {ex.totalReps.toLocaleString()} {t('common.reps')}
                                                             </span>
                                                             <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
-                                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                            <span className="hint-text">
                                                                 {ex.daysCompleted}{t('common.daysAbbr')}
                                                             </span>
                                                             <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
-                                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                            <span className="hint-text">
                                                                 {ex.completionRate}%
                                                             </span>
                                                         </>

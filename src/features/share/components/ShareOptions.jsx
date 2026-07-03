@@ -173,7 +173,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       />
 
       {isGlobal && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div className="flex-col gap-8">
           <OptionRow
             icon={Dumbbell}
             label={t('share.showDailyExercises')}

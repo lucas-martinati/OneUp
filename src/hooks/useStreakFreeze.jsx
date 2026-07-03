@@ -9,6 +9,7 @@ import { useSubscription } from '@contexts/SubscriptionContext';
 import { useAuth } from '@contexts/AuthContext';
 import { useToastGestures } from './useToastGestures';
 import { getToastRoot } from '@components/feedback/toastRoot';
+import { getToastContainerStyle, getToastCardStyle } from '@utils/toastStyles';
 
 const TOAST_DURATION_MS = 6000;
 const FREEZE_COLOR = '#38bdf8';
@@ -29,30 +30,11 @@ function StreakFreezeNotification({ count, onClose }) {
     }, []);
 
     return createPortal(
-        <div style={{
-            order: 1,
-            ...(exit ? { position: 'absolute', left: 0, right: 0, top: 0, margin: '0 auto' } : null),
-            transform: `translateY(${isVisible ? '0' : '-24px'})`,
-            opacity: isVisible ? 1 : 0,
-            transition: 'transform 0.34s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease',
-            pointerEvents: isVisible && !exit ? 'auto' : 'none',
-            maxWidth: 'min(360px, calc(100vw - 32px))', width: '100%',
-            display: 'flex', justifyContent: 'center'
-        }}>
+        <div style={getToastContainerStyle(1, isVisible, exit)}>
             <div
                 {...gestureHandlers}
                 className="hover-lift"
-                style={{
-                    position: 'relative', overflow: 'hidden',
-                    display: 'flex', alignItems: 'center', gap: '14px',
-                    padding: '14px 18px 16px 14px', borderRadius: '18px',
-                    background: `linear-gradient(135deg, ${FREEZE_COLOR}26, rgba(0,0,0,0)) , var(--tooltip-bg)`,
-                    border: `1px solid ${FREEZE_COLOR}55`,
-                    boxShadow: `0 10px 34px rgba(0,0,0,0.45), 0 6px 22px ${FREEZE_COLOR}3a`,
-                    backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)',
-                    minWidth: '290px',
-                    ...gestureStyle,
-                }}
+                style={getToastCardStyle(FREEZE_COLOR, gestureStyle)}
             >
                 <div style={{
                     position: 'relative', flexShrink: 0,

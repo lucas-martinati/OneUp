@@ -324,7 +324,6 @@
     "deleteAllWarning": "Alle deine lokalen Daten werden dauerhaft gelöscht, einschließlich deines Fortschritts, deiner Einstellungen und Routinen. Die App wird neu gestartet.",
     "deleteCannotUndo": "Diese Aktion kann nicht rückgängig gemacht werden",
     "deleteWarning": "Diese Aktion ist <1>unumkehrbar</1>. Alle Ihre Daten werden dauerhaft gelöscht, einschließlich Ihres Fortschritts und Ihrer Einstellungen.",
-    "deleting": "Löschen...",
     "merge": "Verschmelzen",
     "mergeDesc": "Kombinieren Sie lokale und Cloud-Daten",
     "multiDevice": "Synchronisierung mehrerer Geräte",

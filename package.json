@@ -101,7 +101,8 @@
     ],
     "format": [
       "javascript",
-      "jsx"
+      "jsx",
+      "css"
     ],
     "minLines": 10,
     "minTokens": 70,
@@ -109,7 +110,8 @@
     "ignore": [
       "**/__tests__/**",
       "**/*.test.{js,jsx}",
-      "**/*.spec.{js,jsx}"
+      "**/*.spec.{js,jsx}",
+      "**/tokens.css"
     ],
     "reporters": [
       "console"
