@@ -138,12 +138,13 @@ export const DashboardHeader = React.memo(({
             <div ref={rightSideRef} style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 0, justifyContent: 'flex-end' }}>
                 {isAdmin && (
                     <IconButton
-                        icon={Shield}
                         variant="danger"
                         onClick={() => openModal('admin')}
                         aria-label="Admin Panel"
                         className="hover-lift"
-                    />
+                    >
+                        <Shield size={19} style={{ transform: 'translateX(1px)' }} />
+                    </IconButton>
                 )}
 
                 {/* Global streak badge — three states: active (fire), frozen but

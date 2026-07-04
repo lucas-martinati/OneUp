@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Award, Lock } from '@utils/icons';
+import { Award, Lock, X } from '@utils/icons';
 import { useBackHandler } from '@hooks/useBackHandler';
+import { IconButton } from '@components/ui';
 import { SegmentedControl } from '@components/ui/SegmentedControl';
 import { buildBadges } from './buildBadges';
 
@@ -152,117 +153,64 @@ const BadgeItem = React.memo(({ badge, highlighted }) => {
     );
 });
 
+/** Small colored pill that filters the grid to one badge category. */
+const CategoryChip = React.memo(({ label, color, count, active, onClick }) => (
+    <button
+        type="button"
+        onClick={onClick}
+        style={{
+            display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0,
+            padding: '6px 12px', borderRadius: '20px', cursor: 'pointer',
+            background: active ? `${color}26` : 'var(--surface-muted)',
+            border: active ? `1px solid ${color}` : '1px solid var(--border-subtle)',
+            transition: 'background 0.2s ease, border-color 0.2s ease',
+        }}
+    >
+        <span aria-hidden="true" style={{
+            width: '8px', height: '8px', borderRadius: '50%', background: color,
+            opacity: active ? 1 : 0.55,
+        }} />
+        <span style={{
+            fontSize: '0.7rem', fontWeight: '800',
+            color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+        }}>
+            {label}
+        </span>
+        {count && (
+            <span style={{ fontSize: '0.62rem', fontWeight: '700', color: active ? color : 'var(--text-secondary)', opacity: 0.9 }}>
+                {count}
+            </span>
+        )}
+    </button>
+));
+
+/**
+ * Full-screen achievements page (replaces the old draggable bottom sheet):
+ * a compact gold hero with the progress ring, an unlocked/locked filter, a
+ * category chip rail to jump straight to one badge family, and the badge
+ * grid grouped by category. Opens above Stats; back button or ✕ closes it.
+ */
 export function Achievements({ /* completions, exercises, settings, getDayNumber, */ onClose, computedStats, highlightedBadgeId }) {
     const { t } = useTranslation();
-    const [isVisible, setIsVisible] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
-    // Once the entrance slide finishes we drop the persistent transform +
-    // will-change: a permanently composited, transformed scroll container makes
-    // the webview intermittently fail to repaint badges scrolled back into view.
-    const [entered, setEntered] = useState(false);
     const [filter, setFilter] = useState('all'); // 'all' | 'unlocked' | 'locked'
-    
-    // Use refs for drag state to avoid React re-renders which causes jank with long lists
-    const sheetRef = useRef(null);
-    const overlayRef = useRef(null);
-    const scrollContentRef = useRef(null);
-    const startY = useRef(0);
-    const isDragging = useRef(false);
+    const [catFilter, setCatFilter] = useState(null); // null = all categories
+    const contentRef = useRef(null);
 
-    // Deep-link: when opened from a specific badge, scroll it into view once the
-    // entrance slide has settled. The badge also gets a highlight ring + pulse.
+    // Deep-link: when opened from a specific badge, scroll it into view once
+    // the entrance animation has settled. The badge gets a highlight ring + pulse.
     useEffect(() => {
         if (!highlightedBadgeId) return;
         const timer = setTimeout(() => {
-            const el = scrollContentRef.current?.querySelector(`[data-badge-id="${highlightedBadgeId}"]`);
+            const el = contentRef.current?.querySelector(`[data-badge-id="${highlightedBadgeId}"]`);
             el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 480);
+        }, 350);
         return () => clearTimeout(timer);
     }, [highlightedBadgeId]);
 
-    const handleClose = useCallback(() => {
-        setIsClosing(true);
-        setTimeout(() => onClose(), 300); // 300ms to allow spring animation to run
-    }, [onClose]);
-
-    useEffect(() => {
-        requestAnimationFrame(() => {
-            setIsVisible(true);
-        });
-    }, []);
-
     useBackHandler(() => {
-        handleClose();
+        onClose();
         return true;
     }, true);
-
-    // Touch/Mouse Handlers optimized with DOM refs
-    const handleStart = (y) => {
-        const contentEl = sheetRef.current?.querySelector('[data-scroll-content]');
-        // Only allow dragging if we are at the top of the scroll content, or clicking the header area (y < 100)
-        const canScrollUp = contentEl ? contentEl.scrollTop > 0 : false;
-        
-        if (!canScrollUp || y < 100) {
-            startY.current = y;
-            isDragging.current = true;
-            // Removed transition='none' here so it doesn't mutate DOM on simple clicks
-        }
-    };
-    
-    const handleMove = (y) => {
-        if (!isDragging.current) return;
-        const diff = y - startY.current;
-        if (diff > 0) {
-            // First time it moves, remove transition for instant drag follow
-            if (sheetRef.current && sheetRef.current.style.transition !== 'none') {
-                sheetRef.current.style.transition = 'none';
-            }
-            if (overlayRef.current && overlayRef.current.style.transition !== 'none') {
-                overlayRef.current.style.transition = 'none';
-            }
-            
-            const dragPx = diff * 0.6; // Resistance factor
-            if (sheetRef.current) {
-                sheetRef.current.style.transform = `translateY(${dragPx}px)`;
-            }
-            if (overlayRef.current) {
-                const opacity = Math.max(0, 1 - (dragPx / 300));
-                overlayRef.current.style.opacity = opacity.toString();
-            }
-        }
-    };
-    
-    const handleEnd = () => {
-        if (!isDragging.current) return;
-        isDragging.current = false;
-        
-        const currentTransform = sheetRef.current?.style.transform;
-        const dragPx = currentTransform ? parseFloat(currentTransform.replace('translateY(', '').replace('px)', '')) : 0;
-        
-        if (dragPx > 80) { // threshold for closing
-            handleClose();
-        } else if (dragPx > 0) {
-            // Rebound dynamically ONLY if it actually moved
-            if (sheetRef.current) {
-                sheetRef.current.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-                sheetRef.current.style.transform = 'translateY(0px)';
-            }
-            if (overlayRef.current) {
-                overlayRef.current.style.transition = 'opacity 0.4s ease';
-                overlayRef.current.style.opacity = '1';
-                setTimeout(() => {
-                    // Clean up inline styles so React state can take over cleanly
-                    if (overlayRef.current) {
-                        overlayRef.current.style.transition = '';
-                        overlayRef.current.style.opacity = '';
-                    }
-                    if (sheetRef.current) {
-                        sheetRef.current.style.transform = '';
-                    }
-                }, 400);
-            }
-        }
-    };
 
     // Extract stats. Badge unlock/progress reads from `badgeStats` — the shared
     // snapshot (@shared/achievementStats.js) also used by the Cloud Function — so
@@ -289,186 +237,168 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
         }));
     }, [badges]);
 
-    let overlayOpacity = 0;
-    if (!isClosing && isVisible) {
-        overlayOpacity = 1;
-    }
+    // Categories with nothing to show under the current status filter (e.g. a
+    // fully unlocked family while viewing "locked") drop out of the rail and
+    // the grid entirely; a chip selection that disappears falls back to "all".
+    const matchesFilter = (b) =>
+        filter === 'all' || (filter === 'unlocked' ? b.unlocked : !b.unlocked);
+    const visibleCategories = categories.filter(cat =>
+        badges.some(b => b.category === cat.id && matchesFilter(b))
+    );
+    const effectiveCatFilter = visibleCategories.some(c => c.id === catFilter) ? catFilter : null;
 
-    let sheetTransform = 'translateY(100%)';
-    if (!isClosing) {
-        if (entered) {
-            sheetTransform = 'none';
-        } else if (isVisible) {
-            sheetTransform = 'translateY(0%)';
-        }
-    }
+    const total = badges.length || 1;
+    const pct = unlockedCount / total;
+    const R = 40;
+    const C = 2 * Math.PI * R;
 
     return (
-        <div className="modal-overlay" style={{
-            background: 'transparent', zIndex: 199,
-            overflow: 'hidden', pointerEvents: 'none'
-        }}>
-            <div 
-                ref={overlayRef}
-                onClick={handleClose} 
-                style={{
-                    position: 'fixed', inset: 0,
-                    background: 'rgba(0,0,0,0.5)',
-                    opacity: overlayOpacity,
-                    transition: isClosing ? 'opacity 0.3s ease' : 'opacity 0.4s ease',
-                    pointerEvents: 'auto'
-                }} 
-            />
-            
-            <div ref={sheetRef}
-                onClick={(e) => e.stopPropagation()}
-                onTouchStart={(e) => handleStart(e.touches[0].clientY)}
-                onTouchMove={(e) => handleMove(e.touches[0].clientY)}
-                onTouchEnd={handleEnd}
-                onMouseDown={(e) => handleStart(e.clientY)}
-                onMouseMove={(e) => handleMove(e.clientY)}
-                onMouseUp={handleEnd}
-                onMouseLeave={handleEnd}
-                onTransitionEnd={(e) => { if (e.propertyName === 'transform' && isVisible && !isClosing) setEntered(true); }}
-                style={{
-                    position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
-                    background: 'var(--sheet-bg)',
-                    borderRadius: 'calc(var(--radius-xl) * 1.5) calc(var(--radius-xl) * 1.5) 0 0',
-                    boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
-                    transform: sheetTransform,
-                    transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    maxHeight: '90vh', display: 'flex', flexDirection: 'column',
-                    willChange: entered ? 'auto' : 'transform',
-                    pointerEvents: 'auto'
-                }}>
+        <div className="fade-in modal-overlay" style={{ zIndex: 200 }}>
+            <div ref={contentRef} className="modal-content">
 
-                {/* Background extension below the sheet: the spring easing
-                    overshoots past bottom:0, lifting the sheet up and briefly
-                    exposing a gap underneath. This fills that gap. */}
-                <div aria-hidden style={{
-                    position: 'absolute', top: '100%', left: 0, right: 0, height: '40vh',
-                    background: 'var(--sheet-bg)', pointerEvents: 'none'
-                }} />
-
+                {/* ── Header ─────────────────────────────────────────────── */}
                 <div style={{
-                    width: '48px', height: '5px', borderRadius: '3px',
-                    background: 'var(--sheet-handle)', margin: 'var(--spacing-sm) auto',
-                    cursor: 'grab', opacity: 0.7
-                }} />
-
-                <div ref={scrollContentRef} data-scroll-content className="modal-content no-scrollbar" style={{
-                    flex: 1, overflowY: 'auto',
-                    paddingTop: 0
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    marginBottom: 'var(--spacing-md)'
                 }}>
-                    {/* ── Hero: circular progress ring ─────────────────────── */}
-                    {(() => {
-                        const total = badges.length || 1;
-                        const pct = unlockedCount / total;
-                        const R = 54;
-                        const C = 2 * Math.PI * R;
-                        return (
-                            <div style={{
-                                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                                padding: 'var(--spacing-sm) 0 var(--spacing-lg)', marginBottom: 'var(--spacing-md)'
-                            }}>
-                                <div style={{ position: 'relative', width: '132px', height: '132px' }}>
-                                    <svg width="132" height="132" viewBox="0 0 132 132" style={{ transform: 'rotate(-90deg)' }}>
-                                        <circle cx="66" cy="66" r={R} fill="none" stroke="var(--progress-track)" strokeWidth="8" />
-                                        <circle
-                                            cx="66" cy="66" r={R} fill="none"
-                                            stroke="url(#achHeroGrad)" strokeWidth="8" strokeLinecap="round"
-                                            strokeDasharray={C} strokeDashoffset={C * (1 - pct)}
-                                            style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s' }}
-                                        />
-                                        <defs>
-                                            <linearGradient id="achHeroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stopColor="#fbbf24" />
-                                                <stop offset="100%" stopColor="#f59e0b" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                    <div style={{
-                                        position: 'absolute', inset: 0, display: 'flex',
-                                        flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
-                                    }}>
-                                        <Award size={20} color="#fbbf24" style={{ marginBottom: '2px' }} />
-                                        <div style={{ fontSize: '2.1rem', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1 }}>
-                                            {unlockedCount}
-                                        </div>
-                                        <div style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--text-secondary)' }}>
-                                            / {badges.length}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style={{
-                                    marginTop: '12px', fontSize: '0.78rem', textTransform: 'uppercase',
-                                    letterSpacing: '1.5px', fontWeight: '800', color: '#fbbf24'
-                                }}>
-                                    {t('achievements.badgesUnlocked')}
-                                </div>
-                                <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                                    {Math.round(pct * 100)}%
-                                </div>
-                            </div>
-                        );
-                    })()}
+                    <h2 className="panel-title" style={{ margin: 0 }}>
+                        {t('achievements.title')}
+                    </h2>
+                    <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
+                </div>
 
-                    {/* ── Filter ───────────────────────────────────────────── */}
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--spacing-lg)' }}>
-                        <SegmentedControl
-                            options={[
-                                { id: 'all', label: t('achievements.filterAll') },
-                                { id: 'unlocked', label: t('achievements.filterUnlocked') },
-                                { id: 'locked', label: t('achievements.filterLocked') },
-                            ]}
-                            value={filter}
-                            onChange={setFilter}
-                            style={{ width: '100%' }}
-                        />
+                {/* ── Hero: progress ring + counters in one gold card ────── */}
+                <div className="glass-premium slide-up" style={{
+                    display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)',
+                    padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                    marginBottom: 'var(--spacing-md)',
+                    background: 'linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.04))',
+                    border: '1px solid rgba(251,191,36,0.22)',
+                }}>
+                    <div style={{ position: 'relative', width: '96px', height: '96px', flexShrink: 0 }}>
+                        <svg width="96" height="96" viewBox="0 0 96 96" style={{ transform: 'rotate(-90deg)' }}>
+                            <circle cx="48" cy="48" r={R} fill="none" stroke="var(--progress-track)" strokeWidth="7" />
+                            <circle
+                                cx="48" cy="48" r={R} fill="none"
+                                stroke="url(#achHeroGrad)" strokeWidth="7" strokeLinecap="round"
+                                strokeDasharray={C} strokeDashoffset={C * (1 - pct)}
+                                style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s' }}
+                            />
+                            <defs>
+                                <linearGradient id="achHeroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#fbbf24" />
+                                    <stop offset="100%" stopColor="#f59e0b" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div style={{
+                            position: 'absolute', inset: 0, display: 'flex',
+                            alignItems: 'center', justifyContent: 'center'
+                        }}>
+                            <Award size={30} color="#fbbf24" />
+                        </div>
                     </div>
+                    <div className="flex-1-min0">
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '5px' }}>
+                            <span style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1 }}>
+                                {unlockedCount}
+                            </span>
+                            <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-secondary)' }}>
+                                / {badges.length}
+                            </span>
+                        </div>
+                        <div style={{
+                            marginTop: '6px', fontSize: '0.72rem', textTransform: 'uppercase',
+                            letterSpacing: '1.2px', fontWeight: '800', color: '#fbbf24'
+                        }}>
+                            {t('achievements.badgesUnlocked')}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                            {Math.round(pct * 100)}%
+                        </div>
+                    </div>
+                </div>
 
-                    {/* ── Categories Listing ───────────────────────────────── */}
-                    {categories.map(cat => {
+                {/* ── Status filter ───────────────────────────────────────── */}
+                <div style={{ marginBottom: 'var(--spacing-sm)' }}>
+                    <SegmentedControl
+                        options={[
+                            { id: 'all', label: t('achievements.filterAll') },
+                            { id: 'unlocked', label: t('achievements.filterUnlocked') },
+                            { id: 'locked', label: t('achievements.filterLocked') },
+                        ]}
+                        value={filter}
+                        onChange={setFilter}
+                        style={{ width: '100%' }}
+                    />
+                </div>
+
+                {/* ── Category rail ───────────────────────────────────────── */}
+                <div style={{
+                    display: 'flex', flexWrap: 'wrap', gap: '6px',
+                    marginBottom: 'var(--spacing-lg)'
+                }}>
+                    <CategoryChip
+                        label={t('achievements.filterAll')}
+                        color="#fbbf24"
+                        active={effectiveCatFilter === null}
+                        onClick={() => setCatFilter(null)}
+                    />
+                    {visibleCategories.map(cat => {
                         const catBadges = badges.filter(b => b.category === cat.id);
-                        if (catBadges.length === 0) return null;
-                        const shown = catBadges.filter(b =>
-                            filter === 'all' || (filter === 'unlocked' ? b.unlocked : !b.unlocked)
-                        );
-                        if (shown.length === 0) return null;
                         const catUnlocked = catBadges.filter(b => b.unlocked).length;
-
                         return (
-                            <div key={cat.id} style={{ marginBottom: 'var(--spacing-xl)' }}>
-                                <div style={{
-                                    display: 'flex', alignItems: 'center', gap: '10px',
-                                    marginBottom: 'var(--spacing-sm)', paddingLeft: '4px'
-                                }}>
-                                    <div style={{
-                                        fontSize: '0.82rem', fontWeight: '800',
-                                        color: cat.color, textTransform: 'uppercase', letterSpacing: '1px'
-                                    }}>
-                                        {t(cat.titleKey)}
-                                    </div>
-                                    <div style={{
-                                        fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-secondary)',
-                                        background: `${cat.color}1a`, border: `1px solid ${cat.color}33`,
-                                        padding: '2px 8px', borderRadius: '20px'
-                                    }}>
-                                        {catUnlocked}/{catBadges.length}
-                                    </div>
-                                    <div style={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${cat.color}40, transparent)` }} />
-                                </div>
-                                <div style={{
-                                    display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px'
-                                }}>
-                                    {shown.map((badge) => (
-                                        <BadgeItem key={badge.id} badge={badge} highlighted={badge.id === highlightedBadgeId} />
-                                    ))}
-                                </div>
-                            </div>
+                            <CategoryChip
+                                key={cat.id}
+                                label={t(cat.titleKey)}
+                                color={cat.color}
+                                count={`${catUnlocked}/${catBadges.length}`}
+                                active={effectiveCatFilter === cat.id}
+                                onClick={() => setCatFilter(prev => prev === cat.id ? null : cat.id)}
+                            />
                         );
                     })}
                 </div>
+
+                {/* ── Categories listing ──────────────────────────────────── */}
+                {visibleCategories.map(cat => {
+                    if (effectiveCatFilter && effectiveCatFilter !== cat.id) return null;
+                    const catBadges = badges.filter(b => b.category === cat.id);
+                    const shown = catBadges.filter(matchesFilter);
+                    if (shown.length === 0) return null;
+                    const catUnlocked = catBadges.filter(b => b.unlocked).length;
+
+                    return (
+                        <div key={cat.id} style={{ marginBottom: 'var(--spacing-xl)' }}>
+                            <div style={{
+                                display: 'flex', alignItems: 'center', gap: '10px',
+                                marginBottom: 'var(--spacing-sm)', paddingLeft: '4px'
+                            }}>
+                                <div style={{
+                                    fontSize: '0.82rem', fontWeight: '800',
+                                    color: cat.color, textTransform: 'uppercase', letterSpacing: '1px'
+                                }}>
+                                    {t(cat.titleKey)}
+                                </div>
+                                <div style={{
+                                    fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-secondary)',
+                                    background: `${cat.color}1a`, border: `1px solid ${cat.color}33`,
+                                    padding: '2px 8px', borderRadius: '20px'
+                                }}>
+                                    {catUnlocked}/{catBadges.length}
+                                </div>
+                                <div style={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${cat.color}40, transparent)` }} />
+                            </div>
+                            <div style={{
+                                display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px'
+                            }}>
+                                {shown.map((badge) => (
+                                    <BadgeItem key={badge.id} badge={badge} highlighted={badge.id === highlightedBadgeId} />
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

@@ -9,8 +9,10 @@ import { buildBadges } from '../buildBadges';
 
 // Badge inputs live in the shared `badgeStats` snapshot; `achievements` carries
 // the manual overrides. The grid reads exactly these (see Achievements.jsx).
+// perfectDays: 150 unlocks all four "perfection" badges → that category must
+// disappear entirely under the "locked" filter (chip + section).
 const BADGE_STATS = {
-  totalDays: 12, maxStreak: 7, totalRepsAll: 1200, perfectDays: 5,
+  totalDays: 12, maxStreak: 7, totalRepsAll: 1200, perfectDays: 150,
   hasCompletedAllExercisesOnce: true, weekdayWorkouts: 26, weekendWorkouts: 2,
   morningWorkouts: 6, afternoonWorkouts: 3, eveningWorkouts: 3,
   ghostWorkout: false, perfectStreak: 3,
@@ -56,20 +58,25 @@ describe('Achievements', () => {
     expect(ids.every(id => lockedIds.includes(id))).toBe(true);
   });
 
-  it('closes when the backdrop is clicked', async () => {
-    const { container, onClose } = renderPanel();
-    const overlay = container.querySelector('.modal-overlay').firstChild;
-    fireEvent.click(overlay);
+  it('closes when the ✕ button is clicked', async () => {
+    const { getByRole, onClose } = renderPanel();
+    fireEvent.click(getByRole('button', { name: 'Close' }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 
-  it('closes on a downward drag past the threshold', async () => {
-    const { container, onClose } = renderPanel();
-    const sheet = container.querySelector('[data-scroll-content]').parentElement;
-    fireEvent.touchStart(sheet, { touches: [{ clientY: 50 }] });
-    fireEvent.touchMove(sheet, { touches: [{ clientY: 250 }] }); // diff 200 * 0.6 = 120 > 80
-    fireEvent.touchEnd(sheet);
-    await waitFor(() => expect(onClose).toHaveBeenCalled());
+  it('filters to a single category via its chip and toggles back', () => {
+    const { container, getAllByRole } = renderPanel();
+    const badges = buildBadges(BADGE_INPUT);
+    const firstCat = badges[0].category;
+    const catCount = badges.filter(b => b.category === firstCat).length;
+    const chip = getAllByRole('button', { name: /achievements\.categories\./ })[0];
+    fireEvent.click(chip);
+    const shown = container.querySelectorAll('[data-badge-id]').length;
+    expect(shown).toBeLessThan(badges.length);
+    // Toggling the same chip again restores the full grid
+    fireEvent.click(chip);
+    expect(container.querySelectorAll('[data-badge-id]').length).toBe(badges.length);
+    expect(catCount).toBeGreaterThan(0);
   });
 
   it('highlights the deep-linked badge', () => {
@@ -79,6 +86,15 @@ describe('Achievements', () => {
     expect(el).toBeTruthy();
     // highlighted tiles get a 2px colored border
     expect(el.style.border).toContain('2px');
+  });
+
+  it('hides fully unlocked categories under the locked filter', () => {
+    const { container, getByRole } = renderPanel();
+    // Visible while showing everything…
+    expect(container.textContent).toContain('achievements.categories.perfection');
+    fireEvent.click(getByRole('button', { name: 'achievements.filterLocked' }));
+    // …gone (chip and section) once only locked badges are listed
+    expect(container.textContent).not.toContain('achievements.categories.perfection');
   });
 
   it('renders category section headers with counts', () => {
