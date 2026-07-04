@@ -133,7 +133,8 @@ function ExerciseList({ exercises, t }) {
             </span>
             <span style={{
               fontSize: '0.65rem', fontWeight: 700, color: '#10b981',
-              display: 'flex', alignItems: 'center'
+              display: 'flex', alignItems: 'center',
+              whiteSpace: 'nowrap', flexShrink: 0,
             }}>
               {ex.type === 'timer' ? `${ex.reps}s` : `\u00d7${ex.reps}`}
               {ex.weight ? ` • ${ex.weight} ${t('weight.kg')}` : ''}
