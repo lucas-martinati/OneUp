@@ -77,7 +77,7 @@ describe('Button', () => {
 describe('IconButton', () => {
   it('renders the icon component when provided', () => {
     const { getByTestId } = render(<IconButton icon={FakeIcon} size="sm" aria-label="a" />);
-    expect(getByTestId('icon').getAttribute('data-size')).toBe('17');
+    expect(getByTestId('icon').getAttribute('data-size')).toBe('18');
   });
 
   it('renders children when no icon is given', () => {

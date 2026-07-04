@@ -33,7 +33,9 @@ const SIZES = {
   lg: { width: '48px', height: '48px' },
 };
 
-const ICON_PX = { sm: 17, md: 19, lg: 22 };
+// Even sizes only: the buttons are 34/40/48px wide, so an odd icon size
+// leaves a half-pixel margin that desktop (DPR 1) snaps off-center.
+const ICON_PX = { sm: 18, md: 20, lg: 22 };
 
 // Variants backed by an existing utility class inherit its perf-mode overrides.
 const VARIANT_CLASS = { surface: '', glass: 'glass', ghost: '', danger: '' };
