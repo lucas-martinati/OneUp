@@ -198,7 +198,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const { getConfig } = useExerciseConfig();
-  const { customCategories } = useExercises();
+  const { customCategories, exercisesByUserCategory, customExercises: allCustomExercises } = useExercises();
   const fullCategoryOrder = buildFullCategoryOrder(customCategories);
   const fullCategoryColors = buildFullCategoryColors(customCategories);
 
@@ -220,7 +220,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
     const dayNum = getDayNumber ? getDayNumber(targetDate) : 1;
     const dayData = completions[targetDate];
     if (dayData) {
-      const allKnownExercises = [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES, ...(stats?.customExercises || [])];
+      const allKnownExercises = [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES, ...(allCustomExercises || [])];
       for (const [exId, exStats] of Object.entries(dayData)) {
         if (exStats?.isCompleted) {
           const knownEx = allKnownExercises.find(e => e.id === exId);
@@ -282,18 +282,40 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
 
   // Categorize exercises
   const isWeightEx = (ex) => weightIds.includes(ex.id);
-  const isCustomEx = (ex) => isCustomExercise(ex.id) || (!weightIds.includes(ex.id) && sessionType === CATEGORIES.CUSTOM);
   const isCardioEx = (ex) => ex.id === 'running' || ex.id === 'cycling';
+
+  // Determine the actual category of an exercise, including user-created categories
+  const getExCategory = (ex) => {
+    if (isWeightEx(ex)) return CATEGORIES.WEIGHTS;
+    if (isCardioEx(ex)) return CATEGORIES.CARDIO;
+    // Check if this exercise belongs to a user-created custom category
+    if (exercisesByUserCategory) {
+      for (const catId of Object.keys(exercisesByUserCategory)) {
+        if (exercisesByUserCategory[catId].some(e => e.id === ex.id)) return catId;
+      }
+    }
+    if (isCustomExercise(ex.id)) return CATEGORIES.CUSTOM;
+    // Fallback: if it's not a known bodyweight exercise and sessionType is custom
+    if (!weightIds.includes(ex.id) && sessionType === CATEGORIES.CUSTOM) return CATEGORIES.CUSTOM;
+    return CATEGORIES.BODYWEIGHT;
+  };
+
+  const isCustomEx = (ex) => {
+    const cat = getExCategory(ex);
+    return cat === CATEGORIES.CUSTOM || isUserCategory(cat);
+  };
+
   const hasWeightEx = allExercises.some(isWeightEx);
   const hasCustomEx = allExercises.some(isCustomEx);
   const hasCardioEx = allExercises.some(isCardioEx);
-  const showCategoriesSeparately = options.showWeights && (hasWeightEx || hasCustomEx || hasCardioEx);
+  const hasUserCategoryEx = allExercises.some(ex => isUserCategory(getExCategory(ex)));
+  const showCategoriesSeparately = options.showWeights && (hasWeightEx || hasCustomEx || hasCardioEx || hasUserCategoryEx);
 
   const bodyweightExercises = showCategoriesSeparately
-    ? allExercises.filter(ex => !isWeightEx(ex) && !isCustomEx(ex))
+    ? allExercises.filter(ex => getExCategory(ex) === CATEGORIES.BODYWEIGHT)
     : allExercises;
   const weightExercises = allExercises.filter(isWeightEx);
-  const customExercises = allExercises.filter(isCustomEx);
+  const customExercises = allExercises.filter(ex => getExCategory(ex) === CATEGORIES.CUSTOM);
 
   // Libellé d'une catégorie : nom personnalisé si défini, sinon clé brute (catégorie
   // utilisateur) ou traduction (catégorie standard).
@@ -306,9 +328,10 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
   const categories = fullCategoryOrder.map(key => {
     let exList = [];
     if (key === CATEGORIES.BODYWEIGHT) exList = bodyweightExercises;
-    if (key === CATEGORIES.WEIGHTS) exList = weightExercises;
-    if (key === CATEGORIES.CUSTOM) exList = customExercises;
-    if (key === CATEGORIES.CARDIO) exList = allExercises.filter(isCardioEx);
+    else if (key === CATEGORIES.WEIGHTS) exList = weightExercises;
+    else if (key === CATEGORIES.CUSTOM) exList = customExercises;
+    else if (key === CATEGORIES.CARDIO) exList = allExercises.filter(isCardioEx);
+    else if (isUserCategory(key)) exList = allExercises.filter(ex => getExCategory(ex) === key);
     if (exList.length === 0) return null;
     const label = getCategoryLabel(key);
     return { 
@@ -325,29 +348,33 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
     : Object.values(CATEGORIES);
 
   const filteredDailyExercises = isGlobal ? dailyExercises.filter(ex => {
-    if (isCustomEx(ex)) return selectedCats.includes(CATEGORIES.CUSTOM);
-    if (isWeightEx(ex)) return selectedCats.includes(CATEGORIES.WEIGHTS);
-    if (isCardioEx(ex)) return selectedCats.includes(CATEGORIES.CARDIO);
-    return selectedCats.includes(CATEGORIES.BODYWEIGHT);
+    const cat = getExCategory(ex);
+    return selectedCats.includes(cat);
   }) : dailyExercises;
 
   // Categorize daily exercises (for global mode)
   const hasDailyWeightEx = filteredDailyExercises.some(isWeightEx);
   const hasDailyCustomEx = filteredDailyExercises.some(isCustomEx);
   const hasDailyCardioEx = filteredDailyExercises.some(isCardioEx);
-  const shouldSeparateDaily = hasDailyWeightEx || hasDailyCustomEx || hasDailyCardioEx;
+  const hasDailyUserCategoryEx = filteredDailyExercises.some(ex => isUserCategory(getExCategory(ex)));
+  const shouldSeparateDaily = hasDailyWeightEx || hasDailyCustomEx || hasDailyCardioEx || hasDailyUserCategoryEx;
 
-  const dailyBodyweight = shouldSeparateDaily ? filteredDailyExercises.filter(ex => !isWeightEx(ex) && !isCustomEx(ex) && !isCardioEx(ex)) : filteredDailyExercises;
-  const dailyWeight = shouldSeparateDaily ? filteredDailyExercises.filter(isWeightEx) : [];
-  const dailyCustom = shouldSeparateDaily ? filteredDailyExercises.filter(isCustomEx) : [];
-  const dailyCardio = shouldSeparateDaily ? filteredDailyExercises.filter(isCardioEx) : [];
   const dailyCategories = fullCategoryOrder.map(key => {
     let exList = [];
     let isPerfect = false;
-    if (key === CATEGORIES.BODYWEIGHT) { exList = dailyBodyweight; isPerfect = dailyStandardDone; }
-    if (key === CATEGORIES.WEIGHTS) { exList = dailyWeight; isPerfect = dailyWeightsDone; }
-    if (key === CATEGORIES.CUSTOM) exList = dailyCustom;
-    if (key === CATEGORIES.CARDIO) exList = dailyCardio;
+    if (key === CATEGORIES.BODYWEIGHT) {
+      exList = shouldSeparateDaily ? filteredDailyExercises.filter(ex => getExCategory(ex) === CATEGORIES.BODYWEIGHT) : filteredDailyExercises;
+      isPerfect = dailyStandardDone;
+    } else if (key === CATEGORIES.WEIGHTS) {
+      exList = shouldSeparateDaily ? filteredDailyExercises.filter(isWeightEx) : [];
+      isPerfect = dailyWeightsDone;
+    } else if (key === CATEGORIES.CUSTOM) {
+      exList = shouldSeparateDaily ? filteredDailyExercises.filter(ex => getExCategory(ex) === CATEGORIES.CUSTOM) : [];
+    } else if (key === CATEGORIES.CARDIO) {
+      exList = shouldSeparateDaily ? filteredDailyExercises.filter(isCardioEx) : [];
+    } else if (isUserCategory(key)) {
+      exList = shouldSeparateDaily ? filteredDailyExercises.filter(ex => getExCategory(ex) === key) : [];
+    }
     
     if (exList.length === 0) return null;
     const label = getCategoryLabel(key);
@@ -371,10 +398,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
       
       for (const ex of stats.exerciseStats) {
         if (ex.totalReps > 0 && ex.id) {
-          let cat = CATEGORIES.BODYWEIGHT;
-          if (isWeightEx(ex)) cat = CATEGORIES.WEIGHTS;
-          else if (isCardioEx(ex)) cat = CATEGORIES.CARDIO;
-          else if (isCustomEx(ex)) cat = CATEGORIES.CUSTOM;
+          const cat = getExCategory(ex);
           
           if (selectedCats.includes(cat)) {
             totalReps += ex.totalReps;
@@ -394,9 +418,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
       if (stats.exerciseStats) {
         for (const ex of stats.exerciseStats) {
           if (ex.totalReps > 0 && ex.id) {
-            let cat = CATEGORIES.BODYWEIGHT;
-            if (isWeightEx(ex)) cat = CATEGORIES.WEIGHTS;
-            else if (isCustomEx(ex)) cat = CATEGORIES.CUSTOM;
+            const cat = getExCategory(ex);
             
             if (selectedCats.includes(cat) && !countedIds.has(ex.id)) {
               countedIds.add(ex.id);
@@ -674,7 +696,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
           <div style={{ 
             display: 'flex', flexDirection: 'column', 
             gap: options.showDailyExercises && filteredDailyExercises.length > 0 ? '10px' : '0px',
-            maxHeight: options.showDailyExercises && filteredDailyExercises.length > 0 ? '1000px' : '0px',
+            maxHeight: options.showDailyExercises && filteredDailyExercises.length > 0 ? `${filteredDailyExercises.length * 60 + 200}px` : '0px',
             opacity: options.showDailyExercises && filteredDailyExercises.length > 0 ? 1 : 0,
             overflow: 'hidden',
             transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -732,7 +754,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
           borderRadius: '14px',
           background: 'rgba(255,255,255,0.03)',
           border: options.showSessionHistory && sessionHistory.length > 0 ? '1px solid rgba(255,255,255,0.05)' : '0px solid rgba(255,255,255,0)',
-          maxHeight: options.showSessionHistory && sessionHistory.length > 0 ? '400px' : '0px',
+          maxHeight: options.showSessionHistory && sessionHistory.length > 0 ? `${Math.min(sessionHistory.length, 5) * 60 + 60}px` : '0px',
           opacity: options.showSessionHistory && sessionHistory.length > 0 ? 1 : 0,
           overflow: 'hidden',
           transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',

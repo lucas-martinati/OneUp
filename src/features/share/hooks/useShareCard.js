@@ -175,24 +175,33 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
     const el = cardRef.current;
     const prevWidth = el.style.width;
     const prevMaxWidth = el.style.maxWidth;
+    const prevOverflow = el.style.overflow;
     try {
       // Force fixed size for consistent export
       el.style.width = '360px';
       el.style.maxWidth = '360px';
+      // Temporarily remove overflow:hidden so scrollHeight reflects full content
+      el.style.overflow = 'visible';
       
       // Wait for layout to settle after forced resize and for any potential re-renders
       await new Promise(r => setTimeout(r, 50));
+
+      // Capture the full content height (overflow:visible ensures scrollHeight == full content)
+      const fullHeight = el.scrollHeight;
 
       const dataUrl = await captureElement(el, {
         format: options.format,
         quality: 0.95,
         pixelRatio: 2,
+        height: fullHeight,
+        width: 360,
       });
       return dataUrl;
     } finally {
       // Restore original sizing
       el.style.width = prevWidth;
       el.style.maxWidth = prevMaxWidth;
+      el.style.overflow = prevOverflow;
       setIsExporting(false);
     }
   }, [options.format]);

@@ -9,7 +9,7 @@ vi.mock('react-i18next', () => ({
 vi.mock('@hooks/useExerciseConfig', () => ({
   useExerciseConfig: () => ({ getConfig: () => ({ difficulty: 1, weight: 50 }) }),
 }));
-vi.mock('@contexts/ExercisesContext', () => ({ useExercises: () => ({ customCategories: [] }) }));
+vi.mock('@contexts/ExercisesContext', () => ({ useExercises: () => ({ customCategories: [], exercisesByUserCategory: {}, customExercises: [] }) }));
 
 import { ShareCard } from '../ShareCard';
 import { EXERCISES } from '@config/exercises';

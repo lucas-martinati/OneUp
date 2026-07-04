@@ -9,12 +9,12 @@ import { Capacitor } from '@capacitor/core';
 
 const isNative = () => Capacitor.isNativePlatform();
 
-export async function captureElement(element, { format = 'png', quality = 0.92, pixelRatio = 2 } = {}) {
+export async function captureElement(element, { format = 'png', quality = 0.92, pixelRatio = 2, height, width } = {}) {
   if (!element) throw new Error('No element to capture');
 
   const captureFn = format === 'jpeg' ? toJpeg : toPng;
   
-  const dataUrl = await captureFn(element, {
+  const options = {
     quality,
     pixelRatio,
     cacheBust: true,
@@ -23,7 +23,13 @@ export async function captureElement(element, { format = 'png', quality = 0.92, 
       transform: 'none',
     },
     skipFonts: true,
-  });
+  };
+
+  // Pass explicit dimensions to ensure full content is captured
+  if (height) options.height = height;
+  if (width) options.width = width;
+
+  const dataUrl = await captureFn(element, options);
 
   return dataUrl;
 }
