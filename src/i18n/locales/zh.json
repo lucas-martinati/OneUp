@@ -571,7 +571,7 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "empty": "没有保存的训练计划",
+    "edit": "编辑",
     "load": "加载",
     "namePlaceholder": "训练计划名称",
     "title": "我的训练计划"

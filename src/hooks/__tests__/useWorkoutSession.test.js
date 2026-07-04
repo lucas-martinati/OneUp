@@ -92,6 +92,32 @@ describe('initial state', () => {
     expect(result.current.queue).toEqual([bwId]);
     expect(result.current.sessionName).toBe('Resumed');
   });
+
+  it('restores the inter-dashboard toggle of a mixed-category session', () => {
+    storage.isWorkoutSessionStarted.mockReturnValue(true);
+    // activeSlide 1 = bodyweight: the weighted exercise is outside the local category
+    storage.loadWorkoutSession.mockReturnValue({ queue: [bwId, weightId], currentIdx: 0, startTime: 123, name: '', activeSlide: 1, showAll: true });
+    const { result } = setup({ sessionMode: 'running', activeSlide: 1 });
+    expect(result.current.showAll).toBe(true);
+    // Every queued exercise stays reachable, not only the current category's
+    expect(result.current.exerciseInfo.map(e => e.id)).toEqual(expect.arrayContaining([bwId, weightId]));
+  });
+
+  it('infers the toggle from the queue for sessions saved before showAll was persisted', () => {
+    storage.isWorkoutSessionStarted.mockReturnValue(true);
+    storage.loadWorkoutSession.mockReturnValue({ queue: [bwId, weightId], currentIdx: 0, startTime: 123, name: '', activeSlide: 1, showAll: null });
+    const { result } = setup({ sessionMode: 'running', activeSlide: 1 });
+    expect(result.current.showAll).toBe(true);
+    expect(result.current.exerciseInfo.map(e => e.id)).toEqual(expect.arrayContaining([bwId, weightId]));
+  });
+
+  it('persists the inter-dashboard toggle while the session runs', () => {
+    const { result } = setup({ activeSlide: 1 });
+    act(() => result.current.setShowAll(true));
+    act(() => { result.current.toggleExercise(bwId); result.current.toggleExercise(weightId); });
+    act(() => result.current.startSession());
+    expect(storage.saveWorkoutSession).toHaveBeenCalledWith(expect.objectContaining({ queue: [bwId, weightId], showAll: true }));
+  });
 });
 
 describe('queue editing', () => {
@@ -186,7 +212,6 @@ describe('routines', () => {
     act(() => result.current.loadRoutine({ name: 'My routine', exerciseIds: [bwId, 'nonexistent'] }));
     expect(result.current.queue).toEqual([bwId]);
     expect(result.current.sessionName).toBe('My routine');
-    expect(result.current.showRoutineList).toBe(false);
   });
 });
 

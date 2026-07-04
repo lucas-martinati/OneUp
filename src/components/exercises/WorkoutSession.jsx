@@ -1,5 +1,6 @@
-import { X, Play, Check, Save, FolderOpen, Trash2, GripVertical, Pencil, Shuffle, ChevronUp, ChevronDown, DynamicIcon } from '@utils/icons';
-import { IconButton, ToggleSwitch } from '@components/ui';
+import { useRef, useEffect } from 'react';
+import { X, Play, Check, Save, Trash2, GripVertical, Pencil, Shuffle, ChevronUp, ChevronDown, DynamicIcon } from '@utils/icons';
+import { Button, IconButton, ToggleSwitch } from '@components/ui';
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { Z_INDEX } from '@utils/zIndex';
 import { SessionSummary } from './SessionSummary';
@@ -9,21 +10,105 @@ import { getExerciseLabel } from '@utils/exerciseLabel';
 import { CATEGORIES, CATEGORY_ORDER, isUserCategory } from '@config/categories';
 import { useWorkoutSession } from '@hooks/useWorkoutSession';
 import { getLocalDateStr } from '@utils/dateUtils';
+import styles from '@styles/WorkoutSession.module.css';
+
+const MAX_ICON_DOTS = 5;
+
+// Lets mouse users scroll the horizontal routines strip with the wheel.
+// Native non-passive listener: React registers onWheel as passive, so
+// preventDefault() (needed to stop the page scrolling too) would be ignored.
+function useHorizontalWheelScroll(ref, enabled) {
+    useEffect(() => {
+        const el = ref.current;
+        if (!enabled || !el) return undefined;
+        const onWheel = (e) => {
+            if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+            if (el.scrollWidth <= el.clientWidth) return;
+            e.preventDefault();
+            el.scrollLeft += e.deltaY;
+        };
+        el.addEventListener('wheel', onWheel, { passive: false });
+        return () => el.removeEventListener('wheel', onWheel);
+    }, [ref, enabled]);
+}
+
+// ── Routine card ────────────────────────────────────────────────────────
+// The whole card loads the routine; edit/delete are small secondary
+// actions and the delete confirmation swaps in over the card itself.
+function RoutineCard({ routine, index, allExercises, confirming, onLoad, onEdit, onDelete, onCancelDelete, onAskDelete, t }) {
+    const exercises = routine.exerciseIds
+        .map(exId => allExercises.find(e => e.id === exId))
+        .filter(Boolean);
+    // Max 5 dots in total: when overflowing, the "+N" dot takes the 5th slot.
+    const shown = exercises.length > MAX_ICON_DOTS
+        ? exercises.slice(0, MAX_ICON_DOTS - 1)
+        : exercises;
+    const extra = exercises.length - shown.length;
+
+    return (
+        <div
+            className={styles.routineCard}
+            style={{ '--i': index }}
+            onClick={() => !confirming && onLoad(routine)}
+        >
+            <div className={styles.routineTop}>
+                <div className={styles.routineName}>{routine.name}</div>
+                <button
+                    className={styles.cardActionBtn}
+                    onClick={(e) => { e.stopPropagation(); onEdit(routine); }}
+                    aria-label={t('routines.edit')}
+                >
+                    <Pencil size={13} />
+                </button>
+                <button
+                    className={`${styles.cardActionBtn} ${styles.cardActionBtnDanger}`}
+                    onClick={(e) => { e.stopPropagation(); onAskDelete(routine.id); }}
+                    aria-label={t('common.delete')}
+                >
+                    <Trash2 size={13} />
+                </button>
+            </div>
+            <div className={styles.routineMeta}>
+                {t('common.exerciseCount', { count: exercises.length })}
+            </div>
+            <div className={styles.routineIcons}>
+                {shown.map(ex => (
+                    <span
+                        key={ex.id}
+                        className={styles.iconDot}
+                        style={{ background: `color-mix(in srgb, ${ex.color} 15%, transparent)`, color: ex.color }}
+                    >
+                        <DynamicIcon icon={ex.icon} size={14} color={ex.color} />
+                    </span>
+                ))}
+                {extra > 0 && (
+                    <span className={`${styles.iconDot} ${styles.iconDotMore}`}>+{extra}</span>
+                )}
+            </div>
+            <Button size="sm" fullWidth icon={Play} className={styles.loadBtn} onClick={(e) => { e.stopPropagation(); onLoad(routine); }}>
+                {t('routines.load')}
+            </Button>
+
+            {confirming && (
+                <div className={styles.confirmOverlay} onClick={(e) => e.stopPropagation()}>
+                    <div className={styles.confirmLabel}>{t('common.delete')} ?</div>
+                    <div className={styles.confirmActions}>
+                        <IconButton icon={Check} variant="danger" size="sm" onClick={() => onDelete(routine.id)} aria-label={t('common.confirm')} />
+                        <IconButton icon={X} variant="surface" size="sm" onClick={onCancelDelete} aria-label={t('common.cancel')} />
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
 
 // ── Exercise grid item ──────────────────────────────────────────────────
 function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
-    let backgroundStyle = 'rgba(255,255,255,0.05)';
-    if (ex.done) {
-        backgroundStyle = 'rgba(255,255,255,0.03)';
-    } else if (selected) {
-        backgroundStyle = `linear-gradient(135deg, ${ex.color}25, ${ex.color}12)`;
-    }
-
-    let colorStyle = 'var(--text-secondary)';
-    if (ex.done) {
-        colorStyle = '#555';
-    } else if (selected) {
-        colorStyle = ex.color;
+    const dynamicStyle = {};
+    if (!ex.done && selected) {
+        dynamicStyle.background = `linear-gradient(135deg, color-mix(in srgb, ${ex.color} 15%, transparent), color-mix(in srgb, ${ex.color} 7%, transparent))`;
+        dynamicStyle.borderColor = `color-mix(in srgb, ${ex.color} 50%, transparent)`;
+        dynamicStyle.color = ex.color;
     }
 
     let remainingLabel = '';
@@ -39,49 +124,22 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
         <button
             onClick={() => !ex.done && onToggle(ex.id)}
             disabled={ex.done}
-            style={{
-                padding: '14px 10px', borderRadius: 'var(--radius-md)',
-                background: backgroundStyle,
-                border: selected
-                    ? `2px solid ${ex.color}80`
-                    : '2px solid rgba(255,255,255,0.08)',
-                color: colorStyle,
-                cursor: ex.done ? 'default' : 'pointer',
-                opacity: ex.done ? 0.4 : 1,
-                display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: '6px',
-                transition: 'all 0.2s ease',
-                position: 'relative'
-            }}
+            className={ex.done ? `${styles.gridItem} ${styles.gridItemDone}` : styles.gridItem}
+            style={dynamicStyle}
         >
             {ex.done && (
-                <div style={{
-                    position: 'absolute', top: '6px', right: '6px',
-                    background: 'var(--success)', borderRadius: '50%',
-                    width: '16px', height: '16px', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center'
-                }}>
+                <div className={styles.doneBadge}>
                     <Check size={10} color="white" />
                 </div>
             )}
             {orderNum && (
-                <div style={{
-                    position: 'absolute', top: '6px', left: '6px',
-                    background: ex.color, borderRadius: '50%',
-                    width: '18px', height: '18px', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                    fontSize: '0.6rem', fontWeight: '800', color: 'white'
-                }}>
+                <div className={styles.orderBadge} style={{ background: ex.color }}>
                     {orderNum}
                 </div>
             )}
             <DynamicIcon icon={ex.icon} size={24} />
-            <span style={{ fontSize: '0.75rem', fontWeight: '600', textAlign: 'center' }}>
-                {getExerciseLabel(ex, t)}
-            </span>
-            <span style={{ fontSize: '0.6rem', opacity: 0.6 }}>
-                {remainingLabel}
-            </span>
+            <span className={styles.gridItemName}>{getExerciseLabel(ex, t)}</span>
+            <span className={styles.gridItemRemaining}>{remainingLabel}</span>
         </button>
     );
 }
@@ -90,7 +148,7 @@ export function WorkoutSession(props) {
     const ws = useWorkoutSession(props);
     const {
         phase, queue, setQueue, showSaveRoutine, setShowSaveRoutine,
-        routineName, setRoutineName, showRoutineList, setShowRoutineList,
+        routineName, setRoutineName,
         confirmDeleteId, setConfirmDeleteId,
         dragIdx, dragOverIdx, queueListRef, itemRefs,
         sessionDuration, savedSession, sessionName,
@@ -109,157 +167,55 @@ export function WorkoutSession(props) {
         today, dayNumber, activeSlide, onClose, isStarted,
     } = ws;
 
+    const routinesStripRef = useRef(null);
+    useHorizontalWheelScroll(routinesStripRef, phase === 'config' && routines.length > 0);
+
 
     if (phase === 'config') {
         return (
             <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
                 <div className="modal-content">
                 {/* Header */}
-                <div style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    marginBottom: 'var(--spacing-sm)',
-                }}>
-                    <h2 className="panel-title" style={{ 
-                        margin: 0, 
-                        textAlign: 'left'
-                    }}>
+                <div className={styles.header}>
+                    <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
                         {isStarted ? t('dashboard.editSession') : t('dashboard.session')}
                     </h2>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                        {/* Load Routine button */}
-                        <button
-                            onClick={() => setShowRoutineList(!showRoutineList)}
-                            className="hover-lift"
-                            style={{
-                                background: showRoutineList ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.1)',
-                                border: showRoutineList ? '1px solid rgba(245,158,11,0.4)' : 'none',
-                                borderRadius: '20px', height: '40px',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                gap: '5px', padding: '0 14px',
-                                color: showRoutineList ? 'var(--warning)' : 'white', cursor: 'pointer',
-                                fontSize: '0.75rem', fontWeight: '600'
-                            }}
-                        >
-                            <FolderOpen size={16} />
-                            {t('routines.title')}
-                        </button>
-                        <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" style={{ flexShrink: 0 }} />
-                    </div>
+                    <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label={t('common.close')} />
                 </div>
 
-                <div style={{
-                    flex: 1, overflowY: 'auto',
-                    display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)'
-                }}>
-                    {/* ── Routine list (collapsible) ── */}
-                    {showRoutineList && (
-                        <div style={{
-                            background: 'rgba(245,158,11,0.05)',
-                            border: '1px solid rgba(245,158,11,0.15)',
-                            borderRadius: 'var(--radius-lg)',
-                            padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px'
-                        }}>
-                            {routines.length === 0 ? (
-                                <div style={{
-                                    textAlign: 'center', color: 'var(--text-secondary)',
-                                    fontSize: '0.8rem', padding: '12px'
-                                }}>
-                                    {t('routines.empty')}
-                                </div>
-                            ) : (
-                                routines.map(routine => (
-                                    <div key={routine.id} style={{
-                                        display: 'flex', alignItems: 'center', gap: '8px',
-                                        padding: '10px 12px', borderRadius: 'var(--radius-md)',
-                                        background: 'rgba(255,255,255,0.04)',
-                                        border: '1px solid rgba(255,255,255,0.06)'
-                                    }}>
-                                        <div className="flex-1-min0">
-                                            <div style={{
-                                                fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)',
-                                                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
-                                            }}>{routine.name}</div>
-                                            <div style={{
-                                                display: 'flex', gap: '3px', flexWrap: 'wrap', marginTop: '4px'
-                                            }}>
-                                                {routine.exerciseIds.map(exId => {
-                                                    const ex = allExercises.find(e => e.id === exId);
-                                                    if (!ex) return null;
-                                                    return <DynamicIcon key={exId} icon={ex.icon} size={12} color={ex.color} />;
-                                                })}
-                                            </div>
-                                        </div>
-                                        {confirmDeleteId === routine.id ? (
-                                            <div style={{ display: 'flex', gap: '4px' }}>
-                                                <button onClick={() => { deleteRoutine?.(routine.id); setConfirmDeleteId(null); }}
-                                                    style={{
-                                                        width: '30px', height: '30px', borderRadius: '50%',
-                                                        background: 'var(--error)', border: 'none', color: 'white',
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        cursor: 'pointer'
-                                                    }}><Check size={14} /></button>
-                                                <button onClick={() => setConfirmDeleteId(null)}
-                                                    style={{
-                                                        width: '30px', height: '30px', borderRadius: '50%',
-                                                        background: 'rgba(255,255,255,0.08)', border: 'none',
-                                                        color: 'var(--text-secondary)',
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        cursor: 'pointer'
-                                                    }}><X size={14} /></button>
-                                            </div>
-                                        ) : (
-                                            <div style={{ display: 'flex', gap: '4px' }}>
-                                                <button onClick={() => setConfirmDeleteId(routine.id)}
-                                                    style={{
-                                                        width: '30px', height: '30px', borderRadius: '50%',
-                                                        background: 'rgba(239,68,68,0.08)', border: 'none',
-                                                        color: 'var(--error)',
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        cursor: 'pointer'
-                                                    }}><Trash2 size={12} /></button>
-                                                <button onClick={() => editRoutine(routine)}
-                                                    style={{
-                                                        width: '30px', height: '30px', borderRadius: '50%',
-                                                        background: 'rgba(245,158,11,0.1)', border: 'none',
-                                                        color: 'var(--warning)',
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        cursor: 'pointer'
-                                                    }}><Pencil size={12} /></button>
-                                                <button onClick={() => loadRoutine(routine)}
-                                                    className="hover-lift"
-                                                    style={{
-                                                        height: '30px', borderRadius: '16px',
-                                                        background: 'linear-gradient(135deg, var(--color-indigo-light), var(--color-indigo))',
-                                                        border: 'none', color: 'white',
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        gap: '4px', padding: '0 12px', cursor: 'pointer',
-                                                        fontSize: '0.7rem', fontWeight: '700'
-                                                    }}>
-                                                    <Play size={12} />
-                                                    {t('routines.load')}
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))
-                            )}
+                <div className={styles.body}>
+                    {/* ── Routines: always visible, one tap to load ── */}
+                    {routines.length > 0 && (
+                        <div className="flex-col gap-8">
+                            <div className="section-label" style={{ margin: 0 }}>
+                                {t('routines.title')}
+                            </div>
+                            <div ref={routinesStripRef} className={styles.routinesStrip}>
+                                {routines.map((routine, i) => (
+                                    <RoutineCard
+                                        key={routine.id}
+                                        routine={routine}
+                                        index={i}
+                                        allExercises={allExercises}
+                                        confirming={confirmDeleteId === routine.id}
+                                        onLoad={loadRoutine}
+                                        onEdit={editRoutine}
+                                        onAskDelete={setConfirmDeleteId}
+                                        onDelete={(id) => { deleteRoutine?.(id); setConfirmDeleteId(null); }}
+                                        onCancelDelete={() => setConfirmDeleteId(null)}
+                                        t={t}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     )}
 
                     {/* Inter-Dashboard Toggle for Pro Users */}
                     {canMixDashboards && (
-                        <div style={{
-                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                            background: 'rgba(139, 92, 246, 0.1)', padding: '12px',
-                            borderRadius: 'var(--radius-md)', border: '1px solid rgba(139, 92, 246, 0.2)'
-                        }}>
+                        <div className={styles.mixRow}>
                             <div>
-                                <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                                    {t('workout.interDashboard')}
-                                </div>
-                                <div className="hint-text">
-                                    {t('workout.interDashboardDesc')}
-                                </div>
+                                <div className={styles.mixTitle}>{t('workout.interDashboard')}</div>
+                                <div className="hint-text">{t('workout.interDashboardDesc')}</div>
                             </div>
                             <ToggleSwitch
                                 enabled={showAll}
@@ -275,378 +231,232 @@ export function WorkoutSession(props) {
                         </div>
                     )}
 
-                    {/* ── Exercise selection grid (stable position — above queue) ── */}
-                    <div style={{
-                        fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px',
-                        color: 'var(--text-secondary)', fontWeight: '600'
-                    }}>
-                        {t('workout.selectExercises')}
-                    </div>
+                    {/* ── Exercise selection grid ── */}
+                    <div className="flex-col gap-8">
+                        <div className="section-label" style={{ margin: 0 }}>
+                            {t('workout.selectExercises')}
+                        </div>
 
-                    {showAll ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                            {fullCategoryOrder.map(catId => {
-                                if (catId === CATEGORIES.CARDIO) return null;
-                                const categoryMap = {
-                                    [CATEGORIES.CUSTOM]: 'custom',
-                                    [CATEGORIES.BODYWEIGHT]: 'bodyweight',
-                                    [CATEGORIES.WEIGHTS]: 'weights'
-                                };
-                                const targetCategory = categoryMap[catId] || catId;
-                                const catExercises = exerciseInfo.filter(ex => ex.category === targetCategory);
-                                if (catExercises.length === 0) return null;
-                                
-                                let catTitle;
-                                if (isUserCategory(catId)) {
-                                    const catDef = customCategories.find(c => c.id === catId);
-                                    catTitle = catDef?.name || catId;
-                                } else {
-                                    const catDef = customCategories.find(c => c.id === catId);
-                                    let fallbackTitle = t('workout.custom');
-                                    if (catId === CATEGORIES.BODYWEIGHT) {
-                                        fallbackTitle = t('common.bodyweight');
-                                    } else if (catId === CATEGORIES.WEIGHTS) {
-                                        fallbackTitle = t('common.weights');
+                        {showAll ? (
+                            <div className="flex-col" style={{ gap: '16px' }}>
+                                {fullCategoryOrder.map(catId => {
+                                    if (catId === CATEGORIES.CARDIO) return null;
+                                    const categoryMap = {
+                                        [CATEGORIES.CUSTOM]: 'custom',
+                                        [CATEGORIES.BODYWEIGHT]: 'bodyweight',
+                                        [CATEGORIES.WEIGHTS]: 'weights'
+                                    };
+                                    const targetCategory = categoryMap[catId] || catId;
+                                    const catExercises = exerciseInfo.filter(ex => ex.category === targetCategory);
+                                    if (catExercises.length === 0) return null;
+
+                                    let catTitle;
+                                    if (isUserCategory(catId)) {
+                                        const catDef = customCategories.find(c => c.id === catId);
+                                        catTitle = catDef?.name || catId;
+                                    } else {
+                                        const catDef = customCategories.find(c => c.id === catId);
+                                        let fallbackTitle = t('workout.custom');
+                                        if (catId === CATEGORIES.BODYWEIGHT) {
+                                            fallbackTitle = t('common.bodyweight');
+                                        } else if (catId === CATEGORIES.WEIGHTS) {
+                                            fallbackTitle = t('common.weights');
+                                        }
+                                        catTitle = catDef?.name || fallbackTitle;
                                     }
-                                    catTitle = catDef?.name || fallbackTitle;
-                                }
 
-                                return (
-                                    <div key={catId} className="flex-col gap-8">
-                                        <div style={{
-                                            fontSize: '0.8rem', fontWeight: '700', color: fullCategoryColors[catId] || 'var(--text-secondary)',
-                                            textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '4px'
-                                        }}>
-                                            {catTitle}
+                                    return (
+                                        <div key={catId} className="flex-col gap-8">
+                                            <div
+                                                className={styles.categoryTitle}
+                                                style={{ color: fullCategoryColors[catId] || 'var(--text-secondary)' }}
+                                            >
+                                                {catTitle}
+                                            </div>
+                                            <div className={styles.grid}>
+                                                {catExercises.map(ex => {
+                                                    const selected = queue.includes(ex.id);
+                                                    const orderNum = selected ? queue.indexOf(ex.id) + 1 : null;
+                                                    return <ExerciseGridItem key={ex.id} ex={ex} selected={selected} orderNum={orderNum} onToggle={toggleExercise} t={t} />;
+                                                })}
+                                            </div>
                                         </div>
-                                        <div style={{
-                                            display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px'
-                                        }}>
-                                            {catExercises.map(ex => {
-                                                const selected = queue.includes(ex.id);
-                                                const orderNum = selected ? queue.indexOf(ex.id) + 1 : null;
-                                                return <ExerciseGridItem key={ex.id} ex={ex} selected={selected} orderNum={orderNum} onToggle={toggleExercise} t={t} />;
-                                            })}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ) : (
-                        <div style={{
-                            display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
-                            gap: '8px'
-                        }}>
-                            {exerciseInfo.map(ex => {
-                                const selected = queue.includes(ex.id);
-                                const orderNum = selected ? queue.indexOf(ex.id) + 1 : null;
-                                return <ExerciseGridItem key={ex.id} ex={ex} selected={selected} orderNum={orderNum} onToggle={toggleExercise} t={t} />;
-                            })}
-                        </div>
-                    )}
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className={styles.grid}>
+                                {exerciseInfo.map(ex => {
+                                    const selected = queue.includes(ex.id);
+                                    const orderNum = selected ? queue.indexOf(ex.id) + 1 : null;
+                                    return <ExerciseGridItem key={ex.id} ex={ex} selected={selected} orderNum={orderNum} onToggle={toggleExercise} t={t} />;
+                                })}
+                            </div>
+                        )}
+                    </div>
 
                     {/* ── Selected order (drag & drop) — below grid ── */}
                     {queue.length > 0 && (
-                        <>
-                            <div style={{
-                                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                            }}>
-                                <div style={{
-                                    fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px',
-                                    color: 'var(--text-secondary)', fontWeight: '600'
-                                }}>
+                        <div className="flex-col gap-8">
+                            <div className={styles.queueHeader}>
+                                <div className="section-label" style={{ margin: 0 }}>
                                     {t('workout.yourOrder')} ({queue.length})
                                 </div>
-                                <div style={{ display: 'flex', gap: '6px' }}>
+                                <div className="row gap-4">
                                     {queue.length >= 2 && (
-                                        <button
-                                            onClick={shuffleQueue}
-                                            className="hover-lift"
-                                            style={{
-                                                display: 'flex', alignItems: 'center', gap: '5px',
-                                                padding: '6px 12px', borderRadius: '20px',
-                                                background: 'rgba(139,92,246,0.12)',
-                                                border: '1px solid rgba(139,92,246,0.25)',
-                                                color: 'var(--color-violet)', cursor: 'pointer',
-                                                fontSize: '0.7rem', fontWeight: '600'
-                                            }}
-                                        >
-                                            <Shuffle size={13} />
+                                        <Button size="sm" variant="ghost" icon={Shuffle} onClick={shuffleQueue}>
                                             {t('workout.shuffle')}
-                                        </button>
+                                        </Button>
                                     )}
-                                    <button
-                                        onClick={clearQueue}
-                                        className="hover-lift"
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: '5px',
-                                            padding: '6px 12px', borderRadius: '20px',
-                                            background: 'rgba(239,68,68,0.08)',
-                                            border: '1px solid rgba(239,68,68,0.2)',
-                                            color: '#f87171', cursor: 'pointer',
-                                            fontSize: '0.7rem', fontWeight: '600'
-                                        }}
-                                    >
-                                        <Trash2 size={12} />
+                                    <Button size="sm" variant="danger-ghost" icon={Trash2} onClick={clearQueue}>
                                         {t('workout.clearAll')}
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
-                        <div
-                            ref={queueListRef}
-                            style={{
-                                display: 'flex', flexDirection: 'column', gap: '5px',
-                                padding: '10px', borderRadius: '16px',
-                                background: 'linear-gradient(180deg, rgba(129,140,248,0.06), rgba(139,92,246,0.04))',
-                                border: '1px solid rgba(129,140,248,0.12)'
-                            }}
-                        >
-                            {queue.map((id, i) => {
-                                const ex = allExercises.find(e => e.id === id);
-                                if (!ex) return null;
-                                const isDragging = dragIdx === i;
-                                const isDragOver = dragOverIdx === i;
-                                const isFirst = i === 0;
-                                const isLast = i === queue.length - 1;
+                            <div ref={queueListRef} className={styles.queuePanel}>
+                                {queue.map((id, i) => {
+                                    const ex = allExercises.find(e => e.id === id);
+                                    if (!ex) return null;
+                                    const isDragging = dragIdx === i;
+                                    const isDragOver = dragOverIdx === i;
+                                    const isFirst = i === 0;
+                                    const isLast = i === queue.length - 1;
 
-                                let itemBg = `linear-gradient(135deg, ${ex.color}0a, ${ex.color}05)`;
-                                if (isDragging) {
-                                    itemBg = `${ex.color}20`;
-                                } else if (isDragOver) {
-                                    itemBg = 'rgba(129,140,248,0.18)';
-                                }
+                                    let itemBg = `color-mix(in srgb, ${ex.color} 5%, transparent)`;
+                                    if (isDragging) {
+                                        itemBg = `color-mix(in srgb, ${ex.color} 14%, transparent)`;
+                                    } else if (isDragOver) {
+                                        itemBg = 'color-mix(in srgb, var(--accent-glow) 18%, transparent)';
+                                    }
 
-                                return (
-                                    <div
-                                        key={id}
-                                        ref={el => itemRefs.current[i] = el}
-                                        draggable
-                                        onDragStart={() => handleDragStart(i)}
-                                        onDragOver={(e) => { e.preventDefault(); handleDragOver(i); }}
-                                        onDragEnd={handleDragEnd}
-                                        onTouchStart={(e) => handleTouchStart(e, i)}
-                                        onTouchMove={handleTouchMove}
-                                        onTouchEnd={handleTouchEnd}
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: '6px',
-                                            padding: '10px 8px', borderRadius: '14px',
-                                            background: itemBg,
-                                            border: isDragOver
-                                                ? '1.5px dashed rgba(129,140,248,0.5)'
-                                                : `1px solid ${ex.color}18`,
-                                            cursor: 'grab', userSelect: 'none',
-                                            opacity: isDragging ? 0.5 : 1,
-                                            transform: isDragging ? 'scale(0.97)' : 'scale(1)',
-                                            transition: isDragging ? 'none' : 'all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                                            touchAction: 'none'
-                                        }}
-                                    >
-                                        {/* Drag handle */}
-                                        <GripVertical size={14} color="var(--text-secondary)" style={{ opacity: 0.3, flexShrink: 0 }} />
-
-                                        {/* Number badge */}
-                                        <div style={{
-                                            width: '22px', height: '22px', borderRadius: '50%',
-                                            background: `linear-gradient(135deg, ${ex.color}, ${ex.color}cc)`,
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            fontSize: '0.6rem', fontWeight: '800', color: 'white',
-                                            flexShrink: 0,
-                                            boxShadow: `0 2px 6px ${ex.color}40`
-                                        }}>
-                                            {i + 1}
-                                        </div>
-
-                                        {/* Icon + name */}
-                                        <DynamicIcon icon={ex.icon} size={16} color={ex.color} />
-                                        <span style={{
-                                            fontSize: '0.78rem', fontWeight: '600', color: ex.color, flex: 1,
-                                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
-                                        }}>{getExerciseLabel(ex, t)}</span>
-
-                                        {/* Weight badge */}
-                                        {WEIGHT_EXERCISES_MAP[id] && (
-                                            <span style={{
-                                                fontSize: '0.6rem', fontWeight: '700',
-                                                color: 'var(--text-secondary)',
-                                                background: `${ex.color}12`,
-                                                padding: '2px 7px', borderRadius: '10px',
-                                                border: `1px solid ${ex.color}18`
-                                            }}>
-                                                {getConfig(id)?.weight || 0} {t('weight.kg')}
-                                            </span>
-                                        )}
-
-                                        {/* Arrow buttons for reorder */}
-                                        <div style={{
-                                            display: 'flex', flexDirection: 'column', gap: '1px', flexShrink: 0
-                                        }}>
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); moveItem(i, i - 1); }}
-                                                disabled={isFirst}
-                                                aria-label="Move up"
-                                                style={{
-                                                    width: '20px', height: '16px', borderRadius: '6px 6px 2px 2px',
-                                                    background: isFirst ? 'transparent' : 'rgba(255,255,255,0.06)',
-                                                    border: 'none',
-                                                    color: isFirst ? 'rgba(255,255,255,0.1)' : 'var(--text-secondary)',
-                                                    cursor: isFirst ? 'default' : 'pointer',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    padding: 0, transition: 'all 0.15s'
-                                                }}
-                                            >
-                                                <ChevronUp size={12} />
-                                            </button>
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); moveItem(i, i + 1); }}
-                                                disabled={isLast}
-                                                aria-label="Move down"
-                                                style={{
-                                                    width: '20px', height: '16px', borderRadius: '2px 2px 6px 6px',
-                                                    background: isLast ? 'transparent' : 'rgba(255,255,255,0.06)',
-                                                    border: 'none',
-                                                    color: isLast ? 'rgba(255,255,255,0.1)' : 'var(--text-secondary)',
-                                                    cursor: isLast ? 'default' : 'pointer',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    padding: 0, transition: 'all 0.15s'
-                                                }}
-                                            >
-                                                <ChevronDown size={12} />
-                                            </button>
-                                        </div>
-
-                                        {/* Remove button */}
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
+                                    return (
+                                        <div
+                                            key={id}
+                                            ref={el => itemRefs.current[i] = el}
+                                            draggable
+                                            onDragStart={() => handleDragStart(i)}
+                                            onDragOver={(e) => { e.preventDefault(); handleDragOver(i); }}
+                                            onDragEnd={handleDragEnd}
+                                            onTouchStart={(e) => handleTouchStart(e, i)}
+                                            onTouchMove={handleTouchMove}
+                                            onTouchEnd={handleTouchEnd}
+                                            className={styles.queueItem}
                                             style={{
-                                                width: '22px', height: '22px', borderRadius: '50%',
-                                                background: 'rgba(239,68,68,0.08)', border: 'none',
-                                                color: '#f87171', cursor: 'pointer',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                flexShrink: 0, transition: 'all 0.15s'
+                                                background: itemBg,
+                                                border: isDragOver
+                                                    ? '1.5px dashed color-mix(in srgb, var(--accent-glow) 50%, transparent)'
+                                                    : `1px solid color-mix(in srgb, ${ex.color} 12%, transparent)`,
+                                                opacity: isDragging ? 0.5 : 1,
+                                                transform: isDragging ? 'scale(0.97)' : undefined,
                                             }}
                                         >
-                                            <X size={10} />
-                                        </button>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                            <GripVertical size={14} color="var(--text-secondary)" style={{ opacity: 0.3, flexShrink: 0 }} />
 
-                        {/* Reorder hint */}
-                        {queue.length >= 2 && (
-                            <div style={{
-                                textAlign: 'center', fontSize: '0.65rem',
-                                color: 'var(--text-secondary)', opacity: 0.5,
-                                fontStyle: 'italic'
-                            }}>
-                                {t('workout.reorderHint')}
+                                            <div className={styles.numBadge} style={{ background: ex.color }}>
+                                                {i + 1}
+                                            </div>
+
+                                            <DynamicIcon icon={ex.icon} size={16} color={ex.color} />
+                                            <span className={styles.queueItemName} style={{ color: ex.color }}>
+                                                {getExerciseLabel(ex, t)}
+                                            </span>
+
+                                            {WEIGHT_EXERCISES_MAP[id] && (
+                                                <span
+                                                    className={styles.weightChip}
+                                                    style={{
+                                                        background: `color-mix(in srgb, ${ex.color} 8%, transparent)`,
+                                                        border: `1px solid color-mix(in srgb, ${ex.color} 12%, transparent)`
+                                                    }}
+                                                >
+                                                    {getConfig(id)?.weight || 0} {t('weight.kg')}
+                                                </span>
+                                            )}
+
+                                            <div className={styles.arrowCol}>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); moveItem(i, i - 1); }}
+                                                    disabled={isFirst}
+                                                    aria-label="Move up"
+                                                    className={styles.arrowBtn}
+                                                >
+                                                    <ChevronUp size={12} />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); moveItem(i, i + 1); }}
+                                                    disabled={isLast}
+                                                    aria-label="Move down"
+                                                    className={styles.arrowBtn}
+                                                >
+                                                    <ChevronDown size={12} />
+                                                </button>
+                                            </div>
+
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
+                                                className={styles.removeBtn}
+                                                aria-label={t('common.delete')}
+                                            >
+                                                <X size={10} />
+                                            </button>
+                                        </div>
+                                    );
+                                })}
                             </div>
-                        )}
-                        </>
+
+                            {queue.length >= 2 && (
+                                <div className={styles.reorderHint}>{t('workout.reorderHint')}</div>
+                            )}
+                        </div>
                     )}
                 </div>
 
                 {/* ── Save routine inline form ── */}
                 {showSaveRoutine && (
-                    <div style={{
-                        padding: '12px var(--spacing-md)', background: 'rgba(245,158,11,0.05)',
-                        borderTop: '1px solid rgba(245,158,11,0.15)',
-                        display: 'flex', gap: '8px', alignItems: 'center'
-                    }}>
+                    <div className={styles.saveForm}>
                         <input
                             value={routineName}
                             onChange={e => setRoutineName(e.target.value.slice(0, 30))}
                             placeholder={t('routines.namePlaceholder')}
                             autoFocus
-                            style={{
-                                flex: 1, padding: '10px 14px',
-                                background: 'rgba(255,255,255,0.06)',
-                                border: '1.5px solid rgba(245,158,11,0.3)',
-                                borderRadius: 'var(--radius-md)',
-                                color: 'white', fontSize: '0.85rem', fontWeight: '600',
-                                outline: 'none', boxSizing: 'border-box'
-                            }}
+                            className={styles.saveInput}
                             onKeyDown={e => e.key === 'Enter' && handleSaveRoutine()}
                             maxLength={30}
                         />
-                        <button
-                            onClick={handleSaveRoutine}
-                            disabled={!routineName.trim()}
-                            style={{
-                                padding: '10px 16px', borderRadius: 'var(--radius-md)',
-                                background: routineName.trim() ? 'linear-gradient(135deg, var(--warning), #d97706)' : 'rgba(255,255,255,0.05)',
-                                border: 'none', color: 'white', fontWeight: '700',
-                                cursor: routineName.trim() ? 'pointer' : 'default',
-                                opacity: routineName.trim() ? 1 : 0.4,
-                                fontSize: '0.8rem'
-                            }}
-                        >
-                            <Check size={18} />
-                        </button>
-                        <button
+                        <Button variant="success" icon={Check} onClick={handleSaveRoutine} disabled={!routineName.trim()} aria-label={t('common.save')} />
+                        <IconButton
+                            icon={X}
+                            variant="ghost"
                             onClick={() => { setShowSaveRoutine(false); setRoutineName(''); }}
-                            style={{
-                                padding: '10px', borderRadius: 'var(--radius-md)',
-                                background: 'rgba(255,255,255,0.06)', border: 'none',
-                                color: 'var(--text-secondary)', cursor: 'pointer'
-                            }}
-                        >
-                            <X size={18} />
-                        </button>
+                            aria-label={t('common.cancel')}
+                        />
                     </div>
                 )}
 
                 {/* Bottom buttons */}
-                <div style={{
-                    display: 'flex', gap: '8px', paddingTop: 'var(--spacing-sm)'
-                }}>
-                    {/* Save as routine */}
+                <div className={styles.footer}>
                     {!showSaveRoutine && queue.length >= 1 && (
-                        <button
+                        <Button
+                            variant="secondary"
+                            icon={Save}
+                            disabled={routines.length >= maxRoutines}
                             onClick={() => {
                                 if (routines.length >= maxRoutines) return;
                                 setShowSaveRoutine(true);
                             }}
-                            className="hover-lift"
-                            disabled={routines.length >= maxRoutines}
-                            style={{
-                                padding: '14px', borderRadius: 'var(--radius-lg)',
-                                background: routines.length >= maxRoutines
-                                    ? 'rgba(255,255,255,0.05)'
-                                    : 'rgba(245,158,11,0.15)',
-                                border: routines.length >= maxRoutines ? 'none' : '1px solid rgba(245,158,11,0.3)',
-                                color: routines.length >= maxRoutines ? 'var(--text-secondary)' : 'var(--warning)',
-                                cursor: routines.length >= maxRoutines ? 'default' : 'pointer',
-                                opacity: routines.length >= maxRoutines ? 0.4 : 1,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                transition: 'all 0.2s ease'
-                            }}
-                        >
-                            <Save size={20} />
-                        </button>
+                            aria-label={t('common.save')}
+                        />
                     )}
 
-                    {/* Launch button */}
-                    <button
+                    <Button
+                        size="lg"
+                        icon={Play}
                         onClick={startSession}
                         disabled={queue.length < 1}
-                        className="hover-lift"
-                        style={{
-                            flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
-                            background: queue.length >= 1
-                                ? 'linear-gradient(135deg, var(--color-indigo-light), var(--color-indigo))'
-                                : 'rgba(255,255,255,0.05)',
-                            border: 'none', color: 'white',
-                            fontSize: '1rem', fontWeight: '700',
-                            cursor: queue.length >= 1 ? 'pointer' : 'default',
-                            opacity: queue.length >= 1 ? 1 : 0.4,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            gap: '8px', transition: 'all 0.2s ease'
-                        }}
+                        style={{ flex: 1 }}
                     >
-                        <Play size={20} />
                         {t('workout.launch', { count: queue.length, plural: queue.length > 1 ? 's' : '' })}
-                    </button>
+                    </Button>
                 </div>
                 </div>
             </div>

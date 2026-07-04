@@ -40,6 +40,7 @@ describe('save/load round-trip', () => {
       startTime: 1717000000000,
       name: 'Ma séance',
       activeSlide: 2,
+      showAll: true,
     });
     expect(loadWorkoutSession()).toEqual({
       queue: ['pushups', 'squats'],
@@ -47,7 +48,13 @@ describe('save/load round-trip', () => {
       startTime: 1717000000000,
       name: 'Ma séance',
       activeSlide: 2,
+      showAll: true,
     });
+  });
+
+  it('coerces a missing showAll to false on save', () => {
+    saveWorkoutSession({ queue: ['pushups'], currentIdx: 0, startTime: 1, name: '', activeSlide: 0 });
+    expect(loadWorkoutSession().showAll).toBe(false);
   });
 
   it('skips startTime when null but keeps the rest', () => {
@@ -67,6 +74,7 @@ describe('loadWorkoutSession defaults', () => {
       startTime: null,
       name: '',
       activeSlide: null,
+      showAll: null,
     });
   });
 
@@ -88,6 +96,7 @@ describe('clearWorkoutSession', () => {
       startTime: null,
       name: '',
       activeSlide: null,
+      showAll: null,
     });
   });
 

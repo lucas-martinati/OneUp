@@ -12,6 +12,7 @@ const KEYS = {
     startTime: 'workout_session_start_time',
     name: 'workout_session_name',
     activeSlide: 'workout_session_active_slide',
+    showAll: 'workout_session_show_all',
 };
 
 export function isWorkoutSessionStarted() {
@@ -38,16 +39,19 @@ export function loadWorkoutSession() {
     const idx = localStorage.getItem(KEYS.currentIdx);
     const startTime = localStorage.getItem(KEYS.startTime);
     const activeSlide = localStorage.getItem(KEYS.activeSlide);
+    const showAll = localStorage.getItem(KEYS.showAll);
     return {
         queue,
         currentIdx: idx !== null ? parseInt(idx, 10) : 0,
         startTime: startTime !== null ? parseInt(startTime, 10) : null,
         name: localStorage.getItem(KEYS.name) || '',
         activeSlide: activeSlide !== null ? parseInt(activeSlide, 10) : null,
+        // null = flag absent (session saved before showAll was persisted)
+        showAll: showAll !== null ? showAll === 'true' : null,
     };
 }
 
-export function saveWorkoutSession({ queue, currentIdx, startTime, name, activeSlide }) {
+export function saveWorkoutSession({ queue, currentIdx, startTime, name, activeSlide, showAll }) {
     localStorage.setItem(KEYS.started, 'true');
     localStorage.setItem(KEYS.queue, JSON.stringify(queue));
     localStorage.setItem(KEYS.currentIdx, String(currentIdx));
@@ -56,6 +60,7 @@ export function saveWorkoutSession({ queue, currentIdx, startTime, name, activeS
     }
     localStorage.setItem(KEYS.name, name);
     localStorage.setItem(KEYS.activeSlide, String(activeSlide));
+    localStorage.setItem(KEYS.showAll, String(!!showAll));
 }
 
 export function clearWorkoutSession() {

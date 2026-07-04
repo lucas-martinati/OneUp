@@ -571,7 +571,7 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "empty": "Keine Routine gespeichert",
+    "edit": "Bearbeiten",
     "load": "Laden",
     "namePlaceholder": "Routinename",
     "title": "Meine Routinen"

@@ -571,7 +571,7 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "empty": "No hay rutina guardada",
+    "edit": "Editar",
     "load": "Cargar",
     "namePlaceholder": "Nombre de la rutina",
     "title": "Mis Rutinas"

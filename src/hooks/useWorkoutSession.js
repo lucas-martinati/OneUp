@@ -63,7 +63,6 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
 
     const [showSaveRoutine, setShowSaveRoutine] = useState(false);
     const [routineName, setRoutineName] = useState('');
-    const [showRoutineList, setShowRoutineList] = useState(false);
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
     const [editingRoutineId, setEditingRoutineId] = useState(null);
 
@@ -96,7 +95,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     // ── Back handler ──
     useBackHandler(() => {
         if (showSaveRoutine) { setShowSaveRoutine(false); return true; }
-        if (showRoutineList) { setShowRoutineList(false); return true; }
+        if (confirmDeleteId) { setConfirmDeleteId(null); return true; }
         if (phase === 'running') { setPhase('config'); return true; }
         onClose();
         return true;
@@ -120,7 +119,18 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         return isPro ? allExercises : EXERCISES;
     }, [isPro, allExercises]);
 
-    const [showAll, setShowAll] = useState(false);
+    // Restored sessions must keep their inter-dashboard toggle, otherwise a
+    // mixed-category queue reopens showing only the current category's
+    // exercises (and advanceToNext silently skips the others).
+    const [showAll, setShowAll] = useState(() => {
+        if (persisted?.showAll != null) return persisted.showAll;
+        // Sessions persisted before showAll was saved: infer it from the queue
+        if (persisted?.queue?.length) {
+            const localIds = new Set(localExercises.map(ex => ex.id));
+            return persisted.queue.some(id => !localIds.has(id));
+        }
+        return false;
+    });
     const canMixDashboards = canAccessFeature(FEATURES.INTER_DASHBOARD, { isPro });
     const availableExercises = canMixDashboards && showAll ? allExercises : localExercises;
 
@@ -216,7 +226,6 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         const validIds = validExercises.map(ex => ex.id);
         setQueue(validIds);
         setSessionName(routine.name);
-        setShowRoutineList(false);
 
         // Detect exercise categories using the same priority as the grid
         const getExCategory = (ex) => {
@@ -275,7 +284,6 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         setRoutineName(routine.name);
         setEditingRoutineId(routine.id);
         setShowSaveRoutine(true);
-        setShowRoutineList(false);
     };
 
     // ── Move item up / down ──
@@ -384,11 +392,12 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
                     startTime: sessionStartTime.current || null,
                     name: sessionName,
                     activeSlide: sessionActiveSlide,
+                    showAll,
                 });
                 setSessionInProgress?.(true);
             }
         }
-    }, [phase, queue, currentIdx, sessionName, sessionActiveSlide, setSessionInProgress]);
+    }, [phase, queue, currentIdx, sessionName, sessionActiveSlide, showAll, setSessionInProgress]);
 
     const advanceToNext = () => {
         setHasAnimatedFirstPanel(true);
@@ -466,7 +475,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     return {
         // State
         phase, setPhase, queue, setQueue, currentIdx, showSaveRoutine, setShowSaveRoutine,
-        routineName, setRoutineName, showRoutineList, setShowRoutineList,
+        routineName, setRoutineName,
         confirmDeleteId, setConfirmDeleteId, editingRoutineId,
         dragIdx, dragOverIdx, queueListRef, itemRefs,
         sessionDuration, savedSession, sessionName, setSessionName,

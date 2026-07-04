@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import { sounds } from '@utils/soundManager';
@@ -46,6 +46,7 @@ export function ExercisePanel({
     const [showConfetti, setShowConfetti] = useState(false);
     const [wasCompleted, setWasCompleted] = useState(isCompleted);
     const [hasCelebrated, setHasCelebrated] = useState(false);
+    const autoAdvanceTimer = useRef(null);
 
     const isWeightExercise = !isTimer && !!WEIGHT_EXERCISES_MAP[exerciseConfig?.id];
     const currentWeight = isWeightExercise ? getConfig(exerciseConfig?.id).weight : null;
@@ -72,7 +73,25 @@ export function ExercisePanel({
             setHasCelebrated(false);
             setWasCompleted(isCompleted);
         });
+        // Cancel a pending auto-advance: advancing manually (Enter / next
+        // button) during the celebration window must not skip a 2nd exercise.
+        return () => clearTimeout(autoAdvanceTimer.current);
     }, [exerciseConfig?.id, isCompleted]);
+
+    // Desktop: Enter skips to the next exercise of the session. Text fields
+    // keep their own Enter handling (e.g. the weight input validates on Enter).
+    useEffect(() => {
+        if (!isSession || !onNext || hideNextButton) return undefined;
+        const handleKeyDown = (e) => {
+            if (e.key !== 'Enter' || e.repeat) return;
+            const target = e.target;
+            if (target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable) return;
+            e.preventDefault();
+            onNext();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isSession, onNext, hideNextButton]);
 
     useEffect(() => {
         if (!isTimer || !isRunning || isCompleted) return undefined;
@@ -96,7 +115,10 @@ export function ExercisePanel({
                 haptics.success();
             });
 
-            if (onNext) setTimeout(() => onNext(), 1500);
+            if (onNext) {
+                clearTimeout(autoAdvanceTimer.current);
+                autoAdvanceTimer.current = setTimeout(() => onNext(), 1500);
+            }
         }
 
         if (!isCompleted && wasCompleted) {

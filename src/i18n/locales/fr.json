@@ -586,7 +586,7 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "empty": "Aucune routine enregistrée",
+    "edit": "Modifier",
     "load": "Charger",
     "namePlaceholder": "Nom de la routine",
     "title": "Mes Routines"

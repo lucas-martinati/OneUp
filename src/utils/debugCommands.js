@@ -1,3 +1,4 @@
+import { Preferences } from '@capacitor/preferences';
 import { cloudSync } from '@services/cloudSync';
 import { BADGE_DEFINITIONS } from '@config/badgeDefinitions';
 import { useUIStore } from '@store/useUIStore';
@@ -18,13 +19,21 @@ export function installDebugCommands() {
 
   const badgeTitle = (id) => i18n?.t?.(`achievements.badges.${id}.title`, id) ?? id;
 
+  // Progress lives in Capacitor Preferences (SharedPreferences on Android,
+  // `CapacitorStorage.<key>` in localStorage on web) since useProgressStore
+  // migrated off raw localStorage — fall back to the legacy key for old data.
+  const readProgress = async (key) => {
+    const { value } = await Preferences.get({ key });
+    return value ?? localStorage.getItem(key);
+  };
+
   const debug = {
     // ── Data inspection ────────────────────────────────────────────────
-    showData() {
+    async showData() {
       const pKey = getActiveKey('pushup_challenge_data');
-      const hKey = getActiveKey('oneup_session_history');
+      const hKey = 'oneup_session_history'; // sessionHistoryService key is not uid-scoped
       const sKey = getActiveKey('oneup_settings');
-      const progress = localStorage.getItem(pKey);
+      const progress = await readProgress(pKey);
       const history = localStorage.getItem(hKey);
       const settings = localStorage.getItem(sKey);
       console.log(`[OneUp Debug] Current UID: ${cloudSync.getCurrentUserId() || 'Anonymous'}`);
@@ -104,9 +113,9 @@ export function installDebugCommands() {
     },
 
     // ── Resets ─────────────────────────────────────────────────────────
-    resetExercises() {
+    async resetExercises() {
       const key = getActiveKey('pushup_challenge_data');
-      const raw = localStorage.getItem(key);
+      const raw = await readProgress(key);
       if (!raw) {
         console.log(`[OneUp Debug] No data found at ${key}`);
         return;
@@ -122,7 +131,7 @@ export function installDebugCommands() {
               delete day[exId].count;
             }
           }
-          localStorage.setItem(key, JSON.stringify(data));
+          await Preferences.set({ key, value: JSON.stringify(data) });
           console.log(`[OneUp Debug] Today (${todayStr}) exercises reset in ${key}. Reload to apply.`);
         } else {
           console.log(`[OneUp Debug] No data for today (${todayStr}) in ${key}.`);
@@ -132,7 +141,7 @@ export function installDebugCommands() {
       }
     },
     resetHistory() {
-      const key = getActiveKey('oneup_session_history');
+      const key = 'oneup_session_history';
       localStorage.removeItem(key);
       console.log(`[OneUp Debug] Session history cleared for ${key}. Reload to apply.`);
     },
@@ -142,9 +151,13 @@ export function installDebugCommands() {
       console.log(`[OneUp Debug] Settings reset for ${key}. Reload to apply.`);
     },
     /** Clear progress + history + settings in one go. */
-    resetAll() {
-      ['pushup_challenge_data', 'oneup_session_history', 'oneup_settings']
-        .forEach(base => localStorage.removeItem(getActiveKey(base)));
+    async resetAll() {
+      const pKey = getActiveKey('pushup_challenge_data');
+      await Preferences.remove({ key: pKey });
+      // Also drop the legacy localStorage copy so the store doesn't re-migrate it.
+      localStorage.removeItem(pKey);
+      localStorage.removeItem('oneup_session_history');
+      localStorage.removeItem(getActiveKey('oneup_settings'));
       console.log('[OneUp Debug] Progress, history and settings cleared. Reload to apply.');
     },
 

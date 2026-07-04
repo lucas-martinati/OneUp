@@ -571,7 +571,7 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "empty": "저장된 루틴이 없습니다.",
+    "edit": "편집",
     "load": "짐",
     "namePlaceholder": "루틴 이름",
     "title": "내 루틴"

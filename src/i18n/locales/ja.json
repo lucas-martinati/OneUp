@@ -571,7 +571,7 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "empty": "ルーチンは保存されていません",
+    "edit": "編集",
     "load": "負荷",
     "namePlaceholder": "ルーチン名",
     "title": "私のルーティン"

@@ -36,7 +36,7 @@ export {
   Calendar, Check, CheckCheck, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, Cloud, CloudOff, Code, Copy, Crown,
   Download, Dumbbell,
   Edit2,
-  Filter, Flame, FolderOpen, FolderPlus, Footprints,
+  Filter, Flame, FolderPlus, Footprints,
   Gauge, Gem, Ghost, Globe, GripVertical,
   Hash, Heart, HeartHandshake, History,
   Image,

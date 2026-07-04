@@ -1,5 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+const prefsStore = new Map();
+vi.mock('@capacitor/preferences', () => ({
+  Preferences: {
+    get: vi.fn(async ({ key }) => ({ value: prefsStore.get(key) ?? null })),
+    set: vi.fn(async ({ key, value }) => { prefsStore.set(key, value); }),
+    remove: vi.fn(async ({ key }) => { prefsStore.delete(key); }),
+  },
+}));
 vi.mock('@services/cloudSync', () => ({ cloudSync: { getCurrentUserId: vi.fn(() => null) } }));
 vi.mock('@config/badgeDefinitions', () => ({
   BADGE_DEFINITIONS: [
@@ -22,6 +30,7 @@ beforeEach(() => {
   vi.spyOn(console, 'error').mockImplementation(() => {});
   vi.spyOn(console, 'table').mockImplementation(() => {});
   localStorage.clear();
+  prefsStore.clear();
   installDebugCommands();
 });
 afterEach(() => {
@@ -35,16 +44,29 @@ describe('debugCommands', () => {
     expect(window.oneupdebug).toBe(window.oneupDebug);
   });
 
-  it('showData logs progress/history/settings (anonymous key)', () => {
-    localStorage.setItem('pushup_challenge_data', JSON.stringify({ a: 1 }));
-    expect(() => window.oneupDebug.showData()).not.toThrow();
+  it('showData logs progress/history/settings (anonymous key)', async () => {
+    prefsStore.set('pushup_challenge_data', JSON.stringify({ a: 1 }));
+    await expect(window.oneupDebug.showData()).resolves.toBeUndefined();
   });
 
-  it('uses a uid-scoped key when signed in', () => {
+  it('showData falls back to legacy localStorage progress', async () => {
+    localStorage.setItem('pushup_challenge_data', JSON.stringify({ a: 1 }));
+    await expect(window.oneupDebug.showData()).resolves.toBeUndefined();
+  });
+
+  it('uses a uid-scoped key when signed in', async () => {
     cloudSync.getCurrentUserId.mockReturnValue('uid42');
     window.oneupDebug.resetHistory();
-    // key is namespaced; removing a non-existent key is a no-op but must not throw
-    expect(() => window.oneupDebug.resetAll()).not.toThrow();
+    prefsStore.set('pushup_challenge_data_uid42', '{}');
+    await window.oneupDebug.resetAll();
+    expect(prefsStore.has('pushup_challenge_data_uid42')).toBe(false);
+  });
+
+  it('resetHistory clears the unscoped history key even when signed in', () => {
+    cloudSync.getCurrentUserId.mockReturnValue('uid42');
+    localStorage.setItem('oneup_session_history', '[]');
+    window.oneupDebug.resetHistory();
+    expect(localStorage.getItem('oneup_session_history')).toBeNull();
   });
 
   it('listAchievements returns the badge ids', () => {
@@ -87,24 +109,34 @@ describe('debugCommands', () => {
     window.removeEventListener('oneup-debug-poke', handler);
   });
 
-  it('resetExercises clears today completions when present', () => {
+  it('resetExercises clears today completions stored in Preferences', async () => {
     const todayStr = new Date().toLocaleDateString('sv-SE');
-    localStorage.setItem('pushup_challenge_data', JSON.stringify({
+    prefsStore.set('pushup_challenge_data', JSON.stringify({
       completions: { [todayStr]: { pushup: { isCompleted: true, count: 10 } } },
     }));
-    window.oneupDebug.resetExercises();
-    const data = JSON.parse(localStorage.getItem('pushup_challenge_data'));
+    await window.oneupDebug.resetExercises();
+    const data = JSON.parse(prefsStore.get('pushup_challenge_data'));
     expect(data.completions[todayStr].pushup.isCompleted).toBe(false);
     expect(data.completions[todayStr].pushup.count).toBeUndefined();
   });
 
-  it('resetExercises is a no-op without stored data', () => {
-    expect(() => window.oneupDebug.resetExercises()).not.toThrow();
+  it('resetExercises reads legacy localStorage data and writes back to Preferences', async () => {
+    const todayStr = new Date().toLocaleDateString('sv-SE');
+    localStorage.setItem('pushup_challenge_data', JSON.stringify({
+      completions: { [todayStr]: { pushup: { isCompleted: true, count: 10 } } },
+    }));
+    await window.oneupDebug.resetExercises();
+    const data = JSON.parse(prefsStore.get('pushup_challenge_data'));
+    expect(data.completions[todayStr].pushup.isCompleted).toBe(false);
   });
 
-  it('resetExercises handles malformed JSON', () => {
-    localStorage.setItem('pushup_challenge_data', '{not json');
-    window.oneupDebug.resetExercises();
+  it('resetExercises is a no-op without stored data', async () => {
+    await expect(window.oneupDebug.resetExercises()).resolves.toBeUndefined();
+  });
+
+  it('resetExercises handles malformed JSON', async () => {
+    prefsStore.set('pushup_challenge_data', '{not json');
+    await window.oneupDebug.resetExercises();
     expect(console.error).toHaveBeenCalled();
   });
 

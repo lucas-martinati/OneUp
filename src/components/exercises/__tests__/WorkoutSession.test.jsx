@@ -26,8 +26,6 @@ describe('WorkoutSession config phase titles', () => {
     setShowSaveRoutine: vi.fn(),
     routineName: '',
     setRoutineName: vi.fn(),
-    showRoutineList: false,
-    setShowRoutineList: vi.fn(),
     confirmDeleteId: null,
     setConfirmDeleteId: vi.fn(),
     dragIdx: null,
