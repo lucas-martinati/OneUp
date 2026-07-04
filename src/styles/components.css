@@ -77,7 +77,7 @@ button:focus:not(:focus-visible) {
    stretches gracefully. Declared on :root (inherited) so a view that
    must stay narrow (e.g. the calendar month grid) can override the
    property directly on its shell without a specificity fight. */
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   :root {
     --panel-max-width: 860px;
   }

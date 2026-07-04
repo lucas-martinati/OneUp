@@ -17,7 +17,7 @@
 /* Desktop: the shared panel column widens (components.css), but a month
    grid with ~120px day cells looks bloated — keep the calendar itself at
    a readable width. */
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .shell {
     --panel-max-width: 680px;
   }

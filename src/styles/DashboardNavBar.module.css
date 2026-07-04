@@ -93,7 +93,7 @@
 
 /* Desktop: the bar reads as a centered dock instead of 5 items
    stretched across the whole root width. */
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .navBar {
     max-width: 720px;
     margin-inline: auto;

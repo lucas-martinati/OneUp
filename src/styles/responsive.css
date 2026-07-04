@@ -85,26 +85,11 @@
 /* ── Responsive Breakpoints ─────────────────────────────────────────── */
 /* Tablet+ adjustments for full-screen modals and grids */
 
-@media (min-width: 600px) {
-  #root {
-    padding: 12px;
-    max-width: 720px;
-    margin: 0 auto;
-  }
-}
-
-@media (min-width: 900px) {
+@media (min-width: 768px) {
   #root {
     padding: 16px;
-    max-width: 960px;
-  }
-}
-
-/* Wider desktops: stop growing. The dashboard content column caps at
-   640px, so a wider root only pushes the header away from the content. */
-@media (min-width: 1200px) {
-  #root {
     max-width: 1000px;
+    margin: 0 auto;
   }
 }
 
