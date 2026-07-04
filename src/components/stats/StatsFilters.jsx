@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { Filter, Lock } from '@utils/icons';
+import { Filter, Lock, ChevronDown } from '@utils/icons';
 import { canAccessFeature, FEATURES } from '@utils/entitlements';
 import { CATEGORIES, isUserCategory } from '@config/categories';
+import { haptics } from '@utils/hapticsManager';
+import styles from '@styles/StatsFilters.module.css';
 
 /** Category filter toggle + checkbox chips of the Stats panel. */
 export function StatsFilters({
@@ -13,6 +15,7 @@ export function StatsFilters({
     const { t } = useTranslation();
 
     const handleToggleCategory = (catId, checked) => {
+        haptics.light();
         setActiveCategories(prev => {
             if (checked) return [...prev, catId];
             if (prev.length === 1) return prev;
@@ -23,26 +26,23 @@ export function StatsFilters({
     return (
         <div style={{ marginBottom: 'var(--spacing-md)' }}>
             <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="hover-lift"
-                style={{
-                    display: 'flex', alignItems: 'center', gap: '8px',
-                    background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
-                    padding: '10px 16px', borderRadius: 'var(--radius-lg)',
-                    color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: '700',
-                    cursor: 'pointer'
+                onClick={() => {
+                    haptics.light();
+                    setShowFilters(!showFilters);
                 }}
+                className={showFilters ? `${styles.toggle} ${styles.toggleOpen}` : styles.toggle}
+                aria-expanded={showFilters}
             >
                 <Filter size={16} />
-                {t('stats.filters')} ({activeCategories.length})
+                {t('stats.filters')}
+                <span key={activeCategories.length} className={styles.count}>
+                    {activeCategories.length}
+                </span>
+                <ChevronDown size={15} className={styles.chevron} />
             </button>
             {showFilters && (
-                <div className="fade-in" style={{
-                    marginTop: '8px', padding: '12px', background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.06)', borderRadius: 'var(--radius-lg)',
-                    display: 'flex', flexWrap: 'wrap', gap: '8px'
-                }}>
-                    {fullCategoryOrder.map(categoryId => {
+                <div className={styles.panel}>
+                    {fullCategoryOrder.map((categoryId, index) => {
                         let config;
                         if (isUserCategory(categoryId)) {
                             const catDef = customCategories.find(c => c.id === categoryId);
@@ -64,14 +64,11 @@ export function StatsFilters({
                         }
 
                         return (
-                            <label key={cat.id} style={{
-                                display: 'flex', alignItems: 'center', gap: '6px',
+                            <label key={cat.id} className={styles.chip} style={{
+                                '--i': index,
                                 background: activeCategories.includes(cat.id) ? `linear-gradient(135deg, ${cat.color}, ${cat.color}cc)` : 'rgba(255,255,255,0.05)',
                                 color: labelColor,
                                 border: activeCategories.includes(cat.id) ? `1px solid ${cat.color}88` : `1px solid ${cat.color}33`,
-                                padding: '8px 16px', borderRadius: 'var(--radius-full)',
-                                fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer',
-                                transition: 'all 0.2s',
                                 opacity: cat.locked ? 0.6 : 1
                             }}>
                                 {cat.locked ? (

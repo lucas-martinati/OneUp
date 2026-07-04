@@ -1,0 +1,139 @@
+/* ── Stats category filter — toggle pill + chips panel ──────────────────
+   Replaces the hand-rolled inline <button style={{…}}> of StatsFilters.jsx.
+   One-shot mount/press animations only (no infinite loops), with
+   [data-perf="low"] and reduced-motion kill-switches. */
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+
+.toggle:active {
+  transform: scale(0.96);
+}
+
+/* Open state: theme-accent tint so the button clearly reads as "engaged". */
+.toggleOpen {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent-glow) 45%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent-glow) 30%, transparent);
+}
+
+/* Active-category count, as a small accent badge. Re-keyed on change in JSX
+   so countPop replays on every add/remove. */
+.count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--gradient-glow);
+  border-radius: var(--radius-full);
+  color: var(--text-on-surface);
+  font-size: var(--text-xs);
+  animation: countPop 0.25s var(--ease-panel-in);
+}
+
+@keyframes countPop {
+  from { transform: scale(0.4); }
+  60% { transform: scale(1.2); }
+}
+
+.chevron {
+  transition: transform var(--motion-panel) var(--ease-panel-in);
+}
+
+.toggleOpen .chevron {
+  transform: rotate(180deg);
+}
+
+.panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-lg);
+  transform-origin: top center;
+  animation: panelIn var(--motion-panel) var(--ease-panel-in);
+}
+
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+
+/* Category chip — colors stay inline (per-category dynamic), the module owns
+   layout, press feedback and the staggered entrance (via the --i index). */
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    opacity var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+  animation: chipIn 0.3s var(--ease-panel-in) backwards;
+  animation-delay: calc(var(--i, 0) * 35ms);
+}
+
+.chip:active {
+  transform: scale(0.94);
+}
+
+@keyframes chipIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* ── Kill-switches ── */
+:global([data-perf='low']) .panel,
+:global([data-perf='low']) .chip,
+:global([data-perf='low']) .count {
+  animation: none;
+}
+
+:global([data-perf='low']) .toggleOpen {
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .chip,
+  .count {
+    animation: none;
+  }
+
+  .chevron {
+    transition: none;
+  }
+}
