@@ -1,0 +1,216 @@
+/* ShareOptions — metric tiles + category chips ──────────────────────────
+   Replaces the hand-rolled toggle rows and pills of ShareOptions.jsx.
+   Per-item accent color comes in via the --c custom property (dynamic,
+   set inline in JSX); the module owns layout, states and motion.
+   One-shot mount/press animations only, with [data-perf="low"] and
+   reduced-motion kill-switches (same contract as StatsFilters). */
+
+.sectionLabel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 0 4px;
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.sectionLabel:first-child {
+  margin-top: 0;
+}
+
+/* Chrome shared by metric tiles and category chips: neutral surface,
+   accent-aware transitions, staggered one-shot entrance (via --i). */
+.metric,
+.chip {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-muted);
+  color: var(--text-secondary);
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+  animation: tileIn 0.3s var(--ease-panel-in) backwards;
+  animation-delay: calc(var(--i, 0) * 30ms);
+}
+
+/* ── Metric tiles: 2-column multi-select grid ── */
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.metric {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+
+.metric:active {
+  transform: scale(0.96);
+}
+
+.metricOn {
+  background: color-mix(in srgb, var(--c) 10%, transparent);
+  border-color: color-mix(in srgb, var(--c) 35%, transparent);
+  color: var(--text-primary);
+}
+
+/* Round icon holder, tinted by the tile accent when active. */
+.metricIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  transition:
+    background var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+}
+
+.metricOn .metricIcon {
+  background: color-mix(in srgb, var(--c) 18%, transparent);
+  color: var(--c);
+}
+
+.metricLabel {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* Checkbox badge: hollow ring when off, filled accent disc when on. */
+.metricCheck {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  color: rgba(0, 0, 0, 0.75);
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease;
+}
+
+.metricOn .metricCheck {
+  background: var(--c);
+  border-color: transparent;
+  animation: checkPop 0.25s var(--ease-panel-in);
+}
+
+/* Date picker revealed under the grid by the "daily exercises" tile. */
+.dateField {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  color-scheme: dark;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  animation: tileIn 0.25s var(--ease-panel-in);
+}
+
+/* ── Category chips: pill multi-select with check-dot ── */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.chip:active {
+  transform: scale(0.94);
+}
+
+.chipOn {
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+  border-color: color-mix(in srgb, var(--c) 40%, transparent);
+  color: var(--c);
+}
+
+/* Hollow ring in the category color; fills with a check when selected. */
+.chipDot {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid color-mix(in srgb, var(--c) 55%, transparent);
+  border-radius: var(--radius-full);
+  color: rgba(0, 0, 0, 0.75);
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease;
+}
+
+.chipOn .chipDot {
+  background: var(--c);
+  border-color: transparent;
+  animation: checkPop 0.25s var(--ease-panel-in);
+}
+
+@keyframes tileIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes checkPop {
+  from {
+    transform: scale(0.4);
+  }
+
+  60% {
+    transform: scale(1.15);
+  }
+}
+
+/* ── Kill-switches ── */
+:global([data-perf='low']) .metric,
+:global([data-perf='low']) .chip,
+:global([data-perf='low']) .dateField,
+:global([data-perf='low']) .metricOn .metricCheck,
+:global([data-perf='low']) .chipOn .chipDot {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metric,
+  .chip,
+  .dateField,
+  .metricOn .metricCheck,
+  .chipOn .chipDot {
+    animation: none;
+  }
+}

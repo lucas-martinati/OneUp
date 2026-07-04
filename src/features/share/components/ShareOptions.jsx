@@ -1,41 +1,28 @@
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X, Lock } from '@utils/icons';
-import { ToggleSwitch } from '@components/ui/ToggleSwitch';
+import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X, Lock, Check } from '@utils/icons';
+import { haptics } from '@utils/hapticsManager';
+import styles from './ShareOptions.module.css';
 
-// The row is a div (not a button): the accessible switch is the nested
-// ToggleSwitch, and buttons cannot contain buttons.
-function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
+// Multi-select tile: icon pastille + label + checkbox badge. The accent
+// color flows into the module via --c; --i staggers the entrance.
+function MetricTile({ icon: Icon, label, color, checked, onToggle, index }) {
   return (
-    <div
-      onClick={disabled ? undefined : onToggle}
-      style={{
-        display: 'flex', alignItems: 'center', gap: '10px',
-        padding: '10px 14px', borderRadius: '12px',
-        background: checked ? `${color}12` : 'rgba(255,255,255,0.03)',
-        border: `1px solid ${checked ? color + '30' : 'rgba(255,255,255,0.06)'}`,
-        cursor: disabled ? 'default' : 'pointer', width: '100%', textAlign: 'left',
-        transition: 'all 0.2s ease',
-        opacity: disabled ? 0.4 : 1,
-        pointerEvents: disabled ? 'none' : undefined,
+    <button
+      aria-pressed={checked}
+      onClick={() => {
+        haptics.light();
+        onToggle();
       }}
+      className={checked ? `${styles.metric} ${styles.metricOn}` : styles.metric}
+      style={{ '--c': color, '--i': index }}
     >
-      <Icon size={16} color={checked ? color : 'rgba(255,255,255,0.3)'} />
-      <span style={{
-        flex: 1, fontSize: '0.8rem', fontWeight: 600,
-        color: checked ? 'var(--text-primary)' : 'var(--text-secondary)',
-      }}>
-        {label}
+      <span className={styles.metricIcon}><Icon size={14} /></span>
+      <span className={styles.metricLabel}>{label}</span>
+      <span className={styles.metricCheck}>
+        {checked && <Check size={11} strokeWidth={3} />}
       </span>
-      <ToggleSwitch
-        enabled={checked}
-        activeGradient={color}
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggle?.();
-        }}
-      />
-    </div>
+    </button>
   );
 }
 
@@ -63,21 +50,13 @@ function UploadButton({ onClick, label, children }) {
   );
 }
 
-// En-tête de section (label majuscule, icône optionnelle, espaceur optionnel).
-function SectionLabel({ icon: Icon, children, spacer = true }) {
+// En-tête de section (label majuscule, icône optionnelle).
+function SectionLabel({ icon: Icon, children }) {
   return (
-    <>
-      {spacer && <div style={{ height: '4px' }} />}
-      <div style={{
-        fontSize: '0.65rem', fontWeight: 700,
-        color: 'var(--text-secondary)',
-        textTransform: 'uppercase', letterSpacing: '1px',
-        padding: '0 4px',
-      }}>
-        {Icon && <Icon size={11} style={{ marginRight: '4px', verticalAlign: 'middle' }} />}
-        {children}
-      </div>
-    </>
+    <div className={styles.sectionLabel}>
+      {Icon && <Icon size={11} />}
+      {children}
+    </div>
   );
 }
 
@@ -143,8 +122,8 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       width: '100%',
     }}>
       {/* Theme selector — first: it changes the whole look of the card */}
-      <SectionLabel icon={Palette} spacer={false}>
-        {t('share.theme')} {!isPro && <Lock size={11} color="var(--accent)" style={{ marginLeft: '4px', verticalAlign: 'middle', opacity: 0.8 }} />}
+      <SectionLabel icon={Palette}>
+        {t('share.theme')} {!isPro && <Lock size={11} color="var(--accent)" style={{ opacity: 0.8 }} />}
       </SectionLabel>
       <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '12px' }}>
         <div style={{
@@ -188,79 +167,70 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
 
       <SectionLabel>{t('share.metrics')}</SectionLabel>
 
-      <OptionRow
-        icon={isGlobal ? Award : Clock}
-        label={isGlobal ? t('common.bestStreak') : t('share.duration')}
-        color="#818cf8"
-        checked={options.showDuration}
-        onToggle={() => toggleOption('showDuration')}
-      />
-      <OptionRow
-        icon={Zap}
-        label={isGlobal ? t('stats.totalReps') : t('customExercises.typeReps')}
-        color="#fbbf24"
-        checked={options.showVolume}
-        onToggle={() => toggleOption('showVolume')}
-      />
-      <OptionRow
-        icon={isGlobal ? Target : Dumbbell}
-        label={isGlobal ? t('leaderboard.activeDays') : t('share.exercisesCompleted')}
-        color="#34d399"
-        checked={options.showExercises}
-        onToggle={() => toggleOption('showExercises')}
-      />
-      <OptionRow
-        icon={Flame}
-        label={t('achievements.categories.streak')}
-        color="#ef4444"
-        checked={options.showStreak}
-        onToggle={() => toggleOption('showStreak')}
-      />
-
-      {isGlobal && (
-        <div className="flex-col gap-8">
-          <OptionRow
-            icon={Dumbbell}
-            label={t('share.showDailyExercises')}
-            color="#ec4899"
-            checked={options.showDailyExercises}
-            onToggle={() => toggleOption('showDailyExercises')}
+      <div className={styles.metricGrid}>
+        {[
+          {
+            key: 'showDuration',
+            icon: isGlobal ? Award : Clock,
+            label: isGlobal ? t('common.bestStreak') : t('share.duration'),
+            color: '#818cf8',
+          },
+          {
+            key: 'showVolume',
+            icon: Zap,
+            label: isGlobal ? t('stats.totalReps') : t('customExercises.typeReps'),
+            color: '#fbbf24',
+          },
+          {
+            key: 'showExercises',
+            icon: isGlobal ? Target : Dumbbell,
+            label: isGlobal ? t('leaderboard.activeDays') : t('share.exercisesCompleted'),
+            color: '#34d399',
+          },
+          {
+            key: 'showStreak',
+            icon: Flame,
+            label: t('achievements.categories.streak'),
+            color: '#ef4444',
+          },
+          ...(isGlobal ? [{
+            key: 'showDailyExercises',
+            icon: Dumbbell,
+            label: t('share.showDailyExercises'),
+            color: '#ec4899',
+          }] : []),
+          {
+            key: 'showSessionHistory',
+            icon: History,
+            label: t('share.showHistory'),
+            color: '#8b5cf6',
+          },
+          // Weights (pro only, session mode, only if weight exercises exist)
+          ...(!isGlobal && isPro && hasWeightExercises ? [{
+            key: 'showWeights',
+            icon: Weight,
+            label: t('share.showWeights'),
+            color: '#f97316',
+          }] : []),
+        ].map((metric, index) => (
+          <MetricTile
+            key={metric.key}
+            icon={metric.icon}
+            label={metric.label}
+            color={metric.color}
+            index={index}
+            checked={!!options[metric.key]}
+            onToggle={() => toggleOption(metric.key)}
           />
-          {options.showDailyExercises && (
-            <input
-              type="date"
-              value={options.globalDate || new Date().toISOString().split('T')[0]}
-              onChange={(e) => setOption('globalDate', e.target.value)}
-              style={{
-                marginLeft: '36px',
-                padding: '6px 12px',
-                borderRadius: '8px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'white',
-                fontSize: '0.8rem',
-                colorScheme: 'dark'
-              }}
-            />
-          )}
-        </div>
-      )}
-      <OptionRow
-        icon={History}
-        label={t('share.showHistory')}
-        color="#8b5cf6"
-        checked={options.showSessionHistory}
-        onToggle={() => toggleOption('showSessionHistory')}
-      />
+        ))}
+      </div>
 
-      {/* Weights toggle (pro only, session mode, only if weight exercises exist) */}
-      {!isGlobal && isPro && hasWeightExercises && (
-        <OptionRow
-          icon={Weight}
-          label={t('share.showWeights')}
-          color="#f97316"
-          checked={options.showWeights}
-          onToggle={() => toggleOption('showWeights')}
+      {isGlobal && options.showDailyExercises && (
+        <input
+          type="date"
+          className={styles.dateField}
+          value={options.globalDate || new Date().toISOString().split('T')[0]}
+          onChange={(e) => setOption('globalDate', e.target.value)}
         />
       )}
 
@@ -268,33 +238,26 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       {isGlobal && (
         <>
           <SectionLabel icon={Filter}>{t('share.categoryFilter')}</SectionLabel>
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {fullCategoryOrder.map(catKey => {
+          <div className={styles.chips}>
+            {fullCategoryOrder.map((catKey, index) => {
               const isSelected = selectedCategories.includes(catKey);
               const catColor = fullCategoryColors[catKey];
-              let label;
-              if (isUserCategory(catKey)) {
-                const catDef = customCategories.find(c => c.id === catKey);
-                label = catDef?.name || catKey;
-              } else {
-                const catDef = customCategories.find(c => c.id === catKey);
-                label = catDef?.name || t(`common.${catKey}`);
-              }
+              const catDef = customCategories.find(c => c.id === catKey);
+              const label = catDef?.name || (isUserCategory(catKey) ? catKey : t(`common.${catKey}`));
               return (
                 <button
                   key={catKey}
-                  onClick={() => toggleCategory(catKey)}
-                  style={{
-                    padding: '6px 12px', borderRadius: '8px',
-                    border: isSelected ? `1px solid ${catColor}40` : '1px solid rgba(255,255,255,0.06)',
-                    background: isSelected
-                      ? `${catColor}18`
-                      : 'rgba(255,255,255,0.03)',
-                    color: isSelected ? catColor : 'var(--text-secondary)',
-                    fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer',
-                    transition: 'all 0.15s ease',
+                  aria-pressed={isSelected}
+                  onClick={() => {
+                    haptics.light();
+                    toggleCategory(catKey);
                   }}
+                  className={isSelected ? `${styles.chip} ${styles.chipOn}` : styles.chip}
+                  style={{ '--c': catColor, '--i': index }}
                 >
+                  <span className={styles.chipDot}>
+                    {isSelected && <Check size={9} strokeWidth={3.5} />}
+                  </span>
                   {label}
                 </button>
               );
