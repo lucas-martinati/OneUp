@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Award, Lock, ChevronRight } from '@utils/icons';
 import { buildBadges } from '../feedback/buildBadges';
 
+const fmt = (n) => n.toLocaleString();
+
 /** A single clickable badge medallion in the horizontal shelf. */
 const Medallion = React.memo(({ badge, onSelect, t }) => {
     const Icon = badge.icon;
@@ -60,10 +62,11 @@ const Medallion = React.memo(({ badge, onSelect, t }) => {
 });
 
 /**
- * Compact, redesigned achievements display for the stats overview: a progress
- * header plus a horizontal shelf of badge medallions. Tapping a medallion opens
- * the full Achievements panel scrolled to — and highlighting — that badge;
- * "see all" opens the panel normally.
+ * Compact achievements display for the stats overview: a progress header, a
+ * horizontal shelf of badge medallions and a "next achievement" card showing
+ * the locked badge closest to unlocking. Tapping a medallion or the next card
+ * opens the full Achievements panel scrolled to — and highlighting — that
+ * badge; "see all" opens the panel normally.
  *
  * @param {object}   stats        Global computed stats (must include `achievements`).
  * @param {function} onOpen       Called with an optional badgeId to open the panel.
@@ -85,6 +88,15 @@ export function AchievementsShowcase({ stats, onOpen }) {
             return 0;
         });
     }, [badges]);
+
+    // The locked, non-secret badge closest to unlocking.
+    const nextBadge = useMemo(() => {
+        return badges
+            .filter(b => !b.unlocked && !b.secret && b.progress != null)
+            .sort((a, b) => (b.progress - a.progress) || (a.goal - b.goal))[0] || null;
+    }, [badges]);
+
+    const NextIcon = nextBadge?.icon;
 
     return (
         <div className="glass-premium slide-up" style={{
@@ -149,6 +161,62 @@ export function AchievementsShowcase({ stats, onOpen }) {
                     <Medallion key={badge.id} badge={badge} onSelect={onOpen} t={t} />
                 ))}
             </div>
+
+            {/* Next achievement: closest locked badge, deep-links to it */}
+            {nextBadge && (
+                <button
+                    type="button"
+                    onClick={() => onOpen(nextBadge.id)}
+                    className="hover-lift"
+                    style={{
+                        width: '100%', marginTop: '12px', padding: '10px 12px',
+                        display: 'flex', alignItems: 'center', gap: '12px',
+                        background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
+                        borderRadius: 'var(--radius-lg)', cursor: 'pointer', textAlign: 'left',
+                    }}
+                >
+                    <div style={{
+                        width: '38px', height: '38px', borderRadius: '12px', flexShrink: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: `${nextBadge.color}1a`, border: `1px solid ${nextBadge.color}33`,
+                    }}>
+                        <NextIcon size={19} color={nextBadge.color} />
+                    </div>
+                    <div className="flex-1-min0">
+                        <div style={{
+                            fontSize: '0.58rem', fontWeight: '800', letterSpacing: '1px',
+                            textTransform: 'uppercase', color: 'var(--text-secondary)',
+                        }}>
+                            {t('achievements.nextBadge')}
+                        </div>
+                        <div style={{
+                            fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-primary)',
+                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                            marginTop: '1px',
+                        }}>
+                            {t(nextBadge.titleKey)}
+                        </div>
+                        <div style={{
+                            height: '4px', borderRadius: '2px', marginTop: '6px',
+                            background: 'var(--progress-track-thin)', overflow: 'hidden',
+                        }}>
+                            <div style={{
+                                width: `${Math.round(nextBadge.progress * 100)}%`, height: '100%',
+                                borderRadius: '2px',
+                                background: `linear-gradient(90deg, ${nextBadge.color}, ${nextBadge.color}aa)`,
+                                transition: 'width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                            }} />
+                        </div>
+                    </div>
+                    <div style={{
+                        fontSize: '0.68rem', fontWeight: '800', color: nextBadge.color,
+                        whiteSpace: 'nowrap', flexShrink: 0,
+                    }}>
+                        {fmt(nextBadge.current)} / {fmt(nextBadge.goal)}
+                    </div>
+                    <ChevronRight size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+                </button>
+            )}
         </div>
     );
 }
