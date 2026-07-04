@@ -15,7 +15,7 @@ import {
   Settings, Settings2, Bell, Volume2, Vibrate, Clock, Lock, Unlock,
   Globe, Gauge, ShoppingBag, PieChart,
   // Sharing & media
-  Share2, Download, Image, Palette, Target,
+  Share2, Download, Image, Palette, Target, Maximize2,
   History, Weight, Filter, Loader2, Smartphone,
   // Cloud & sync
   Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
@@ -41,7 +41,7 @@ export {
   Hash, Heart, HeartHandshake, History,
   Image,
   Link, Link2, Loader2, Lock, LogIn, LogOut,
-  Medal, Minus, Moon,
+  Maximize2, Medal, Minus, Moon,
   Palette, Pause, PieChart, Play, Plus,
   RefreshCw, Rocket, RotateCcw,
   Save, Settings, Settings2, Share2, Shield, ShieldAlert, ShoppingBag, Shuffle, Smartphone, Snowflake, Sparkles, Star, Sun,

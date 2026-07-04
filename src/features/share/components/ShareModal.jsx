@@ -1,19 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Share2, Download, X, Loader2 } from '@utils/icons';
-import { IconButton } from'@components/ui';
+import { IconButton } from '@components/ui';
 import { Z_INDEX } from '@utils/zIndex';
 import { ShareCard } from './ShareCard';
+import { SharePreview } from './SharePreview';
 import { ShareOptions } from './ShareOptions';
 import { CropModal } from './CropModal';
 import { canShareNatively } from '@features/share/services/shareService';
 import { useProgressStore } from '@store/useProgressStore';
 import { useUIStore } from '@store/useUIStore';
+import styles from './ShareModal.module.css';
 
 export function ShareModal({ shareHook, onClose, isPro = false, completions = {}, getDayNumber, settings }) {
   const { t } = useTranslation();
   const hasShared = useProgressStore(s => s.hasShared);
   const setHasShared = useProgressStore(s => s.setHasShared);
+  const [cardFormat, setCardFormat] = useState(null);
   const {
     cardRef, options, toggleOption, setOption, toggleCategory,
     setBackgroundImage, clearBackgroundImage,
@@ -30,13 +33,19 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
     }
   };
 
-  const handleShare = async () => { 
-    await shareCard(); 
+  const handleShare = async () => {
+    await shareCard();
     handleShareSuccess();
   };
-  const handleDownload = async () => { 
-    await exportCard(); 
+  const handleDownload = async () => {
+    await exportCard();
     handleShareSuccess();
+  };
+
+  // Shared by the ref-holding preview card and its enlarged zoom copy
+  const cardProps = {
+    sessionData, stats, sessionHistory, completions, getDayNumber,
+    settings, options, mode, isPro,
   };
 
   return (
@@ -58,46 +67,84 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
         <IconButton icon={X} variant="glass" onClick={onClose} aria-label="Close" />
       </div>
 
-      {/* Card preview */}
-      <div style={{
-        padding: '0 0 12px', display: 'flex', justifyContent: 'center',
-      }}>
-          <ShareCard
-            cardRef={cardRef}
-            sessionData={sessionData}
-            stats={stats}
-            sessionHistory={sessionHistory}
-            completions={completions}
-            getDayNumber={getDayNumber}
-            settings={settings}
-            options={options}
-            mode={mode}
-            isPro={isPro}
-          />
-      </div>
+      <div className={styles.layout}>
+        {/* Card preview — stays visible while options are tweaked */}
+        <div className={styles.preview}>
+          <SharePreview
+            formatLabel={cardFormat}
+            className={styles.stage}
+            zoomContent={<ShareCard {...cardProps} />}
+          >
+            <ShareCard
+              {...cardProps}
+              cardRef={cardRef}
+              onFormatChange={setCardFormat}
+            />
+          </SharePreview>
+        </div>
 
-      {/* Options */}
-      <div style={{
-        padding: '8px 0',
-      }}>
-        <ShareOptions
-          options={options}
-          toggleOption={toggleOption}
-          setOption={setOption}
-          toggleCategory={toggleCategory}
-          setBackgroundImage={setBackgroundImage}
-          clearBackgroundImage={clearBackgroundImage}
-          originalImage={originalImage}
-          cropData={cropData}
-          openCropModal={openCropModal}
-          mode={mode}
-          isPro={isPro}
-          sessionData={sessionData}
-          onOpenStore={() => {
-            onClose();
-            useUIStore.getState().openStore();
-          }}
-        />
+        {/* Options + actions */}
+        <div className={styles.side}>
+          <div style={{ padding: '8px 0' }}>
+            <ShareOptions
+              options={options}
+              toggleOption={toggleOption}
+              setOption={setOption}
+              toggleCategory={toggleCategory}
+              setBackgroundImage={setBackgroundImage}
+              clearBackgroundImage={clearBackgroundImage}
+              originalImage={originalImage}
+              cropData={cropData}
+              openCropModal={openCropModal}
+              mode={mode}
+              isPro={isPro}
+              sessionData={sessionData}
+              onOpenStore={() => {
+                onClose();
+                useUIStore.getState().openStore();
+              }}
+            />
+          </div>
+
+          <div className={styles.actions}>
+            <button
+              onClick={handleDownload}
+              disabled={isExporting}
+              className="hover-lift"
+              style={{
+                flex: 1, padding: '14px', borderRadius: '14px',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                color: 'white', fontSize: '0.85rem', fontWeight: 700,
+                cursor: isExporting ? 'default' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: '8px', opacity: isExporting ? 0.5 : 1,
+              }}
+            >
+              {isExporting ? <Loader2 size={18} className="spin" /> : <Download size={18} />}
+              {t('share.download')}
+            </button>
+            <button
+              onClick={handleShare}
+              disabled={isExporting}
+              className="hover-lift"
+              style={{
+                flex: 1, padding: '14px', borderRadius: '14px',
+                background: 'linear-gradient(135deg, #818cf8, #6366f1)',
+                border: 'none',
+                color: 'white', fontSize: '0.85rem', fontWeight: 700,
+                cursor: isExporting ? 'default' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: '8px', opacity: isExporting ? 0.7 : 1,
+              }}
+            >
+              {isExporting ? <Loader2 size={18} className="spin" /> : <Share2 size={18} />}
+              {canShareNatively()
+                ? t('common.share')
+                : t('share.download')}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Crop Modal */}
@@ -110,49 +157,6 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
           onClose={closeCropModal}
         />
       )}
-
-      {/* Action buttons */}
-      <div style={{
-        padding: '8px 0 24px',
-        display: 'flex', gap: '10px',
-      }}>
-        <button
-          onClick={handleDownload}
-          disabled={isExporting}
-          className="hover-lift"
-          style={{
-            flex: 1, padding: '14px', borderRadius: '14px',
-            background: 'rgba(255,255,255,0.08)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            color: 'white', fontSize: '0.85rem', fontWeight: 700,
-            cursor: isExporting ? 'default' : 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: '8px', opacity: isExporting ? 0.5 : 1,
-          }}
-        >
-          {isExporting ? <Loader2 size={18} className="spin" /> : <Download size={18} />}
-          {t('share.download')}
-        </button>
-        <button
-          onClick={handleShare}
-          disabled={isExporting}
-          className="hover-lift"
-          style={{
-            flex: 1, padding: '14px', borderRadius: '14px',
-            background: 'linear-gradient(135deg, #818cf8, #6366f1)',
-            border: 'none',
-            color: 'white', fontSize: '0.85rem', fontWeight: 700,
-            cursor: isExporting ? 'default' : 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: '8px', opacity: isExporting ? 0.7 : 1,
-          }}
-        >
-          {isExporting ? <Loader2 size={18} className="spin" /> : <Share2 size={18} />}
-          {canShareNatively()
-            ? t('common.share')
-            : t('share.download')}
-        </button>
-      </div>
       </div>
     </div>
   );

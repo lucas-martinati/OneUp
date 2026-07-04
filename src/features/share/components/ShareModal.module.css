@@ -1,0 +1,58 @@
+/* ShareModal —
+   Mobile: preview on top in the flow (tap opens it fullscreen), options below.
+   Desktop (≥768px): two columns, sticky preview left, options + actions right. */
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.preview {
+  padding-bottom: var(--spacing-xs);
+}
+
+/* Mobile: fixed-height stage so toggling options rescales the card without
+   ever moving the controls below (no layout shift while tweaking).
+   Must stay in sync with the 0.45 viewport factor in SharePreview. */
+.stage {
+  height: 45vh;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0 24px;
+}
+
+@media (min-width: 768px) {
+  .layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+
+  /* Exact 50/50 split: equal flex-basis so the gap is shared evenly. */
+  .preview {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-bottom: 0;
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+  }
+
+  .side {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .stage {
+    height: auto;
+  }
+}

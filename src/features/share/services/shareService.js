@@ -9,11 +9,56 @@ import { Capacitor } from '@capacitor/core';
 
 const isNative = () => Capacitor.isNativePlatform();
 
+/**
+ * Builds a CSS string with the app's webfont (Outfit) embedded as base64
+ * data URIs, so the exported image renders with the real font instead of a
+ * system fallback. Only the latin subsets are embedded to stay light.
+ * Cached for the session; resolves to '' on failure (e.g. offline) so the
+ * capture falls back to skipping fonts, as before.
+ */
+let fontCssPromise = null;
+
+async function buildFontEmbedCss() {
+  const hrefs = Array.from(document.querySelectorAll('link[href*="fonts.googleapis.com"]'))
+    .map(l => l.href);
+  if (hrefs.length === 0) return '';
+
+  const cssTexts = await Promise.all(hrefs.map(async (href) => (await fetch(href)).text()));
+  const blocks = cssTexts.join('\n').match(/@font-face\s*{[^}]*}/g) || [];
+  const latinBlocks = blocks.filter(b => b.includes('U+0000-00FF'));
+
+  const embedded = await Promise.all(latinBlocks.map(async (block) => {
+    const urlMatch = block.match(/url\((https:[^)]+)\)/);
+    if (!urlMatch) return block;
+    const res = await fetch(urlMatch[1]);
+    const blob = await res.blob();
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+    return block.replace(urlMatch[1], dataUrl);
+  }));
+  return embedded.join('\n');
+}
+
+export function getFontEmbedCss() {
+  if (!fontCssPromise) {
+    fontCssPromise = buildFontEmbedCss().catch(() => {
+      fontCssPromise = null; // retry on next capture (e.g. back online)
+      return '';
+    });
+  }
+  return fontCssPromise;
+}
+
 export async function captureElement(element, { format = 'png', quality = 0.92, pixelRatio = 2, height, width } = {}) {
   if (!element) throw new Error('No element to capture');
 
   const captureFn = format === 'jpeg' ? toJpeg : toPng;
-  
+  const fontEmbedCSS = await getFontEmbedCss();
+
   const options = {
     quality,
     pixelRatio,
@@ -22,7 +67,7 @@ export async function captureElement(element, { format = 'png', quality = 0.92, 
     style: {
       transform: 'none',
     },
-    skipFonts: true,
+    ...(fontEmbedCSS ? { fontEmbedCSS } : { skipFonts: true }),
   };
 
   // Pass explicit dimensions to ensure full content is captured

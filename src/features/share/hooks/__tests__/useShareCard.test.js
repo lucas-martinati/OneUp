@@ -6,7 +6,10 @@ vi.mock('@features/share/services/shareService', () => ({
   shareImage: vi.fn(() => Promise.resolve({ success: true })),
   downloadImage: vi.fn(() => Promise.resolve()),
 }));
-vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: (k) => k }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
+}));
 vi.mock('@utils/sessionNameGenerator', () => ({ generateShareTextFromSession: vi.fn(() => 'shared!') }));
 
 import { captureElement, shareImage, downloadImage } from '@features/share/services/shareService';

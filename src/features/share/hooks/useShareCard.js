@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { captureElement, shareImage, downloadImage } from '@features/share/services/shareService';
+import { CARD_WIDTH } from '@features/share/services/cardModel';
 import { CATEGORIES } from '@config/categories';
 import { useTranslation } from 'react-i18next';
 import { generateShareTextFromSession } from '@utils/sessionNameGenerator';
@@ -172,36 +173,20 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
   const captureCard = useCallback(async () => {
     if (!cardRef.current) throw new Error('Card ref not attached');
     setIsExporting(true);
-    const el = cardRef.current;
-    const prevWidth = el.style.width;
-    const prevMaxWidth = el.style.maxWidth;
-    const prevOverflow = el.style.overflow;
     try {
-      // Force fixed size for consistent export
-      el.style.width = '360px';
-      el.style.maxWidth = '360px';
-      // Temporarily remove overflow:hidden so scrollHeight reflects full content
-      el.style.overflow = 'visible';
-      
-      // Wait for layout to settle after forced resize and for any potential re-renders
-      await new Promise(r => setTimeout(r, 50));
-
-      // Capture the full content height (overflow:visible ensures scrollHeight == full content)
-      const fullHeight = el.scrollHeight;
-
+      const el = cardRef.current;
+      // The card renders at its fixed logical size (CARD_WIDTH × snapped
+      // height) whatever the preview scale, so it is captured as-is.
+      // pixelRatio 2 → 1080px wide, the social-network standard.
       const dataUrl = await captureElement(el, {
         format: options.format,
         quality: 0.95,
         pixelRatio: 2,
-        height: fullHeight,
-        width: 360,
+        height: el.offsetHeight,
+        width: CARD_WIDTH,
       });
       return dataUrl;
     } finally {
-      // Restore original sizing
-      el.style.width = prevWidth;
-      el.style.maxWidth = prevMaxWidth;
-      el.style.overflow = prevOverflow;
       setIsExporting(false);
     }
   }, [options.format]);

@@ -1,10 +1,13 @@
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X, Lock } from '@utils/icons';
+import { ToggleSwitch } from '@components/ui/ToggleSwitch';
 
+// The row is a div (not a button): the accessible switch is the nested
+// ToggleSwitch, and buttons cannot contain buttons.
 function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
   return (
-    <button
+    <div
       onClick={disabled ? undefined : onToggle}
       style={{
         display: 'flex', alignItems: 'center', gap: '10px',
@@ -14,6 +17,7 @@ function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
         cursor: disabled ? 'default' : 'pointer', width: '100%', textAlign: 'left',
         transition: 'all 0.2s ease',
         opacity: disabled ? 0.4 : 1,
+        pointerEvents: disabled ? 'none' : undefined,
       }}
     >
       <Icon size={16} color={checked ? color : 'rgba(255,255,255,0.3)'} />
@@ -23,18 +27,15 @@ function OptionRow({ icon: Icon, label, color, checked, onToggle, disabled }) {
       }}>
         {label}
       </span>
-      <div style={{
-        width: '36px', height: '20px', borderRadius: '10px',
-        background: checked ? color : 'rgba(255,255,255,0.12)',
-        position: 'relative', transition: 'all 0.2s ease', flexShrink: 0,
-      }}>
-        <div style={{
-          width: '16px', height: '16px', borderRadius: '50%',
-          background: 'white', position: 'absolute', top: '2px',
-          left: checked ? '18px' : '2px', transition: 'all 0.2s ease',
-        }} />
-      </div>
-    </button>
+      <ToggleSwitch
+        enabled={checked}
+        activeGradient={color}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle?.();
+        }}
+      />
+    </div>
   );
 }
 
@@ -83,6 +84,7 @@ function SectionLabel({ icon: Icon, children, spacer = true }) {
 import { buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
 import { useExercises } from '@contexts/ExercisesContext';
 import { THEMES as GLOBAL_THEMES } from '@config/themes';
+import { WEIGHT_EXERCISES } from '@config/weights';
 import { ThemeSwatch } from'@components/ui/ThemeSwatch';
 
 export function ShareOptions({ options, toggleOption, setOption, toggleCategory, clearBackgroundImage, originalImage, openCropModal, mode = 'session', isPro = false, sessionData, onOpenStore }) {
@@ -131,17 +133,60 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
     e.target.value = '';
   };
 
-  const hasWeightExercises = !isGlobal && sessionData?.exercises?.some(ex => {
-    const weightIds = ['biceps_curl','hammer_curl','bench_press','overhead_press','squat_weights','deadlift','barbell_row'];
-    return weightIds.includes(ex.id);
-  });
+  const hasWeightExercises = !isGlobal && sessionData?.exercises?.some(
+    ex => WEIGHT_EXERCISES.some(w => w.id === ex.id)
+  );
 
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', gap: '8px',
       width: '100%',
     }}>
-      <SectionLabel spacer={false}>{t('share.metrics')}</SectionLabel>
+      {/* Theme selector — first: it changes the whole look of the card */}
+      <SectionLabel icon={Palette} spacer={false}>
+        {t('share.theme')} {!isPro && <Lock size={11} color="var(--accent)" style={{ marginLeft: '4px', verticalAlign: 'middle', opacity: 0.8 }} />}
+      </SectionLabel>
+      <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '12px' }}>
+        <div style={{
+          display: 'flex', gap: '6px', flexWrap: 'wrap',
+          opacity: isPro ? 1 : 0.6,
+          pointerEvents: isPro ? 'auto' : 'none'
+        }}>
+          {GLOBAL_THEMES.map(theme => (
+            <ThemeSwatch
+              key={theme.key}
+              theme={theme}
+              isSelected={options.theme === theme.key}
+              onClick={() => setOption('theme', theme.key)}
+              title={t(`share.theme.${theme.key}`, theme.key)}
+            />
+          ))}
+        </div>
+        {!isPro && (
+          <div
+            onClick={onOpenStore}
+            style={{
+              position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(0,0,0,0.1)', backdropFilter: 'blur(1.5px)',
+              cursor: 'pointer', zIndex: 2
+            }}
+          >
+            <div style={{
+              background: 'var(--surface-elevated)', color: 'var(--text-primary)',
+              padding: '6px 12px', borderRadius: '20px',
+              fontSize: '0.75rem', fontWeight: 'bold',
+              display: 'flex', alignItems: 'center', gap: '6px',
+              border: '1px solid var(--border-default)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+            }}>
+              <Lock size={12} color="var(--accent)" /> PRO
+            </div>
+          </div>
+        )}
+      </div>
+
+      <SectionLabel>{t('share.metrics')}</SectionLabel>
 
       <OptionRow
         icon={isGlobal ? Award : Clock}
@@ -257,52 +302,6 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
           </div>
         </>
       )}
-
-      {/* Theme selector */}
-      <>
-        <SectionLabel icon={Palette}>
-          {t('share.theme')} {!isPro && <Lock size={11} color="var(--accent)" style={{ marginLeft: '4px', verticalAlign: 'middle', opacity: 0.8 }} />}
-        </SectionLabel>
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '12px' }}>
-          <div style={{
-            display: 'flex', gap: '6px', flexWrap: 'wrap',
-            opacity: isPro ? 1 : 0.6,
-            pointerEvents: isPro ? 'auto' : 'none'
-          }}>
-            {GLOBAL_THEMES.map(theme => (
-              <ThemeSwatch
-                key={theme.key}
-                theme={theme}
-                isSelected={options.theme === theme.key}
-                onClick={() => setOption('theme', theme.key)}
-                title={t(`share.theme.${theme.key}`, theme.key)}
-              />
-            ))}
-          </div>
-          {!isPro && (
-            <div
-              onClick={onOpenStore}
-              style={{
-                position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                background: 'rgba(0,0,0,0.1)', backdropFilter: 'blur(1.5px)',
-                cursor: 'pointer', zIndex: 2
-              }}
-            >
-              <div style={{
-                background: 'var(--surface-elevated)', color: 'var(--text-primary)',
-                padding: '6px 12px', borderRadius: '20px',
-                fontSize: '0.75rem', fontWeight: 'bold',
-                display: 'flex', alignItems: 'center', gap: '6px',
-                border: '1px solid var(--border-default)',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
-              }}>
-                <Lock size={12} color="var(--accent)" /> PRO
-              </div>
-            </div>
-          )}
-        </div>
-      </>
 
       {/* Background image (pro only) */}
       {isPro && (
