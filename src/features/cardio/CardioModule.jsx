@@ -9,7 +9,6 @@ import { CardioLastSession } from './CardioLastSession';
 import { CardioStreak } from './CardioStreak';
 import { stravaService } from '@services/stravaService';
 import { healthConnectService } from '@services/healthConnectService';
-import { googleHealthService } from '@services/googleHealthService';
 import { ChevronRight, Link2, CheckCircle2, Activity } from '@utils/icons';
 import { SegmentedControl } from'@components/ui/SegmentedControl';
 import { GoogleIcon } from'@components/ui/GoogleIcon';
@@ -69,13 +68,10 @@ export function CardioModule() {
   const [stravaConnected, setStravaConnected] = useState(false);
   const [healthConnected, setHealthConnected] = useState(false);
   const [healthAvailable, setHealthAvailable] = useState(false);
-  const [googleHealthConnected, setGoogleHealthConnected] = useState(false);
-  // Health Connect on native, Google Health API on web — never coexist on a platform.
-  const googleHealthAvailable = googleHealthService.isAvailable();
 
   const needsGoogleLogin = !auth.isSignedIn;
-  // A "cardio source" is any connected provider (Strava, Health Connect, Google Health).
-  const hasCardioSource = stravaConnected || healthConnected || googleHealthConnected;
+  // A "cardio source" is any connected provider (Strava, Health Connect).
+  const hasCardioSource = stravaConnected || healthConnected;
   const needsCardioSource = auth.isSignedIn && !hasCardioSource;
   // Fake demo values for the paywall
   const isDemo = needsGoogleLogin || needsCardioSource;
@@ -96,17 +92,15 @@ export function CardioModule() {
   React.useEffect(() => {
     let cancelled = false;
     const checkStatus = async () => {
-      const [strava, hcAvailable, googleHealth] = await Promise.all([
+      const [strava, hcAvailable] = await Promise.all([
         stravaService.isAuthenticated(),
         healthConnectService.isAvailable(),
-        googleHealthService.isAvailable() ? googleHealthService.isAuthenticated() : Promise.resolve(false),
       ]);
       const hc = hcAvailable ? await healthConnectService.isAuthenticated() : false;
       if (cancelled) return;
       setStravaConnected(strava);
       setHealthAvailable(hcAvailable);
       setHealthConnected(hc);
-      setGoogleHealthConnected(googleHealth);
     };
     checkStatus();
 
@@ -142,15 +136,7 @@ export function CardioModule() {
     }
   };
 
-  const handleConnectGoogleHealth = async () => {
-    if (googleHealthConnected) {
-      await googleHealthService.disconnect();
-      setGoogleHealthConnected(false);
-    } else {
-      // Redirects to Google's OAuth page; returns via 'cardio-source-connected'.
-      await googleHealthService.connect();
-    }
-  };
+
 
   return (
     <>
@@ -319,23 +305,6 @@ export function CardioModule() {
                         {t('cardio.healthConnect')}
                       </button>
                     )}
-                    {googleHealthAvailable && (
-                      <button
-                        onClick={handleConnectGoogleHealth}
-                        style={{
-                          flex: 1, padding: '8px', borderRadius: 'var(--radius-sm)',
-                          background: googleHealthConnected ? 'rgba(0, 184, 156, 0.1)' : 'var(--surface-subtle)',
-                          border: `1px solid ${googleHealthConnected ? '#00B0B9' : 'var(--border-muted)'}`,
-                          color: googleHealthConnected ? '#00B0B9' : 'var(--text-primary)',
-                          fontSize: '0.7rem', fontWeight: '700',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                          cursor: 'pointer', transition: 'all 0.2s ease'
-                        }}
-                      >
-                        {googleHealthConnected ? <CheckCircle2 size={12} /> : <Activity size={12} />}
-                        {t('cardio.healthConnect')}
-                      </button>
-                    )}
                   </div>
                 </div>
               )}
@@ -481,19 +450,6 @@ export function CardioModule() {
                         fontWeight: '800', fontSize: 'clamp(0.8rem, 1.5vh, 0.9rem)',
                         border: 'none', cursor: 'pointer',
                         boxShadow: '0 8px 28px rgba(66, 133, 244, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
-                        display: 'flex', gap: '8px', alignItems: 'center', letterSpacing: '0.3px',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                      }}>
-                        <Activity size={18} /> {t('cardio.healthConnect')}
-                      </button>
-                    )}
-                    {googleHealthAvailable && (
-                      <button onClick={handleConnectGoogleHealth} className="hover-lift" style={{
-                        padding: '12px 26px', borderRadius: '16px',
-                        background: 'linear-gradient(145deg, #00B0B9, #008a91)', color: 'white',
-                        fontWeight: '800', fontSize: 'clamp(0.8rem, 1.5vh, 0.9rem)',
-                        border: 'none', cursor: 'pointer',
-                        boxShadow: '0 8px 28px rgba(0, 176, 185, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
                         display: 'flex', gap: '8px', alignItems: 'center', letterSpacing: '0.3px',
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                       }}>

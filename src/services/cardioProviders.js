@@ -1,6 +1,5 @@
 import { stravaService } from './stravaService';
 import { healthConnectService } from './healthConnectService';
-import { googleHealthService } from './googleHealthService';
 
 /**
  * Cardio provider registry.
@@ -11,7 +10,7 @@ import { googleHealthService } from './googleHealthService';
  * behind this registry means the day Strava becomes paid, dropping it is a
  * one-line change here — the UI and sync logic don't move.
  */
-const cardioProviders = [stravaService, healthConnectService, googleHealthService];
+const cardioProviders = [stravaService, healthConnectService];
 
 /**
  * Fetch new activities from every connected provider, concatenated and
