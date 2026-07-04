@@ -48,3 +48,19 @@ export function buildFullCategoryColors(customCategories = []) {
 export function isUserCategory(catId) {
     return typeof catId === 'string' && catId.startsWith('cat_');
 }
+
+/**
+ * Resolve the display label of a category: user rename first (also covers the
+ * renamable built-in 'custom'), then the i18n label for built-ins, then the
+ * raw id as last resort (unknown/deleted user category).
+ * @param {string} catId
+ * @param {Array} customCategories - Array of { id, name }
+ * @param {Function} t - i18n translate function
+ * @returns {string}
+ */
+export function getCategoryLabel(catId, customCategories = [], t) {
+    const catDef = customCategories.find(c => c.id === catId);
+    if (catDef?.name) return catDef.name;
+    if (isUserCategory(catId) || !t) return catId;
+    return t(`common.${catId}`);
+}

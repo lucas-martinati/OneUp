@@ -60,11 +60,12 @@ function SectionLabel({ icon: Icon, children }) {
   );
 }
 
-import { buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
+import { buildFullCategoryOrder, buildFullCategoryColors, getCategoryLabel } from '@config/categories';
 import { useExercises } from '@contexts/ExercisesContext';
 import { THEMES as GLOBAL_THEMES } from '@config/themes';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { ThemeSwatch } from'@components/ui/ThemeSwatch';
+import { CategoryChips } from '@components/ui';
 
 export function ShareOptions({ options, toggleOption, setOption, toggleCategory, clearBackgroundImage, originalImage, openCropModal, mode = 'session', isPro = false, sessionData, onOpenStore }) {
   const { t } = useTranslation();
@@ -238,31 +239,15 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       {isGlobal && (
         <>
           <SectionLabel icon={Filter}>{t('share.categoryFilter')}</SectionLabel>
-          <div className={styles.chips}>
-            {fullCategoryOrder.map((catKey, index) => {
-              const isSelected = selectedCategories.includes(catKey);
-              const catColor = fullCategoryColors[catKey];
-              const catDef = customCategories.find(c => c.id === catKey);
-              const label = catDef?.name || (isUserCategory(catKey) ? catKey : t(`common.${catKey}`));
-              return (
-                <button
-                  key={catKey}
-                  aria-pressed={isSelected}
-                  onClick={() => {
-                    haptics.light();
-                    toggleCategory(catKey);
-                  }}
-                  className={isSelected ? `${styles.chip} ${styles.chipOn}` : styles.chip}
-                  style={{ '--c': catColor, '--i': index }}
-                >
-                  <span className={styles.chipDot}>
-                    {isSelected && <Check size={9} strokeWidth={3.5} />}
-                  </span>
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+          <CategoryChips
+            items={fullCategoryOrder.map(catKey => ({
+              id: catKey,
+              label: getCategoryLabel(catKey, customCategories, t),
+              color: fullCategoryColors[catKey],
+            }))}
+            selected={selectedCategories}
+            onToggle={toggleCategory}
+          />
         </>
       )}
 

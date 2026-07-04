@@ -1,5 +1,6 @@
-/* ── Stats category filter — toggle pill + chips panel ──────────────────
-   Replaces the hand-rolled inline <button style={{…}}> of StatsFilters.jsx.
+/* ── Stats category filter — toggle pill + collapsible panel ────────────
+   The chips inside the panel are the shared ui/CategoryChips component;
+   this module only owns the toggle button, count badge and panel chrome.
    One-shot mount/press animations only (no infinite loops), with
    [data-perf="low"] and reduced-motion kill-switches. */
 
@@ -83,41 +84,8 @@
   }
 }
 
-/* Category chip — colors stay inline (per-category dynamic), the module owns
-   layout, press feedback and the staggered entrance (via the --i index). */
-.chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  cursor: pointer;
-  transition:
-    background var(--motion-fast) ease,
-    border-color var(--motion-fast) ease,
-    color var(--motion-fast) ease,
-    opacity var(--motion-fast) ease,
-    transform var(--motion-fast) ease;
-  animation: chipIn 0.3s var(--ease-panel-in) backwards;
-  animation-delay: calc(var(--i, 0) * 35ms);
-}
-
-.chip:active {
-  transform: scale(0.94);
-}
-
-@keyframes chipIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-}
-
 /* ── Kill-switches ── */
 :global([data-perf='low']) .panel,
-:global([data-perf='low']) .chip,
 :global([data-perf='low']) .count {
   animation: none;
 }
@@ -128,7 +96,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .panel,
-  .chip,
   .count {
     animation: none;
   }

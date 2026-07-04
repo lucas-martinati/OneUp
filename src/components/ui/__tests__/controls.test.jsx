@@ -5,6 +5,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key) => key }),
 }));
 
+import { CategoryChips } from '../CategoryChips';
 import { SegmentedControl } from '../SegmentedControl';
 import { Slider } from '../Slider';
 import { ToggleSwitch } from '../ToggleSwitch';
@@ -258,5 +259,38 @@ describe('Avatar', () => {
     cleanup();
     const { container: c2 } = render(<Avatar name="Alice" />);
     expect(c2.firstChild.style.background).toBe(grad); // same name → same gradient
+  });
+});
+
+// ── CategoryChips ───────────────────────────────────────────────────────
+
+describe('CategoryChips', () => {
+  const items = [
+    { id: 'cardio', label: 'Cardio', color: '#ef4444' },
+    { id: 'weights', label: 'Poids', color: '#f97316', locked: true },
+  ];
+
+  it('toggles an unlocked chip and reflects selection via aria-pressed', () => {
+    const onToggle = vi.fn();
+    const { getByText } = render(
+      <CategoryChips items={items} selected={['cardio']} onToggle={onToggle} />
+    );
+    const cardio = getByText('Cardio').closest('button');
+    expect(cardio.getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(cardio);
+    expect(onToggle).toHaveBeenCalledWith('cardio');
+  });
+
+  it('routes taps on a locked chip to onLockedClick instead of toggling', () => {
+    const onToggle = vi.fn();
+    const onLockedClick = vi.fn();
+    const { getByText } = render(
+      <CategoryChips items={items} selected={[]} onToggle={onToggle} onLockedClick={onLockedClick} />
+    );
+    const locked = getByText('Poids').closest('button');
+    expect(locked.getAttribute('aria-disabled')).toBe('true');
+    fireEvent.click(locked);
+    expect(onLockedClick).toHaveBeenCalledWith('weights');
+    expect(onToggle).not.toHaveBeenCalled();
   });
 });

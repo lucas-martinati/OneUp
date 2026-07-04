@@ -1,0 +1,106 @@
+/* CategoryChips — shared category filter pills (ui/CategoryChips.jsx).
+   Per-chip accent color comes in via the --c custom property (dynamic, set
+   inline in JSX); --i staggers the one-shot entrance. Selected = accent tint
+   + the hollow dot fills with a check. Locked = dimmed + padlock in the dot.
+   [data-perf="low"] and reduced-motion kill-switches, as everywhere. */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 14px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+  animation: chipIn 0.3s var(--ease-panel-in) backwards;
+  animation-delay: calc(var(--i, 0) * 30ms);
+}
+
+.chip:active {
+  transform: scale(0.94);
+}
+
+.chipOn {
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+  border-color: color-mix(in srgb, var(--c) 40%, transparent);
+  color: var(--c);
+}
+
+.chipLocked {
+  opacity: 0.55;
+}
+
+/* Hollow ring in the category color; fills with a check when selected. */
+.chipDot {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid color-mix(in srgb, var(--c) 55%, transparent);
+  border-radius: var(--radius-full);
+  color: rgba(0, 0, 0, 0.75);
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease;
+}
+
+.chipOn .chipDot {
+  background: var(--c);
+  border-color: transparent;
+  animation: checkPop 0.25s var(--ease-panel-in);
+}
+
+/* The padlock keeps the chip's muted text color, not the accent. */
+.chipLocked .chipDot {
+  border-color: var(--border-strong);
+  color: var(--text-secondary);
+}
+
+@keyframes chipIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes checkPop {
+  from {
+    transform: scale(0.4);
+  }
+
+  60% {
+    transform: scale(1.15);
+  }
+}
+
+/* ── Kill-switches ── */
+:global([data-perf='low']) .chip,
+:global([data-perf='low']) .chipOn .chipDot {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .chipOn .chipDot {
+    animation: none;
+  }
+}

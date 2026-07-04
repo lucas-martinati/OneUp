@@ -1,6 +1,7 @@
 export { Avatar } from './Avatar';
 export { Button } from './Button';
 export { Card } from './Card';
+export { CategoryChips } from './CategoryChips';
 export { ConfirmDialog } from './ConfirmDialog';
 export { ConflictOverlay } from './ConflictOverlay';
 export { DifficultyBadge } from './DifficultyBadge';
