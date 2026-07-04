@@ -48,7 +48,10 @@ button:focus:not(:focus-visible) {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 640px; /* Centralized width for all panels */
+  /* Centralized width for all panels; desktop widens it via
+     --panel-max-width (:root below). A panel that must stay narrower
+     declares its own --panel-max-width in its module. */
+  max-width: var(--panel-max-width, 640px);
   margin: 0 auto;
   padding: 0 var(--spacing-sm);
 }
@@ -66,6 +69,17 @@ button:focus:not(:focus-visible) {
   .modal-overlay {
     align-items: center;
     justify-content: flex-start;
+  }
+}
+
+/* Desktop: widen panels so they use the screen instead of hugging a
+   phone-sized column. Content inside (cards, charts, auto-fill grids)
+   stretches gracefully. Declared on :root (inherited) so a view that
+   must stay narrow (e.g. the calendar month grid) can override the
+   property directly on its shell without a specificity fight. */
+@media (min-width: 1024px) {
+  :root {
+    --panel-max-width: 860px;
   }
 }
 

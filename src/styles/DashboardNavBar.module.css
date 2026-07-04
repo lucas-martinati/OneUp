@@ -91,6 +91,15 @@
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
 }
 
+/* Desktop: the bar reads as a centered dock instead of 5 items
+   stretched across the whole root width. */
+@media (min-width: 1024px) {
+  .navBar {
+    max-width: 720px;
+    margin-inline: auto;
+  }
+}
+
 @media (max-height: 740px) {
   .navBar {
     border-radius: var(--radius-md);
