@@ -71,11 +71,10 @@ export function Settings({ defaultShowStore = false, onClose }) {
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                             {!showStore && (
                                 <Button
-                                    variant="success"
+                                    variant="premium"
                                     icon={ShoppingBag}
                                     onClick={() => setShowStore(true)}
                                     className="hover-lift"
-                                    style={{ borderRadius: 'var(--radius-xl)', height: 'var(--touch-min)', letterSpacing: '0.5px' }}
                                 >
                                     {t('store.title')}
                                 </Button>

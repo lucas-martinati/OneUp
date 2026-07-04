@@ -10,7 +10,7 @@ import { haptics } from '@utils/hapticsManager';
  * driven by the design tokens, so buttons stay consistent across all themes
  * and are covered by the [data-perf="low"] / reduced-motion overrides.
  *
- * @param {'primary'|'secondary'|'success'|'danger'|'ghost'|'danger-ghost'} [variant='primary']
+ * @param {'primary'|'secondary'|'success'|'danger'|'ghost'|'danger-ghost'|'premium'} [variant='primary']
  * @param {'sm'|'md'|'lg'} [size='md']
  * @param {boolean} [fullWidth=false] – stretch to container width
  * @param {React.ComponentType} [icon] – leading icon component (lucide-style)

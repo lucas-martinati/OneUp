@@ -66,6 +66,21 @@
   box-shadow: var(--glow-error);
 }
 
+/* Gold-tinted glass pill for store entry points — gold is the app-wide
+   premium accent (.gold-text, --glow-gold), unlike the success green. */
+.btn--premium {
+  background: var(--gradient-gold-trans);
+  color: var(--color-gold);
+  border-color: color-mix(in srgb, var(--color-gold) 30%, transparent);
+  border-radius: var(--radius-full);
+  letter-spacing: 0.5px;
+}
+
+.btn--premium:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--color-gold) 55%, transparent);
+  box-shadow: var(--glow-gold);
+}
+
 .btn--ghost {
   background: transparent;
   color: var(--text-secondary);

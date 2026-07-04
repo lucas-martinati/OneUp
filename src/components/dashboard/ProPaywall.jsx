@@ -26,11 +26,11 @@ export const ProPaywall = ({ title, onOpenStore }) => {
                 {t('paywall.proRequiredDesc')}
             </p>
             <Button
-                variant="success"
+                variant="premium"
                 icon={ShoppingBag}
                 onClick={onOpenStore}
                 className="hover-lift"
-                style={{ marginTop: '8px', borderRadius: 'var(--radius-xl)' }}
+                style={{ marginTop: '8px' }}
             >
                 {t('paywall.viewStore')}
             </Button>
