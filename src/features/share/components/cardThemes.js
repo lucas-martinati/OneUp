@@ -1,6 +1,6 @@
 import { THEMES as GLOBAL_THEMES } from '@config/themes';
 
-export function darkenHex(hex, factor) {
+function darkenHex(hex, factor) {
   if (!hex || !hex.startsWith('#')) return hex;
   let color = hex.replace('#', '');
   if (color.length === 3) color = color.split('').map(c => c + c).join('');
@@ -13,7 +13,7 @@ export function darkenHex(hex, factor) {
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-export function hexToRgba(hex, alpha) {
+function hexToRgba(hex, alpha) {
   if (!hex || !hex.startsWith('#')) return hex;
   let color = hex.replace('#', '');
   if (color.length === 3) color = color.split('').map(c => c + c).join('');

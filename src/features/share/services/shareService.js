@@ -43,7 +43,7 @@ async function buildFontEmbedCss() {
   return embedded.join('\n');
 }
 
-export function getFontEmbedCss() {
+function getFontEmbedCss() {
   if (!fontCssPromise) {
     fontCssPromise = buildFontEmbedCss().catch(() => {
       fontCssPromise = null; // retry on next capture (e.g. back online)

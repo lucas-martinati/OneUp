@@ -60,7 +60,7 @@ export function isUserCategory(catId) {
  * @param {Function} t - i18n translate function
  * @returns {string}
  */
-export function getCategoryLabel(catId, customCategories = [], t) {
+function getCategoryLabel(catId, customCategories = [], t) {
     const catDef = customCategories.find(c => c.id === catId);
     if (catDef?.name) return catDef.name;
     if (isUserCategory(catId) || !t) return catId;
