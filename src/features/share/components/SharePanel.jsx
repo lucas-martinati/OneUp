@@ -8,6 +8,7 @@ import { useProgressStore } from '@store/useProgressStore';
 import { useSettingsStore } from '@store/useSettingsStore';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { CATEGORIES } from '@config/categories';
+import { Button } from '@components/ui';
 
 const ShareModal = lazy(() => import('./ShareModal').then(m => ({ default: m.ShareModal })));
 
@@ -86,57 +87,24 @@ export function SharePanel({
     return false;
   }, showShare);
 
-  let buttonStyle = {
-    padding: '14px 16px', borderRadius: 'var(--radius-lg)',
-    background: 'rgba(255,255,255,0.08)',
-    border: '1px solid rgba(255,255,255,0.15)',
-    color: 'white', fontSize: '1rem', fontWeight: 700,
-    cursor: 'pointer', display: 'flex',
-    alignItems: 'center', justifyContent: 'center',
-  };
-  if (isStats) {
-    buttonStyle = {
-      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-      padding: '14px', borderRadius: 'var(--radius-lg)',
-      background: 'linear-gradient(135deg, rgba(129,140,248,0.15), rgba(139,92,246,0.1))',
-      border: '1px solid rgba(129,140,248,0.2)',
-      color: '#818cf8', fontSize: '0.9rem', fontWeight: 700,
-      cursor: 'pointer', width: '100%',
-    };
-  } else if (isCompact) {
-    buttonStyle = {
-      padding: '12px', borderRadius: '12px',
-      background: 'var(--gradient-primary)',
-      border: 'none', color: 'white', fontSize: '0.85rem', fontWeight: 700,
-      cursor: 'pointer', display: 'flex', alignItems: 'center',
-      justifyContent: 'center', gap: '8px', flex: 1,
-    };
-  }
-
-  let defaultLabel = undefined;
+  // All placements reuse the canonical Button primitive:
+  // stats → full-width primary CTA, compact → primary stretched in a footer
+  // row, large (default) → icon-only secondary next to a main CTA.
+  let defaultLabel;
+  let btnProps = { variant: 'secondary', 'aria-label': t('common.share') };
   if (isStats) {
     defaultLabel = t('share.shareCard');
+    btnProps = { fullWidth: true };
   } else if (isCompact) {
     defaultLabel = t('common.share');
-  }
-
-  let iconSize = 20;
-  if (isCompact) {
-    iconSize = 16;
-  } else if (isStats) {
-    iconSize = 18;
+    btnProps = { style: { flex: 1 } };
   }
 
   return (
     <>
-      <button
-        onClick={() => setShowShare(true)}
-        className="hover-lift"
-        style={buttonStyle}
-      >
-        <Share2 size={iconSize} />
-        {(label || defaultLabel)}
-      </button>
+      <Button icon={Share2} onClick={() => setShowShare(true)} {...btnProps}>
+        {label || defaultLabel}
+      </Button>
 
       <Suspense fallback={null}>
         {showShare && (

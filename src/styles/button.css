@@ -21,6 +21,7 @@
     border-color var(--motion-fast) ease,
     box-shadow var(--motion-fast) ease,
     opacity var(--motion-fast) ease,
+    filter var(--motion-fast) ease,
     transform var(--motion-fast) ease;
 }
 
@@ -37,10 +38,17 @@
 .btn--lg { padding: 16px 24px; font-size: 1rem; min-height: 52px; }
 
 /* Variants */
+/* Soft two-tone gradient + discreet colored shadow: the previous
+   --gradient-glow + --glow-accent halo made every primary CTA shout
+   compared to the rest of the UI. */
 .btn--primary {
-  background: var(--gradient-glow);
+  background: var(--gradient-primary);
   color: #fff;
-  box-shadow: var(--glow-accent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.btn--primary:hover:not(:disabled) {
+  filter: brightness(1.07);
 }
 
 .btn--secondary {
