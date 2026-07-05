@@ -60,7 +60,7 @@ function SectionLabel({ icon: Icon, children }) {
   );
 }
 
-import { buildFullCategoryOrder, buildFullCategoryColors, getCategoryLabel } from '@config/categories';
+import { buildFullCategoryOrder, buildFullCategoryColors, buildCategoryChipItems } from '@config/categories';
 import { useExercises } from '@contexts/ExercisesContext';
 import { THEMES as GLOBAL_THEMES } from '@config/themes';
 import { WEIGHT_EXERCISES } from '@config/weights';
@@ -240,13 +240,16 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
         <>
           <SectionLabel icon={Filter}>{t('share.categoryFilter')}</SectionLabel>
           <CategoryChips
-            items={fullCategoryOrder.map(catKey => ({
-              id: catKey,
-              label: getCategoryLabel(catKey, customCategories, t),
-              color: fullCategoryColors[catKey],
-            }))}
+            items={buildCategoryChipItems({
+              categoryOrder: fullCategoryOrder,
+              categoryColors: fullCategoryColors,
+              customCategories,
+              t,
+              isPro,
+            })}
             selected={selectedCategories}
             onToggle={toggleCategory}
+            onLockedClick={onOpenStore}
           />
         </>
       )}

@@ -124,10 +124,11 @@
   animation: tileIn 0.25s var(--ease-panel-in);
 }
 
+/* Tiles pop in place (grid) rather than sliding up like pill chips. */
 @keyframes tileIn {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: scale(0.95);
   }
 }
 

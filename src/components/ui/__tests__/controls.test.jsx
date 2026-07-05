@@ -5,6 +5,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key) => key }),
 }));
 
+import { buildCategoryChipItems } from '@config/categories';
 import { CategoryChips } from '../CategoryChips';
 import { SegmentedControl } from '../SegmentedControl';
 import { Slider } from '../Slider';
@@ -292,5 +293,32 @@ describe('CategoryChips', () => {
     fireEvent.click(locked);
     expect(onLockedClick).toHaveBeenCalledWith('weights');
     expect(onToggle).not.toHaveBeenCalled();
+  });
+});
+
+// ── buildCategoryChipItems ──────────────────────────────────────────────
+
+describe('buildCategoryChipItems', () => {
+  const categoryOrder = ['cardio', 'bodyweight', 'weights', 'custom', 'cat_abc', 'cat_gone'];
+  const categoryColors = { cardio: '#ef4444', bodyweight: '#8b5cf6', weights: '#f97316', custom: '#34d399', cat_abc: '#123456' };
+  const customCategories = [{ id: 'cat_abc', name: 'Mobilité', color: '#123456' }];
+  const t = (key) => key;
+
+  it('locks pro-gated categories for free users and skips orphan user categories', () => {
+    const items = buildCategoryChipItems({ categoryOrder, categoryColors, customCategories, t, isPro: false });
+    expect(items.map(i => i.id)).toEqual(['cardio', 'bodyweight', 'weights', 'custom', 'cat_abc']);
+    const byId = Object.fromEntries(items.map(i => [i.id, i]));
+    expect(byId.cardio.locked).toBe(false);
+    expect(byId.bodyweight.locked).toBe(false);
+    expect(byId.weights.locked).toBe(true);
+    expect(byId.custom.locked).toBe(true);
+    expect(byId.cat_abc.locked).toBe(true);
+    expect(byId.cat_abc.label).toBe('Mobilité');
+    expect(byId.cardio.label).toBe('common.cardio');
+  });
+
+  it('unlocks everything for pro users', () => {
+    const items = buildCategoryChipItems({ categoryOrder, categoryColors, customCategories, t, isPro: true });
+    expect(items.every(i => !i.locked)).toBe(true);
   });
 });

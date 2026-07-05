@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Filter, ChevronDown } from '@utils/icons';
-import { canAccessFeature, FEATURES } from '@utils/entitlements';
-import { CATEGORIES, isUserCategory, getCategoryLabel } from '@config/categories';
+import { CATEGORIES, buildCategoryChipItems } from '@config/categories';
 import { haptics } from '@utils/hapticsManager';
 import { CategoryChips } from '@components/ui';
 import styles from '@styles/StatsFilters.module.css';
@@ -23,23 +22,17 @@ export function StatsFilters({
         });
     };
 
-    const isLocked = (categoryId) => {
-        if (isUserCategory(categoryId)) return !canAccessFeature(FEATURES.CUSTOM_CATEGORIES, { isPro: hasProAccess });
-        if (categoryId === CATEGORIES.WEIGHTS) return !canAccessFeature(FEATURES.WEIGHTS, { isPro: hasProAccess });
-        if (categoryId === CATEGORIES.CUSTOM) return !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro: hasProAccess });
-        return false;
-    };
-
-    const chipItems = fullCategoryOrder
-        // Skip user categories whose definition is gone (deleted mid-session)
-        .filter(categoryId => !isUserCategory(categoryId) || customCategories.some(c => c.id === categoryId))
-        .map(categoryId => ({
-            // The Stats filter state keeps its legacy id for bodyweight
-            id: categoryId === CATEGORIES.BODYWEIGHT ? 'standard' : categoryId,
-            label: getCategoryLabel(categoryId, customCategories, t),
-            color: fullCategoryColors[categoryId],
-            locked: isLocked(categoryId),
-        }));
+    const chipItems = buildCategoryChipItems({
+        categoryOrder: fullCategoryOrder,
+        categoryColors: fullCategoryColors,
+        customCategories,
+        t,
+        isPro: hasProAccess,
+    }).map(item => ({
+        ...item,
+        // The Stats filter state keeps its legacy id for bodyweight
+        id: item.id === CATEGORIES.BODYWEIGHT ? 'standard' : item.id,
+    }));
 
     return (
         <div style={{ marginBottom: 'var(--spacing-md)' }}>

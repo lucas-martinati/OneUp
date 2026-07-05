@@ -1,3 +1,5 @@
+import { canAccessFeature, FEATURES } from '@utils/entitlements';
+
 export const CATEGORIES = {
     BODYWEIGHT: 'bodyweight',
     WEIGHTS: 'weights',
@@ -63,4 +65,33 @@ export function getCategoryLabel(catId, customCategories = [], t) {
     if (catDef?.name) return catDef.name;
     if (isUserCategory(catId) || !t) return catId;
     return t(`common.${catId}`);
+}
+
+/**
+ * Build the items of a <CategoryChips> from the category model: labels,
+ * colors and pro-gating resolved in one place so every category filter
+ * behaves the same. Skips user categories whose definition is gone.
+ * @param {Object} params
+ * @param {string[]} params.categoryOrder - from buildFullCategoryOrder()
+ * @param {Object} params.categoryColors - from buildFullCategoryColors()
+ * @param {Array} params.customCategories - user categories [{ id, name, color }]
+ * @param {Function} params.t - i18n translate function
+ * @param {boolean} params.isPro - pro entitlement of the current user
+ * @returns {Array} [{ id, label, color, locked }]
+ */
+export function buildCategoryChipItems({ categoryOrder, categoryColors, customCategories = [], t, isPro = false }) {
+    const isLocked = (catId) => {
+        if (isUserCategory(catId)) return !canAccessFeature(FEATURES.CUSTOM_CATEGORIES, { isPro });
+        if (catId === CATEGORIES.WEIGHTS) return !canAccessFeature(FEATURES.WEIGHTS, { isPro });
+        if (catId === CATEGORIES.CUSTOM) return !canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro });
+        return false;
+    };
+    return categoryOrder
+        .filter(catId => !isUserCategory(catId) || customCategories.some(c => c.id === catId))
+        .map(catId => ({
+            id: catId,
+            label: getCategoryLabel(catId, customCategories, t),
+            color: categoryColors[catId],
+            locked: isLocked(catId),
+        }));
 }
