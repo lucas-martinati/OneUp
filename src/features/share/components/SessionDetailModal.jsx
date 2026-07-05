@@ -1,13 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Clock, Check, Trash2, Pencil, Dumbbell, Zap } from '@utils/icons';
+import { X, Clock, Trash2, Pencil, Dumbbell, Zap } from '@utils/icons';
 import { getIcon } from '@utils/icons';
-import { IconButton } from'@components/ui';
+import { IconButton, Button, ConfirmDialog, WeightBadge } from '@components/ui';
 import { Z_INDEX } from '@utils/zIndex';
 import { updateSessionName } from '@features/share/services/sessionHistoryService';
 import { getExerciseLabel, getExerciseColor } from '@utils/exerciseLabel';
 import { sumExerciseReps } from '@utils/stats';
 import { SharePanel } from './SharePanel';
+import styles from './SessionDetailModal.module.css';
 
 function formatDuration(seconds) {
   if (!seconds || seconds <= 0) return '0:00';
@@ -42,6 +43,18 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   const totalReps = sumExerciseReps(exercises);
   const sessionWithName = useMemo(() => ({ ...session, name }), [session, name]);
 
+  // Escape backs out one level: name edit first, then the panel.
+  // The delete dialog handles its own Escape (and sits above us).
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key !== 'Escape' || confirmDelete) return;
+      if (editingName) setEditingName(false);
+      else onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [confirmDelete, editingName, onClose]);
+
   if (!session) return null;
 
   const handleNameSave = () => {
@@ -51,258 +64,126 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   };
 
   const handleDelete = () => {
+    setConfirmDelete(false);
     onDelete?.(session.id);
     onClose();
   };
 
+  const sessionStats = [
+    { icon: Clock, value: formatDuration(session.duration), label: t('share.duration') },
+    { icon: Zap, value: totalReps, label: t('customExercises.typeReps') },
+    { icon: Dumbbell, value: exercises.length, label: t('share.exercises') },
+  ];
+
   return (
     <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST + 1 }}>
       <div className="modal-content">
-      <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        marginBottom: '8px', 
-      }}>
-        <h2 className="panel-title" style={{
-          margin: 0,
-          background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
-          WebkitBackgroundClip: 'text', backgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-        }}>
-          {t('share.sessionDetail')}
-        </h2>
-        <IconButton icon={X} variant="glass" onClick={onClose} aria-label="Close" />
-      </div>
+        <div className={styles.header}>
+          <h2 className={`panel-title ${styles.title}`}>
+            {t('share.sessionDetail')}
+          </h2>
+          <IconButton icon={X} variant="glass" onClick={onClose} aria-label={t('common.close')} />
+        </div>
 
-      <div style={{
-        display: 'flex', flexDirection: 'column', gap: '16px',
-      }}>
-        {/* Date & name */}
-        <div style={{
-          padding: '16px', borderRadius: '16px',
-          background: 'linear-gradient(135deg, rgba(129,140,248,0.1), rgba(139,92,246,0.06))',
-          border: '1px solid rgba(129,140,248,0.15)',
-        }}>
-          <div style={{
-            fontSize: '0.65rem', color: 'var(--text-secondary)',
-            textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px',
-          }}>
-            {formatDateTime(session.date, lang)}
-          </div>
-          {editingName && (
-            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '6px' }}>
-              <input
-                autoFocus
-                value={name}
-                onChange={e => setName(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleNameSave(); }}
-                placeholder={t('share.sessionNamePlaceholder')}
-                style={{
-                  flex: 1, padding: '8px 12px', borderRadius: '10px',
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(129,140,248,0.3)',
-                  color: 'white', fontSize: '0.85rem', fontWeight: 600,
-                  outline: 'none',
-                }}
-              />
-              <button onClick={handleNameSave} style={{
-                padding: '8px 14px', borderRadius: '10px',
-                background: 'rgba(129,140,248,0.2)',
-                border: 'none', color: '#818cf8',
-                fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer',
-              }}>
-                OK
-              </button>
-            </div>
-          )}
-          {!editingName && hasName && (
-            <button
-              onClick={() => setEditingName(true)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '8px',
-                background: 'none', border: 'none', cursor: 'pointer',
-                padding: 0, width: '100%', textAlign: 'left',
-              }}
-            >
-              <span style={{
-                fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)',
-                flex: 1,
-              }}>
-                {name}
-              </span>
-              <Pencil size={14} style={{ opacity: 0.4, flexShrink: 0 }} />
-            </button>
-          )}
-          {!editingName && !hasName && exercises.length > 0 && (
-            <button
-              onClick={() => setEditingName(true)}
-              style={{
-                display: 'flex', gap: '4px', alignItems: 'center',
-                background: 'none', border: 'none', cursor: 'pointer',
-                padding: 0, width: '100%',
-              }}
-            >
-              <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flex: 1 }}>
-                {exercises.map((ex, i) => {
-                  const Icon = getIcon(ex.icon);
-                  return <Icon key={ex.id || i} size={16} color={getExerciseColor(ex)} />;
-                })}
+        <div className={styles.body}>
+          {/* Date & name */}
+          <div className={styles.hero}>
+            <div className={styles.date}>{formatDateTime(session.date, lang)}</div>
+            {editingName && (
+              <div className={styles.nameRow}>
+                <input
+                  autoFocus
+                  className={styles.nameInput}
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleNameSave(); }}
+                  placeholder={t('share.sessionNamePlaceholder')}
+                />
+                <button className={styles.nameSave} onClick={handleNameSave}>
+                  OK
+                </button>
               </div>
-              <Pencil size={14} style={{ opacity: 0.3, flexShrink: 0 }} />
-            </button>
-          )}
-        </div>
+            )}
+            {!editingName && hasName && (
+              <button className={styles.nameBtn} onClick={() => setEditingName(true)}>
+                <span className={styles.nameText}>{name}</span>
+                <Pencil size={14} className={styles.namePencil} />
+              </button>
+            )}
+            {!editingName && !hasName && (
+              <button className={styles.nameAdd} onClick={() => setEditingName(true)}>
+                <Pencil size={14} />
+                {t('share.sessionNamePlaceholder')}
+              </button>
+            )}
+          </div>
 
-        {/* Stats row */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <div style={{
-            flex: 1, padding: '14px', borderRadius: '14px',
-            background: 'rgba(129,140,248,0.08)',
-            border: '1px solid rgba(129,140,248,0.12)', textAlign: 'center',
-          }}>
-            <Clock size={18} color="#818cf8" style={{ marginBottom: '4px' }} />
-            <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#818cf8' }}>
-              {formatDuration(session.duration)}
-            </div>
-            <div style={{
-              fontSize: '0.55rem', color: 'var(--text-secondary)',
-              textTransform: 'uppercase', letterSpacing: '0.5px',
-            }}>
-              {t('share.duration')}
-            </div>
+          {/* Stats strip */}
+          <div className={styles.stats}>
+            {sessionStats.map(({ icon: Icon, value, label }) => (
+              <div key={label} className={styles.stat}>
+                <Icon size={16} />
+                <div className={styles.statVal}>{value}</div>
+                <div className={styles.statLab}>{label}</div>
+              </div>
+            ))}
           </div>
-          <div style={{
-            flex: 1, padding: '14px', borderRadius: '14px',
-            background: 'rgba(251,191,36,0.08)',
-            border: '1px solid rgba(251,191,36,0.12)', textAlign: 'center',
-          }}>
-            <Zap size={18} color="#fbbf24" style={{ marginBottom: '4px' }} />
-            <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fbbf24' }}>
-              {totalReps}
-            </div>
-            <div style={{
-              fontSize: '0.55rem', color: 'var(--text-secondary)',
-              textTransform: 'uppercase', letterSpacing: '0.5px',
-            }}>
-              {t('customExercises.typeReps')}
-            </div>
-          </div>
-          <div style={{
-            flex: 1, padding: '14px', borderRadius: '14px',
-            background: 'rgba(52,211,153,0.08)',
-            border: '1px solid rgba(52,211,153,0.12)', textAlign: 'center',
-          }}>
-            <Dumbbell size={18} color="#34d399" style={{ marginBottom: '4px' }} />
-            <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#34d399' }}>
-              {exercises.length}
-            </div>
-            <div style={{
-              fontSize: '0.55rem', color: 'var(--text-secondary)',
-              textTransform: 'uppercase', letterSpacing: '0.5px',
-            }}>
-              {t('share.exercises')}
-            </div>
-          </div>
-        </div>
 
-        {/* Exercise list */}
-        {exercises.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <div style={{
-              fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-secondary)',
-              textTransform: 'uppercase', letterSpacing: '1px', padding: '0 4px',
-            }}>
-              {t('share.exercisesCompleted')}
-            </div>
-            {exercises.map((ex, i) => {
-              const Icon = getIcon(ex.icon);
-              return (
-                <div key={ex.id || i} style={{
-                  display: 'flex', alignItems: 'center', gap: '10px',
-                  padding: '12px 14px', borderRadius: '12px',
-                  background: `${getExerciseColor(ex)}0a`,
-                  border: `1px solid ${getExerciseColor(ex)}15`,
-                }}>
-                  <div style={{
-                    width: '32px', height: '32px', borderRadius: '10px',
-                    background: `${getExerciseColor(ex)}15`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0,
-                  }}>
-                    <Icon size={16} color={getExerciseColor(ex)} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{
-                      fontSize: '0.85rem', fontWeight: 700,
-                      color: getExerciseColor(ex),
-                    }}>
-                      {getExerciseLabel(ex, t)}
+          {/* Exercise list */}
+          {exercises.length > 0 && (
+            <div className={styles.section}>
+              <div className={styles.sectionLabel}>{t('share.exercisesCompleted')}</div>
+              {exercises.map((ex, i) => {
+                const Icon = getIcon(ex.icon);
+                const color = getExerciseColor(ex);
+                return (
+                  <div key={ex.id || i} className={styles.row} style={{ '--ex-color': color }}>
+                    <div className={styles.rowIcon}>
+                      <Icon size={18} color={color} />
+                    </div>
+                    <div className={styles.rowName}>{getExerciseLabel(ex)}</div>
+                    {ex.weight ? <WeightBadge weight={ex.weight} color={color} /> : null}
+                    <div className={styles.rowVal}>
+                      {ex.reps}
+                      <span className={styles.rowUnit}>
+                        {ex.type === 'timer' ? 's' : t('common.reps')}
+                      </span>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Check size={14} color="#10b981" />
-                    <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#10b981' }}>
-                      {ex.type === 'timer' ? `${ex.reps}s` : `${ex.reps} ${t('common.reps')}`}
-                      {ex.weight ? ` • ${ex.weight} ${t('weight.kg')}` : ''}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Action buttons */}
-        <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-          <SharePanel
-            sessionData={sessionWithName}
-            stats={stats}
-            isPro={isPro}
-            variant="compact"
-
-          />
-          {confirmDelete ? (
-            <div style={{ display: 'flex', gap: '6px' }}>
-              <button
-                onClick={handleDelete}
-                style={{
-                  padding: '12px 16px', borderRadius: '12px',
-                  background: '#ef4444', border: 'none',
-                  color: 'white', fontSize: '0.8rem', fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
-                {t('common.confirm')}
-              </button>
-              <button
-                onClick={() => setConfirmDelete(false)}
-                style={{
-                  padding: '12px 16px', borderRadius: '12px',
-                  background: 'rgba(255,255,255,0.06)', border: 'none',
-                  color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                {t('common.cancel')}
-              </button>
+                );
+              })}
             </div>
-          ) : (
-            <button
-              onClick={() => setConfirmDelete(true)}
-              style={{
-                padding: '12px 16px', borderRadius: '12px',
-                background: 'rgba(239,68,68,0.08)',
-                border: '1px solid rgba(239,68,68,0.15)',
-                color: '#ef4444', fontSize: '0.85rem', fontWeight: 600,
-                cursor: 'pointer', display: 'flex', alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Trash2 size={16} />
-            </button>
           )}
+
+          {/* Actions */}
+          <div className={styles.footer}>
+            <SharePanel
+              sessionData={sessionWithName}
+              stats={stats}
+              isPro={isPro}
+              variant="compact"
+            />
+            <Button
+              variant="danger-ghost"
+              icon={Trash2}
+              className={styles.deleteBtn}
+              aria-label={t('common.delete')}
+              onClick={() => setConfirmDelete(true)}
+            />
+          </div>
         </div>
       </div>
-      </div>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        destructive
+        title={t('share.deleteSession')}
+        message={hasName ? name : formatDateTime(session.date, lang)}
+        warning={t('share.deleteSessionWarning')}
+        confirmLabel={t('common.delete')}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }

@@ -625,6 +625,8 @@
     "backgroundImage": "Immagine di sfondo",
     "categoryFilter": "Categoria",
     "cropImage": "Ritaglia immagine",
+    "deleteSession": "Eliminare questa sessione?",
+    "deleteSessionWarning": "Questa azione non può essere annullata.",
     "download": "Scaricamento",
     "duration": "Durata",
     "exercises": "Esercizi",

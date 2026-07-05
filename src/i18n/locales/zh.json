@@ -625,6 +625,8 @@
     "backgroundImage": "背景图片",
     "categoryFilter": "类别",
     "cropImage": "裁剪图片",
+    "deleteSession": "删除该训练？",
+    "deleteSessionWarning": "此操作无法撤销。",
     "download": "下载",
     "duration": "时长",
     "exercises": "练习",

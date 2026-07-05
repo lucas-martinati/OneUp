@@ -1,0 +1,254 @@
+/* SessionDetailModal — detail view of a past session.
+   Theme-aware rebuild of the former inline-styled version: every surface,
+   border and accent derives from the design tokens so the panel follows the
+   active theme instead of hard-coding indigo. */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: var(--spacing-xs);
+}
+
+.title {
+  margin: 0;
+  text-align: left;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+}
+
+/* ── Hero: date + editable name ─────────────────────────────────────── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-default);
+}
+
+/* Soft glow in the active theme's accent at the top of the card */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 100px;
+  pointer-events: none;
+  background: radial-gradient(
+    130% 100% at 50% 0%,
+    color-mix(in srgb, var(--accent-glow) 12%, transparent) 0%,
+    transparent 70%
+  );
+}
+
+.date {
+  position: relative;
+  margin-bottom: 10px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* Editing state */
+.nameRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nameInput {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  border: 1px solid color-mix(in srgb, var(--accent-glow) 35%, transparent);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.nameSave {
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border: none;
+  color: var(--accent-glow);
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Named session: the name is the card's headline, pencil hints editability */
+.nameBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.nameText {
+  flex: 1;
+  min-width: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.namePencil {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+/* Unnamed session: explicit dashed "name it" affordance */
+.nameAdd {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  border: 1px dashed var(--border-strong);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+/* ── Stats strip ────────────────────────────────────────────────────── */
+.stats {
+  display: flex;
+  gap: 8px;
+}
+
+.stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 6px;
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-glow); /* tints the icon via currentColor */
+}
+
+.statVal {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.statLab {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* ── Exercise list ──────────────────────────────────────────────────── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sectionLabel {
+  padding: 0 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* Each row is tinted with its exercise color (--ex-color, set inline):
+   colored wash + border so the list reads as a colorful recap, while the
+   name stays in --text-primary for contrast. */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--ex-color, var(--accent-glow)) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ex-color, var(--accent-glow)) 22%, transparent);
+}
+
+.rowIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--ex-color, var(--accent-glow)) 16%, transparent);
+}
+
+.rowName {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowVal {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--ex-color, var(--text-primary));
+}
+
+.rowUnit {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ── Footer actions ─────────────────────────────────────────────────── */
+.footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+/* Square icon-only delete next to the stretched share button */
+.deleteBtn {
+  padding-left: 0;
+  padding-right: 0;
+  min-width: 52px;
+}

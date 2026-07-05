@@ -625,6 +625,8 @@
     "backgroundImage": "Imagen de fondo",
     "categoryFilter": "Categoría",
     "cropImage": "Recortar imagen",
+    "deleteSession": "¿Eliminar esta sesión?",
+    "deleteSessionWarning": "Esta acción no se puede deshacer.",
     "download": "Descargar",
     "duration": "Duración",
     "exercises": "Ejercicios",

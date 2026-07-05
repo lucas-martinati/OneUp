@@ -625,6 +625,8 @@
     "backgroundImage": "背景画像",
     "categoryFilter": "カテゴリ",
     "cropImage": "画像のトリミング",
+    "deleteSession": "このセッションを削除しますか？",
+    "deleteSessionWarning": "この操作は取り消せません。",
     "download": "ダウンロード",
     "duration": "間隔",
     "exercises": "演習",

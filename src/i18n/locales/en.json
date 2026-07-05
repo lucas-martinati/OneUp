@@ -640,6 +640,8 @@
     "backgroundImage": "Background image",
     "categoryFilter": "Category",
     "cropImage": "Crop Image",
+    "deleteSession": "Delete this session?",
+    "deleteSessionWarning": "This can't be undone.",
     "download": "Download",
     "duration": "Duration",
     "exercises": "Exercises",

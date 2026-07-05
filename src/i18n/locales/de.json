@@ -625,6 +625,8 @@
     "backgroundImage": "Hintergrundbild",
     "categoryFilter": "Kategorie",
     "cropImage": "Bild zuschneiden",
+    "deleteSession": "Diese Sitzung löschen?",
+    "deleteSessionWarning": "Das kann nicht rückgängig gemacht werden.",
     "download": "Herunterladen",
     "duration": "Dauer",
     "exercises": "Übungen",

@@ -640,6 +640,8 @@
     "backgroundImage": "Image de fond",
     "categoryFilter": "Catégorie",
     "cropImage": "Cadrage de l'image",
+    "deleteSession": "Supprimer la séance ?",
+    "deleteSessionWarning": "Cette action est irréversible.",
     "download": "Télécharger",
     "duration": "Durée",
     "exercises": "Exercices",

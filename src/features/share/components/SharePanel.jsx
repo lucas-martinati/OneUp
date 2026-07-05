@@ -106,7 +106,7 @@ export function SharePanel({
   } else if (isCompact) {
     buttonStyle = {
       padding: '12px', borderRadius: '12px',
-      background: 'linear-gradient(135deg, #818cf8, #6366f1)',
+      background: 'var(--gradient-primary)',
       border: 'none', color: 'white', fontSize: '0.85rem', fontWeight: 700,
       cursor: 'pointer', display: 'flex', alignItems: 'center',
       justifyContent: 'center', gap: '8px', flex: 1,

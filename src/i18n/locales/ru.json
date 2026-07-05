@@ -625,6 +625,8 @@
     "backgroundImage": "Фоновое изображение",
     "categoryFilter": "Категория",
     "cropImage": "Обрезать изображение",
+    "deleteSession": "Удалить эту тренировку?",
+    "deleteSessionWarning": "Это действие нельзя отменить.",
     "download": "Скачать",
     "duration": "Длительность",
     "exercises": "Упражнения",
