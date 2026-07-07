@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <application
         android:allowBackup="true"
         android:hardwareAccelerated="true"
@@ -99,10 +100,25 @@
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <!-- Health Connect (Google Health) — cardio sync without OAuth. -->
+    <!-- Health Connect (Google Health) — cardio sync without OAuth.
+         OneUp only reads completed workouts (exercise sessions), their distance
+         and their GPS route. These are the only data types the app consumes. -->
     <uses-permission android:name="android.permission.health.READ_EXERCISE" />
     <uses-permission android:name="android.permission.health.READ_DISTANCE" />
     <uses-permission android:name="android.permission.health.READ_EXERCISE_ROUTE" />
+
+    <!-- The capacitor-health plugin's manifest injects extra Health Connect
+         permissions (steps, calories, heart rate) that OneUp does not use.
+         Strip them here so the merged manifest stays within Minimum Scope and
+         passes Google Play's Health Connect permissions review. -->
+    <uses-permission android:name="android.permission.health.READ_STEPS"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE"
+        tools:node="remove" />
 
     <!-- Lets us detect / open the Health Connect app on the device. -->
     <queries>
