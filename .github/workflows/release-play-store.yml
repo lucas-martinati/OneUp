@@ -22,6 +22,10 @@ on:
         description: 'Incrémentation forcée du numéro de version (défaut: 1)'
         required: false
         default: '1'
+      send_for_review:
+        description: 'Envoyer automatiquement en révision ? (mettre "false" si une déclaration Health Connect/permissions doit être complétée à la main dans la console)'
+        required: false
+        default: 'true'
 
 jobs:
   build-and-deploy:
@@ -203,6 +207,13 @@ jobs:
           releaseFiles: android/app/build/outputs/bundle/prodRelease/app-prod-release.aab
           tracks: production
           status: completed
+          # By default the edit is committed AND sent for review automatically.
+          # Set the "send_for_review" input to "false" to only upload the bundle,
+          # release notes and version, leaving the edit pending so a Health
+          # Connect / permissions declaration can be completed by hand and sent
+          # for review from the Play Console UI. Tag-triggered runs (empty input)
+          # keep the automatic behaviour.
+          changesNotSentForReview: ${{ github.event.inputs.send_for_review == 'false' }}
           whatsNewDirectory: ${{ (github.event.inputs.release_notes_fr != '' || github.event.inputs.release_notes_en != '') && 'distribution/whatsnew' || '' }}
 
       # ── Commit updated versionCode back to repo ────────────────
