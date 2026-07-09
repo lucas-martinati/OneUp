@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Share2, Download, X, Loader2 } from '@utils/icons';
 import { IconButton } from '@components/ui';
@@ -48,7 +49,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
     settings, options, mode, isPro,
   };
 
-  return (
+  return createPortal(
     <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
       <div className="modal-content">
       {/* Header */}
@@ -158,6 +159,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
         />
       )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
