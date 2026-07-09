@@ -10,6 +10,8 @@ vi.mock('@shared/exerciseRules.js', () => ({
         // Leaving out cycling to trigger fallback
     ],
     getDailyGoal: vi.fn(),
+    getWeeklyGoalKm: vi.fn(),
+    CARDIO_REPS_PER_KM: 15,
 }));
 
 describe('exercises config fallbacks', () => {

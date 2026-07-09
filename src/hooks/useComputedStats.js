@@ -1,6 +1,6 @@
 import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions } from '@utils/dateUtils';
 import { walkStreak } from '@shared/streakFreeze.js';
-import { EXERCISES, getDailyGoal } from '@config/exercises';
+import { EXERCISES, getDailyGoal, getWeeklyGoalKm, CARDIO_REPS_PER_KM } from '@config/exercises';
 import { evaluateCardioWeek } from '@utils/cardioStreak';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '@config/badgeDefinitions';
@@ -146,8 +146,15 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
                 
                 let reps = 0;
                 if (exId === 'running' || exId === 'cycling') {
-                    // Cardio reps are now computed from distance * 15 in useCardio.js
-                    // We don't add daily reps for cardio here to avoid double counting
+                    // Goal-based, same rule as every other exercise: a validated
+                    // week only ever counts that week's goal km (capped — no bonus
+                    // for logging more distance than the goal). Difficulty is the
+                    // one locked onto the completion at validation time (see
+                    // useCardio.js), not the live config, so it can't drift.
+                    const weekNum = Math.max(1, Math.floor((dayNum - 1) / 7) + 1);
+                    const cardioDifficulty = exData.difficulty ?? 1;
+                    const goalKm = getWeeklyGoalKm(exId, weekNum) * cardioDifficulty;
+                    reps = Math.floor(goalKm * CARDIO_REPS_PER_KM);
                 } else {
                     reps = getDailyGoal(ex, dayNum, diffToUse);
                 }
@@ -338,13 +345,6 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         }
     }
 
-    // Inject cardio reps (from the cardioReps argument; cardio lives in its own node now)
-    const runningReps = cardioReps?.running;
-    const cyclingReps = cardioReps?.cycling;
-
-    if (runningReps && allExercises.some(e => e.id === 'running')) exerciseReps['running'] = runningReps;
-    if (cyclingReps && allExercises.some(e => e.id === 'cycling')) exerciseReps['cycling'] = cyclingReps;
-
     // ─── Derived values ──────────────────────────────────────────────────
     const globalTotalReps = Object.values(exerciseReps).reduce((sum, r) => sum + r, 0) ;
     const successRate = totalDays > 0 ? Math.round((totalDays / MAX_STREAK_WINDOW) * 100) : 0;
@@ -421,7 +421,10 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
             if (ex) {
                 let reps = 0;
                 if (exId === 'running' || exId === 'cycling') {
-                    // Cardio reps are handled in useCardio.js, not counted in daily reps
+                    // Same goal-based, capped rule as the main pass above.
+                    const weekNum = Math.max(1, Math.floor((dayNum - 1) / 7) + 1);
+                    const cardioDifficulty = exData.difficulty ?? 1;
+                    reps = Math.floor(getWeeklyGoalKm(exId, weekNum) * cardioDifficulty * CARDIO_REPS_PER_KM);
                 } else {
                     reps = getDailyGoal(ex, dayNum, getConfig ? getConfig(exId, dateStr).difficulty : 1.0);
                 }

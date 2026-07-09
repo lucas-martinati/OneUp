@@ -24,6 +24,7 @@ import {
   CARDIO_EXERCISES as SHARED_CARDIO,
   getDailyGoal as sharedGetDailyGoal,
   getWeeklyGoalKm as sharedGetWeeklyGoalKm,
+  CARDIO_REPS_PER_KM as SHARED_CARDIO_REPS_PER_KM,
 } from '@shared/exerciseRules.js';
 
 const CLIENT_EXERCISES = [
@@ -136,6 +137,7 @@ export const CARDIO_EXERCISES = CLIENT_CARDIO_EXERCISES.map(ex => {
 });
 
 export const getWeeklyGoalKm = sharedGetWeeklyGoalKm;
+export const CARDIO_REPS_PER_KM = SHARED_CARDIO_REPS_PER_KM;
 
 /** Quick lookup by exercise id */
 export const EXERCISES_MAP = Object.fromEntries(EXERCISES.map(e => [e.id, e]));

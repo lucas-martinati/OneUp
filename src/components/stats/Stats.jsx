@@ -147,16 +147,12 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         return list;
     }, [deferredCategories, exercisesList, customCategories, exercisesByUserCategory]);
 
-    const localCardioData = React.useMemo(() => {
-        const sessions = cardioData?.allSessions || [];
-        const runningKm = sessions.filter(s => s.type === 'running').reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
-        const cyclingKm = sessions.filter(s => s.type === 'cycling').reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
-        return {
-            allSessions: sessions,
-            running: Math.floor(runningKm * 15),
-            cycling: Math.floor(cyclingKm * 15)
-        };
-    }, [cardioData.allSessions]);
+    // Cardio reps are now computed inside computeAllStats directly from
+    // completions (goal-based, capped per validated week) — this only needs
+    // to carry the raw session list through for the weekly streak calculation.
+    const localCardioData = React.useMemo(() => ({
+        allSessions: cardioData?.allSessions || [],
+    }), [cardioData.allSessions]);
 
     const userStartDate = useProgressStore(s => s.userStartDate);
     const frozenDays = useProgressStore(s => s.frozenDays);

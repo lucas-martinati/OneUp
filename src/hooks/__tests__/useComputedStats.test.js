@@ -233,14 +233,17 @@ describe('computeAllStats — cardio-only dashboard (weekly streaks)', () => {
 
   const run = (km) => ({ type: 'running', startTime: Date.now(), distance: km * 1000 });
 
-  it('counts a current weekly streak when the distance goal is met', () => {
-    const cardioReps = { allSessions: [run(0.5)], running: 1234 };
-    const stats = computeAllStats({}, cardioSettings, getDayNumber, cardioExercises, false, {}, getConfig, cardioReps, userStart);
+  it('counts a current weekly streak and computes reps from the validated week, capped at the goal', () => {
+    // The 0.5km actually logged in `run(0.5)` must NOT inflate reps — only the
+    // validated completions day counts, capped at that week's goal.
+    const completions = { [userStart]: { running: { isCompleted: true } } };
+    const cardioReps = { allSessions: [run(0.5)] };
+    const stats = computeAllStats(completions, cardioSettings, getDayNumber, cardioExercises, false, {}, getConfig, cardioReps, userStart);
 
     expect(stats.exerciseCurrentStreaks.running).toBeGreaterThanOrEqual(1);
     expect(stats.exerciseMaxStreaks.running).toBeGreaterThanOrEqual(1);
-    // cardio reps are injected from the cardioReps argument, not recomputed
-    expect(stats.exerciseReps.running).toBe(1234);
+    // getDayNumber is mocked to always return 10 → week 2, goal 0.9km → floor(0.9*15)=13
+    expect(stats.exerciseReps.running).toBe(13);
     // a cardio-only dashboard surfaces the weekly streak as the display streak
     expect(stats.displayStreak).toBeGreaterThanOrEqual(1);
     expect(stats.maxStreak).toBeGreaterThanOrEqual(1);

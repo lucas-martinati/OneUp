@@ -26,11 +26,8 @@ import {
   ALL_EXERCISE_IDS,
   getDailyGoal,
   getWeeklyGoalKm,
+  CARDIO_REPS_PER_KM,
 } from "./shared/exerciseRules.js";
-
-// Reps-per-km used to convert a validated cardio week's goal distance into
-// the same "reps" unit as every other exercise (leaderboard/profile display).
-const CARDIO_REPS_PER_KM = 15;
 
 
 function getDayNumber(startDate, dateStr) {

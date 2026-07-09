@@ -60,15 +60,32 @@ describe('loading & fetching', () => {
 });
 
 describe('computations', () => {
-  it('computes total reps from distance (km * 15)', async () => {
+  it('computes total reps from validated weeks only, capped at that week goal (not raw distance)', async () => {
+    // Sessions logging way more than the goal must NOT inflate reps: only the
+    // validated completions day counts, capped at week 1's goal.
     loadCardioSessions.mockResolvedValue([
-      runSession({ id: 'r', type: 'running', distance: 4000 }),
-      runSession({ id: 'c', type: 'cycling', distance: 20000 }),
+      runSession({ id: 'r', type: 'running', distance: 40000 }),
+      runSession({ id: 'c', type: 'cycling', distance: 200000 }),
     ]);
+    stores.progress.completions = {
+      '2024-01-01': {
+        running: { isCompleted: true, count: 1 },
+        cycling: { isCompleted: true, count: 1 },
+      },
+    };
     const { result } = renderHook(() => useCardio());
     await waitFor(() => expect(result.current.totalReps).toBeGreaterThan(0));
-    // running 4km*15=60, cycling 20km*15=300 → 360
-    expect(result.current.totalReps).toBe(360);
+    // Week 1 goal: running 0.45km → floor(0.45*15)=6, cycling 0.75km → floor(0.75*15)=11 → 17
+    expect(result.current.totalReps).toBe(17);
+  });
+
+  it('does not count reps for weeks that were never validated in completions', async () => {
+    loadCardioSessions.mockResolvedValue([
+      runSession({ id: 'r', type: 'running', distance: 40000 }),
+    ]);
+    const { result } = renderHook(() => useCardio());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.totalReps).toBe(0);
   });
 
   it('switches active mode and filters sessions', async () => {

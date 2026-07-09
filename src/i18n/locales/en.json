@@ -273,7 +273,6 @@
     "stravaWallDesc": "Automatically sync your running and cycling sessions to progress your global streak.",
     "stravaWallTitle": "Connect Strava",
     "streak": "Streak",
-    "streakWeeks": "wks",
     "tap": "Tap",
     "totalDistance": "Total Distance ({{unit}})",
     "units": {
@@ -283,7 +282,6 @@
       "minKm": "min/km"
     },
     "viewHistory": "View history",
-    "week": "Wk",
     "weeklyGoal": "Weekly goal"
   },
   "clan": {

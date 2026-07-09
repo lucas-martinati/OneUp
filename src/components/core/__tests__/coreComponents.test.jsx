@@ -43,10 +43,11 @@ describe('ComputedStatsSynchronizer', () => {
     const { container } = render(<ComputedStatsSynchronizer />);
     expect(container.firstChild).toBeNull(); // invisible
     expect(recompute).toHaveBeenCalled();
+    // Reps are now computed inside computeAllStats from completions (goal-based,
+    // capped per validated week) — cardioData only needs to carry the raw
+    // session list through for the weekly streak calculation.
     const cardioData = recompute.mock.calls[0][7];
     expect(cardioData.allSessions).toHaveLength(2);
-    expect(cardioData.running).toBe(Math.floor((5000 / 1000) * 15));
-    expect(cardioData.cycling).toBe(Math.floor((10000 / 1000) * 15));
   });
 
   it('builds a getConfig resolving difficulty across all branches', () => {

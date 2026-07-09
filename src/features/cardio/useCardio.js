@@ -6,7 +6,7 @@ import { useProgressStore } from '@store/useProgressStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '@utils/dateUtils';
-import { getWeeklyGoalKm } from '@config/exercises';
+import { getWeeklyGoalKm, CARDIO_REPS_PER_KM } from '@config/exercises';
 import { evaluateCardioWeek } from '@utils/cardioStreak';
 
 /**
@@ -142,18 +142,27 @@ export function useCardio() {
     }
   }, [fetchSessions, isReady]);
 
-  // Compute total cardio reps: kilometers * 15
+  // Compute total cardio reps: goal-based per validated week, capped at that
+  // week's goal (no bonus for logging more distance than the goal — same
+  // rule as every other exercise). Mirrors the Cloud Function's leaderboard
+  // computation (firebase/functions/index.js) so personal stats and the
+  // public profile never drift apart.
   const cardioReps = useMemo(() => {
-    if (!sessions.length) return { running: 0, cycling: 0, total: 0 };
-    
-    const runningKm = sessions.filter(s => s.type === 'running').reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
-    const cyclingKm = sessions.filter(s => s.type === 'cycling').reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
-    
-    const running = Math.floor(runningKm * 15);
-    const cycling = Math.floor(cyclingKm * 15);
-    
+    let running = 0;
+    let cycling = 0;
+    for (const [dateStr, day] of Object.entries(completions)) {
+      if (!day || typeof day !== 'object') continue;
+      for (const mode of ['running', 'cycling']) {
+        const comp = day[mode];
+        if (!comp?.isCompleted) continue;
+        const weekNum = getCurrentWeekNumber(startDate, dateStr);
+        const difficulty = comp.difficulty ?? 1;
+        const reps = Math.floor(getWeeklyGoalKm(mode, weekNum) * difficulty * CARDIO_REPS_PER_KM);
+        if (mode === 'running') running += reps; else cycling += reps;
+      }
+    }
     return { running, cycling, total: running + cycling };
-  }, [sessions]);
+  }, [completions, startDate]);
 
   // Sync to global progress state for cloud persistence
   useEffect(() => {

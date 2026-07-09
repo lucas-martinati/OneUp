@@ -273,7 +273,6 @@
     "stravaWallDesc": "달리기 및 사이클링 세션을 자동으로 동기화하여 글로벌 연속 기록을 달성하세요.",
     "stravaWallTitle": "Strava 연결",
     "streak": "줄",
-    "streakWeeks": "몇주",
     "tap": "수도꼭지",
     "totalDistance": "총 거리({{unit}})",
     "units": {
@@ -283,7 +282,6 @@
       "minKm": "분/km"
     },
     "viewHistory": "기록 보기",
-    "week": "주",
     "weeklyGoal": "주간 목표"
   },
   "clan": {

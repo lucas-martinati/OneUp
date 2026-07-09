@@ -53,7 +53,7 @@ export const CardioStreak = React.memo(({ streak }) => {
           {streak} <span style={{
             fontSize: 'clamp(0.65rem, 1.2vh, 0.8rem)',
             fontWeight: '600', opacity: 0.7
-          }}>{t('cardio.streakWeeks')}</span>
+          }}>{t('common.weeksAbbr')}</span>
         </div>
       </div>
     </div>

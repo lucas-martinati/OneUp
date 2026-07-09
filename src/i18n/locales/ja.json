@@ -273,7 +273,6 @@
     "stravaWallDesc": "ランニングとサイクリングのセッションを自動的に同期して、世界記録を伸ばします。",
     "stravaWallTitle": "Strava に接続する",
     "streak": "ストリーク",
-    "streakWeeks": "数週間",
     "tap": "タップ",
     "totalDistance": "合計距離 ({{unit}})",
     "units": {
@@ -283,7 +282,6 @@
       "minKm": "分/km"
     },
     "viewHistory": "履歴を見る",
-    "week": "週",
     "weeklyGoal": "週間目標"
   },
   "clan": {

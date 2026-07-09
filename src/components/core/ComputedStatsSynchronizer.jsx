@@ -28,17 +28,12 @@ export function ComputedStatsSynchronizer() {
     const { customExercises } = useExercises();
     const recompute = useComputedStatsStore(s => s.recompute);
 
-    // Derive cardioData from cardio sessions
-    const cardioData = useMemo(() => {
-        const sessions = Object.values(cardio?.sessions || {});
-        const runningKm = sessions.filter(s => s.type === 'running').reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
-        const cyclingKm = sessions.filter(s => s.type === 'cycling').reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
-        return {
-            allSessions: sessions,
-            running: Math.floor(runningKm * 15),
-            cycling: Math.floor(cyclingKm * 15),
-        };
-    }, [cardio]);
+    // Cardio reps are computed inside computeAllStats directly from
+    // completions (goal-based, capped per validated week) — this only needs
+    // to carry the raw session list through for the weekly streak calculation.
+    const cardioData = useMemo(() => ({
+        allSessions: Object.values(cardio?.sessions || {}),
+    }), [cardio]);
 
     // Difficulty helper
     const getDifficulty = useCallback((exId, dateStr = null) => {

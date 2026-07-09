@@ -273,7 +273,6 @@
     "stravaWallDesc": "Sincronizza automaticamente le tue sessioni di corsa e ciclismo per progredire nella tua serie globale.",
     "stravaWallTitle": "Connetti Strava",
     "streak": "Strisciante",
-    "streakWeeks": "sett",
     "tap": "Rubinetto",
     "totalDistance": "Distanza totale ({{unit}})",
     "units": {
@@ -283,7 +282,6 @@
       "minKm": "min/km"
     },
     "viewHistory": "Visualizza la cronologia",
-    "week": "sett",
     "weeklyGoal": "Obiettivo settimanale"
   },
   "clan": {

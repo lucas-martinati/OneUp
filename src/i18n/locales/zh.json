@@ -273,7 +273,6 @@
     "stravaWallDesc": "自动同步您的跑步和骑行活动，以提升您的全球连胜记录。",
     "stravaWallTitle": "连接 Strava",
     "streak": "连续",
-    "streakWeeks": "周",
     "tap": "轻触",
     "totalDistance": "总距离 ({{unit}})",
     "units": {
@@ -283,7 +282,6 @@
       "minKm": "分/公里"
     },
     "viewHistory": "查看历史",
-    "week": "第",
     "weeklyGoal": "每周目标"
   },
   "clan": {

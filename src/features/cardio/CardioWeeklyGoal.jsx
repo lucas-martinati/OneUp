@@ -28,7 +28,7 @@ export const CardioWeeklyGoal = React.memo(({
             fontSize: 'clamp(0.6rem, 1.1vh, 0.7rem)',
             color: 'var(--text-secondary)', opacity: 0.6
           }}>
-            {t('cardio.week')} {weekNumber}
+            {t('common.weeksAbbr')} {weekNumber}
           </span>
         </div>
 

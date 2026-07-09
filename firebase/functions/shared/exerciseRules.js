@@ -70,3 +70,11 @@ export function getWeeklyGoalKm(mode, weekNumber) {
   if (!incrementM) return 0;
   return (weekNumber * incrementM) / 1000;
 }
+
+/**
+ * Reps-per-km used to convert a validated cardio week's goal distance into
+ * the same "reps" unit as every other exercise. Single source of truth so
+ * the Cloud Function (leaderboard/public profile) and the client (personal
+ * Stats page, dashboard) never drift apart on this conversion.
+ */
+export const CARDIO_REPS_PER_KM = 15;

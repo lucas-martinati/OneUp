@@ -273,7 +273,6 @@
     "stravaWallDesc": "Synchronisieren Sie Ihre Lauf- und Radfahreinheiten automatisch, um Ihre globale Erfolgsserie voranzutreiben.",
     "stravaWallTitle": "Strava verbinden",
     "streak": "Strähne",
-    "streakWeeks": "Wo",
     "tap": "Klopfen",
     "totalDistance": "Gesamtstrecke ({{unit}})",
     "units": {
@@ -283,7 +282,6 @@
       "minKm": "min/km"
     },
     "viewHistory": "Verlauf anzeigen",
-    "week": "Wo",
     "weeklyGoal": "Wöchentliches Ziel"
   },
   "clan": {
