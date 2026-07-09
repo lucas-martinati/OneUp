@@ -25,7 +25,12 @@ import {
   ALL_WEIGHT_IDS,
   ALL_EXERCISE_IDS,
   getDailyGoal,
+  getWeeklyGoalKm,
 } from "./shared/exerciseRules.js";
+
+// Reps-per-km used to convert a validated cardio week's goal distance into
+// the same "reps" unit as every other exercise (leaderboard/profile display).
+const CARDIO_REPS_PER_KM = 15;
 
 
 function getDayNumber(startDate, dateStr) {
@@ -115,17 +120,21 @@ const MAX_STREAK_WINDOW = 365;
 // All known exercise ids (standard + weights + cardio), as a flat list.
 const ALL_EX_OBJECTS = [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES];
 
-function computeExerciseDerived(completions, anchorDateStr, frozenDays = {}) {
+function computeExerciseDerived(completions, anchorDateStr, frozenDays = {}, startDate = null) {
   const pad = n => String(n).padStart(2, '0');
   const dayStr = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
   const dayIsDone = day => !!day && typeof day === 'object' &&
     Object.entries(day).some(([id, e]) => e?.isCompleted && ALL_EXERCISE_IDS.has(id));
 
-  // Per-exercise total days completed.
+  // Per-exercise total days completed. Dates before the challenge start are
+  // excluded — e.g. cardio weeks retroactively marked "completed" from
+  // historical Health Connect/Strava imports that predate the user's own
+  // challenge (see the reps loop in recomputeLeaderboardEntry for the same rule).
   const exerciseDays = {};
   for (const ex of ALL_EX_OBJECTS) exerciseDays[ex.id] = 0;
-  for (const day of Object.values(completions)) {
+  for (const [dateStr, day] of Object.entries(completions)) {
     if (!day || typeof day !== 'object') continue;
+    if (startDate && dateStr < startDate) continue;
     for (const ex of ALL_EX_OBJECTS) {
       if (day[ex.id]?.isCompleted) exerciseDays[ex.id]++;
     }
@@ -138,7 +147,7 @@ function computeExerciseDerived(completions, anchorDateStr, frozenDays = {}) {
   // Frozen days are transparent in the global streak walk (see @shared/streakFreeze).
   const currentStreak = walkStreak(
     (offset) => dayStr(new Date(anchorMs - offset * 86400000)),
-    (ds) => dayIsDone(completions[ds]),
+    (ds) => (!startDate || ds >= startDate) && dayIsDone(completions[ds]),
     (ds) => !!frozenDays[ds],
     MAX_STREAK_WINDOW
   );
@@ -149,6 +158,7 @@ function computeExerciseDerived(completions, anchorDateStr, frozenDays = {}) {
     let streak = 0;
     for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
       const ds = dayStr(new Date(anchorMs - i * 86400000));
+      if (startDate && ds < startDate) break;
       if (completions[ds]?.[ex.id]?.isCompleted) streak++;
       else break;
     }
@@ -167,15 +177,14 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   if (!progress) return;
 
   // ── Read auxiliary data in parallel ─────────────────────────────────────
-  // cardioSessions live in their own decoupled node `users/{uid}/cardioSessions`
-  // (out of `progress` so GPS tracks stay private). Exercise weights live in
-  // `users/{uid}/exerciseWeights` (NOT in settings).
-  const [settingsSnap, purchaseSnap, existingSnap, achievementsSnap, cardioSnap, weightsSnap] = await Promise.all([
+  // Exercise weights live in `users/{uid}/exerciseWeights` (NOT in settings).
+  // Cardio reps are goal-based (see the completions loop below) so raw
+  // `users/{uid}/cardioSessions` distance never needs to be read here.
+  const [settingsSnap, purchaseSnap, existingSnap, achievementsSnap, weightsSnap] = await Promise.all([
     db.ref(paths.userSettings(uid)).once('value'),
     db.ref(paths.userPurchase(uid)).once('value'),
     db.ref(paths.leaderboardEntry(uid)).once('value'),
     db.ref(paths.userAchievements(uid)).once('value'),
-    db.ref(paths.userCardioSessions(uid)).once('value'),
     db.ref(paths.userExerciseWeights(uid)).once('value'),
   ]);
 
@@ -228,6 +237,8 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   const exerciseReps = {};
   let totalClassicReps = 0;
   let weightsTotalReps = 0;
+  let runningReps = 0;
+  let cyclingReps = 0;
   let lastActiveDay = null;
 
   const sortedDates = Object.keys(completions).sort();
@@ -248,8 +259,20 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
 
       anyDone = true;
 
-      // Skip cardio — reps computed from distance below
-      if (exId === 'running' || exId === 'cycling') continue;
+      if (exId === 'running' || exId === 'cycling') {
+        // Cardio is validated per WEEK (not per day — see useCardio.js), and
+        // only the week's goal distance counts, never the actual distance
+        // logged: same "goal, not overage" rule as getDailyGoal for every
+        // other exercise. A validated week where the user ran 40km still only
+        // counts that week's (small, linearly-growing) goal in km.
+        const weekNum = Math.floor((dayNum - 1) / 7) + 1;
+        const difficulty = exData.difficulty ?? 1;
+        const goalKm = getWeeklyGoalKm(exId, weekNum) * difficulty;
+        const reps = Math.floor(goalKm * CARDIO_REPS_PER_KM);
+        exerciseReps[exId] = (exerciseReps[exId] || 0) + reps;
+        if (exId === 'running') runningReps += reps; else cyclingReps += reps;
+        continue;
+      }
 
       const exercise = EXERCISES.find(e => e.id === exId) || WEIGHT_EXERCISES.find(e => e.id === exId);
       if (!exercise) continue;
@@ -282,23 +305,6 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     }
   }
 
-  // ── Cardio reps from Strava sessions ───────────────────────────────────
-  const cardioSessions = cardioSnap.val() || {};
-  let runningDistanceM = 0;
-  let cyclingDistanceM = 0;
-
-  for (const session of Object.values(cardioSessions)) {
-    if (session.type === 'running' || session.type === 'Run') {
-      runningDistanceM += session.distance || 0;
-    } else if (session.type === 'cycling' || session.type === 'Ride') {
-      cyclingDistanceM += session.distance || 0;
-    }
-  }
-
-  const runningReps = Math.floor((runningDistanceM / 1000) * 15);
-  const cyclingReps = Math.floor((cyclingDistanceM / 1000) * 15);
-  if (runningReps > 0) exerciseReps['running'] = runningReps;
-  if (cyclingReps > 0) exerciseReps['cycling'] = cyclingReps;
   const cardioTotalReps = runningReps + cyclingReps;
 
   // ── isPerfectToday ─────────────────────────────────────────────────────
@@ -460,7 +466,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   // stats let UserDetail.jsx render streaks/days WITHOUT reading anyone's
   // private completions calendar.
   if (isPublic) {
-    const derived = computeExerciseDerived(completions, userLocalDate, frozenDays);
+    const derived = computeExerciseDerived(completions, userLocalDate, frozenDays, startDate);
     await db.ref(paths.publicProfile(uid)).set({
       // Detail-view-only payload. exerciseReps lives in the leaderboard entry
       // (needed for the list's per-exercise ranking); everything below is only

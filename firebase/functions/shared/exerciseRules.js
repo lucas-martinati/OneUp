@@ -51,3 +51,22 @@ export function getDailyGoal(exercise, dayNumber, userMultiplier = 1.0, isWeekly
   const mult = exercise.multiplier !== undefined ? exercise.multiplier : 1;
   return Math.max(1, Math.ceil(dayNumber * mult * userMultiplier));
 }
+
+/**
+ * Weekly cardio distance goal in METERS per activity type.
+ * Running: +450 m/week cumulative
+ * Cycling: +750 m/week cumulative
+ */
+const CARDIO_WEEKLY_INCREMENT_M = {
+  running: 450,
+  cycling: 750,
+};
+
+/**
+ * Weekly goal for cardio (running/cycling), in km. Formula: weekNumber × increment.
+ */
+export function getWeeklyGoalKm(mode, weekNumber) {
+  const incrementM = CARDIO_WEEKLY_INCREMENT_M[mode];
+  if (!incrementM) return 0;
+  return (weekNumber * incrementM) / 1000;
+}

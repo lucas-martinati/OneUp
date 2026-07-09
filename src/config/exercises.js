@@ -23,6 +23,7 @@ import {
   EXERCISES as SHARED_EXERCISES,
   CARDIO_EXERCISES as SHARED_CARDIO,
   getDailyGoal as sharedGetDailyGoal,
+  getWeeklyGoalKm as sharedGetWeeklyGoalKm,
 } from '@shared/exerciseRules.js';
 
 const CLIENT_EXERCISES = [
@@ -134,25 +135,7 @@ export const CARDIO_EXERCISES = CLIENT_CARDIO_EXERCISES.map(ex => {
   return { ...ex, multiplier: shared ? shared.multiplier : 1 };
 });
 
-/**
- * Weekly increment in METERS per activity type.
- * Running: +450 m/week cumulative
- * Cycling: +750 m/week cumulative
- */
-const WEEKLY_INCREMENT = {
-    running: 450,
-    cycling: 750,
-};
-
-/**
- * Compute the weekly goal for the current week.
- * Formula: weekNumber × increment (in km)
- */
-export function getWeeklyGoalKm(mode, weekNumber) {
-    const incrementM = WEEKLY_INCREMENT[mode];
-    if (!incrementM) return 0;
-    return (weekNumber * incrementM) / 1000;
-}
+export const getWeeklyGoalKm = sharedGetWeeklyGoalKm;
 
 /** Quick lookup by exercise id */
 export const EXERCISES_MAP = Object.fromEntries(EXERCISES.map(e => [e.id, e]));

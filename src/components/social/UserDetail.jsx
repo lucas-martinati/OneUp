@@ -72,6 +72,11 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
         const allList = [...EXERCISES, ...WEIGHT_EXERCISES];
         const maxReps = Math.max(...allList.map(e => entry.exerciseReps?.[e.id] || 0), 1);
         const barWidth = (reps / maxReps) * 100;
+        // Cardio is validated per WEEK, not per day (see useCardio.js): each
+        // "day" flagged isCompleted for running/cycling actually represents
+        // one validated week, so exerciseDays already counts weeks here — it
+        // just needs the right unit label.
+        const isCardioEx = !!CARDIO_EXERCISES.find(c => c.id === ex.id);
         const exDays = loadingDetails ? null : (stats.exerciseDays?.[ex.id] || 0);
         const weight = details?.exerciseWeights?.[ex.id] || ex.defaultWeight;
         const isWeightEx = !!WEIGHT_EXERCISES.find(e => e.id === ex.id);
@@ -106,7 +111,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                                 );
                             })()}
                             {exDays !== null && (
-                                <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', opacity: 0.7 }}>{exDays}{t('common.daysAbbr')}</span>
+                                <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', opacity: 0.7 }}>{exDays}{t(isCardioEx ? 'common.weeksAbbr' : 'common.daysAbbr')}</span>
                             )}
                             {isWeightEx && <WeightBadge weight={weight} color={ex.color} />}
                             {(() => {
