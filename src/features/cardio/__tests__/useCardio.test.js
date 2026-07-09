@@ -75,8 +75,8 @@ describe('computations', () => {
     };
     const { result } = renderHook(() => useCardio());
     await waitFor(() => expect(result.current.totalReps).toBeGreaterThan(0));
-    // Week 1 goal: running 0.45km → floor(0.45*15)=6, cycling 0.75km → floor(0.75*15)=11 → 17
-    expect(result.current.totalReps).toBe(17);
+    // Week 1 goal: running 0.45km → floor(0.45*109)=49, cycling 0.75km → floor(0.75*65)=48 → 97
+    expect(result.current.totalReps).toBe(97);
   });
 
   it('does not count reps for weeks that were never validated in completions', async () => {

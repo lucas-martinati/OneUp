@@ -76,5 +76,17 @@ export function getWeeklyGoalKm(mode, weekNumber) {
  * the same "reps" unit as every other exercise. Single source of truth so
  * the Cloud Function (leaderboard/public profile) and the client (personal
  * Stats page, dashboard) never drift apart on this conversion.
+ *
+ * Calibrated so a validated cardio week grows at roughly the same rate as the
+ * app's mult=1 baseline exercise (pushups/squats: ~49 × weekNumber reps/week —
+ * see EXERCISES above and getDailyGoal). Per-mode because running/cycling have
+ * different weekly km increments (see CARDIO_WEEKLY_INCREMENT_M): a flat
+ * per-km rate can't track both curves at once.
+ *   running: 49 / 0.45 ≈ 108.9 → 109
+ *   cycling: 49 / 0.75 ≈ 65.3  → 65
+ * Residual vs the 49×weekNumber baseline stays under 2.5% from week 15 on.
  */
-export const CARDIO_REPS_PER_KM = 15;
+export const CARDIO_REPS_PER_KM = {
+  running: 109,
+  cycling: 65,
+};

@@ -157,7 +157,7 @@ export function useCardio() {
         if (!comp?.isCompleted) continue;
         const weekNum = getCurrentWeekNumber(startDate, dateStr);
         const difficulty = comp.difficulty ?? 1;
-        const reps = Math.floor(getWeeklyGoalKm(mode, weekNum) * difficulty * CARDIO_REPS_PER_KM);
+        const reps = Math.floor(getWeeklyGoalKm(mode, weekNum) * difficulty * CARDIO_REPS_PER_KM[mode]);
         if (mode === 'running') running += reps; else cycling += reps;
       }
     }

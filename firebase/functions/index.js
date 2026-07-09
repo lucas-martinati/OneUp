@@ -265,7 +265,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
         const weekNum = Math.floor((dayNum - 1) / 7) + 1;
         const difficulty = exData.difficulty ?? 1;
         const goalKm = getWeeklyGoalKm(exId, weekNum) * difficulty;
-        const reps = Math.floor(goalKm * CARDIO_REPS_PER_KM);
+        const reps = Math.floor(goalKm * CARDIO_REPS_PER_KM[exId]);
         exerciseReps[exId] = (exerciseReps[exId] || 0) + reps;
         if (exId === 'running') runningReps += reps; else cyclingReps += reps;
         continue;

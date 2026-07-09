@@ -154,7 +154,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
                     const weekNum = Math.max(1, Math.floor((dayNum - 1) / 7) + 1);
                     const cardioDifficulty = exData.difficulty ?? 1;
                     const goalKm = getWeeklyGoalKm(exId, weekNum) * cardioDifficulty;
-                    reps = Math.floor(goalKm * CARDIO_REPS_PER_KM);
+                    reps = Math.floor(goalKm * CARDIO_REPS_PER_KM[exId]);
                 } else {
                     reps = getDailyGoal(ex, dayNum, diffToUse);
                 }
@@ -424,7 +424,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
                     // Same goal-based, capped rule as the main pass above.
                     const weekNum = Math.max(1, Math.floor((dayNum - 1) / 7) + 1);
                     const cardioDifficulty = exData.difficulty ?? 1;
-                    reps = Math.floor(getWeeklyGoalKm(exId, weekNum) * cardioDifficulty * CARDIO_REPS_PER_KM);
+                    reps = Math.floor(getWeeklyGoalKm(exId, weekNum) * cardioDifficulty * CARDIO_REPS_PER_KM[exId]);
                 } else {
                     reps = getDailyGoal(ex, dayNum, getConfig ? getConfig(exId, dateStr).difficulty : 1.0);
                 }

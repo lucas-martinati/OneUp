@@ -11,7 +11,7 @@ vi.mock('@shared/exerciseRules.js', () => ({
     ],
     getDailyGoal: vi.fn(),
     getWeeklyGoalKm: vi.fn(),
-    CARDIO_REPS_PER_KM: 15,
+    CARDIO_REPS_PER_KM: { running: 109, cycling: 65 },
 }));
 
 describe('exercises config fallbacks', () => {

@@ -242,8 +242,8 @@ describe('computeAllStats — cardio-only dashboard (weekly streaks)', () => {
 
     expect(stats.exerciseCurrentStreaks.running).toBeGreaterThanOrEqual(1);
     expect(stats.exerciseMaxStreaks.running).toBeGreaterThanOrEqual(1);
-    // getDayNumber is mocked to always return 10 → week 2, goal 0.9km → floor(0.9*15)=13
-    expect(stats.exerciseReps.running).toBe(13);
+    // getDayNumber is mocked to always return 10 → week 2, goal 0.9km → floor(0.9*109)=98
+    expect(stats.exerciseReps.running).toBe(98);
     // a cardio-only dashboard surfaces the weekly streak as the display streak
     expect(stats.displayStreak).toBeGreaterThanOrEqual(1);
     expect(stats.maxStreak).toBeGreaterThanOrEqual(1);
