@@ -26,6 +26,9 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
     // (kept as hex strings because they get alpha-suffixed below).
     const rankColors = { 1: PALETTE.amber, 2: PALETTE.silver, 3: PALETTE.bronze };
     const todayStr = getLocalDateStr(new Date());
+    const yesterdayDate = new Date();
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const yesterdayStr = getLocalDateStr(yesterdayDate);
     const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
     const rankColor = rankColors[rank] || PALETTE.indigoLight;
 
@@ -83,12 +86,25 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
                         <span style={{ fontSize: '0.75rem', fontWeight: '600', color: ex.color }}>{getExerciseLabel(ex, t)}</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            {!loadingDetails && (
-                                <StreakFlame
-                                    streak={stats.exerciseStreaks?.[ex.id] || 0}
-                                    active={!!stats.exerciseDoneToday?.[ex.id]}
-                                />
-                            )}
+                            {!loadingDetails && (() => {
+                                // stats.exerciseDoneToday/exerciseStreaks are baked server-side
+                                // at the last write (anchored on that day's "today") and never
+                                // refreshed on day change. entry.lastActiveDay is derived straight
+                                // from completions so it can't go stale the same way — use it to
+                                // find out which real-world day that anchor actually was.
+                                const doneAtAnchor = !!stats.exerciseDoneToday?.[ex.id];
+                                const doneToday = doneAtAnchor && entry.lastActiveDay === todayStr;
+                                const doneYesterday = doneAtAnchor && entry.lastActiveDay === yesterdayStr;
+                                // Streak still alive (grey, pending today) only if it was done
+                                // yesterday; otherwise it's broken and the flame shouldn't show.
+                                const streakAlive = doneToday || doneYesterday;
+                                return (
+                                    <StreakFlame
+                                        streak={streakAlive ? (stats.exerciseStreaks?.[ex.id] || 0) : 0}
+                                        active={doneToday}
+                                    />
+                                );
+                            })()}
                             {exDays !== null && (
                                 <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', opacity: 0.7 }}>{exDays}{t('common.daysAbbr')}</span>
                             )}
