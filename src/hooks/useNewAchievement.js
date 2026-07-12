@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '@config/badgeDefinitions';
+import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked, getBadgeById } from '@config/badgeDefinitions';
 
 /**
  * Hook de détection des nouveaux badges débloqués.
@@ -47,7 +47,7 @@ export function useNewAchievement(computedStats, t) {
 
         if (newIds.length > 0) {
             // Find the badge definition for the first new ID
-            const newBadge = BADGE_DEFINITIONS.find(b => b.id === newIds[0]);
+            const newBadge = getBadgeById(newIds[0]);
             
             if (newBadge) {
                 const IconComponent = getBadgeIconFromDef(newBadge);

@@ -1,3 +1,5 @@
+import { WEIGHT_EXERCISES } from './weights';
+
 /**
  * Multi-exercise configuration for OneUp.
  *
@@ -138,6 +140,14 @@ export const CARDIO_EXERCISES = CLIENT_CARDIO_EXERCISES.map(ex => {
 
 export const getWeeklyGoalKm = sharedGetWeeklyGoalKm;
 export const CARDIO_REPS_PER_KM = SHARED_CARDIO_REPS_PER_KM;
+
+const BODYWEIGHT_SET = new Set(EXERCISES.map(e => e.id));
+const WEIGHTS_SET = new Set(WEIGHT_EXERCISES.map(e => e.id));
+const CARDIO_SET = new Set(CARDIO_EXERCISES.map(e => e.id));
+
+export const isBodyweightExercise = (id) => BODYWEIGHT_SET.has(id);
+export const isWeightExercise = (id) => WEIGHTS_SET.has(id);
+export const isCardioExercise = (id) => CARDIO_SET.has(id);
 
 /** Quick lookup by exercise id */
 export const EXERCISES_MAP = Object.fromEntries(EXERCISES.map(e => [e.id, e]));

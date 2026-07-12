@@ -77,6 +77,9 @@ export const BADGE_DEFINITIONS = METADATA.map(meta => {
   };
 });
 
+export const BADGE_MAP = Object.fromEntries(BADGE_DEFINITIONS.map(b => [b.id, b]));
+export const getBadgeById = (id) => BADGE_MAP[id];
+
 // Helper to get the icon component from a badge definition
 export function getBadgeIconFromDef(def) {
   return BADGE_ICONS[def.icon] || Star;

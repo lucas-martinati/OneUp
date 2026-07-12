@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { isWeightExercise } from '@config/exercises';
 import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X, Lock, Check } from '@utils/icons';
 import { haptics } from '@utils/hapticsManager';
 import styles from './ShareOptions.module.css';
@@ -63,7 +64,6 @@ function SectionLabel({ icon: Icon, children }) {
 import { buildFullCategoryOrder, buildFullCategoryColors, buildCategoryChipItems } from '@config/categories';
 import { useExercises } from '@contexts/ExercisesContext';
 import { THEMES as GLOBAL_THEMES } from '@config/themes';
-import { WEIGHT_EXERCISES } from '@config/weights';
 import { ThemeSwatch } from'@components/ui/ThemeSwatch';
 import { CategoryChips } from '@components/ui';
 
@@ -114,7 +114,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
   };
 
   const hasWeightExercises = !isGlobal && sessionData?.exercises?.some(
-    ex => WEIGHT_EXERCISES.some(w => w.id === ex.id)
+    ex => isWeightExercise(ex.id)
   );
 
   return (

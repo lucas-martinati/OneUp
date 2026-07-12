@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { loadCardioSessions, saveCardioSession } from '@services/cardioService';
+import { loadCardioSessions, saveCardioSession, getSortedCardioSessions } from '@services/cardioService';
 import { getAllActivities } from '@services/cardioProviders';
 import { useAuth } from '@contexts/AuthContext';
 import { useProgressStore } from '@store/useProgressStore';
@@ -59,7 +59,7 @@ export function useCardio() {
   const { getConfig } = useExerciseConfig();
   const [sessions, setSessions] = useState(() => {
     // Initialize from context if available to avoid flicker/wiping during initial load
-    return Object.values(cardio?.sessions || {}).sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
+    return getSortedCardioSessions(cardio?.sessions);
   });
   const [loading, setLoading] = useState(true);
   const [activeMode, setActiveMode] = useState('running');
@@ -68,7 +68,7 @@ export function useCardio() {
   const hasInitializedFromStore = useRef(false);
   useEffect(() => {
     if (isReady && !hasInitializedFromStore.current) {
-      const storeSessions = Object.values(cardio?.sessions || {}).sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
+      const storeSessions = getSortedCardioSessions(cardio?.sessions);
       setSessions(storeSessions);
       hasInitializedFromStore.current = true;
       setLoading(false);

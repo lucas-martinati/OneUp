@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, Sparkles } from '@utils/icons';
-import { BADGE_DEFINITIONS, BADGE_ICONS, getBadgeIconFromDef } from '@config/badgeDefinitions';
+import { BADGE_ICONS, getBadgeIconFromDef, getBadgeById } from '@config/badgeDefinitions';
 import { haptics } from '@utils/hapticsManager';
 import { useToastGestures } from './useToastGestures';
 import { getToastRoot } from'@components/feedback/toastRoot';
@@ -144,7 +144,7 @@ export function useAchievementToast(onViewAchievement, onValidateBadge) {
     }, []);
 
     const showAchievement = useCallback((badgeId) => {
-        const badge = BADGE_DEFINITIONS.find(b => b.id === badgeId);
+        const badge = getBadgeById(badgeId);
         if (!badge) {
             console.warn('Badge not found:', badgeId);
             return;

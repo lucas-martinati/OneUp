@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EXERCISES, getDailyGoal } from '@config/exercises';
+import { EXERCISES, getDailyGoal, isBodyweightExercise, isWeightExercise } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { CATEGORIES, buildFullCategoryOrder, isUserCategory, buildFullCategoryColors } from '@config/categories';
 import { canAccessFeature, FEATURES } from '@utils/entitlements';
@@ -143,8 +143,8 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
             const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
 
             let category = 'custom';
-            if (EXERCISES.some(e => e.id === ex.id)) category = 'bodyweight';
-            else if (WEIGHT_EXERCISES.some(e => e.id === ex.id)) category = 'weights';
+            if (isBodyweightExercise(ex.id)) category = 'bodyweight';
+            else if (isWeightExercise(ex.id)) category = 'weights';
             else {
                 for (const catId in exercisesByUserCategory) {
                     if (exercisesByUserCategory[catId].some(e => e.id === ex.id)) {
@@ -163,7 +163,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         setQueue(prev => {
             if (prev.includes(id)) return prev.filter(x => x !== id);
 
-            const isBW = EXERCISES.some(e => e.id === id);
+            const isBW = isBodyweightExercise(id);
             if (!isBW && !isPro) return prev;
 
             return [...prev, id];
@@ -209,7 +209,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
             .map(id => allExercises.find(e => e.id === id))
             .filter(ex => {
                 if (!ex) return false;
-                const isWeight = WEIGHT_EXERCISES.some(e => e.id === ex.id);
+                const isWeight = isWeightExercise(ex.id);
                 const isCustom = isCustomExercise(ex.id);
                 if (!isPro && (isWeight || isCustom)) return false;
                 return true;
@@ -229,8 +229,8 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
 
         // Detect exercise categories using the same priority as the grid
         const getExCategory = (ex) => {
-            if (EXERCISES.some(e => e.id === ex.id)) return CATEGORIES.BODYWEIGHT;
-            if (WEIGHT_EXERCISES.some(e => e.id === ex.id)) return CATEGORIES.WEIGHTS;
+            if (isBodyweightExercise(ex.id)) return CATEGORIES.BODYWEIGHT;
+            if (isWeightExercise(ex.id)) return CATEGORIES.WEIGHTS;
             for (const catId in exercisesByUserCategory) {
                 if (exercisesByUserCategory[catId].some(e => e.id === ex.id)) return catId;
             }

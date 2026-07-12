@@ -1,6 +1,6 @@
 import { Preferences } from '@capacitor/preferences';
 import { cloudSync } from '@services/cloudSync';
-import { BADGE_DEFINITIONS } from '@config/badgeDefinitions';
+import { BADGE_DEFINITIONS, getBadgeById } from '@config/badgeDefinitions';
 import { useUIStore } from '@store/useUIStore';
 import i18n from '../i18n';
 
@@ -55,7 +55,7 @@ export function installDebugCommands() {
 
     /** Trigger the unlock toast for a badge (and mark it earned). */
     giveAchievement(badgeId) {
-      if (!BADGE_DEFINITIONS.some(b => b.id === badgeId)) {
+      if (!getBadgeById(badgeId)) {
         console.warn(`[OneUp Debug] Unknown badge "${badgeId}". Use .listAchievements() to see all ids.`);
         return;
       }
@@ -71,7 +71,7 @@ export function installDebugCommands() {
 
     /** Open the achievements panel — optionally scrolled to & highlighting a badge. */
     openAchievements(badgeId = null) {
-      if (badgeId && !BADGE_DEFINITIONS.some(b => b.id === badgeId)) {
+      if (badgeId && !getBadgeById(badgeId)) {
         console.warn(`[OneUp Debug] Unknown badge "${badgeId}". Opening without highlight.`);
         badgeId = null;
       }

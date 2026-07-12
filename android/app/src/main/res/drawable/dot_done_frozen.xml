@@ -1,39 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="28dp"
-    android:height="28dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    
-    <!-- Glow behind the cube -->
-    <path
-        android:fillColor="#307DD3FC"
-        android:pathData="M12,1 C18,1 23,6 23,12 C23,18 18,23 12,23 C6,23 1,18 1,12 C1,6 6,1 12,1 Z" />
-        
-    <!-- Top Face (Lightest blue/white) -->
-    <path
-        android:fillColor="#E0F2FE"
-        android:pathData="M12,4 L20,8 L12,12 L4,8 Z" />
-    
-    <!-- Left Face (Medium blue) -->
-    <path
-        android:fillColor="#7DD3FC"
-        android:pathData="M4,8 L12,12 L12,20 L4,16 Z" />
-        
-    <!-- Right Face (Darkest blue) -->
-    <path
-        android:fillColor="#0284C7"
-        android:pathData="M12,12 L20,8 L20,16 L12,20 Z" />
-        
-    <!-- Highlight reflections (Top surface glare) -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M12,4.8 L18.5,8 L12,11.2 L5.5,8 Z" />
-        
-    <!-- Edge highlights for that glossy ice look -->
-    <path
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="0.8"
-        android:strokeLineCap="round"
-        android:pathData="M4.5,8.8 L4.5,15.2 M12,12.8 L12,19.2 M20,8 L20,16 M4,8 L12,12 L20,8" />
-</vector>
+<!-- Frozen day — streak freeze used, icy frosted-glass look with snowflake accent -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Outer glow (icy blue instead of violet) -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#3038bdf8" />
+            <size android:width="28dp" android:height="28dp" />
+        </shape>
+    </item>
+
+    <!-- Inner gradient circle — frosted glass -->
+    <item android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp">
+        <shape android:shape="oval">
+            <gradient
+                android:startColor="#FFE0F2FE"
+                android:endColor="#FF38BDF8"
+                android:angle="135" />
+            <size android:width="24dp" android:height="24dp" />
+        </shape>
+    </item>
+
+    <!-- Frost rim -->
+    <item android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp">
+        <shape android:shape="oval">
+            <stroke
+                android:width="1dp"
+                android:color="#80FFFFFF" />
+            <size android:width="24dp" android:height="24dp" />
+        </shape>
+    </item>
+
+    <!-- Shine highlight (identique à l'originale) -->
+    <item android:bottom="6dp" android:left="5dp" android:right="5dp" android:top="3dp">
+        <shape android:shape="oval">
+            <gradient
+                android:startColor="#50FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="270" />
+            <size android:width="14dp" android:height="14dp" />
+        </shape>
+    </item>
+
+    <!-- Accent flocon : 3 barres à 0°/60°/120° -->
+    <item android:bottom="8dp" android:left="8dp" android:right="8dp" android:top="8dp">
+        <rotate
+            android:fromDegrees="0"
+            android:toDegrees="0"
+            android:pivotX="50%"
+            android:pivotY="50%">
+            <shape android:shape="rectangle">
+                <solid android:color="#E6FFFFFF" />
+                <corners android:radius="1dp" />
+                <size android:width="1.6dp" android:height="12dp" />
+            </shape>
+        </rotate>
+    </item>
+    <item android:bottom="8dp" android:left="8dp" android:right="8dp" android:top="8dp">
+        <rotate
+            android:fromDegrees="60"
+            android:toDegrees="60"
+            android:pivotX="50%"
+            android:pivotY="50%">
+            <shape android:shape="rectangle">
+                <solid android:color="#E6FFFFFF" />
+                <corners android:radius="1dp" />
+                <size android:width="1.6dp" android:height="12dp" />
+            </shape>
+        </rotate>
+    </item>
+    <item android:bottom="8dp" android:left="8dp" android:right="8dp" android:top="8dp">
+        <rotate
+            android:fromDegrees="120"
+            android:toDegrees="120"
+            android:pivotX="50%"
+            android:pivotY="50%">
+            <shape android:shape="rectangle">
+                <solid android:color="#E6FFFFFF" />
+                <corners android:radius="1dp" />
+                <size android:width="1.6dp" android:height="12dp" />
+            </shape>
+        </rotate>
+    </item>
+
+</layer-list>

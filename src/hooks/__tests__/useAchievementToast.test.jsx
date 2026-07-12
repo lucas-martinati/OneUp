@@ -12,6 +12,7 @@ vi.mock('@config/badgeDefinitions', () => ({
   BADGE_DEFINITIONS: [{ id: 'first_blood', color: '#f00' }],
   BADGE_ICONS: { Star: () => null },
   getBadgeIconFromDef: () => (() => null),
+  getBadgeById: (id) => id === 'first_blood' ? { id: 'first_blood', color: '#f00' } : undefined,
 }));
 vi.mock('@components/feedback/toastRoot', () => ({
   getToastRoot: () => {

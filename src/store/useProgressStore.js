@@ -247,16 +247,14 @@ export const useProgressStore = create((set, get) => ({
   // ── Day-level helpers ───────────────────────────────────────────────
 
   isDayDone: (dateStr) => {
-    const day = get().completions[dateStr];
-    if (!day) return false;
-    return Object.values(day).some(ex => ex?.isCompleted === true);
+    return isDayDoneFromCompletions(get().completions, dateStr);
   },
 
   toggleCompletion: (dateStr, difficulties = {}) => {
     set((state) => {
       const newCompletions = { ...state.completions };
       const day = newCompletions[dateStr] || {};
-      const currentlyDone = Object.values(day).some(ex => ex?.isCompleted);
+      const currentlyDone = isDayDoneFromCompletions(newCompletions, dateStr);
 
       if (currentlyDone) {
         const updated = {};

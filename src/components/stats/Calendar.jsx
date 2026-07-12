@@ -175,16 +175,16 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
             const isBeforeStart = dStr < startDate;
             if (!isFuture && !isBeforeStart) {
                 total++;
-                const day = completions[dStr];
-                if (day && Object.values(day).some(ex => ex?.isCompleted)) completed++;
-                if (!isCustom && day && isPerfectDay(day, exercises)) perfect++;
+                if (getDayStatus(dStr, completions, frozenDays, todayStr) === DAY_STATUS.DONE) completed++;
+                const day = completions[dStr] || {};
+                if (!isCustom && isPerfectDay(day, exercises)) perfect++;
             }
         });
 
         const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
 
         return { days: daysArr, monthCompleted: completed, completionRate: rate, monthPerfect: perfect };
-    }, [year, month, startDate, completions, exercises, isCustom]);
+    }, [year, month, startDate, completions, exercises, isCustom, frozenDays]);
 
     // Slide-in animation for button navigation
     const gridSlideStyle = slideDirection ? {

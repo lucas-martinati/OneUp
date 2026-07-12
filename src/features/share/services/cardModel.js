@@ -1,5 +1,5 @@
 import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
-import { EXERCISES, CARDIO_EXERCISES, getDailyGoal } from '@config/exercises';
+import { EXERCISES, CARDIO_EXERCISES, getDailyGoal, isCardioExercise, isWeightExercise } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { isCustomExercise } from '@utils/exerciseLabel';
 import { sumExerciseReps } from '@utils/stats';
@@ -37,9 +37,8 @@ export function getExerciseDensity(count) {
   return 'compact';
 }
 
-const weightIds = WEIGHT_EXERCISES.map(e => e.id);
-const isWeightEx = (ex) => weightIds.includes(ex.id);
-const isCardioEx = (ex) => CARDIO_EXERCISES.some(c => c.id === ex.id);
+const isWeightEx = (ex) => isWeightExercise(ex.id);
+const isCardioEx = (ex) => isCardioExercise(ex.id);
 
 /**
  * buildCardModel — pure data preparation for the ShareCard.
@@ -88,7 +87,7 @@ export function buildCardModel({
       for (const [exId, exStats] of Object.entries(dayData)) {
         if (exStats?.isCompleted) {
           const knownEx = allKnownExercises.find(e => e.id === exId);
-          if (knownEx && !CARDIO_EXERCISES.some(c => c.id === exId)) {
+          if (knownEx && !isCardioExercise(exId)) {
             const conf = getConfig(exId, targetDate);
             dailyExercises.push({
               ...knownEx,
@@ -152,7 +151,7 @@ export function buildCardModel({
     }
     if (isCustomExercise(ex.id)) return CATEGORIES.CUSTOM;
     // Fallback: if it's not a known bodyweight exercise and sessionType is custom
-    if (!weightIds.includes(ex.id) && sessionType === CATEGORIES.CUSTOM) return CATEGORIES.CUSTOM;
+    if (!isWeightEx(ex) && sessionType === CATEGORIES.CUSTOM) return CATEGORIES.CUSTOM;
     return CATEGORIES.BODYWEIGHT;
   };
 

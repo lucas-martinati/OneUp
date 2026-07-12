@@ -3,6 +3,7 @@ import { useProgressStore } from '@store/useProgressStore';
 import { useSettingsStore } from '@store/useSettingsStore';
 import { useExercises } from '@contexts/ExercisesContext';
 import { useComputedStatsStore } from '@store/useComputedStatsStore';
+import { getSortedCardioSessions } from '@services/cardioService';
 
 /**
  * Invisible component that synchronizes computed stats into the Zustand store.
@@ -32,7 +33,7 @@ export function ComputedStatsSynchronizer() {
     // completions (goal-based, capped per validated week) — this only needs
     // to carry the raw session list through for the weekly streak calculation.
     const cardioData = useMemo(() => ({
-        allSessions: Object.values(cardio?.sessions || {}),
+        allSessions: getSortedCardioSessions(cardio?.sessions),
     }), [cardio]);
 
     // Difficulty helper

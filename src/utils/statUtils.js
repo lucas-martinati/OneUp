@@ -1,6 +1,4 @@
-import { getDailyGoal } from '@config/exercises';
-import { EXERCISES } from '@config/exercises';
-import { WEIGHT_EXERCISES } from '@config/weights';
+import { getDailyGoal, isBodyweightExercise, isWeightExercise } from '@config/exercises';
 
 import { getCurrentWeekNumber } from '@shared/dateUtils';
 
@@ -73,8 +71,8 @@ export function isCaughtUpDay(dayCompletions, dateString) {
 export function isGlobalPerfectDay(dayCompletions, allExercises = []) {
     if (!dayCompletions) return false;
     
-    const standardExercises = allExercises.filter(ex => EXERCISES.some(e => e.id === ex.id));
-    const weightsExercises = allExercises.filter(ex => WEIGHT_EXERCISES.some(e => e.id === ex.id));
+    const standardExercises = allExercises.filter(ex => isBodyweightExercise(ex.id));
+    const weightsExercises = allExercises.filter(ex => isWeightExercise(ex.id));
     
     const isStandardPerfect = standardExercises.length > 0 && standardExercises.every(ex => dayCompletions[ex.id]?.isCompleted);
     const isWeightsPerfect = weightsExercises.length > 0 && weightsExercises.every(ex => dayCompletions[ex.id]?.isCompleted);

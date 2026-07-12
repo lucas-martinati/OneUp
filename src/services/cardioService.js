@@ -41,7 +41,7 @@ export async function loadCardioSessions() {
   const snapshot = await get(ref(database, paths.userCardioSessions(auth.currentUser.uid)));
   if (snapshot.exists()) {
     const data = snapshot.val();
-    const sessions = Object.values(data).sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
+    const sessions = getSortedCardioSessions(data);
     logger.success(`Loaded ${sessions.length} cardio sessions`);
     return sessions;
   }
@@ -58,4 +58,9 @@ export async function deleteCardioSession(sessionId) {
   await remove(ref(database, paths.userCardioSession(auth.currentUser.uid, sessionId)));
   logger.success('Cardio session deleted');
   return true;
+}
+
+export function getSortedCardioSessions(sessionsObj) {
+  if (!sessionsObj) return [];
+  return Object.values(sessionsObj).sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
 }

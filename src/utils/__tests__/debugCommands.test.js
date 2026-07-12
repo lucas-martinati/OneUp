@@ -14,6 +14,11 @@ vi.mock('@config/badgeDefinitions', () => ({
     { id: 'first_blood', category: 'reps', secret: false },
     { id: 'secret_one', category: 'fun', secret: true },
   ],
+  getBadgeById: (id) => {
+    if (id === 'first_blood') return { id: 'first_blood', category: 'reps', secret: false };
+    if (id === 'secret_one') return { id: 'secret_one', category: 'fun', secret: true };
+    return undefined;
+  },
 }));
 const openAchievements = vi.fn();
 vi.mock('@store/useUIStore', () => ({ useUIStore: { getState: () => ({ openAchievements }) } }));
