@@ -28,6 +28,7 @@ export function AppOrchestrator({ computedStats }) {
   const auth = useAuth();
 
   const completions = useProgressStore(s => s.completions);
+  const frozenDays = useProgressStore(s => s.frozenDays);
   const initProgressForUser = useProgressStore(s => s.initForUser);
   const initSettingsForUser = useSettingsStore(s => s.initForUser);
   const initExercisesForUser = useExercisesStore(s => s.initForUser);
@@ -58,8 +59,8 @@ export function AppOrchestrator({ computedStats }) {
 
   // ── Push widget data ───────────────────────────────────────────────
   useEffect(() => {
-    updateWidgetData(computedStats, completions);
-  }, [computedStats, completions]);
+    updateWidgetData(computedStats, completions, frozenDays);
+  }, [computedStats, completions, frozenDays]);
 
   // ── Performance mode & Theme on document root ──────────────────────
   useEffect(() => {

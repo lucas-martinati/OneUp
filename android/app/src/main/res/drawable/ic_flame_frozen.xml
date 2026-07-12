@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Active streak flame (frozen) — icy crystal: sky-blue base → white tips -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Outer flame glow -->
+    <path
+        android:fillColor="#457dd3fc"
+        android:pathData="M12,24c-4.5,0 -8,-3.5 -8,-8c0,-4.5 4,-8.5 5.5,-11.5c0.6,2.3 2.3,4 2.3,4s2.3,-2.8 2.3,-5.7C17.5,6 20,9.5 20,15.5C20,20.5 16.5,24 12,24z" />
+
+    <!-- Main flame: white tips → sky-blue base -->
+    <path
+        android:pathData="M12,23c-3.866,0 -7,-3.134 -7,-7c0,-3.866 3.5,-7.5 5,-10c0.5,2 2,3.5 2,3.5s2,-2.5 2,-5c3,3 5,6 5,11.5C19,19.866 15.866,23 12,23z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="12" android:startY="23"
+                android:endX="12" android:endY="3">
+                <item android:offset="0.0" android:color="#FF38bdf8" />
+                <item android:offset="0.5" android:color="#FF7dd3fc" />
+                <item android:offset="1.0" android:color="#FFf0f9ff" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Inner bright core: icy blue -->
+    <path
+        android:fillColor="#FFbae6fd"
+        android:pathData="M12,23c-2.209,0 -4,-1.791 -4,-4c0,-2.209 2,-4.5 3,-6c0.3,1.2 1,2 1,2s1,-1.5 1,-3c1.5,1.8 3,3.5 3,7C16,21.209 14.209,23 12,23z" />
+
+    <!-- Hot white center -->
+    <path
+        android:fillColor="#B0FFFFFF"
+        android:pathData="M12,23c-1.1,0 -2,-0.9 -2,-2c0,-1.1 1,-2.5 1.5,-3.5c0.15,0.6 0.5,1 0.5,1s0.5,-0.75 0.5,-1.5c0.75,0.9 1.5,1.75 1.5,4C14,22.1 13.1,23 12,23z" />
+</vector>

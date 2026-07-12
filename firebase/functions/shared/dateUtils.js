@@ -74,6 +74,38 @@ function isDayDone(completions, dateStr) {
   return false;
 }
 
+export const DAY_STATUS = {
+  FUTURE: 0,
+  PENDING: 1, // Today, not yet done
+  MISSED: 2,  // Past, not done
+  FROZEN: 3,  // Past, protected by freeze
+  DONE: 4     // At least one exercise done (or perfectly done)
+};
+
+/**
+ * Global helper to resolve a day's visual/logical status.
+ * @param {string} dateStr - The date to check
+ * @param {Object} completions - Raw completions object
+ * @param {Object} frozenDays - Raw frozenDays object
+ * @param {string} todayStr - The current local date string
+ * @returns {number} DAY_STATUS enum
+ */
+export function getDayStatus(dateStr, completions, frozenDays, todayStr) {
+  if (dateStr > todayStr) {
+    return DAY_STATUS.FUTURE;
+  }
+  if (isDayDone(completions, dateStr)) {
+    return DAY_STATUS.DONE;
+  }
+  if (dateStr === todayStr) {
+    return DAY_STATUS.PENDING;
+  }
+  if (frozenDays && frozenDays[dateStr]) {
+    return DAY_STATUS.FROZEN;
+  }
+  return DAY_STATUS.MISSED;
+}
+
 export const MAX_STREAK_WINDOW = 365;
 
 /**

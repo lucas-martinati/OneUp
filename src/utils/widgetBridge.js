@@ -1,5 +1,5 @@
 import i18n from '../i18n';
-import { getLocalDateStr } from '@shared/dateUtils';
+import { getLocalDateStr, getDayStatus, DAY_STATUS } from '@shared/dateUtils';
 import { isAndroidPlatform } from './platform';
 
 /**
@@ -56,9 +56,10 @@ export async function getWidgetBridge() {
 /**
  * Compute the week days status (Mon→Sun) for the current week.
  * @param {Object} completions - { [dateStr]: { [exerciseId]: { isCompleted } } }
- * @returns {boolean[]} Array of 7 booleans [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
+ * @param {Object} frozenDays - { [dateStr]: { consumedAt } }
+ * @returns {number[]} Array of 7 integers (0=PENDING, 1=DONE, 2=FROZEN)
  */
-function getWeekDaysStatus(completions) {
+function getWeekDaysStatus(completions, frozenDays = {}) {
   const today = new Date();
   const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ... 6=Sat
   // Convert to Mon=0, Tue=1, ... Sun=6
@@ -69,11 +70,17 @@ function getWeekDaysStatus(completions) {
     const d = new Date(today);
     d.setDate(d.getDate() - mondayOffset + i);
     const dateStr = getLocalDateStr(d);
-    const dayData = completions[dateStr];
-    const isDone = dayData
-      ? Object.values(dayData).some(ex => ex?.isCompleted)
-      : false;
-    weekDays.push(isDone);
+    
+    const status = getDayStatus(dateStr, completions, frozenDays, getLocalDateStr(today));
+    
+    let state = 0; // PENDING
+    if (status === DAY_STATUS.DONE) {
+      state = 1;
+    } else if (status === DAY_STATUS.FROZEN) {
+      state = 2;
+    }
+    
+    weekDays.push(state);
   }
 
   return weekDays;
@@ -94,8 +101,9 @@ function getTodayIndex() {
  *
  * @param {Object} computedStats - Output of useComputedStats
  * @param {Object} completions - Raw completions data
+ * @param {Object} frozenDays - Frozen days data
  */
-export async function updateWidgetData(computedStats, completions) {
+export async function updateWidgetData(computedStats, completions, frozenDays = {}) {
   // Only run on native Android
   if (!isAndroidPlatform()) return;
 
@@ -112,9 +120,10 @@ export async function updateWidgetData(computedStats, completions) {
         || 0,
       streakActive: !!computedStats.streakActive,
       todayDone: !!computedStats.todayDone,
-      weekDays: getWeekDaysStatus(completions),
+      weekDays: getWeekDaysStatus(completions, frozenDays),
       todayIndex: getTodayIndex(),
       updatedAt: Date.now(),
+      streakFrozen: !!computedStats.streakFrozen,
       // Translations
       streakLabel: i18n.t('widgets.streak'),
       daysLabel: i18n.t('widgets.days'),

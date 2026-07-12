@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Current day (frozen) — glowing icy blue ring -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer icy glow -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#357dd3fc" />
+            <size android:width="28dp" android:height="28dp" />
+        </shape>
+    </item>
+    <!-- Faint inner fill -->
+    <item android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp">
+        <shape android:shape="oval">
+            <solid android:color="#227dd3fc" />
+            <size android:width="24dp" android:height="24dp" />
+        </shape>
+    </item>
+    <!-- Bright icy ring -->
+    <item android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp">
+        <shape android:shape="oval">
+            <stroke android:width="2dp" android:color="#FF7dd3fc" />
+            <solid android:color="#00000000" />
+            <size android:width="24dp" android:height="24dp" />
+        </shape>
+    </item>
+</layer-list>

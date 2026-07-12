@@ -8,7 +8,7 @@ import { getDailyGoal } from '@config/exercises';
 import { getIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { isPerfectDay, calculateRepsForDay, isCaughtUpDay } from '@utils/statUtils';
-import { getCurrentWeekNumber } from '@shared/dateUtils';
+import { getCurrentWeekNumber, getDayStatus, DAY_STATUS } from '@shared/dateUtils';
 import { DifficultyBadge } from '@components/ui/DifficultyBadge';
 import { useProgressStore } from '@store/useProgressStore';
 import styles from '@styles/Calendar.module.css';
@@ -269,18 +269,39 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                         const isFuture = dateString > todayStr;
                         const isBeforeStart = dateString < startDate;
                         const isToday = dateString === todayStr;
-                        const isMuted = isFuture || isBeforeStart;
+
+                        let isMissed = false;
+                        let isFrozen = false;
+                        let isPerfect = false;
+                        let isAnyDone = false;
+                        let isCaughtUp = false;
+                        let isMuted = false;
 
                         const dayCompletions = completions[dateString] || {};
-                        const isPerfect = !isCustom && isPerfectDay(dayCompletions, exercises);
-                        const isAnyDone = !isPerfect && Object.values(dayCompletions).some(ex => ex?.isCompleted);
-                        const isCaughtUp = isCaughtUpDay(dayCompletions, dateString);
-                        // A missed day protected by a Streak Freeze (only shown on the
-                        // global calendar; per-exercise/custom views don't freeze).
-                        const isFrozen = !isCustom && !isAnyDone && !isPerfect && !isCaughtUp
-                            && !!frozenDays?.[dateString] && !isMuted && !isToday;
-                        // Today is never shown as "missed" — it isn't a failure yet.
-                        const isMissed = !isPerfect && !isAnyDone && !isFrozen && !isMuted && !isToday;
+
+                        if (isCustom) {
+                            // Custom routine view (subset of exercises)
+                            isPerfect = isPerfectDay(dayCompletions, exercises);
+                            isAnyDone = !isPerfect && Object.values(dayCompletions).some(ex => ex?.isCompleted);
+                            isMuted = isFuture || isBeforeStart;
+                            isMissed = !isPerfect && !isAnyDone && !isMuted && !isToday;
+                        } else {
+                            // Global stats view
+                            const status = getDayStatus(dateString, completions, frozenDays, todayStr);
+                            if (isBeforeStart && status === DAY_STATUS.MISSED) {
+                                isMuted = true;
+                            } else if (status === DAY_STATUS.FUTURE) {
+                                isMuted = true;
+                            } else if (status === DAY_STATUS.DONE) {
+                                isPerfect = isPerfectDay(dayCompletions, exercises);
+                                isAnyDone = !isPerfect;
+                                isCaughtUp = isCaughtUpDay(dayCompletions, dateString);
+                            } else if (status === DAY_STATUS.FROZEN) {
+                                isFrozen = true;
+                            } else if (status === DAY_STATUS.MISSED) {
+                                isMissed = true;
+                            }
+                        }
                         const completedCount = exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length;
                         const isSelected = selectedDay === dateString;
 

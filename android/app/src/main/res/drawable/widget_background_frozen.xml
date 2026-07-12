@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Frozen widget background — icy dark blue with a frosty sky-blue wash -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Deep icy base -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <gradient
+                android:startColor="#FF060a14"
+                android:centerColor="#FF080c16"
+                android:endColor="#FF050810"
+                android:angle="135" />
+        </shape>
+    </item>
+
+    <!-- Icy wash: faint sky-blue diagonal tint -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <gradient
+                android:startColor="#1a7dd3fc"
+                android:centerColor="#0c38bdf8"
+                android:endColor="#16bae6fd"
+                android:angle="135" />
+        </shape>
+    </item>
+
+    <!-- Soft frost highlight for depth -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <gradient
+                android:startColor="#18FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="270" />
+        </shape>
+    </item>
+
+    <!-- Hairline icy border -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <stroke android:width="1dp" android:color="#307dd3fc" />
+            <solid android:color="#00000000" />
+        </shape>
+    </item>
+
+</layer-list>

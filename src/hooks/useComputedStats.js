@@ -405,10 +405,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         : null;
 
     // Compute stable daily reps data for line chart
-    const globalCompletedDates = Object.keys(completions).filter(dateStr => {
-        const day = completions[dateStr];
-        return day && typeof day === 'object' && Object.values(day).some(exData => exData?.isCompleted);
-    }).sort();
+    const globalCompletedDates = Object.keys(completions).filter(dateStr => isDayDoneFromCompletions(completions, dateStr)).sort();
 
     globalCompletedDates.forEach(dateStr => {
         const day = completions[dateStr] || {};

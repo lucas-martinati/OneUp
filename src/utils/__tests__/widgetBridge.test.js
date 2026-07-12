@@ -53,4 +53,10 @@ describe('updateWidgetData', () => {
     await expect(updateWidgetData(stats, {})).resolves.toBeUndefined();
     console.warn.mockRestore();
   });
+
+  it('includes streakFrozen in the payload', async () => {
+    await updateWidgetData({ ...stats, streakFrozen: true }, {});
+    const payload = JSON.parse(prefSet.mock.calls[0][0].value);
+    expect(payload.streakFrozen).toBe(true);
+  });
 });

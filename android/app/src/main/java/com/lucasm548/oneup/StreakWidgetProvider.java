@@ -131,9 +131,10 @@ public class StreakWidgetProvider extends AppWidgetProvider {
         int streak = 0;
         boolean streakActive = false;
         boolean todayDone = false;
-        boolean[] weekDays = new boolean[7];
+        int[] weekDays = new int[7];
         int storedTodayIndex = -1;
         long updatedAt = 0;
+        boolean streakFrozen = false;
 
         String streakLabel = "STREAK";
         String daysLabel = "DAYS";
@@ -147,6 +148,7 @@ public class StreakWidgetProvider extends AppWidgetProvider {
                 todayDone = data.optBoolean("todayDone", false);
                 storedTodayIndex = data.optInt("todayIndex", -1);
                 updatedAt = data.optLong("updatedAt", 0);
+                streakFrozen = data.optBoolean("streakFrozen", false);
 
                 streakLabel = data.optString("streakLabel", streakLabel);
                 daysLabel = data.optString("daysLabel", daysLabel);
@@ -160,7 +162,7 @@ public class StreakWidgetProvider extends AppWidgetProvider {
                 JSONArray weekArray = data.optJSONArray("weekDays");
                 if (weekArray != null) {
                     for (int i = 0; i < Math.min(weekArray.length(), 7); i++) {
-                        weekDays[i] = weekArray.optBoolean(i, false);
+                        weekDays[i] = weekArray.optInt(i, 0);
                     }
                 }
             } catch (Exception e) {
@@ -203,13 +205,13 @@ public class StreakWidgetProvider extends AppWidgetProvider {
             if (newWeek) {
                 // New week: reset all dots, only keep days already done this new week
                 for (int i = 0; i < 7; i++) {
-                    weekDays[i] = false;
+                    weekDays[i] = 0;
                 }
             } else {
                 // Same week, just moved forward: mark future days (from today onward) as not done
                 // Past days keep their green dots
                 for (int i = storedTodayIndex + 1; i < 7; i++) {
-                    weekDays[i] = false;
+                    weekDays[i] = 0;
                 }
             }
         }
@@ -228,10 +230,10 @@ public class StreakWidgetProvider extends AppWidgetProvider {
             if (minWidth >= 200) {
                 updateLargeWidget(context, appWidgetManager, appWidgetId, pendingIntent,
                     streak, streakActive, todayDone, weekDays, todayIndex,
-                    streakLabel, daysLabel, weekdayLabels);
+                    streakLabel, daysLabel, weekdayLabels, streakFrozen);
             } else {
                 updateSmallWidget(context, appWidgetManager, appWidgetId, pendingIntent,
-                    streak, streakActive, streakLabel);
+                    streak, streakActive, streakLabel, streakFrozen);
             }
         }
     }
@@ -244,7 +246,8 @@ public class StreakWidgetProvider extends AppWidgetProvider {
 
     private void updateSmallWidget(Context context, AppWidgetManager appWidgetManager,
                                     int appWidgetId, PendingIntent pendingIntent,
-                                    int streak, boolean streakActive, String streakLabel) {
+                                    int streak, boolean streakActive, String streakLabel,
+                                    boolean isFrozen) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_streak_small);
 
         views.setTextViewText(R.id.widget_streak_count, String.valueOf(streak));
@@ -252,19 +255,26 @@ public class StreakWidgetProvider extends AppWidgetProvider {
 
         // Sad state when streak is 0: dormant, dim, extinguished-ember look
         boolean isSad = streak == 0;
-        views.setInt(R.id.widget_small_root, "setBackgroundResource",
-            isSad ? R.drawable.widget_background_sad : R.drawable.widget_background);
-        views.setTextColor(R.id.widget_streak_count,
-            isSad ? 0x99b0a596 : 0xFFFFFFFF);
-        views.setTextColor(R.id.widget_streak_label,
-            isSad ? 0x66a3978a : 0x80FFFFFF);
 
-        // Flame icon: sad (frozen) / active (fire) / inactive (gray)
-        if (isSad) {
-            views.setImageViewResource(R.id.widget_flame_icon, R.drawable.ic_flame_sad);
+        if (isFrozen) {
+            views.setInt(R.id.widget_small_root, "setBackgroundResource", R.drawable.widget_background_frozen);
+            views.setTextColor(R.id.widget_streak_count, 0xFFFFFFFF);
+            views.setTextColor(R.id.widget_streak_label, 0x80FFFFFF);
+            views.setImageViewResource(R.id.widget_flame_icon, R.drawable.ic_flame_frozen);
         } else {
-            views.setImageViewResource(R.id.widget_flame_icon,
-                streakActive ? R.drawable.ic_flame : R.drawable.ic_flame_gray);
+            views.setInt(R.id.widget_small_root, "setBackgroundResource",
+                isSad ? R.drawable.widget_background_sad : R.drawable.widget_background);
+            views.setTextColor(R.id.widget_streak_count,
+                isSad ? 0x99b0a596 : 0xFFFFFFFF);
+            views.setTextColor(R.id.widget_streak_label,
+                isSad ? 0x66a3978a : 0x80FFFFFF);
+                
+            if (isSad) {
+                views.setImageViewResource(R.id.widget_flame_icon, R.drawable.ic_flame_sad);
+            } else {
+                views.setImageViewResource(R.id.widget_flame_icon,
+                    streakActive ? R.drawable.ic_flame : R.drawable.ic_flame_gray);
+            }
         }
 
         // Clickable root layout
@@ -276,30 +286,37 @@ public class StreakWidgetProvider extends AppWidgetProvider {
     private void updateLargeWidget(Context context, AppWidgetManager appWidgetManager,
                                     int appWidgetId, PendingIntent pendingIntent,
                                     int streak, boolean streakActive, boolean todayDone,
-                                    boolean[] weekDays, int todayIndex,
-                                    String streakLabel, String daysLabel, String[] weekdayLabels) {
+                                    int[] weekDays, int todayIndex,
+                                    String streakLabel, String daysLabel, String[] weekdayLabels,
+                                    boolean isFrozen) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_streak_large);
 
         // Sad state when streak is 0: dormant, dim, extinguished-ember look
         boolean isSad = streak == 0;
-        views.setInt(R.id.widget_large_root, "setBackgroundResource",
-            isSad ? R.drawable.widget_background_sad : R.drawable.widget_background);
+
+        if (isFrozen) {
+            views.setInt(R.id.widget_large_root, "setBackgroundResource", R.drawable.widget_background_frozen);
+            views.setTextColor(R.id.widget_large_streak_count, 0xFFFFFFFF);
+            views.setTextColor(R.id.widget_large_streak_label, 0x60FFFFFF);
+            views.setImageViewResource(R.id.widget_large_flame_icon, R.drawable.ic_flame_frozen);
+        } else {
+            views.setInt(R.id.widget_large_root, "setBackgroundResource",
+                isSad ? R.drawable.widget_background_sad : R.drawable.widget_background);
+            views.setTextColor(R.id.widget_large_streak_count,
+                isSad ? 0x99b0a596 : 0xFFFFFFFF);
+            views.setTextColor(R.id.widget_large_streak_label,
+                isSad ? 0x66a3978a : 0x60FFFFFF);
+                
+            if (isSad) {
+                views.setImageViewResource(R.id.widget_large_flame_icon, R.drawable.ic_flame_sad);
+            } else {
+                views.setImageViewResource(R.id.widget_large_flame_icon,
+                    streakActive ? R.drawable.ic_flame : R.drawable.ic_flame_gray);
+            }
+        }
 
         views.setTextViewText(R.id.widget_large_streak_count, String.valueOf(streak));
         views.setTextViewText(R.id.widget_large_streak_label, daysLabel);
-
-        views.setTextColor(R.id.widget_large_streak_count,
-            isSad ? 0x99b0a596 : 0xFFFFFFFF);
-        views.setTextColor(R.id.widget_large_streak_label,
-            isSad ? 0x66a3978a : 0x60FFFFFF);
-
-        // Flame icon: sad (frozen) / active (fire) / inactive (gray)
-        if (isSad) {
-            views.setImageViewResource(R.id.widget_large_flame_icon, R.drawable.ic_flame_sad);
-        } else {
-            views.setImageViewResource(R.id.widget_large_flame_icon,
-                streakActive ? R.drawable.ic_flame : R.drawable.ic_flame_gray);
-        }
 
         // Update week day dots and labels
         int[] dotIds = {
@@ -311,7 +328,7 @@ public class StreakWidgetProvider extends AppWidgetProvider {
             R.id.label_thu, R.id.label_fri, R.id.label_sat, R.id.label_sun
         };
 
-        // Label colors mirror the dots: violet done, cyan today, dim default
+        // Label colors: frozen uses icy sky-blue, default uses violet/cyan
         int colorDone = 0xFFa78bfa;
         int colorToday = 0xFF22d3ee;
         int colorDefault = 0x60FFFFFF;
@@ -322,16 +339,21 @@ public class StreakWidgetProvider extends AppWidgetProvider {
         for (int i = 0; i < 7; i++) {
             int drawableRes;
             int labelColor;
-            if (weekDays[i]) {
+            
+            if (weekDays[i] == 1) { // DONE
                 drawableRes = R.drawable.dot_done;
                 labelColor = colorDone;
-            } else if (i == todayIndex) {
+            } else if (weekDays[i] == 2) { // FROZEN
+                drawableRes = R.drawable.dot_done_frozen;
+                labelColor = 0xFF7dd3fc; // sky-blue
+            } else if (i == todayIndex) { // TODAY (pending)
                 drawableRes = R.drawable.dot_today;
                 labelColor = colorToday;
-            } else {
+            } else { // PENDING
                 drawableRes = R.drawable.dot_pending;
                 labelColor = colorDefault;
             }
+            
             views.setImageViewResource(dotIds[i], drawableRes);
             views.setTextColor(labelIds[i], labelColor);
             views.setTextViewText(labelIds[i], weekdayLabels[i]);
