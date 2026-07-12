@@ -9,6 +9,9 @@ const progressState = {
   completions: {},
 };
 const statsState = { stats: { totalReps: 0 } };
+const allEx = [...EXERCISES, ...WEIGHT_EXERCISES];
+const allExMap = allEx.reduce((acc, ex) => { acc[ex.id] = ex; return acc; }, {});
+
 const exCtx = {
   routines: [],
   saveRoutine: vi.fn(),
@@ -19,6 +22,8 @@ const exCtx = {
   customCategories: [],
   exercisesByUserCategory: {},
   defaultCustomExercises: [],
+  allExercises: allEx,
+  allExercisesMap: allExMap,
 };
 const sub = { isPro: true };
 const storage = {

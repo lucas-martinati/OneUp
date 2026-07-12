@@ -9,6 +9,9 @@ vi.mock('@shared/exerciseRules.js', () => ({
         { id: 'running', multiplier: 2.0 },
         // Leaving out cycling to trigger fallback
     ],
+    WEIGHT_EXERCISES: [
+        { id: 'bench_press', multiplier: 2.0 },
+    ],
     getDailyGoal: vi.fn(),
     getWeeklyGoalKm: vi.fn(),
     CARDIO_REPS_PER_KM: { running: 109, cycling: 65 },
