@@ -5,11 +5,7 @@ import { WEIGHT_EXERCISES } from '@config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '@config/badgeDefinitions';
 import { computeAchievementStats } from '@shared/achievementStats.js';
 import { isGlobalPerfectDay } from '@utils/statUtils';
-import { useMemo } from 'react';
-import { useProgressStore } from '@store/useProgressStore';
-import { useExercises } from '@contexts/ExercisesContext';
-import { useExerciseConfig } from '@hooks/useExerciseConfig';
-import { useComputedStatsStore } from '@store/useComputedStatsStore';
+
 /**
  * Pure function that computes all stats in a single pass.
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
@@ -513,35 +509,3 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     };
 }
 
-export function useComputedStats() {
-    const { 
-        completions, 
-        settings, 
-        getDayNumber, 
-        hasShared, 
-        achievements, 
-        userStartDateStr,
-        frozenDays 
-    } = useProgressStore();
-    const { allExercises, allExercisesMap } = useExercises();
-    const { getConfig } = useExerciseConfig();
-    const cardioReps = useComputedStatsStore(s => s.cardioReps);
-
-    const stats = useMemo(() => {
-        return computeAllStats(
-            completions, 
-            settings, 
-            getDayNumber, 
-            allExercises,
-            hasShared, 
-            achievements, 
-            getConfig, 
-            cardioReps,
-            userStartDateStr,
-            frozenDays,
-            allExercisesMap
-        );
-    }, [completions, settings, getDayNumber, allExercises, allExercisesMap, hasShared, achievements, getConfig, cardioReps, userStartDateStr, frozenDays]);
-
-    return stats;
-}

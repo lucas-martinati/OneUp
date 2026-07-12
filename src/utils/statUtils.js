@@ -34,6 +34,14 @@ export function calculateRepsForDay(dayCompletions, dayNumber, exercises, getCon
  */
 export function isPerfectDay(dayCompletions, exercises = []) {
     if (!dayCompletions || exercises.length === 0) return false;
+    
+    // Quick bailout: if they haven't completed enough exercises, it can't be perfect
+    let completedCount = 0;
+    for (const key in dayCompletions) {
+        if (dayCompletions[key]?.isCompleted) completedCount++;
+    }
+    if (completedCount < exercises.length) return false;
+
     return exercises.every(ex => dayCompletions[ex.id]?.isCompleted);
 }
 
@@ -70,12 +78,31 @@ export function isCaughtUpDay(dayCompletions, dateString) {
  */
 export function isGlobalPerfectDay(dayCompletions, allExercises = []) {
     if (!dayCompletions) return false;
+
+    let completedIds = 0;
+    for (const key in dayCompletions) {
+        if (dayCompletions[key]?.isCompleted) completedIds++;
+    }
+    if (completedIds === 0) return false;
     
-    const standardExercises = allExercises.filter(ex => isBodyweightExercise(ex.id));
-    const weightsExercises = allExercises.filter(ex => isWeightExercise(ex.id));
+    let standardTotal = 0;
+    let weightsTotal = 0;
+    let standardCompleted = 0;
+    let weightsCompleted = 0;
+
+    for (let i = 0; i < allExercises.length; i++) {
+        const exId = allExercises[i].id;
+        if (isBodyweightExercise(exId)) {
+            standardTotal++;
+            if (dayCompletions[exId]?.isCompleted) standardCompleted++;
+        } else if (isWeightExercise(exId)) {
+            weightsTotal++;
+            if (dayCompletions[exId]?.isCompleted) weightsCompleted++;
+        }
+    }
     
-    const isStandardPerfect = standardExercises.length > 0 && standardExercises.every(ex => dayCompletions[ex.id]?.isCompleted);
-    const isWeightsPerfect = weightsExercises.length > 0 && weightsExercises.every(ex => dayCompletions[ex.id]?.isCompleted);
+    const isStandardPerfect = standardTotal > 0 && standardCompleted === standardTotal;
+    const isWeightsPerfect = weightsTotal > 0 && weightsCompleted === weightsTotal;
     
     return isStandardPerfect || isWeightsPerfect;
 }

@@ -6,7 +6,7 @@ import { Z_INDEX } from '@utils/zIndex';
 import { DifficultyBadge } from '@components/ui/DifficultyBadge';
 import { StreakFlame } from '@components/ui/StreakFlame';
 import { WeightBadge } from '@components/ui/WeightBadge';
-import { EXERCISES, CARDIO_EXERCISES } from '@config/exercises';
+import { EXERCISES, CARDIO_EXERCISES, isBodyweightExercise, isCardioExercise, isWeightExercise } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { getLocalDateStr } from '@shared/dateUtils';
 import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '@utils/entitlements';
@@ -66,20 +66,29 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
     // Server-computed derived stats from the user's public profile.
     const stats = details?.derivedStats || {};
 
+    const maxReps = React.useMemo(() => {
+        let max = 1;
+        if (!entry.exerciseReps) return 1;
+        for (const [key, val] of Object.entries(entry.exerciseReps)) {
+            if (isBodyweightExercise(key) || isWeightExercise(key)) {
+                if (val > max) max = val;
+            }
+        }
+        return max;
+    }, [entry.exerciseReps]);
+
     const renderExerciseRow = (ex) => {
         const ExIcon = getIcon(ex.icon);
         const reps = entry.exerciseReps?.[ex.id] || 0;
-        const allList = [...EXERCISES, ...WEIGHT_EXERCISES];
-        const maxReps = Math.max(...allList.map(e => entry.exerciseReps?.[e.id] || 0), 1);
         const barWidth = (reps / maxReps) * 100;
         // Cardio is validated per WEEK, not per day (see useCardio.js): each
         // "day" flagged isCompleted for running/cycling actually represents
         // one validated week, so exerciseDays already counts weeks here — it
         // just needs the right unit label.
-        const isCardioEx = !!CARDIO_EXERCISES.find(c => c.id === ex.id);
+        const isCardioEx = isCardioExercise(ex.id);
         const exDays = loadingDetails ? null : (stats.exerciseDays?.[ex.id] || 0);
         const weight = details?.exerciseWeights?.[ex.id] || ex.defaultWeight;
-        const isWeightEx = !!WEIGHT_EXERCISES.find(e => e.id === ex.id);
+        const isWeightEx = isWeightExercise(ex.id);
         return (
             <div key={ex.id} style={{
                 display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px',

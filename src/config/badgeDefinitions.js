@@ -92,6 +92,6 @@ export function isBadgeUnlocked(badgeId, stats, achievements = {}) {
   if (val === true || val === 'true') return true;
   if (val === false || val === 'false') return false;
   
-  const def = BADGE_RULES.find(b => b.id === badgeId);
+  const def = getBadgeById(badgeId);
   return def ? def.test(stats) : false;
 }
