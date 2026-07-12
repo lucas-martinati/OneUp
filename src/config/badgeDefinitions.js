@@ -30,7 +30,6 @@ const METADATA = [
   { id: 'fifty_sessions',        icon: 'Award', color: '#14b8a6', category: 'quantite' },
   { id: 'hundred_sessions',      icon: 'Crown', color: '#f472b6', category: 'quantite' },
   { id: 'two_hundred_sessions',  icon: 'Star',  color: '#fb923c', category: 'quantite' },
-  { id: 'five_hundred_sessions', icon: 'Gem',   color: '#a855f7', category: 'quantite' },
   { id: 'all_exercises',         icon: 'Target',color: '#8b5cf6', category: 'quantite' },
 
   // ── Volume ─────────────────────────────────────────────────────────

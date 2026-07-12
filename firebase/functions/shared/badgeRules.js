@@ -29,7 +29,6 @@ export const BADGE_RULES = [
   { id: 'fifty_sessions',       test: s => s.totalDays >= 50 },
   { id: 'hundred_sessions',     test: s => s.totalDays >= 100 },
   { id: 'two_hundred_sessions', test: s => s.totalDays >= 200 },
-  { id: 'five_hundred_sessions',test: s => s.totalDays >= 500 },
   { id: 'all_exercises',        test: s => s.hasCompletedAllExercisesOnce },
 
   // ── Volume ─────────────────────────────────────────────────────────

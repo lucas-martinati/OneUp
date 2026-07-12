@@ -8,7 +8,7 @@ const PROGRESS_META = {
     month_warrior: ['maxStreak', 30], two_months: ['maxStreak', 60], quarter_year: ['maxStreak', 90],
     half_year: ['maxStreak', 180], year_beast: ['maxStreak', 365],
     ten_sessions: ['totalDays', 10], fifty_sessions: ['totalDays', 50], hundred_sessions: ['totalDays', 100],
-    two_hundred_sessions: ['totalDays', 200], five_hundred_sessions: ['totalDays', 500],
+    two_hundred_sessions: ['totalDays', 200],
     rep_500: ['totalRepsAll', 500], rep_1000: ['totalRepsAll', 1000], rep_5000: ['totalRepsAll', 5000],
     rep_10000: ['totalRepsAll', 10000], rep_50000: ['totalRepsAll', 50000],
     perfect_one: ['perfectDays', 1], perfect_five: ['perfectDays', 5], perfect_fifty: ['perfectDays', 50], perfect_hundred: ['perfectDays', 100],

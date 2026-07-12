@@ -78,7 +78,6 @@ describe('isBadgeUnlocked — quantity (totalDays) thresholds', () => {
     ['fifty_sessions', 50],
     ['hundred_sessions', 100],
     ['two_hundred_sessions', 200],
-    ['five_hundred_sessions', 500],
   ])('%s unlocks exactly at totalDays %i', (id, threshold) => {
     expect(test(id, { ...zeroStats(), totalDays: threshold - 1 })).toBe(false);
     expect(test(id, { ...zeroStats(), totalDays: threshold })).toBe(true);
@@ -181,7 +180,7 @@ describe('isBadgeUnlocked — secret badges', () => {
 
 describe('BADGE_DEFINITIONS — catalog integrity', () => {
   it('exposes a non-trivial set of badges with unique ids', () => {
-    expect(BADGE_DEFINITIONS.length).toBeGreaterThanOrEqual(40);
+    expect(BADGE_DEFINITIONS.length).toBeGreaterThanOrEqual(39);
     const ids = BADGE_DEFINITIONS.map(b => b.id);
     expect(new Set(ids).size).toBe(ids.length);
   });

@@ -33,27 +33,27 @@ afterEach(() => cleanup()); // no global auto-cleanup configured → unmount bet
 describe('Achievements', () => {
   it('renders the unlocked count from buildBadges', () => {
     const expectedUnlocked = buildBadges(BADGE_INPUT).filter(b => b.unlocked).length;
-    const { container } = renderPanel();
+    const { baseElement } = renderPanel();
     // hero shows the unlocked count
-    expect(container.textContent).toContain(String(expectedUnlocked));
+    expect(baseElement.textContent).toContain(String(expectedUnlocked));
     // at least one badge tile rendered
-    expect(container.querySelectorAll('[data-badge-id]').length).toBeGreaterThan(0);
+    expect(baseElement.querySelectorAll('[data-badge-id]').length).toBeGreaterThan(0);
   });
 
   it('filters to unlocked-only badges', () => {
-    const { getByRole, container } = renderPanel();
-    const totalBadges = container.querySelectorAll('[data-badge-id]').length;
+    const { getByRole, baseElement } = renderPanel();
+    const totalBadges = baseElement.querySelectorAll('[data-badge-id]').length;
     fireEvent.click(getByRole('button', { name: 'achievements.filterUnlocked' }));
-    const shown = container.querySelectorAll('[data-badge-id]').length;
+    const shown = baseElement.querySelectorAll('[data-badge-id]').length;
     const unlocked = buildBadges(BADGE_INPUT).filter(b => b.unlocked).length;
     expect(shown).toBe(unlocked);
     expect(shown).toBeLessThanOrEqual(totalBadges);
   });
 
   it('filters to locked-only badges', () => {
-    const { getByRole, container } = renderPanel();
+    const { getByRole, baseElement } = renderPanel();
     fireEvent.click(getByRole('button', { name: 'achievements.filterLocked' }));
-    const ids = [...container.querySelectorAll('[data-badge-id]')].map(e => e.getAttribute('data-badge-id'));
+    const ids = [...baseElement.querySelectorAll('[data-badge-id]')].map(e => e.getAttribute('data-badge-id'));
     const lockedIds = buildBadges(BADGE_INPUT).filter(b => !b.unlocked).map(b => b.id);
     expect(ids.every(id => lockedIds.includes(id))).toBe(true);
   });
@@ -65,43 +65,43 @@ describe('Achievements', () => {
   });
 
   it('filters to a single category via its chip and toggles back', () => {
-    const { container, getAllByRole } = renderPanel();
+    const { baseElement, getAllByRole } = renderPanel();
     const badges = buildBadges(BADGE_INPUT);
     const firstCat = badges[0].category;
     const catCount = badges.filter(b => b.category === firstCat).length;
     const chip = getAllByRole('button', { name: /achievements\.categories\./ })[0];
     fireEvent.click(chip);
-    const shown = container.querySelectorAll('[data-badge-id]').length;
+    const shown = baseElement.querySelectorAll('[data-badge-id]').length;
     expect(shown).toBeLessThan(badges.length);
     // Toggling the same chip again restores the full grid
     fireEvent.click(chip);
-    expect(container.querySelectorAll('[data-badge-id]').length).toBe(badges.length);
+    expect(baseElement.querySelectorAll('[data-badge-id]').length).toBe(badges.length);
     expect(catCount).toBeGreaterThan(0);
   });
 
   it('highlights the deep-linked badge', () => {
     const firstId = buildBadges(BADGE_INPUT)[0].id;
-    const { container } = renderPanel({ highlightedBadgeId: firstId });
-    const el = container.querySelector(`[data-badge-id="${firstId}"]`);
+    const { baseElement } = renderPanel({ highlightedBadgeId: firstId });
+    const el = baseElement.querySelector(`[data-badge-id="${firstId}"]`);
     expect(el).toBeTruthy();
     // highlighted tiles get a 2px colored border
     expect(el.style.border).toContain('2px');
   });
 
   it('hides fully unlocked categories under the locked filter', () => {
-    const { container, getByRole } = renderPanel();
+    const { baseElement, getByRole } = renderPanel();
     // Visible while showing everything…
-    expect(container.textContent).toContain('achievements.categories.perfection');
+    expect(baseElement.textContent).toContain('achievements.categories.perfection');
     fireEvent.click(getByRole('button', { name: 'achievements.filterLocked' }));
     // …gone (chip and section) once only locked badges are listed
-    expect(container.textContent).not.toContain('achievements.categories.perfection');
+    expect(baseElement.textContent).not.toContain('achievements.categories.perfection');
   });
 
   it('renders category section headers with counts', () => {
-    const { container } = renderPanel();
-    const grids = container.querySelectorAll('[data-badge-id]');
+    const { baseElement } = renderPanel();
+    const grids = baseElement.querySelectorAll('[data-badge-id]');
     // Each tile lives under a category grid; smoke-check a known category badge exists
-    const within0 = within(container);
+    const within0 = within(baseElement);
     expect(within0.getByText('achievements.badgesUnlocked')).toBeTruthy();
     expect(grids.length).toBeGreaterThan(3);
   });
