@@ -14,6 +14,7 @@ import { PWAReloadHandler } from'@components/core/PWAReloadHandler';
 import { useHardwareBack } from '@hooks/useHardwareBack';
 import { useCloudSyncOrchestration } from '@hooks/useCloudSyncOrchestration';
 import { useStreakFreeze } from '@hooks/useStreakFreeze';
+import { useTimezoneTracker } from '@hooks/useTimezoneTracker';
 // Only install debug utilities in development builds
 if (import.meta.env.DEV) {
   import('@utils/debugCommands').then(({ installDebugCommands }) => installDebugCommands());
@@ -53,6 +54,9 @@ function AppContent() {
 
   // Streak Freeze: monthly refill + auto-protect the streak across missed days.
   const { StreakFreezeToast } = useStreakFreeze();
+
+  // Track timezone changes
+  useTimezoneTracker();
 
   // Reset theme if Pro is lost
   useEffect(() => {

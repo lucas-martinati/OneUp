@@ -12,7 +12,7 @@ export function getDefaultState() {
     cardio: {},
     // Streak Freeze: days protected from breaking the streak, + the freeze
     // inventory. `lastRefill: null` makes the first reconcile grant the starter
-    // allotment. See src/config/streakFreeze.js.
+    // allotment. See @shared/streakFreeze.js.
     frozenDays: {},
     streakFreezes: { count: 0, lastRefill: null },
   };

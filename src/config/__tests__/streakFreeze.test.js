@@ -5,9 +5,10 @@ import {
     monthKey,
     applyMonthlyRefill,
     reconcileStreakFreezeState,
-} from '@config/streakFreeze';
-import { walkStreak, normalizeFrozenDays } from '@shared/streakFreeze.js';
-import { calculateStreak } from '@utils/dateUtils';
+    walkStreak,
+    normalizeFrozenDays
+} from '@shared/streakFreeze.js';
+import { calculateStreak, isDayDoneFromCompletions } from '@utils/dateUtils';
 
 const START = '2026-01-01';
 const done = () => ({ pushups: { isCompleted: true } });
@@ -66,10 +67,14 @@ describe('applyMonthlyRefill', () => {
 
 describe('reconcileStreakFreezeState — auto-freeze', () => {
     const base = { startDate: START, isPro: false, todayStr: '2026-06-23' };
+    const testReconcile = (args) => reconcileStreakFreezeState({
+        ...args,
+        isDayDone: (ds) => isDayDoneFromCompletions(args.completions || {}, ds)
+    });
 
     it('freezes a single missed day when a freeze is available', () => {
         const completions = { '2026-06-21': done() }; // 06-22 missed, 06-23 today
-        const r = reconcileStreakFreezeState({
+        const r = testReconcile({
             ...base, completions,
             frozenDays: {}, streakFreezes: { count: 1, lastRefill: '2026-06' },
         });
@@ -83,7 +88,7 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
         // Passive 2-day absence with a single freeze: protect the FIRST missed day
         // (06-21), then break the streak on the second (06-22, left unfrozen).
         const completions = { '2026-06-20': done() }; // 06-21 & 06-22 both missed
-        const r = reconcileStreakFreezeState({
+        const r = testReconcile({
             ...base, completions,
             frozenDays: {}, streakFreezes: { count: 1, lastRefill: '2026-06' },
         });
@@ -96,7 +101,7 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
 
     it('bridges a 2-day gap when enough freezes are stocked', () => {
         const completions = { '2026-06-20': done() };
-        const r = reconcileStreakFreezeState({
+        const r = testReconcile({
             ...base, completions,
             frozenDays: {}, streakFreezes: { count: 2, lastRefill: '2026-06' },
         });
@@ -105,7 +110,7 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
     });
 
     it('does nothing when there is no prior streak to protect', () => {
-        const r = reconcileStreakFreezeState({
+        const r = testReconcile({
             ...base, completions: {},
             frozenDays: {}, streakFreezes: { count: 2, lastRefill: '2026-06' },
         });
@@ -114,7 +119,7 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
 
     it('does nothing when yesterday is already done', () => {
         const completions = { '2026-06-22': done() };
-        const r = reconcileStreakFreezeState({
+        const r = testReconcile({
             ...base, completions,
             frozenDays: {}, streakFreezes: { count: 1, lastRefill: '2026-06' },
         });
@@ -123,7 +128,7 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
     });
 
     it('never freezes days before the challenge start', () => {
-        const r = reconcileStreakFreezeState({
+        const r = testReconcile({
             ...base, startDate: '2026-06-22', completions: {},
             frozenDays: {}, streakFreezes: { count: 2, lastRefill: '2026-06' },
         });
@@ -131,7 +136,7 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
     });
 
     it('prunes frozen days older than the streak window', () => {
-        const r = reconcileStreakFreezeState({
+        const r = testReconcile({
             ...base,
             completions: {},
             // 2024-01-01 is well over 365 days before 2026-06-23; 2026-06-01 is recent.
@@ -145,7 +150,7 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
 
     it('combines a monthly refill with an auto-freeze', () => {
         const completions = { '2026-06-21': done() };
-        const r = reconcileStreakFreezeState({
+        const r = testReconcile({
             ...base, completions,
             frozenDays: {}, streakFreezes: { count: 1, lastRefill: '2026-05' },
         });
@@ -160,7 +165,7 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
         // Pro user, streak up to 05-29, then 05-30 & 05-31 missed with an EMPTY
         // stock. Opening on 06-01 must NOT let the June refill bridge May's misses.
         const completions = { '2026-05-29': done() };
-        const r = reconcileStreakFreezeState({
+        const r = testReconcile({
             ...base, isPro: true, todayStr: '2026-06-01',
             completions, frozenDays: {},
             streakFreezes: { count: 0, lastRefill: '2026-05' },
@@ -176,7 +181,7 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
         // Same boundary but the user held 1 freeze in May: it protects the FIRST
         // missed day (05-30), the second breaks the streak, THEN June tops up.
         const completions = { '2026-05-29': done() };
-        const r = reconcileStreakFreezeState({
+        const r = testReconcile({
             ...base, isPro: true, todayStr: '2026-06-01',
             completions, frozenDays: {},
             streakFreezes: { count: 1, lastRefill: '2026-05' },
@@ -189,7 +194,7 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
     it('bridges a full multi-day passive gap when the stock covers it (Pro)', () => {
         // Pro absent 3 days with 3 freezes: every missed day is protected in order.
         const completions = { '2026-06-19': done() };
-        const r = reconcileStreakFreezeState({
+        const r = testReconcile({
             ...base, isPro: true,
             completions, frozenDays: {},
             streakFreezes: { count: 3, lastRefill: '2026-06' },

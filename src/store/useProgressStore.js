@@ -3,8 +3,8 @@ import { Preferences } from '@capacitor/preferences';
 import { serverTimestamp } from '@utils/firebaseTimestamp';
 import { EXERCISES, getDailyGoal } from '@config/exercises';
 import { createLogger } from '@utils/logger';
-import { getLocalDateStr, parseLocalDate } from '@utils/dateUtils';
-import { reconcileStreakFreezeState } from '@config/streakFreeze';
+import { getLocalDateStr, parseLocalDate, isDayDoneFromCompletions } from '@utils/dateUtils';
+import { reconcileStreakFreezeState } from '@shared/streakFreeze.js';
 import { STORAGE_KEY_BASE, getDefaultState, parseProgressData, validateProgressData } from '@hooks/useProgressStorage';
 import { cloudSync } from '@services/cloudSync';
 
@@ -290,6 +290,7 @@ export const useProgressStore = create((set, get) => ({
       startDate: state.startDate,
       isPro,
       todayStr: getLocalDateStr(new Date()),
+      isDayDone: (ds) => isDayDoneFromCompletions(state.completions, ds),
     });
     if (!result.changed) return [];
     set({

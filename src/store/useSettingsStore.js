@@ -13,6 +13,7 @@ const defaultSettings = {
   performanceMode: 'high',
   exerciseDifficulties: {},
   keepScreenOn: true,
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
 };
 
 /** Keys that were stored in older versions and should be stripped on load */

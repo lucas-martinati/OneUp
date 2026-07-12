@@ -1,11 +1,12 @@
 import { onRequest } from "firebase-functions/v2/https";
 import { onValueWritten } from "firebase-functions/v2/database";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 import functionsV1 from "firebase-functions/v1";
 import admin from "firebase-admin";
 import crypto from "crypto";
 import { BADGE_RULES, isBadgeUnlocked } from "./shared/badgeRules.js";
 import { DB_SCHEMA, LEAF, paths } from "./shared/dbSchema.js";
-import { walkStreak, normalizeFrozenDays } from "./shared/streakFreeze.js";
+import { walkStreak, normalizeFrozenDays, reconcileStreakFreezeState } from "./shared/streakFreeze.js";
 import { computeAchievementStats } from "./shared/achievementStats.js";
 
 // Initialize Firebase Admin SDK using Default Compute Service Account
@@ -1153,4 +1154,92 @@ export const googleHealthRefreshToken = onRequest(GOOGLE_HEALTH_SECRETS_CONFIG, 
     grant_type: "refresh_token",
     refresh_token: refreshToken,
   }, "Token refresh");
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Scheduled Jobs
+// ══════════════════════════════════════════════════════════════════════════════
+
+export const autoReconcileStreakFreezes = onSchedule("every hour", async (event) => {
+  const usersSnap = await db.ref(paths.users()).once('value');
+  const users = usersSnap.val() || {};
+
+  const serverNow = new Date();
+  const pad = n => String(n).padStart(2, '0');
+
+  const updates = {};
+  let usersProcessed = 0;
+
+  for (const [uid, user] of Object.entries(users)) {
+    try {
+      const progress = user.progress;
+      if (!progress || !progress.isSetup) continue;
+
+      const userTimezone = user.settings?.timezone || 'UTC';
+      let userTodayStr;
+      try {
+        userTodayStr = new Intl.DateTimeFormat('en-CA', { timeZone: userTimezone }).format(serverNow);
+      } catch (e) {
+        userTodayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'UTC' }).format(serverNow);
+      }
+
+      const isPro = !!user.purchase?.isPro;
+      const isSupporter = !!user.purchase?.isSupporter;
+
+      const getWeekBounds = (date) => {
+        const d = new Date(date);
+        const day = d.getUTCDay();
+        const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
+        const start = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), diff));
+        return start;
+      };
+
+      const isDayDone = (dateStr) => {
+        const dayData = progress.completions?.[dateStr];
+        if (dayData && typeof dayData === 'object' && Object.values(dayData).some(e => e?.isCompleted)) {
+          return true;
+        }
+        
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const current = new Date(Date.UTC(y, m - 1, d));
+        const monday = getWeekBounds(current);
+        
+        let loop = new Date(monday);
+        while (loop <= current) {
+          const dStr = `${loop.getUTCFullYear()}-${pad(loop.getUTCMonth() + 1)}-${pad(loop.getUTCDate())}`;
+          const dData = progress.completions?.[dStr];
+          if (dData && (dData.running?.isCompleted || dData.cycling?.isCompleted)) {
+            return true;
+          }
+          loop.setUTCDate(loop.getUTCDate() + 1);
+        }
+        return false;
+      };
+
+      const result = reconcileStreakFreezeState({
+        completions: progress.completions || {},
+        frozenDays: progress.frozenDays || {},
+        streakFreezes: progress.streakFreezes || {},
+        startDate: progress.startDate,
+        isPro: isPro || isSupporter,
+        todayStr: userTodayStr,
+        isDayDone
+      });
+
+      if (result.changed) {
+        updates[`${paths.userProgress(uid)}/frozenDays`] = result.frozenDays;
+        updates[`${paths.userProgress(uid)}/streakFreezes`] = result.streakFreezes;
+        usersProcessed++;
+      }
+    } catch (err) {
+      console.error(`[autoReconcileStreakFreezes] Failed to process user ${uid}:`, err);
+    }
+  }
+
+  if (Object.keys(updates).length > 0) {
+    await db.ref().update(updates);
+    console.log(`[autoReconcileStreakFreezes] Successfully reconciled freezes for ${usersProcessed} users.`);
+  } else {
+    console.log(`[autoReconcileStreakFreezes] No users needed streak freeze reconciliation.`);
+  }
 });

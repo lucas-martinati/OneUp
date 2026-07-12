@@ -8,7 +8,7 @@ import { useUIStore } from '@store/useUIStore';
 import { useProgressStore } from '@store/useProgressStore';
 import { useSubscription } from '@contexts/SubscriptionContext';
 import { useAuth } from '@contexts/AuthContext';
-import { STREAK_FREEZE_LIMITS, getFreezeLimits } from '@config/streakFreeze';
+import { STREAK_FREEZE_LIMITS, getFreezeLimits } from '@shared/streakFreeze';
 
 const FREEZE_COLOR = '#38bdf8';
 
