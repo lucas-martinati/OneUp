@@ -1,5 +1,4 @@
-import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions } from '@shared/dateUtils';
-import { walkStreak } from '@shared/streakFreeze.js';
+import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions, walkStreak } from '@shared/dateUtils';
 import { EXERCISES, getDailyGoal, getWeeklyGoalKm, CARDIO_REPS_PER_KM } from '@config/exercises';
 import { evaluateCardioWeek } from '@utils/cardioStreak';
 import { WEIGHT_EXERCISES } from '@config/weights';

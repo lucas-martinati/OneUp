@@ -6,8 +6,8 @@ import admin from "firebase-admin";
 import crypto from "crypto";
 import { BADGE_RULES, isBadgeUnlocked } from "./shared/badgeRules.js";
 import { DB_SCHEMA, LEAF, paths } from "./shared/dbSchema.js";
-import { walkStreak, normalizeFrozenDays, reconcileStreakFreezeState, isDayDone } from "./shared/streakFreeze.js";
-import { MAX_STREAK_WINDOW } from "./dateUtils.js";
+import { normalizeFrozenDays, reconcileStreakFreezeState } from "./shared/streakFreeze.js";
+import { walkStreak, isDayDone, MAX_STREAK_WINDOW } from "./shared/dateUtils.js";
 import { computeAchievementStats } from "./shared/achievementStats.js";
 
 // Initialize Firebase Admin SDK using Default Compute Service Account

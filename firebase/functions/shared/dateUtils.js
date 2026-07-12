@@ -4,7 +4,34 @@
  * This file is executed by both the Cloud Functions backend and the React frontend.
  */
 
-import { walkStreak } from './streakFreeze.js';
+/**
+ * Walk consecutive days backward from an anchor, counting a current streak that
+ * frozen days keep alive without incrementing. Stops at the first genuinely
+ * missed (not done, not frozen) day.
+ *
+ * The date arithmetic is delegated to the caller so this stays agnostic of the
+ * local-vs-UTC date conventions used on each side.
+ *
+ * @param {(offset:number)=>string} dateAt   - returns the YYYY-MM-DD string `offset` days before the anchor (offset 0 = the anchor itself)
+ * @param {(dateStr:string)=>boolean} isDone - whether a day counts as completed
+ * @param {(dateStr:string)=>boolean} isFrozen - whether a day is protected by a freeze
+ * @param {number} [windowDays=365]           - how many days back to scan
+ * @returns {number}
+ */
+export function walkStreak(dateAt, isDone, isFrozen, windowDays = MAX_STREAK_WINDOW) {
+  let streak = 0;
+  for (let i = 0; i < windowDays; i++) {
+    const dateStr = dateAt(i);
+    if (isDone(dateStr)) {
+      streak++;
+    } else if (isFrozen(dateStr)) {
+      continue; // protected — neither breaks nor counts toward the streak
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
 
 export function shiftDateStr(dateStr, deltaDays) {
   const [y, m, d] = dateStr.split('-').map(Number);
