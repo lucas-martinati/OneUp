@@ -52,6 +52,13 @@ export function useToastGestures({ onClose, onTap, duration = 5000 }) {
         startX.current = e.clientX;
         setAnimate(false);
         e.currentTarget.setPointerCapture?.(e.pointerId);
+        // A tap that hides the toast (e.g. onTap unmounts it) still queues a
+        // delayed compatibility "click" at the same screen coordinates; by
+        // then the toast is gone from the DOM and the click falls through to
+        // whatever is now underneath. Suppressing it here (touch/pen only —
+        // mice have no compatibility click to begin with) keeps taps local
+        // to the toast.
+        if (e.pointerType !== 'mouse' && e.cancelable) e.preventDefault();
     };
 
     const onPointerMove = (e) => {

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Award, Lock, X } from '@utils/icons';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { IconButton } from '@components/ui';
 import { SegmentedControl } from '@components/ui/SegmentedControl';
+import { Z_INDEX } from '@utils/zIndex';
 import { buildBadges } from './buildBadges';
 
 const CATEGORY_COLORS = {
@@ -252,8 +254,8 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
     const R = 40;
     const C = 2 * Math.PI * R;
 
-    return (
-        <div className="fade-in modal-overlay" style={{ zIndex: 200 }}>
+    return createPortal(
+        <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.ACHIEVEMENTS }}>
             <div ref={contentRef} className="modal-content">
 
                 {/* ── Header ─────────────────────────────────────────────── */}
@@ -400,6 +402,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                     );
                 })}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
