@@ -28,7 +28,7 @@ vi.mock('../../i18n', () => ({
   }
 }));
 
-import { getLocalDateStr } from '@utils/dateUtils';
+import { getLocalDateStr } from '@shared/dateUtils';
 import { useNotificationManager } from '../useNotificationManager';
 
 describe('useNotificationManager', () => {

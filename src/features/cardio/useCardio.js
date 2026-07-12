@@ -5,7 +5,7 @@ import { useAuth } from '@contexts/AuthContext';
 import { useProgressStore } from '@store/useProgressStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
-import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '@utils/dateUtils';
+import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '@shared/dateUtils';
 import { getWeeklyGoalKm, CARDIO_REPS_PER_KM } from '@config/exercises';
 import { evaluateCardioWeek } from '@utils/cardioStreak';
 

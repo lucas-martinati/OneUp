@@ -1,4 +1,4 @@
-import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from './dateUtils';
+import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '@shared/dateUtils';
 import { getWeeklyGoalKm } from '@config/exercises';
 
 /**

@@ -1,5 +1,5 @@
 import i18n from '../i18n';
-import { getLocalDateStr } from './dateUtils';
+import { getLocalDateStr } from '@shared/dateUtils';
 import { isAndroidPlatform } from './platform';
 
 /**

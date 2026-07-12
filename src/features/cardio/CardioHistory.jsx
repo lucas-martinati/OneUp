@@ -6,7 +6,7 @@ import { IconButton } from'@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { CardioMap } from './CardioMap';
 import { CardioFullscreenMap } from './CardioFullscreenMap';
-import { parseTimestamp } from '@utils/dateUtils';
+import { parseTimestamp } from '@shared/dateUtils';
 
 
 function formatDuration(seconds) {

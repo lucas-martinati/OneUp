@@ -3,6 +3,7 @@
     ".read": "auth != null && auth.uid === 'bAI8hvjR5TdIu0hDEDh4uP2MyCh1'",
     ".write": "auth != null && auth.uid === 'bAI8hvjR5TdIu0hDEDh4uP2MyCh1'",
     "users": {
+      ".indexOn": ["settings/timezone"],
       "$uid": {
         ".read": "$uid === auth.uid",
         "progress": {

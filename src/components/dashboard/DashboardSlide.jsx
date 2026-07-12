@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Settings, Star, FolderPlus } from '@utils/icons';
 import { UI_ICONS, DynamicIcon } from '@utils/icons';
 import { getDailyGoal } from '@config/exercises';
-import { formatTime, parseTimestamp } from '@utils/dateUtils';
+import { parseTimestamp } from '@shared/dateUtils';
+import { formatTime } from '@utils/formatters';
 import { isPerfectDay } from '@utils/statUtils';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 

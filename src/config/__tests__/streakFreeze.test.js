@@ -8,7 +8,7 @@ import {
     walkStreak,
     normalizeFrozenDays
 } from '@shared/streakFreeze.js';
-import { calculateStreak, isDayDoneFromCompletions } from '@utils/dateUtils';
+import { calculateStreak, isDayDoneFromCompletions } from '@shared/dateUtils';
 
 const START = '2026-01-01';
 const done = () => ({ pushups: { isCompleted: true } });

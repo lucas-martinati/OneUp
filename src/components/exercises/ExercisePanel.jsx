@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import { sounds } from '@utils/soundManager';
 import { haptics } from '@utils/hapticsManager';
-import { formatTime } from '@utils/dateUtils';
+import { formatTime } from '@utils/formatters';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';

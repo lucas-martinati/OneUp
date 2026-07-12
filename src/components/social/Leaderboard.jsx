@@ -4,7 +4,7 @@ import { X, Trophy, LogOut, Activity } from '@utils/icons';
 import { IconButton, Spinner, GoogleSignInButton } from '@components/ui';
 import { EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
-import { getLocalDateStr } from '@utils/dateUtils';
+import { getLocalDateStr } from '@shared/dateUtils';
 import { ClanInviteCard } from './ClanInviteCard';
 import { LeaderboardTabs } from './LeaderboardTabs';
 import { LeaderboardRow } from './LeaderboardRow';

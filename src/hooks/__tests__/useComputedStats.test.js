@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { computeAllStats } from '../useComputedStats';
-import { getLocalDateStr } from '@utils/dateUtils';
+import { getLocalDateStr } from '@shared/dateUtils';
 
 // Two simple exercises with a 1x multiplier and a fixed day number of 10,
 // so each completed exercise contributes exactly 10 reps.

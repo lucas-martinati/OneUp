@@ -6,7 +6,8 @@ import {
 } from '@utils/icons';
 import { getExerciseLabel, getExerciseColor } from '@utils/exerciseLabel';
 import { APP_URL_DISPLAY } from '@config/app';
-import { formatDuration, parseLocalDate } from '@utils/dateUtils';
+import { parseLocalDate } from '@shared/dateUtils';
+import { formatDuration } from '@utils/formatters';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { DifficultyBadge } from '@components/ui/DifficultyBadge';
 import { useExercises } from '@contexts/ExercisesContext';

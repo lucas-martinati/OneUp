@@ -12,7 +12,7 @@ import { useSubscription } from '@contexts/SubscriptionContext';
 import { useExercises } from '@contexts/ExercisesContext';
 import { useExerciseConfig } from './useExerciseConfig';
 import { useBackHandler } from './useBackHandler';
-import { getLocalDateStr } from '@utils/dateUtils';
+import { getLocalDateStr } from '@shared/dateUtils';
 import { generateSessionName } from '@utils/sessionNameGenerator';
 import { isWorkoutSessionStarted, loadWorkoutSession, saveWorkoutSession, clearWorkoutSession } from '@utils/workoutSessionStorage';
 

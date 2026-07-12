@@ -7,7 +7,7 @@ import {
     Sparkles, AlertCircle, CheckCircle2, Globe, getIcon
 } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
-import { getLocalDateStr } from '@utils/dateUtils';
+import { getLocalDateStr } from '@shared/dateUtils';
 import { EXERCISES } from '@config/exercises';
 import { LANGUAGES, resolveLanguageCode } from '@config/languages';
 import { useAuth } from '@contexts/AuthContext';

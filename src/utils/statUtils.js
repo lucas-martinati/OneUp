@@ -2,7 +2,7 @@ import { getDailyGoal } from '@config/exercises';
 import { EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 
-import { getCurrentWeekNumber } from './dateUtils';
+import { getCurrentWeekNumber } from '@shared/dateUtils';
 
 /**
  * Calculates total reps for a day across given exercises.

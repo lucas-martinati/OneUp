@@ -31,7 +31,7 @@ import {
   ALL_EXERCISE_IDS,
 } from './exerciseRules.js';
 
-const MAX_STREAK_WINDOW = 365;
+import { MAX_STREAK_WINDOW } from "./dateUtils.js";
 
 // Deterministic "local hour" shared by client and server: hours elapsed between
 // the local day's UTC-midnight and the recorded UTC timestamp, wrapped to 0-23.

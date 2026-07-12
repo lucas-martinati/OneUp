@@ -11,7 +11,7 @@
 // Keep it dependency-free (no Node/browser/DOM APIs).
 // ══════════════════════════════════════════════════════════════════════════════
 
-export const MAX_STREAK_WINDOW = 365;
+import { MAX_STREAK_WINDOW, shiftDateStr } from './dateUtils.js';
 
 /**
  * Walk consecutive days backward from an anchor, counting a current streak that
@@ -27,7 +27,7 @@ export const MAX_STREAK_WINDOW = 365;
  * @param {number} [windowDays=365]           - how many days back to scan
  * @returns {number}
  */
-export function walkStreak(dateAt, isDone, isFrozen, windowDays = 365) {
+export function walkStreak(dateAt, isDone, isFrozen, windowDays = MAX_STREAK_WINDOW) {
   let streak = 0;
   for (let i = 0; i < windowDays; i++) {
     const dateStr = dateAt(i);
@@ -75,13 +75,7 @@ export function monthKey(dateInput) {
   return `${dateInput.getFullYear()}-${pad(dateInput.getMonth() + 1)}`;
 }
 
-export function shiftDateStr(dateStr, deltaDays) {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  const date = new Date(Date.UTC(y, m - 1, d));
-  date.setUTCDate(date.getUTCDate() + deltaDays);
-  const pad = n => String(n).padStart(2, '0');
-  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
-}
+
 
 /**
  * Apply the monthly refill to a freeze inventory.

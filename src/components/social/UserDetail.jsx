@@ -8,7 +8,7 @@ import { StreakFlame } from '@components/ui/StreakFlame';
 import { WeightBadge } from '@components/ui/WeightBadge';
 import { EXERCISES, CARDIO_EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
-import { getLocalDateStr } from '@utils/dateUtils';
+import { getLocalDateStr } from '@shared/dateUtils';
 import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '@utils/entitlements';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { getIcon } from '@utils/icons';

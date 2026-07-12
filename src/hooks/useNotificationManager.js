@@ -1,6 +1,6 @@
 import { useCallback, useRef, useEffect } from 'react';
 import i18n from '../i18n';
-import { getLocalDateStr } from '@utils/dateUtils';
+import { getLocalDateStr } from '@shared/dateUtils';
 
 // Starting ID for daily notifications. The range [NOTIFICATION_ID, NOTIFICATION_ID + 6]
 // is reserved exclusively for the 7 days of daily reminders.

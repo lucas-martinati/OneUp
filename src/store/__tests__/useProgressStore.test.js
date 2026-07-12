@@ -48,7 +48,7 @@ import { Preferences } from '@capacitor/preferences';
 import { cloudSync } from '@services/cloudSync';
 import { useProgressStore } from '../useProgressStore';
 import { STORAGE_KEY_BASE } from '@hooks/useProgressStorage';
-import { getLocalDateStr } from '@utils/dateUtils';
+import { getLocalDateStr } from '@shared/dateUtils';
 
 const currentYear = new Date().getFullYear();
 const fixedStart = `${currentYear}-01-01`;

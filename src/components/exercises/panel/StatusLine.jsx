@@ -1,5 +1,5 @@
 import { Check } from '@utils/icons';
-import { formatTime } from '@utils/dateUtils';
+import { formatTime } from '@utils/formatters';
 
 export function StatusLine({ activeColor, exerciseLabel, gradEnd, gradStart, isCompleted, isTimer, remaining, t }) {
     if (!isCompleted) {

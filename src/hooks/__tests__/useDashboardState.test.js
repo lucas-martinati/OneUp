@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 let mockNow = '2026-06-21';
-vi.mock('@utils/dateUtils', () => ({ getLocalDateStr: () => mockNow }));
+vi.mock('@shared/dateUtils', () => ({ getLocalDateStr: () => mockNow }));
 
 const getDayNumber = vi.fn((d) => (d === '2026-06-21' ? 1 : 2));
 const isDayDone = vi.fn(() => false);

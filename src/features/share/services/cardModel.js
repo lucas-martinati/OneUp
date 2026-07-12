@@ -3,7 +3,7 @@ import { EXERCISES, CARDIO_EXERCISES, getDailyGoal } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { isCustomExercise } from '@utils/exerciseLabel';
 import { sumExerciseReps } from '@utils/stats';
-import { getLocalDateStr, getCurrentWeekNumber, parseLocalDate } from '@utils/dateUtils';
+import { getLocalDateStr, getCurrentWeekNumber, parseLocalDate } from '@shared/dateUtils';
 
 /**
  * Card geometry — the card renders at a fixed logical width and snaps its

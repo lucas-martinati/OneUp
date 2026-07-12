@@ -6,7 +6,8 @@ import admin from "firebase-admin";
 import crypto from "crypto";
 import { BADGE_RULES, isBadgeUnlocked } from "./shared/badgeRules.js";
 import { DB_SCHEMA, LEAF, paths } from "./shared/dbSchema.js";
-import { walkStreak, normalizeFrozenDays, reconcileStreakFreezeState } from "./shared/streakFreeze.js";
+import { walkStreak, normalizeFrozenDays, reconcileStreakFreezeState, isDayDone } from "./shared/streakFreeze.js";
+import { MAX_STREAK_WINDOW } from "./dateUtils.js";
 import { computeAchievementStats } from "./shared/achievementStats.js";
 
 // Initialize Firebase Admin SDK using Default Compute Service Account
@@ -113,7 +114,6 @@ function getUserLocalDate(completions, serverNow) {
 // Streaks are anchored on the user's local date (best server-side approximation).
 // ══════════════════════════════════════════════════════════════════════════════
 
-const MAX_STREAK_WINDOW = 365;
 
 // All known exercise ids (standard + weights + cardio), as a flat list.
 const ALL_EX_OBJECTS = [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES];
@@ -1160,82 +1160,86 @@ export const googleHealthRefreshToken = onRequest(GOOGLE_HEALTH_SECRETS_CONFIG, 
 // Scheduled Jobs
 // ══════════════════════════════════════════════════════════════════════════════
 
-export const autoReconcileStreakFreezes = onSchedule("every hour", async (event) => {
-  const usersSnap = await db.ref(paths.users()).once('value');
-  const users = usersSnap.val() || {};
-
+export const autoReconcileStreakFreezes = onSchedule("every hour", async () => {
   const serverNow = new Date();
-  const pad = n => String(n).padStart(2, '0');
+  
+  // 1. Identify which timezones have just crossed midnight
+  // An IANA timezone is considered to have just crossed midnight if its current local hour is 0.
+  const timezonesThatJustPassedMidnight = Intl.supportedValuesOf('timeZone').filter(tz => {
+    try {
+      const f = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hour12: false });
+      const hour = parseInt(f.format(serverNow), 10);
+      return hour === 0 || hour === 24; // 24 is sometimes returned instead of 0 depending on runtime/locale
+    } catch {
+      return false;
+    }
+  });
+
+  // If UTC is one of them, we'll also query users who have no timezone set.
+  const utcPassedMidnight = timezonesThatJustPassedMidnight.includes('UTC');
+  
+  console.log(`[autoReconcileStreakFreezes] Timezones at midnight: ${timezonesThatJustPassedMidnight.join(', ')}`);
 
   const updates = {};
   let usersProcessed = 0;
 
-  for (const [uid, user] of Object.entries(users)) {
-    try {
-      const progress = user.progress;
-      if (!progress || !progress.isSetup) continue;
-
-      const userTimezone = user.settings?.timezone || 'UTC';
-      let userTodayStr;
+  // Process a snapshot of users
+  const processUsers = (users) => {
+    for (const [uid, user] of Object.entries(users)) {
       try {
-        userTodayStr = new Intl.DateTimeFormat('en-CA', { timeZone: userTimezone }).format(serverNow);
-      } catch (e) {
-        userTodayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'UTC' }).format(serverNow);
-      }
+        const progress = user.progress;
+        if (!progress || !progress.isSetup) continue;
 
-      const isPro = !!user.purchase?.isPro;
-      const isSupporter = !!user.purchase?.isSupporter;
-
-      const getWeekBounds = (date) => {
-        const d = new Date(date);
-        const day = d.getUTCDay();
-        const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
-        const start = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), diff));
-        return start;
-      };
-
-      const isDayDone = (dateStr) => {
-        const dayData = progress.completions?.[dateStr];
-        if (dayData && typeof dayData === 'object' && Object.values(dayData).some(e => e?.isCompleted)) {
-          return true;
+        const userTimezone = user.settings?.timezone || 'UTC';
+        let userTodayStr;
+        try {
+          userTodayStr = new Intl.DateTimeFormat('en-CA', { timeZone: userTimezone }).format(serverNow);
+        } catch {
+          userTodayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'UTC' }).format(serverNow);
         }
-        
-        const [y, m, d] = dateStr.split('-').map(Number);
-        const current = new Date(Date.UTC(y, m - 1, d));
-        const monday = getWeekBounds(current);
-        
-        let loop = new Date(monday);
-        while (loop <= current) {
-          const dStr = `${loop.getUTCFullYear()}-${pad(loop.getUTCMonth() + 1)}-${pad(loop.getUTCDate())}`;
-          const dData = progress.completions?.[dStr];
-          if (dData && (dData.running?.isCompleted || dData.cycling?.isCompleted)) {
-            return true;
-          }
-          loop.setUTCDate(loop.getUTCDate() + 1);
+
+        const isPro = !!user.purchase?.isPro;
+        const isSupporter = !!user.purchase?.isSupporter;
+
+        const result = reconcileStreakFreezeState({
+          completions: progress.completions || {},
+          frozenDays: progress.frozenDays || {},
+          streakFreezes: progress.streakFreezes || {},
+          startDate: progress.startDate,
+          isPro: isPro || isSupporter,
+          todayStr: userTodayStr,
+          isDayDone: (dateStr) => isDayDone(progress.completions, dateStr)
+        });
+
+        if (result.changed) {
+          updates[`${paths.userProgress(uid)}/frozenDays`] = result.frozenDays;
+          updates[`${paths.userProgress(uid)}/streakFreezes`] = result.streakFreezes;
+          usersProcessed++;
         }
-        return false;
-      };
-
-      const result = reconcileStreakFreezeState({
-        completions: progress.completions || {},
-        frozenDays: progress.frozenDays || {},
-        streakFreezes: progress.streakFreezes || {},
-        startDate: progress.startDate,
-        isPro: isPro || isSupporter,
-        todayStr: userTodayStr,
-        isDayDone
-      });
-
-      if (result.changed) {
-        updates[`${paths.userProgress(uid)}/frozenDays`] = result.frozenDays;
-        updates[`${paths.userProgress(uid)}/streakFreezes`] = result.streakFreezes;
-        usersProcessed++;
+      } catch (err) {
+        console.error(`[autoReconcileStreakFreezes] Failed to process user ${uid}:`, err);
       }
-    } catch (err) {
-      console.error(`[autoReconcileStreakFreezes] Failed to process user ${uid}:`, err);
     }
+  };
+
+  // 2. Fetch users for each relevant timezone
+  const queries = timezonesThatJustPassedMidnight.map(tz => 
+    db.ref(paths.users()).orderByChild('settings/timezone').equalTo(tz).once('value')
+  );
+
+  // If UTC is at midnight, also query users with no timezone (fallback to UTC)
+  if (utcPassedMidnight) {
+    queries.push(db.ref(paths.users()).orderByChild('settings/timezone').equalTo(null).once('value'));
   }
 
+  const snapshots = await Promise.all(queries);
+
+  for (const snap of snapshots) {
+    const users = snap.val() || {};
+    processUsers(users);
+  }
+
+  // 3. Apply updates
   if (Object.keys(updates).length > 0) {
     await db.ref().update(updates);
     console.log(`[autoReconcileStreakFreezes] Successfully reconciled freezes for ${usersProcessed} users.`);

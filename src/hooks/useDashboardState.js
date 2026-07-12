@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getLocalDateStr } from '@utils/dateUtils';
+import { getLocalDateStr } from '@shared/dateUtils';
 import { useProgressStore } from '@store/useProgressStore';
 import { useSettingsStore } from '@store/useSettingsStore';
 import { useNotificationManager } from './useNotificationManager';

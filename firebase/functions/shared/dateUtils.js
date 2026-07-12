@@ -1,9 +1,51 @@
 /**
  * Shared date utilities for the OneUp app.
  * Centralizes date formatting and streak calculation logic.
+ * This file is executed by both the Cloud Functions backend and the React frontend.
  */
 
-import { walkStreak } from '@shared/streakFreeze.js';
+import { walkStreak } from './streakFreeze.js';
+
+export function shiftDateStr(dateStr, deltaDays) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  date.setUTCDate(date.getUTCDate() + deltaDays);
+  const pad = n => String(n).padStart(2, '0');
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
+}
+
+function getWeekBoundsStr(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  const day = date.getUTCDay();
+  const diff = date.getUTCDate() - day + (day === 0 ? -6 : 1);
+  date.setUTCDate(diff);
+  const pad = n => String(n).padStart(2, '0');
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
+}
+
+/**
+ * Returns true if ANY exercise is marked done for the given date.
+ * Handles single day exercises and weekly cardio window.
+ */
+function isDayDone(completions, dateStr) {
+  const dayData = completions?.[dateStr];
+  if (dayData && typeof dayData === 'object' && Object.values(dayData).some(e => e?.isCompleted)) {
+    return true;
+  }
+  
+  const mondayStr = getWeekBoundsStr(dateStr);
+  let currentStr = mondayStr;
+  while (currentStr <= dateStr) {
+    const dData = completions?.[currentStr];
+    if (dData && (dData.running?.isCompleted || dData.cycling?.isCompleted)) {
+      return true;
+    }
+    if (currentStr === dateStr) break;
+    currentStr = shiftDateStr(currentStr, 1);
+  }
+  return false;
+}
 
 export const MAX_STREAK_WINDOW = 365;
 
@@ -90,7 +132,7 @@ export function calculateStreak(completions, todayStr, frozenDays = {}) {
     };
     return walkStreak(
         dateAt,
-        (dateStr) => isDayDoneFromCompletions(completions, dateStr),
+        (dateStr) => isDayDone(completions, dateStr),
         (dateStr) => !!frozenDays[dateStr],
         MAX_STREAK_WINDOW
     );
@@ -127,31 +169,7 @@ export function calculateExerciseStreak(completions, todayStr, exerciseId) {
  * @returns {boolean}
  */
 export function isDayDoneFromCompletions(completions, dateStr) {
-    const day = completions[dateStr];
-    
-    // 1. Direct completion on this day (Standard, Weights, Custom, or Cardio done TODAY)
-    if (day && Object.values(day).some(ex => ex?.isCompleted === true)) {
-        return true;
-    }
-
-    // 2. Week-wide completion for Cardio
-    // If running or cycling was completed anytime between last Monday and dateStr, this day is "done"
-    const { start } = getWeekBounds(parseLocalDate(dateStr));
-    const monday = new Date(start);
-    const current = parseLocalDate(dateStr);
-    
-    // Check each day from Monday to current
-    let loop = new Date(monday);
-    while (loop <= current) {
-        const dStr = getLocalDateStr(loop);
-        const dData = completions[dStr];
-        if (dData && (dData.running?.isCompleted || dData.cycling?.isCompleted)) {
-            return true;
-        }
-        loop.setDate(loop.getDate() + 1);
-    }
-
-    return false;
+    return isDayDone(completions, dateStr);
 }
 
 /**
@@ -172,7 +190,7 @@ export function calculateMaxStreak(completions, frozenDays = {}) {
         d.setDate(d.getDate() - i);
         const dateStr = getLocalDateStr(d);
 
-        if (isDayDoneFromCompletions(completions, dateStr)) {
+        if (isDayDone(completions, dateStr)) {
             temp++;
             if (temp > max) max = temp;
         } else if (frozenDays[dateStr]) {
@@ -182,33 +200,6 @@ export function calculateMaxStreak(completions, frozenDays = {}) {
         }
     }
     return max;
-}
-
-// ── Time formatting ────────────────────────────────────────────────────
-
-export function formatTime(seconds) {
-    const m = Math.floor(seconds / 60);
-    const s = (seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-}
-
-/**
- * Format duration in a human-readable format.
- * @param {number} seconds - Duration in seconds
- * @returns {string} Formatted duration (e.g., "1h 30m", "45m", "30s")
- */
-export function formatDuration(seconds) {
-    if (!seconds || seconds <= 0) return '0s';
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    if (h > 0) {
-        return `${h}h ${m}m`;
-    }
-    if (m > 0) {
-        return `${m}m`;
-    }
-    return `${s}s`;
 }
 
 /**

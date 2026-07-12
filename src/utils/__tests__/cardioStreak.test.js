@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { evaluateCardioWeek } from '../cardioStreak';
-import { getWeekBounds, getLocalDateStr } from '../dateUtils';
+import { getWeekBounds, getLocalDateStr } from '@shared/dateUtils';
 
 // Bornes de la semaine courante (weekOffset = 0) — calculées dynamiquement
 // pour que les tests restent valides quelle que soit la date d'exécution.

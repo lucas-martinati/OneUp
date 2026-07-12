@@ -9,7 +9,7 @@ import { getSessionHistory } from '@features/share/services/sessionHistoryServic
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { CATEGORIES, CATEGORY_ORDER, isUserCategory } from '@config/categories';
 import { useWorkoutSession } from '@hooks/useWorkoutSession';
-import { getLocalDateStr } from '@utils/dateUtils';
+import { getLocalDateStr } from '@shared/dateUtils';
 import styles from '@styles/WorkoutSession.module.css';
 
 const MAX_ICON_DOTS = 5;
