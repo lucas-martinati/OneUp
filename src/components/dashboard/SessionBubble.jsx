@@ -1,8 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Play, DynamicIcon } from '@utils/icons';
-import { EXERCISES } from '@config/exercises';
-import { WEIGHT_EXERCISES } from '@config/weights';
 import { useExercises } from '@contexts/ExercisesContext';
 import { Z_INDEX } from '@utils/zIndex';
 import { loadWorkoutSession } from '@utils/workoutSessionStorage';
@@ -41,21 +39,16 @@ const computeTrailSizes = (count) => {
  * this component to unmount), reading localStorage on mount always yields fresh data.
  */
 export const SessionBubble = React.memo(({ onResume, onDiscard }) => {
-    const { customExercises } = useExercises();
-
-    const allExercises = useMemo(
-        () => [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises],
-        [customExercises]
-    );
+    const { allExercisesMap } = useExercises();
 
     // ── Session data (fresh on every mount — see component docstring) ──
     const [{ queue: sessionQueue, currentIdx }] = useState(() => loadWorkoutSession());
 
     const queueExercises = useMemo(() => {
         return sessionQueue
-            .map(id => allExercises.find(ex => ex.id === id))
+            .map(id => allExercisesMap[id])
             .filter(Boolean);
-    }, [sessionQueue, allExercises]);
+    }, [sessionQueue, allExercisesMap]);
 
     const progress = useMemo(() => {
         if (queueExercises.length === 0) return 0;

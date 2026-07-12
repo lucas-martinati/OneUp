@@ -173,19 +173,25 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         dailyRepsData
     } = computedStats;
 
+    const exercisesMapForStats = React.useMemo(() => {
+        const map = {};
+        exercises.forEach(e => { map[e.id] = e; });
+        return map;
+    }, [exercises]);
+
     const enrichedExerciseStats = React.useMemo(() => {
         return exerciseStats.map(ex => {
-            const found = exercises.find(e => e.id === ex.id);
+            const found = exercisesMapForStats[ex.id];
             return { ...ex, categoryId: found?.categoryId || ex.categoryId };
         }).filter(ex => ex.categoryId); // Only keep exercises that are in the active categories
-    }, [exerciseStats, exercises]);
+    }, [exerciseStats, exercisesMapForStats]);
 
     const activeData = pieData.filter(d => d.value > 0).map(d => ({
         ...d,
         name: t('stats.pieLabels.' + d.id)
     }));
     const translatedRadarData = radarData.map(d => {
-        const ex = exercises?.find(e => e.id === d.exId);
+        const ex = exercisesMapForStats[d.exId];
         return {
             ...d,
             subject: getExerciseLabel(ex, t)

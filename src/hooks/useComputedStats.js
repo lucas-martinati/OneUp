@@ -5,12 +5,19 @@ import { WEIGHT_EXERCISES } from '@config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '@config/badgeDefinitions';
 import { computeAchievementStats } from '@shared/achievementStats.js';
 import { isGlobalPerfectDay } from '@utils/statUtils';
-
+import { useMemo } from 'react';
+import { useProgressStore } from '@store/useProgressStore';
+import { useExercises } from '@contexts/ExercisesContext';
+import { useExerciseConfig } from '@hooks/useExerciseConfig';
+import { useComputedStatsStore } from '@store/useComputedStatsStore';
 /**
  * Pure function that computes all stats in a single pass.
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
  */
-export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, achievements = {}, getConfig = null, cardioReps = null, userStartDateStr = null, frozenDays = {}) {
+export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, achievements = {}, getConfig = null, cardioReps = null, userStartDateStr = null, frozenDays = {}, allExercisesMap = null) {
+    if (!allExercisesMap && allExercises) {
+        allExercisesMap = Object.fromEntries(allExercises.map(e => [e.id, e]));
+    }
     const todayStr = getLocalDateStr(new Date());
     const today = new Date(todayStr);
 
@@ -18,7 +25,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         const day = completions[dateStr];
         if (!day) return false;
         return Object.entries(day).some(([exId, exData]) =>
-            exData?.isCompleted && allExercises.some(e => e.id === exId)
+            exData?.isCompleted && !!allExercisesMap[exId]
         );
     };
 
@@ -62,6 +69,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     let bestDayExReps = {};
 
     // Monthly activity
+    const allExercisesIndexMap = Object.fromEntries(allExercises.map((e, idx) => [e.id, idx]));
     const monthlyActivityByExercise = allExercises.map(() => Array(12).fill(0));
     const monthlyActivityTotal = Array(12).fill(0);
 
@@ -85,6 +93,9 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     // ─── SINGLE PASS over completions ────────────────────────────────────
     const sortedDates = Object.keys(completions).sort();
 
+    const hasStandard = EXERCISES.every(ex => !!allExercisesMap[ex.id]);
+    const hasWeights = WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => !!allExercisesMap[ex.id]);
+
     for (const dateStr of sortedDates) {
         const day = completions[dateStr];
         if (!day || typeof day !== 'object') continue;
@@ -100,9 +111,6 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         
         if (isPerfect) perfectDays++;
         if (dateStr === todayStr) {
-            // Recalculate category-specific perfection for specific flags
-            const hasStandard = EXERCISES.every(ex => allExercises.some(e => e.id === ex.id));
-            const hasWeights = WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => allExercises.some(e => e.id === ex.id));
             if (hasStandard && EXERCISES.every(ex => day[ex.id]?.isCompleted)) standardPerfectToday = true;
             if (hasWeights && WEIGHT_EXERCISES.every(ex => day[ex.id]?.isCompleted)) weightsPerfectToday = true;
             if (isPerfect) isPerfectToday = true;
@@ -114,8 +122,8 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         if (dayOfWeek >= 1 && dayOfWeek <= 5) weekdayWorkouts++;
         if (dayOfWeek === 0 || dayOfWeek === 6) weekendWorkouts++;
 
-        // Monthly activity
-        const monthIdx = dateObj.getMonth();
+        // Monthly activity (parse directly from YYYY-MM-DD for speed)
+        const monthIdx = parseInt(dateStr.slice(5, 7), 10) - 1;
         monthlyActivityTotal[monthIdx]++;
 
         // Time of day (one per day — take first completed exercise)
@@ -135,7 +143,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
             if (!exData?.isCompleted) continue;
 
             // Exercise reps
-            const ex = allExercises.find(e => e.id === exId);
+            const ex = allExercisesMap[exId];
             if (ex) {
                 totalExerciseCompletions++;
                 dayExCount++;
@@ -167,8 +175,8 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
                 exerciseDays[exId] = (exerciseDays[exId] || 0) + 1;
 
                 // Monthly by exercise
-                const exIndex = allExercises.findIndex(e => e.id === exId);
-                if (exIndex !== -1) {
+                const exIndex = allExercisesIndexMap[exId];
+                if (exIndex !== undefined) {
                     monthlyActivityByExercise[exIndex][monthIdx]++;
                 }
             }
@@ -244,8 +252,6 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
 
     // Perfect streak (consecutive perfect days)
     let perfectStreak = 0, maxPerfectStreak = 0;
-    const hasStandard = EXERCISES.every(ex => allExercises.some(exe => exe.id === ex.id));
-    const hasWeights = WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => allExercises.some(exe => exe.id === ex.id));
 
     for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
         const d = new Date(today);
@@ -413,7 +419,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         const dayNum = getDayNumber(dateStr);
         for (const [exId, exData] of Object.entries(day)) {
             if (!exData?.isCompleted) continue;
-            const ex = allExercises.find(e => e.id === exId);
+            const ex = allExercisesMap[exId];
             if (ex) {
                 let reps = 0;
                 if (exId === 'running' || exId === 'cycling') {
@@ -505,4 +511,37 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         // Sorted dates
         sortedDates
     };
+}
+
+export function useComputedStats() {
+    const { 
+        completions, 
+        settings, 
+        getDayNumber, 
+        hasShared, 
+        achievements, 
+        userStartDateStr,
+        frozenDays 
+    } = useProgressStore();
+    const { allExercises, allExercisesMap } = useExercises();
+    const { getConfig } = useExerciseConfig();
+    const cardioReps = useComputedStatsStore(s => s.cardioReps);
+
+    const stats = useMemo(() => {
+        return computeAllStats(
+            completions, 
+            settings, 
+            getDayNumber, 
+            allExercises,
+            hasShared, 
+            achievements, 
+            getConfig, 
+            cardioReps,
+            userStartDateStr,
+            frozenDays,
+            allExercisesMap
+        );
+    }, [completions, settings, getDayNumber, allExercises, allExercisesMap, hasShared, achievements, getConfig, cardioReps, userStartDateStr, frozenDays]);
+
+    return stats;
 }

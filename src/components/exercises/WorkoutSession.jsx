@@ -35,9 +35,9 @@ function useHorizontalWheelScroll(ref, enabled) {
 // ── Routine card ────────────────────────────────────────────────────────
 // The whole card loads the routine; edit/delete are small secondary
 // actions and the delete confirmation swaps in over the card itself.
-function RoutineCard({ routine, index, allExercises, confirming, onLoad, onEdit, onDelete, onCancelDelete, onAskDelete, t }) {
+function RoutineCard({ routine, index, allExercisesMap, confirming, onLoad, onEdit, onDelete, onCancelDelete, onAskDelete, t }) {
     const exercises = routine.exerciseIds
-        .map(exId => allExercises.find(e => e.id === exId))
+        .map(exId => allExercisesMap[exId])
         .filter(Boolean);
     // Max 5 dots in total: when overflowing, the "+N" dot takes the 5th slot.
     const shown = exercises.length > MAX_ICON_DOTS
@@ -155,7 +155,7 @@ export function WorkoutSession(props) {
         hasAnimatedFirstPanel, showAll, setShowAll,
         t, computedStats, isPro, fullCategoryOrder, fullCategoryColors,
         routines, deleteRoutine, maxRoutines, customCategories, localExercises,
-        exerciseInfo, allExercises, canMixDashboards,
+        exerciseInfo, allExercisesMap, canMixDashboards,
         currentEx, currentExId, currentGoal, currentCount, currentDone,
         currentDifficulty, hasNextAvailableExercise,
         updateExerciseCount, getConfig,
@@ -196,7 +196,7 @@ export function WorkoutSession(props) {
                                         key={routine.id}
                                         routine={routine}
                                         index={i}
-                                        allExercises={allExercises}
+                                        allExercisesMap={allExercisesMap}
                                         confirming={confirmDeleteId === routine.id}
                                         onLoad={loadRoutine}
                                         onEdit={editRoutine}
@@ -315,7 +315,7 @@ export function WorkoutSession(props) {
                             </div>
                             <div ref={queueListRef} className={styles.queuePanel}>
                                 {queue.map((id, i) => {
-                                    const ex = allExercises.find(e => e.id === id);
+                                    const ex = allExercisesMap[id];
                                     if (!ex) return null;
                                     const isDragging = dragIdx === i;
                                     const isDragOver = dragOverIdx === i;

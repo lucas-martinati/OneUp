@@ -30,8 +30,9 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     const { isPro } = useSubscription();
     const {
         routines, saveRoutine, deleteRoutine, updateRoutine, maxRoutines,
-        customExercises, customCategories,
-        exercisesByUserCategory, defaultCustomExercises
+        customCategories,
+        exercisesByUserCategory, defaultCustomExercises,
+        allExercises, allExercisesMap
     } = useExercises();
     const fullCategoryOrder = useMemo(() => buildFullCategoryOrder(customCategories), [customCategories]);
     const fullCategoryColors = useMemo(() => buildFullCategoryColors(customCategories), [customCategories]);
@@ -111,14 +112,6 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         return EXERCISES;
     }, [sessionActiveSlide, defaultCustomExercises, fullCategoryOrder, exercisesByUserCategory]);
 
-    const allExercises = useMemo(() => {
-        return [...EXERCISES, ...WEIGHT_EXERCISES, ...customExercises];
-    }, [customExercises]);
-
-    const allowedExercises = useMemo(() => {
-        return isPro ? allExercises : EXERCISES;
-    }, [isPro, allExercises]);
-
     // Restored sessions must keep their inter-dashboard toggle, otherwise a
     // mixed-category queue reopens showing only the current category's
     // exercises (and advanceToNext silently skips the others).
@@ -186,7 +179,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     const startSession = () => {
         if (queue.length < 1) return;
         const filteredQueue = queue.filter(id => {
-            const ex = allExercises.find(e => e.id === id);
+            const ex = allExercisesMap[id];
             if (!ex) return false;
             const currentDiff = getConfig(ex.id, today).difficulty;
             const goal = getDailyGoal(ex, dayNumber, currentDiff);
@@ -206,7 +199,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     // ── Load routine ──
     const loadRoutine = (routine) => {
         const routineExercises = routine.exerciseIds
-            .map(id => allExercises.find(e => e.id === id))
+            .map(id => allExercisesMap[id])
             .filter(ex => {
                 if (!ex) return false;
                 const isWeight = isWeightExercise(ex.id);
@@ -272,12 +265,12 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
 
     const editRoutine = (routine) => {
         const validIds = routine.exerciseIds.filter(id => {
-            const ex = allowedExercises.find(e => e.id === id);
+            const ex = allExercisesMap[id];
             if (!ex) return false;
             const currentDiff = getConfig(ex.id, today).difficulty;
             const goal = getDailyGoal(ex, dayNumber, currentDiff);
             const count = getExerciseCount(today, ex.id);
-            const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
+            const done = completions[today]?.[id]?.isCompleted || count >= goal;
             return !done;
         });
         setQueue(validIds);
@@ -350,7 +343,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
 
     // ── Running phase ──
     const currentExId = queue[currentIdx];
-    const currentEx = currentExId ? allExercises.find(e => e.id === currentExId) : null;
+    const currentEx = currentExId ? allExercisesMap[currentExId] || null : null;
     const currentDifficulty = getConfig(currentEx?.id, today).difficulty;
     const currentGoal = currentEx ? getDailyGoal(currentEx, dayNumber, currentDifficulty) : 0;
     const currentCount = currentEx ? getExerciseCount(today, currentExId) : 0;
@@ -359,14 +352,14 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     const hasNextAvailableExercise = useMemo(() => {
         return queue.some((id, idx) => {
             if (idx === currentIdx) return false;
-            const ex = allExercises.find(item => item.id === id);
+            const ex = allExercisesMap[id];
             if (!ex) return false;
             const difficulty = getConfig(ex.id, today).difficulty;
             const goal = getDailyGoal(ex, dayNumber, difficulty);
             const count = getExerciseCount(today, id);
             return !(completions[today]?.[id]?.isCompleted || count >= goal);
         });
-    }, [allExercises, completions, currentIdx, dayNumber, getConfig, getExerciseCount, queue, today]);
+    }, [allExercisesMap, completions, currentIdx, dayNumber, getConfig, getExerciseCount, queue, today]);
 
     useEffect(() => {
         if (phase !== 'running' || !currentEx || hasAnimatedFirstPanel) return undefined;
@@ -420,13 +413,13 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         setSessionDuration(duration);
 
         const completedExercises = queue.map(id => {
-            const ex = exerciseInfo.find(e => e.id === id);
+            const ex = allExercisesMap[id];
             if (!ex) return null;
             const label = getExerciseLabel(ex, t);
             const conf = getConfig(id, getLocalDateStr(new Date()));
             const w = conf ? conf.weight : null;
             const diff = conf ? conf.difficulty : 1.0;
-            return { id: ex.id, label, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff };
+            return { id: ex.id, label, reps: getDailyGoal(ex, dayNumber, diff), color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff };
         }).filter(Boolean);
 
         let detectedName = sessionName;
@@ -485,7 +478,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         // Derived
         t, computedStats, isPro, fullCategoryOrder, fullCategoryColors,
         routines, deleteRoutine, maxRoutines, customCategories, localExercises,
-        exerciseInfo, allExercises, canMixDashboards,
+        exerciseInfo, allExercisesMap, canMixDashboards,
         currentEx, currentExId, currentGoal, currentCount, currentDone,
         currentDifficulty, hasNextAvailableExercise,
 

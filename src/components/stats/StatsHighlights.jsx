@@ -19,9 +19,12 @@ function Chip({ color, children }) {
     );
 }
 
+import { useExercises } from '@contexts/ExercisesContext';
+
 /** Champion + best day highlight cards, followed by the exercise color legend. */
-export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExReps, exercises, pending = false }) {
+export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExReps, pending = false }) {
     const { t, i18n } = useTranslation();
+    const { allExercisesMap } = useExercises();
 
     const formatDate = (dateStr) => {
         if (!dateStr) return '—';
@@ -68,7 +71,7 @@ export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExR
                                         fontSize: '0.9rem', fontWeight: '700', color: champion.color,
                                         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
                                     }}>
-                                        {getExerciseLabel(exercises?.find(e => e.id === champion.id) || { id: champion.id }, t)}
+                                        {getExerciseLabel(allExercisesMap?.[champion.id] || { id: champion.id }, t)}
                                     </div>
                                 </div>
                             </div>
@@ -102,7 +105,7 @@ export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExR
                                 position: 'relative', zIndex: 1
                             }}>
                                 {Object.entries(bestDayExReps).map(([exId, reps]) => {
-                                    const ex = exercises?.find(e => e.id === exId);
+                                    const ex = allExercisesMap?.[exId];
                                     if (!ex) return null;
                                     return (
                                         <div key={exId} style={{

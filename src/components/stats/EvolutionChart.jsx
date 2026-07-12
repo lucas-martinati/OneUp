@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import LineChart from './charts/LineChart';
 import { DynamicIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
+import { useExercises } from '@contexts/ExercisesContext';
 
 /**
  * Graphe d'évolution générique (une métrique par exercice dans le temps).
@@ -26,6 +27,7 @@ export default function EvolutionChart({
     carryForward = false, // tracé en escalier : maintient la dernière valeur jusqu'à la saisie suivante au lieu d'interpoler
 }) {
     const defaultId = exercises[0]?.id;
+    const { allExercisesMap } = useExercises();
     const [selectedExIds, setSelectedExIds] = useState(defaultId ? [defaultId] : []);
 
     const toggleExercise = (id) => {
@@ -78,10 +80,10 @@ export default function EvolutionChart({
 
     const selectedSeries = useMemo(() => selectedExIds
         .map(id => {
-            const ex = exercises.find(e => e.id === id);
+            const ex = allExercisesMap[id];
             return ex ? { key: id, color: ex.color, name: getExerciseLabel(ex, t) } : null;
         })
-        .filter(Boolean), [selectedExIds, exercises, t]);
+        .filter(Boolean), [selectedExIds, allExercisesMap, t]);
 
     let formatYTick = (v) => `${v}`;
     if (yAxisExtra?.tickFormatter) formatYTick = yAxisExtra.tickFormatter;
@@ -153,7 +155,7 @@ export default function EvolutionChart({
                     gap: '8px', marginBottom: '12px'
                 }}>
                     {selectedExIds.map(id => {
-                        const ex = exercises.find(e => e.id === id);
+                        const ex = allExercisesMap[id];
                         if (!ex) return null;
                         return (
                             <span key={id} style={{

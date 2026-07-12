@@ -10,6 +10,7 @@ const stores = {
 vi.mock('@services/cardioService', () => ({
   loadCardioSessions: vi.fn(() => Promise.resolve([])),
   saveCardioSession: vi.fn(() => Promise.resolve()),
+  getSortedCardioSessions: vi.fn((v) => v ? Object.values(v) : []),
 }));
 vi.mock('@services/stravaService', () => ({ stravaService: { getActivities: vi.fn(() => Promise.resolve([])) } }));
 vi.mock('@contexts/AuthContext', () => ({ useAuth: () => stores.auth }));

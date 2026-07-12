@@ -4,14 +4,16 @@ import { DynamicIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { CATEGORIES, isUserCategory } from '@config/categories';
 import { StreakFlame } from '@components/ui';
+import { useExercises } from '@contexts/ExercisesContext';
 
 /** Per-exercise breakdown list, grouped by category. */
 export function ExerciseBreakdown({
     enrichedExerciseStats,
-    fullCategoryOrder, fullCategoryColors, customCategories,
+    fullCategoryOrder, fullCategoryColors,
     hasCardio, cardioSessions
 }) {
     const { t } = useTranslation();
+    const { customCategoriesMap } = useExercises();
 
     if (enrichedExerciseStats.length === 0) return null;
 
@@ -27,7 +29,7 @@ export function ExerciseBreakdown({
                     if (catStats.length === 0) return null;
                     let catLabel;
                     if (isUserCategory(catId)) {
-                        const catDef = customCategories.find(c => c.id === catId);
+                        const catDef = customCategoriesMap[catId];
                         catLabel = catDef?.name || catId;
                     } else {
                         catLabel = {

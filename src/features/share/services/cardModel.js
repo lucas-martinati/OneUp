@@ -83,10 +83,13 @@ export function buildCardModel({
     const dayNum = getDayNumber ? getDayNumber(targetDate) : 1;
     const dayData = completions[targetDate];
     if (dayData) {
-      const allKnownExercises = [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES, ...(customExercises || [])];
+      const allKnownExercisesMap = {};
+      [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES, ...(customExercises || [])].forEach(e => {
+        allKnownExercisesMap[e.id] = e;
+      });
       for (const [exId, exStats] of Object.entries(dayData)) {
         if (exStats?.isCompleted) {
-          const knownEx = allKnownExercises.find(e => e.id === exId);
+          const knownEx = allKnownExercisesMap[exId];
           if (knownEx && !isCardioExercise(exId)) {
             const conf = getConfig(exId, targetDate);
             dailyExercises.push({
@@ -168,10 +171,17 @@ export function buildCardModel({
     ? allExercises.filter(ex => getExCategory(ex) === CATEGORIES.BODYWEIGHT)
     : allExercises;
 
+  const customCategoriesMapForModel = {};
+  if (customCategories) {
+    customCategories.forEach(c => {
+      customCategoriesMapForModel[c.id] = c;
+    });
+  }
+
   // Category label: custom name if defined, otherwise raw key (user category)
   // or translation (standard category).
   const getCategoryLabel = (key) => {
-    const catDef = customCategories.find(c => c.id === key);
+    const catDef = customCategoriesMapForModel[key];
     if (catDef?.name) return catDef.name;
     return isUserCategory(key) ? key : t(`common.${key}`);
   };
