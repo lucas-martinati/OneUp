@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Clock, Trash2, Pencil, Dumbbell, Zap } from '@utils/icons';
+import { X, Clock, Trash2, Dumbbell, Zap } from '@utils/icons';
 import { getIcon } from '@utils/icons';
-import { IconButton, Button, ConfirmDialog, WeightBadge } from '@components/ui';
+import { IconButton, Button, ConfirmDialog, WeightBadge, InlineNameEditor } from '@components/ui';
 import { Z_INDEX } from '@utils/zIndex';
 import { updateSessionName } from '@features/share/services/sessionHistoryService';
 import { getExerciseLabel, getExerciseColor } from '@utils/exerciseLabel';
@@ -35,7 +35,6 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(session?.name || '');
   const hasName = name && name.trim().length > 0;
 
@@ -45,22 +44,22 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
 
   // Escape backs out one level: name edit first, then the panel.
   // The delete dialog handles its own Escape (and sits above us).
+  // The delete dialog handles its own Escape (and sits above us).
   useEffect(() => {
     const onKey = (e) => {
       if (e.key !== 'Escape' || confirmDelete) return;
-      if (editingName) setEditingName(false);
-      else onClose();
+      onClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [confirmDelete, editingName, onClose]);
+  }, [confirmDelete, onClose]);
 
   if (!session) return null;
 
-  const handleNameSave = () => {
-    setEditingName(false);
-    updateSessionName(session.id, name);
-    onNameChange?.(session.id, name);
+  const handleNameSave = async (newName) => {
+    setName(newName);
+    updateSessionName(session.id, newName);
+    onNameChange?.(session.id, newName);
   };
 
   const handleDelete = () => {
@@ -89,33 +88,13 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
           {/* Date & name */}
           <div className={styles.hero}>
             <div className={styles.date}>{formatDateTime(session.date, lang)}</div>
-            {editingName && (
-              <div className={styles.nameRow}>
-                <input
-                  autoFocus
-                  className={styles.nameInput}
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleNameSave(); }}
-                  placeholder={t('share.sessionNamePlaceholder')}
-                />
-                <button className={styles.nameSave} onClick={handleNameSave}>
-                  OK
-                </button>
-              </div>
-            )}
-            {!editingName && hasName && (
-              <button className={styles.nameBtn} onClick={() => setEditingName(true)}>
-                <span className={styles.nameText}>{name}</span>
-                <Pencil size={14} className={styles.namePencil} />
-              </button>
-            )}
-            {!editingName && !hasName && (
-              <button className={styles.nameAdd} onClick={() => setEditingName(true)}>
-                <Pencil size={14} />
-                {t('share.sessionNamePlaceholder')}
-              </button>
-            )}
+            <InlineNameEditor
+              value={name}
+              onSave={handleNameSave}
+              placeholder={t('share.sessionNamePlaceholder')}
+              emptyLabel={t('share.sessionNamePlaceholder')}
+              textStyle={{ fontSize: '1.3rem' }}
+            />
           </div>
 
           {/* Stats strip */}

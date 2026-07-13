@@ -41,6 +41,28 @@ const FAKE_GPS_TRACK = [
 // Impure values should be defined outside or in effects
 const DEMO_START_TIME = Date.now() - 86400000 * 2;
 
+const RestrictionSection = ({ title, children }) => (
+  <div style={{
+    display: 'flex', flexDirection: 'column', gap: '8px',
+    padding: '12px',
+    borderRadius: 'var(--radius-md)',
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px dashed var(--border-subtle)',
+    marginTop: '8px'
+  }}>
+    <div style={{
+      fontSize: '0.7rem', fontWeight: '800',
+      color: 'var(--text-secondary)', textTransform: 'uppercase',
+      letterSpacing: '0.05em'
+    }}>
+      {title}
+    </div>
+    <div style={{ display: 'flex', gap: '8px' }}>
+      {children}
+    </div>
+  </div>
+);
+
 export function CardioModule() {
   const { t, i18n } = useTranslation();
   const auth = useAuth();
@@ -248,59 +270,28 @@ export function CardioModule() {
 
               {/* Connection Section (only visible when connected) */}
               {!isDemo && healthAvailable && (
-                <div style={{
-                  display: 'flex', flexDirection: 'column', gap: '8px',
-                  padding: '12px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px dashed var(--border-subtle)',
-                  marginTop: '8px'
-                }}>
-                  <div style={{
-                    fontSize: '0.7rem', fontWeight: '800',
-                    color: 'var(--text-secondary)', textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    {t('cardio.connectTitle')}
-                  </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button
-                      onClick={handleConnectHealth}
-                      style={{
-                        flex: 1, padding: '8px', borderRadius: 'var(--radius-sm)',
-                        background: healthConnected ? 'rgba(66, 133, 244, 0.1)' : 'var(--surface-subtle)',
-                        border: `1px solid ${healthConnected ? '#4285F4' : 'var(--border-muted)'}`,
-                        color: healthConnected ? '#4285F4' : 'var(--text-primary)',
-                        fontSize: '0.7rem', fontWeight: '700',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                        cursor: 'pointer', transition: 'all 0.2s ease'
-                      }}
-                    >
-                      {healthConnected ? <CheckCircle2 size={12} /> : <Activity size={12} />}
-                      {t('cardio.healthConnect')}
-                    </button>
-                  </div>
-                </div>
+                <RestrictionSection title={t('cardio.connectTitle')}>
+                  <button
+                    onClick={handleConnectHealth}
+                    style={{
+                      flex: 1, padding: '8px', borderRadius: 'var(--radius-sm)',
+                      background: healthConnected ? 'rgba(66, 133, 244, 0.1)' : 'var(--surface-subtle)',
+                      border: `1px solid ${healthConnected ? '#4285F4' : 'var(--border-muted)'}`,
+                      color: healthConnected ? '#4285F4' : 'var(--text-primary)',
+                      fontSize: '0.7rem', fontWeight: '700',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                      cursor: 'pointer', transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {healthConnected ? <CheckCircle2 size={12} /> : <Activity size={12} />}
+                    {t('cardio.healthConnect')}
+                  </button>
+                </RestrictionSection>
               )}
 
               {/* Web Sync Section */}
               {!isDemo && isWeb && (
-                <div style={{
-                  display: 'flex', flexDirection: 'column', gap: '8px',
-                  padding: '12px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px dashed var(--border-subtle)',
-                  marginTop: '8px'
-                }}>
-                  <div style={{
-                    fontSize: '0.7rem', fontWeight: '800',
-                    color: 'var(--text-secondary)', textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    {t('cardio.webRestrictionTitle')}
-                  </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                <RestrictionSection title={t('cardio.webRestrictionTitle')}>
                     <a 
                       href="https://play.google.com/store/apps/details?id=com.lucasm548.oneup" 
                       target="_blank" 
@@ -349,8 +340,7 @@ export function CardioModule() {
                         </span>
                       </div>
                     </a>
-                  </div>
-                </div>
+                </RestrictionSection>
               )}
 
               {/* No sessions message */}

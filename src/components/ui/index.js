@@ -9,6 +9,7 @@ export { FrozenFlame } from './FrozenFlame';
 export { GoogleIcon } from './GoogleIcon';
 export { GoogleSignInButton } from './GoogleSignInButton';
 export { IconButton } from './IconButton';
+export { InlineNameEditor } from './InlineNameEditor';
 export { SegmentedControl } from './SegmentedControl';
 export { SettingRow } from './SettingRow';
 export { Slider } from './Slider';

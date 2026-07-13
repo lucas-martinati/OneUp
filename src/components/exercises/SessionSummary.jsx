@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Trophy, Check, Pencil } from '@utils/icons';
+import { Trophy, Check } from '@utils/icons';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import { getIcon } from '@utils/icons';
@@ -8,6 +8,7 @@ import { updateSessionName } from '@features/share/services/sessionHistoryServic
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { SharePanel } from '@features/share/components/SharePanel';
+import { InlineNameEditor } from '@components/ui';
 import styles from '@styles/SessionSummary.module.css';
 
 function formatDuration(seconds) {
@@ -19,16 +20,11 @@ function formatDuration(seconds) {
 
 export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, defaultSessionName = '' }) {
     const { t } = useTranslation();
-    const [editingName, setEditingName] = useState(false);
     const [sessionName, setSessionName] = useState(defaultSessionName);
     const [confettiDone, setConfettiDone] = useState(false);
 
-    // Handle back button to close summary or cancel editing
+    // Handle back button to close summary
     useBackHandler(() => {
-        if (editingName) {
-            setEditingName(false);
-            return true;
-        }
         onClose();
         return true;
     }, true);
@@ -58,10 +54,10 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
     const exCount = recapExercises.length;
     const totalReps = recapExercises.reduce((sum, ex) => sum + (ex.type !== 'timer' ? (ex.reps || ex.goal || 0) : 0), 0);
 
-    const handleNameSave = () => {
-        setEditingName(false);
+    const handleNameSave = async (newName) => {
+        setSessionName(newName);
         if (sessionData?.id) {
-            updateSessionName(sessionData.id, sessionName);
+            await updateSessionName(sessionData.id, newName);
         }
     };
 
@@ -100,30 +96,15 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                     </div>
 
                     {/* Editable session name */}
-                    <div className={styles.nameWrap}>
-                        {editingName ? (
-                            <div className={styles.nameRow}>
-                                <input
-                                    autoFocus
-                                    className={styles.nameInput}
-                                    value={sessionName}
-                                    onChange={e => setSessionName(e.target.value)}
-                                    onKeyDown={e => { if (e.key === 'Enter') handleNameSave(); }}
-                                    placeholder={t('share.sessionNamePlaceholder')}
-                                />
-                                <button className={styles.nameOk} onClick={handleNameSave}>OK</button>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={() => setEditingName(true)}
-                                className={`${styles.nameBtn} ${sessionName ? styles.nameBtnFilled : styles.nameBtnEmpty}`}
-                            >
-                                <Pencil size={14} style={{ opacity: 0.5, flexShrink: 0 }} />
-                                <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                    {sessionName || t('share.sessionNamePlaceholder')}
-                                </span>
-                            </button>
-                        )}
+                    <div style={{ width: '100%', marginTop: '2px' }}>
+                        <InlineNameEditor
+                            value={sessionName}
+                            onSave={handleNameSave}
+                            placeholder={t('share.sessionNamePlaceholder')}
+                            emptyLabel={t('share.sessionNamePlaceholder')}
+                            align="center"
+                            textStyle={{ fontSize: '0.85rem' }}
+                        />
                     </div>
                 </div>
 
