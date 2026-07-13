@@ -250,8 +250,6 @@
     "goalReached": "目标达成！",
     "googleWallDesc": "使用您的 Google 账户登录以访问有氧模块并同步数据。",
     "googleWallStep1": "Google 登录",
-    "googleWallStep2": "连接 Strava",
-    "googleWallStep3": "自动同步",
     "googleWallTitle": "需要账户",
     "gpsTrack": "GPS 路线",
     "history": "有氧历史",
@@ -267,7 +265,6 @@
     "speed": "速度",
     "start": "起点",
     "stravaWallDesc": "自动同步您的跑步和骑行活动，以提升您的全球连胜记录。",
-    "stravaWallTitle": "连接 Strava",
     "streak": "连续",
     "tap": "轻触",
     "totalDistance": "总距离 ({{unit}})",
@@ -278,7 +275,9 @@
       "minKm": "分/公里"
     },
     "viewHistory": "查看历史",
-    "weeklyGoal": "每周目标"
+    "weeklyGoal": "每周目标",
+    "webRestrictionTitle": "有氧运动在线不可用",
+    "webRestrictionDesc": "有氧运动跟踪需要Google Health Connect来在手机上同步您的锻炼。此功能在网页版上不可用。"
   },
   "clan": {
     "alreadyMember": "您已经在这个公会中",

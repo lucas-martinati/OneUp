@@ -250,8 +250,6 @@
     "goalReached": "Goal reached!",
     "googleWallDesc": "Sign in with your Google account to access the Cardio module and sync your data.",
     "googleWallStep1": "Google Sign-in",
-    "googleWallStep2": "Link an app",
-    "googleWallStep3": "Auto Sync",
     "googleWallTitle": "Account Required",
     "gpsTrack": "GPS Track",
     "history": "Cardio History",
@@ -267,7 +265,6 @@
     "speed": "Speed",
     "start": "Start",
     "stravaWallDesc": "Automatically sync your running and cycling sessions to progress your global streak.",
-    "stravaWallTitle": "Connect Strava",
     "streak": "Streak",
     "tap": "Tap",
     "totalDistance": "Total Distance ({{unit}})",
@@ -278,7 +275,9 @@
       "minKm": "min/km"
     },
     "viewHistory": "View history",
-    "weeklyGoal": "Weekly goal"
+    "weeklyGoal": "Weekly goal",
+    "webRestrictionTitle": "Cardio not available online",
+    "webRestrictionDesc": "Cardio tracking requires Google Health Connect to sync your workouts directly on your phone. This feature is not available on the web version."
   },
   "clan": {
     "alreadyMember": "You are already in this clan",

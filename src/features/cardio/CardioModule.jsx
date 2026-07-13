@@ -7,9 +7,9 @@ import { CardioWeeklyGoal } from './CardioWeeklyGoal';
 import { CardioMap } from './CardioMap';
 import { CardioLastSession } from './CardioLastSession';
 import { CardioStreak } from './CardioStreak';
-import { stravaService } from '@services/stravaService';
+import { Capacitor } from '@capacitor/core';
 import { healthConnectService } from '@services/healthConnectService';
-import { ChevronRight, Link2, CheckCircle2, Activity } from '@utils/icons';
+import { ChevronRight, CheckCircle2, Activity } from '@utils/icons';
 import { SegmentedControl } from'@components/ui/SegmentedControl';
 import { GoogleIcon } from'@components/ui/GoogleIcon';
 import { GoogleSignInButton } from'@components/ui/GoogleSignInButton';
@@ -42,7 +42,7 @@ const FAKE_GPS_TRACK = [
 const DEMO_START_TIME = Date.now() - 86400000 * 2;
 
 export function CardioModule() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const auth = useAuth();
   const [showHistory, setShowHistory] = useState(false);
   const {
@@ -65,16 +65,16 @@ export function CardioModule() {
     }
   });
 
-  const [stravaConnected, setStravaConnected] = useState(false);
+  const isWeb = Capacitor.getPlatform() === 'web';
   const [healthConnected, setHealthConnected] = useState(false);
   const [healthAvailable, setHealthAvailable] = useState(false);
 
   const needsGoogleLogin = !auth.isSignedIn;
-  // A "cardio source" is any connected provider (Strava, Health Connect).
-  const hasCardioSource = stravaConnected || healthConnected;
+  // A "cardio source" is any connected provider (Health Connect).
+  const hasCardioSource = healthConnected;
   const needsCardioSource = auth.isSignedIn && !hasCardioSource;
   // Fake demo values for the paywall
-  const isDemo = needsGoogleLogin || needsCardioSource;
+  const isDemo = !isWeb && (needsGoogleLogin || needsCardioSource);
   const displayDistance = isDemo ? 12.5 : weeklyDistance;
   const displayGoal = isDemo ? 15 : weeklyGoal;
   const displayWeekNumber = isDemo ? 3 : weekNumber;
@@ -92,37 +92,22 @@ export function CardioModule() {
   React.useEffect(() => {
     let cancelled = false;
     const checkStatus = async () => {
-      const [strava, hcAvailable] = await Promise.all([
-        stravaService.isAuthenticated(),
-        healthConnectService.isAvailable(),
-      ]);
+      const hcAvailable = await healthConnectService.isAvailable();
       const hc = hcAvailable ? await healthConnectService.isAuthenticated() : false;
       if (cancelled) return;
-      setStravaConnected(strava);
       setHealthAvailable(hcAvailable);
       setHealthConnected(hc);
     };
     checkStatus();
 
-    // Either provider dispatches its connected event; re-check everything and refresh.
+    // Provider dispatches connected event; re-check everything and refresh.
     const onConnected = () => { checkStatus(); refresh(); };
-    window.addEventListener('strava-connected', onConnected);
     window.addEventListener('cardio-source-connected', onConnected);
     return () => {
       cancelled = true;
-      window.removeEventListener('strava-connected', onConnected);
       window.removeEventListener('cardio-source-connected', onConnected);
     };
   }, [refresh]);
-
-  const handleConnectStrava = async () => {
-    if (stravaConnected) {
-      await stravaService.disconnect();
-      setStravaConnected(false);
-    } else {
-      await stravaService.connect();
-    }
-  };
 
   const handleConnectHealth = async () => {
     if (healthConnected) {
@@ -186,7 +171,120 @@ export function CardioModule() {
           />
         </div>
 
-        {loading ? (
+        {(() => {
+          if (isWeb) return (
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '16px',
+            textAlign: 'center',
+            padding: '24px',
+            borderRadius: 'var(--radius-lg)',
+            background: 'var(--surface-subtle)',
+            border: '1px solid var(--border-subtle)',
+            backdropFilter: 'blur(12px)',
+            margin: '20px 0',
+            position: 'relative'
+          }}>
+            {/* Soft decorative background glow */}
+            <div style={{
+              position: 'absolute',
+              width: '100px',
+              height: '100px',
+              background: 'radial-gradient(circle, rgba(66,133,244,0.15) 0%, transparent 70%)',
+              pointerEvents: 'none',
+              top: '10%',
+              left: '10%'
+            }} />
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '2rem',
+              background: 'rgba(66, 133, 244, 0.1)',
+              border: '1px solid rgba(66, 133, 244, 0.2)',
+              marginBottom: '8px',
+              boxShadow: '0 8px 24px rgba(66, 133, 244, 0.15)'
+            }}>
+              📱
+            </div>
+            <h3 style={{
+              fontSize: '1rem',
+              fontWeight: '800',
+              color: 'var(--text-primary)',
+              margin: 0
+            }}>
+              {t('cardio.webRestrictionTitle')}
+            </h3>
+            <p style={{
+              fontSize: '0.78rem',
+              color: 'var(--text-secondary)',
+              lineHeight: 1.5,
+              maxWidth: '280px',
+              margin: 0,
+              opacity: 0.9
+            }}>
+              {t('cardio.webRestrictionDesc')}
+            </p>
+            <a 
+              href="https://play.google.com/store/apps/details?id=com.lucasm548.oneup" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover-lift"
+              style={{
+                marginTop: '16px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '12px',
+                background: '#0a0a0a',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                padding: '10px 20px',
+                borderRadius: '12px',
+                textDecoration: 'none',
+                color: '#ffffff',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(66, 133, 244, 0.1)',
+                transition: 'all 0.25s ease',
+              }}
+            >
+              {/* Official Google Play Triangle SVG (2022 Rounded Version) */}
+              <svg viewBox="0 0 29 32" width="20" height="22" style={{ flexShrink: 0 }}>
+                <path d="M13.54 15.28.12 29.34a3.64 3.64 0 0 0 5.33 2.16l15.1-8.6z" fill="#ea4335"/>
+                <path d="m27.11 12.89-6.53-3.74-7.35 6.45 7.38 7.28 6.48-3.7a3.55 3.55 0 0 0 0-6.29z" fill="#fbbc04"/>
+                <path d="M.12 2.66a3.46 3.46 0 0 0-.12.92v24.84a3.66 3.66 0 0 0 .12.92L14 15.64Z" fill="#4285f4"/>
+                <path d="m13.64 16 6.94-6.85L5.5.51A3.72 3.72 0 0 0 3.63 0 3.64 3.64 0 0 0 .12 2.65Z" fill="#34a853"/>
+              </svg>
+              
+              {/* Typography Column */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.1 }}>
+                <span style={{ 
+                  fontSize: '0.58rem', 
+                  fontWeight: '600', 
+                  color: 'rgba(255, 255, 255, 0.55)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.8px',
+                  marginBottom: '2px'
+                }}>
+                  {i18n.language?.startsWith('fr') ? 'Disponible sur' : 'Get it on'}
+                </span>
+                <span style={{ 
+                  fontSize: '1rem', 
+                  fontWeight: '700', 
+                  color: '#ffffff',
+                  letterSpacing: '0.2px'
+                }}>
+                  Google Play
+                </span>
+              </div>
+            </a>
+          </div>
+          );
+          if (loading) return (
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flex: 1, color: 'var(--text-secondary)', opacity: 0.5,
@@ -194,7 +292,8 @@ export function CardioModule() {
           }}>
             {t('common.loading')}
           </div>
-        ) : (
+          );
+          return (
           <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div className="custom-scrollbar" style={{
               flex: 1, overflowY: isDemo ? 'hidden' : 'auto', overflowX: 'hidden',
@@ -256,7 +355,7 @@ export function CardioModule() {
               </div>
 
               {/* Connection Section (only visible when connected) */}
-              {!isDemo && (
+              {!isDemo && healthAvailable && (
                 <div style={{
                   display: 'flex', flexDirection: 'column', gap: '8px',
                   padding: '12px',
@@ -274,37 +373,20 @@ export function CardioModule() {
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button
-                      onClick={handleConnectStrava}
+                      onClick={handleConnectHealth}
                       style={{
                         flex: 1, padding: '8px', borderRadius: 'var(--radius-sm)',
-                        background: stravaConnected ? 'rgba(252, 76, 2, 0.1)' : 'var(--surface-subtle)',
-                        border: `1px solid ${stravaConnected ? '#fc4c02' : 'var(--border-muted)'}`,
-                        color: stravaConnected ? '#fc4c02' : 'var(--text-primary)',
+                        background: healthConnected ? 'rgba(66, 133, 244, 0.1)' : 'var(--surface-subtle)',
+                        border: `1px solid ${healthConnected ? '#4285F4' : 'var(--border-muted)'}`,
+                        color: healthConnected ? '#4285F4' : 'var(--text-primary)',
                         fontSize: '0.7rem', fontWeight: '700',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                         cursor: 'pointer', transition: 'all 0.2s ease'
                       }}
                     >
-                      {stravaConnected ? <CheckCircle2 size={12} /> : <Link2 size={12} />}
-                      Strava
+                      {healthConnected ? <CheckCircle2 size={12} /> : <Activity size={12} />}
+                      {t('cardio.healthConnect')}
                     </button>
-                    {healthAvailable && (
-                      <button
-                        onClick={handleConnectHealth}
-                        style={{
-                          flex: 1, padding: '8px', borderRadius: 'var(--radius-sm)',
-                          background: healthConnected ? 'rgba(66, 133, 244, 0.1)' : 'var(--surface-subtle)',
-                          border: `1px solid ${healthConnected ? '#4285F4' : 'var(--border-muted)'}`,
-                          color: healthConnected ? '#4285F4' : 'var(--text-primary)',
-                          fontSize: '0.7rem', fontWeight: '700',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                          cursor: 'pointer', transition: 'all 0.2s ease'
-                        }}
-                      >
-                        {healthConnected ? <CheckCircle2 size={12} /> : <Activity size={12} />}
-                        {t('cardio.healthConnect')}
-                      </button>
-                    )}
                   </div>
                 </div>
               )}
@@ -323,19 +405,17 @@ export function CardioModule() {
               )}
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* Unified Cardio Login Wall — a frosted-glass teaser that lets the demo
-            content peek through behind a glass card. Same design for both auth
-            steps, with a 3-step progress (Google → Strava → auto-sync). The
-            accent follows the current step; the veil adapts to the theme. */}
+            content peek through behind a glass card. */}
         {isDemo && (() => {
           const onGoogleStep = needsGoogleLogin;
-          const accent = onGoogleStep ? '#4285F4' : '#fc4c02';
+          const accent = onGoogleStep ? '#4285F4' : '#34A853';
           const steps = [
             { label: t('cardio.googleWallStep1'), color: '#4285F4', done: auth.isSignedIn, active: needsGoogleLogin },
-            { label: t('cardio.googleWallStep2'), color: '#fc4c02', done: hasCardioSource, active: needsCardioSource },
-            { label: t('cardio.googleWallStep3'), color: '#34A853', done: false, active: false },
+            { label: t('cardio.healthConnect'), color: '#34A853', done: hasCardioSource, active: needsCardioSource }
           ];
           return (
             <div
@@ -358,7 +438,7 @@ export function CardioModule() {
                 bottom: '-40px', right: '-30px',
                 width: '150px', height: '150px',
                 animationDirection: 'reverse', animationDuration: '9s',
-                background: `radial-gradient(circle, ${onGoogleStep ? 'rgba(234,67,53,0.14)' : 'rgba(252,140,2,0.16)'} 0%, transparent 70%)`,
+                background: `radial-gradient(circle, ${onGoogleStep ? 'rgba(234,67,53,0.14)' : 'rgba(52,168,83,0.16)'} 0%, transparent 70%)`,
               }} />
 
               <div className="cardio-login-card">
@@ -366,29 +446,17 @@ export function CardioModule() {
                 <div className="cardio-wall-icon">
                   {onGoogleStep
                     ? <GoogleIcon size={28} />
-                    : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="36"
-                        height="36"
-                        viewBox="0 0 64 64"
-                        style={{ objectFit: 'contain' }}
-                        aria-label="Strava"
-                      >
-                        <path d="M41.03 47.852l-5.572-10.976h-8.172L41.03 64l13.736-27.124h-8.18" fill="#f9b797" />
-                        <path d="M27.898 21.944l7.564 14.928h11.124L27.898 0 9.234 36.876H20.35" fill="#f05222" />
-                      </svg>
-                    )}
+                    : <Activity size={28} color="#34A853" />}
                 </div>
 
                 <h2 className="cardio-wall-title">
-                  {onGoogleStep ? t('cardio.googleWallTitle') : t('cardio.stravaWallTitle')}
+                  {onGoogleStep ? t('cardio.googleWallTitle') : t('cardio.healthConnect')}
                 </h2>
                 <p className="cardio-wall-desc">
                   {onGoogleStep ? t('cardio.googleWallDesc') : t('cardio.stravaWallDesc')}
                 </p>
 
-                {/* 3-step progress indicator — vertical connected stepper so the
+                {/* 2-step progress indicator — vertical connected stepper so the
                     longer translated labels never overflow the card. */}
                 <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '210px', margin: '2px 0' }}>
                   {steps.map((step, i) => {
@@ -432,17 +500,6 @@ export function CardioModule() {
                   />
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', marginTop: '6px' }}>
-                    <button onClick={handleConnectStrava} className="hover-lift cardio-strava-btn" style={{
-                      padding: '14px 30px', borderRadius: '16px',
-                      background: 'linear-gradient(145deg, #fc4c02, #d94400)', color: 'white',
-                      fontWeight: '800', fontSize: 'clamp(0.85rem, 1.6vh, 0.95rem)',
-                      border: 'none', cursor: 'pointer',
-                      boxShadow: '0 8px 28px rgba(252, 76, 2, 0.45), inset 0 1px 0 rgba(255,255,255,0.15)',
-                      display: 'flex', gap: '8px', alignItems: 'center', letterSpacing: '0.3px',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                    }}>
-                      <Link2 size={18} /> Strava
-                    </button>
                     {healthAvailable && (
                       <button onClick={handleConnectHealth} className="hover-lift" style={{
                         padding: '12px 26px', borderRadius: '16px',

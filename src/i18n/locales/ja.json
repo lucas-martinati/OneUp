@@ -250,8 +250,6 @@
     "goalReached": "目標達成！",
     "googleWallDesc": "Google アカウントでサインインして、Cardio モジュールにアクセスし、データを同期します。",
     "googleWallStep1": "Googleサインイン",
-    "googleWallStep2": "リンクストラバ",
-    "googleWallStep3": "自動同期",
     "googleWallTitle": "アカウントが必要です",
     "gpsTrack": "GPS トラック",
     "history": "有酸素運動の歴史",
@@ -267,7 +265,6 @@
     "speed": "スピード",
     "start": "始める",
     "stravaWallDesc": "ランニングとサイクリングのセッションを自動的に同期して、世界記録を伸ばします。",
-    "stravaWallTitle": "Strava に接続する",
     "streak": "ストリーク",
     "tap": "タップ",
     "totalDistance": "合計距離 ({{unit}})",
@@ -278,7 +275,9 @@
       "minKm": "分/km"
     },
     "viewHistory": "履歴を見る",
-    "weeklyGoal": "週間目標"
+    "weeklyGoal": "週間目標",
+    "webRestrictionTitle": "有酸素運動はオンラインでは利用できません",
+    "webRestrictionDesc": "有酸素運動の追跡には、携帯電話でワークアウトを同期するためのGoogle Health Connectが必要です。この機能はウェブ版では利用できません。"
   },
   "clan": {
     "alreadyMember": "あなたはすでにこのクランに属しています",

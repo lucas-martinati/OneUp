@@ -945,8 +945,6 @@ export const onRevenueCatWebhook = onRequest({ secrets: ["REVENUECAT_WEBHOOK_SEC
 // `firebase functions:secrets:set STRAVA_CLIENT_SECRET`).
 // ══════════════════════════════════════════════════════════════════════════════
 
-const STRAVA_TOKEN_URL = "https://www.strava.com/oauth/token";
-
 // Public web origin allowed to call the OAuth proxies. Read from the APP_URL
 // env var (set via the functions .env / deploy environment) so the domain is
 // not hardcoded; falls back to the production URL so CORS stays valid even if
@@ -962,100 +960,7 @@ const OAUTH_PROXY_CORS = [
   "capacitor://localhost",
 ];
 
-const STRAVA_SECRETS_CONFIG = {
-  secrets: ["STRAVA_CLIENT_ID", "STRAVA_CLIENT_SECRET"],
-  cors: OAUTH_PROXY_CORS,
-};
 
-/**
- * stravaExchangeToken
- * Exchanges an OAuth authorization code for tokens.
- * Client sends: { code: string }
- * Returns:      The full Strava token response (access_token, refresh_token, expires_at, athlete, …)
- */
-export const stravaExchangeToken = onRequest(STRAVA_SECRETS_CONFIG, async (req, res) => {
-  if (req.method !== "POST") {
-    res.status(405).send("Method Not Allowed");
-    return;
-  }
-
-  const { code } = req.body || {};
-  if (!code || typeof code !== "string") {
-    res.status(400).json({ error: "Missing or invalid 'code' parameter" });
-    return;
-  }
-
-  try {
-    const response = await fetch(STRAVA_TOKEN_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        client_id: process.env.STRAVA_CLIENT_ID,
-        client_secret: process.env.STRAVA_CLIENT_SECRET,
-        code,
-        grant_type: "authorization_code",
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("[Strava] Token exchange failed:", data);
-      res.status(response.status).json(data);
-      return;
-    }
-
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("[Strava] Token exchange error:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-/**
- * stravaRefreshToken
- * Refreshes an expired access token.
- * Client sends: { refresh_token: string }
- * Returns:      The refreshed Strava token response (access_token, refresh_token, expires_at, …)
- */
-export const stravaRefreshToken = onRequest(STRAVA_SECRETS_CONFIG, async (req, res) => {
-  if (req.method !== "POST") {
-    res.status(405).send("Method Not Allowed");
-    return;
-  }
-
-  const { refresh_token } = req.body || {};
-  if (!refresh_token || typeof refresh_token !== "string") {
-    res.status(400).json({ error: "Missing or invalid 'refresh_token' parameter" });
-    return;
-  }
-
-  try {
-    const response = await fetch(STRAVA_TOKEN_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        client_id: process.env.STRAVA_CLIENT_ID,
-        client_secret: process.env.STRAVA_CLIENT_SECRET,
-        refresh_token,
-        grant_type: "refresh_token",
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("[Strava] Token refresh failed:", data);
-      res.status(response.status).json(data);
-      return;
-    }
-
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("[Strava] Token refresh error:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Google Health API OAuth Token Proxy (web cardio source)

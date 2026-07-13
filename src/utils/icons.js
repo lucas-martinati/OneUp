@@ -20,7 +20,7 @@ import {
   // Cloud & sync
   Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
   // Misc
-  Copy, RefreshCw, Heart, Sparkles, Link, Link2, Calendar, TrendingUp, BarChart3,
+  Copy, RefreshCw, Heart, Sparkles, Link, Calendar, TrendingUp, BarChart3,
   Gem, Ghost, Moon, Rocket, Sun,
   // New Custom Icons
   Bike, Mountain, Droplets, Navigation, MapPin, Compass, 
@@ -40,7 +40,7 @@ export {
   Gauge, Gem, Ghost, Globe, GripVertical,
   Hash, Heart, HeartHandshake, History,
   Image,
-  Link, Link2, Loader2, Lock, LogIn, LogOut,
+  Link, Loader2, Lock, LogIn, LogOut,
   Maximize2, Medal, Minus, Moon,
   Palette, Pause, PieChart, Play, Plus,
   RefreshCw, Rocket, RotateCcw,

@@ -1,16 +1,13 @@
-import { stravaService } from './stravaService';
 import { healthConnectService } from './healthConnectService';
 
 /**
  * Cardio provider registry.
  *
- * Both Strava and Google Health Connect expose the same surface
- * (isAuthenticated / connect / getActivities / disconnect) and emit normalized
- * sessions with unique, source-prefixed ids (`strava_…` / `hc_…`). Keeping them
- * behind this registry means the day Strava becomes paid, dropping it is a
- * one-line change here — the UI and sync logic don't move.
+ * Exposes Google Health Connect normalized sessions with unique, 
+ * source-prefixed ids (`hc_…`). Keeping it behind this registry means 
+ * dropping or adding other providers is a one-line change here.
  */
-const cardioProviders = [stravaService, healthConnectService];
+const cardioProviders = [healthConnectService];
 
 /**
  * Fetch new activities from every connected provider, concatenated and

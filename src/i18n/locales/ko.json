@@ -250,8 +250,6 @@
     "goalReached": "목표 달성!",
     "googleWallDesc": "심장 강화 모듈에 액세스하고 데이터를 동기화하려면 Google 계정으로 로그인하세요.",
     "googleWallStep1": "구글 로그인",
-    "googleWallStep2": "링크 스트라바",
-    "googleWallStep3": "자동 동기화",
     "googleWallTitle": "계정 필요",
     "gpsTrack": "GPS 트랙",
     "history": "심장 강화 역사",
@@ -267,7 +265,6 @@
     "speed": "속도",
     "start": "시작",
     "stravaWallDesc": "달리기 및 사이클링 세션을 자동으로 동기화하여 글로벌 연속 기록을 달성하세요.",
-    "stravaWallTitle": "Strava 연결",
     "streak": "줄",
     "tap": "수도꼭지",
     "totalDistance": "총 거리({{unit}})",
@@ -278,7 +275,9 @@
       "minKm": "분/km"
     },
     "viewHistory": "기록 보기",
-    "weeklyGoal": "주간 목표"
+    "weeklyGoal": "주간 목표",
+    "webRestrictionTitle": "유산소 운동은 온라인에서 사용할 수 없습니다",
+    "webRestrictionDesc": "유산소 운동 추적 기능을 사용하려면 Google Health Connect가 필요합니다. 이 기능은 웹 버전에서 사용할 수 없습니다."
   },
   "clan": {
     "alreadyMember": "귀하는 이미 이 클랜에 가입되어 있습니다.",

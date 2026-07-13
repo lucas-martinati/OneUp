@@ -250,8 +250,6 @@
     "goalReached": "Цель достигнута!",
     "googleWallDesc": "Войдите через Google, чтобы получить доступ к модулю кардио и синхронизировать данные.",
     "googleWallStep1": "Войти через Google",
-    "googleWallStep2": "Связать Strava",
-    "googleWallStep3": "Автосинхронизация",
     "googleWallTitle": "Требуется аккаунт",
     "gpsTrack": "GPS Маршрут",
     "history": "История кардио",
@@ -267,7 +265,6 @@
     "speed": "Скорость",
     "start": "Старт",
     "stravaWallDesc": "Автоматически синхронизируйте свои пробежки и велопоездки, чтобы продвигаться в глобальной серии.",
-    "stravaWallTitle": "Подключить Strava",
     "streak": "Серия",
     "tap": "Нажмите",
     "totalDistance": "Общая дистанция ({{unit}})",
@@ -278,7 +275,9 @@
       "minKm": "мин/км"
     },
     "viewHistory": "Посмотреть историю",
-    "weeklyGoal": "Цель на неделю"
+    "weeklyGoal": "Цель на неделю",
+    "webRestrictionTitle": "Кардио недоступно онлайн",
+    "webRestrictionDesc": "Для отслеживания кардио требуется Google Health Connect для синхронизации тренировок на телефоне. Эта функция недоступна в веб-версии."
   },
   "clan": {
     "alreadyMember": "Вы уже в этом клане",

@@ -12,14 +12,16 @@ vi.mock('@services/cardioService', () => ({
   saveCardioSession: vi.fn(() => Promise.resolve()),
   getSortedCardioSessions: vi.fn((v) => v ? Object.values(v) : []),
 }));
-vi.mock('@services/stravaService', () => ({ stravaService: { getActivities: vi.fn(() => Promise.resolve([])) } }));
+vi.mock('@services/cardioProviders', () => ({
+  getAllActivities: vi.fn(() => Promise.resolve([])),
+}));
 vi.mock('@contexts/AuthContext', () => ({ useAuth: () => stores.auth }));
 vi.mock('@store/useProgressStore', () => ({ useProgressStore: (sel) => sel(stores.progress) }));
 vi.mock('@store/useCloudSyncStore', () => ({ useCloudSyncStore: (sel) => sel(stores.cloud) }));
 vi.mock('@hooks/useExerciseConfig', () => ({ useExerciseConfig: () => ({ getConfig: () => ({ difficulty: 1 }) }) }));
 
 import { loadCardioSessions, saveCardioSession } from '@services/cardioService';
-import { stravaService } from '@services/stravaService';
+import { getAllActivities } from '@services/cardioProviders';
 import { useCardio } from '../useCardio';
 
 beforeEach(() => {
@@ -29,7 +31,7 @@ beforeEach(() => {
   stores.auth = { loading: false, isSignedIn: true };
   stores.cloud = { isInitialSyncDone: true };
   loadCardioSessions.mockResolvedValue([]);
-  stravaService.getActivities.mockResolvedValue([]);
+  getAllActivities.mockResolvedValue([]);
 });
 
 const runSession = (over = {}) => ({ id: 's1', type: 'running', distance: 5000, startTime: Date.now(), ...over });
@@ -42,9 +44,9 @@ describe('loading & fetching', () => {
     expect(result.current.allSessions).toEqual([]);
   });
 
-  it('loads Firebase sessions and merges new Strava activities', async () => {
+  it('loads Firebase sessions and merges new provider activities', async () => {
     loadCardioSessions.mockResolvedValue([runSession({ id: 'fb1', distance: 3000 })]);
-    stravaService.getActivities.mockResolvedValue([runSession({ id: 'strava_9', distance: 10000 })]);
+    getAllActivities.mockResolvedValue([runSession({ id: 'hc_9', distance: 10000 })]);
     const { result } = renderHook(() => useCardio());
     await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => expect(result.current.allSessions.length).toBe(2));

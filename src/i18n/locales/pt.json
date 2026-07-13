@@ -250,8 +250,6 @@
     "goalReached": "Meta alcançada!",
     "googleWallDesc": "Faça login com sua conta Google para acessar o módulo Cardio e sincronizar seus dados.",
     "googleWallStep1": "Login do Google",
-    "googleWallStep2": "Link Strava",
-    "googleWallStep3": "Sincronização automática",
     "googleWallTitle": "Conta necessária",
     "gpsTrack": "Rastreamento GPS",
     "history": "História cardiovascular",
@@ -267,7 +265,6 @@
     "speed": "Velocidade",
     "start": "Começar",
     "stravaWallDesc": "Sincronize automaticamente suas sessões de corrida e ciclismo para progredir em sua sequência global.",
-    "stravaWallTitle": "Conectar o Strava",
     "streak": "Onda",
     "tap": "Tocar",
     "totalDistance": "Distância Total ({{unit}})",
@@ -278,7 +275,9 @@
       "minKm": "min/km"
     },
     "viewHistory": "Ver histórico",
-    "weeklyGoal": "Meta semanal"
+    "weeklyGoal": "Meta semanal",
+    "webRestrictionTitle": "Cardio não disponível online",
+    "webRestrictionDesc": "O monitoramento de cardio requer o Google Health Connect para sincronizar seus treinos. Esse recurso não está disponível na versão web."
   },
   "clan": {
     "alreadyMember": "Você já está neste clã",
