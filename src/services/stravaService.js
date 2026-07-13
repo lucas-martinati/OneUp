@@ -187,9 +187,12 @@ class StravaService {
       const activities = await response.json();
       return activities.map(a => {
         let actType = 'other';
-        if (a.type === 'Run') {
+        const runTypes = ['Run', 'VirtualRun', 'TrailRun'];
+        const rideTypes = ['Ride', 'VirtualRide', 'EBikeRide', 'GravelRide', 'MountainBikeRide', 'Handcycle'];
+        
+        if (runTypes.includes(a.type)) {
           actType = 'running';
-        } else if (a.type === 'Ride') {
+        } else if (rideTypes.includes(a.type)) {
           actType = 'cycling';
         }
 

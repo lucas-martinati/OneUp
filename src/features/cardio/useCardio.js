@@ -97,7 +97,9 @@ export function useCardio() {
       // Determine the latest session start time to fetch only new Strava activities
       let afterTimestamp = 0;
       if (rawFirebase.length > 0) {
-        afterTimestamp = rawFirebase.reduce((max, s) => Math.max(max, s.startTime || 0), 0);
+        const latestTime = rawFirebase.reduce((max, s) => Math.max(max, s.startTime || 0), 0);
+        // Look back 14 days from our latest known activity to catch retroactive manual entries
+        afterTimestamp = Math.max(0, latestTime - (14 * 24 * 60 * 60 * 1000));
       }
 
       // Fetch new activities from all connected cardio providers (Strava, Health Connect)
