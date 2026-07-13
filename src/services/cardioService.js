@@ -1,4 +1,4 @@
-import { ref, set, get, remove, push, serverTimestamp } from 'firebase/database';
+import { ref, set, get, remove, push, serverTimestamp, update } from 'firebase/database';
 import { createLogger } from '@utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
 import { paths } from '@shared/dbSchema.js';
@@ -59,6 +59,19 @@ export async function deleteCardioSession(sessionId) {
   logger.success('Cardio session deleted');
   return true;
 }
+
+// ── Update session name ────────────────────────────────────────────────
+
+export async function updateCardioSessionName(sessionId, name) {
+  const auth = getAuthInstance();
+  const database = getDatabaseInstance();
+  if (!auth?.currentUser || !database) return false;
+
+  await update(ref(database, paths.userCardioSession(auth.currentUser.uid, sessionId)), { name });
+  logger.success('Cardio session renamed');
+  return true;
+}
+
 
 export function getSortedCardioSessions(sessionsObj) {
   if (!sessionsObj) return [];

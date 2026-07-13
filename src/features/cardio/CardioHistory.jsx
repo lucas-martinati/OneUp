@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import 'leaflet/dist/leaflet.css';
-import { X, Clock, Target, TrendingUp, Gauge, ChevronDown, Activity } from '@utils/icons';
+import { X, Clock, Target, TrendingUp, Gauge, ChevronDown, Activity, Pencil, Check } from '@utils/icons';
+import { updateCardioSessionName } from '@services/cardioService';
 import { IconButton } from'@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { CardioMap } from './CardioMap';
@@ -57,11 +58,27 @@ const StatChip = ({ icon: Icon, label, value, unit }) => (
 
 function SessionCard({ session, mode, t, lang }) {
   const [expanded, setExpanded] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [overrideName, setOverrideName] = useState(undefined);
+  
   const hasGps = session.gpsTrack && session.gpsTrack.length > 1;
   const type = session.type || mode;
   const speed = getSpeed(session);
   const elevation = getElevation(session);
-  const title = session.name || (type === 'running' ? t('exercises.running') : t('exercises.cycling'));
+  
+  const currentName = overrideName !== undefined ? overrideName : session.name;
+  const title = currentName || (type === 'running' ? t('exercises.running') : t('exercises.cycling'));
+  const [localName, setLocalName] = useState(currentName || '');
+
+  const handleSaveName = async (e) => {
+    e.stopPropagation();
+    setEditingName(false);
+    const newName = localName.trim();
+    if (newName !== (currentName || '')) {
+      setOverrideName(newName || null);
+      await updateCardioSessionName(session.id, newName || null);
+    }
+  };
 
   return (
     <div
@@ -84,15 +101,44 @@ function SessionCard({ session, mode, t, lang }) {
         </div>
 
         <div className="flex-1-min0">
-          <div style={{
-            fontSize: 'clamp(0.82rem, 1.55vh, 0.98rem)',
-            fontWeight: '800',
-            color: 'var(--text-primary)',
-            marginBottom: '2px',
-            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-          }}>
-            {title}
-          </div>
+          {editingName ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }} onClick={(e) => e.stopPropagation()}>
+              <input 
+                type="text" 
+                value={localName} 
+                onChange={(e) => setLocalName(e.target.value)} 
+                onBlur={handleSaveName}
+                onKeyDown={(e) => e.key === 'Enter' && handleSaveName(e)}
+                autoFocus
+                style={{
+                  background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)', 
+                  color: 'var(--text-primary)', borderRadius: '6px', padding: '2px 8px',
+                  fontSize: 'clamp(0.82rem, 1.55vh, 0.98rem)', fontWeight: '800', width: '100%',
+                  outline: 'none'
+                }}
+              />
+              <button onClick={handleSaveName} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', padding: '4px', cursor: 'pointer', display: 'flex' }}>
+                <Check size={16} />
+              </button>
+            </div>
+          ) : (
+            <div style={{
+              fontSize: 'clamp(0.82rem, 1.55vh, 0.98rem)',
+              fontWeight: '800',
+              color: 'var(--text-primary)',
+              marginBottom: '2px',
+              display: 'flex', alignItems: 'center', gap: '6px'
+            }}>
+              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</span>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setLocalName(currentName || ''); setEditingName(true); }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', padding: '2px', cursor: 'pointer', display: 'flex', opacity: 0.7 }}
+                aria-label="Rename session"
+              >
+                <Pencil size={12} />
+              </button>
+            </div>
+          )}
           <div style={{
             fontSize: 'clamp(0.65rem, 1.2vh, 0.78rem)',
             color: 'var(--text-secondary)',

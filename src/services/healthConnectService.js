@@ -164,7 +164,7 @@ function mapWorkout(w) {
     duration,
     movingTime: duration,
     startTime,
-    name: w.sourceName || null,
+    name: null,
     gpsTrack,
     polyline: null,
     elevation: null,
