@@ -235,7 +235,9 @@
       "Gio",
       "Ven",
       "Sab"
-    ]
+    ],
+    "notes": "Note",
+    "addNotePlaceholder": "Aggiungi una nota per questo giorno..."
   },
   "cardio": {
     "avgSpeed": "Velocità media",

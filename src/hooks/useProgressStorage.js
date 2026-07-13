@@ -15,6 +15,7 @@ export function getDefaultState() {
     // allotment. See @shared/streakFreeze.js.
     frozenDays: {},
     streakFreezes: { count: 0, lastRefill: null },
+    notes: {},
   };
 }
 
@@ -115,6 +116,7 @@ export function validateProgressData(data) {
     cardio: data.cardio || {},
     frozenDays: validateFrozenDays(data.frozenDays),
     streakFreezes: validateStreakFreezes(data.streakFreezes),
+    notes: typeof data.notes === 'object' && data.notes !== null ? data.notes : {},
   };
 }
 

@@ -235,7 +235,9 @@
       "Je",
       "Ve",
       "Sa"
-    ]
+    ],
+    "notes": "Notes",
+    "addNotePlaceholder": "Ajouter une note pour ce jour..."
   },
   "cardio": {
     "avgSpeed": "Vit. moy.",

@@ -437,3 +437,62 @@
   .rise { animation: none; }
   .navBtn { transition: none; }
 }
+
+/* ── Notes ───────────────────────────────────────────────────────────── */
+.noteIndicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  background: var(--text-primary);
+  opacity: 0.45;
+  transform: translate(50%, -50%) rotate(45deg);
+  pointer-events: none;
+}
+
+.noteSection {
+  margin-top: var(--spacing-sm);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.noteHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.noteIcon {
+  color: var(--accent-glow);
+}
+
+.noteInput {
+  width: 100%;
+  min-height: 80px;
+  background: transparent;
+  border: none;
+  resize: none;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.noteInput::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.noteInput:focus {
+  outline: none;
+}

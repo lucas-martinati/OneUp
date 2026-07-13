@@ -235,7 +235,9 @@
       "qui",
       "sex",
       "Sentado"
-    ]
+    ],
+    "notes": "Notas",
+    "addNotePlaceholder": "Adicione uma nota para este dia..."
   },
   "cardio": {
     "avgSpeed": "Velocidade média",

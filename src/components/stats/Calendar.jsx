@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { X, ChevronLeft, ChevronRight, CheckCircle2, ShieldAlert, Star, Snowflake } from '@utils/icons';
+import { X, ChevronLeft, ChevronRight, CheckCircle2, ShieldAlert, Star, Snowflake, FileText } from '@utils/icons';
 import { IconButton } from '@components/ui';
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr } from '@shared/dateUtils';
@@ -16,6 +16,7 @@ import styles from '@styles/Calendar.module.css';
 export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, getConfig }) {
     const { t } = useTranslation();
     const frozenDays = useProgressStore(s => s.frozenDays);
+    const notes = useProgressStore(s => s.notes);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
     const [isClosing, setIsClosing] = useState(false);
@@ -325,6 +326,8 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                         else if (isMissed) cls.push(styles.missed);
                         if (isToday) cls.push(styles.today);
                         if (isSelected) cls.push(styles.selected);
+                        
+                        const hasNote = !!notes?.[dateString];
 
                         return (
                             <button
@@ -359,6 +362,9 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                                             <Snowflake size={dotPx + 6} color="#38bdf8" strokeWidth={2.5} style={{ filter: 'drop-shadow(0 0 3px rgba(56,189,248,0.55))' }} />
                                         )}
                                     </span>
+                                )}
+                                {hasNote && !isMuted && (
+                                    <span className={styles.noteIndicator} />
                                 )}
                             </button>
                         );
@@ -406,6 +412,18 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
     const dayCompletions = completions[dateString] || {};
     const isCaughtUp = isCaughtUpDay(dayCompletions, dateString);
     const [isVisible, setIsVisible] = useState(false);
+    
+    const notes = useProgressStore(s => s.notes);
+    const setNote = useProgressStore(s => s.setNote);
+    const noteText = notes?.[dateString] || '';
+    const [localNote, setLocalNote] = useState(noteText);
+
+    const handleNoteBlur = () => {
+        if (localNote !== noteText) {
+            setNote(dateString, localNote);
+        }
+    };
+
     // Blur is only enabled once the entrance slide finishes. Keeping the
     // backdrop-filter live while the sheet translates forces the browser to
     // re-blur the whole backdrop every frame, which makes the slide-in
@@ -628,6 +646,23 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                         </div>
                     );
                 })}
+
+                <div className={styles.noteSection}>
+                    <div className={styles.noteHeader}>
+                        <FileText size={16} className={styles.noteIcon} />
+                        <span>{t('calendar.notes')}</span>
+                    </div>
+                    <textarea
+                        className={styles.noteInput}
+                        placeholder={t('calendar.addNotePlaceholder')}
+                        value={localNote}
+                        onChange={(e) => setLocalNote(e.target.value)}
+                        onBlur={handleNoteBlur}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
+                        onMouseDown={(e) => e.stopPropagation()}
+                    />
+                </div>
             </div>
             </div>
         </div>

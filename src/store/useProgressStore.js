@@ -99,6 +99,7 @@ export const useProgressStore = create((set, get) => ({
   cardio: {},
   frozenDays: {},
   streakFreezes: { count: 0, lastRefill: null },
+  notes: getDefaultState().notes,
   hasShared: false,
   lastCompletionChange: null,
   isStoreInitialized: false,
@@ -143,6 +144,7 @@ export const useProgressStore = create((set, get) => ({
       cardio: loaded.cardio || {},
       frozenDays: loaded.frozenDays || {},
       streakFreezes: loaded.streakFreezes || { count: 0, lastRefill: null },
+      notes: loaded.notes || {},
       hasShared: !!finalAch.first_share,
       lastCompletionChange: loaded.lastCompletionChange || null,
       isStoreInitialized: true,
@@ -207,6 +209,7 @@ export const useProgressStore = create((set, get) => ({
       cardio: s.cardio,
       frozenDays: s.frozenDays,
       streakFreezes: s.streakFreezes,
+      notes: s.notes,
       lastCompletionChange: s.lastCompletionChange,
     }).catch(err => logger.error('Async background persist failed:', err));
   },
@@ -309,6 +312,21 @@ export const useProgressStore = create((set, get) => ({
     const state = get();
     if (!state.streakFreezes?.count && !state.streakFreezes?.lastRefill) return;
     set({ streakFreezes: { count: 0, lastRefill: null } });
+    get()._persist();
+  },
+
+  // ── Notes ───────────────────────────────────────────────────────────
+
+  setNote: (dateStr, text) => {
+    set((state) => {
+      const newNotes = { ...state.notes };
+      if (text && text.trim().length > 0) {
+        newNotes[dateStr] = text;
+      } else {
+        delete newNotes[dateStr];
+      }
+      return { notes: newNotes, lastCompletionChange: serverTimestamp() };
+    });
     get()._persist();
   },
 
@@ -498,6 +516,7 @@ export const useProgressStore = create((set, get) => ({
       cardio: validated.cardio || {},
       frozenDays: validated.frozenDays || {},
       streakFreezes: validated.streakFreezes || { count: 0, lastRefill: null },
+      notes: validated.notes || {},
     }));
     get()._persist();
   },
@@ -537,6 +556,7 @@ export const useProgressStore = create((set, get) => ({
         cardio: { ...state.cardio, sessions: nextSessions },
         frozenDays: merged.frozenDays || state.frozenDays,
         streakFreezes: merged.streakFreezes || state.streakFreezes,
+        notes: merged.notes || state.notes,
       };
     });
     get()._persist();
@@ -617,6 +637,7 @@ export const useProgressStore = create((set, get) => ({
           streakFreezes: (state.streakFreezes?.lastRefill || '') >= (validated.streakFreezes?.lastRefill || '')
             ? state.streakFreezes
             : validated.streakFreezes,
+          notes: { ...(state.notes || {}), ...(validated.notes || {}) },
           lastCompletionChange: serverTimestamp(),
         };
       });
@@ -666,6 +687,7 @@ export const useProgressStore = create((set, get) => ({
         cardio: state.cardio,
         frozenDays: state.frozenDays,
         streakFreezes: state.streakFreezes,
+        notes: state.notes,
       });
       return { success: true };
     } catch (error) {
@@ -702,6 +724,7 @@ export const useProgressStore = create((set, get) => ({
         cardio: state.cardio,
         frozenDays: state.frozenDays,
         streakFreezes: state.streakFreezes,
+        notes: state.notes,
       });
       if (mergedData) {
         get().applySyncedData(mergedData);

@@ -235,7 +235,9 @@
       "四",
       "五",
       "六"
-    ]
+    ],
+    "notes": "笔记",
+    "addNotePlaceholder": "为这一天添加笔记..."
   },
   "cardio": {
     "avgSpeed": "平均速度",

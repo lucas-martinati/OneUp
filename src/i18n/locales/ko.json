@@ -235,7 +235,9 @@
       "목",
       "금",
       "앉았다"
-    ]
+    ],
+    "notes": "메모",
+    "addNotePlaceholder": "이 날짜에 메모 추가..."
   },
   "cardio": {
     "avgSpeed": "평균 속도",

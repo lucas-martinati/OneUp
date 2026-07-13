@@ -119,6 +119,7 @@ export function mergeData(localData, cloudData) {
       isSetup: cloudData.isSetup,
       lastCompletionChange: cloudData.lastCompletionChange,
       cardio: cloudData.cardio || { sessions: {} },
+      notes: cloudData.notes || {},
       ...mergeStreakFreeze(localData, cloudData),
     };
   }
@@ -187,6 +188,7 @@ export function mergeData(localData, cloudData) {
       ...cloudData.cardio,
       sessions: mergedSessions
     },
+    notes: { ...(localData.notes || {}), ...(cloudData.notes || {}) },
     ...mergeStreakFreeze(localData, cloudData),
   };
 

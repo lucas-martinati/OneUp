@@ -235,7 +235,9 @@
       "Do",
       "Fr",
       "Sa"
-    ]
+    ],
+    "notes": "Notizen",
+    "addNotePlaceholder": "Füge eine Notiz für diesen Tag hinzu..."
   },
   "cardio": {
     "avgSpeed": "Durchschnittliche Geschwindigkeit",

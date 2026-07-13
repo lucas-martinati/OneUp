@@ -7,6 +7,7 @@ import {
   X, Check, CheckCheck, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Plus, Minus, 
   Play, Pause, RotateCcw, Save, Trash2, Edit3, Edit2, Code,
   FolderOpen, FolderPlus, GripVertical, Shuffle, ArrowLeft, ArrowRight,
+  FileText, MessageSquare, StickyNote,
   // Social & gamification
   Trophy, Medal, Award, Star, Crown,
   Users, User, LogIn, UserPlus, Shield, ShieldAlert, HeartHandshake,
@@ -39,7 +40,7 @@ export {
   Filter, Flame, FolderPlus, Footprints,
   Gauge, Gem, Ghost, Globe, GripVertical,
   Hash, Heart, HeartHandshake, History,
-  Image,
+  Image, FileText,
   Link, Loader2, Lock, LogIn, LogOut,
   Maximize2, Medal, Minus, Moon,
   Palette, Pause, PieChart, Play, Plus,
@@ -68,7 +69,8 @@ export const EXERCISE_ICONS = {
 export const UI_ICONS = {
   X, Check, CheckCheck, ChevronLeft, ChevronRight, ChevronNext: ChevronRight,
   Plus, Minus, Play, Pause, RotateCcw, Save, Trash2, Edit3, Pencil: Edit2,
-  FolderOpen, GripVertical, Shuffle, ArrowLeft, ArrowRight
+  FolderOpen, GripVertical, Shuffle, ArrowLeft, ArrowRight,
+  FileText, MessageSquare, StickyNote
 };
 
 export const SOCIAL_ICONS = {

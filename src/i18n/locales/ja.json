@@ -235,7 +235,9 @@
       "木",
       "金",
       "土"
-    ]
+    ],
+    "notes": "メモ",
+    "addNotePlaceholder": "この日のメモを追加..."
   },
   "cardio": {
     "avgSpeed": "平均速度",

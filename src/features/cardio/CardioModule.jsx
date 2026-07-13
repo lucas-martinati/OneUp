@@ -73,8 +73,12 @@ export function CardioModule() {
   // A "cardio source" is any connected provider (Health Connect).
   const hasCardioSource = healthConnected;
   const needsCardioSource = auth.isSignedIn && !hasCardioSource;
+  
+  const hasSessions = sessions && sessions.length > 0;
+  
   // Fake demo values for the paywall
-  const isDemo = !isWeb && (needsGoogleLogin || needsCardioSource);
+  // We show demo data only if there are no sessions AND the user needs to connect/download.
+  const isDemo = !hasSessions && (isWeb || needsGoogleLogin || needsCardioSource);
   const displayDistance = isDemo ? 12.5 : weeklyDistance;
   const displayGoal = isDemo ? 15 : weeklyGoal;
   const displayWeekNumber = isDemo ? 3 : weekNumber;
@@ -172,118 +176,6 @@ export function CardioModule() {
         </div>
 
         {(() => {
-          if (isWeb) return (
-          <div style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '16px',
-            textAlign: 'center',
-            padding: '24px',
-            borderRadius: 'var(--radius-lg)',
-            background: 'var(--surface-subtle)',
-            border: '1px solid var(--border-subtle)',
-            backdropFilter: 'blur(12px)',
-            margin: '20px 0',
-            position: 'relative'
-          }}>
-            {/* Soft decorative background glow */}
-            <div style={{
-              position: 'absolute',
-              width: '100px',
-              height: '100px',
-              background: 'radial-gradient(circle, rgba(66,133,244,0.15) 0%, transparent 70%)',
-              pointerEvents: 'none',
-              top: '10%',
-              left: '10%'
-            }} />
-            <div style={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '2rem',
-              background: 'rgba(66, 133, 244, 0.1)',
-              border: '1px solid rgba(66, 133, 244, 0.2)',
-              marginBottom: '8px',
-              boxShadow: '0 8px 24px rgba(66, 133, 244, 0.15)'
-            }}>
-              📱
-            </div>
-            <h3 style={{
-              fontSize: '1rem',
-              fontWeight: '800',
-              color: 'var(--text-primary)',
-              margin: 0
-            }}>
-              {t('cardio.webRestrictionTitle')}
-            </h3>
-            <p style={{
-              fontSize: '0.78rem',
-              color: 'var(--text-secondary)',
-              lineHeight: 1.5,
-              maxWidth: '280px',
-              margin: 0,
-              opacity: 0.9
-            }}>
-              {t('cardio.webRestrictionDesc')}
-            </p>
-            <a 
-              href="https://play.google.com/store/apps/details?id=com.lucasm548.oneup" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hover-lift"
-              style={{
-                marginTop: '16px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '12px',
-                background: '#0a0a0a',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                padding: '10px 20px',
-                borderRadius: '12px',
-                textDecoration: 'none',
-                color: '#ffffff',
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(66, 133, 244, 0.1)',
-                transition: 'all 0.25s ease',
-              }}
-            >
-              {/* Official Google Play Triangle SVG (2022 Rounded Version) */}
-              <svg viewBox="0 0 29 32" width="20" height="22" style={{ flexShrink: 0 }}>
-                <path d="M13.54 15.28.12 29.34a3.64 3.64 0 0 0 5.33 2.16l15.1-8.6z" fill="#ea4335"/>
-                <path d="m27.11 12.89-6.53-3.74-7.35 6.45 7.38 7.28 6.48-3.7a3.55 3.55 0 0 0 0-6.29z" fill="#fbbc04"/>
-                <path d="M.12 2.66a3.46 3.46 0 0 0-.12.92v24.84a3.66 3.66 0 0 0 .12.92L14 15.64Z" fill="#4285f4"/>
-                <path d="m13.64 16 6.94-6.85L5.5.51A3.72 3.72 0 0 0 3.63 0 3.64 3.64 0 0 0 .12 2.65Z" fill="#34a853"/>
-              </svg>
-              
-              {/* Typography Column */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.1 }}>
-                <span style={{ 
-                  fontSize: '0.58rem', 
-                  fontWeight: '600', 
-                  color: 'rgba(255, 255, 255, 0.55)', 
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.8px',
-                  marginBottom: '2px'
-                }}>
-                  {i18n.language?.startsWith('fr') ? 'Disponible sur' : 'Get it on'}
-                </span>
-                <span style={{ 
-                  fontSize: '1rem', 
-                  fontWeight: '700', 
-                  color: '#ffffff',
-                  letterSpacing: '0.2px'
-                }}>
-                  Google Play
-                </span>
-              </div>
-            </a>
-          </div>
-          );
           if (loading) return (
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -391,6 +283,76 @@ export function CardioModule() {
                 </div>
               )}
 
+              {/* Web Sync Section */}
+              {!isDemo && isWeb && (
+                <div style={{
+                  display: 'flex', flexDirection: 'column', gap: '8px',
+                  padding: '12px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px dashed var(--border-subtle)',
+                  marginTop: '8px'
+                }}>
+                  <div style={{
+                    fontSize: '0.7rem', fontWeight: '800',
+                    color: 'var(--text-secondary)', textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    {t('cardio.webRestrictionTitle')}
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <a 
+                      href="https://play.google.com/store/apps/details?id=com.lucasm548.oneup" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="hover-lift"
+                      style={{
+                        flex: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        background: '#0a0a0a',
+                        border: '1px solid rgba(255, 255, 255, 0.12)',
+                        padding: '8px 16px',
+                        borderRadius: 'var(--radius-sm)',
+                        textDecoration: 'none',
+                        color: '#ffffff',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                        transition: 'all 0.25s ease',
+                      }}
+                    >
+                      <svg viewBox="0 0 29 32" width="16" height="18" style={{ flexShrink: 0 }}>
+                        <path d="M13.54 15.28.12 29.34a3.64 3.64 0 0 0 5.33 2.16l15.1-8.6z" fill="#ea4335"/>
+                        <path d="m27.11 12.89-6.53-3.74-7.35 6.45 7.38 7.28 6.48-3.7a3.55 3.55 0 0 0 0-6.29z" fill="#fbbc04"/>
+                        <path d="M.12 2.66a3.46 3.46 0 0 0-.12.92v24.84a3.66 3.66 0 0 0 .12.92L14 15.64Z" fill="#4285f4"/>
+                        <path d="m13.64 16 6.94-6.85L5.5.51A3.72 3.72 0 0 0 3.63 0 3.64 3.64 0 0 0 .12 2.65Z" fill="#34a853"/>
+                      </svg>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.1 }}>
+                        <span style={{ 
+                          fontSize: '0.5rem', 
+                          fontWeight: '600', 
+                          color: 'rgba(255, 255, 255, 0.55)', 
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          marginBottom: '2px'
+                        }}>
+                          {i18n.language?.startsWith('fr') ? 'Disponible sur' : 'Get it on'}
+                        </span>
+                        <span style={{ 
+                          fontSize: '0.85rem', 
+                          fontWeight: '700', 
+                          color: '#ffffff',
+                          letterSpacing: '0.2px'
+                        }}>
+                          Google Play
+                        </span>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              )}
+
               {/* No sessions message */}
               {!isDemo && sessions.length === 0 && (
                 <div style={{
@@ -411,12 +373,142 @@ export function CardioModule() {
         {/* Unified Cardio Login Wall — a frosted-glass teaser that lets the demo
             content peek through behind a glass card. */}
         {isDemo && (() => {
-          const onGoogleStep = needsGoogleLogin;
-          const accent = onGoogleStep ? '#4285F4' : '#34A853';
-          const steps = [
-            { label: t('cardio.googleWallStep1'), color: '#4285F4', done: auth.isSignedIn, active: needsGoogleLogin },
-            { label: t('cardio.healthConnect'), color: '#34A853', done: hasCardioSource, active: needsCardioSource }
-          ];
+          const isWebWall = isWeb;
+          const onGoogleStep = !isWebWall && needsGoogleLogin;
+          let accent = '#34A853';
+          if (isWebWall || onGoogleStep) {
+            accent = '#4285F4';
+          }
+
+          const googlePlayButton = (
+            <a 
+              href="https://play.google.com/store/apps/details?id=com.lucasm548.oneup" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover-lift"
+              style={{
+                marginTop: isWebWall ? '16px' : '0',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '12px',
+                background: '#0a0a0a',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                padding: '10px 20px',
+                borderRadius: '12px',
+                textDecoration: 'none',
+                color: '#ffffff',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(66, 133, 244, 0.1)',
+                transition: 'all 0.25s ease',
+              }}
+            >
+              <svg viewBox="0 0 29 32" width="20" height="22" style={{ flexShrink: 0 }}>
+                <path d="M13.54 15.28.12 29.34a3.64 3.64 0 0 0 5.33 2.16l15.1-8.6z" fill="#ea4335"/>
+                <path d="m27.11 12.89-6.53-3.74-7.35 6.45 7.38 7.28 6.48-3.7a3.55 3.55 0 0 0 0-6.29z" fill="#fbbc04"/>
+                <path d="M.12 2.66a3.46 3.46 0 0 0-.12.92v24.84a3.66 3.66 0 0 0 .12.92L14 15.64Z" fill="#4285f4"/>
+                <path d="m13.64 16 6.94-6.85L5.5.51A3.72 3.72 0 0 0 3.63 0 3.64 3.64 0 0 0 .12 2.65Z" fill="#34a853"/>
+              </svg>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.1 }}>
+                <span style={{ 
+                  fontSize: '0.58rem', 
+                  fontWeight: '600', 
+                  color: 'rgba(255, 255, 255, 0.55)', 
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.8px',
+                  marginBottom: '2px'
+                }}>
+                  {i18n.language?.startsWith('fr') ? 'Disponible sur' : 'Get it on'}
+                </span>
+                <span style={{ 
+                  fontSize: '1rem', 
+                  fontWeight: '700', 
+                  color: '#ffffff',
+                  letterSpacing: '0.2px'
+                }}>
+                  Google Play
+                </span>
+              </div>
+            </a>
+          );
+
+          let title, desc, icon, actionButton, stepsUI;
+
+          if (isWebWall) {
+             title = t('cardio.webRestrictionTitle');
+             desc = t('cardio.webRestrictionDesc');
+             icon = <div style={{ fontSize: '1.5rem' }}>📱</div>;
+             actionButton = googlePlayButton;
+             stepsUI = null;
+          } else {
+             title = onGoogleStep ? t('cardio.googleWallTitle') : t('cardio.healthConnect');
+             desc = onGoogleStep ? t('cardio.googleWallDesc') : t('cardio.stravaWallDesc');
+             icon = onGoogleStep ? <GoogleIcon size={28} /> : <Activity size={28} color="#34A853" />;
+             const steps = [
+               { label: t('cardio.googleWallStep1'), color: '#4285F4', done: auth.isSignedIn, active: needsGoogleLogin },
+               { label: t('cardio.healthConnect'), color: '#34A853', done: hasCardioSource, active: needsCardioSource }
+             ];
+             stepsUI = (
+               <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '210px', margin: '2px 0' }}>
+                 {steps.map((step, i) => {
+                   const lit = step.active || step.done;
+                   return (
+                     <React.Fragment key={i}>
+                       {i > 0 && (
+                         <div style={{
+                           width: '2px', height: '10px', marginLeft: '10px', borderRadius: '2px',
+                           background: steps[i - 1].done ? `${steps[i - 1].color}66` : 'var(--border-subtle)'
+                         }} />
+                       )}
+                       <div style={{
+                         display: 'flex', alignItems: 'center', gap: '10px',
+                         opacity: lit ? 1 : 0.55
+                       }}>
+                         <span style={{
+                           width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0,
+                           display: 'flex', alignItems: 'center', justifyContent: 'center',
+                           fontSize: '0.62rem', fontWeight: '900',
+                           background: lit ? `${step.color}22` : 'var(--surface-muted)',
+                           border: `1px solid ${lit ? step.color + '55' : 'var(--border-subtle)'}`,
+                           color: lit ? step.color : 'var(--text-secondary)'
+                         }}>{step.done ? '✓' : i + 1}</span>
+                         <span style={{
+                           fontSize: '0.74rem', fontWeight: '700', textAlign: 'left',
+                           color: lit ? 'var(--text-primary)' : 'var(--text-secondary)'
+                         }}>{step.label}</span>
+                       </div>
+                     </React.Fragment>
+                   );
+                 })}
+               </div>
+             );
+             actionButton = onGoogleStep ? (
+               <GoogleSignInButton onClick={() => auth.signIn()} className="hover-lift" style={{ width: 'auto', marginTop: '6px' }} />
+             ) : (
+               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', marginTop: '6px' }}>
+                 {healthAvailable && (
+                   <button onClick={handleConnectHealth} className="hover-lift" style={{
+                     padding: '12px 26px', borderRadius: '16px',
+                     background: 'linear-gradient(145deg, #4285F4, #3367d6)', color: 'white',
+                     fontWeight: '800', fontSize: 'clamp(0.8rem, 1.5vh, 0.9rem)',
+                     border: 'none', cursor: 'pointer',
+                     boxShadow: '0 8px 28px rgba(66, 133, 244, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
+                     display: 'flex', gap: '8px', alignItems: 'center', letterSpacing: '0.3px',
+                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                   }}>
+                     <Activity size={18} /> {t('cardio.healthConnect')}
+                   </button>
+                 )}
+               </div>
+             );
+          }
+
+          let glowColor = 'rgba(52,168,83,0.16)';
+          if (isWebWall) {
+            glowColor = 'rgba(66,133,244,0.14)';
+          } else if (onGoogleStep) {
+            glowColor = 'rgba(234,67,53,0.14)';
+          }
+
           return (
             <div
               className="fade-in cardio-login-wall"
@@ -428,7 +520,7 @@ export function CardioModule() {
                 '--cardio-accent-shadow': `${accent}3a`,
               }}
             >
-              {/* Ambient glows — luminous reminders of the brand colors */}
+              {/* Ambient glows */}
               <div className="cardio-wall-glow" style={{
                 top: '-50px', left: '50%', marginLeft: '-90px',
                 width: '180px', height: '180px',
@@ -438,83 +530,26 @@ export function CardioModule() {
                 bottom: '-40px', right: '-30px',
                 width: '150px', height: '150px',
                 animationDirection: 'reverse', animationDuration: '9s',
-                background: `radial-gradient(circle, ${onGoogleStep ? 'rgba(234,67,53,0.14)' : 'rgba(52,168,83,0.16)'} 0%, transparent 70%)`,
+                background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
               }} />
 
               <div className="cardio-login-card">
                 {/* Icon for the current step */}
                 <div className="cardio-wall-icon">
-                  {onGoogleStep
-                    ? <GoogleIcon size={28} />
-                    : <Activity size={28} color="#34A853" />}
+                  {icon}
                 </div>
 
                 <h2 className="cardio-wall-title">
-                  {onGoogleStep ? t('cardio.googleWallTitle') : t('cardio.healthConnect')}
+                  {title}
                 </h2>
                 <p className="cardio-wall-desc">
-                  {onGoogleStep ? t('cardio.googleWallDesc') : t('cardio.stravaWallDesc')}
+                  {desc}
                 </p>
 
-                {/* 2-step progress indicator — vertical connected stepper so the
-                    longer translated labels never overflow the card. */}
-                <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '210px', margin: '2px 0' }}>
-                  {steps.map((step, i) => {
-                    const lit = step.active || step.done;
-                    return (
-                      <React.Fragment key={i}>
-                        {i > 0 && (
-                          <div style={{
-                            width: '2px', height: '10px', marginLeft: '10px', borderRadius: '2px',
-                            background: steps[i - 1].done ? `${steps[i - 1].color}66` : 'var(--border-subtle)'
-                          }} />
-                        )}
-                        <div style={{
-                          display: 'flex', alignItems: 'center', gap: '10px',
-                          opacity: lit ? 1 : 0.55
-                        }}>
-                          <span style={{
-                            width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '0.62rem', fontWeight: '900',
-                            background: lit ? `${step.color}22` : 'var(--surface-muted)',
-                            border: `1px solid ${lit ? step.color + '55' : 'var(--border-subtle)'}`,
-                            color: lit ? step.color : 'var(--text-secondary)'
-                          }}>{step.done ? '✓' : i + 1}</span>
-                          <span style={{
-                            fontSize: '0.74rem', fontWeight: '700', textAlign: 'left',
-                            color: lit ? 'var(--text-primary)' : 'var(--text-secondary)'
-                          }}>{step.label}</span>
-                        </div>
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
+                {stepsUI}
 
                 {/* Action button for the current step */}
-                {onGoogleStep ? (
-                  <GoogleSignInButton
-                    onClick={() => auth.signIn()}
-                    className="hover-lift"
-                    style={{ width: 'auto', marginTop: '6px' }}
-                  />
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', marginTop: '6px' }}>
-                    {healthAvailable && (
-                      <button onClick={handleConnectHealth} className="hover-lift" style={{
-                        padding: '12px 26px', borderRadius: '16px',
-                        background: 'linear-gradient(145deg, #4285F4, #3367d6)', color: 'white',
-                        fontWeight: '800', fontSize: 'clamp(0.8rem, 1.5vh, 0.9rem)',
-                        border: 'none', cursor: 'pointer',
-                        boxShadow: '0 8px 28px rgba(66, 133, 244, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
-                        display: 'flex', gap: '8px', alignItems: 'center', letterSpacing: '0.3px',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                      }}>
-                        <Activity size={18} /> {t('cardio.healthConnect')}
-                      </button>
-                    )}
-                  </div>
-                )}
+                {actionButton}
               </div>
             </div>
           );

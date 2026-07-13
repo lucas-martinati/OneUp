@@ -235,7 +235,9 @@
       "Thu",
       "Fri",
       "Sat"
-    ]
+    ],
+    "notes": "Notes",
+    "addNotePlaceholder": "Add a note for this day..."
   },
   "cardio": {
     "avgSpeed": "Avg speed",
