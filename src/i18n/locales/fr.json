@@ -237,7 +237,8 @@
       "Sa"
     ],
     "notes": "Notes",
-    "addNotePlaceholder": "Ajouter une note pour ce jour..."
+    "addNotePlaceholder": "Ajouter une note pour ce jour...",
+    "noteSaved": "Sauvegardé !"
   },
   "cardio": {
     "avgSpeed": "Vit. moy.",

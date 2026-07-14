@@ -237,7 +237,8 @@
       "Sat"
     ],
     "notes": "Notes",
-    "addNotePlaceholder": "Add a note for this day..."
+    "addNotePlaceholder": "Add a note for this day...",
+    "noteSaved": "Saved!"
   },
   "cardio": {
     "avgSpeed": "Avg speed",

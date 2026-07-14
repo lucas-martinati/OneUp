@@ -237,7 +237,8 @@
       "六"
     ],
     "notes": "笔记",
-    "addNotePlaceholder": "为这一天添加笔记..."
+    "addNotePlaceholder": "为这一天添加笔记...",
+    "noteSaved": "已保存！"
   },
   "cardio": {
     "avgSpeed": "平均速度",

@@ -237,7 +237,8 @@
       "Сб"
     ],
     "notes": "Заметки",
-    "addNotePlaceholder": "Добавить заметку для этого дня..."
+    "addNotePlaceholder": "Добавить заметку для этого дня...",
+    "noteSaved": "Сохранено!"
   },
   "cardio": {
     "avgSpeed": "Ср. скорость",

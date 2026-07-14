@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { X, ChevronLeft, ChevronRight, CheckCircle2, ShieldAlert, Star, Snowflake, FileText } from '@utils/icons';
+import { X, ChevronLeft, ChevronRight, CheckCircle2, Check, ShieldAlert, Star, Snowflake, FileText } from '@utils/icons';
 import { IconButton } from '@components/ui';
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr } from '@shared/dateUtils';
@@ -417,10 +417,14 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
     const setNote = useProgressStore(s => s.setNote);
     const noteText = notes?.[dateString] || '';
     const [localNote, setLocalNote] = useState(noteText);
+    const [noteSaved, setNoteSaved] = useState(false);
+    const noteDirty = localNote !== noteText;
 
-    const handleNoteBlur = () => {
-        if (localNote !== noteText) {
+    const handleSaveNote = () => {
+        if (noteDirty) {
             setNote(dateString, localNote);
+            setNoteSaved(true);
+            setTimeout(() => setNoteSaved(false), 1800);
         }
     };
 
@@ -651,17 +655,33 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                     <div className={styles.noteHeader}>
                         <FileText size={16} className={styles.noteIcon} />
                         <span>{t('calendar.notes')}</span>
+                        {noteSaved && (
+                            <span className={styles.noteSavedBadge}>
+                                <Check size={12} /> {t('calendar.noteSaved')}
+                            </span>
+                        )}
                     </div>
                     <textarea
                         className={styles.noteInput}
                         placeholder={t('calendar.addNotePlaceholder')}
                         value={localNote}
                         onChange={(e) => setLocalNote(e.target.value)}
-                        onBlur={handleNoteBlur}
                         onPointerDown={(e) => e.stopPropagation()}
                         onTouchStart={(e) => e.stopPropagation()}
                         onMouseDown={(e) => e.stopPropagation()}
                     />
+                    {noteDirty && (
+                        <button
+                            type="button"
+                            className={styles.noteSaveBtn}
+                            onClick={handleSaveNote}
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onTouchStart={(e) => e.stopPropagation()}
+                        >
+                            <Check size={16} />
+                            {t('common.save')}
+                        </button>
+                    )}
                 </div>
             </div>
             </div>

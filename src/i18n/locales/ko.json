@@ -237,7 +237,8 @@
       "앉았다"
     ],
     "notes": "메모",
-    "addNotePlaceholder": "이 날짜에 메모 추가..."
+    "addNotePlaceholder": "이 날짜에 메모 추가...",
+    "noteSaved": "저장됨!"
   },
   "cardio": {
     "avgSpeed": "평균 속도",

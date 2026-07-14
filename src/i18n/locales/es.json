@@ -237,7 +237,8 @@
       "Sáb"
     ],
     "notes": "Notas",
-    "addNotePlaceholder": "Añade una nota para este día..."
+    "addNotePlaceholder": "Añade una nota para este día...",
+    "noteSaved": "¡Guardado!"
   },
   "cardio": {
     "avgSpeed": "Vel. media",

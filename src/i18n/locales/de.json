@@ -237,7 +237,8 @@
       "Sa"
     ],
     "notes": "Notizen",
-    "addNotePlaceholder": "Füge eine Notiz für diesen Tag hinzu..."
+    "addNotePlaceholder": "Füge eine Notiz für diesen Tag hinzu...",
+    "noteSaved": "Gespeichert!"
   },
   "cardio": {
     "avgSpeed": "Durchschnittliche Geschwindigkeit",

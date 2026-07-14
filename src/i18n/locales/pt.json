@@ -237,7 +237,8 @@
       "Sentado"
     ],
     "notes": "Notas",
-    "addNotePlaceholder": "Adicione uma nota para este dia..."
+    "addNotePlaceholder": "Adicione uma nota para este dia...",
+    "noteSaved": "Salvo!"
   },
   "cardio": {
     "avgSpeed": "Velocidade média",

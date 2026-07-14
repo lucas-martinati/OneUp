@@ -237,7 +237,8 @@
       "土"
     ],
     "notes": "メモ",
-    "addNotePlaceholder": "この日のメモを追加..."
+    "addNotePlaceholder": "この日のメモを追加...",
+    "noteSaved": "保存しました！"
   },
   "cardio": {
     "avgSpeed": "平均速度",
