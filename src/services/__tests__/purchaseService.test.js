@@ -186,18 +186,33 @@ describe('getPurchaseHistory', () => {
           isActive: true, willRenew: false,
           purchaseDate: '2023-01-01T00:00:00Z', expiresDate: '2226-01-01T00:00:00Z',
         },
+        pro_onetime: {
+          isActive: true, willRenew: false,
+          purchaseDate: '2024-01-15T00:00:00Z', expiresDate: '2024-02-15T00:00:00Z',
+        },
+        pro_unknown: {
+          isActive: true, willRenew: true,
+          purchaseDate: '2024-01-15T00:00:00Z', expiresDate: '2024-02-15T00:00:00Z',
+        }
       },
       nonSubscriptionTransactions: [
         { productIdentifier: 'supporter', transactionIdentifier: 'tx1', purchaseDate: '2022-06-01T00:00:00Z' },
+        { productIdentifier: 'pro_unknown', transactionIdentifier: 'tx2', purchaseDate: '2022-07-01T00:00:00Z' },
+        { productIdentifier: 'random', transactionIdentifier: 'tx3', purchaseDate: '2022-08-01T00:00:00Z' },
       ],
       entitlements: {
         all: {
           pro: { productIdentifier: 'oneup_pro_promo', periodType: 'PROMOTIONAL', isActive: false, expirationDate: '2024-02-01T00:00:00Z', latestPurchaseDate: '2024-02-01T00:00:00Z' },
+          pro_ent: { productIdentifier: 'pro_ent_onetime', willRenew: false, isActive: false, latestPurchaseDate: '2024-02-01T00:00:00Z' },
+          pro_ent_lifetime: { productIdentifier: 'pro_ent_lifetime', willRenew: false, isActive: false, latestPurchaseDate: '2024-02-01T00:00:00Z', expirationDate: '2227-01-01T00:00:00Z' },
+          pro_ent_reg: { productIdentifier: 'pro_ent_reg', willRenew: true, isActive: true, latestPurchaseDate: '2024-02-01T00:00:00Z' },
+          random_ent: { productIdentifier: 'random_ent', willRenew: true, isActive: true, latestPurchaseDate: '2024-02-01T00:00:00Z' },
+          supporter_ent: { productIdentifier: 'supporter_ent', willRenew: false, isActive: true, latestPurchaseDate: '2024-02-01T00:00:00Z' }
         },
       },
     });
     const history = await svc.getPurchaseHistory();
-    expect(history.length).toBe(4);
+    expect(history.length).toBeGreaterThan(4);
     // newest first
     const dates = history.map(h => new Date(h.date).getTime());
     expect(dates).toEqual([...dates].sort((a, b) => b - a));

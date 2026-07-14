@@ -4,12 +4,13 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 const ho = vi.hoisted(() => ({
   native: false,
   loginConfig: null,
+  googleLoginHandler: vi.fn(),
   prefStore: {},
   googleAuthApi: { initialize: vi.fn(), signIn: vi.fn(), signOut: vi.fn(() => Promise.resolve()) },
 }));
 
 vi.mock('@react-oauth/google', () => ({
-  useGoogleLogin: (cfg) => { ho.loginConfig = cfg; return vi.fn(); },
+  useGoogleLogin: (cfg) => { ho.loginConfig = cfg; return ho.googleLoginHandler; },
 }));
 vi.mock('@utils/platform', () => ({ isNativePlatform: () => ho.native }));
 vi.mock('@utils/logger', () => ({ createLogger: () => ({ info: vi.fn(), success: vi.fn(), error: vi.fn(), warn: vi.fn() }) }));
@@ -25,13 +26,29 @@ vi.mock('@services/cloudSync', () => ({
     signOut: vi.fn(() => Promise.resolve()),
   },
 }));
-vi.mock('@codetrix-studio/capacitor-google-auth', () => ({ GoogleAuth: ho.googleAuthApi }));
+
+vi.mock('@capacitor/core', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    registerPlugin: (name, config) => {
+      if (name === 'GoogleAuth') return ho.googleAuthApi;
+      return actual.registerPlugin(name, config);
+    }
+  };
+});
+
+vi.mock('@codetrix-studio/capacitor-google-auth', () => ({
+  GoogleAuth: ho.googleAuthApi
+}));
 
 import { cloudSync } from '@services/cloudSync';
 import { useGoogleAuth } from '../useGoogleAuth';
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 
 beforeEach(() => {
   vi.clearAllMocks();
+
   ho.native = false;
   ho.prefStore = {};
   globalThis.fetch = vi.fn(() => Promise.resolve({ json: () => Promise.resolve({ email: 'a@b.c' }) }));
@@ -89,9 +106,19 @@ describe('web sign-in flow', () => {
   });
 
   it('signIn triggers firebase boot and the GIS handler', async () => {
+    ho.googleLoginHandler = vi.fn();
     const { result } = renderHook(() => useGoogleAuth());
     await act(async () => { await result.current.signIn(); });
     expect(cloudSync.ensureInitialized).toHaveBeenCalled();
+  });
+
+  it('signIn logs error if webSignInHandler is not initialized on web', async () => {
+    ho.googleLoginHandler = null;
+    const { result } = renderHook(() => useGoogleAuth());
+    await act(async () => { await result.current.signIn(); });
+    expect(result.current.error).toBe('Web sign-in not available');
+    expect(result.current.syncStatus).toBe('error');
+    ho.googleLoginHandler = vi.fn();
   });
 });
 
@@ -113,6 +140,35 @@ describe('sign-out (web path)', () => {
     await act(async () => { await result.current.signOut().catch((e) => { thrown = e; }); });
     expect(thrown).toEqual(new Error('net'));
     expect(result.current.error).toBe('net');
+  });
+});
+
+describe('native sign-in / sign-out', () => {
+  it('signs in natively via Capacitor', async () => {
+    ho.native = true;
+    GoogleAuth.signIn.mockResolvedValue({ authentication: { idToken: 'nat_tok' }, email: 'nat@nat.com' });
+    const { result } = renderHook(() => useGoogleAuth());
+    await act(async () => { await result.current.signIn(); });
+    expect(cloudSync.signInWithGoogle).toHaveBeenCalledWith('nat_tok');
+  });
+
+  it('handles native sign-in error', async () => {
+    ho.native = true;
+    GoogleAuth.signIn.mockRejectedValue(new Error('nat err'));
+    const { result } = renderHook(() => useGoogleAuth());
+    
+    let thrown;
+    await act(async () => { await result.current.signIn().catch(e => { thrown = e; }) });
+    expect(thrown).toBeDefined();
+    expect(result.current.error).toBe('nat err');
+  });
+
+  it('signs out natively', async () => {
+    ho.native = true;
+    const { result } = renderHook(() => useGoogleAuth());
+    await act(async () => { await result.current.signOut(); });
+    expect(GoogleAuth.signOut).toHaveBeenCalled();
+    expect(cloudSync.signOut).toHaveBeenCalled();
   });
 });
 

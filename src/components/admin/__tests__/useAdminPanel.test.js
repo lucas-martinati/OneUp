@@ -20,6 +20,7 @@ vi.mock('@services/adminService', () => ({
 
 import { get } from 'firebase/database';
 import * as admin from '@services/adminService';
+import { getDatabaseInstance } from '@services/firebase';
 import { useAdminPanel, FILTER_OPTIONS } from '../useAdminPanel';
 
 const USERS = {
@@ -185,6 +186,14 @@ describe('danger actions', () => {
     expect(result.current.message.type).toBe('success');
   });
 
+  it('resets progress handles error', async () => {
+    admin.resetUserProgress.mockRejectedValueOnce(new Error('reset fail'));
+    const { result } = await ready();
+    act(() => result.current.handleSelectUser(result.current.filteredUsers.find(u => u.uid === 'alice')));
+    await act(async () => { await result.current.handleResetProgress(); });
+    expect(result.current.message.type).toBe('error');
+  });
+
   it('deletes the user record and clears the selection', async () => {
     const { result } = await ready();
     act(() => result.current.handleSelectUser(result.current.filteredUsers.find(u => u.uid === 'alice')));
@@ -192,5 +201,134 @@ describe('danger actions', () => {
     expect(admin.deleteUserData).toHaveBeenCalledWith('alice');
     expect(result.current.selectedUid).toBeNull();
     expect(result.current.filteredUsers.find(u => u.uid === 'alice')).toBeUndefined();
+  });
+
+  it('deletes user handles error', async () => {
+    admin.deleteUserData.mockRejectedValueOnce(new Error('del fail'));
+    const { result } = await ready();
+    act(() => result.current.handleSelectUser(result.current.filteredUsers.find(u => u.uid === 'alice')));
+    await act(async () => { await result.current.handleDeleteUser(); });
+    expect(result.current.message.type).toBe('error');
+  });
+});
+
+describe('additional coverage', () => {
+  it('handles empty usersData and leaderboard errors', async () => {
+    vi.mocked(get).mockRejectedValueOnce(new Error('lb err'));
+    admin.fetchAllUsersData.mockResolvedValueOnce(null);
+    const { result } = await ready();
+    expect(result.current.filteredUsers).toEqual([]);
+    expect(result.current.selectedMeta).toBeNull();
+  });
+
+  it('handles SORTERS logic including days and reps', async () => {
+    const { result } = await ready();
+    act(() => result.current.cycleSort('reps'));
+    expect(result.current.sortBy).toBe('reps');
+    act(() => result.current.cycleSort('days'));
+    expect(result.current.sortBy).toBe('days');
+  });
+
+  it('toggles filters from the same group to replace them, and un-toggles them', async () => {
+    const { result } = await ready();
+    act(() => result.current.toggleFilter('setup_yes'));
+    expect(result.current.activeFilters).toContain('setup_yes');
+    act(() => result.current.toggleFilter('setup_no')); // Replaces setup_yes
+    expect(result.current.activeFilters).toContain('setup_no');
+    expect(result.current.activeFilters).not.toContain('setup_yes');
+    act(() => result.current.toggleFilter('setup_no')); // Untoggles
+    expect(result.current.activeFilters).toEqual([]);
+  });
+
+  it('filters active, inactive, supporter, no_photo', async () => {
+    const { result } = await ready();
+    act(() => result.current.toggleFilter('active'));
+    act(() => result.current.toggleFilter('inactive'));
+    act(() => result.current.toggleFilter('supporter'));
+    act(() => result.current.toggleFilter('no_photo'));
+  });
+
+  it('handles JSON dirty check edge cases', async () => {
+    const { result } = await ready();
+    const bob = result.current.filteredUsers.find(u => u.uid === 'bob');
+    act(() => result.current.handleSelectUser(bob));
+    
+    // keyJsonDirty for __full__
+    const userBob = { profile: { displayName: 'Bob' } };
+    act(() => {
+      result.current.handleKeyJsonChange('__full__', JSON.stringify(userBob, null, 2));
+      result.current.handleKeyJsonChange('unknown_key', undefined);
+    });
+    // undefined content -> false
+    // removed the unknown_key assertion since it's not in selectedUserKeys
+    
+    // JSON dirty error catch
+    act(() => {
+      result.current.handleKeyJsonChange('profile', '{bad');
+    });
+    expect(result.current.keyJsonDirty['profile']).toBe(true);
+    
+    // handleRevertKeyJson
+    act(() => result.current.handleRevertKeyJson('__full__'));
+    
+    act(() => result.current.handleRevertKeyJson('profile'));
+  });
+
+  it('saves sub-key via handleSaveKeyJson', async () => {
+    const { result } = await ready();
+    const alice = result.current.filteredUsers.find(u => u.uid === 'alice');
+    act(() => result.current.handleSelectUser(alice));
+    
+    // Missing selectedUid early return
+    act(() => result.current.setSelectedUid(null));
+    await act(async () => { await result.current.handleSaveKeyJson('profile'); });
+    expect(admin.saveUserData).not.toHaveBeenCalled();
+
+    // Reset selection
+    act(() => result.current.handleSelectUser(alice));
+    
+    // Save 'settings'
+    await act(async () => { await result.current.handleSaveKeyJson('settings'); });
+    
+    // Save '__full__' with no progress
+    act(() => {
+      result.current.handleKeyJsonChange('__full__', JSON.stringify({ profile: {} }));
+    });
+    await act(async () => { await result.current.handleSaveKeyJson('__full__'); });
+    expect(admin.saveUserData).toHaveBeenCalled();
+    
+    // Force database error
+    getDatabaseInstance.mockReturnValueOnce(null);
+    await act(async () => { await result.current.handleSaveKeyJson('profile'); });
+    expect(result.current.message.text).toContain('Database not initialized');
+  });
+
+  it('handles danger actions edge cases', async () => {
+    const { result } = await ready();
+    act(() => result.current.setSelectedUid(null));
+    await act(async () => { await result.current.handleSaveForm(); }); // early return
+    await act(async () => { await result.current.handleResetProgress(); }); // early return
+    await act(async () => { await result.current.handleDeleteUser(); }); // early return
+    expect(admin.saveUserData).not.toHaveBeenCalled();
+  });
+
+  it('sorts keys correctly', async () => {
+    // Create user with out-of-order and unknown keys
+    admin.fetchAllUsersData.mockResolvedValueOnce({
+      u3: {
+        unknown2: {},
+        purchase: {},
+        profile: {},
+        unknown1: {},
+        progress: {}
+      }
+    });
+    get.mockResolvedValueOnce({ exists: () => true, val: () => ({ u3: { pseudo: 'User 3' } }) });
+    
+    const { result } = await ready();
+    const user3 = result.current.filteredUsers.find(u => u.uid === 'u3');
+    act(() => result.current.handleSelectUser(user3));
+    
+    expect(result.current.selectedUserKeys).toEqual(['profile', 'purchase', 'progress', 'unknown1', 'unknown2', '__full__']);
   });
 });

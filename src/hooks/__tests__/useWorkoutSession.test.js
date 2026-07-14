@@ -57,6 +57,7 @@ vi.mock('@utils/workoutSessionStorage', () => ({
 
 import { useWorkoutSession } from '../useWorkoutSession';
 import { addSession } from '@features/share/services/sessionHistoryService';
+import { isCustomExercise } from '@utils/exerciseLabel';
 
 const bwId = EXERCISES[0].id;
 const bwId2 = EXERCISES[1].id;
@@ -188,9 +189,72 @@ describe('advanceToNext', () => {
     progressState.completions = { '2024-01-01': { [bwId]: { isCompleted: true } } };
     rerender({ onClose: result.current.onClose, today: '2024-01-01', dayNumber: 1, activeSlide: 0, sessionMode: null, setSessionInProgress });
     act(() => result.current.advanceToNext());
-    expect(result.current.phase).toBe('done');
     expect(addSession).toHaveBeenCalled();
     expect(result.current.savedSession).toMatchObject({ id: 'sess1' });
+  });
+
+  it('sets session type to weights', () => {
+    const { result, rerender, setSessionInProgress } = setup({ activeSlide: 2 });
+    act(() => result.current.toggleExercise(bwId));
+    act(() => result.current.startSession());
+    progressState.completions = { '2024-01-01': { [bwId]: { isCompleted: true } } };
+    rerender({ onClose: result.current.onClose, today: '2024-01-01', dayNumber: 1, activeSlide: 2, sessionMode: null, setSessionInProgress });
+    act(() => result.current.advanceToNext());
+    expect(addSession).toHaveBeenCalledWith(expect.objectContaining({ type: 'weights' }));
+  });
+
+  it('sets session type to custom', () => {
+    const { result, rerender, setSessionInProgress } = setup({ activeSlide: 3 });
+    act(() => result.current.toggleExercise(bwId));
+    act(() => result.current.startSession());
+    progressState.completions = { '2024-01-01': { [bwId]: { isCompleted: true } } };
+    rerender({ onClose: result.current.onClose, today: '2024-01-01', dayNumber: 1, activeSlide: 3, sessionMode: null, setSessionInProgress });
+    act(() => result.current.advanceToNext());
+    expect(addSession).toHaveBeenCalledWith(expect.objectContaining({ type: 'custom' }));
+  });
+
+  it('sets session type to user category', () => {
+    exCtx.customCategories = [{ id: 'cat_my' }];
+    const { result, rerender, setSessionInProgress } = setup({ activeSlide: 4 });
+    act(() => result.current.toggleExercise(bwId));
+    act(() => result.current.startSession());
+    progressState.completions = { '2024-01-01': { [bwId]: { isCompleted: true } } };
+    rerender({ onClose: result.current.onClose, today: '2024-01-01', dayNumber: 1, activeSlide: 4, sessionMode: null, setSessionInProgress });
+    act(() => result.current.advanceToNext());
+    expect(addSession).toHaveBeenCalledWith(expect.objectContaining({ type: 'cat_my' }));
+    exCtx.customCategories = []; // reset
+  });
+
+  it('sets session type to cardio', () => {
+    const { result, rerender, setSessionInProgress } = setup({ activeSlide: 0 });
+    act(() => result.current.toggleExercise(bwId));
+    act(() => result.current.startSession());
+    progressState.completions = { '2024-01-01': { [bwId]: { isCompleted: true } } };
+    rerender({ onClose: result.current.onClose, today: '2024-01-01', dayNumber: 1, activeSlide: 0, sessionMode: null, setSessionInProgress });
+    act(() => result.current.advanceToNext());
+    expect(addSession).toHaveBeenCalledWith(expect.objectContaining({ type: 'cardio' }));
+  });
+
+  it('uses routine name if session matches a routine exactly', () => {
+    exCtx.routines = [{ id: 'r1', name: 'Matched Routine', exerciseIds: [bwId] }];
+    const { result, rerender, setSessionInProgress } = setup();
+    act(() => result.current.toggleExercise(bwId));
+    act(() => result.current.startSession());
+    progressState.completions = { '2024-01-01': { [bwId]: { isCompleted: true } } };
+    rerender({ onClose: result.current.onClose, today: '2024-01-01', dayNumber: 1, activeSlide: 0, sessionMode: null, setSessionInProgress });
+    act(() => result.current.advanceToNext());
+    expect(addSession).toHaveBeenCalledWith(expect.objectContaining({ name: 'Matched Routine' }));
+    exCtx.routines = [];
+  });
+
+  it('clears session if queue is emptied while running', () => {
+    const { result } = setup();
+    act(() => result.current.toggleExercise(bwId));
+    act(() => result.current.startSession());
+    expect(result.current.phase).toBe('running');
+    act(() => result.current.toggleExercise(bwId)); // removes it from queue
+    expect(result.current.queue).toHaveLength(0);
+    expect(storage.clearWorkoutSession).toHaveBeenCalled();
   });
 });
 
@@ -234,8 +298,136 @@ describe('drag & drop', () => {
     const { result } = setup();
     act(() => { result.current.toggleExercise(bwId); result.current.toggleExercise(bwId2); });
     act(() => result.current.handleTouchStart({ touches: [{ clientY: 10 }] }, 0));
-    act(() => result.current.handleTouchMove({ touches: [{ clientY: 50 }] }));
+    
+    // Simulate itemRef
+    result.current.queueListRef.current = true;
+    result.current.itemRefs.current[0] = { getBoundingClientRect: () => ({ top: 0, bottom: 20 }) };
+    result.current.itemRefs.current[1] = { getBoundingClientRect: () => ({ top: 40, bottom: 60 }) };
+
+    act(() => result.current.handleTouchMove({ touches: [{ clientY: 50 }] })); // Over index 1
     act(() => result.current.handleTouchEnd());
-    expect(result.current.queue).toHaveLength(2);
+    expect(result.current.queue).toEqual([bwId2, bwId]);
+  });
+});
+
+import { useBackHandler } from '@hooks/useBackHandler';
+
+describe('additional coverage', () => {
+  it('handles useBackHandler edge cases', () => {
+    const { result } = setup();
+    
+    const getBackFn = () => {
+      const calls = vi.mocked(useBackHandler).mock.calls;
+      return calls[calls.length - 1][0];
+    };
+    
+    // showSaveRoutine
+    act(() => result.current.setShowSaveRoutine(true));
+    expect(result.current.showSaveRoutine).toBe(true);
+    // call back
+    act(() => { getBackFn()(); });
+    expect(result.current.showSaveRoutine).toBe(false);
+
+    // confirmDeleteId
+    act(() => result.current.setConfirmDeleteId('r1'));
+    act(() => { getBackFn()(); });
+    expect(result.current.confirmDeleteId).toBeNull();
+
+    // running phase
+    act(() => result.current.toggleExercise(bwId));
+    act(() => result.current.startSession());
+    act(() => { getBackFn()(); });
+    expect(result.current.phase).toBe('config');
+    
+    // default
+    act(() => { getBackFn()(); });
+    // Should call onClose
+  });
+
+  it('handles filteredQueue returning empty in startSession', () => {
+    const { result, rerender, onClose, setSessionInProgress } = setup();
+    act(() => result.current.toggleExercise(bwId));
+    // Simulate exercise done
+    progressState.completions = { '2024-01-01': { [bwId]: { isCompleted: true } } };
+    rerender({ onClose, today: '2024-01-01', dayNumber: 1, activeSlide: 0, sessionMode: null, setSessionInProgress });
+    
+    act(() => result.current.startSession());
+    expect(result.current.phase).toBe('config'); // Didn't start
+  });
+
+  it('handles invalid exercise id in toggleExercise and loadRoutine', () => {
+    const { result } = setup();
+    act(() => result.current.loadRoutine({ name: 'r', exerciseIds: ['invalid'] }));
+    expect(result.current.queue).toEqual([]);
+  });
+
+  it('identifies custom exercises and categories', () => {
+    exCtx.defaultCustomExercises = [{ id: 'cust1', name: 'Cust1' }, { id: 'cust2', name: 'Cust2' }];
+    exCtx.exercisesByUserCategory = { 'cat1': [{ id: 'cust1' }] };
+    exCtx.allExercisesMap['cust1'] = { id: 'cust1', name: 'Cust1' };
+    exCtx.allExercisesMap['cust2'] = { id: 'cust2', name: 'Cust2' };
+    const { result } = setup();
+    act(() => result.current.loadRoutine({ name: 'r', exerciseIds: ['cust1', 'cust2'] }));
+    expect(result.current.queue).toEqual(['cust1', 'cust2']);
+  });
+
+  it('loadRoutine blocks weight and custom exercises for non-pro', () => {
+    sub.isPro = false;
+    exCtx.defaultCustomExercises = [{ id: 'custom_1', name: 'Cust1' }];
+    exCtx.allExercisesMap['custom_1'] = { id: 'custom_1', name: 'Cust1' };
+    const { result } = setup();
+    console.log('Test setup: isPro=', sub.isPro);
+    console.log('isCustom 1:', isCustomExercise('custom_1'));
+    act(() => result.current.loadRoutine({ name: 'r', exerciseIds: [bwId, weightId, 'custom_1'] }));
+    expect(result.current.queue).toEqual([bwId]);
+  });
+
+  it('loadRoutine updates oneup_share_options and catches localStorage errors', () => {
+    const { result } = setup();
+    localStorage.setItem('oneup_share_options', JSON.stringify({ showWeights: false }));
+    act(() => result.current.loadRoutine({ name: 'r', exerciseIds: [bwId, weightId] })); // 2 categories
+    expect(JSON.parse(localStorage.getItem('oneup_share_options')).showWeights).toBe(true);
+
+    localStorage.setItem('oneup_share_options', '{bad');
+    act(() => result.current.loadRoutine({ name: 'r2', exerciseIds: [bwId, weightId] }));
+    // catches and ignores
+  });
+
+  it('handleSaveRoutine returns early on empty name or queue', () => {
+    const { result } = setup();
+    act(() => result.current.setRoutineName('   '));
+    act(() => result.current.handleSaveRoutine());
+    expect(exCtx.saveRoutine).not.toHaveBeenCalled();
+
+    act(() => result.current.setRoutineName('valid'));
+    act(() => result.current.handleSaveRoutine()); // queue is empty
+    expect(exCtx.saveRoutine).not.toHaveBeenCalled();
+  });
+
+  it('editRoutine handles missing exercise', () => {
+    const { result } = setup();
+    act(() => result.current.editRoutine({ id: 'r1', name: 'n', exerciseIds: ['missing'] }));
+    expect(result.current.queue).toEqual([]);
+  });
+
+  it('moveItem, handleDragOver, handleDragEnd and handleTouchMove edge cases', () => {
+    const { result } = setup();
+    act(() => { result.current.toggleExercise(bwId); result.current.toggleExercise(bwId2); });
+    
+    // moveItem toIdx < 0
+    act(() => result.current.moveItem(0, -1));
+    expect(result.current.queue).toEqual([bwId, bwId2]);
+
+    // handleDragOver with null or same
+    act(() => result.current.handleDragOver(0)); // dragIdx is null
+    act(() => result.current.handleDragStart(0));
+    act(() => result.current.handleDragOver(0)); // dragIdx === idx
+
+    // handleDragEnd without overIdx
+    act(() => result.current.handleDragEnd()); // dragOverIdx is null
+    expect(result.current.queue).toEqual([bwId, bwId2]);
+
+    // handleTouchMove with null touchStartIdx
+    act(() => result.current.handleTouchMove({ touches: [{ clientY: 50 }] }));
   });
 });

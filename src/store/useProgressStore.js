@@ -511,12 +511,12 @@ export const useProgressStore = create((set, get) => ({
     set(() => ({
       startDate: validated.startDate,
       userStartDate: validated.userStartDate,
-      completions: validated.completions || {},
+      completions: validated.completions,
       isSetup: validated.isSetup,
-      cardio: validated.cardio || {},
-      frozenDays: validated.frozenDays || {},
-      streakFreezes: validated.streakFreezes || { count: 0, lastRefill: null },
-      notes: validated.notes || {},
+      cardio: validated.cardio,
+      frozenDays: validated.frozenDays,
+      streakFreezes: validated.streakFreezes,
+      notes: validated.notes,
     }));
     get()._persist();
   },
@@ -548,15 +548,15 @@ export const useProgressStore = create((set, get) => ({
       logger.info('[Real-time sync] Incoming cloud update applied');
       const merged = cloudSync.mergeData(state, validated);
       return {
-        startDate: merged.startDate || state.startDate,
-        userStartDate: merged.userStartDate || state.userStartDate,
-        completions: merged.completions || state.completions,
-        isSetup: merged.isSetup ?? state.isSetup,
+        startDate: merged.startDate,
+        userStartDate: merged.userStartDate,
+        completions: merged.completions,
+        isSetup: merged.isSetup,
         lastCompletionChange: merged.lastCompletionChange,
         cardio: { ...state.cardio, sessions: nextSessions },
-        frozenDays: merged.frozenDays || state.frozenDays,
-        streakFreezes: merged.streakFreezes || state.streakFreezes,
-        notes: merged.notes || state.notes,
+        frozenDays: merged.frozenDays,
+        streakFreezes: merged.streakFreezes,
+        notes: merged.notes,
       };
     });
     get()._persist();
@@ -577,11 +577,11 @@ export const useProgressStore = create((set, get) => ({
 
       set((state) => {
         const mergedCompletions = { ...state.completions };
-        Object.keys(validated.completions || {}).forEach(dateStr => {
+        Object.keys(validated.completions).forEach(dateStr => {
           if (!mergedCompletions[dateStr]) {
             mergedCompletions[dateStr] = { ...validated.completions[dateStr] };
           } else {
-            const guestDay = validated.completions[dateStr] || {};
+            const guestDay = validated.completions[dateStr];
             const userDay = { ...mergedCompletions[dateStr] };
             
             const allExIds = new Set([...Object.keys(guestDay), ...Object.keys(userDay)]);
@@ -628,16 +628,16 @@ export const useProgressStore = create((set, get) => ({
         });
 
         return {
-          startDate: validated.startDate || state.startDate,
-          userStartDate: validated.userStartDate || state.userStartDate,
+          startDate: [validated.startDate, state.startDate].filter(Boolean).sort()[0],
+          userStartDate: [validated.userStartDate, state.userStartDate].filter(Boolean).sort()[0],
           completions: mergedCompletions,
           isSetup: validated.isSetup || state.isSetup,
           // Union frozen days; keep the inventory with the most recent refill.
-          frozenDays: { ...(validated.frozenDays || {}), ...(state.frozenDays || {}) },
-          streakFreezes: (state.streakFreezes?.lastRefill || '') >= (validated.streakFreezes?.lastRefill || '')
+          frozenDays: { ...validated.frozenDays, ...state.frozenDays },
+          streakFreezes: (state.streakFreezes.lastRefill || '') >= (validated.streakFreezes.lastRefill || '')
             ? state.streakFreezes
             : validated.streakFreezes,
-          notes: { ...(state.notes || {}), ...(validated.notes || {}) },
+          notes: { ...state.notes, ...validated.notes },
           lastCompletionChange: serverTimestamp(),
         };
       });

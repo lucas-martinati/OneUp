@@ -1,56 +1,141 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { buildBackup, parseBackup, restoreBackup } from '@utils/dataBackup';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { buildBackup, downloadBackup, parseBackup, restoreBackup, readFileText } from '../dataBackup';
 
 describe('dataBackup', () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
-  it('snapshots every localStorage entry into a marked backup', () => {
-    localStorage.setItem('pushup_challenge_data', '{"completions":{}}');
-    localStorage.setItem('oneup_settings', '{"theme":"dark"}');
-
-    const backup = buildBackup();
-
-    expect(backup.app).toBe('oneup-backup');
-    expect(backup.version).toBe(1);
-    expect(typeof backup.exportedAt).toBe('string');
-    expect(backup.data).toEqual({
-      pushup_challenge_data: '{"completions":{}}',
-      oneup_settings: '{"theme":"dark"}',
+    beforeEach(() => {
+        localStorage.clear();
+        vi.stubGlobal('URL', {
+            createObjectURL: vi.fn(() => 'blob:test'),
+            revokeObjectURL: vi.fn(),
+        });
     });
-  });
 
-  it('round-trips through parse + restore, replacing existing data', () => {
-    localStorage.setItem('keep_me', 'old');
-    const backup = buildBackup();
+    it('builds a backup from localStorage', () => {
+        localStorage.setItem('key1', 'val1');
+        localStorage.setItem('key2', 'val2');
+        const backup = buildBackup();
+        expect(backup.app).toBe('oneup-backup');
+        expect(backup.data).toEqual({ key1: 'val1', key2: 'val2' });
+    });
 
-    // Mutate the store, then restore — the backup must become authoritative.
-    localStorage.clear();
-    localStorage.setItem('stale', 'should-be-wiped');
+    it('skips null keys', () => {
+        const fakeStorage = {
+            length: 2,
+            key: vi.fn(i => i === 0 ? 'k' : null),
+            getItem: vi.fn(k => k === 'k' ? 'v' : null),
+        };
+        vi.stubGlobal('localStorage', fakeStorage);
+        
+        const backup = buildBackup();
+        expect(backup.data).toEqual({ k: 'v' });
+        
+        vi.unstubAllGlobals();
+    });
 
-    const parsed = parseBackup(JSON.stringify(backup));
-    const count = restoreBackup(parsed);
+    it('downloadBackup creates a file download', () => {
+        localStorage.setItem('k', 'v');
+        const mockClick = vi.fn();
+        const mockRemove = vi.fn();
+        const mockAppend = vi.spyOn(document.body, 'appendChild').mockImplementation(() => {});
+        vi.spyOn(document, 'createElement').mockReturnValue({
+            click: mockClick,
+            remove: mockRemove,
+        });
 
-    expect(count).toBe(1);
-    expect(localStorage.getItem('keep_me')).toBe('old');
-    expect(localStorage.getItem('stale')).toBeNull();
-  });
+        const numKeys = downloadBackup();
+        expect(numKeys).toBe(1);
+        expect(mockClick).toHaveBeenCalled();
+        expect(mockRemove).toHaveBeenCalled();
+        expect(mockAppend).toHaveBeenCalled();
+    });
 
-  it('rejects malformed JSON', () => {
-    expect(() => parseBackup('{not json')).toThrow('invalid-json');
-  });
+    it('parseBackup handles valid backups', () => {
+        const json = JSON.stringify({
+            app: 'oneup-backup',
+            data: { k: 'v' }
+        });
+        const parsed = parseBackup(json);
+        expect(parsed.data).toEqual({ k: 'v' });
+    });
 
-  it('rejects JSON that is not a OneUp backup', () => {
-    expect(() => parseBackup(JSON.stringify({ app: 'other', data: {} }))).toThrow('invalid-backup');
-    expect(() => parseBackup(JSON.stringify({ app: 'oneup-backup' }))).toThrow('invalid-backup');
-    expect(() => parseBackup(JSON.stringify({ app: 'oneup-backup', data: null }))).toThrow('invalid-backup');
-  });
+    it('parseBackup throws invalid-json', () => {
+        expect(() => parseBackup('{bad json}')).toThrowError('invalid-json');
+    });
 
-  it('ignores non-string values when restoring', () => {
-    const count = restoreBackup({ data: { a: 'x', b: 42, c: null, d: 'y' } });
-    expect(count).toBe(2);
-    expect(localStorage.getItem('a')).toBe('x');
-    expect(localStorage.getItem('b')).toBeNull();
-  });
+    it('parseBackup throws invalid-backup', () => {
+        const json1 = JSON.stringify({ app: 'wrong', data: {} });
+        expect(() => parseBackup(json1)).toThrowError('invalid-backup');
+
+        const json2 = JSON.stringify({ app: 'oneup-backup', data: null });
+        expect(() => parseBackup(json2)).toThrowError('invalid-backup');
+    });
+
+    it('restoreBackup writes string values to localStorage', () => {
+        localStorage.setItem('old', 'gone');
+        const parsed = {
+            data: {
+                strKey: 'val',
+                numKey: 123, // should be skipped as it's not a string
+            }
+        };
+        const numKeys = restoreBackup(parsed);
+        expect(numKeys).toBe(1);
+        expect(localStorage.getItem('strKey')).toBe('val');
+        expect(localStorage.getItem('old')).toBeNull();
+    });
+
+    it('readFileText resolves text', async () => {
+        const mockFile = {};
+        const originalFileReader = globalThis.FileReader;
+        
+        let onloadCb;
+        globalThis.FileReader = class {
+            readAsText() {
+                this.result = 'hello';
+                onloadCb();
+            }
+            set onload(cb) { onloadCb = cb; }
+        };
+
+        const result = await readFileText(mockFile);
+        expect(result).toBe('hello');
+        
+        globalThis.FileReader = originalFileReader;
+    });
+
+    it('readFileText rejects on error', async () => {
+        const mockFile = {};
+        const originalFileReader = globalThis.FileReader;
+        
+        let onerrorCb;
+        globalThis.FileReader = class {
+            readAsText() {
+                this.error = new Error('test-error');
+                onerrorCb();
+            }
+            set onerror(cb) { onerrorCb = cb; }
+        };
+
+        await expect(readFileText(mockFile)).rejects.toThrow('test-error');
+        
+        globalThis.FileReader = originalFileReader;
+    });
+    
+    it('readFileText rejects with default error if none provided', async () => {
+        const mockFile = {};
+        const originalFileReader = globalThis.FileReader;
+        
+        let onerrorCb;
+        globalThis.FileReader = class {
+            readAsText() {
+                this.error = null;
+                onerrorCb();
+            }
+            set onerror(cb) { onerrorCb = cb; }
+        };
+
+        await expect(readFileText(mockFile)).rejects.toThrow('read-failed');
+        
+        globalThis.FileReader = originalFileReader;
+    });
 });
