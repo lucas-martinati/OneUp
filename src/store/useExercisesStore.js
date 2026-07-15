@@ -178,11 +178,13 @@ export const useExercisesStore = create((set, get) => ({
 
   setRoutinesFromCloud: (cloudRoutines) => {
     if (Array.isArray(cloudRoutines)) {
+      let changed = false;
       set((state) => {
         if (JSON.stringify(state.routines) === JSON.stringify(cloudRoutines)) return state;
+        changed = true;
         return { routines: cloudRoutines };
       });
-      get()._persistRoutines();
+      if (changed) get()._persistRoutines();
     }
   },
 
@@ -251,11 +253,13 @@ export const useExercisesStore = create((set, get) => ({
 
   setCustomExercisesFromCloud: (cloudData) => {
     if (Array.isArray(cloudData)) {
+      let changed = false;
       set((state) => {
         if (JSON.stringify(state.customExercises) === JSON.stringify(cloudData)) return state;
+        changed = true;
         return { customExercises: cloudData };
       });
-      get()._persistCustomExercises();
+      if (changed) get()._persistCustomExercises();
     }
   },
 
@@ -342,14 +346,16 @@ export const useExercisesStore = create((set, get) => ({
 
   setCategoriesFromCloud: (cloudData) => {
     if (Array.isArray(cloudData)) {
+      let changed = false;
       set((state) => {
         if (JSON.stringify(state.customCategories) === JSON.stringify(cloudData)) return state;
+        changed = true;
         return {
           customCategories: cloudData,
           customCategoriesMap: updateCategoriesMap(cloudData)
         };
       });
-      get()._persistCustomCategories();
+      if (changed) get()._persistCustomCategories();
     }
   },
 

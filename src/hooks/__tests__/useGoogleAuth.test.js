@@ -55,12 +55,13 @@ beforeEach(() => {
 });
 
 describe('mount / auth bootstrap', () => {
-  it('resolves to a definitive signed-out state for new visitors', async () => {
-    const { result } = renderHook(() => useGoogleAuth());
+  it('initializes and subscribes to cloudSync on mount', async () => {
+    const { result, unmount } = renderHook(() => useGoogleAuth());
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.isSignedIn).toBe(false);
     expect(result.current.authConfirmed).toBe(true);
     expect(cloudSync.subscribe).toHaveBeenCalled();
+    unmount();
   });
 
   it('optimistically boots a previously signed-in user from cache', async () => {

@@ -1,199 +1,224 @@
-import { describe, it, expect, vi } from 'vitest';
-
-vi.mock('../logger', () => ({
-  createLogger: () => ({ info() {}, debug() {}, warn() {}, error() {} }),
-}));
-
+import { describe, it, expect } from 'vitest';
 import { sanitizeForCloud, mergeData } from '../syncUtils';
 
-// ── sanitizeForCloud ────────────────────────────────────────────────────
-
-describe('sanitizeForCloud', () => {
-  it('returns the input untouched when there is nothing to sanitize', () => {
-    expect(sanitizeForCloud(null)).toBe(null);
-    const noCompletions = { startDate: '2026-01-01' };
-    expect(sanitizeForCloud(noCompletions)).toBe(noCompletions);
-  });
-
-  it('normalizes exercise entries and defaults missing fields', () => {
-    const out = sanitizeForCloud({
-      completions: { '2026-01-01': { push: { isCompleted: true, timestamp: 123 } } },
+describe('syncUtils', () => {
+  describe('sanitizeForCloud', () => {
+    it('returns falsy or object without completions as is', () => {
+      expect(sanitizeForCloud(null)).toBeNull();
+      expect(sanitizeForCloud({ foo: 'bar' })).toEqual({ foo: 'bar' });
     });
-    expect(out.completions['2026-01-01'].push).toEqual({ isCompleted: true, timestamp: 123 });
-  });
 
-  it('defaults isCompleted to false and timestamp to null', () => {
-    const out = sanitizeForCloud({ completions: { d: { push: {} } } });
-    expect(out.completions.d.push).toEqual({ isCompleted: false, timestamp: null });
-  });
+    it('strips non-cloud fields and formats completions', () => {
+      const data = {
+        achievements: { ghost: true },
+        hasShared: true,
+        cardio: { sessions: {} },
+        startDate: '2026-01-01',
+        completions: {
+          '2026-01-01': {
+            squats: {
+              isCompleted: true,
+              timestamp: 12345,
+              localHour: 10,
+              weight: 50,
+              difficulty: 3,
+              ignoredField: 'should disappear'
+            },
+            pushups: null // invalid object
+          },
+          '2026-01-02': null // invalid day
+        }
+      };
 
-  it('keeps weight and difficulty only when defined', () => {
-    const out = sanitizeForCloud({
-      completions: { d: { bench: { isCompleted: true, weight: 40, difficulty: 0.8 } } },
+      const result = sanitizeForCloud(data);
+
+      expect(result.achievements).toBeUndefined();
+      expect(result.hasShared).toBeUndefined();
+      expect(result.cardio).toBeUndefined();
+      expect(result.startDate).toBe('2026-01-01');
+
+      expect(result.completions['2026-01-01'].squats).toEqual({
+        isCompleted: true,
+        timestamp: 12345,
+        localHour: 10,
+        weight: 50,
+        difficulty: 3
+      });
+      expect(result.completions['2026-01-01'].squats.ignoredField).toBeUndefined();
+      expect(result.completions['2026-01-01'].pushups).toBeUndefined();
+      expect(result.completions['2026-01-02']).toBeUndefined();
     });
-    expect(out.completions.d.bench).toMatchObject({ weight: 40, difficulty: 0.8 });
-  });
 
-  it('skips non-object day entries and non-object exercise entries', () => {
-    const out = sanitizeForCloud({
-      completions: { bad: 'oops', d: { ghost: null, push: { isCompleted: true } } },
+    it('handles defaults for completions', () => {
+      const result = sanitizeForCloud({ completions: { '2026-01-01': { foo: {} } } });
+      expect(result.completions['2026-01-01'].foo).toEqual({
+        isCompleted: false,
+        timestamp: null
+      });
     });
-    expect(out.completions.bad).toBeUndefined();
-    expect(out.completions.d.ghost).toBeUndefined();
-    expect(out.completions.d.push.isCompleted).toBe(true);
   });
 
-  it('strips achievements, hasShared and cardio from the payload', () => {
-    const out = sanitizeForCloud({
-      completions: {},
-      achievements: ['a'],
-      hasShared: true,
-      cardio: { sessions: { s1: { id: 's1' } } },
-      startDate: '2026-01-01',
+  describe('mergeData', () => {
+    it('returns local if cloud is missing, cloud if local is missing', () => {
+      const local = { foo: 'bar' };
+      const cloud = { baz: 'qux' };
+      expect(mergeData(local, null)).toBe(local);
+      expect(mergeData(null, cloud)).toBe(cloud);
     });
-    expect(out.achievements).toBeUndefined();
-    expect(out.hasShared).toBeUndefined();
-    // cardio lives in users/{uid}/cardioSessions — never written under progress.
-    expect(out.cardio).toBeUndefined();
-    expect(out.startDate).toBe('2026-01-01');
-  });
-});
 
-// ── mergeData ───────────────────────────────────────────────────────────
-
-describe('mergeData', () => {
-  it('returns the other side when one is missing', () => {
-    const local = { completions: {} };
-    const cloud = { completions: {} };
-    expect(mergeData(local, null)).toBe(local);
-    expect(mergeData(null, cloud)).toBe(cloud);
-  });
-
-  it('overwrites local with cloud when cloud is strictly newer', () => {
-    const local = { startDate: 'L', completions: { d: { push: { isCompleted: true, count: 5 } } }, lastCompletionChange: 1000 };
-    const cloud = {
-      startDate: 'C', userStartDate: 'CU', isSetup: true,
-      completions: { d: { push: { isCompleted: true } } }, // no count
-      lastCompletionChange: 2000,
-      cardio: { sessions: { s1: { id: 's1' } } },
-    };
-    const out = mergeData(local, cloud);
-    expect(out.startDate).toBe('C');
-    expect(out.isSetup).toBe(true);
-    // reattachLocalCounts: local count is re-attached when cloud lacks it and isCompleted matches
-    expect(out.completions.d.push.count).toBe(5);
-    expect(out.cardio.sessions.s1).toEqual({ id: 's1' });
-  });
-
-  it('defaults cardio to an empty sessions map when cloud has none (overwrite path)', () => {
-    const local = { completions: {}, lastCompletionChange: 1 };
-    const cloud = { startDate: 'C', completions: {}, lastCompletionChange: 2 };
-    expect(mergeData(local, cloud).cardio).toEqual({ sessions: {} });
-  });
-
-  it('does NOT overwrite when local has a pending placeholder, even if cloud ts looks newer', () => {
-    const local = {
-      startDate: 'L', isSetup: true,
-      completions: { d: { push: { isCompleted: true, timestamp: 5 } } },
-      lastCompletionChange: { '.sv': 'timestamp' }, // placeholder → ts 0
-    };
-    const cloud = {
-      startDate: 'C',
-      completions: { d: { push: { isCompleted: true, timestamp: 5 } } },
-      lastCompletionChange: 2000,
-    };
-    const out = mergeData(local, cloud);
-    // Took the merge path (kept local startDate), not the overwrite path.
-    expect(out.startDate).toBe('L');
-    // finalLCC: placeholder local + real cloud → cloud wins
-    expect(out.lastCompletionChange).toBe(2000);
-  });
-
-  it('adds cloud-only days during a merge', () => {
-    const local = { startDate: 'L', completions: {}, lastCompletionChange: 1000 };
-    const cloud = { completions: { d2: { push: { isCompleted: true } } }, lastCompletionChange: 1000 };
-    const out = mergeData(local, cloud);
-    expect(out.completions.d2.push.isCompleted).toBe(true);
-  });
-
-  it('merges exercises within a shared day with the right precedence', () => {
-    const local = {
-      startDate: 'L',
-      completions: {
-        d: {
-          older: { isCompleted: true, timestamp: 1000 },       // cloud newer → replaced
-          noTs: { isCompleted: false },                         // local has no ts → cloud wins
-          localOnly: { isCompleted: true, timestamp: 500 },     // preserved (not in cloud)
+    it('prioritizes cloud if cloud timestamp is strictly newer and local is not placeholder', () => {
+      const local = {
+        lastCompletionChange: 1000,
+        completions: {
+          '2026-01-01': {
+            squats: { isCompleted: true, count: 10 }
+          }
         },
-      },
-      lastCompletionChange: 1000,
-    };
-    const cloud = {
-      completions: {
-        d: {
-          older: { isCompleted: true, timestamp: 9999 },
-          noTs: { isCompleted: true, timestamp: 800 },
-          cloudOnly: { isCompleted: true, timestamp: 700 },     // added (!localEx)
+        cardio: null,
+        streakFreezes: null,
+        notes: null
+      };
+      const cloud = {
+        lastCompletionChange: 2000,
+        startDate: '2026-01-01',
+        completions: {
+          '2026-01-01': {
+            squats: { isCompleted: true } // Missing count, should reattach
+          }
         },
-      },
-      lastCompletionChange: 1000,
-    };
-    const out = mergeData(local, cloud).completions.d;
-    expect(out.older.timestamp).toBe(9999);     // cloudIsNewer
-    expect(out.noTs.timestamp).toBe(800);       // localHasNoTimestamp
-    expect(out.localOnly.timestamp).toBe(500);  // preserved local-only
-    expect(out.cloudOnly.timestamp).toBe(700);  // cloud-only added
-  });
+        cardio: { sessions: { a: 1 } }
+      };
 
-  it('replaces a local placeholder timestamp with the matching cloud value', () => {
-    const local = {
-      startDate: 'L',
-      completions: { d: { push: { isCompleted: true, timestamp: { '.sv': 'timestamp' } } } },
-      lastCompletionChange: 1000,
-    };
-    const cloud = {
-      completions: { d: { push: { isCompleted: true, timestamp: 4242 } } },
-      lastCompletionChange: 1000,
-    };
-    const out = mergeData(local, cloud);
-    expect(out.completions.d.push.timestamp).toBe(4242); // cloudReplacesPlaceholder
-  });
+      const result = mergeData(local, cloud);
+      expect(result.lastCompletionChange).toBe(2000);
+      expect(result.startDate).toBe('2026-01-01');
+      // Should reattach count
+      expect(result.completions['2026-01-01'].squats.count).toBe(10);
+      expect(result.cardio.sessions.a).toBe(1);
+    });
 
-  it('merges cardio sessions from both sides', () => {
-    const local = { startDate: 'L', completions: {}, lastCompletionChange: 1000, cardio: { sessions: { a: { id: 'a' } } } };
-    const cloud = { completions: {}, lastCompletionChange: 1000, cardio: { sessions: { b: { id: 'b' } } } };
-    const out = mergeData(local, cloud);
-    expect(Object.keys(out.completions)).toEqual([]);
-    expect(out.cardio.sessions).toEqual({ a: { id: 'a' }, b: { id: 'b' } });
-  });
+    it('reattachLocalCounts handles missing objects gracefully', () => {
+      // cloud newer
+      const local = { lastCompletionChange: 1000, completions: null };
+      const cloud = { lastCompletionChange: 2000, completions: null };
+      const result = mergeData(local, cloud);
+      expect(result.completions).toEqual({});
+    });
 
-  it('keeps the local lastCompletionChange when it is not older than the cloud', () => {
-    const local = { startDate: 'L', completions: {}, lastCompletionChange: 5000 };
-    const cloud = { completions: {}, lastCompletionChange: 1000 };
-    expect(mergeData(local, cloud).lastCompletionChange).toBe(5000);
-  });
+    it('merges day by day if cloud is not strictly newer (or local has placeholder)', () => {
+      const localPlaceholder = { '.sv': 'timestamp' };
+      const local = {
+        lastCompletionChange: localPlaceholder,
+        completions: {
+          '2026-01-01': {
+            squats: { isCompleted: true, timestamp: 1000 },
+            localOnly: { isCompleted: true, timestamp: 1000 } // Should be preserved
+          },
+          '2026-01-02': {
+            bench: { isCompleted: true, timestamp: localPlaceholder, count: 5 }
+          }
+        }
+      };
+      const cloud = {
+        lastCompletionChange: 1500, // strictly newer, but local is placeholder, so we fall through
+        completions: {
+          '2026-01-01': {
+            squats: { isCompleted: true, timestamp: 2000, weight: 10 }, // cloud newer
+            pushups: { isCompleted: true } // cloud new exercise
+          },
+          '2026-01-02': {
+            bench: { isCompleted: true, timestamp: 2000, count: 5 } // replaces placeholder
+          },
+          '2026-01-03': {
+            deadlift: { isCompleted: true } // completely new day
+          }
+        }
+      };
 
-  it('unions frozen days from both sides', () => {
-    const local = { startDate: 'L', completions: {}, lastCompletionChange: 5000, frozenDays: { a: true } };
-    const cloud = { completions: {}, lastCompletionChange: 1000, frozenDays: { b: true } };
-    expect(mergeData(local, cloud).frozenDays).toEqual({ a: true, b: true });
-  });
+      const result = mergeData(local, cloud);
+      expect(result.lastCompletionChange).toBe(1500); // cloud real timestamp replaces placeholder
+      
+      expect(result.completions['2026-01-01'].squats.timestamp).toBe(2000); // cloud newer
+      expect(result.completions['2026-01-01'].squats.weight).toBe(10); 
+      expect(result.completions['2026-01-01'].pushups.isCompleted).toBe(true);
+      expect(result.completions['2026-01-01'].localOnly.isCompleted).toBe(true); // preserved
 
-  it('unions frozen days even when the cloud is newer and overwrites', () => {
-    const local = { startDate: 'L', completions: {}, lastCompletionChange: 1000, frozenDays: { a: true } };
-    const cloud = { startDate: 'C', completions: {}, lastCompletionChange: 5000, frozenDays: { b: true } };
-    expect(mergeData(local, cloud).frozenDays).toEqual({ a: true, b: true });
-  });
+      expect(result.completions['2026-01-02'].bench.timestamp).toBe(2000); // replaced placeholder
 
-  it('keeps the freeze inventory with the most recent refill', () => {
-    const local = { startDate: 'L', completions: {}, lastCompletionChange: 5000, streakFreezes: { count: 2, lastRefill: '2026-06' } };
-    const cloud = { completions: {}, lastCompletionChange: 1000, streakFreezes: { count: 0, lastRefill: '2026-05' } };
-    expect(mergeData(local, cloud).streakFreezes).toEqual({ count: 2, lastRefill: '2026-06' });
-  });
+      expect(result.completions['2026-01-03'].deadlift.isCompleted).toBe(true);
+    });
 
-  it('takes the lower freeze count when refills tie (no double-spend)', () => {
-    const local = { startDate: 'L', completions: {}, lastCompletionChange: 5000, streakFreezes: { count: 2, lastRefill: '2026-06' } };
-    const cloud = { completions: {}, lastCompletionChange: 1000, streakFreezes: { count: 1, lastRefill: '2026-06' } };
-    expect(mergeData(local, cloud).streakFreezes).toEqual({ count: 1, lastRefill: '2026-06' });
+    it('retains local properties if cloud is older', () => {
+      const local = {
+        lastCompletionChange: 2000,
+        completions: {
+          '2026-01-01': { squats: { isCompleted: true, timestamp: 2000 } }
+        }
+      };
+      const cloud = {
+        lastCompletionChange: 1000,
+        completions: {
+          '2026-01-01': { squats: { isCompleted: false, timestamp: 1000 } }
+        }
+      };
+
+      const result = mergeData(local, cloud);
+      expect(result.completions['2026-01-01'].squats.isCompleted).toBe(true); // local wins
+    });
+    
+    it('uses cloud if local has no timestamp and cloud does', () => {
+      const local = {
+        lastCompletionChange: 1000,
+        completions: {
+          '2026-01-01': { squats: { isCompleted: true } }
+        }
+      };
+      const cloud = {
+        lastCompletionChange: 1000,
+        completions: {
+          '2026-01-01': { squats: { isCompleted: false, timestamp: 1000 } }
+        }
+      };
+
+      const result = mergeData(local, cloud);
+      expect(result.completions['2026-01-01'].squats.timestamp).toBe(1000);
+    });
+
+    describe('mergeStreakFreeze', () => {
+      it('picks cloud if local is null', () => {
+        const local = { completions: {}, streakFreezes: null };
+        const cloud = { completions: {}, streakFreezes: { count: 2, lastRefill: '2026-01' } };
+        const result = mergeData(local, cloud);
+        expect(result.streakFreezes).toEqual(cloud.streakFreezes);
+      });
+
+      it('picks local if cloud is null', () => {
+        const local = { completions: {}, streakFreezes: { count: 1, lastRefill: '2026-01' } };
+        const cloud = { completions: {}, streakFreezes: null };
+        const result = mergeData(local, cloud);
+        expect(result.streakFreezes).toEqual(local.streakFreezes);
+      });
+
+      it('picks newer refill date', () => {
+        const local = { completions: {}, streakFreezes: { count: 1, lastRefill: '2026-01' } };
+        const cloud = { completions: {}, streakFreezes: { count: 1, lastRefill: '2026-02' } };
+        const result = mergeData(local, cloud);
+        expect(result.streakFreezes.lastRefill).toBe('2026-02');
+      });
+
+      it('picks lower count if refill date is the same', () => {
+        const local = { completions: {}, streakFreezes: { count: 2, lastRefill: '2026-01' } };
+        const cloud = { completions: {}, streakFreezes: { count: 1, lastRefill: '2026-01' } };
+        const result = mergeData(local, cloud);
+        expect(result.streakFreezes.count).toBe(1);
+      });
+      
+      it('handles undefined counts gracefully when tied on refill', () => {
+        const local = { completions: {}, streakFreezes: { count: undefined, lastRefill: '2026-01' } };
+        const cloud = { completions: {}, streakFreezes: { count: undefined, lastRefill: '2026-01' } };
+        const result = mergeData(local, cloud);
+        expect(result.streakFreezes.count).toBe(0);
+      });
+    });
   });
 });

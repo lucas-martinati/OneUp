@@ -1,30 +1,47 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import * as authService from '../authService';
+import {
+  GoogleAuthProvider,
+  signInWithCredential,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  deleteUser
+} from 'firebase/auth';
+import { remove, update } from 'firebase/database';
+import { Preferences } from '@utils/preferences';
+import { getAuthInstance, getDatabaseInstance, initializeFirebase } from '../firebase';
 
+
+// Mock Dependencies
 vi.mock('firebase/auth', () => ({
-  GoogleAuthProvider: { credential: vi.fn((idToken, accessToken) => ({ idToken, accessToken })) },
+  GoogleAuthProvider: { credential: vi.fn(() => 'mock_credential') },
   signInWithCredential: vi.fn(),
-  signOut: vi.fn(() => Promise.resolve()),
+  signOut: vi.fn(),
   onAuthStateChanged: vi.fn(),
-  deleteUser: vi.fn(() => Promise.resolve()),
+  deleteUser: vi.fn(),
 }));
 
 vi.mock('firebase/database', () => ({
-  ref: vi.fn((db, path) => ({ db, path })),
-  remove: vi.fn(() => Promise.resolve()),
-  update: vi.fn(() => Promise.resolve()),
+  ref: vi.fn((db, path) => path),
+  remove: vi.fn(),
+  update: vi.fn(),
 }));
 
 vi.mock('@utils/logger', () => ({
-  createLogger: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() }),
+  createLogger: () => ({
+    warn: vi.fn(),
+    info: vi.fn(),
+    success: vi.fn(),
+    error: vi.fn(),
+  }),
 }));
 
-const prefStore = {};
 vi.mock('@utils/preferences', () => ({
   Preferences: {
-    set: vi.fn(({ key, value }) => { prefStore[key] = value; return Promise.resolve(); }),
-    get: vi.fn(({ key }) => Promise.resolve({ value: prefStore[key] ?? null })),
-    remove: vi.fn(({ key }) => { delete prefStore[key]; return Promise.resolve(); }),
-  },
+    set: vi.fn(() => Promise.resolve()),
+    get: vi.fn(),
+    remove: vi.fn(() => Promise.resolve()),
+  }
 }));
 
 vi.mock('../firebase', () => ({
@@ -33,155 +50,271 @@ vi.mock('../firebase', () => ({
   initializeFirebase: vi.fn(),
 }));
 
-import { signInWithCredential, signOut as fbSignOut, onAuthStateChanged, deleteUser } from 'firebase/auth';
-import { remove } from 'firebase/database';
-import { getAuthInstance, getDatabaseInstance } from '../firebase';
-import * as auth from '../authService';
+vi.mock('@shared/dbSchema.js', () => ({
+  paths: {
+    userProfile: (uid) => `userProfile/${uid}`,
+    user: (uid) => `user/${uid}`,
+    leaderboardEntry: (uid) => `leaderboard/${uid}`,
+  }
+}));
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  for (const k of Object.keys(prefStore)) delete prefStore[k];
-  vi.mocked(getDatabaseInstance).mockReturnValue({ db: true });
-});
+describe('authService', () => {
+  let mockAuth, mockDb;
 
-describe('setupAuthListener', () => {
-  it('does nothing when there is no auth instance', () => {
-    vi.mocked(getAuthInstance).mockReturnValue(null);
-    auth.setupAuthListener([vi.fn()]);
-    expect(onAuthStateChanged).not.toHaveBeenCalled();
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockAuth = { currentUser: { uid: 'u1', email: 'a@b.com', displayName: 'A', photoURL: 'a.jpg' } };
+    mockDb = {};
+    getAuthInstance.mockReturnValue(mockAuth);
+    getDatabaseInstance.mockReturnValue(mockDb);
   });
 
-  it('notifies listeners and persists identity on sign-in', async () => {
-    vi.mocked(getAuthInstance).mockReturnValue({});
-    const listener = vi.fn();
-    vi.mocked(onAuthStateChanged).mockImplementation((_a, cb) => cb({
-      uid: 'u1', email: 'a@b.c', displayName: 'A', photoURL: 'p',
-    }));
-    auth.setupAuthListener([listener]);
-    await vi.waitFor(() => expect(listener).toHaveBeenCalled());
-    expect(listener).toHaveBeenCalledWith({ isSignedIn: true, user: expect.objectContaining({ uid: 'u1' }) });
-    expect(auth.getLastAuthState().isSignedIn).toBe(true);
-    expect(prefStore.user_signed_in).toBe('true');
-  });
+  describe('setupAuthListener', () => {
+    it('sets up listener and handles sign in', async () => {
+      let listenerCallback;
+      onAuthStateChanged.mockImplementation((auth, cb) => { listenerCallback = cb; });
+      const listeners = [vi.fn()];
+      
+      authService.setupAuthListener(listeners);
+      expect(onAuthStateChanged).toHaveBeenCalledWith(mockAuth, expect.any(Function));
+      
+      // Simulate user signing in
+      const mockUser = { uid: 'u2', email: 'b@c.com', displayName: 'B', photoURL: 'b.jpg' };
+      await listenerCallback(mockUser);
+      
+      expect(Preferences.set).toHaveBeenCalledWith({ key: 'user_signed_in', value: 'true' });
+      expect(Preferences.set).toHaveBeenCalledWith({ key: 'user_profile', value: expect.any(String) });
+      expect(update).toHaveBeenCalledWith(
+        `userProfile/u2`,
+        expect.objectContaining({ email: 'b@c.com', displayName: 'B' })
+      );
+      expect(listeners[0]).toHaveBeenCalledWith({
+        isSignedIn: true,
+        user: { uid: 'u2', email: 'b@c.com', displayName: 'B', photoURL: 'b.jpg' }
+      });
+      expect(authService.getLastAuthState()).toEqual({
+        isSignedIn: true,
+        user: { uid: 'u2', email: 'b@c.com', displayName: 'B', photoURL: 'b.jpg' }
+      });
+    });
 
-  it('notifies a signed-out state when no user', async () => {
-    vi.mocked(getAuthInstance).mockReturnValue({});
-    const listener = vi.fn();
-    vi.mocked(onAuthStateChanged).mockImplementation((_a, cb) => cb(null));
-    auth.setupAuthListener([listener]);
-    await vi.waitFor(() => expect(listener).toHaveBeenCalledWith({ isSignedIn: false, user: null }));
-  });
-});
+    it('handles sign in with missing profile fields and database failure', async () => {
+      update.mockRejectedValueOnce(new Error('DB Error'));
+      let listenerCallback;
+      onAuthStateChanged.mockImplementation((auth, cb) => { listenerCallback = cb; });
+      const listeners = [vi.fn()];
+      authService.setupAuthListener(listeners);
+      
+      await listenerCallback({ uid: 'u3' }); // missing email etc
+      expect(update).toHaveBeenCalled();
+      // It should just log and not crash
+    });
 
-describe('signInWithGoogle / signInWithGoogleWeb', () => {
-  it('throws when firebase is not initialized', async () => {
-    vi.mocked(getAuthInstance).mockReturnValue(null);
-    await expect(auth.signInWithGoogle('tok', [])).rejects.toThrow('Firebase not initialized');
-    await expect(auth.signInWithGoogleWeb('tok', {}, [])).rejects.toThrow('Firebase not initialized');
-  });
+    it('does nothing if no db instance', async () => {
+      getDatabaseInstance.mockReturnValueOnce(null);
+      let listenerCallback;
+      onAuthStateChanged.mockImplementation((auth, cb) => { listenerCallback = cb; });
+      authService.setupAuthListener([vi.fn()]);
+      
+      await listenerCallback({ uid: 'u4' });
+      expect(update).not.toHaveBeenCalled();
+    });
 
-  it('signs in with an id token and notifies listeners', async () => {
-    vi.mocked(getAuthInstance).mockReturnValue({});
-    vi.mocked(signInWithCredential).mockResolvedValue({ user: { uid: 'u2', email: 'e', displayName: 'D', photoURL: 'p' } });
-    const listener = vi.fn();
-    const user = await auth.signInWithGoogle('idtok', [listener]);
-    expect(user.uid).toBe('u2');
-    expect(listener).toHaveBeenCalledWith({ isSignedIn: true, user: expect.objectContaining({ uid: 'u2' }) });
-    expect(prefStore.user_id).toBe('u2');
-  });
+    it('sets up listener and handles sign out', async () => {
+      let listenerCallback;
+      onAuthStateChanged.mockImplementation((auth, cb) => { listenerCallback = cb; });
+      const listeners = [vi.fn()];
+      
+      authService.setupAuthListener(listeners);
+      
+      // Simulate user signing out (null user)
+      await listenerCallback(null);
+      
+      expect(listeners[0]).toHaveBeenCalledWith({ isSignedIn: false, user: null });
+      expect(authService.getLastAuthState()).toEqual({ isSignedIn: false, user: null });
+    });
 
-  it('web sign-in falls back to userInfo fields when firebase profile is empty', async () => {
-    vi.mocked(getAuthInstance).mockReturnValue({});
-    vi.mocked(signInWithCredential).mockResolvedValue({ user: { uid: 'u3', email: null, displayName: null, photoURL: null } });
-    const listener = vi.fn();
-    await auth.signInWithGoogleWeb('access', { email: 'fallback@x', name: 'Fallback', picture: 'pic' }, [listener]);
-    expect(listener).toHaveBeenCalledWith({
-      isSignedIn: true,
-      user: expect.objectContaining({ email: 'fallback@x', displayName: 'Fallback', photoURL: 'pic' }),
+    it('returns early if no auth instance', () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      authService.setupAuthListener([]);
+      expect(onAuthStateChanged).not.toHaveBeenCalled();
     });
   });
-});
 
-describe('signOut', () => {
-  it('throws without an auth instance', async () => {
-    vi.mocked(getAuthInstance).mockReturnValue(null);
-    await expect(auth.signOut([])).rejects.toThrow('Firebase not initialized');
+  describe('signInWithGoogle', () => {
+    it('signs in and notifies listeners', async () => {
+      signInWithCredential.mockResolvedValueOnce({
+        user: { uid: 'u5', email: 'e', displayName: 'D', photoURL: 'P' }
+      });
+      const listeners = [vi.fn()];
+      
+      const user = await authService.signInWithGoogle('token123', listeners);
+      
+      expect(GoogleAuthProvider.credential).toHaveBeenCalledWith('token123');
+      expect(signInWithCredential).toHaveBeenCalledWith(mockAuth, 'mock_credential');
+      expect(Preferences.set).toHaveBeenCalledWith({ key: 'user_signed_in', value: 'true' });
+      expect(listeners[0]).toHaveBeenCalledWith({
+        isSignedIn: true,
+        user: { uid: 'u5', email: 'e', displayName: 'D', photoURL: 'P' }
+      });
+      expect(update).toHaveBeenCalled(); // profile sync
+      expect(user.uid).toBe('u5');
+    });
+
+    it('throws if no auth instance', async () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      await expect(authService.signInWithGoogle('token', [])).rejects.toThrow('Firebase not initialized');
+    });
   });
 
-  it('clears preferences and notifies a signed-out state', async () => {
-    vi.mocked(getAuthInstance).mockReturnValue({});
-    prefStore.user_signed_in = 'true';
-    const listener = vi.fn();
-    await auth.signOut([listener]);
-    expect(fbSignOut).toHaveBeenCalled();
-    expect(prefStore.user_signed_in).toBeUndefined();
-    expect(listener).toHaveBeenCalledWith({ isSignedIn: false, user: null });
-  });
-});
+  describe('signInWithGoogleWeb', () => {
+    it('signs in, uses fallback user info, and notifies listeners', async () => {
+      signInWithCredential.mockResolvedValueOnce({
+        user: { uid: 'u6' } // missing email, displayName, photoURL
+      });
+      const listeners = [vi.fn()];
+      
+      const userInfo = { email: 'fb', name: 'fbn', picture: 'fbp' };
+      const user = await authService.signInWithGoogleWeb('accToken', userInfo, listeners);
+      
+      expect(GoogleAuthProvider.credential).toHaveBeenCalledWith(null, 'accToken');
+      expect(listeners[0]).toHaveBeenCalledWith({
+        isSignedIn: true,
+        user: { uid: 'u6', email: 'fb', displayName: 'fbn', photoURL: 'fbp' }
+      });
+      expect(user.uid).toBe('u6');
+    });
 
-describe('deleteAccount', () => {
-  const setupSignedIn = () => vi.mocked(getAuthInstance).mockReturnValue({ currentUser: { uid: 'u9' } });
-
-  it('throws when no user is signed in', async () => {
-    vi.mocked(getAuthInstance).mockReturnValue({ currentUser: null });
-    await expect(auth.deleteAccount([], vi.fn(), vi.fn())).rejects.toThrow('User not signed in');
-  });
-
-  it('leaves clans, wipes data and deletes the user', async () => {
-    setupSignedIn();
-    const leaveClan = vi.fn(() => Promise.resolve());
-    const getUserClans = vi.fn(() => Promise.resolve([{ id: 'c1' }, { id: 'c2' }]));
-    const listener = vi.fn();
-    const ok = await auth.deleteAccount([listener], leaveClan, getUserClans);
-    expect(ok).toBe(true);
-    expect(leaveClan).toHaveBeenCalledTimes(2);
-    expect(remove).toHaveBeenCalledTimes(2);
-    expect(deleteUser).toHaveBeenCalled();
-    expect(listener).toHaveBeenCalledWith({ isSignedIn: false, user: null });
+    it('throws if no auth instance', async () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      await expect(authService.signInWithGoogleWeb('t', {}, [])).rejects.toThrow('Firebase not initialized');
+    });
   });
 
-  it('tolerates clan-leave failures and data-removal denials', async () => {
-    setupSignedIn();
-    vi.mocked(remove).mockRejectedValue(new Error('permission denied'));
-    const getUserClans = vi.fn(() => Promise.reject(new Error('boom')));
-    const ok = await auth.deleteAccount([], vi.fn(), getUserClans);
-    expect(ok).toBe(true);
-    expect(deleteUser).toHaveBeenCalled();
+  describe('signOut', () => {
+    it('signs out and notifies listeners', async () => {
+      const listeners = [vi.fn()];
+      await authService.signOut(listeners);
+      
+      expect(firebaseSignOut).toHaveBeenCalledWith(mockAuth);
+      expect(Preferences.remove).toHaveBeenCalledWith({ key: 'user_signed_in' });
+      expect(Preferences.remove).toHaveBeenCalledWith({ key: 'user_id' });
+      expect(Preferences.remove).toHaveBeenCalledWith({ key: 'user_profile' });
+      expect(listeners[0]).toHaveBeenCalledWith({ isSignedIn: false, user: null });
+    });
+
+    it('throws if no auth instance', async () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      await expect(authService.signOut([])).rejects.toThrow('Firebase not initialized');
+    });
   });
 
-  it('signs out instead of throwing on requires-recent-login', async () => {
-    setupSignedIn();
-    vi.mocked(deleteUser).mockRejectedValue({ code: 'auth/requires-recent-login' });
-    const ok = await auth.deleteAccount([], vi.fn(), vi.fn(() => Promise.resolve([])));
-    expect(ok).toBe(true);
-    expect(fbSignOut).toHaveBeenCalled();
+  describe('deleteAccount', () => {
+    it('deletes account, leaves clans, removes data, and signs out', async () => {
+      const listeners = [vi.fn()];
+      const leaveClanFn = vi.fn();
+      const getUserClansFn = vi.fn(() => Promise.resolve([{ id: 'c1' }, { id: 'c2' }]));
+      
+      const result = await authService.deleteAccount(listeners, leaveClanFn, getUserClansFn);
+      
+      expect(getUserClansFn).toHaveBeenCalled();
+      expect(leaveClanFn).toHaveBeenCalledWith('c1');
+      expect(leaveClanFn).toHaveBeenCalledWith('c2');
+      
+      expect(remove).toHaveBeenCalledWith('user/u1');
+      expect(remove).toHaveBeenCalledWith('leaderboard/u1');
+      
+      expect(Preferences.remove).toHaveBeenCalledWith({ key: 'user_signed_in' });
+      
+      expect(deleteUser).toHaveBeenCalledWith(mockAuth.currentUser);
+      expect(result).toBe(true);
+    });
+
+    it('handles clan leave failure gracefully', async () => {
+      const getUserClansFn = vi.fn(() => Promise.resolve([{ id: 'c1' }]));
+      const leaveClanFn = vi.fn(() => Promise.reject(new Error('clan fail')));
+      
+      await authService.deleteAccount([], leaveClanFn, getUserClansFn);
+      // should continue to deleteUser
+      expect(deleteUser).toHaveBeenCalled();
+    });
+
+    it('handles missing database by initializing it', async () => {
+      getDatabaseInstance.mockReturnValueOnce(null);
+      const getUserClansFn = vi.fn(() => Promise.resolve([]));
+      await authService.deleteAccount([], vi.fn(), getUserClansFn);
+      expect(initializeFirebase).toHaveBeenCalled();
+    });
+
+    it('handles client-side DB remove failure gracefully', async () => {
+      remove.mockRejectedValue(new Error('permission denied')); // for user and leaderboard
+      const getUserClansFn = vi.fn(() => Promise.resolve([]));
+      
+      await authService.deleteAccount([], vi.fn(), getUserClansFn);
+      expect(deleteUser).toHaveBeenCalled(); // still deletes user
+    });
+
+    it('handles requires-recent-login by signing out', async () => {
+      deleteUser.mockRejectedValueOnce({ code: 'auth/requires-recent-login' });
+      const getUserClansFn = vi.fn(() => Promise.resolve([]));
+      
+      const result = await authService.deleteAccount([], vi.fn(), getUserClansFn);
+      
+      expect(firebaseSignOut).toHaveBeenCalled();
+      expect(result).toBe(true); // wait, it returns true? Yes, it returns true and catches the error.
+    });
+
+    it('throws other auth errors', async () => {
+      deleteUser.mockRejectedValueOnce({ code: 'auth/unknown' });
+      const getUserClansFn = vi.fn(() => Promise.resolve([]));
+      
+      await expect(authService.deleteAccount([], vi.fn(), getUserClansFn)).rejects.toEqual({ code: 'auth/unknown' });
+    });
+
+    it('throws if no current user', async () => {
+      getAuthInstance.mockReturnValueOnce({ currentUser: null });
+      await expect(authService.deleteAccount([], vi.fn(), vi.fn())).rejects.toThrow('User not signed in');
+    });
   });
 
-  it('rethrows unexpected auth deletion errors', async () => {
-    setupSignedIn();
-    vi.mocked(deleteUser).mockRejectedValue({ code: 'auth/network-request-failed' });
-    await expect(auth.deleteAccount([], vi.fn(), vi.fn(() => Promise.resolve([])))).rejects.toEqual({ code: 'auth/network-request-failed' });
-  });
-});
+  describe('checkSignInStatus', () => {
+    it('returns signed in status if pref is true and user exists', async () => {
+      Preferences.get.mockResolvedValueOnce({ value: 'true' });
+      const result = await authService.checkSignInStatus();
+      
+      expect(result.isSignedIn).toBe(true);
+      expect(result.user.uid).toBe('u1');
+    });
 
-describe('checkSignInStatus / getCurrentUserId', () => {
-  it('reports signed-in when the flag and currentUser agree', async () => {
-    prefStore.user_signed_in = 'true';
-    vi.mocked(getAuthInstance).mockReturnValue({ currentUser: { uid: 'u1', email: 'e', displayName: 'D', photoURL: 'p' } });
-    const status = await auth.checkSignInStatus();
-    expect(status).toEqual({ isSignedIn: true, user: expect.objectContaining({ uid: 'u1' }) });
+    it('returns false if pref is false', async () => {
+      Preferences.get.mockResolvedValueOnce({ value: 'false' });
+      const result = await authService.checkSignInStatus();
+      
+      expect(result.isSignedIn).toBe(false);
+    });
+
+    it('returns false if pref is true but no currentUser', async () => {
+      Preferences.get.mockResolvedValueOnce({ value: 'true' });
+      getAuthInstance.mockReturnValueOnce({ currentUser: null });
+      const result = await authService.checkSignInStatus();
+      
+      expect(result.isSignedIn).toBe(false);
+    });
   });
 
-  it('reports signed-out when the flag is missing', async () => {
-    vi.mocked(getAuthInstance).mockReturnValue({ currentUser: { uid: 'u1' } });
-    const status = await auth.checkSignInStatus();
-    expect(status).toEqual({ isSignedIn: false, user: null });
-  });
+  describe('getCurrentUserId', () => {
+    it('returns uid if user is present', () => {
+      expect(authService.getCurrentUserId()).toBe('u1');
+    });
 
-  it('getCurrentUserId returns the uid or null', () => {
-    vi.mocked(getAuthInstance).mockReturnValue({ currentUser: { uid: 'abc' } });
-    expect(auth.getCurrentUserId()).toBe('abc');
-    vi.mocked(getAuthInstance).mockReturnValue(null);
-    expect(auth.getCurrentUserId()).toBeNull();
+    it('returns null if no user', () => {
+      getAuthInstance.mockReturnValueOnce({ currentUser: null });
+      expect(authService.getCurrentUserId()).toBeNull();
+    });
+
+    it('returns null if no auth instance', () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      expect(authService.getCurrentUserId()).toBeNull();
+    });
   });
 });

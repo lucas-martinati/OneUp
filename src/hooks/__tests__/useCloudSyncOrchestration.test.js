@@ -65,7 +65,25 @@ describe('useCloudSyncOrchestration', () => {
   });
 
   it('does not attach listeners when disabled', () => {
-    renderHook(() => useCloudSyncOrchestration(false, [], [], []));
+    const { unmount } = renderHook(() => useCloudSyncOrchestration(false, [], [], []));
     expect(cloudSync.listenToRoutinesFromCloud).not.toHaveBeenCalled();
+    unmount(); // Covers cleanup with null unsubs
+  });
+
+  it('handles missing cloudSync methods gracefully', () => {
+    const oldExercises = cloudSync.listenToCustomExercisesFromCloud;
+    const oldCategories = cloudSync.listenToCustomCategoriesFromCloud;
+    const oldRoutines = cloudSync.listenToRoutinesFromCloud;
+
+    cloudSync.listenToCustomExercisesFromCloud = undefined;
+    cloudSync.listenToCustomCategoriesFromCloud = undefined;
+    cloudSync.listenToRoutinesFromCloud = undefined;
+
+    const { unmount } = renderHook(() => useCloudSyncOrchestration(true, [], [], []));
+    unmount(); // Cleanup with null unsubs
+
+    cloudSync.listenToCustomExercisesFromCloud = oldExercises;
+    cloudSync.listenToCustomCategoriesFromCloud = oldCategories;
+    cloudSync.listenToRoutinesFromCloud = oldRoutines;
   });
 });

@@ -50,4 +50,17 @@ describe('useDashboardState', () => {
     act(() => result.current.setShowDayConfetti(true));
     expect(result.current.showDayConfetti).toBe(true);
   });
+
+  it('does not trigger confetti if day number does not advance', () => {
+    const { result } = renderHook(() => useDashboardState());
+    mockNow = '2026-06-20'; 
+    getDayNumber.mockImplementation((d) => {
+      if (d === '2026-06-21') return 1;
+      if (d === '2026-06-20') return 0;
+      return 2;
+    });
+    act(() => { vi.advanceTimersByTime(10000); });
+    expect(result.current.today).toBe('2026-06-20');
+    expect(result.current.showDayConfetti).toBe(false); // No confetti
+  });
 });

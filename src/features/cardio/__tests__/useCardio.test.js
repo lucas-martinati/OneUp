@@ -7,6 +7,7 @@ import { useCloudSyncStore } from '@store/useCloudSyncStore';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { loadCardioSessions, saveCardioSession } from '@services/cardioService';
 import { getAllActivities } from '@services/cardioProviders';
+import { evaluateCardioWeek } from '@utils/cardioStreak';
 
 vi.mock('@contexts/AuthContext');
 vi.mock('@store/useProgressStore');
@@ -16,6 +17,9 @@ vi.mock('@services/cardioService', () => ({
     loadCardioSessions: vi.fn(),
     saveCardioSession: vi.fn(),
     getSortedCardioSessions: vi.fn((s) => s || [])
+}));
+vi.mock('@utils/cardioStreak', () => ({
+    evaluateCardioWeek: vi.fn(() => ({ weekNum: 1, achieved: true }))
 }));
 vi.mock('@services/cardioProviders', () => ({
     getAllActivities: vi.fn()
@@ -69,6 +73,7 @@ describe('useCardio', () => {
 
         loadCardioSessions.mockResolvedValue([]);
         getAllActivities.mockResolvedValue([]);
+        evaluateCardioWeek.mockImplementation(() => ({ weekNum: 1, achieved: true }));
     });
 
     it('initializes and fetches sessions when ready', async () => {
@@ -132,14 +137,12 @@ describe('useCardio', () => {
         
         getAllActivities.mockResolvedValue([{ id: 's1', type: 'running', distance: 2000, startTime: 1000 }]); // Only 2km, goal is 5km
         
-        const { result } = renderHook(() => useCardio());
+        renderHook(() => useCardio());
         
         await vi.waitFor(() => {
-            expect(result.current.loading).toBe(false);
+            // Need to wait until it unmarks
+            expect(mockUpdateExerciseCount).toHaveBeenCalledWith('1970-01-01', 'running', 0, 1, null, 1);
         }, { timeout: 3000 });
-
-        // It should call with 0 to unmark
-        expect(mockUpdateExerciseCount).toHaveBeenCalledWith('1970-01-01', 'running', 0, 1, null, 1);
     });
 
     it('handles invalidateCurrentWeek', () => {
@@ -153,6 +156,23 @@ describe('useCardio', () => {
         });
         
         expect(mockUpdateExerciseCount).toHaveBeenCalledWith('1970-01-01', 'running', 0, 1, null, 1);
+    });
+
+    it('handles invalidateCurrentWeek for cycling', () => {
+        mockProgress.completions = {
+            '1970-01-01': { cycling: { isCompleted: true, difficulty: 2 } }
+        };
+        const { result } = renderHook(() => useCardio());
+        
+        act(() => {
+            result.current.setActiveMode('cycling');
+        });
+
+        act(() => {
+            result.current.invalidateCurrentWeek();
+        });
+        
+        expect(mockUpdateExerciseCount).toHaveBeenCalledWith('1970-01-01', 'cycling', 0, 1, null, 1);
     });
 
     it('handles catch error during fetch', async () => {
@@ -171,5 +191,34 @@ describe('useCardio', () => {
             result.current.setActiveMode('cycling');
         });
         expect(result.current.activeMode).toBe('cycling');
+    });
+
+    it('sets empty sessions if not signed in', async () => {
+        mockAuth.isSignedIn = false;
+        // The hook requires isStoreInitialized for guests, which is true in mockProgress
+        const { result } = renderHook(() => useCardio());
+        
+        await vi.waitFor(() => {
+            expect(result.current.loading).toBe(false);
+        });
+        
+        expect(result.current.allSessions).toEqual([]);
+        expect(loadCardioSessions).not.toHaveBeenCalled();
+    });
+
+    it('breaks streak computation properly', () => {
+        // Provide at least one session so it doesn't return 0 early
+        mockProgress.cardio = { sessions: [{ id: '1' }] };
+        
+        // weekOffset 0: achieved false (does not break)
+        // weekOffset 1: achieved false (BREAKS)
+        evaluateCardioWeek.mockImplementation((sessions, mode, weekOffset) => {
+            if (weekOffset === 0) return { weekNum: 1, achieved: false };
+            if (weekOffset === 1) return { weekNum: 1, achieved: false };
+            return { weekNum: 0, achieved: false };
+        });
+
+        const { result } = renderHook(() => useCardio());
+        expect(result.current.streak).toBe(0);
     });
 });

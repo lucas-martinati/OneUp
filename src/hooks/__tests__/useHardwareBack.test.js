@@ -63,4 +63,21 @@ describe('useHardwareBack', () => {
     await flush();
     expect(removeListener).toHaveBeenCalled();
   });
+
+  it('handles Capacitor plugin errors gracefully', async () => {
+    // Suppress console.warn for this test
+    const warnMock = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    addListener.mockRejectedValueOnce(new Error('Plugin not available'));
+    renderHook(() => useHardwareBack());
+    await flush();
+    expect(warnMock).toHaveBeenCalledWith('Capacitor App plugin error:', expect.any(Error));
+    warnMock.mockRestore();
+  });
+
+  it('bails out if unmounted before listener resolves', async () => {
+    const { unmount } = renderHook(() => useHardwareBack());
+    unmount(); // Set cancelled = true
+    await flush(); // Let promise resolve
+    // Should not crash, and shouldn't set up the listener correctly since it's cancelled
+  });
 });

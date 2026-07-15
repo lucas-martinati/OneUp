@@ -1,413 +1,387 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import * as clanService from '../clanService';
+import { get, remove, push, update, onValue, runTransaction } from 'firebase/database';
+import { getAuthInstance, getDatabaseInstance } from '../firebase';
 
-// Mock firebase/database
-vi.mock('firebase/database', () => {
-  const mRef = vi.fn((db, path) => path !== undefined ? path : 'mock_db_ref');
-  const mPush = vi.fn((ref) => ({ key: 'clan_mock_key', ref }));
-  
-  return {
-    ref: mRef,
-    set: vi.fn(),
-    get: vi.fn(),
-    remove: vi.fn(),
-    push: mPush,
-    update: vi.fn(),
-    onValue: vi.fn(),
-    serverTimestamp: vi.fn(() => 'SERVER_TIMESTAMP'),
-    runTransaction: vi.fn(),
-  };
-});
 
-// Mock ../firebase
-vi.mock('../firebase', () => ({
-  getAuthInstance: vi.fn(() => ({ currentUser: { uid: 'test-uid' } })),
-  getDatabaseInstance: vi.fn(() => ({})),
+vi.mock('firebase/database', () => ({
+  ref: vi.fn((db, path) => path),
+  get: vi.fn(),
+  remove: vi.fn(),
+  push: vi.fn(() => ({ key: 'new_id' })),
+  update: vi.fn(),
+  onValue: vi.fn(),
+  serverTimestamp: vi.fn(() => 'ts'),
+  runTransaction: vi.fn()
 }));
 
-// Mock ../i18n
+vi.mock('@utils/logger', () => ({
+  createLogger: () => ({
+    success: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
+  })
+}));
+
+vi.mock('../firebase', () => ({
+  getAuthInstance: vi.fn(),
+  getDatabaseInstance: vi.fn()
+}));
+
+vi.mock('@shared/dbSchema.js', () => ({
+  paths: {
+    clans: () => 'clans',
+    clan: (id) => `clan/${id}`,
+    clanCode: (code) => `code/${code}`,
+    userClan: (uid, clanId) => `userClan/${uid}/${clanId}`,
+    clanMember: (clanId, uid) => `clanMember/${clanId}/${uid}`,
+    userClans: (uid) => `userClans/${uid}`,
+    leaderboard: () => 'leaderboard',
+    leaderboardEntry: (uid) => `lb/${uid}`,
+    notification: (target, from) => `notif/${target}/${from}`,
+    notifications: (uid) => `notifs/${uid}`
+  }
+}));
+
 vi.mock('../../i18n', () => ({
   default: {
-    t: vi.fn((key) => key),
-  },
+    t: vi.fn((k) => k)
+  }
 }));
 
-import { get, remove, push, update, onValue, runTransaction } from 'firebase/database';
-import { 
-  createClan, 
-  joinClan, 
-  leaveClan, 
-  getUserClans, 
-  getClanDetails, 
-  sendPoke, 
-  listenToNotifications, 
-  deleteNotification 
-} from '../clanService';
-
-const snapshot = (val) => ({
-  exists: () => val != null,
-  val: () => val,
-});
-
 describe('clanService', () => {
+  const mockAuth = { currentUser: { uid: 'u1' } };
+  const mockDb = {};
+
   beforeEach(() => {
     vi.clearAllMocks();
+    getAuthInstance.mockReturnValue(mockAuth);
+    getDatabaseInstance.mockReturnValue(mockDb);
   });
 
   describe('createClan', () => {
-    it('creates a clan, writes to clanCodes and updates user node successfully', async () => {
-      // Stub get to indicate the generated code is unique
-      vi.mocked(get).mockResolvedValueOnce(snapshot(null));
-      vi.mocked(update).mockResolvedValue();
+    it('creates clan successfully on first attempt', async () => {
+      // Mock code doesn't exist
+      get.mockResolvedValueOnce({ exists: () => false });
+      update.mockResolvedValueOnce();
 
-      const result = await createClan('My Awesome Clan');
+      const result = await clanService.createClan('My Clan');
       expect(result.success).toBe(true);
-      expect(result.clanId).toBe('clan_mock_key');
+      expect(result.clanId).toBe('new_id');
       expect(result.code).toHaveLength(6);
-
-      expect(push).toHaveBeenCalled();
-      expect(get).toHaveBeenCalled();
-      expect(update).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          'clans/clan_mock_key': expect.objectContaining({
-            name: 'My Awesome Clan',
-            createdBy: 'test-uid',
-            members: { 'test-uid': 'admin' }
-          }),
-          [`clanCodes/${result.code}`]: 'clan_mock_key',
-          'users/test-uid/clans/clan_mock_key': 'admin'
-        })
-      );
-    });
-
-    it('retries generation when a code collision occurs', async () => {
-      // First get says code exists, second get says it does not
-      vi.mocked(get)
-        .mockResolvedValueOnce(snapshot('existing-clan-id'))
-        .mockResolvedValueOnce(snapshot(null));
-      vi.mocked(update).mockResolvedValue();
-
-      const result = await createClan('Retry Clan');
-      expect(result.success).toBe(true);
-      expect(result.clanId).toBe('clan_mock_key');
-      expect(get).toHaveBeenCalledTimes(2);
+      expect(push).toHaveBeenCalledWith('clans');
       expect(update).toHaveBeenCalled();
     });
 
-    it('catches update errors and retries (collision or write failure)', async () => {
-      // First try: code doesn't exist, but update throws an error
-      // Second try: code doesn't exist, update succeeds
-      vi.mocked(get)
-        .mockResolvedValueOnce(snapshot(null))
-        .mockResolvedValueOnce(snapshot(null));
+    it('retries on code collision', async () => {
+      // First attempt collision
+      get.mockResolvedValueOnce({ exists: () => true });
+      // Second attempt success
+      get.mockResolvedValueOnce({ exists: () => false });
+      update.mockResolvedValueOnce();
 
-      vi.mocked(update)
-        .mockRejectedValueOnce(new Error('Write failure'))
-        .mockResolvedValueOnce();
-
-      const result = await createClan('Retry Write Fail Clan');
+      const result = await clanService.createClan('Retry Clan');
       expect(result.success).toBe(true);
-      expect(update).toHaveBeenCalledTimes(2);
+      expect(get).toHaveBeenCalledTimes(2);
+    });
+
+    it('returns error if all attempts fail', async () => {
+      get.mockResolvedValue({ exists: () => true });
+      const result = await clanService.createClan('Fail Clan');
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('clan.createError');
+      expect(get).toHaveBeenCalledTimes(5);
+    });
+
+    it('handles unexpected errors', async () => {
+      get.mockRejectedValueOnce(new Error('db err'));
+      const result = await clanService.createClan('Error Clan');
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('clan.createError');
+    });
+
+    it('throws if not initialized', async () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      const result = await clanService.createClan('My Clan');
+      expect(result.success).toBe(false);
     });
   });
 
   describe('joinClan', () => {
-    it('joins a clan successfully when code is valid', async () => {
-      const mockClan = {
-        name: 'Target Clan',
-        code: 'CLANCODE',
-        members: { 'other-uid': 'admin' }
-      };
+    it('joins successfully if code is valid and user is not member', async () => {
+      // code lookup
+      get.mockResolvedValueOnce({ exists: () => true, val: () => 'clan1' });
+      // clan exists
+      get.mockResolvedValueOnce({ exists: () => true });
+      // user not in clan
+      get.mockResolvedValueOnce({ exists: () => false });
       
-      // 1. Get clanId from code mapping
-      // 2. Get clan details
-      // 3. Check user membership
-      vi.mocked(get)
-        .mockResolvedValueOnce(snapshot('clan_id_123'))
-        .mockResolvedValueOnce(snapshot(mockClan))
-        .mockResolvedValueOnce(snapshot(null));
-
-      vi.mocked(update).mockResolvedValue();
-
-      const result = await joinClan('CLANCODE');
+      const result = await clanService.joinClan('ABCDEF');
       expect(result.success).toBe(true);
-      expect(result.clanId).toBe('clan_id_123');
-
-      expect(get).toHaveBeenCalledTimes(3);
-      expect(update).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          'clans/clan_id_123/members/test-uid': 'member',
-          'users/test-uid/clans/clan_id_123': 'member'
-        })
-      );
+      expect(result.clanId).toBe('clan1');
+      expect(update).toHaveBeenCalledWith(undefined, {
+        'clanMember/clan1/u1': 'member',
+        'userClan/u1/clan1': 'member'
+      });
     });
 
-    it('returns error if the invitation code is not registered', async () => {
-      vi.mocked(get).mockResolvedValueOnce(snapshot(null));
-
-      const result = await joinClan('BADCODE');
+    it('fails if code does not exist', async () => {
+      get.mockResolvedValueOnce({ exists: () => false });
+      const result = await clanService.joinClan('BADCODE');
       expect(result.success).toBe(false);
-      expect(result.error).toBeDefined();
+      expect(result.error).toBe('clan.invalidCode');
     });
 
-    it('returns error if the user is already a member', async () => {
-      const mockClan = {
-        name: 'Target Clan',
-        code: 'CLANCODE',
-        members: { 'test-uid': 'member' }
-      };
-
-      vi.mocked(get)
-        .mockResolvedValueOnce(snapshot('clan_id_123'))
-        .mockResolvedValueOnce(snapshot(mockClan))
-        .mockResolvedValueOnce(snapshot('member'));
-
-      const result = await joinClan('CLANCODE');
+    it('fails if clan node does not exist', async () => {
+      get.mockResolvedValueOnce({ exists: () => true, val: () => 'clan1' });
+      get.mockResolvedValueOnce({ exists: () => false }); // clan gone
+      const result = await clanService.joinClan('ABCDEF');
       expect(result.success).toBe(false);
-      expect(result.error).toBeDefined();
+      expect(result.error).toBe('clan.invalidCode');
+    });
+
+    it('fails if already a member', async () => {
+      get.mockResolvedValueOnce({ exists: () => true, val: () => 'clan1' });
+      get.mockResolvedValueOnce({ exists: () => true });
+      get.mockResolvedValueOnce({ exists: () => true }); // already member
+      const result = await clanService.joinClan('ABCDEF');
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('clan.alreadyMember');
+    });
+
+    it('handles errors', async () => {
+      get.mockRejectedValueOnce(new Error('err'));
+      const result = await clanService.joinClan('ABCDEF');
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('clan.joinError');
+    });
+
+    it('returns error if uninitialized', async () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      const result = await clanService.joinClan('ABCDEF');
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('clan.joinError');
     });
   });
 
   describe('leaveClan', () => {
-    it('leaves a clan and deletes it along with its code if empty', async () => {
-      vi.mocked(get)
-        .mockResolvedValueOnce(snapshot('member')) // user is member
-        .mockResolvedValueOnce(snapshot({ members: { 'test-uid': 'member' }, code: 'MYCODE' })); // clan details with only test-uid
-      vi.mocked(update).mockResolvedValue();
-
-      const result = await leaveClan('clan_id_123');
+    it('leaves successfully and removes clan if last member', async () => {
+      get.mockResolvedValueOnce({ exists: () => true }); // user is in clan
+      get.mockResolvedValueOnce({ 
+        exists: () => true, 
+        val: () => ({ code: 'XYZ123', members: { u1: 'admin' } }) 
+      });
+      
+      const result = await clanService.leaveClan('clan1');
       expect(result.success).toBe(true);
-      expect(update).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          'users/test-uid/clans/clan_id_123': null,
-          'clans/clan_id_123': null,
-          'clanCodes/MYCODE': null
-        })
-      );
+      expect(update).toHaveBeenCalledWith(undefined, expect.objectContaining({
+        'userClan/u1/clan1': null,
+        'clan/clan1': null,
+        'code/XYZ123': null
+      }));
     });
 
-    it('leaves a clan but does not delete it if members remain', async () => {
-      vi.mocked(get)
-        .mockResolvedValueOnce(snapshot('member')) // user is member
-        .mockResolvedValueOnce(snapshot({ members: { 'test-uid': 'member', 'other-uid': 'member' }, code: 'MYCODE' })); // other members remain
-      vi.mocked(update).mockResolvedValue();
-
-      const result = await leaveClan('clan_id_123');
+    it('leaves successfully and removes only member if not last', async () => {
+      get.mockResolvedValueOnce({ exists: () => true }); // user is in clan
+      get.mockResolvedValueOnce({ 
+        exists: () => true, 
+        val: () => ({ code: 'XYZ123', members: { u1: 'admin', u2: 'member' } }) 
+      });
+      
+      const result = await clanService.leaveClan('clan1');
       expect(result.success).toBe(true);
-      expect(update).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          'users/test-uid/clans/clan_id_123': null,
-          'clans/clan_id_123/members/test-uid': null
-        })
-      );
+      expect(update).toHaveBeenCalledWith(undefined, expect.objectContaining({
+        'userClan/u1/clan1': null,
+        'clanMember/clan1/u1': null
+      }));
+    });
+
+    it('returns early if not a member', async () => {
+      get.mockResolvedValueOnce({ exists: () => false });
+      const result = await clanService.leaveClan('clan1');
+      expect(result.success).toBe(true);
+      expect(update).not.toHaveBeenCalled();
+    });
+
+    it('returns error if no clanId', async () => {
+      const result = await clanService.leaveClan(null);
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('clan.missingId');
+    });
+
+    it('handles unexpected errors', async () => {
+      get.mockRejectedValueOnce(new Error('err'));
+      const result = await clanService.leaveClan('clan1');
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('clan.leaveError');
+    });
+
+    it('returns error if uninitialized', async () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      const result = await clanService.leaveClan('clan1');
+      expect(result.success).toBe(false);
     });
   });
 
   describe('getUserClans', () => {
-    it('returns empty array if user has no joined clans', async () => {
-      vi.mocked(get).mockResolvedValueOnce(snapshot(null));
+    it('returns list of clans', async () => {
+      get.mockResolvedValueOnce({ exists: () => true, val: () => ({ 'clan1': 'admin', 'clan2': 'member' }) });
+      get.mockResolvedValueOnce({ exists: () => true, val: () => ({ name: 'C1', code: 'A', members: { u1: 'admin' } }) });
+      get.mockResolvedValueOnce({ exists: () => true, val: () => ({ name: 'C2', code: 'B', members: { u1: 'member', u2: 'admin' } }) });
 
-      const result = await getUserClans();
-      expect(result).toEqual([]);
+      const clans = await clanService.getUserClans();
+      expect(clans).toHaveLength(2);
+      expect(clans[0]).toEqual({ id: 'clan1', name: 'C1', code: 'A', role: 'admin', memberCount: 1 });
+      expect(clans[1]).toEqual({ id: 'clan2', name: 'C2', code: 'B', role: 'member', memberCount: 2 });
     });
 
-    it('returns clan details list for the user', async () => {
-      vi.mocked(get)
-        .mockResolvedValueOnce(snapshot({ clan1: 'admin', clan2: 'member' }))
-        .mockResolvedValueOnce(snapshot({ name: 'Clan One', code: 'CODE1', members: { 'test-uid': 'admin' } }))
-        .mockResolvedValueOnce(snapshot({ name: 'Clan Two', code: 'CODE2', members: { 'test-uid': 'member', 'other': 'admin' } }));
+    it('ignores missing clans', async () => {
+      get.mockResolvedValueOnce({ exists: () => true, val: () => ({ 'clan1': 'admin' }) });
+      get.mockResolvedValueOnce({ exists: () => false });
 
-      const result = await getUserClans();
-      expect(result).toHaveLength(2);
-      expect(result[0]).toEqual({
-        id: 'clan1',
-        name: 'Clan One',
-        code: 'CODE1',
-        role: 'admin',
-        memberCount: 1
-      });
-      expect(result[1]).toEqual({
-        id: 'clan2',
-        name: 'Clan Two',
-        code: 'CODE2',
-        role: 'member',
-        memberCount: 2
-      });
+      const clans = await clanService.getUserClans();
+      expect(clans).toHaveLength(0);
+    });
+
+    it('returns empty if user has no clans', async () => {
+      get.mockResolvedValueOnce({ exists: () => false });
+      const clans = await clanService.getUserClans();
+      expect(clans).toEqual([]);
+    });
+
+    it('returns empty if uninitialized', async () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      const clans = await clanService.getUserClans();
+      expect(clans).toEqual([]);
     });
   });
 
   describe('getClanDetails', () => {
-    it('returns null if clan does not exist', async () => {
-      vi.mocked(get).mockResolvedValueOnce(snapshot(null));
+    it('returns populated clan details', async () => {
+      get.mockResolvedValueOnce({ exists: () => true, val: () => ({ name: 'C', code: 'A', members: { u1: 'admin', u2: 'member' } }) });
+      get.mockResolvedValueOnce({ exists: () => true, val: () => ({
+        u1: { pseudo: 'U1', totalReps: 100 },
+        u2: { pseudo: 'U2', totalReps: 200 }
+      })});
 
-      const result = await getClanDetails('clan_id_123');
-      expect(result).toBeNull();
+      const details = await clanService.getClanDetails('clan1');
+      expect(details.name).toBe('C');
+      expect(details.members).toHaveLength(2);
+      expect(details.members[0].uid).toBe('u2'); // sorted by totalReps desc
+      expect(details.members[1].isCurrentUser).toBe(true); // u1 is current user
     });
 
-    it('returns sorted and decorated clan details', async () => {
-      const mockClan = {
-        name: 'Super Clan',
-        code: 'CLANCODE',
-        members: { 'test-uid': 'admin', 'user-2': 'member' }
-      };
-      
-      const mockLeaderboard = {
-        'test-uid': { pseudo: 'Alice', totalReps: 50 },
-        'user-2': { pseudo: 'Bob', totalReps: 150, isPro: true }
-      };
+    it('handles empty leaderboard gracefully', async () => {
+      get.mockResolvedValueOnce({ exists: () => true, val: () => ({ name: 'C', code: 'A', members: { u1: 'admin' } }) });
+      get.mockResolvedValueOnce({ exists: () => false }); // no lb data
 
-      vi.mocked(get)
-        .mockResolvedValueOnce(snapshot(mockClan))
-        .mockResolvedValueOnce(snapshot(mockLeaderboard));
+      const details = await clanService.getClanDetails('clan1');
+      expect(details.members[0].pseudo).toBe('common.anonymous');
+      expect(details.members[0].totalReps).toBe(0);
+    });
 
-      const result = await getClanDetails('clan_id_123');
-      expect(result).not.toBeNull();
-      expect(result.id).toBe('clan_id_123');
-      expect(result.name).toBe('Super Clan');
-      expect(result.code).toBe('CLANCODE');
-      
-      // Bob should be first because 150 > 50
-      expect(result.members).toHaveLength(2);
-      expect(result.members[0].pseudo).toBe('Bob');
-      expect(result.members[0].totalReps).toBe(150);
-      expect(result.members[0].isPro).toBe(true);
-      expect(result.members[0].isCurrentUser).toBe(false);
+    it('returns null if clan not found', async () => {
+      get.mockResolvedValueOnce({ exists: () => false });
+      const details = await clanService.getClanDetails('clan1');
+      expect(details).toBeNull();
+    });
 
-      expect(result.members[1].pseudo).toBe('Alice');
-      expect(result.members[1].totalReps).toBe(50);
-      expect(result.members[1].isCurrentUser).toBe(true);
+    it('returns null if uninitialized', async () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      const details = await clanService.getClanDetails('clan1');
+      expect(details).toBeNull();
     });
   });
 
   describe('sendPoke', () => {
-    it('sends poke successfully and increments count via transaction, handles null current state', async () => {
-      let txCallback;
-      vi.mocked(runTransaction).mockImplementationOnce((ref, callback) => {
-        txCallback = callback;
-        return Promise.resolve({ committed: true });
+    it('sends poke and looks up sender info', async () => {
+      get.mockResolvedValueOnce({ exists: () => true, val: () => ({ pseudo: 'Me', photoURL: 'p.jpg' }) });
+      runTransaction.mockImplementationOnce((ref, updateFn) => {
+        const newData = updateFn({ count: 1 });
+        expect(newData.count).toBe(2);
+        expect(newData.fromName).toBe('Me');
+        expect(newData.type).toBe('nudge');
+        return Promise.resolve();
       });
 
-      // Get sender pseudo from leaderboard (missing pseudo)
-      vi.mocked(get).mockResolvedValueOnce(snapshot({ photoURL: 'photo-url' }));
-
-      const result = await sendPoke('target-uid', 'nudge', 'Hello Poke');
-      expect(result).toBe(true);
+      const res = await clanService.sendPoke('u2', 'nudge', 'msg');
+      expect(res).toBe(true);
       expect(runTransaction).toHaveBeenCalled();
-
-      // Test transaction count increment when current is null
-      const nextTxStateNull = txCallback(null);
-      expect(nextTxStateNull.count).toBe(1);
-      
-      // Test transaction count increment when current has count
-      const currentTxState = { count: 3 };
-      const nextTxState = txCallback(currentTxState);
-      expect(nextTxState.count).toBe(4);
-      expect(nextTxState.type).toBe('nudge');
-      expect(nextTxState.message).toBe('Hello Poke');
-      expect(nextTxState.fromName).toBe('common.member'); // Fallback from i18n
-      expect(nextTxState.fromPhoto).toBe('photo-url');
     });
 
-    it('returns false if target is self', async () => {
-      const result = await sendPoke('test-uid');
-      expect(result).toBe(false);
-      expect(runTransaction).not.toHaveBeenCalled();
+    it('handles missing sender info gracefully', async () => {
+      get.mockRejectedValueOnce(new Error('fail'));
+      runTransaction.mockImplementationOnce((ref, updateFn) => {
+        const newData = updateFn(null); // no existing
+        expect(newData.count).toBe(1);
+        expect(newData.fromName).toBe('common.member');
+        return Promise.resolve();
+      });
+
+      const res = await clanService.sendPoke('u2', 'nudge', 'msg');
+      expect(res).toBe(true);
     });
 
-    it('handles transaction errors gracefully', async () => {
-      vi.mocked(runTransaction).mockRejectedValueOnce(new Error('Tx Failed'));
-      vi.mocked(get).mockResolvedValueOnce(snapshot({ pseudo: 'Sender' }));
+    it('returns false if poking self', async () => {
+      const res = await clanService.sendPoke('u1');
+      expect(res).toBe(false);
+    });
 
-      const result = await sendPoke('target-uid');
-      expect(result).toBe(false);
+    it('returns false if uninitialized', async () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      const res = await clanService.sendPoke('u2');
+      expect(res).toBe(false);
+    });
+
+    it('handles transaction failure', async () => {
+      runTransaction.mockRejectedValueOnce(new Error('tx fail'));
+      const res = await clanService.sendPoke('u2');
+      expect(res).toBe(false);
     });
   });
 
   describe('listenToNotifications', () => {
-    it('subscribes and maps notifications list through onValue', () => {
-      const mockNotifs = {
-        'sender-1': { type: 'poke', message: 'Hi', count: 1 }
-      };
-
-      const mockForEach = vi.fn((fn) => {
-        Object.entries(mockNotifs).forEach(([key, val]) => {
-          fn({ key, val: () => val });
-        });
-      });
-
-      const mockSnapshot = {
-        exists: () => true,
-        forEach: mockForEach
-      };
-
-      vi.mocked(onValue).mockImplementationOnce((ref, callback) => {
-        callback(mockSnapshot);
-        return () => {};
-      });
-
-      const callback = vi.fn();
-      listenToNotifications(callback);
-
+    it('sets up listener and parses notifications', () => {
+      const cb = vi.fn();
+      let listener;
+      onValue.mockImplementationOnce((ref, cbImpl) => { listener = cbImpl; });
+      
+      clanService.listenToNotifications(cb);
       expect(onValue).toHaveBeenCalled();
-      expect(callback).toHaveBeenCalledWith([
-        { id: 'sender-1', type: 'poke', message: 'Hi', count: 1 }
-      ]);
+
+      // Trigger with data
+      const mockSnap = {
+        exists: () => true,
+        forEach: (fn) => {
+          fn({ key: 'n1', val: () => ({ type: 'nudge' }) });
+          fn({ key: 'n2', val: () => ({ type: 'poke' }) });
+        }
+      };
+      listener(mockSnap);
+      expect(cb).toHaveBeenCalledWith([{ id: 'n1', type: 'nudge' }, { id: 'n2', type: 'poke' }]);
+
+      // Trigger empty
+      listener({ exists: () => false });
+      expect(cb).toHaveBeenCalledWith([]);
+    });
+
+    it('returns null if uninitialized', () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      expect(clanService.listenToNotifications(() => {})).toBeNull();
     });
   });
 
   describe('deleteNotification', () => {
-    it('deletes notification node successfully', async () => {
-      vi.mocked(remove).mockResolvedValueOnce();
-
-      const result = await deleteNotification('sender-1');
-      expect(result).toBe(true);
-      expect(remove).toHaveBeenCalledWith('notifications/test-uid/sender-1');
+    it('deletes notification', async () => {
+      const res = await clanService.deleteNotification('n1');
+      expect(res).toBe(true);
+      expect(remove).toHaveBeenCalledWith('notif/u1/n1');
     });
 
-    it('returns false if not authenticated', async () => {
-      // Temporarily mock getAuthInstance to return null
-      const originalAuth = await import('../firebase').then(m => m.getAuthInstance);
-      vi.mocked(originalAuth).mockReturnValueOnce(null);
-      
-      const result = await deleteNotification('sender-1');
-      expect(result).toBe(false);
-    });
-  });
-
-  describe('error handling / edge cases', () => {
-    it('createClan fails gracefully after max retries or general error', async () => {
-      vi.mocked(get).mockResolvedValue(snapshot('collision')); // always collides
-      const result = await createClan('Retry Fail');
-      expect(result.success).toBe(false);
-      expect(result.error).toBeDefined();
-    });
-
-    it('joinClan handles unexpected errors gracefully', async () => {
-      vi.mocked(get).mockRejectedValueOnce(new Error('Firebase error'));
-      const result = await joinClan('CODE');
-      expect(result.success).toBe(false);
-      expect(result.error).toBeDefined();
-    });
-
-    it('leaveClan handles unexpected errors gracefully', async () => {
-      vi.mocked(get).mockRejectedValueOnce(new Error('Firebase error'));
-      const result = await leaveClan('clan-1');
-      expect(result.success).toBe(false);
-      expect(result.error).toBeDefined();
-    });
-
-    it('listenToNotifications handles empty snapshot', () => {
-      vi.mocked(onValue).mockImplementationOnce((ref, callback) => {
-        callback({ exists: () => false });
-        return () => {};
-      });
-
-      const callback = vi.fn();
-      listenToNotifications(callback);
-      expect(callback).toHaveBeenCalledWith([]);
+    it('returns false if uninitialized', async () => {
+      getAuthInstance.mockReturnValueOnce(null);
+      const res = await clanService.deleteNotification('n1');
+      expect(res).toBe(false);
     });
   });
 });
