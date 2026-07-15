@@ -254,10 +254,6 @@
   .ann-cta-shine { animation: none; }
 }
 
-
-
-.cardio-strava-btn:active { transform: scale(0.97) !important; }
-
 /* ── Cardio Login Wall ─────────────────────────────────────────────────
    Frosted-glass teaser. The demo content stays faintly visible behind a
    soft blurred veil (instead of a flat opaque block) while a glass card
