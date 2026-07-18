@@ -572,7 +572,7 @@ function LanguageSwitcher({ i18n }) {
                 cursor: 'pointer', backdropFilter: 'blur(8px)'
             }}
         >
-            <Globe size={15} />
+            <Globe size={16} />
             <span>{label}</span>
             <select
                 value={current}

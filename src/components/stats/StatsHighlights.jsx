@@ -65,7 +65,7 @@ export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExR
                                 </Chip>
                                 <div style={{ minWidth: 0 }}>
                                     <div style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                        <Crown size={11} color="#fbbf24" /> {t('stats.champion')}
+                                        <Crown size={12} color="#fbbf24" /> {t('stats.champion')}
                                     </div>
                                     <div style={{
                                         fontSize: '0.9rem', fontWeight: '700', color: champion.color,

@@ -58,7 +58,7 @@ function AchievementNotification({ achievement, count = 1, onClose, onView }) {
                     border: `2px solid ${achievement.color}`,
                     boxShadow: `0 4px 16px ${achievement.color}66, inset 0 1px 2px rgba(255,255,255,0.4)`
                 }}>
-                    <Icon size={23} color="#fff" />
+                    <Icon size={24} color="#fff" />
                     <span style={{
                         position: 'absolute', top: '-3px', right: '-3px',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
@@ -86,7 +86,7 @@ function AchievementNotification({ achievement, count = 1, onClose, onView }) {
                         fontSize: '0.62rem', fontWeight: 800, color: achievement.color,
                         textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px'
                     }}>
-                        <Sparkles size={11} />
+                        <Sparkles size={12} />
                         {t('achievementToast.title')}
                     </div>
                     <div style={{

@@ -21,7 +21,7 @@ function MetricTile({ icon: Icon, label, color, checked, onToggle, index }) {
       <span className={styles.metricIcon}><Icon size={14} /></span>
       <span className={styles.metricLabel}>{label}</span>
       <span className={styles.metricCheck}>
-        {checked && <Check size={11} strokeWidth={3} />}
+        {checked && <Check size={12} strokeWidth={3} />}
       </span>
     </button>
   );
@@ -55,7 +55,7 @@ function UploadButton({ onClick, label, children }) {
 function SectionLabel({ icon: Icon, children }) {
   return (
     <div className={styles.sectionLabel}>
-      {Icon && <Icon size={11} />}
+      {Icon && <Icon size={12} />}
       {children}
     </div>
   );
@@ -124,7 +124,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
     }}>
       {/* Theme selector — first: it changes the whole look of the card */}
       <SectionLabel icon={Palette}>
-        {t('share.theme')} {!isPro && <Lock size={11} color="var(--accent)" style={{ opacity: 0.8 }} />}
+        {t('share.theme')} {!isPro && <Lock size={12} color="var(--accent)" style={{ opacity: 0.8 }} />}
       </SectionLabel>
       <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '12px' }}>
         <div style={{
@@ -335,7 +335,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                       width: '100%',
                     }}
                   >
-                    <Image size={13} />
+                    <Image size={14} />
                     {t('share.recropImage')}
                   </button>
                 )}

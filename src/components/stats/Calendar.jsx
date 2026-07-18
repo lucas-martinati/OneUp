@@ -581,12 +581,12 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                     <div className={styles.detailPills}>
                         {isPerfectDay && (
                             <span className={`${styles.statusPill} ${styles.pillPerfect}`}>
-                                <Star size={11} color="#fcd34d" fill="#fcd34d" /> {t('calendar.perfectDayLegend')}
+                                <Star size={12} color="#fcd34d" fill="#fcd34d" /> {t('calendar.perfectDayLegend')}
                             </span>
                         )}
                         {isCaughtUp && (
                             <span className={`${styles.statusPill} ${styles.pillCaught}`}>
-                                <ShieldAlert size={11} color="#f59e0b" /> {t('calendar.caughtUp')}
+                                <ShieldAlert size={12} color="#f59e0b" /> {t('calendar.caughtUp')}
                             </span>
                         )}
                     </div>

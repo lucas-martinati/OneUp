@@ -248,7 +248,7 @@ export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
                     gap: '2px', minWidth: '52px',
                   }}>
-                    <stat.icon size={13} color={stat.color} style={{ opacity: 0.7 }} />
+                    <stat.icon size={14} color={stat.color} style={{ opacity: 0.7 }} />
                     <div style={{
                       display: 'flex', alignItems: 'baseline', gap: '2px'
                     }}>

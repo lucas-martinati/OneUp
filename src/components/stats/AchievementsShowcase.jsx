@@ -180,7 +180,7 @@ export function AchievementsShowcase({ stats, onOpen }) {
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         background: `${nextBadge.color}1a`, border: `1px solid ${nextBadge.color}33`,
                     }}>
-                        <NextIcon size={19} color={nextBadge.color} />
+                        <NextIcon size={20} color={nextBadge.color} />
                     </div>
                     <div className="flex-1-min0">
                         <div style={{

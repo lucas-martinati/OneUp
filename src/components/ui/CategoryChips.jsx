@@ -43,8 +43,8 @@ export function CategoryChips({ items, selected = [], onToggle, onLockedClick })
           >
             <span className={styles.chipDot}>
               {item.locked
-                ? <Lock size={9} strokeWidth={2.5} />
-                : (isSelected && <Check size={9} strokeWidth={3.5} />)}
+                ? <Lock size={10} strokeWidth={3.5} />
+                : (isSelected && <Check size={10} strokeWidth={3.5} />)}
             </span>
             {item.label}
           </button>

@@ -29,7 +29,7 @@ export const DashboardNavBar = React.memo(({
             aria-label={label}
             className={styles.navItem}
         >
-            <Icon size={19} />
+            <Icon size={20} />
             <span className={styles.label}>{label}</span>
         </button>
     );

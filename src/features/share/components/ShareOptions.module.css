@@ -96,7 +96,7 @@
   flex-shrink: 0;
   width: 16px;
   height: 16px;
-  border: 1.5px solid var(--border-strong);
+  border: 2px solid var(--border-strong);
   border-radius: var(--radius-full);
   color: rgba(0, 0, 0, 0.75);
   transition:

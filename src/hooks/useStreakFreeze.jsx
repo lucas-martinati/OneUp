@@ -44,7 +44,7 @@ function StreakFreezeNotification({ count, onClose }) {
                     border: `2px solid ${FREEZE_COLOR}`,
                     boxShadow: `0 4px 16px ${FREEZE_COLOR}66, inset 0 1px 2px rgba(255,255,255,0.4)`
                 }}>
-                    <Snowflake size={23} color="#fff" />
+                    <Snowflake size={24} color="#fff" />
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -53,7 +53,7 @@ function StreakFreezeNotification({ count, onClose }) {
                         fontSize: '0.62rem', fontWeight: 800, color: FREEZE_COLOR,
                         textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px'
                     }}>
-                        <Snowflake size={11} />
+                        <Snowflake size={12} />
                         {t('streakFreeze.toastTitle')}
                     </div>
                     <div style={{

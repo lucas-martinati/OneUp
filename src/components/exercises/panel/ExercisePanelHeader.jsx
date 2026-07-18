@@ -59,7 +59,7 @@ export function ExercisePanelHeader({ activeColor, exerciseConfig, exerciseLabel
                         }}
                     >
                         <span>{t('common.next')}</span>
-                        <ChevronRight size={15} />
+                        <ChevronRight size={16} />
                     </button>
                 )}
                 <button

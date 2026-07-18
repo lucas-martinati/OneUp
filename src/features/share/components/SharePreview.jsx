@@ -168,7 +168,7 @@ export function SharePreview({ formatLabel, zoomContent, className, children }) 
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             pointerEvents: 'none',
           }}>
-            <Maximize2 size={13} color="rgba(255,255,255,0.8)" />
+            <Maximize2 size={14} color="rgba(255,255,255,0.8)" />
           </span>
         )}
         {formatLabel && (

@@ -53,7 +53,7 @@ const StatCard = ({ icon: Icon, label, value, color }) => (
       fontSize: 'clamp(0.6rem, 1.2vh, 0.75rem)',
       fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px'
     }}>
-      <Icon size={13} color={color || 'var(--accent-glow)'} />
+      <Icon size={14} color={color || 'var(--accent-glow)'} />
       {label}
     </div>
     <div style={{

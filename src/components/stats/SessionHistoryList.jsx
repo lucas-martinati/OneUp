@@ -69,7 +69,7 @@ export function SessionHistoryList({ sessionHistory, onSelectSession }) {
                                 {exercises.length > 0 && (
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', alignItems: 'center' }}>
                                         {exercises.map((ex, j) => {
-                                            return <DynamicIcon key={ex.id || j} icon={ex.icon} size={13} color={getExerciseColor(ex)} />;
+                                            return <DynamicIcon key={ex.id || j} icon={ex.icon} size={14} color={getExerciseColor(ex)} />;
                                         })}
                                     </div>
                                 )}

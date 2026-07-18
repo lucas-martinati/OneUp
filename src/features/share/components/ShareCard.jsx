@@ -84,7 +84,7 @@ function MetricTile({ icon: Icon, value, label, color, isVisible = true }) {
   );
 }
 
-function SessionIcons({ exercises, size = 13 }) {
+function SessionIcons({ exercises, size = 14 }) {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
       {exercises.map((ex, i) => {
@@ -122,7 +122,7 @@ function HistoryRow({ session, t, lang }) {
           </>
         )}
         {!hasName && session.exercises?.length > 0 && (
-          <SessionIcons exercises={session.exercises} size={15} />
+          <SessionIcons exercises={session.exercises} size={16} />
         )}
         {!hasName && !session.exercises?.length && (
           <span style={{
@@ -206,7 +206,7 @@ function ExerciseBlock({ exercises, density, t }) {
               padding: '6px 10px', borderRadius: '10px',
               background: `${color}0a`,
             }}>
-              <Icon size={13} color={color} style={{ flexShrink: 0 }} />
+              <Icon size={14} color={color} style={{ flexShrink: 0 }} />
               <span style={{
                 flex: 1, fontSize: '11px', fontWeight: 600, color,
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -224,7 +224,7 @@ function ExerciseBlock({ exercises, density, t }) {
             background: `${color}0a`,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0 }}>
-              <Icon size={15} color={color} style={{ flexShrink: 0 }} />
+              <Icon size={16} color={color} style={{ flexShrink: 0 }} />
               <span style={{
                 flex: 1, fontSize: '12px', fontWeight: 600, color,
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -267,7 +267,7 @@ function PerfectBadge({ t }) {
       height: 'fit-content', flexShrink: 0,
       whiteSpace: 'nowrap',
     }}>
-      <Award size={11} color="#fbbf24" fill="#fbbf24" />
+      <Award size={12} color="#fbbf24" fill="#fbbf24" />
       {t('common.perfectDays')}
     </div>
   );

@@ -49,7 +49,7 @@ export function StatsFilters({
                 <span key={activeCategories.length} className={styles.count}>
                     {activeCategories.length}
                 </span>
-                <ChevronDown size={15} className={styles.chevron} />
+                <ChevronDown size={16} className={styles.chevron} />
             </button>
             {showFilters && (
                 <div className={styles.panel}>

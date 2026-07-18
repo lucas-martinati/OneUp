@@ -81,7 +81,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
                   fontSize: '0.75rem', fontWeight: '700'
                 }}
               >
-                <X size={13} /> Réinitialiser
+                <X size={14} /> Réinitialiser
               </button>
             )}
           </div>

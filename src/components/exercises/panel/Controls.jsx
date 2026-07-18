@@ -96,7 +96,7 @@ export function CounterControls({
                             transition: 'background 0.45s ease, border-color 0.45s ease, opacity 0.2s ease, transform 0.12s ease'
                         }}
                     >
-                        <Plus size={13} style={{ opacity: 0.7 }} />
+                        <Plus size={14} style={{ opacity: 0.7 }} />
                         {amount}
                     </button>
                 ))}
@@ -212,7 +212,7 @@ function CompleteButton({ activeColor, gradEnd, completeFlash, isCompleted, onCo
                 minHeight: 'var(--touch-min)'
             }}
         >
-            <CheckCheck size={19} />
+            <CheckCheck size={20} />
             {label}
         </button>
     );

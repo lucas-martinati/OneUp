@@ -54,7 +54,7 @@ function StatTile({ icon: Icon, label, value, color = 'var(--text-secondary)' })
       background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color, marginBottom: '4px' }}>
-        <Icon size={13} />
+        <Icon size={14} />
         <span style={{ fontSize: '0.68rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</span>
       </div>
       <div style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

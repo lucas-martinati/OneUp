@@ -67,7 +67,7 @@ export function WeightSelector({ activeColor, currentWeight, handleValidateWeigh
                         opacity: isUnchanged ? 0.5 : 1
                     }}
                 >
-                    <Check size={19} />
+                    <Check size={20} />
                 </button>
             </div>
         </div>

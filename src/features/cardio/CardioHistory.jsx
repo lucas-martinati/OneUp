@@ -46,7 +46,7 @@ function getElevation(session) {
 const StatChip = ({ icon: Icon, label, value, unit }) => (
   <div className="cardio-stat-chip">
     <div className="cardio-stat-chip-label">
-      <Icon size={11} color="var(--accent-glow)" />
+      <Icon size={12} color="var(--accent-glow)" />
       {label}
     </div>
     <div className="cardio-stat-chip-value">

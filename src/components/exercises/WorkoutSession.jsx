@@ -58,14 +58,14 @@ function RoutineCard({ routine, index, allExercisesMap, confirming, onLoad, onEd
                     onClick={(e) => { e.stopPropagation(); onEdit(routine); }}
                     aria-label={t('routines.edit')}
                 >
-                    <Pencil size={13} />
+                    <Pencil size={14} />
                 </button>
                 <button
                     className={`${styles.cardActionBtn} ${styles.cardActionBtnDanger}`}
                     onClick={(e) => { e.stopPropagation(); onAskDelete(routine.id); }}
                     aria-label={t('common.delete')}
                 >
-                    <Trash2 size={13} />
+                    <Trash2 size={14} />
                 </button>
             </div>
             <div className={styles.routineMeta}>

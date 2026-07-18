@@ -14,7 +14,7 @@ export function CameraModeBar({
                     style={{ '--exercise-color': activeColor }}
                 >
                     <span className="camera-mode-toggle-icon">
-                        {isCameraActive ? <CameraOff size={15} /> : <Camera size={15} />}
+                        {isCameraActive ? <CameraOff size={16} /> : <Camera size={16} />}
                     </span>
                     {t('counter.cameraMode')}
                 </button>
@@ -25,7 +25,7 @@ export function CameraModeBar({
                         className="camera-recal-btn hover-lift glass"
                         aria-label={t('counter.cameraCalibrate')}
                     >
-                        <RefreshCw size={13} />
+                        <RefreshCw size={14} />
                         {t('counter.cameraCalibrate')}
                     </button>
                 )}
