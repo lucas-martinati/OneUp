@@ -44,7 +44,14 @@ const BadgeItem = React.memo(({ badge, highlighted }) => {
 
     let desc = '';
     if (badge.descKey) {
-        desc = t(badge.descKey);
+        let period = null;
+        if (badge.id.startsWith('morning_')) period = t('period.morning');
+        else if (badge.id.startsWith('afternoon_')) period = t('period.afternoon');
+        else if (badge.id.startsWith('evening_')) period = t('period.evening');
+        else if (badge.id.endsWith('_sessions')) period = t('period.total');
+        
+        const formattedGoal = typeof badge.goal === 'number' ? badge.goal.toLocaleString() : badge.goal;
+        desc = t(badge.descKey, { count: formattedGoal, period });
     } else if (secret) {
         desc = '???';
     }
@@ -264,7 +271,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                     marginBottom: 'var(--spacing-md)'
                 }}>
                     <h2 className="panel-title" style={{ margin: 0 }}>
-                        {t('achievements.title')}
+                        {t('common.achievements')}
                     </h2>
                     <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
                 </div>

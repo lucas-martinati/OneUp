@@ -56,7 +56,7 @@ function RoutineCard({ routine, index, allExercisesMap, confirming, onLoad, onEd
                 <button
                     className={styles.cardActionBtn}
                     onClick={(e) => { e.stopPropagation(); onEdit(routine); }}
-                    aria-label={t('routines.edit')}
+                    aria-label={t('common.edit')}
                 >
                     <Pencil size={14} />
                 </button>
@@ -178,7 +178,7 @@ export function WorkoutSession(props) {
                 {/* Header */}
                 <div className={styles.header}>
                     <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
-                        {isStarted ? t('dashboard.editSession') : t('dashboard.session')}
+                        {isStarted ? t('common.edit') : t('dashboard.session')}
                     </h2>
                     <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label={t('common.close')} />
                 </div>

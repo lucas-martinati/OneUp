@@ -265,7 +265,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 <div style={{ marginBottom: 'var(--spacing-md)' }}>
                     <SegmentedControl
                         options={[
-                            { id: 'overview', label: t('stats.tabOverview') },
+                            { id: 'overview', label: t('common.preview') },
                             { id: 'charts', label: t('stats.tabCharts') },
                             { id: 'details', label: t('stats.tabDetails') },
                         ]}

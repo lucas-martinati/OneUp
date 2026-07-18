@@ -303,7 +303,7 @@ export function Onboarding({ onStart }) {
 
                         <NavRow onBack={() => setStep(1)} t={t}>
                             <button onClick={() => setStep(3)} className="gradient-button hover-lift" style={{ ...primaryBtn, flex: 2 }}>
-                                {t('onboarding.continue')}
+                                {t('common.continue')}
                                 <ArrowRight size={20} strokeWidth={3} />
                             </button>
                         </NavRow>

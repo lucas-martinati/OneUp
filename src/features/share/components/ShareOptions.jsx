@@ -238,7 +238,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       {/* Category filter for global stats (multi-select) */}
       {isGlobal && (
         <>
-          <SectionLabel icon={Filter}>{t('share.categoryFilter')}</SectionLabel>
+          <SectionLabel icon={Filter}>{t('common.category')}</SectionLabel>
           <CategoryChips
             items={buildCategoryChipItems({
               categoryOrder: fullCategoryOrder,

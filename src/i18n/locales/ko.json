@@ -11,15 +11,12 @@
   "achievements": {
     "badges": {
       "afternoon_10": {
-        "desc": "10 오후 운동",
         "title": "오후"
       },
       "afternoon_25": {
-        "desc": "25일 오후 운동",
         "title": "율"
       },
       "afternoon_5": {
-        "desc": "5 오후 운동",
         "title": "킥스타트"
       },
       "all_exercises": {
@@ -39,19 +36,15 @@
         "title": "일관성"
       },
       "evening_10": {
-        "desc": "10 저녁 운동",
         "title": "야행성"
       },
       "evening_25": {
-        "desc": "25 저녁 운동",
         "title": "달"
       },
       "evening_5": {
-        "desc": "5 저녁 운동",
         "title": "올빼미"
       },
       "fifty_sessions": {
-        "desc": "총 50가지 운동",
         "title": "오십"
       },
       "first_blood": {
@@ -67,39 +60,30 @@
         "title": "귀신"
       },
       "half_year": {
-        "desc": "180일 연속",
         "title": "반년"
       },
       "hundred_sessions": {
-        "desc": "총 100가지 운동",
         "title": "백부장"
       },
       "month_warrior": {
-        "desc": "30일 연속",
         "title": "월병"
       },
       "morning_10": {
-        "desc": "10 아침 운동",
         "title": "아침형 인간"
       },
       "morning_25": {
-        "desc": "25 아침 운동",
         "title": "새벽"
       },
       "morning_5": {
-        "desc": "5 아침 운동",
         "title": "얼리버드"
       },
       "perfect_fifty": {
-        "desc": "완벽한 50일",
         "title": "지배"
       },
       "perfect_five": {
-        "desc": "완벽한 5일",
         "title": "우수"
       },
       "perfect_hundred": {
-        "desc": "완벽한 100일",
         "title": "완벽주의자"
       },
       "perfect_one": {
@@ -111,48 +95,37 @@
         "title": "멈출 수 없는"
       },
       "quarter_year": {
-        "desc": "90일 연속",
         "title": "쿼터백"
       },
       "rep_1000": {
-        "desc": "총 반복수 1,000",
         "title": "천"
       },
       "rep_10000": {
-        "desc": "총 반복수 10,000",
         "title": "계수기"
       },
       "rep_500": {
-        "desc": "총 반복수 500회",
         "title": "500회"
       },
       "rep_5000": {
-        "desc": "총 반복수 5,000",
         "title": "5천"
       },
       "rep_50000": {
-        "desc": "총 반복수 50,000",
         "title": "도살자"
       },
       "secret": "비밀",
       "ten_sessions": {
-        "desc": "총 10가지 운동",
         "title": "톱 10"
       },
       "two_hundred_sessions": {
-        "desc": "총 200가지 운동",
         "title": "전설"
       },
       "two_months": {
-        "desc": "연속 60일",
         "title": "철의 규율"
       },
       "two_weeks": {
-        "desc": "14일 연속",
         "title": "끈기"
       },
       "week_warrior": {
-        "desc": "7일 연속",
         "title": "주간 전사"
       },
       "weekday_warrior": {
@@ -164,13 +137,16 @@
         "title": "주말"
       },
       "year_beast": {
-        "desc": "365일 연속",
         "title": "경쟁의 짐승"
       },
       "white_hat": {
         "title": "White Hat",
         "desc": "중대한 버그를 신고하여 OneUp 개선에 기여했습니다."
-      }
+      },
+      "streak_desc": "{{count}}일 연속",
+      "perfect_days_desc": "완벽한 {{count}}일",
+      "total_reps_desc": "총 반복수 {{count}}",
+      "workout_count_desc": "{{period}} {{count}}회 운동"
     },
     "badgesUnlocked": "배지 잠금 해제",
     "nextBadge": "다음 업적",
@@ -185,8 +161,7 @@
     },
     "filterAll": "전체",
     "filterUnlocked": "획득",
-    "filterLocked": "미획득",
-    "title": "업적"
+    "filterLocked": "미획득"
   },
   "announcement": {
     "badge": "새로운",
@@ -260,7 +235,6 @@
     "noGpsTrack": "GPS 트랙 없음",
     "noSessions": "기록된 세션이 없습니다.",
     "pace": "속도",
-    "revalidate": "계속하다",
     "speed": "속도",
     "start": "시작",
     "stravaWallDesc": "달리기 및 사이클링 세션을 자동으로 동기화하여 글로벌 연속 기록을 달성하세요.",
@@ -337,6 +311,19 @@
     "backOnline": "다시 온라인 상태입니다"
   },
   "common": {
+    "continue": "계속하다",
+    "edit": "편집",
+    "preview": "개요",
+    "category": "카테고리",
+    "achievements": "업적",
+    "max": "맥스",
+    "tips": [
+      "물을 마시면 성능이 향상됩니다.",
+      "허리를 곧게 펴세요!",
+      "일관성이 강도를 이긴다.",
+      "노력하는 동안과 노력한 후에는 숨을 잘 쉬십시오.",
+      "매일 1% 더 좋아집니다."
+    ],
     "anonymous": "익명의",
     "bestStreak": "최고의 연속",
     "bodyweight": "체중",
@@ -370,13 +357,6 @@
   "counter": {
     "completeAll": "모두 완료",
     "reset": "다시 놓기",
-    "tips": [
-      "물을 마시면 성능이 향상됩니다.",
-      "허리를 곧게 펴세요!",
-      "일관성이 강도를 이긴다.",
-      "노력한 후에는 숨을 잘 쉬십시오.",
-      "매일 1% 더 좋아집니다."
-    ],
     "validated": "{{exercise}} 완료되었습니다!",
     "cameraMode": "Camera Counter",
     "cameraCalibrate": "Recalibrate",
@@ -390,7 +370,6 @@
     "cameraDepth": "깊이"
   },
   "customExercises": {
-    "categoryLabel": "카테고리",
     "colorLabel": "테마 색상",
     "create": "운동 만들기",
     "deleteConfirm": "{{name}}을(를) 삭제하시겠습니까?",
@@ -425,7 +404,6 @@
     "noExercisesConfigured": "여기에는 아직 어떤 운동도 구성하지 않았습니다.",
     "session": "세션",
     "waiting": "⏳ 대기 중",
-    "editSession": "세션 수정",
     "discard": "포기",
     "discardConfirm": "진행 중인 세션을 포기하시겠습니까?"
   },
@@ -451,7 +429,6 @@
     "squats": "스쿼트"
   },
   "leaderboard": {
-    "achievements": "업적",
     "activeDays": "활동일수",
     "copied": "복사됨",
     "copy": "복사",
@@ -529,7 +506,6 @@
     "recommended": "추천",
     "modePastTitle": "올해부터 벌써 시작했어요",
     "modePastDesc": "이미 챌린지를 진행 중이신가요? 실제로 완료한 날짜를 가져옵니다.",
-    "continue": "계속하다",
     "readyTitle": "모든 준비가 완료되었습니다.",
     "todayRecap": "귀하의 도전은 오늘 {{day}}일부터 시작됩니다. 매일 목표가 하나씩 올라갑니다. 내일 만나요!",
     "whenStartedReal": "올해는 언제부터 했나요?",
@@ -568,7 +544,6 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "edit": "편집",
     "load": "짐",
     "namePlaceholder": "루틴 이름",
     "title": "내 루틴"
@@ -588,7 +563,6 @@
     "languageDesc": "애플리케이션 언어 변경",
     "leaderboardDesc": "공개 리더보드에 표시",
     "lock": "잠그다",
-    "max": "맥스",
     "maxChars": "최대 20자 · Google 사진이 사용됩니다.",
     "multiplier": "승수(최대 1.0)",
     "notifications": "알림",
@@ -620,7 +594,6 @@
   },
   "share": {
     "backgroundImage": "배경 이미지",
-    "categoryFilter": "범주",
     "cropImage": "이미지 자르기",
     "deleteSession": "이 세션을 삭제할까요?",
     "deleteSessionWarning": "이 작업은 되돌릴 수 없습니다.",
@@ -698,7 +671,6 @@
     "title": "통계",
     "totalReps": "총 담당자",
     "recordDay": "기록일",
-    "tabOverview": "개요",
     "tabCharts": "차트",
     "tabDetails": "세부정보",
     "selectAll": "모두 선택",
@@ -734,13 +706,6 @@
     "remaining": "{{time}} 남음",
     "reset": "다시 놓기",
     "skip": "건너뛰다",
-    "tips": [
-      "물을 마시면 성능이 향상됩니다.",
-      "허리를 곧게 펴세요!",
-      "일관성이 강도를 이긴다.",
-      "노력하는 동안 숨을 잘 쉬십시오.",
-      "매일 1% 더 좋아집니다."
-    ],
     "validated": "타이머 완료!"
   },
   "weight": {
@@ -788,7 +753,6 @@
     "limitReached": "카테고리는 최대 {{count}}개까지 가능합니다.",
     "nameLabel": "카테고리 이름",
     "namePlaceholder": "예: 상체, 스트레칭...",
-    "preview": "미리보기",
     "title": "커스텀 카테고리"
   },
   "sessionNames": {
@@ -950,7 +914,6 @@
     "guestDesc": "로그인하여 스트릭 얼리기를 획득하고 하루를 놓쳐도 스트릭을 보호하세요。",
     "statAvailable": "보유",
     "statPerMonth": "매달",
-    "statReserve": "최대",
     "proPitch": "Pro는 {{multiplier}}배 더 많이 — 매달 얼리기 {{count}}개를 받습니다.",
     "proCta": "Pro 잠금 해제"
   },
@@ -958,5 +921,11 @@
     "title": "OneUp이 {{host}}(으)로 이전했습니다",
     "message": "사이트 주소가 변경되었습니다. Google 계정으로 로그인하지 않았다면 설정 › 데이터에서 데이터를 내보낸 뒤 새 사이트에서 다시 가져오면 데이터를 잃지 않습니다.",
     "button": "이동하기"
+  },
+  "period": {
+    "morning": "아침",
+    "afternoon": "오후",
+    "evening": "저녁",
+    "total": "총"
   }
 }

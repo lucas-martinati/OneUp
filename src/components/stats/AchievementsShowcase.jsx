@@ -125,7 +125,7 @@ export function AchievementsShowcase({ stats, onOpen }) {
                 </div>
                 <div className="flex-1-min0">
                     <div style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--text-primary)' }}>
-                        {t('achievements.title', 'Succès')}
+                        {t('common.achievements', 'Succès')}
                     </div>
                     <div style={{ fontSize: '0.72rem', fontWeight: '700', color: '#f59e0b' }}>
                         {unlockedCount} / {total} · {Math.round(pct * 100)}%

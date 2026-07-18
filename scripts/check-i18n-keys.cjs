@@ -174,14 +174,21 @@ usedPrefixes.add('shareTexts');
 const badgeDefPath = path.join(SRC_DIR, 'config/badgeDefinitions.js');
 if (fs.existsSync(badgeDefPath)) {
   const content = fs.readFileSync(badgeDefPath, 'utf-8');
-  // Simple regex to extract IDs: { id: 'some_id', ... }
-  const idRegex = /id:\s*['"]([^'"]+)['"]/g;
+  // Match each definition line: { id: '...', ..., descKey: '...' }
+  const lineRegex = /\{\s*id:\s*['"]([^'"]+)['"](?:.*descKey:\s*['"]([^'"]+)['"])?/g;
   let match;
   let badgeCount = 0;
-  while ((match = idRegex.exec(content)) !== null) {
+  
+  while ((match = lineRegex.exec(content)) !== null) {
     const id = match[1];
+    const descKey = match[2];
+    
     usedStaticKeys.add(`achievements.badges.${id}.title`);
-    usedStaticKeys.add(`achievements.badges.${id}.desc`);
+    if (descKey) {
+      usedStaticKeys.add(`achievements.badges.${descKey}`);
+    } else {
+      usedStaticKeys.add(`achievements.badges.${id}.desc`);
+    }
     badgeCount++;
   }
   console.log(`\x1b[90m🏅 Badges : ${badgeCount * 2} clés générées dynamiquement\x1b[0m\n`);

@@ -11,15 +11,12 @@
   "achievements": {
     "badges": {
       "afternoon_10": {
-        "desc": "10 afternoon workouts",
         "title": "Afternoon"
       },
       "afternoon_25": {
-        "desc": "25 afternoon workouts",
         "title": "Rhythm"
       },
       "afternoon_5": {
-        "desc": "5 afternoon workouts",
         "title": "Kickstart"
       },
       "all_exercises": {
@@ -39,19 +36,15 @@
         "title": "Consistency"
       },
       "evening_10": {
-        "desc": "10 evening workouts",
         "title": "Nocturnal"
       },
       "evening_25": {
-        "desc": "25 evening workouts",
         "title": "Moon"
       },
       "evening_5": {
-        "desc": "5 evening workouts",
         "title": "Night Owl"
       },
       "fifty_sessions": {
-        "desc": "50 workouts total",
         "title": "Fifty"
       },
       "first_blood": {
@@ -67,39 +60,30 @@
         "title": "Ghost"
       },
       "half_year": {
-        "desc": "180 days in a row",
         "title": "Half Year"
       },
       "hundred_sessions": {
-        "desc": "100 workouts total",
         "title": "Centurion"
       },
       "month_warrior": {
-        "desc": "30 days in a row",
         "title": "Month Soldier"
       },
       "morning_10": {
-        "desc": "10 morning workouts",
         "title": "Morning Person"
       },
       "morning_25": {
-        "desc": "25 morning workouts",
         "title": "Dawn"
       },
       "morning_5": {
-        "desc": "5 morning workouts",
         "title": "Early Bird"
       },
       "perfect_fifty": {
-        "desc": "50 perfect days",
         "title": "Mastery"
       },
       "perfect_five": {
-        "desc": "5 perfect days",
         "title": "Excellence"
       },
       "perfect_hundred": {
-        "desc": "100 perfect days",
         "title": "Perfectionist"
       },
       "perfect_one": {
@@ -111,48 +95,37 @@
         "title": "Unstoppable"
       },
       "quarter_year": {
-        "desc": "90 days in a row",
         "title": "Quarterback"
       },
       "rep_1000": {
-        "desc": "1,000 total reps",
         "title": "Thousand"
       },
       "rep_10000": {
-        "desc": "10,000 total reps",
         "title": "Counter"
       },
       "rep_500": {
-        "desc": "500 total reps",
         "title": "500 Reps"
       },
       "rep_5000": {
-        "desc": "5,000 total reps",
         "title": "Five Thousand"
       },
       "rep_50000": {
-        "desc": "50,000 total reps",
         "title": "Slaughterer"
       },
       "secret": "Secret",
       "ten_sessions": {
-        "desc": "10 workouts total",
         "title": "Top Ten"
       },
       "two_hundred_sessions": {
-        "desc": "200 workouts total",
         "title": "Legend"
       },
       "two_months": {
-        "desc": "60 days in a row",
         "title": "Iron Discipline"
       },
       "two_weeks": {
-        "desc": "14 days in a row",
         "title": "Tenacity"
       },
       "week_warrior": {
-        "desc": "7 days in a row",
         "title": "Week Warrior"
       },
       "weekday_warrior": {
@@ -164,13 +137,16 @@
         "title": "Weekend"
       },
       "year_beast": {
-        "desc": "365 days in a row",
         "title": "Competition Beast"
       },
       "white_hat": {
         "title": "White Hat",
         "desc": "You reported a major bug and helped improve OneUp."
-      }
+      },
+      "streak_desc": "{{count}} days in a row",
+      "perfect_days_desc": "{{count}} perfect days",
+      "total_reps_desc": "{{count}} total reps",
+      "workout_count_desc": "{{count}} {{period}} workouts"
     },
     "badgesUnlocked": "Badges Unlocked",
     "nextBadge": "Next achievement",
@@ -185,8 +161,7 @@
     },
     "filterAll": "All",
     "filterUnlocked": "Unlocked",
-    "filterLocked": "Locked",
-    "title": "Achievements"
+    "filterLocked": "Locked"
   },
   "announcement": {
     "badge": "New",
@@ -260,7 +235,6 @@
     "noGpsTrack": "No GPS track",
     "noSessions": "No sessions recorded",
     "pace": "Pace",
-    "revalidate": "Continue",
     "speed": "Speed",
     "start": "Start",
     "stravaWallDesc": "Automatically sync your running and cycling sessions to progress your global streak.",
@@ -337,6 +311,19 @@
     "backOnline": "Back online"
   },
   "common": {
+    "continue": "Continue",
+    "edit": "Edit",
+    "preview": "Overview",
+    "category": "Category",
+    "achievements": "Achievements",
+    "max": "Max",
+    "tips": [
+      "Drinking water boosts performance.",
+      "Keep your back straight!",
+      "Consistency beats intensity.",
+      "Breathe well during and after the effort.",
+      "1% better every day."
+    ],
     "anonymous": "Anonymous",
     "bestStreak": "Best Streak",
     "bodyweight": "Bodyweight",
@@ -370,13 +357,6 @@
   "counter": {
     "completeAll": "Complete All",
     "reset": "Reset",
-    "tips": [
-      "Drinking water boosts performance.",
-      "Keep your back straight!",
-      "Consistency beats intensity.",
-      "Breathe well after the effort.",
-      "1% better every day."
-    ],
     "validated": "{{exercise}} Complete!",
     "cameraMode": "Camera Counter",
     "cameraCalibrate": "Recalibrate",
@@ -401,11 +381,9 @@
     "limitReached": "Limit of {{count}} categories reached.",
     "nameLabel": "Category name",
     "namePlaceholder": "Ex: Upper body, Stretching...",
-    "preview": "Preview",
     "title": "Custom Categories"
   },
   "customExercises": {
-    "categoryLabel": "Category",
     "colorLabel": "Theme color",
     "create": "Create an exercise",
     "deleteConfirm": "Delete {{name}}?",
@@ -440,7 +418,6 @@
     "noExercisesConfigured": "You haven't configured any exercises here yet.",
     "session": "Session",
     "waiting": "⏳ Waiting",
-    "editSession": "Edit session",
     "discard": "Discard",
     "discardConfirm": "Do you want to discard the session in progress?"
   },
@@ -466,7 +443,6 @@
     "squats": "Squats"
   },
   "leaderboard": {
-    "achievements": "Achievements",
     "activeDays": "Active Days",
     "copied": "Copied",
     "copy": "Copy",
@@ -544,7 +520,6 @@
     "recommended": "Recommended",
     "modePastTitle": "I already started this year",
     "modePastDesc": "Already been doing the challenge? Import the days you actually completed.",
-    "continue": "Continue",
     "readyTitle": "You're all set!",
     "todayRecap": "Your challenge begins today at <0>Day {{day}}</0> of the year. The goal climbs by one every day — see you tomorrow!",
     "whenStartedReal": "Since when have you been doing it this year?",
@@ -583,7 +558,6 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "edit": "Edit",
     "load": "Load",
     "namePlaceholder": "Routine name",
     "title": "My Routines"
@@ -603,7 +577,6 @@
     "languageDesc": "Change the application language",
     "leaderboardDesc": "Appear in the public leaderboard",
     "lock": "Lock",
-    "max": "Max",
     "maxChars": "Max 20 characters · Your Google photo will be used",
     "multiplier": "Multiplier (Max 1.0)",
     "notifications": "Notifications",
@@ -635,7 +608,6 @@
   },
   "share": {
     "backgroundImage": "Background image",
-    "categoryFilter": "Category",
     "cropImage": "Crop Image",
     "deleteSession": "Delete this session?",
     "deleteSessionWarning": "This can't be undone.",
@@ -713,7 +685,6 @@
     "title": "Statistics",
     "totalReps": "Total Reps",
     "recordDay": "Record day",
-    "tabOverview": "Overview",
     "tabCharts": "Charts",
     "tabDetails": "Details",
     "selectAll": "Select all",
@@ -749,13 +720,6 @@
     "remaining": "{{time}} left to hold",
     "reset": "Reset",
     "skip": "Skip",
-    "tips": [
-      "Drinking water boosts performance.",
-      "Keep your back straight!",
-      "Consistency beats intensity.",
-      "Breathe well during the effort.",
-      "1% better every day."
-    ],
     "validated": "Timer Complete!"
   },
   "weight": {
@@ -950,7 +914,6 @@
     "guestDesc": "Sign in to earn streak freezes and protect your streak when you miss a day.",
     "statAvailable": "In reserve",
     "statPerMonth": "Per month",
-    "statReserve": "Max",
     "proPitch": "Pro members earn {{multiplier}}× more — {{count}} freezes every month.",
     "proCta": "Unlock Pro"
   },
@@ -958,5 +921,11 @@
     "title": "OneUp has moved to {{host}}",
     "message": "The site address has changed. Not signed in with Google? Export your data from Settings › Data, then re-import it on the new site so nothing is lost.",
     "button": "Go now"
+  },
+  "period": {
+    "morning": "morning",
+    "afternoon": "afternoon",
+    "evening": "evening",
+    "total": "total"
   }
 }

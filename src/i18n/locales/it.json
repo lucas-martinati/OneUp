@@ -11,15 +11,12 @@
   "achievements": {
     "badges": {
       "afternoon_10": {
-        "desc": "10 allenamenti pomeridiani",
         "title": "Pomeriggio"
       },
       "afternoon_25": {
-        "desc": "25 allenamenti pomeridiani",
         "title": "Ritmo"
       },
       "afternoon_5": {
-        "desc": "5 allenamenti pomeridiani",
         "title": "Kickstart"
       },
       "all_exercises": {
@@ -39,19 +36,15 @@
         "title": "Coerenza"
       },
       "evening_10": {
-        "desc": "10 allenamenti serali",
         "title": "Notturno"
       },
       "evening_25": {
-        "desc": "25 allenamenti serali",
         "title": "Luna"
       },
       "evening_5": {
-        "desc": "5 allenamenti serali",
         "title": "Nottambulo"
       },
       "fifty_sessions": {
-        "desc": "50 allenamenti in totale",
         "title": "Cinquanta"
       },
       "first_blood": {
@@ -67,39 +60,30 @@
         "title": "Fantasma"
       },
       "half_year": {
-        "desc": "180 giorni consecutivi",
         "title": "Metà anno"
       },
       "hundred_sessions": {
-        "desc": "100 allenamenti in totale",
         "title": "Centurione"
       },
       "month_warrior": {
-        "desc": "30 giorni consecutivi",
         "title": "Soldato del mese"
       },
       "morning_10": {
-        "desc": "10 allenamenti mattutini",
         "title": "Persona mattiniera"
       },
       "morning_25": {
-        "desc": "25 allenamenti mattutini",
         "title": "Alba"
       },
       "morning_5": {
-        "desc": "5 allenamenti mattutini",
         "title": "Mattiniero"
       },
       "perfect_fifty": {
-        "desc": "50 giorni perfetti",
         "title": "Padronanza"
       },
       "perfect_five": {
-        "desc": "5 giorni perfetti",
         "title": "Eccellenza"
       },
       "perfect_hundred": {
-        "desc": "100 giorni perfetti",
         "title": "Perfezionista"
       },
       "perfect_one": {
@@ -111,48 +95,37 @@
         "title": "Inarrestabile"
       },
       "quarter_year": {
-        "desc": "90 giorni consecutivi",
         "title": "Il quarterback"
       },
       "rep_1000": {
-        "desc": "1.000 ripetizioni totali",
         "title": "Mille"
       },
       "rep_10000": {
-        "desc": "10.000 ripetizioni totali",
         "title": "Contatore"
       },
       "rep_500": {
-        "desc": "500 ripetizioni totali",
         "title": "500 ripetizioni"
       },
       "rep_5000": {
-        "desc": "5.000 ripetizioni totali",
         "title": "Cinquemila"
       },
       "rep_50000": {
-        "desc": "50.000 ripetizioni totali",
         "title": "Macellatore"
       },
       "secret": "Segreto",
       "ten_sessions": {
-        "desc": "10 allenamenti in totale",
         "title": "I primi dieci"
       },
       "two_hundred_sessions": {
-        "desc": "200 allenamenti in totale",
         "title": "Leggenda"
       },
       "two_months": {
-        "desc": "60 giorni consecutivi",
         "title": "Disciplina del ferro"
       },
       "two_weeks": {
-        "desc": "14 giorni consecutivi",
         "title": "Tenacia"
       },
       "week_warrior": {
-        "desc": "7 giorni di fila",
         "title": "Settimana Guerriero"
       },
       "weekday_warrior": {
@@ -164,13 +137,16 @@
         "title": "Fine settimana"
       },
       "year_beast": {
-        "desc": "365 giorni consecutivi",
         "title": "Bestia da competizione"
       },
       "white_hat": {
         "title": "White Hat",
         "desc": "Hai segnalato un bug importante e aiutato a migliorare OneUp."
-      }
+      },
+      "streak_desc": "{{count}} giorni di fila",
+      "perfect_days_desc": "{{count}} giorni perfetti",
+      "total_reps_desc": "{{count}} ripetizioni totali",
+      "workout_count_desc": "{{count}} allenamenti {{period}}"
     },
     "badgesUnlocked": "Badge sbloccati",
     "nextBadge": "Prossimo risultato",
@@ -185,8 +161,7 @@
     },
     "filterAll": "Tutti",
     "filterUnlocked": "Sbloccati",
-    "filterLocked": "Bloccati",
-    "title": "Risultati"
+    "filterLocked": "Bloccati"
   },
   "announcement": {
     "badge": "Nuovo",
@@ -260,7 +235,6 @@
     "noGpsTrack": "Nessuna traccia GPS",
     "noSessions": "Nessuna sessione registrata",
     "pace": "Ritmo",
-    "revalidate": "Continuare",
     "speed": "Velocità",
     "start": "Inizio",
     "stravaWallDesc": "Sincronizza automaticamente le tue sessioni di corsa e ciclismo per progredire nella tua serie globale.",
@@ -337,6 +311,19 @@
     "backOnline": "Di nuovo online"
   },
   "common": {
+    "continue": "Continuare",
+    "edit": "Modifica",
+    "preview": "Panoramica",
+    "category": "Categoria",
+    "achievements": "Risultati",
+    "max": "Massimo",
+    "tips": [
+      "L'acqua potabile aumenta le prestazioni.",
+      "Tieni la schiena dritta!",
+      "La coerenza batte l’intensità.",
+      "Respira bene durante e dopo lo sforzo.",
+      "1% meglio ogni giorno."
+    ],
     "anonymous": "Anonimo",
     "bestStreak": "Miglior serie",
     "bodyweight": "Peso corporeo",
@@ -370,13 +357,6 @@
   "counter": {
     "completeAll": "Completa tutto",
     "reset": "Reset",
-    "tips": [
-      "L'acqua potabile aumenta le prestazioni.",
-      "Tieni la schiena dritta!",
-      "La coerenza batte l’intensità.",
-      "Respira bene dopo lo sforzo.",
-      "1% meglio ogni giorno."
-    ],
     "validated": "{{exercise}} Completo!",
     "cameraMode": "Camera Counter",
     "cameraCalibrate": "Recalibrate",
@@ -390,7 +370,6 @@
     "cameraDepth": "Profondità"
   },
   "customExercises": {
-    "categoryLabel": "Categoria",
     "colorLabel": "Colore del tema",
     "create": "Crea un esercizio",
     "deleteConfirm": "Eliminare {{name}}?",
@@ -425,7 +404,6 @@
     "noExercisesConfigured": "Non hai ancora configurato alcun esercizio qui.",
     "session": "Sessione",
     "waiting": "⏳ In attesa",
-    "editSession": "Modifica la sessione",
     "discard": "Abbandona",
     "discardConfirm": "Vuoi abbandonare la sessione in corso?"
   },
@@ -451,7 +429,6 @@
     "squats": "Squat"
   },
   "leaderboard": {
-    "achievements": "Risultati",
     "activeDays": "Giorni attivi",
     "copied": "Copiato",
     "copy": "Copia",
@@ -529,7 +506,6 @@
     "recommended": "Raccomandato",
     "modePastTitle": "Ho già iniziato quest'anno",
     "modePastDesc": "Hai già partecipato alla sfida? Importa i giorni effettivamente completati.",
-    "continue": "Continuare",
     "readyTitle": "È tutto pronto!",
     "todayRecap": "La tua sfida inizia oggi nel giorno {{day}} dell'anno. L'obiettivo aumenta di uno ogni giorno: ci vediamo domani!",
     "whenStartedReal": "Da quando lo fai quest'anno?",
@@ -568,7 +544,6 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "edit": "Modifica",
     "load": "Carico",
     "namePlaceholder": "Nome della routine",
     "title": "Le mie routine"
@@ -588,7 +563,6 @@
     "languageDesc": "Cambia la lingua dell'applicazione",
     "leaderboardDesc": "Appare nella classifica pubblica",
     "lock": "Serratura",
-    "max": "Massimo",
     "maxChars": "Massimo 20 caratteri · Verrà utilizzata la tua foto Google",
     "multiplier": "Moltiplicatore (massimo 1,0)",
     "notifications": "Notifiche",
@@ -620,7 +594,6 @@
   },
   "share": {
     "backgroundImage": "Immagine di sfondo",
-    "categoryFilter": "Categoria",
     "cropImage": "Ritaglia immagine",
     "deleteSession": "Eliminare questa sessione?",
     "deleteSessionWarning": "Questa azione non può essere annullata.",
@@ -698,7 +671,6 @@
     "title": "Statistiche",
     "totalReps": "Rappresentazioni totali",
     "recordDay": "Giorno record",
-    "tabOverview": "Panoramica",
     "tabCharts": "Grafici",
     "tabDetails": "Dettagli",
     "selectAll": "Seleziona tutto",
@@ -734,13 +706,6 @@
     "remaining": "{{time}} rimasto da tenere premuto",
     "reset": "Reset",
     "skip": "Saltare",
-    "tips": [
-      "L'acqua potabile aumenta le prestazioni.",
-      "Tieni la schiena dritta!",
-      "La coerenza batte l’intensità.",
-      "Respira bene durante lo sforzo.",
-      "1% meglio ogni giorno."
-    ],
     "validated": "Cronometro completato!"
   },
   "weight": {
@@ -788,7 +753,6 @@
     "limitReached": "Limite di {{count}} categorie raggiunto.",
     "nameLabel": "Nome della categoria",
     "namePlaceholder": "Es: Parte superiore, Stretching...",
-    "preview": "Anteprima",
     "title": "Categorie Personalizzate"
   },
   "sessionNames": {
@@ -950,7 +914,6 @@
     "guestDesc": "Accedi per guadagnare congelamenti serie e proteggere la tua serie quando salti un giorno.",
     "statAvailable": "In riserva",
     "statPerMonth": "Al mese",
-    "statReserve": "Max",
     "proPitch": "Gli utenti Pro ne ottengono {{multiplier}}× di più — {{count}} congelamenti al mese.",
     "proCta": "Sblocca Pro"
   },
@@ -958,5 +921,11 @@
     "title": "OneUp si è spostato su {{host}}",
     "message": "L'indirizzo del sito è cambiato. Non hai effettuato l'accesso con Google? Esporta i tuoi dati da Impostazioni › Dati e reimportali sul nuovo sito per non perdere nulla.",
     "button": "Vai ora"
+  },
+  "period": {
+    "morning": "mattutini",
+    "afternoon": "pomeridiani",
+    "evening": "serali",
+    "total": "totali"
   }
 }

@@ -109,7 +109,7 @@ describe('WorkoutSession config phase titles', () => {
     });
 
     const { getByText } = render(<WorkoutSession onClose={vi.fn()} />);
-    const titleElement = getByText('dashboard.editSession');
+    const titleElement = getByText('common.edit');
     expect(titleElement).toBeTruthy();
     
     // Ensure hardcoded gradient styles are removed so it uses canonical panel-title class styles

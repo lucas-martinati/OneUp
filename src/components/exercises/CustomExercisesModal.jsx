@@ -236,7 +236,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
             {/* CATEGORY SELECTOR */}
             <div>
               <label className="section-label" style={{ marginBottom: '8px' }}>
-                {t('customExercises.categoryLabel')}
+                {t('common.category')}
               </label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                 {[

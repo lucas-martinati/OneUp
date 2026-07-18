@@ -40,7 +40,11 @@ export function buildBadges(stats) {
             category: def.category,
             secret: def.secret || false,
             titleKey: def.secret && !unlocked ? null : `achievements.badges.${def.id}.title`,
-            descKey: def.secret && !unlocked ? null : `achievements.badges.${def.id}.desc`,
+            descKey: (() => {
+                if (def.secret && !unlocked) return null;
+                if (def.descKey) return `achievements.badges.${def.descKey}`;
+                return `achievements.badges.${def.id}.desc`;
+            })(),
             unlocked,
             current,
             goal,

@@ -113,7 +113,7 @@ export function StreakFreezeInfo({ open, onClose }) {
                     <div style={{ width: '1px', background: 'var(--border-subtle)' }} />
                     <FreezeStat value={`+${limits.perMonth}`} label={t('streakFreeze.statPerMonth')} />
                     <div style={{ width: '1px', background: 'var(--border-subtle)' }} />
-                    <FreezeStat value={limits.maxStock} label={t('streakFreeze.statReserve')} />
+                    <FreezeStat value={limits.maxStock} label={t('common.max')} />
                 </div>
                 )}
 

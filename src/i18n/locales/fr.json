@@ -11,15 +11,12 @@
   "achievements": {
     "badges": {
       "afternoon_10": {
-        "desc": "10 entraînements l'après-midi",
         "title": "Après-Midi"
       },
       "afternoon_25": {
-        "desc": "25 entraînements l'après-midi",
         "title": "Rythme"
       },
       "afternoon_5": {
-        "desc": "5 entraînements l'après-midi",
         "title": "Coup de Pied"
       },
       "all_exercises": {
@@ -39,19 +36,15 @@
         "title": "Régularité"
       },
       "evening_10": {
-        "desc": "10 entraînements le soir",
         "title": "Noctambule"
       },
       "evening_25": {
-        "desc": "25 entraînements le soir",
         "title": "Lune"
       },
       "evening_5": {
-        "desc": "5 entraînements le soir",
         "title": "Couche-Tard"
       },
       "fifty_sessions": {
-        "desc": "50 entraînements total",
         "title": "Cinquante"
       },
       "first_blood": {
@@ -67,39 +60,30 @@
         "title": "Fantôme"
       },
       "half_year": {
-        "desc": "180 jours d'affilée",
         "title": "Demi-Année"
       },
       "hundred_sessions": {
-        "desc": "100 entraînements total",
         "title": "Centurion"
       },
       "month_warrior": {
-        "desc": "30 jours d'affilée",
         "title": "Soldat du Mois"
       },
       "morning_10": {
-        "desc": "10 entraînements le matin",
         "title": "Matinal"
       },
       "morning_25": {
-        "desc": "25 entraînements le matin",
         "title": "Aurore"
       },
       "morning_5": {
-        "desc": "5 entraînements le matin",
         "title": "Lève-Tôt"
       },
       "perfect_fifty": {
-        "desc": "50 jours parfaits",
         "title": "Maîtrise"
       },
       "perfect_five": {
-        "desc": "5 jours parfaits",
         "title": "Excellence"
       },
       "perfect_hundred": {
-        "desc": "100 jours parfaits",
         "title": "Perfectionniste"
       },
       "perfect_one": {
@@ -111,48 +95,37 @@
         "title": "Inarrêtable"
       },
       "quarter_year": {
-        "desc": "90 jours d'affilée",
         "title": "Quarterback"
       },
       "rep_1000": {
-        "desc": "1 000 reps au total",
         "title": "Millier"
       },
       "rep_10000": {
-        "desc": "10 000 reps au total",
         "title": "Compteur"
       },
       "rep_500": {
-        "desc": "500 reps au total",
         "title": "500 Répétitions"
       },
       "rep_5000": {
-        "desc": "5 000 reps au total",
         "title": "Cinq Milliers"
       },
       "rep_50000": {
-        "desc": "50 000 reps au total",
         "title": "Massacreur"
       },
       "secret": "Secret",
       "ten_sessions": {
-        "desc": "10 entraînements total",
         "title": "Dix de der"
       },
       "two_hundred_sessions": {
-        "desc": "200 entraînements total",
         "title": "Légende"
       },
       "two_months": {
-        "desc": "60 jours d'affilée",
         "title": "Discipline de Fer"
       },
       "two_weeks": {
-        "desc": "14 jours d'affilée",
         "title": "Ténacité"
       },
       "week_warrior": {
-        "desc": "7 jours d'affilée",
         "title": "Guerrier de la Semaine"
       },
       "weekday_warrior": {
@@ -164,13 +137,16 @@
         "title": "Week-end"
       },
       "year_beast": {
-        "desc": "365 jours d'affilée",
         "title": "Bête de Compétition"
       },
       "white_hat": {
         "title": "White Hat",
         "desc": "Vous avez signalé un bug majeur et aidé à améliorer OneUp."
-      }
+      },
+      "streak_desc": "{{count}} jours d'affilée",
+      "perfect_days_desc": "{{count}} jours parfaits",
+      "total_reps_desc": "{{count}} reps au total",
+      "workout_count_desc": "{{count}} entraînements {{period}}"
     },
     "badgesUnlocked": "Badges Débloqués",
     "nextBadge": "Prochain succès",
@@ -185,8 +161,7 @@
     },
     "filterAll": "Tous",
     "filterUnlocked": "Débloqués",
-    "filterLocked": "Verrouillés",
-    "title": "Succès"
+    "filterLocked": "Verrouillés"
   },
   "announcement": {
     "badge": "Nouveau",
@@ -260,7 +235,6 @@
     "noGpsTrack": "Aucun tracé GPS",
     "noSessions": "Aucune séance enregistrée pour le moment.",
     "pace": "Allure",
-    "revalidate": "Continuer",
     "speed": "Vitesse",
     "start": "Départ",
     "stravaWallDesc": "Synchronisez automatiquement vos sessions de course et de vélo pour faire progresser votre streak globale.",
@@ -337,6 +311,19 @@
     "backOnline": "Connexion rétablie"
   },
   "common": {
+    "continue": "Continuer",
+    "edit": "Modifier",
+    "preview": "Aperçu",
+    "category": "Catégorie",
+    "achievements": "Succès",
+    "max": "Max",
+    "tips": [
+      "Boire de l'eau booste les performances.",
+      "Garde le dos droit !",
+      "La constance bat l'intensité.",
+      "Respire bien pendant et après l'effort.",
+      "1% meilleur chaque jour."
+    ],
     "anonymous": "Anonyme",
     "bestStreak": "Meilleure série",
     "bodyweight": "Poids du corps",
@@ -370,13 +357,6 @@
   "counter": {
     "completeAll": "Tout compléter",
     "reset": "Réinitialiser",
-    "tips": [
-      "Boire de l'eau booste les performances.",
-      "Garde le dos droit !",
-      "La constance bat l'intensité.",
-      "Respire bien après l'effort.",
-      "1% meilleur chaque jour."
-    ],
     "validated": "{{exercise}} Validé !",
     "cameraMode": "Compteur Caméra",
     "cameraCalibrate": "Recalibrer",
@@ -401,11 +381,9 @@
     "limitReached": "Limite de {{count}} catégories atteinte.",
     "nameLabel": "Nom de la catégorie",
     "namePlaceholder": "Ex: Haut du corps, Étirements...",
-    "preview": "Aperçu",
     "title": "Catégories Personnalisées"
   },
   "customExercises": {
-    "categoryLabel": "Catégorie",
     "colorLabel": "Couleur de thème",
     "create": "Créer un exercice",
     "deleteConfirm": "Supprimer {{name}} ?",
@@ -440,7 +418,6 @@
     "noExercisesConfigured": "Tu n'as pas encore configuré d'exercices ici.",
     "session": "Séance",
     "waiting": "⏳ En attente",
-    "editSession": "Modifier la séance",
     "discard": "Abandonner",
     "discardConfirm": "Voulez-vous abandonner la séance en cours ?"
   },
@@ -466,7 +443,6 @@
     "squats": "Squats"
   },
   "leaderboard": {
-    "achievements": "Succès",
     "activeDays": "Jours actifs",
     "copied": "Copié",
     "copy": "Copier",
@@ -544,7 +520,6 @@
     "recommended": "Recommandé",
     "modePastTitle": "J'ai déjà commencé cette année",
     "modePastDesc": "Tu fais déjà le défi depuis un moment ? Importe les jours que tu as réellement faits.",
-    "continue": "Continuer",
     "readyTitle": "Tout est prêt !",
     "todayRecap": "Ton défi démarre aujourd'hui, au <0>Jour {{day}}</0> de l'année. L'objectif grimpe d'un cran chaque jour — à demain !",
     "whenStartedReal": "Depuis quand fais-tu le défi cette année ?",
@@ -583,7 +558,6 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "edit": "Modifier",
     "load": "Charger",
     "namePlaceholder": "Nom de la routine",
     "title": "Mes Routines"
@@ -603,7 +577,6 @@
     "languageDesc": "Changer la langue de l'application",
     "leaderboardDesc": "Apparaître dans le classement public",
     "lock": "Bloquer",
-    "max": "Max",
     "maxChars": "Max 20 caractères · Ta photo Google sera utilisée",
     "multiplier": "Multiplicateur (Max 1.0)",
     "notifications": "Notifications",
@@ -635,7 +608,6 @@
   },
   "share": {
     "backgroundImage": "Image de fond",
-    "categoryFilter": "Catégorie",
     "cropImage": "Cadrage de l'image",
     "deleteSession": "Supprimer la séance ?",
     "deleteSessionWarning": "Cette action est irréversible.",
@@ -713,7 +685,6 @@
     "title": "Statistiques",
     "totalReps": "Reps totales",
     "recordDay": "Jour record",
-    "tabOverview": "Aperçu",
     "tabCharts": "Graphiques",
     "tabDetails": "Détails",
     "selectAll": "Tout sélectionner",
@@ -749,13 +720,6 @@
     "remaining": "Encore {{time}} à tenir",
     "reset": "reset",
     "skip": "Skip",
-    "tips": [
-      "Boire de l'eau booste les performances.",
-      "Garde le dos droit !",
-      "La constance bat l'intensité.",
-      "Respire bien pendant l'effort.",
-      "1% meilleur chaque jour."
-    ],
     "validated": "Chrono Validé !"
   },
   "weight": {
@@ -950,7 +914,6 @@
     "guestDesc": "Connecte-toi pour gagner des gels de série et protéger ta série quand tu rates un jour.",
     "statAvailable": "En réserve",
     "statPerMonth": "Par mois",
-    "statReserve": "Max",
     "proPitch": "Les membres Pro en gagnent {{multiplier}}× plus — {{count}} gels chaque mois.",
     "proCta": "Passer Pro"
   },
@@ -958,5 +921,11 @@
     "title": "OneUp a déménagé sur {{host}}",
     "message": "L'adresse du site a changé. Pas connecté à un compte Google ? Exporte tes données dans Réglages › Données, puis réimporte-les sur le nouveau site pour ne rien perdre.",
     "button": "Y aller"
+  },
+  "period": {
+    "morning": "le matin",
+    "afternoon": "l'après-midi",
+    "evening": "le soir",
+    "total": "total"
   }
 }

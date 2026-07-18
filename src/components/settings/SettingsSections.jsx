@@ -214,7 +214,7 @@ export function PerformanceSection({ settings, onSave }) {
                 <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
                     {[
                         { value: 'low', label: t('settings.eco'), color: 'var(--warning)' },
-                        { value: 'high', label: t('settings.max'), color: 'var(--accent-glow)' }
+                        { value: 'high', label: t('common.max'), color: 'var(--accent-glow)' }
                     ].map(opt => (
                         <button
                             key={opt.value}

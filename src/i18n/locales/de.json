@@ -11,15 +11,12 @@
   "achievements": {
     "badges": {
       "afternoon_10": {
-        "desc": "10 Nachmittagstrainingseinheiten",
         "title": "Nachmittag"
       },
       "afternoon_25": {
-        "desc": "25 Nachmittagstrainingseinheiten",
         "title": "Rhythmus"
       },
       "afternoon_5": {
-        "desc": "5 Nachmittagstrainings",
         "title": "Kickstart"
       },
       "all_exercises": {
@@ -39,19 +36,15 @@
         "title": "Konsistenz"
       },
       "evening_10": {
-        "desc": "10 Abendtrainings",
         "title": "Nächtlich"
       },
       "evening_25": {
-        "desc": "25 Abendtrainings",
         "title": "Mond"
       },
       "evening_5": {
-        "desc": "5 Abendtrainings",
         "title": "Nachteule"
       },
       "fifty_sessions": {
-        "desc": "Insgesamt 50 Trainingseinheiten",
         "title": "Fünfzig"
       },
       "first_blood": {
@@ -67,39 +60,30 @@
         "title": "Geist"
       },
       "half_year": {
-        "desc": "180 Tage am Stück",
         "title": "Halbjahr"
       },
       "hundred_sessions": {
-        "desc": "Insgesamt 100 Trainingseinheiten",
         "title": "Zenturio"
       },
       "month_warrior": {
-        "desc": "30 Tage hintereinander",
         "title": "Monatssoldat"
       },
       "morning_10": {
-        "desc": "10 Morgentrainingseinheiten",
         "title": "Morgenmensch"
       },
       "morning_25": {
-        "desc": "25 Morgentrainingseinheiten",
         "title": "Dämmerung"
       },
       "morning_5": {
-        "desc": "5 Morgentrainingseinheiten",
         "title": "Frühaufsteher"
       },
       "perfect_fifty": {
-        "desc": "50 perfekte Tage",
         "title": "Meisterschaft"
       },
       "perfect_five": {
-        "desc": "5 perfekte Tage",
         "title": "Exzellenz"
       },
       "perfect_hundred": {
-        "desc": "100 perfekte Tage",
         "title": "Perfektionist"
       },
       "perfect_one": {
@@ -111,48 +95,37 @@
         "title": "Unaufhaltsam"
       },
       "quarter_year": {
-        "desc": "90 Tage am Stück",
         "title": "Quarterback"
       },
       "rep_1000": {
-        "desc": "Insgesamt 1.000 Wiederholungen",
         "title": "Tausend"
       },
       "rep_10000": {
-        "desc": "Insgesamt 10.000 Wiederholungen",
         "title": "Schalter"
       },
       "rep_500": {
-        "desc": "Insgesamt 500 Wiederholungen",
         "title": "500 Wiederholungen"
       },
       "rep_5000": {
-        "desc": "Insgesamt 5.000 Wiederholungen",
         "title": "Fünftausend"
       },
       "rep_50000": {
-        "desc": "Insgesamt 50.000 Wiederholungen",
         "title": "Schlachter"
       },
       "secret": "Geheimnis",
       "ten_sessions": {
-        "desc": "Insgesamt 10 Trainingseinheiten",
         "title": "Top Ten"
       },
       "two_hundred_sessions": {
-        "desc": "Insgesamt 200 Trainingseinheiten",
         "title": "Legende"
       },
       "two_months": {
-        "desc": "60 Tage am Stück",
         "title": "Eiserne Disziplin"
       },
       "two_weeks": {
-        "desc": "14 Tage hintereinander",
         "title": "Zähigkeit"
       },
       "week_warrior": {
-        "desc": "7 Tage hintereinander",
         "title": "Wochenkrieger"
       },
       "weekday_warrior": {
@@ -164,13 +137,16 @@
         "title": "Wochenende"
       },
       "year_beast": {
-        "desc": "365 Tage am Stück",
         "title": "Wettkampf-Biest"
       },
       "white_hat": {
         "title": "White Hat",
         "desc": "Du hast einen schweren Fehler gemeldet und geholfen, OneUp zu verbessern."
-      }
+      },
+      "streak_desc": "{{count}} Tage hintereinander",
+      "perfect_days_desc": "{{count}} perfekte Tage",
+      "total_reps_desc": "Insgesamt {{count}} Wiederholungen",
+      "workout_count_desc": "{{count}} {{period}}"
     },
     "badgesUnlocked": "Abzeichen freigeschaltet",
     "nextBadge": "Nächster Erfolg",
@@ -185,8 +161,7 @@
     },
     "filterAll": "Alle",
     "filterUnlocked": "Freigeschaltet",
-    "filterLocked": "Gesperrt",
-    "title": "Erfolge"
+    "filterLocked": "Gesperrt"
   },
   "announcement": {
     "badge": "Neu",
@@ -260,7 +235,6 @@
     "noGpsTrack": "Kein GPS-Track",
     "noSessions": "Keine Sitzungen aufgezeichnet",
     "pace": "Tempo",
-    "revalidate": "Weitermachen",
     "speed": "Geschwindigkeit",
     "start": "Start",
     "stravaWallDesc": "Synchronisieren Sie Ihre Lauf- und Radfahreinheiten automatisch, um Ihre globale Erfolgsserie voranzutreiben.",
@@ -337,6 +311,19 @@
     "backOnline": "Wieder online"
   },
   "common": {
+    "continue": "Weitermachen",
+    "edit": "Bearbeiten",
+    "preview": "Übersicht",
+    "category": "Kategorie",
+    "achievements": "Erfolge",
+    "max": "Max",
+    "tips": [
+      "Trinkwasser steigert die Leistung.",
+      "Halten Sie Ihren Rücken gerade!",
+      "Konsistenz schlägt Intensität.",
+      "Atmen Sie während und nach der Anstrengung gut.",
+      "Jeden Tag 1 % besser."
+    ],
     "anonymous": "Anonym",
     "bestStreak": "Beste Serie",
     "bodyweight": "Körpergewicht",
@@ -370,13 +357,6 @@
   "counter": {
     "completeAll": "Schließe „Alle“ ab",
     "reset": "Zurücksetzen",
-    "tips": [
-      "Trinkwasser steigert die Leistung.",
-      "Halten Sie Ihren Rücken gerade!",
-      "Konsistenz schlägt Intensität.",
-      "Atmen Sie nach der Anstrengung gut durch.",
-      "Jeden Tag 1 % besser."
-    ],
     "validated": "{{exercise}} Abgeschlossen!",
     "cameraMode": "Camera Counter",
     "cameraCalibrate": "Recalibrate",
@@ -390,7 +370,6 @@
     "cameraDepth": "Tiefe"
   },
   "customExercises": {
-    "categoryLabel": "Kategorie",
     "colorLabel": "Themenfarbe",
     "create": "Erstellen Sie eine Übung",
     "deleteConfirm": "{{name}} löschen?",
@@ -425,7 +404,6 @@
     "noExercisesConfigured": "Sie haben hier noch keine Übungen konfiguriert.",
     "session": "Sitzung",
     "waiting": "⏳ Warten",
-    "editSession": "Sitzung bearbeiten",
     "discard": "Abbrechen",
     "discardConfirm": "Möchten Sie die laufende Sitzung abbrechen?"
   },
@@ -451,7 +429,6 @@
     "squats": "Kniebeugen"
   },
   "leaderboard": {
-    "achievements": "Erfolge",
     "activeDays": "Aktive Tage",
     "copied": "Kopiert",
     "copy": "Kopie",
@@ -529,7 +506,6 @@
     "recommended": "Empfohlen",
     "modePastTitle": "Ich habe dieses Jahr schon angefangen",
     "modePastDesc": "Hast du die Challenge schon gemacht? Importieren Sie die tatsächlich absolvierten Tage.",
-    "continue": "Weitermachen",
     "readyTitle": "Sie sind bereit!",
     "todayRecap": "Ihre Herausforderung beginnt heute am Tag {{day}} des Jahres. Das Ziel steigt jeden Tag um eins – bis morgen!",
     "whenStartedReal": "Seit wann machst du das dieses Jahr?",
@@ -568,7 +544,6 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "edit": "Bearbeiten",
     "load": "Laden",
     "namePlaceholder": "Routinename",
     "title": "Meine Routinen"
@@ -588,7 +563,6 @@
     "languageDesc": "Ändern Sie die Anwendungssprache",
     "leaderboardDesc": "Erscheinen Sie in der öffentlichen Bestenliste",
     "lock": "Sperren",
-    "max": "Max",
     "maxChars": "Maximal 20 Zeichen · Ihr Google-Foto wird verwendet",
     "multiplier": "Multiplikator (max. 1,0)",
     "notifications": "Benachrichtigungen",
@@ -620,7 +594,6 @@
   },
   "share": {
     "backgroundImage": "Hintergrundbild",
-    "categoryFilter": "Kategorie",
     "cropImage": "Bild zuschneiden",
     "deleteSession": "Diese Sitzung löschen?",
     "deleteSessionWarning": "Das kann nicht rückgängig gemacht werden.",
@@ -698,7 +671,6 @@
     "title": "Statistiken",
     "totalReps": "Gesamtzahl der Wiederholungen",
     "recordDay": "Rekordtag",
-    "tabOverview": "Übersicht",
     "tabCharts": "Diagramme",
     "tabDetails": "Details",
     "selectAll": "Alle auswählen",
@@ -734,13 +706,6 @@
     "remaining": "{{time}} bleibt zu halten",
     "reset": "Zurücksetzen",
     "skip": "Überspringen",
-    "tips": [
-      "Trinkwasser steigert die Leistung.",
-      "Halten Sie Ihren Rücken gerade!",
-      "Konsistenz schlägt Intensität.",
-      "Atmen Sie während der Anstrengung gut.",
-      "Jeden Tag 1 % besser."
-    ],
     "validated": "Timer abgeschlossen!"
   },
   "weight": {
@@ -788,7 +753,6 @@
     "limitReached": "Limit von {{count}} Kategorien erreicht.",
     "nameLabel": "Kategoriename",
     "namePlaceholder": "Z.B. Oberkörper, Dehnen...",
-    "preview": "Vorschau",
     "title": "Benutzerdefinierte Kategorien"
   },
   "sessionNames": {
@@ -950,7 +914,6 @@
     "guestDesc": "Melde dich an, um Serien-Einfrierungen zu verdienen und deine Serie zu schützen, wenn du einen Tag verpasst.",
     "statAvailable": "Im Vorrat",
     "statPerMonth": "Pro Monat",
-    "statReserve": "Max",
     "proPitch": "Pro-Mitglieder erhalten {{multiplier}}× mehr — {{count}} Einfrierungen pro Monat.",
     "proCta": "Pro freischalten"
   },
@@ -958,5 +921,11 @@
     "title": "OneUp ist auf {{host}} umgezogen",
     "message": "Die Adresse der Seite hat sich geändert. Nicht mit Google angemeldet? Exportiere deine Daten unter Einstellungen › Daten und importiere sie auf der neuen Seite, damit nichts verloren geht.",
     "button": "Jetzt öffnen"
+  },
+  "period": {
+    "morning": "Morgentrainingseinheiten",
+    "afternoon": "Nachmittagstrainingseinheiten",
+    "evening": "Abendtrainingseinheiten",
+    "total": "Trainingseinheiten insgesamt"
   }
 }

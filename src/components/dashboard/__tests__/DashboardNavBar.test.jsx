@@ -72,7 +72,7 @@ describe('DashboardNavBar', () => {
   it('uses the in-progress aria label when a session is running', () => {
     useUIStore.setState({ sessionInProgress: true });
     const { getByRole } = renderNavBar();
-    expect(getByRole('button', { name: 'dashboard.editSession' })).toBeTruthy();
+    expect(getByRole('button', { name: 'common.edit' })).toBeTruthy();
   });
 
   it('tints the central button with the active category color', () => {

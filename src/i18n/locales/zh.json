@@ -11,15 +11,12 @@
   "achievements": {
     "badges": {
       "afternoon_10": {
-        "desc": "10次下午锻炼",
         "title": "午后"
       },
       "afternoon_25": {
-        "desc": "25次下午锻炼",
         "title": "节奏"
       },
       "afternoon_5": {
-        "desc": "5次下午锻炼",
         "title": "下午起步"
       },
       "all_exercises": {
@@ -39,19 +36,15 @@
         "title": "坚持"
       },
       "evening_10": {
-        "desc": "10次晚间锻炼",
         "title": "夜行者"
       },
       "evening_25": {
-        "desc": "25次晚间锻炼",
         "title": "月光"
       },
       "evening_5": {
-        "desc": "5次晚间锻炼",
         "title": "夜猫子"
       },
       "fifty_sessions": {
-        "desc": "共50次锻炼",
         "title": "五十"
       },
       "first_blood": {
@@ -67,39 +60,30 @@
         "title": "幽灵"
       },
       "half_year": {
-        "desc": "连续180天",
         "title": "半年"
       },
       "hundred_sessions": {
-        "desc": "共100次锻炼",
         "title": "百夫长"
       },
       "month_warrior": {
-        "desc": "连续30天",
         "title": "月战士"
       },
       "morning_10": {
-        "desc": "10次晨练",
         "title": "晨型人"
       },
       "morning_25": {
-        "desc": "25次晨练",
         "title": "黎明"
       },
       "morning_5": {
-        "desc": "5次晨练",
         "title": "早起鸟"
       },
       "perfect_fifty": {
-        "desc": "50个完美天",
         "title": "大师"
       },
       "perfect_five": {
-        "desc": "5个完美天",
         "title": "卓越"
       },
       "perfect_hundred": {
-        "desc": "100个完美天",
         "title": "完美主义者"
       },
       "perfect_one": {
@@ -111,48 +95,37 @@
         "title": "势不可挡"
       },
       "quarter_year": {
-        "desc": "连续90天",
         "title": "季度王"
       },
       "rep_1000": {
-        "desc": "共1,000次",
         "title": "千次"
       },
       "rep_10000": {
-        "desc": "共10,000次",
         "title": "万次"
       },
       "rep_500": {
-        "desc": "共500次",
         "title": "500次"
       },
       "rep_5000": {
-        "desc": "共5,000次",
         "title": "五千"
       },
       "rep_50000": {
-        "desc": "共50,000次",
         "title": "收割者"
       },
       "secret": "秘密",
       "ten_sessions": {
-        "desc": "共10次锻炼",
         "title": "前十"
       },
       "two_hundred_sessions": {
-        "desc": "共200次锻炼",
         "title": "传奇"
       },
       "two_months": {
-        "desc": "连续60天",
         "title": "铁律"
       },
       "two_weeks": {
-        "desc": "连续14天",
         "title": "坚韧"
       },
       "week_warrior": {
-        "desc": "连续7天",
         "title": "周战士"
       },
       "weekday_warrior": {
@@ -164,13 +137,16 @@
         "title": "周末"
       },
       "year_beast": {
-        "desc": "连续365天",
         "title": "竞技之兽"
       },
       "white_hat": {
         "title": "White Hat",
         "desc": "您报告了一个重大错误并帮助改进了 OneUp。"
-      }
+      },
+      "streak_desc": "连续{{count}}天",
+      "perfect_days_desc": "{{count}}个完美天",
+      "total_reps_desc": "共{{count}}次",
+      "workout_count_desc": "{{period}}{{count}}次锻炼"
     },
     "badgesUnlocked": "已解锁徽章",
     "nextBadge": "下一个成就",
@@ -185,8 +161,7 @@
     },
     "filterAll": "全部",
     "filterUnlocked": "已解锁",
-    "filterLocked": "未解锁",
-    "title": "成就"
+    "filterLocked": "未解锁"
   },
   "announcement": {
     "badge": "新功能",
@@ -260,7 +235,6 @@
     "noGpsTrack": "无 GPS 轨迹",
     "noSessions": "暂无训练记录",
     "pace": "配速",
-    "revalidate": "继续",
     "speed": "速度",
     "start": "起点",
     "stravaWallDesc": "自动同步您的跑步和骑行活动，以提升您的全球连胜记录。",
@@ -337,6 +311,19 @@
     "backOnline": "已恢复连接"
   },
   "common": {
+    "continue": "继续",
+    "edit": "编辑",
+    "preview": "概览",
+    "category": "类别",
+    "achievements": "成就",
+    "max": "最高",
+    "tips": [
+      "喝水能提升表现。",
+      "保持背部挺直！",
+      "坚持胜过强度。",
+      "运动时和运动后好好呼吸。",
+      "每天进步1%。"
+    ],
     "anonymous": "匿名",
     "bestStreak": "最佳连续",
     "bodyweight": "自重",
@@ -370,13 +357,6 @@
   "counter": {
     "completeAll": "全部完成",
     "reset": "重置",
-    "tips": [
-      "喝水能提升表现。",
-      "保持背部挺直！",
-      "坚持胜过强度。",
-      "运动后好好呼吸。",
-      "每天进步1%。"
-    ],
     "validated": "{{exercise}} 完成！",
     "cameraMode": "Camera Counter",
     "cameraCalibrate": "Recalibrate",
@@ -390,7 +370,6 @@
     "cameraDepth": "深度"
   },
   "customExercises": {
-    "categoryLabel": "类别",
     "colorLabel": "主题颜色",
     "create": "创建练习",
     "deleteConfirm": "删除 {{name}}？",
@@ -425,7 +404,6 @@
     "noExercisesConfigured": "您尚未在此处配置任何练习。",
     "session": "训练",
     "waiting": "⏳ 等待中",
-    "editSession": "修改运动",
     "discard": "放弃",
     "discardConfirm": "您确定要放弃当前的运动吗？"
   },
@@ -451,7 +429,6 @@
     "squats": "深蹲"
   },
   "leaderboard": {
-    "achievements": "成就",
     "activeDays": "活跃天数",
     "copied": "已复制",
     "copy": "复制",
@@ -529,7 +506,6 @@
     "recommended": "受到推崇的",
     "modePastTitle": "我今年已经开始了",
     "modePastDesc": "已经在挑战了吗？导入您实际完成的天数。",
-    "continue": "继续",
     "readyTitle": "你都准备好了！",
     "todayRecap": "您的挑战从今天开始，即一年中的第 {{day}} 日。目标每天都上升一位——明天见！",
     "whenStartedReal": "今年你从什么时候开始这样做的？",
@@ -568,7 +544,6 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "edit": "编辑",
     "load": "加载",
     "namePlaceholder": "训练计划名称",
     "title": "我的训练计划"
@@ -588,7 +563,6 @@
     "languageDesc": "更改应用语言",
     "leaderboardDesc": "在公开排行榜中显示",
     "lock": "锁定",
-    "max": "最高",
     "maxChars": "最多20个字符 · 将使用你的Google头像",
     "multiplier": "倍率（最高1.0）",
     "notifications": "通知",
@@ -620,7 +594,6 @@
   },
   "share": {
     "backgroundImage": "背景图片",
-    "categoryFilter": "类别",
     "cropImage": "裁剪图片",
     "deleteSession": "删除该训练？",
     "deleteSessionWarning": "此操作无法撤销。",
@@ -698,7 +671,6 @@
     "title": "统计",
     "totalReps": "总次数",
     "recordDay": "纪录日",
-    "tabOverview": "概览",
     "tabCharts": "图表",
     "tabDetails": "详情",
     "selectAll": "全选",
@@ -734,13 +706,6 @@
     "remaining": "还需保持 {{time}}",
     "reset": "重置",
     "skip": "跳过",
-    "tips": [
-      "喝水能提升表现。",
-      "保持背部挺直！",
-      "坚持胜过强度。",
-      "运动中好好呼吸。",
-      "每天进步1%。"
-    ],
     "validated": "计时器完成！"
   },
   "weight": {
@@ -788,7 +753,6 @@
     "limitReached": "已达到 {{count}} 个类别的限制。",
     "nameLabel": "类别名称",
     "namePlaceholder": "例如：上半身、拉伸...",
-    "preview": "预览",
     "title": "自定义类别"
   },
   "sessionNames": {
@@ -950,7 +914,6 @@
     "guestDesc": "登录即可获得连续记录冻结，错过一天也能保护你的连续记录。",
     "statAvailable": "剩余",
     "statPerMonth": "每月",
-    "statReserve": "上限",
     "proPitch": "Pro 会员获得 {{multiplier}}× 更多——每月 {{count}} 次冻结。",
     "proCta": "解锁 Pro"
   },
@@ -958,5 +921,11 @@
     "title": "OneUp 已迁移至 {{host}}",
     "message": "网站地址已更改。未使用 Google 账号登录？请在「设置 › 数据」中导出你的数据，然后在新网站重新导入，以免丢失。",
     "button": "前往"
+  },
+  "period": {
+    "morning": "早上",
+    "afternoon": "下午",
+    "evening": "晚上",
+    "total": "共"
   }
 }

@@ -407,7 +407,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                       {name.trim()}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                      {t('customCategories.preview')}
+                      {t('common.preview')}
                     </div>
                   </div>
                 </div>

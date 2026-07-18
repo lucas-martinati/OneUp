@@ -45,7 +45,7 @@ export const DashboardNavBar = React.memo(({
                     openSession('config');
                     pauseCloudSync?.();
                 }}
-                aria-label={sessionInProgress ? t('dashboard.editSession') : t('dashboard.session')}
+                aria-label={sessionInProgress ? t('common.edit') : t('dashboard.session')}
                 className={styles.sessionBtn}
             >
                 <span

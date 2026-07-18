@@ -11,15 +11,12 @@
   "achievements": {
     "badges": {
       "afternoon_10": {
-        "desc": "午後のトレーニング10回",
         "title": "午後"
       },
       "afternoon_25": {
-        "desc": "午後のトレーニング25回",
         "title": "リズム"
       },
       "afternoon_5": {
-        "desc": "午後のトレーニング5回",
         "title": "キックスタート"
       },
       "all_exercises": {
@@ -39,19 +36,15 @@
         "title": "一貫性"
       },
       "evening_10": {
-        "desc": "夜のトレーニング10回",
         "title": "夜行性"
       },
       "evening_25": {
-        "desc": "夜のトレーニング25回",
         "title": "月"
       },
       "evening_5": {
-        "desc": "夜のトレーニング5回",
         "title": "ナイトフクロウ"
       },
       "fifty_sessions": {
-        "desc": "合計 50 回のトレーニング",
         "title": "50"
       },
       "first_blood": {
@@ -67,39 +60,30 @@
         "title": "おばけ"
       },
       "half_year": {
-        "desc": "180日連続",
         "title": "半年"
       },
       "hundred_sessions": {
-        "desc": "合計100回のトレーニング",
         "title": "センチュリオン"
       },
       "month_warrior": {
-        "desc": "30日連続",
         "title": "月の兵士"
       },
       "morning_10": {
-        "desc": "朝のトレーニング10回",
         "title": "朝の人"
       },
       "morning_25": {
-        "desc": "25回の朝のトレーニング",
         "title": "夜明け"
       },
       "morning_5": {
-        "desc": "朝のトレーニング5回",
         "title": "早割"
       },
       "perfect_fifty": {
-        "desc": "完璧な50日",
         "title": "マスタリー"
       },
       "perfect_five": {
-        "desc": "完璧な5日間",
         "title": "卓越性"
       },
       "perfect_hundred": {
-        "desc": "完璧な100日",
         "title": "完璧主義者"
       },
       "perfect_one": {
@@ -111,48 +95,37 @@
         "title": "止められない"
       },
       "quarter_year": {
-        "desc": "90日連続",
         "title": "クォーターバック"
       },
       "rep_1000": {
-        "desc": "合計 1,000 回の繰り返し",
         "title": "千"
       },
       "rep_10000": {
-        "desc": "合計 10,000 回の繰り返し",
         "title": "カウンタ"
       },
       "rep_500": {
-        "desc": "合計 500 回の繰り返し",
         "title": "500回の繰り返し"
       },
       "rep_5000": {
-        "desc": "合計 5,000 回の繰り返し",
         "title": "5,000"
       },
       "rep_50000": {
-        "desc": "合計 50,000 回の繰り返し",
         "title": "屠殺者"
       },
       "secret": "秘密",
       "ten_sessions": {
-        "desc": "合計10回のトレーニング",
         "title": "トップ10"
       },
       "two_hundred_sessions": {
-        "desc": "合計 200 回のトレーニング",
         "title": "伝説"
       },
       "two_months": {
-        "desc": "60日連続",
         "title": "鉄の規律"
       },
       "two_weeks": {
-        "desc": "14日連続",
         "title": "粘り強さ"
       },
       "week_warrior": {
-        "desc": "7日連続",
         "title": "週の戦士"
       },
       "weekday_warrior": {
@@ -164,13 +137,16 @@
         "title": "週末"
       },
       "year_beast": {
-        "desc": "365日連続",
         "title": "競争の獣"
       },
       "white_hat": {
         "title": "White Hat",
         "desc": "重大なバグを報告し、OneUpの改善に貢献しました。"
-      }
+      },
+      "streak_desc": "{{count}}日連続",
+      "perfect_days_desc": "完璧な{{count}}日間",
+      "total_reps_desc": "合計 {{count}} 回の繰り返し",
+      "workout_count_desc": "{{period}}{{count}}回のトレーニング"
     },
     "badgesUnlocked": "バッジのロックが解除されました",
     "nextBadge": "次の実績",
@@ -185,8 +161,7 @@
     },
     "filterAll": "すべて",
     "filterUnlocked": "解除済み",
-    "filterLocked": "未解除",
-    "title": "実績"
+    "filterLocked": "未解除"
   },
   "announcement": {
     "badge": "新しい",
@@ -260,7 +235,6 @@
     "noGpsTrack": "GPS トラックがありません",
     "noSessions": "セッションは記録されていません",
     "pace": "ペース",
-    "revalidate": "続く",
     "speed": "スピード",
     "start": "始める",
     "stravaWallDesc": "ランニングとサイクリングのセッションを自動的に同期して、世界記録を伸ばします。",
@@ -337,6 +311,19 @@
     "backOnline": "オンラインに復帰しました"
   },
   "common": {
+    "continue": "続く",
+    "edit": "編集",
+    "preview": "概要",
+    "category": "カテゴリー",
+    "achievements": "実績",
+    "max": "マックス",
+    "tips": [
+      "水を飲むとパフォーマンスが向上します。",
+      "背中をまっすぐにしてください！",
+      "一貫性は強度に勝ります。",
+      "努力中および努力後はよく呼吸してください。",
+      "毎日 1% 改善します。"
+    ],
     "anonymous": "匿名",
     "bestStreak": "ベストストリーク",
     "bodyweight": "体重",
@@ -370,13 +357,6 @@
   "counter": {
     "completeAll": "すべて完了",
     "reset": "リセット",
-    "tips": [
-      "水を飲むとパフォーマンスが向上します。",
-      "背中をまっすぐにしてください！",
-      "一貫性は強度に勝ります。",
-      "努力した後はよく呼吸してください。",
-      "毎日 1% 改善します。"
-    ],
     "validated": "{{exercise}} 完了しました!",
     "cameraMode": "Camera Counter",
     "cameraCalibrate": "Recalibrate",
@@ -390,7 +370,6 @@
     "cameraDepth": "深さ"
   },
   "customExercises": {
-    "categoryLabel": "カテゴリー",
     "colorLabel": "テーマカラー",
     "create": "演習を作成する",
     "deleteConfirm": "{{name}} を削除しますか?",
@@ -425,7 +404,6 @@
     "noExercisesConfigured": "ここではまだ演習を設定していません。",
     "session": "セッション",
     "waiting": "⏳ 待機中",
-    "editSession": "セッションを変更",
     "discard": "破棄",
     "discardConfirm": "進行中のセッションを破棄しますか？"
   },
@@ -451,7 +429,6 @@
     "squats": "スクワット"
   },
   "leaderboard": {
-    "achievements": "業績",
     "activeDays": "アクティブな日",
     "copied": "コピーされました",
     "copy": "コピー",
@@ -529,7 +506,6 @@
     "recommended": "推奨",
     "modePastTitle": "もう今年も始まって​​ます",
     "modePastDesc": "すでにチャレンジを始めていますか？実際に完了した日数をインポートします。",
-    "continue": "続く",
     "readyTitle": "準備は完了です!",
     "todayRecap": "あなたのチャレンジは今日、今年の {{day}} 日に始まります。目標は毎日 1 つずつ上がっていきます。また明日お会いしましょう!",
     "whenStartedReal": "今年はいつからやっているのですか？",
@@ -568,7 +544,6 @@
     "yearlySavings": "-17%"
   },
   "routines": {
-    "edit": "編集",
     "load": "負荷",
     "namePlaceholder": "ルーチン名",
     "title": "私のルーティン"
@@ -588,7 +563,6 @@
     "languageDesc": "アプリケーション言語を変更する",
     "leaderboardDesc": "公開リーダーボードに表示される",
     "lock": "ロック",
-    "max": "マックス",
     "maxChars": "最大 20 文字 · Google フォトが使用されます",
     "multiplier": "乗数(最大1.0)",
     "notifications": "通知",
@@ -620,7 +594,6 @@
   },
   "share": {
     "backgroundImage": "背景画像",
-    "categoryFilter": "カテゴリ",
     "cropImage": "画像のトリミング",
     "deleteSession": "このセッションを削除しますか？",
     "deleteSessionWarning": "この操作は取り消せません。",
@@ -698,7 +671,6 @@
     "title": "統計",
     "totalReps": "合計担当者",
     "recordDay": "記録日",
-    "tabOverview": "概要",
     "tabCharts": "グラフ",
     "tabDetails": "詳細",
     "selectAll": "すべて選択",
@@ -734,13 +706,6 @@
     "remaining": "{{time}} はまだ保持されています",
     "reset": "リセット",
     "skip": "スキップ",
-    "tips": [
-      "水を飲むとパフォーマンスが向上します。",
-      "背中をまっすぐにしてください！",
-      "一貫性は強度に勝ります。",
-      "努力中はよく呼吸してください。",
-      "毎日 1% 改善します。"
-    ],
     "validated": "タイマー完了！"
   },
   "weight": {
@@ -788,7 +753,6 @@
     "limitReached": "カテゴリー数は{{count}}個までです。",
     "nameLabel": "カテゴリー名",
     "namePlaceholder": "例：上半身、ストレッチ...",
-    "preview": "プレビュー",
     "title": "カスタムカテゴリー"
   },
   "sessionNames": {
@@ -950,7 +914,6 @@
     "guestDesc": "サインインしてストリーク凍結を獲得し、1日逃してもストリークを守りましょう。",
     "statAvailable": "残り",
     "statPerMonth": "毎月",
-    "statReserve": "上限",
     "proPitch": "Proなら{{multiplier}}倍——毎月{{count}}回の凍結を獲得できます。",
     "proCta": "Proを解除"
   },
@@ -958,5 +921,11 @@
     "title": "OneUp は {{host}} に移転しました",
     "message": "サイトのアドレスが変わりました。Googleアカウントにログインしていない場合は、「設定 › データ」からデータをエクスポートし、新しいサイトで再インポートすればデータを失いません。",
     "button": "移動する"
+  },
+  "period": {
+    "morning": "朝の",
+    "afternoon": "午後の",
+    "evening": "夜の",
+    "total": "合計"
   }
 }

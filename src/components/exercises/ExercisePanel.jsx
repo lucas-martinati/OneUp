@@ -389,7 +389,7 @@ export function ExercisePanel({
                     border: '1px solid rgba(255,255,255,0.06)'
                 }}>
                     <span style={{ marginRight: '4px' }}>{'\u{1F4A1}'}</span>
-                    {t(isTimer ? 'timer.tips' : 'counter.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
+                    {t('common.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
                 </div>
             )}
         </div>

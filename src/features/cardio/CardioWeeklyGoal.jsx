@@ -150,7 +150,7 @@ export const CardioWeeklyGoal = React.memo(({
                 flexShrink: 0
               }}
             >
-              {t('cardio.revalidate')}
+              {t('common.continue')}
             </button>
           </div>
         )}
