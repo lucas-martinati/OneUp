@@ -28,10 +28,10 @@ const CATEGORY_TITLES = {
     social: 'achievements.categories.social',
 };
 
-const fmt = (n) => n.toLocaleString();
+const fmt = (n, lang) => typeof n === 'number' ? n.toLocaleString(lang) : n;
 
 const BadgeItem = React.memo(({ badge, highlighted }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const Icon = badge.icon;
     const { unlocked, secret, color } = badge;
 
@@ -50,7 +50,7 @@ const BadgeItem = React.memo(({ badge, highlighted }) => {
         else if (badge.id.startsWith('evening_')) period = t('period.evening');
         else if (badge.id.endsWith('_sessions')) period = t('period.total');
         
-        const formattedGoal = typeof badge.goal === 'number' ? badge.goal.toLocaleString() : badge.goal;
+        const formattedGoal = fmt(badge.goal, i18n.language);
         desc = t(badge.descKey, { count: formattedGoal, period });
     } else if (secret) {
         desc = '???';
@@ -154,7 +154,7 @@ const BadgeItem = React.memo(({ badge, highlighted }) => {
                         }} />
                     </div>
                     <div style={{ fontSize: '0.58rem', color: 'var(--text-secondary)', marginTop: '5px', fontWeight: '700' }}>
-                        {fmt(badge.current)} / {fmt(badge.goal)}
+                        {fmt(badge.current, i18n.language)} / {fmt(badge.goal, i18n.language)}
                     </div>
                 </div>
             )}

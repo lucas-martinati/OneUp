@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Award, Lock, ChevronRight } from '@utils/icons';
 import { buildBadges } from '../feedback/buildBadges';
 
-const fmt = (n) => n.toLocaleString();
+const fmt = (n, lang) => typeof n === 'number' ? n.toLocaleString(lang) : n;
 
 /** A single clickable badge medallion in the horizontal shelf. */
 const Medallion = React.memo(({ badge, onSelect, t }) => {
@@ -72,7 +72,7 @@ const Medallion = React.memo(({ badge, onSelect, t }) => {
  * @param {function} onOpen       Called with an optional badgeId to open the panel.
  */
 export function AchievementsShowcase({ stats, onOpen }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const badges = useMemo(() => buildBadges(stats), [stats]);
     const unlockedCount = useMemo(() => badges.filter(b => b.unlocked).length, [badges]);
@@ -212,7 +212,7 @@ export function AchievementsShowcase({ stats, onOpen }) {
                         fontSize: '0.68rem', fontWeight: '800', color: nextBadge.color,
                         whiteSpace: 'nowrap', flexShrink: 0,
                     }}>
-                        {fmt(nextBadge.current)} / {fmt(nextBadge.goal)}
+                        {fmt(nextBadge.current, i18n.language)} / {fmt(nextBadge.goal, i18n.language)}
                     </div>
                     <ChevronRight size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
                 </button>
