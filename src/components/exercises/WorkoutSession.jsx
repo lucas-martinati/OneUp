@@ -455,7 +455,7 @@ export function WorkoutSession(props) {
                         disabled={queue.length < 1}
                         style={{ flex: 1 }}
                     >
-                        {t('workout.launch', { count: queue.length, plural: queue.length > 1 ? 's' : '' })}
+                        {t('workout.launch', { count: queue.length })}
                     </Button>
                 </div>
                 </div>

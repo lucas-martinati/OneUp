@@ -259,11 +259,8 @@
     "loading": "有酸素運動データをロードしています...",
     "noGpsTrack": "GPS トラックがありません",
     "noSessions": "セッションは記録されていません",
-    "overSessions": "{{count}} セッション全体",
     "pace": "ペース",
     "revalidate": "続く",
-    "sessionsCount_one": "{{count}} セッション",
-    "sessionsCount_other": "{{count}} セッション",
     "speed": "スピード",
     "start": "始める",
     "stravaWallDesc": "ランニングとサイクリングのセッションを自動的に同期して、世界記録を伸ばします。",
@@ -279,7 +276,11 @@
     "viewHistory": "履歴を見る",
     "weeklyGoal": "週間目標",
     "webRestrictionTitle": "有酸素運動はオンラインでは利用できません",
-    "webRestrictionDesc": "有酸素運動の追跡には、携帯電話でワークアウトを同期するためのGoogle Health Connectが必要です。この機能はウェブ版では利用できません。"
+    "webRestrictionDesc": "有酸素運動の追跡には、携帯電話でワークアウトを同期するためのGoogle Health Connectが必要です。この機能はウェブ版では利用できません。",
+    "overSessions_one": "{{count}} セッション全体",
+    "overSessions_other": "{{count}} セッション全体",
+    "sessionsCount_one": "{{count}} セッション",
+    "sessionsCount_other": "{{count}} セッション"
   },
   "clan": {
     "alreadyMember": "あなたはすでにこのクランに属しています",
@@ -652,7 +653,6 @@
     "uploadGallery": "ギャラリー"
   },
   "stats": {
-    "basedOnManual": "{{count}} マニュアル日{{plural}} に基づく",
     "basedOnManual_one": "{{count}} 手動日に基づく",
     "basedOnManual_other": "{{count}} 手動日数に基づく",
     "champion": "チャンピオン",
@@ -686,9 +686,8 @@
     "muscleBalance": "🕸️筋肉バランス",
     "notEnoughData": "📊 データがまだ不十分です",
     "ofYear": "今年の",
-    "overExercises": "{{count}} 運動{{plural}} · {{days}} 日{{dayPlural}} の努力",
-    "overExercises_one": "{{count}} 演習 · {{days}} 日の努力",
-    "overExercises_other": "{{count}} 演習全体 · {{days}} 日の努力",
+    "overExercises_one": "{{count}} 演習",
+    "overExercises_other": "{{count}} 演習全体",
     "pieLabels": {
       "afternoon": "午後",
       "evening": "夕方",
@@ -703,7 +702,9 @@
     "tabCharts": "グラフ",
     "tabDetails": "詳細",
     "selectAll": "すべて選択",
-    "deselectAll": "すべて解除"
+    "deselectAll": "すべて解除",
+    "daysOfEffort_one": "{{count}} 日の努力",
+    "daysOfEffort_other": "{{count}} 日の努力"
   },
   "store": {
     "historyDesc": "ワンアップトランザクション",
@@ -767,7 +768,6 @@
     "custom": "カスタム",
     "interDashboard": "ミックスエクササイズ",
     "interDashboardDesc": "すべてのダッシュボードの演習を組み合わせます。",
-    "launch": "開始 ({{count}} 演習{{plural}})",
     "launch_one": "開始 ({{count}} 演習)",
     "launch_other": "開始 ({{count}} 演習)",
     "reorderHint": "矢印またはドラッグで並び替え",

@@ -358,7 +358,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                             activeData={activeData}
                             trackedCount={trackedCount}
                             title={t('stats.consistency')}
-                            subTitle={t('stats.basedOnManual', { count: trackedCount, plural: trackedCount !== 1 ? 's' : '' })}
+                            subTitle={t('stats.basedOnManual', { count: trackedCount })}
                             emptyTitle={t('stats.notEnoughData')}
                             emptySub={t('stats.completeForHabits')}
                         />

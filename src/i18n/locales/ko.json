@@ -259,11 +259,8 @@
     "loading": "심장 강화 데이터 로드 중...",
     "noGpsTrack": "GPS 트랙 없음",
     "noSessions": "기록된 세션이 없습니다.",
-    "overSessions": "{{count}} 세션 전반에 걸쳐",
     "pace": "속도",
     "revalidate": "계속하다",
-    "sessionsCount_one": "{{count}} 세션",
-    "sessionsCount_other": "{{count}} 세션",
     "speed": "속도",
     "start": "시작",
     "stravaWallDesc": "달리기 및 사이클링 세션을 자동으로 동기화하여 글로벌 연속 기록을 달성하세요.",
@@ -279,7 +276,11 @@
     "viewHistory": "기록 보기",
     "weeklyGoal": "주간 목표",
     "webRestrictionTitle": "유산소 운동은 온라인에서 사용할 수 없습니다",
-    "webRestrictionDesc": "유산소 운동 추적 기능을 사용하려면 Google Health Connect가 필요합니다. 이 기능은 웹 버전에서 사용할 수 없습니다."
+    "webRestrictionDesc": "유산소 운동 추적 기능을 사용하려면 Google Health Connect가 필요합니다. 이 기능은 웹 버전에서 사용할 수 없습니다.",
+    "overSessions_one": "{{count}} 세션 전반에 걸쳐",
+    "overSessions_other": "{{count}} 세션 전반에 걸쳐",
+    "sessionsCount_one": "{{count}} 세션",
+    "sessionsCount_other": "{{count}} 세션"
   },
   "clan": {
     "alreadyMember": "귀하는 이미 이 클랜에 가입되어 있습니다.",
@@ -652,7 +653,6 @@
     "uploadGallery": "갱도"
   },
   "stats": {
-    "basedOnManual": "{{count}} 수동일{{plural}} 기준",
     "basedOnManual_one": "{{count}} 수동일 기준",
     "basedOnManual_other": "{{count}} 수동 일수 기준",
     "champion": "챔피언",
@@ -686,9 +686,8 @@
     "muscleBalance": "🕸️ 근육 균형",
     "notEnoughData": "📊 아직 데이터가 충분하지 않습니다.",
     "ofYear": "올해의",
-    "overExercises": "{{count}} 운동{{plural}} · {{days}}일{{dayPlural}} 동안의 노력",
-    "overExercises_one": "{{count}} 운동 전체 · {{days}}일 노력",
-    "overExercises_other": "{{count}}번의 연습 · {{days}}일의 노력",
+    "overExercises_one": "{{count}} 운동 전체",
+    "overExercises_other": "{{count}}번의 연습",
     "pieLabels": {
       "afternoon": "오후",
       "evening": "저녁",
@@ -703,7 +702,9 @@
     "tabCharts": "차트",
     "tabDetails": "세부정보",
     "selectAll": "모두 선택",
-    "deselectAll": "모두 해제"
+    "deselectAll": "모두 해제",
+    "daysOfEffort_one": "{{count}}일 노력",
+    "daysOfEffort_other": "{{count}}일의 노력"
   },
   "store": {
     "historyDesc": "원업 거래",
@@ -767,7 +768,6 @@
     "custom": "관습",
     "interDashboard": "혼합 운동",
     "interDashboardDesc": "모든 대시보드의 연습을 결합합니다.",
-    "launch": "시작({{count}} 운동{{plural}})",
     "launch_one": "시작({{count}} 운동)",
     "launch_other": "시작({{count}} 운동)",
     "reorderHint": "화살표 또는 드래그하여 순서 변경",

@@ -259,11 +259,8 @@
     "loading": "Загрузка данных кардио...",
     "noGpsTrack": "Нет данных GPS",
     "noSessions": "Нет записанных тренировок",
-    "overSessions": "За {{count}} сессий",
     "pace": "Темп",
     "revalidate": "Продолжить",
-    "sessionsCount_one": "{{count}} сессия",
-    "sessionsCount_other": "{{count}} сессий",
     "speed": "Скорость",
     "start": "Старт",
     "stravaWallDesc": "Автоматически синхронизируйте свои пробежки и велопоездки, чтобы продвигаться в глобальной серии.",
@@ -279,7 +276,11 @@
     "viewHistory": "Посмотреть историю",
     "weeklyGoal": "Цель на неделю",
     "webRestrictionTitle": "Кардио недоступно онлайн",
-    "webRestrictionDesc": "Для отслеживания кардио требуется Google Health Connect для синхронизации тренировок на телефоне. Эта функция недоступна в веб-версии."
+    "webRestrictionDesc": "Для отслеживания кардио требуется Google Health Connect для синхронизации тренировок на телефоне. Эта функция недоступна в веб-версии.",
+    "overSessions_one": "За {{count}} сессию",
+    "overSessions_other": "За {{count}} сессий",
+    "sessionsCount_one": "{{count}} сессия",
+    "sessionsCount_other": "{{count}} сессий"
   },
   "clan": {
     "alreadyMember": "Вы уже в этом клане",
@@ -652,7 +653,6 @@
     "uploadGallery": "Галерея"
   },
   "stats": {
-    "basedOnManual": "На основе {{count}} ручных дней",
     "basedOnManual_one": "На основе {{count}} ручного дня",
     "basedOnManual_other": "На основе {{count}} ручных дней",
     "champion": "Чемпион",
@@ -686,9 +686,8 @@
     "muscleBalance": "🕸️ Баланс мышц",
     "notEnoughData": "📊 Недостаточно данных",
     "ofYear": "В этом году",
-    "overExercises": "в {{count}} упражнени{{plural}} · {{days}} дне{{dayPlural}} работы",
-    "overExercises_one": "в {{count}} упражнении · {{days}} день работы",
-    "overExercises_other": "в {{count}} упражнениях · {{days}} дней работы",
+    "overExercises_one": "в {{count}} упражнении",
+    "overExercises_other": "в {{count}} упражнениях",
     "pieLabels": {
       "afternoon": "День",
       "evening": "Вечер",
@@ -703,7 +702,9 @@
     "tabCharts": "Графики",
     "tabDetails": "Детали",
     "selectAll": "Выбрать все",
-    "deselectAll": "Снять выделение"
+    "deselectAll": "Снять выделение",
+    "daysOfEffort_one": "{{count}} день работы",
+    "daysOfEffort_other": "{{count}} дней работы"
   },
   "store": {
     "historyDesc": "Транзакция OneUp",
@@ -767,7 +768,6 @@
     "custom": "Пользовательский",
     "interDashboard": "Смешать упражнения",
     "interDashboardDesc": "Объединить упражнения со всех панелей.",
-    "launch": "Начать ({{count}} упражнени{{plural}})",
     "launch_one": "Начать ({{count}} упражнение)",
     "launch_other": "Начать ({{count}} упражнений)",
     "reorderHint": "Используйте стрелки или перетащите для изменения порядка",

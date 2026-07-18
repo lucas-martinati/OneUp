@@ -104,7 +104,7 @@ export function StatsOverviewCards({
                         />
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
-                        {isCardioHero ? t('cardio.overSessions', { count: cardioSessionsCount }) : t('stats.overExercises', { count: exercisesCount, days: totalDays, plural: totalDays !== 1 ? 's' : '' })}
+                        {isCardioHero ? t('cardio.overSessions', { count: cardioSessionsCount }) : `${t('stats.overExercises', { count: exercisesCount })} · ${t('stats.daysOfEffort', { count: totalDays })}`}
                     </div>
                 </div>
             </div>

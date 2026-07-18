@@ -259,11 +259,8 @@
     "loading": "Cardio-Daten werden geladen...",
     "noGpsTrack": "Kein GPS-Track",
     "noSessions": "Keine Sitzungen aufgezeichnet",
-    "overSessions": "Über {{count}} Sitzungen hinweg",
     "pace": "Tempo",
     "revalidate": "Weitermachen",
-    "sessionsCount_one": "{{count}} Sitzung",
-    "sessionsCount_other": "{{count}} Sitzungen",
     "speed": "Geschwindigkeit",
     "start": "Start",
     "stravaWallDesc": "Synchronisieren Sie Ihre Lauf- und Radfahreinheiten automatisch, um Ihre globale Erfolgsserie voranzutreiben.",
@@ -279,7 +276,11 @@
     "viewHistory": "Verlauf anzeigen",
     "weeklyGoal": "Wöchentliches Ziel",
     "webRestrictionTitle": "Cardio online nicht verfügbar",
-    "webRestrictionDesc": "Für das Cardio-Tracking ist Google Health Connect erforderlich. Diese Funktion ist in der Webversion nicht verfügbar."
+    "webRestrictionDesc": "Für das Cardio-Tracking ist Google Health Connect erforderlich. Diese Funktion ist in der Webversion nicht verfügbar.",
+    "overSessions_one": "Über {{count}} Sitzung hinweg",
+    "overSessions_other": "Über {{count}} Sitzungen hinweg",
+    "sessionsCount_one": "{{count}} Sitzung",
+    "sessionsCount_other": "{{count}} Sitzungen"
   },
   "clan": {
     "alreadyMember": "Du bist bereits in diesem Clan",
@@ -652,7 +653,6 @@
     "uploadGallery": "Galerie"
   },
   "stats": {
-    "basedOnManual": "Basierend auf {{count}} manuellem Tag{{plural}}",
     "basedOnManual_one": "Basierend auf {{count}} manuellen Tag",
     "basedOnManual_other": "Basierend auf {{count}} manuellen Tagen",
     "champion": "Champion",
@@ -686,9 +686,8 @@
     "muscleBalance": "🕸️ Muskelbalance",
     "notEnoughData": "📊 Noch nicht genügend Daten",
     "ofYear": "Des Jahres",
-    "overExercises": "über {{count}} Übung{{plural}} · {{days}} Tag{{dayPlural}} Aufwand",
-    "overExercises_one": "über {{count}} Übung · {{days}} Tag der Anstrengung",
-    "overExercises_other": "über {{count}} Übungen · {{days}} Tage Aufwand",
+    "overExercises_one": "über {{count}} Übung",
+    "overExercises_other": "über {{count}} Übungen",
     "pieLabels": {
       "afternoon": "Nachmittag",
       "evening": "Abend",
@@ -703,7 +702,9 @@
     "tabCharts": "Diagramme",
     "tabDetails": "Details",
     "selectAll": "Alle auswählen",
-    "deselectAll": "Alle abwählen"
+    "deselectAll": "Alle abwählen",
+    "daysOfEffort_one": "{{count}} Tag der Anstrengung",
+    "daysOfEffort_other": "{{count}} Tage Aufwand"
   },
   "store": {
     "historyDesc": "OneUp-Transaktion",
@@ -767,7 +768,6 @@
     "custom": "Brauch",
     "interDashboard": "Mischen Sie Übungen",
     "interDashboardDesc": "Kombinieren Sie Übungen aus allen Dashboards.",
-    "launch": "Start ({{count}} Übung{{plural}})",
     "launch_one": "Start ({{count}} Übung)",
     "launch_other": "Start ({{count}} Übungen)",
     "reorderHint": "Pfeile oder Ziehen zum Umordnen",

@@ -259,11 +259,8 @@
     "loading": "正在加载有氧运动数据...",
     "noGpsTrack": "无 GPS 轨迹",
     "noSessions": "暂无训练记录",
-    "overSessions": "共 {{count}} 次训练",
     "pace": "配速",
     "revalidate": "继续",
-    "sessionsCount_one": "{{count}} 次训练",
-    "sessionsCount_other": "{{count}} 次训练",
     "speed": "速度",
     "start": "起点",
     "stravaWallDesc": "自动同步您的跑步和骑行活动，以提升您的全球连胜记录。",
@@ -279,7 +276,11 @@
     "viewHistory": "查看历史",
     "weeklyGoal": "每周目标",
     "webRestrictionTitle": "有氧运动在线不可用",
-    "webRestrictionDesc": "有氧运动跟踪需要Google Health Connect来在手机上同步您的锻炼。此功能在网页版上不可用。"
+    "webRestrictionDesc": "有氧运动跟踪需要Google Health Connect来在手机上同步您的锻炼。此功能在网页版上不可用。",
+    "overSessions_one": "共 {{count}} 次训练",
+    "overSessions_other": "共 {{count}} 次训练",
+    "sessionsCount_one": "{{count}} 次训练",
+    "sessionsCount_other": "{{count}} 次训练"
   },
   "clan": {
     "alreadyMember": "您已经在这个公会中",
@@ -652,7 +653,6 @@
     "uploadGallery": "相册"
   },
   "stats": {
-    "basedOnManual": "基于{{count}}个手动记录的天数",
     "basedOnManual_one": "基于{{count}}个手动记录的天数",
     "basedOnManual_other": "基于{{count}}个手动记录的天数",
     "champion": "冠军",
@@ -686,9 +686,8 @@
     "muscleBalance": "🕸️ 肌肉平衡",
     "notEnoughData": "📊 数据不足",
     "ofYear": "本年度",
-    "overExercises": "共{{count}}项运动 · {{days}}天努力",
-    "overExercises_one": "共{{count}}项运动 · {{days}}天努力",
-    "overExercises_other": "共{{count}}项运动 · {{days}}天努力",
+    "overExercises_one": "共{{count}}项运动",
+    "overExercises_other": "共{{count}}项运动",
     "pieLabels": {
       "afternoon": "下午",
       "evening": "晚上",
@@ -703,7 +702,9 @@
     "tabCharts": "图表",
     "tabDetails": "详情",
     "selectAll": "全选",
-    "deselectAll": "取消全选"
+    "deselectAll": "取消全选",
+    "daysOfEffort_one": "{{count}}天努力",
+    "daysOfEffort_other": "{{count}}天努力"
   },
   "store": {
     "historyDesc": "OneUp 交易",
@@ -767,7 +768,6 @@
     "custom": "自定义",
     "interDashboard": "混合运动",
     "interDashboardDesc": "合并所有仪表板的运动。",
-    "launch": "开始 ({{count}} 项运动)",
     "launch_one": "开始 ({{count}} 项运动)",
     "launch_other": "开始 ({{count}} 项运动)",
     "reorderHint": "使用箭头或拖动来重新排序",

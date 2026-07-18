@@ -259,11 +259,8 @@
     "loading": "Loading cardio data...",
     "noGpsTrack": "No GPS track",
     "noSessions": "No sessions recorded",
-    "overSessions": "Across {{count}} sessions",
     "pace": "Pace",
     "revalidate": "Continue",
-    "sessionsCount_one": "{{count}} session",
-    "sessionsCount_other": "{{count}} sessions",
     "speed": "Speed",
     "start": "Start",
     "stravaWallDesc": "Automatically sync your running and cycling sessions to progress your global streak.",
@@ -279,7 +276,11 @@
     "viewHistory": "View history",
     "weeklyGoal": "Weekly goal",
     "webRestrictionTitle": "Cardio not available online",
-    "webRestrictionDesc": "Cardio tracking requires Google Health Connect to sync your workouts directly on your phone. This feature is not available on the web version."
+    "webRestrictionDesc": "Cardio tracking requires Google Health Connect to sync your workouts directly on your phone. This feature is not available on the web version.",
+    "overSessions_one": "Across {{count}} session",
+    "overSessions_other": "Across {{count}} sessions",
+    "sessionsCount_one": "{{count}} session",
+    "sessionsCount_other": "{{count}} sessions"
   },
   "clan": {
     "alreadyMember": "You are already in this clan",
@@ -667,7 +668,6 @@
     "uploadGallery": "Gallery"
   },
   "stats": {
-    "basedOnManual": "Based on {{count}} manual day{{plural}}",
     "basedOnManual_one": "Based on {{count}} manual day",
     "basedOnManual_other": "Based on {{count}} manual days",
     "champion": "Champion",
@@ -701,9 +701,8 @@
     "muscleBalance": "🕸️ Muscle Balance",
     "notEnoughData": "📊 Not enough data yet",
     "ofYear": "Of the year",
-    "overExercises": "across {{count}} exercise{{plural}} · {{days}} day{{dayPlural}} of effort",
-    "overExercises_one": "across {{count}} exercise · {{days}} day of effort",
-    "overExercises_other": "across {{count}} exercises · {{days}} days of effort",
+    "overExercises_one": "across {{count}} exercise",
+    "overExercises_other": "across {{count}} exercises",
     "pieLabels": {
       "afternoon": "Afternoon",
       "evening": "Evening",
@@ -718,7 +717,9 @@
     "tabCharts": "Charts",
     "tabDetails": "Details",
     "selectAll": "Select all",
-    "deselectAll": "Deselect all"
+    "deselectAll": "Deselect all",
+    "daysOfEffort_one": "{{count}} day of effort",
+    "daysOfEffort_other": "{{count}} days of effort"
   },
   "store": {
     "historyDesc": "OneUp Transaction",
@@ -782,7 +783,6 @@
     "custom": "Custom",
     "interDashboard": "Mix exercises",
     "interDashboardDesc": "Combine exercises from all dashboards.",
-    "launch": "Start ({{count}} exercise{{plural}})",
     "launch_one": "Start ({{count}} exercise)",
     "launch_other": "Start ({{count}} exercises)",
     "reorderHint": "Use arrows or drag to reorder",
