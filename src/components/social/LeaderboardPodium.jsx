@@ -65,21 +65,21 @@ export function LeaderboardPodium({ items, currentUid, todayStr, onSelect, clanD
                             {slot === 0 && <Crown className={styles.pCrown} size={24} color={PALETTE.gold} fill={PALETTE.gold} />}
                             {isPerfect && (
                                 <>
-                                    <Star className="sparkle-icon" size={11} fill={PALETTE.gold} style={{ top: '-2px', left: '-4px', animationDelay: '0s' }} />
+                                    <Star className="sparkle-icon" size={12} fill={PALETTE.gold} style={{ top: '-2px', left: '-4px', animationDelay: '0s' }} />
                                     <Star className="sparkle-icon" size={8} fill={PALETTE.gold} style={{ bottom: '4px', right: '-4px', animationDelay: '1.5s' }} />
-                                    <Star className="sparkle-icon" size={9} fill={PALETTE.gold} style={{ top: '45%', right: '-7px', animationDelay: '2.8s' }} />
+                                    <Star className="sparkle-icon" size={10} fill={PALETTE.gold} style={{ top: '45%', right: '-7px', animationDelay: '2.8s' }} />
                                 </>
                             )}
                             <Avatar photoURL={entry.photoURL} name={entry.pseudo} size={avatarSize} borderColor={isPerfect ? PALETTE.gold : medal.border} />
 
                             {showVerifiedShield && (
                                 <span className={styles.pShield} style={{ background: 'var(--success)' }}>
-                                    <Shield size={11} color="#fff" />
+                                    <Shield size={12} color="#fff" />
                                 </span>
                             )}
                             {showSuspiciousShield && (
                                 <span className={styles.pShield} style={{ background: 'var(--warning)' }}>
-                                    <ShieldAlert size={11} color="#fff" />
+                                    <ShieldAlert size={12} color="#fff" />
                                 </span>
                             )}
 

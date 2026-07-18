@@ -48,8 +48,8 @@ export function LeaderboardRow({
         <div className={rowCls.join(' ')} onClick={() => onSelect(entry)}>
             {isPerfect && (
                 <>
-                    <Star className="sparkle-icon" size={9} fill="#FFD700" style={{ top: '18%', left: '30%', animationDelay: '0s' }} />
-                    <Star className="sparkle-icon" size={7} fill="#FFD700" style={{ top: '55%', left: '52%', animationDelay: '1.6s' }} />
+                    <Star className="sparkle-icon" size={10} fill="#FFD700" style={{ top: '18%', left: '30%', animationDelay: '0s' }} />
+                    <Star className="sparkle-icon" size={8} fill="#FFD700" style={{ top: '55%', left: '52%', animationDelay: '1.6s' }} />
                     <Star className="sparkle-icon" size={10} fill="#FFD700" style={{ top: '22%', right: '22%', animationDelay: '3s' }} />
                 </>
             )}
@@ -62,7 +62,7 @@ export function LeaderboardRow({
                     <span className={`${styles.name} ${nameCls}`}>
                         {isMe ? `${entry.pseudo} (${t('common.you')})` : entry.pseudo}
                     </span>
-                    {isPerfect && <Star size={13} color="#fbbf24" fill="#fbbf24" className={styles.perfectStar} />}
+                    {isPerfect && <Star size={14} color="#fbbf24" fill="#fbbf24" className={styles.perfectStar} />}
                     {getTierBadgeConfigs(entry).map(badge => {
                         const BadgeIcon = badge.icon;
                         return (

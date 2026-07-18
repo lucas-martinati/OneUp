@@ -218,9 +218,9 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                     }}>
                         {isPerfect && (
                             <>
-                                <Star className="sparkle-icon" size={13} fill={PALETTE.gold} style={{ top: '-4px', left: '-2px', animationDelay: '0s' }} />
+                                <Star className="sparkle-icon" size={14} fill={PALETTE.gold} style={{ top: '-4px', left: '-2px', animationDelay: '0s' }} />
                                 <Star className="sparkle-icon" size={10} fill={PALETTE.gold} style={{ bottom: '2px', right: '-4px', animationDelay: '1.6s' }} />
-                                <Star className="sparkle-icon" size={11} fill={PALETTE.gold} style={{ top: '46%', right: '-8px', animationDelay: '2.9s' }} />
+                                <Star className="sparkle-icon" size={12} fill={PALETTE.gold} style={{ top: '46%', right: '-8px', animationDelay: '2.9s' }} />
                             </>
                         )}
                         <Avatar photoURL={entry.photoURL} name={entry.pseudo} size={76} borderColor={isPerfect ? PALETTE.gold : rankColor} />
@@ -263,7 +263,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                                                 WebkitTextFillColor: 'initial'
                                             }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', fontSize: '0.8rem', fontWeight: '700', color: badge.color }}>
-                                                    <BadgeIcon size={13} color={badge.color} fill={badge.fill} />
+                                                    <BadgeIcon size={14} color={badge.color} fill={badge.fill} />
                                                     {info.title}
                                                 </div>
                                                 <div style={{ fontSize: '0.68rem', fontWeight: '500', lineHeight: 1.35, color: 'var(--text-secondary)', marginTop: '3px' }}>
