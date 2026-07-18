@@ -619,6 +619,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                     const num = isCardio ? getCurrentWeekNumber(startDate, new Date(dateString)) : dayNum;
                     const goal = getDailyGoal(ex, num, exDiff, isCardio);
                     const done = !!(dayCompletions[ex.id] || {}).isCompleted;
+                    const currentCount = (dayCompletions[ex.id] || {}).count || (done ? goal : 0);
                     return (
                         <div
                             key={ex.id}
@@ -633,19 +634,23 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                                     {getExerciseLabel(ex, t)}
                                 </div>
                                 <div className={styles.exSub}>
-                                    {t('calendar.repsCount', { done: done ? goal : 0, goal })}
                                     <DifficultyBadge difficulty={exDiff} />
                                 </div>
                             </div>
                             {done ? (
                                 <>
                                     <span className={styles.exReps} style={{ color: ex.color }}>
-                                        {goal.toLocaleString()}<span className={styles.exRepsUnit}>{t('common.reps')}</span>
+                                        {currentCount.toLocaleString()}<span className={styles.exRepsUnit}>{t('common.reps')}</span>
                                     </span>
                                     <CheckCircle2 size={22} color={ex.color} strokeWidth={2.2} />
                                 </>
                             ) : (
-                                <span className={styles.exTodoMark} aria-hidden />
+                                <>
+                                    <span className={styles.exReps} style={{ color: 'var(--text-secondary)' }}>
+                                        {currentCount.toLocaleString()}/{goal.toLocaleString()}<span className={styles.exRepsUnit} style={{ marginLeft: 2 }}>{t('common.reps')}</span>
+                                    </span>
+                                    <span className={styles.exTodoMark} aria-hidden />
+                                </>
                             )}
                         </div>
                     );
