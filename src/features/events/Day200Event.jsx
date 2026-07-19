@@ -298,9 +298,14 @@ const Day200Styles = memo(() => (
           pointer-events: none;
           padding: 8px 16px;
           border-radius: 16px;
-          background: rgb(28, 10, 4);
-          border: 1px solid rgba(249, 115, 22, 0.28);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+          background: rgba(48, 18, 8, 0.85) !important;
+          backdrop-filter: blur(16px) !important;
+          -webkit-backdrop-filter: blur(16px) !important;
+          border: 1px solid rgba(249, 115, 22, 0.3) !important;
+          box-shadow: 0 0 18px rgba(249, 115, 22, 0.10), inset 0 0 30px rgba(251, 191, 36, 0.05) !important;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          will-change: transform, opacity;
           animation: d200ThermoIn 0.5s ease-out;
         }
         .d200-thermo-temp {
