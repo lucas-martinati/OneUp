@@ -510,7 +510,7 @@ const Day200Decor = memo(() => (
 const mercuryColor = (pct) =>
     `rgb(${Math.round(lerp(239, 56, pct))}, ${Math.round(lerp(68, 189, pct))}, ${Math.round(lerp(68, 248, pct))})`;
 
-function HeatThermometer({ reps = 0, goal = SWEAT_GOAL, onSolve, placement = 'dashboard' }) {
+function HeatThermometer({ reps = 0, goal = SWEAT_GOAL, onSolve, placement = 'dashboard', hidden = false }) {
     const pct = Math.min(reps / goal, 1);
     const cooled = reps >= goal;
 
@@ -525,7 +525,11 @@ function HeatThermometer({ reps = 0, goal = SWEAT_GOAL, onSolve, placement = 'da
     const fill = lerp(92, 16, pct);
 
     return (
-        <div className={`d200-thermo d200-thermo--${placement}`}>
+        <div className={`d200-thermo d200-thermo--${placement}`} style={{
+            opacity: hidden ? 0 : 1,
+            pointerEvents: hidden ? 'none' : 'auto',
+            transition: 'opacity 0.3s ease'
+        }}>
             <div className="d200-thermo-temp" style={{ color }}>{temp}°C</div>
             <div className="d200-thermo-body">
                 <div className="d200-thermo-tube">
@@ -557,11 +561,11 @@ function Day200DecorOverlay() {
 }
 
 // HUD intégré (rendu par le Dashboard / l'ExercisePanel via <EventHud />).
-function Day200Hud({ onSolve, reps, goal, placement }) {
+function Day200Hud({ onSolve, reps, goal, placement, hidden }) {
     return (
         <>
             <Day200Styles />
-            <HeatThermometer reps={reps} goal={goal} onSolve={onSolve} placement={placement} />
+            <HeatThermometer reps={reps} goal={goal} onSolve={onSolve} placement={placement} hidden={hidden} />
         </>
     );
 }

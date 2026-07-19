@@ -443,7 +443,7 @@ const Day300Decor = memo(() => (
 // ============================================================================
 // 3. CONSTELLATION : la mécanique vivante (valider des exercices → ciel rallumé)
 // ============================================================================
-function ExerciseConstellation({ validated = 0, goal = VALIDATE_GOAL, onSolve, placement = 'dashboard' }) {
+function ExerciseConstellation({ validated = 0, goal = VALIDATE_GOAL, onSolve, placement = 'dashboard', hidden = false }) {
     const lit = Math.min(validated, goal);
     const complete = goal > 0 && validated >= goal;
 
@@ -453,7 +453,11 @@ function ExerciseConstellation({ validated = 0, goal = VALIDATE_GOAL, onSolve, p
     }, [complete, onSolve]);
 
     return (
-        <div className={`d300-constellation d300-constellation--${placement}`}>
+        <div className={`d300-constellation d300-constellation--${placement}`} style={{
+            opacity: hidden ? 0 : 1,
+            pointerEvents: hidden ? 'none' : 'auto',
+            transition: 'opacity 0.3s ease'
+        }}>
             <div className="d300-constellation-label">
                 {complete ? 'Constellation rallumée ✦' : 'Valide des exercices'}
             </div>
@@ -478,11 +482,11 @@ function Day300DecorOverlay() {
 }
 
 // HUD intégré (rendu par le Dashboard / l'ExercisePanel via <EventHud />).
-function Day300Hud({ onSolve, validated, goal, placement }) {
+function Day300Hud({ onSolve, validated, goal, placement, hidden }) {
     return (
         <>
             <Day300Styles />
-            <ExerciseConstellation validated={validated} goal={goal} onSolve={onSolve} placement={placement} />
+            <ExerciseConstellation validated={validated} goal={goal} onSolve={onSolve} placement={placement} hidden={hidden} />
         </>
     );
 }
