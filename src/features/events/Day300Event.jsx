@@ -82,6 +82,7 @@ const Day300Styles = () => (
             radial-gradient(ellipse at 50% 88%, rgba(129, 140, 248, 0.14) 0%, transparent 60%);
           pointer-events: none;
           z-index: 0;
+          will-change: transform, opacity;
           animation: d300Nebula 12s ease-in-out infinite alternate;
         }
         @keyframes d300Nebula {
@@ -95,6 +96,7 @@ const Day300Styles = () => (
           position: absolute;
           border-radius: 50%;
           background: #fff;
+          will-change: transform, opacity;
           animation: d300Twinkle ease-in-out infinite;
         }
         @keyframes d300Twinkle {
@@ -113,6 +115,7 @@ const Day300Styles = () => (
             radial-gradient(ellipse 35% 100% at 50% 0%, rgba(45, 212, 191, 0.16) 0%, transparent 70%);
           filter: blur(8px);
           opacity: 0.8;
+          will-change: transform, opacity;
           animation: d300Aurora 14s ease-in-out infinite alternate;
         }
         @keyframes d300Aurora {
@@ -126,6 +129,7 @@ const Day300Styles = () => (
           width: 2px; height: 2px; border-radius: 50%;
           background: #fff;
           box-shadow: 0 0 6px 1px rgba(255,255,255,0.9);
+          will-change: transform, opacity;
           animation: d300Shoot linear infinite;
         }
         .d300-shooting::after {
@@ -154,12 +158,6 @@ const Day300Styles = () => (
           -webkit-text-fill-color: transparent !important;
           color: transparent !important;
           filter: drop-shadow(0 0 14px rgba(129, 140, 248, 0.55)) !important;
-          animation: d300StarFlow 7s ease infinite !important;
-        }
-        @keyframes d300StarFlow {
-          0%   { background-position: 0% 50%; }
-          50%  { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
         }
 
         /* ── Label du jour : cyan stellaire ── */
@@ -183,15 +181,14 @@ const Day300Styles = () => (
           -webkit-text-fill-color: transparent !important;
           color: transparent !important;
           filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.45)) !important;
-          animation: d300StarFlow 8s ease infinite !important;
         }
         .day300-global .app-logo-text::after { content: ' ✦'; font-size: 0.8em; }
 
         /* ── Bouton central : astre (le border est volontairement laissé à l'anneau) ── */
         .day300-global .counter-button {
           background: radial-gradient(circle at 50% 38%, rgba(129, 140, 248, 0.3), rgba(10, 12, 34, 0.5)) !important;
-          box-shadow: 0 0 34px rgba(56, 189, 248, 0.5), inset 0 0 26px rgba(129, 140, 248, 0.4) !important;
-          animation: counterBlobMorph 9s ease-in-out infinite, d300AstroPulse 4s ease-in-out infinite !important;
+          box-shadow: 0 0 42px rgba(56, 189, 248, 0.5), inset 0 0 26px rgba(129, 140, 248, 0.4) !important;
+          animation: counterBlobMorph 9s ease-in-out infinite !important;
         }
         /* ── Anneau de progression de l'année : teinte cosmique ── */
         .day300-global .counter-ring {
@@ -206,10 +203,6 @@ const Day300Styles = () => (
         .day300-global .counter-button svg {
           color: #7dd3fc !important;
           filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.8)) !important;
-        }
-        @keyframes d300AstroPulse {
-          0%, 100% { box-shadow: 0 0 30px rgba(56,189,248,0.45), inset 0 0 22px rgba(129,140,248,0.35); }
-          50%      { box-shadow: 0 0 52px rgba(129,140,248,0.8), inset 0 0 36px rgba(56,189,248,0.6); }
         }
 
         /* ── Header : verre cosmique ── */
@@ -341,9 +334,9 @@ const Day300Styles = () => (
         @keyframes d300SplashIn  { 0% { opacity: 0; } 100% { opacity: 1; } }
         @keyframes d300SplashOut { 0% { opacity: 1; } 100% { opacity: 0; transform: scale(1.05); } }
         @keyframes d300BigNum {
-          0%   { opacity: 0; transform: scale(0.4) translateY(20px); filter: blur(14px); letter-spacing: 30px; }
-          60%  { opacity: 1; transform: scale(1.08) translateY(-4px); filter: blur(0); letter-spacing: 6px; }
-          100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); letter-spacing: 6px; }
+          0%   { opacity: 0; transform: scale(0.4) translateY(20px); }
+          60%  { opacity: 1; transform: scale(1.08) translateY(-4px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
         }
         @keyframes d300Rise {
           0%   { opacity: 0; transform: translateY(16px); }
@@ -536,6 +529,7 @@ function Day300IntroModal({ onDismiss }) {
                 borderRadius: '50%',
                 border: '1px solid rgba(129, 140, 248, 0.25)',
                 boxShadow: '0 0 60px rgba(56, 189, 248, 0.15) inset',
+                willChange: 'transform',
                 animation: 'd300CardOrbit 24s linear infinite',
             }}>
                 <div style={{
@@ -566,7 +560,8 @@ function Day300IntroModal({ onDismiss }) {
                     WebkitBackgroundClip: 'text', backgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     filter: 'drop-shadow(0 0 30px rgba(129, 140, 248, 0.5))',
-                    animation: 'd300BigNum 1s cubic-bezier(0.22, 1, 0.36, 1) both, d300StarFlow 7s ease infinite',
+                    letterSpacing: '6px',
+                    animation: 'd300BigNum 1s cubic-bezier(0.22, 1, 0.36, 1) both',
                 }}>
                     300
                 </div>
@@ -698,7 +693,7 @@ function Day300RewardAnimation({ onComplete }) {
                         backgroundSize: '200% 200%',
                         WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent',
                         filter: 'drop-shadow(0 0 30px rgba(129, 140, 248, 0.6))',
-                        animation: 'd300RewardReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), d300StarFlow 5s ease infinite',
+                        animation: 'd300RewardReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
                         letterSpacing: '2px',
                     }}>
                         CIEL RALLUMÉ
