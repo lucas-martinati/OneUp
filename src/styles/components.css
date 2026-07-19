@@ -63,6 +63,7 @@ button:focus:not(:focus-visible) {
 .modal-overlay.fade-in > .modal-content {
   animation: panelEnter var(--motion-panel) var(--ease-panel-in);
   transform-origin: top center;
+  will-change: transform, opacity;
 }
 
 @media (min-width: 600px) {
@@ -131,6 +132,7 @@ button:focus:not(:focus-visible) {
     0 24px 64px rgba(0, 0, 0, 0.5),
     0 0 40px color-mix(in srgb, var(--accent-glow) 8%, transparent);
   animation: dialogPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, opacity;
 }
 
 .dialog-card--danger {
