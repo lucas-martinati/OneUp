@@ -15,7 +15,7 @@
 .bubble {
   width: 56px;
   height: 56px;
-  border-radius: 58% 42% 56% 44% / 53% 47% 53% 47%;
+  border-radius: 58% 42% 56% 44% / 53% 47%;
   /* Dark Glassmorphism with radial glare */
   background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 60%),
               linear-gradient(135deg, rgba(20, 20, 35, 0.9) 0%, rgba(10, 10, 15, 0.95) 100%);
@@ -47,7 +47,7 @@
    breathe in phase (border-radius only — never clobbers the transforms used
    for centering, scaling and the entry animation). */
 @keyframes bubbleBlobMorph {
-  0%, 100% { border-radius: 58% 42% 56% 44% / 53% 47% 53% 47%; }
+  0%, 100% { border-radius: 58% 42% 56% 44% / 53% 47%; }
   25%      { border-radius: 46% 54% 43% 57% / 57% 43% 56% 44%; }
   50%      { border-radius: 53% 47% 52% 48% / 44% 57% 43% 56%; }
   75%      { border-radius: 44% 56% 57% 43% / 49% 52% 48% 51%; }
@@ -81,7 +81,7 @@
   inset: 0;
   padding: 2.5px;
   pointer-events: none;
-  border-radius: 58% 42% 56% 44% / 53% 47% 53% 47%;
+  border-radius: 58% 42% 56% 44% / 53% 47%;
   animation: bubbleBlobMorph 9s ease-in-out infinite;
   filter: drop-shadow(0 0 3px rgba(167, 139, 250, 0.55));
   z-index: 1;
@@ -102,7 +102,7 @@
   inset: -3px;
   padding: 3px;
   pointer-events: none;
-  border-radius: 58% 42% 56% 44% / 53% 47% 53% 47%;
+  border-radius: 58% 42% 56% 44% / 53% 47%;
   animation: bubbleBlobMorph 9s ease-in-out infinite;
   filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.8));
   z-index: 3;
@@ -163,7 +163,7 @@
   left: 50%;
   width: 68px;
   height: 68px;
-  border-radius: 58% 42% 56% 44% / 53% 47% 53% 47%;
+  border-radius: 58% 42% 56% 44% / 53% 47%;
   border: 1.5px solid rgba(167, 139, 250, 0.35);
   background: radial-gradient(circle, rgba(167, 139, 250, 0.04) 0%, transparent 70%);
   animation: bubblePulseGlow 2.5s cubic-bezier(0.25, 0, 0, 1) infinite,
@@ -174,7 +174,7 @@
 /* ── Trail Sphere (fixed-position, rAF-driven) ───────────────────── */
 
 .trailSphereFixed {
-  border-radius: 56% 44% 54% 46% / 52% 48% 52% 48%;
+  border-radius: 56% 44% 54% 46% / 52% 48%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -205,7 +205,7 @@
 .overflowBadgeFixed {
   width: 24px;
   height: 24px;
-  border-radius: 56% 44% 54% 46% / 52% 48% 52% 48%;
+  border-radius: 56% 44% 54% 46% / 52% 48%;
   background: rgba(255, 255, 255, 0.08);
   border: 1.5px solid rgba(255, 255, 255, 0.15);
   display: flex;
