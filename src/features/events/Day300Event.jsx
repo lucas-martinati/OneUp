@@ -34,7 +34,7 @@ const validatedCount = ({ today, dayNumber, getExerciseCount, getConfig, complet
 // ============================================================================
 // 1. STYLES CSS (Injectés uniquement pour cet événement)
 // ============================================================================
-const Day300Styles = () => (
+const Day300Styles = memo(() => (
     <style dangerouslySetInnerHTML={{ __html: `
         /* ── PALETTE "ASCENSION COSMIQUE" : indigo nuit + cyan + or ──
            On redéfinit les tokens du thème sur la racine de l'event. */
@@ -208,9 +208,8 @@ const Day300Styles = () => (
         /* ── Header : verre cosmique ── */
         .day300-global .dashboard-header {
           border-color: rgba(129, 140, 248, 0.3) !important;
-          background: rgba(18, 20, 48, 0.20) !important;
+          background: rgba(18, 20, 48, 0.85) !important;
           box-shadow: 0 0 18px rgba(56, 189, 248, 0.10), inset 0 0 30px rgba(129, 140, 248, 0.05) !important;
-          backdrop-filter: blur(2px);
         }
 
         /* ── Tuiles d'exercices : plaques de vaisseau ── */
@@ -270,9 +269,7 @@ const Day300Styles = () => (
           pointer-events: none;
           padding: 8px 16px;
           border-radius: 16px;
-          background: rgba(8, 10, 28, 0.55);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
+          background: rgba(8, 10, 28, 0.9);
           border: 1px solid rgba(129, 140, 248, 0.28);
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
           animation: d300ConstellationIn 0.5s ease-out;
@@ -391,7 +388,7 @@ const Day300Styles = () => (
           .day300-global .app-logo-text, .day300-global .counter-button { animation: none !important; }
         }
     `}} />
-);
+));
 
 
 // ============================================================================

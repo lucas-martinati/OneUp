@@ -35,7 +35,7 @@ const lerp = (a, b, t) => a + (b - a) * t;
 // ============================================================================
 // 1. STYLES CSS (Injectés uniquement pour cet événement)
 // ============================================================================
-const Day200Styles = () => (
+const Day200Styles = memo(() => (
     <style dangerouslySetInnerHTML={{ __html: `
         /* ── PALETTE "CANICULE" : fournaise ambre / orange / braise ── */
         .day200-global {
@@ -236,9 +236,8 @@ const Day200Styles = () => (
         /* ── Header ── */
         .day200-global .dashboard-header {
           border-color: rgba(249, 115, 22, 0.3) !important;
-          background: rgba(54, 20, 8, 0.22) !important;
+          background: rgba(48, 18, 8, 0.85) !important;
           box-shadow: 0 0 18px rgba(249, 115, 22, 0.10), inset 0 0 30px rgba(251, 191, 36, 0.05) !important;
-          backdrop-filter: blur(2px);
         }
 
         /* ── Tuiles d'exercices : plaques chauffées ── */
@@ -298,9 +297,7 @@ const Day200Styles = () => (
           pointer-events: none;
           padding: 8px 16px;
           border-radius: 16px;
-          background: rgba(28, 10, 4, 0.55);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
+          background: rgb(28, 10, 4);
           border: 1px solid rgba(249, 115, 22, 0.28);
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
           animation: d200ThermoIn 0.5s ease-out;
@@ -444,7 +441,7 @@ const Day200Styles = () => (
           .day200-global .app-logo-text, .day200-global .counter-button { animation: none !important; }
         }
     `}} />
-);
+));
 
 
 // ============================================================================

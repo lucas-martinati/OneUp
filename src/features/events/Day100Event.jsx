@@ -13,7 +13,7 @@ import { makeEventManager, seeded } from './eventEngine';
 // ============================================================================
 // 1. STYLES CSS (Injectés uniquement pour cet événement)
 // ============================================================================
-const Day100Styles = () => (
+const Day100Styles = memo(() => (
     <style dangerouslySetInnerHTML={{ __html: `
         /* ── Global wrapper: tints the entire dashboard ── */
         .day100-global {
@@ -564,7 +564,7 @@ const Day100Styles = () => (
           100% { opacity: 1; }
         }
     `}} />
-);
+));
 
 
 // ============================================================================
