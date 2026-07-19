@@ -263,9 +263,10 @@ const Day300Styles = memo(() => (
            Mobile : pastille DANS le flux (placée par l'hôte). Desktop : épinglée
            dans la gouttière GAUCHE, en colonne. Jamais en superposition. */
         .d300-constellation {
-          display: flex; flex-direction: row; align-items: center; gap: 12px;
+          display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px;
           margin: 6px auto;
           width: 94vw; max-width: 500px;
+          box-sizing: border-box;
           pointer-events: none;
           padding: 8px 16px;
           border-radius: 16px;
@@ -292,7 +293,8 @@ const Day300Styles = memo(() => (
           font-size: 11px; font-weight: 700; letter-spacing: 1px;
           color: #7dd3fc;
           text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
-          flex-shrink: 0;
+          flex: 1 1 auto;
+          text-align: center;
         }
         .d300-constellation-stars { display: flex; gap: 8px; flex: 1; justify-content: center; }
         .d300-cstar {

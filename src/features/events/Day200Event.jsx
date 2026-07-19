@@ -294,6 +294,7 @@ const Day200Styles = memo(() => (
           display: flex; flex-direction: row; align-items: center; gap: 12px;
           margin: 6px auto;
           width: 94vw; max-width: 500px;
+          box-sizing: border-box;
           pointer-events: none;
           padding: 8px 16px;
           border-radius: 16px;
