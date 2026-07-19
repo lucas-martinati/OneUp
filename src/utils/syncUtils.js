@@ -41,6 +41,8 @@ export function sanitizeForCloud(data) {
   delete restOfData.achievements;
   delete restOfData.hasShared;
   delete restOfData.cardio;
+  delete restOfData.streakFreezes;
+  delete restOfData.frozenDays;
   return { ...restOfData, completions: sanitizedCompletions };
 }
 

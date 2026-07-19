@@ -1,94 +1,79 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useStreakFreeze } from '../useStreakFreeze';
+import { useProgressStore } from '@store/useProgressStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { useSubscription } from '@contexts/SubscriptionContext';
+import { useAuth } from '@contexts/AuthContext';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 
-const mockReconcile = vi.fn();
-const mockClear = vi.fn();
-
-vi.mock('@store/useProgressStore', () => ({
-    useProgressStore: (selector) => selector({
-        isSetup: true,
-        isStoreInitialized: true,
-        reconcileStreakFreezes: mockReconcile,
-        clearStreakFreezes: mockClear
-    })
-}));
-
-vi.mock('@store/useCloudSyncStore', () => ({
-    useCloudSyncStore: (selector) => selector({
-        isInitialSyncDone: true
-    })
-}));
-
-vi.mock('@contexts/SubscriptionContext', () => ({
-    useSubscription: () => ({ isPro: false, isSubscriptionLoading: false })
-}));
-
-let mockIsSignedIn = true;
-vi.mock('@contexts/AuthContext', () => ({
-    useAuth: () => ({ isSignedIn: mockIsSignedIn })
-}));
-
-vi.mock('@components/feedback/toastRoot', () => ({
-    getToastRoot: () => document.body
-}));
+vi.mock('@store/useProgressStore');
+vi.mock('@store/useCloudSyncStore');
+vi.mock('@contexts/SubscriptionContext');
+vi.mock('@contexts/AuthContext');
+vi.mock('@utils/icons', () => ({ Snowflake: () => null, ChevronRight: () => null }));
+vi.mock('../useToastGestures', () => ({ useToastGestures: () => ({ exit: false, cardProps: { style: {} } }) }));
 
 describe('useStreakFreeze', () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-        vi.useFakeTimers();
-        mockIsSignedIn = true;
-        mockReconcile.mockReturnValue([]);
-    });
+    let mockClearStreakFreezes;
 
-    afterEach(() => {
-        vi.useRealTimers();
+    beforeEach(() => {
+        mockClearStreakFreezes = vi.fn();
+        useProgressStore.mockImplementation((selector) => {
+            const state = {
+                isSetup: true,
+                isStoreInitialized: true,
+                clearStreakFreezes: mockClearStreakFreezes,
+                frozenDays: {}
+            };
+            return selector(state);
+        });
+        useCloudSyncStore.mockImplementation((selector) => {
+            const state = { isInitialSyncDone: true };
+            return selector(state);
+        });
+        useSubscription.mockReturnValue({ isPro: false, isSubscriptionLoading: false });
+        useAuth.mockReturnValue({ isSignedIn: true });
     });
 
     it('clears streak freezes if store is initialized but not signed in', () => {
-        mockIsSignedIn = false;
+        useAuth.mockReturnValue({ isSignedIn: false });
         renderHook(() => useStreakFreeze());
-        expect(mockClear).toHaveBeenCalled();
+        expect(mockClearStreakFreezes).toHaveBeenCalled();
     });
 
-    it('runs reconciliation when ready', () => {
-        mockReconcile.mockReturnValue([]);
-        renderHook(() => useStreakFreeze());
-        
-        act(() => {
-            vi.runOnlyPendingTimers();
-        });
-        
-        expect(mockReconcile).toHaveBeenCalled();
-    });
+    it('triggers a toast when frozenDays increases', () => {
+        vi.useFakeTimers();
+        let currentFrozenDays = { '2025-01-01': true };
 
-    it('sets toast state when freezes occurred', () => {
-        mockReconcile.mockReturnValue(['2024-01-01']);
-        const { result } = renderHook(() => useStreakFreeze());
-        
-        act(() => {
-            vi.runOnlyPendingTimers();
+        useProgressStore.mockImplementation((selector) => {
+            const state = {
+                isSetup: true,
+                isStoreInitialized: true,
+                clearStreakFreezes: mockClearStreakFreezes,
+                frozenDays: currentFrozenDays
+            };
+            return selector(state);
         });
-        
-        expect(mockReconcile).toHaveBeenCalled();
-        // The hook returns { StreakFreezeToast } which is a component
-        const ToastComponent = result.current.StreakFreezeToast;
-        expect(ToastComponent).toBeTruthy();
-        
-        // We could render the ToastComponent, but rendering hook state should suffice for branch coverage
-        const toastEl = ToastComponent();
-        expect(toastEl).not.toBeNull();
-    });
 
-    it('runs reconciliation on interval if date changes', () => {
-        mockReconcile.mockReturnValue([]);
-        renderHook(() => useStreakFreeze());
-        
+        const { result, rerender } = renderHook(() => useStreakFreeze());
+
+        // Initial render: no toast
+        let Toast = result.current.StreakFreezeToast();
+        expect(Toast).toBeNull();
+
+        // Update frozenDays
         act(() => {
-            vi.advanceTimersByTime(24 * 60 * 60 * 1000 + 35000); // Wait 24h to trigger date change
+            currentFrozenDays = { '2025-01-01': true, '2025-01-02': true };
+            rerender();
         });
-        
-        // Initial + Interval call = 2
-        expect(mockReconcile).toHaveBeenCalledTimes(2);
+
+        act(() => {
+            vi.runAllTimers();
+        });
+
+        Toast = result.current.StreakFreezeToast();
+        expect(Toast).not.toBeNull();
+        expect(Toast.props.count).toBe(1);
+        vi.useRealTimers();
     });
 });

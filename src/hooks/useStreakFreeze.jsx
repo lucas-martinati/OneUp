@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Snowflake, ChevronRight } from '@utils/icons';
-import { getLocalDateStr } from '@shared/dateUtils';
 import { useProgressStore } from '@store/useProgressStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
 import { useSubscription } from '@contexts/SubscriptionContext';
@@ -89,24 +88,16 @@ function StreakFreezeNotification({ count, onClose }) {
  * render). Reconciliation is idempotent, so repeated calls are harmless.
  */
 export function useStreakFreeze() {
-    const { isPro, isSubscriptionLoading } = useSubscription();
+    const { isSubscriptionLoading } = useSubscription();
     const auth = useAuth();
     const isSetup = useProgressStore(s => s.isSetup);
     const isStoreInitialized = useProgressStore(s => s.isStoreInitialized);
-    const reconcileStreakFreezes = useProgressStore(s => s.reconcileStreakFreezes);
     const clearStreakFreezes = useProgressStore(s => s.clearStreakFreezes);
+    const frozenDays = useProgressStore(s => s.frozenDays);
     const isInitialSyncDone = useCloudSyncStore(s => s.isInitialSyncDone);
 
     const [toast, setToast] = useState(null);
-    const lastRunDateRef = useRef(null);
-
-    const runReconcile = useCallback(() => {
-        const frozeDates = reconcileStreakFreezes(isPro);
-        lastRunDateRef.current = getLocalDateStr(new Date());
-        if (Array.isArray(frozeDates) && frozeDates.length > 0) {
-            setToast({ count: frozeDates.length, seq: Date.now() });
-        }
-    }, [reconcileStreakFreezes, isPro]);
+    const prevFrozenDaysRef = useRef(null);
 
     // Streak freezes are exclusive to signed-in users: guests never earn or hold
     // them. Once the store is loaded, wipe any local inventory while signed out
@@ -122,16 +113,25 @@ export function useStreakFreeze() {
         && !isSubscriptionLoading && isInitialSyncDone;
 
     useEffect(() => {
-        if (!ready) return undefined;
-        // Defer the first run a tick so we never setState synchronously inside the
-        // effect body (the toast is a side effect of reconciliation).
-        const initial = setTimeout(runReconcile, 0);
-        // Detect day rollover (cheap date-string compare on a coarse interval).
-        const interval = setInterval(() => {
-            if (getLocalDateStr(new Date()) !== lastRunDateRef.current) runReconcile();
-        }, 30000);
-        return () => { clearTimeout(initial); clearInterval(interval); };
-    }, [ready, runReconcile]);
+        if (!ready) return;
+
+        if (prevFrozenDaysRef.current === null) {
+            prevFrozenDaysRef.current = frozenDays;
+            return;
+        }
+
+        const newKeys = Object.keys(frozenDays || {});
+        const oldKeys = Object.keys(prevFrozenDaysRef.current || {});
+        const addedCount = newKeys.filter(k => !oldKeys.includes(k)).length;
+
+        if (addedCount > 0) {
+            setTimeout(() => {
+                setToast({ count: addedCount, seq: Date.now() });
+            }, 0);
+        }
+
+        prevFrozenDaysRef.current = frozenDays;
+    }, [ready, frozenDays]);
 
     const StreakFreezeToast = useCallback(() => {
         if (!toast) return null;

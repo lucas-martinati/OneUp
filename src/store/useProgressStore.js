@@ -4,7 +4,6 @@ import { serverTimestamp } from '@utils/firebaseTimestamp';
 import { EXERCISES, getDailyGoal } from '@config/exercises';
 import { createLogger } from '@utils/logger';
 import { getLocalDateStr, parseLocalDate, isDayDoneFromCompletions } from '@shared/dateUtils';
-import { reconcileStreakFreezeState } from '@shared/streakFreeze.js';
 import { STORAGE_KEY_BASE, getDefaultState, parseProgressData, validateProgressData } from '@hooks/useProgressStorage';
 import { cloudSync } from '@services/cloudSync';
 
@@ -281,29 +280,7 @@ export const useProgressStore = create((set, get) => ({
    * call repeatedly (on load and at each day rollover). Returns the list of days
    * newly frozen this run, so the caller can surface a notification/toast.
    */
-  reconcileStreakFreezes: (isPro = false) => {
-    const state = get();
-    if (!state.isSetup) return [];
-    const result = reconcileStreakFreezeState({
-      completions: state.completions,
-      frozenDays: state.frozenDays,
-      streakFreezes: state.streakFreezes,
-      startDate: state.startDate,
-      isPro,
-      todayStr: getLocalDateStr(new Date()),
-      isDayDone: (ds) => isDayDoneFromCompletions(state.completions, ds),
-    });
-    if (!result.changed) return [];
-    set({
-      frozenDays: result.frozenDays,
-      streakFreezes: result.streakFreezes,
-      // Bump the change marker only when a day was actually frozen, so the cloud
-      // (and thus the server-recomputed leaderboard streak) picks it up.
-      ...(result.frozeDates.length > 0 ? { lastCompletionChange: serverTimestamp() } : {}),
-    });
-    get()._persist();
-    return result.frozeDates;
-  },
+
 
   // Streak freezes are a signed-in-only feature. When the user is a guest (or
   // signs out) we wipe the local inventory so guests never hold freezes. Cloud

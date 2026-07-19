@@ -816,28 +816,8 @@ describe('streak freezes and notes', () => {
     // second call should just return
     useProgressStore.getState().clearStreakFreezes();
   });
-
-  it('reconcileStreakFreezes returns early if not setup', () => {
-    useProgressStore.setState({ isSetup: false });
-    expect(useProgressStore.getState().reconcileStreakFreezes()).toEqual([]);
-  });
-
-  it('reconcileStreakFreezes works when changed', () => {
-    useProgressStore.setState({ isSetup: true, startDate: '2025-01-01', streakFreezes: { count: 1 } });
-    // This is relying on reconcileStreakFreezeState, which we assume is mocked or works.
-    // Since we don't mock reconcileStreakFreezeState, it will run the real one.
-    // The real one returns result.changed if it used a freeze. Let's just let it run.
-    const result = useProgressStore.getState().reconcileStreakFreezes();
-    expect(Array.isArray(result)).toBe(true);
-  });
 });
 
-  it('reconcileStreakFreezes with isPro true', () => {
-    useProgressStore.setState({ isSetup: true });
-    // This covers the isPro=false default and isPro=true branch
-    useProgressStore.getState().reconcileStreakFreezes(true);
-  });
-  
   it('mergeWithAnonymousData aborts if guest JSON is identical to user JSON', async () => {
     const day = `${currentYear}-02-02`;
     const identicalCompletions = { [day]: { bench: { isCompleted: true, count: 10 } } };
