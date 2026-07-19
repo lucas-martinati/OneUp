@@ -82,6 +82,7 @@ const Day200Styles = () => (
             radial-gradient(ellipse at 50% 105%, rgba(234, 88, 12, 0.18) 0%, transparent 55%);
           pointer-events: none;
           z-index: 0;
+          will-change: opacity;
           animation: d200Furnace 5s ease-in-out infinite alternate;
         }
         @keyframes d200Furnace {
@@ -102,11 +103,12 @@ const Day200Styles = () => (
           z-index: 0;
           background: radial-gradient(circle, #ffffff 0%, #fff7d6 24%, #fdba74 52%, #f97316 74%, rgba(249, 115, 22, 0) 100%);
           box-shadow: 0 0 90px rgba(253, 224, 71, 0.7), 0 0 200px rgba(249, 115, 22, 0.5);
+          will-change: transform, opacity;
           animation: d200SunBlaze 4s ease-in-out infinite alternate;
         }
         @keyframes d200SunBlaze {
-          0%   { filter: brightness(1);    transform: translateX(-50%) scale(1); }
-          100% { filter: brightness(1.18); transform: translateX(-50%) scale(1.05); }
+          0%   { opacity: 0.9; transform: translateX(-50%) scale(1); }
+          100% { opacity: 1; transform: translateX(-50%) scale(1.05); }
         }
 
         /* ── Air qui ondule (mirage / heat haze) ── */
@@ -115,14 +117,15 @@ const Day200Styles = () => (
           pointer-events: none; z-index: 0;
           background: repeating-linear-gradient(0deg,
             rgba(255, 237, 213, 0) 0px,
-            rgba(255, 237, 213, 0.05) 2px,
+            rgba(255, 237, 213, 0.1) 2px,
             rgba(255, 237, 213, 0) 5px);
-          mix-blend-mode: screen;
+          opacity: 0.3;
+          will-change: transform, opacity;
           animation: d200Haze 6s ease-in-out infinite;
         }
         @keyframes d200Haze {
-          0%, 100% { transform: translateY(0) skewX(0deg); opacity: 0.5; }
-          50%      { transform: translateY(-8px) skewX(0.6deg); opacity: 0.95; }
+          0%, 100% { transform: translateY(0) skewX(0deg); opacity: 0.15; }
+          50%      { transform: translateY(-8px) skewX(0.6deg); opacity: 0.3; }
         }
 
         /* ── Gouttes de sueur qui dégoulinent sur l'écran ── */
@@ -134,6 +137,7 @@ const Day200Styles = () => (
           border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
           background: linear-gradient(180deg, rgba(224, 242, 254, 0.9), rgba(56, 189, 248, 0.5));
           box-shadow: 0 0 6px rgba(56, 189, 248, 0.5);
+          will-change: transform, opacity;
           animation: d200Drip linear infinite;
         }
         @keyframes d200Drip {
@@ -151,6 +155,7 @@ const Day200Styles = () => (
           text-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
           pointer-events: none; z-index: 1;
           white-space: nowrap;
+          will-change: transform, opacity;
           animation: d200MsgFloat ease-in-out infinite;
         }
         @keyframes d200MsgFloat {
@@ -176,12 +181,7 @@ const Day200Styles = () => (
           -webkit-text-fill-color: transparent !important;
           color: transparent !important;
           filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.55)) !important;
-          animation: d200Molten 6s ease infinite, d200Shimmer 4s ease-in-out infinite !important;
-        }
-        @keyframes d200Molten {
-          0%   { background-position: 0% 50%; }
-          50%  { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+          animation: d200Shimmer 4s ease-in-out infinite !important;
         }
         @keyframes d200Shimmer {
           0%, 100% { transform: translateY(0) skewX(0deg); }
@@ -209,15 +209,14 @@ const Day200Styles = () => (
           -webkit-text-fill-color: transparent !important;
           color: transparent !important;
           filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.45)) !important;
-          animation: d200Molten 7s ease infinite !important;
         }
         .day200-global .app-logo-text::after { content: ' 🔥'; font-size: 0.8em; }
 
         /* ── Bouton central : braise incandescente ── */
         .day200-global .counter-button {
           background: radial-gradient(circle at 50% 38%, rgba(249, 115, 22, 0.32), rgba(40, 12, 6, 0.5)) !important;
-          box-shadow: 0 0 34px rgba(249, 115, 22, 0.55), inset 0 0 26px rgba(251, 191, 36, 0.4) !important;
-          animation: counterBlobMorph 9s ease-in-out infinite, d200Ember 3.4s ease-in-out infinite !important;
+          box-shadow: 0 0 40px rgba(249, 115, 22, 0.6), inset 0 0 28px rgba(251, 191, 36, 0.45) !important;
+          animation: counterBlobMorph 9s ease-in-out infinite !important;
         }
         .day200-global .counter-button span {
           color: #fff7e0 !important;
@@ -226,10 +225,6 @@ const Day200Styles = () => (
         .day200-global .counter-button svg {
           color: #fdba74 !important;
           filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.8)) !important;
-        }
-        @keyframes d200Ember {
-          0%, 100% { box-shadow: 0 0 30px rgba(249,115,22,0.5),  inset 0 0 22px rgba(251,191,36,0.35); }
-          50%      { box-shadow: 0 0 52px rgba(239,68,68,0.7),    inset 0 0 36px rgba(251,191,36,0.6); }
         }
         /* ── Anneau de progression de l'année : braise ── */
         .day200-global .counter-ring {
@@ -398,8 +393,8 @@ const Day200Styles = () => (
         @keyframes d200CardOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-22px) scale(0.96); } }
         @keyframes d200Rise { 0% { opacity: 0; transform: translateY(14px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes d200AlertPulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
-          70%      { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+          0%, 100% { opacity: 1; }
+          70%      { opacity: 0.8; }
         }
 
         /* ── Récompense : l'orage qui casse la canicule ── */
