@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent, waitFor, within, cleanup } from '@testing-library/react';
 
-vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (k) => k, i18n: { language: 'en' } }) }));
 vi.mock('@hooks/useBackHandler', () => ({ useBackHandler: vi.fn() }));
 
 import { Achievements } from '../Achievements';

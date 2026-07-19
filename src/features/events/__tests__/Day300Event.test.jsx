@@ -71,7 +71,7 @@ describe('Day300EventManager', () => {
     findAndDismiss(getByText);
     expect(root().classList.contains('day300-global')).toBe(true);
     const hudEl = document.querySelector('.d300-constellation-count');
-    expect(hudEl?.textContent).toMatch(new RegExp(`^0 / ${VALIDATE_GOAL}`));
+    expect(hudEl?.textContent).toMatch(new RegExp(`^0/${VALIDATE_GOAL}`));
   });
 
   it('does NOT complete while fewer than VALIDATE_GOAL exercises are validated', () => {
@@ -79,7 +79,7 @@ describe('Day300EventManager', () => {
     findAndDismiss(getByText);
     act(() => { vi.advanceTimersByTime(2000); });
     const hudEl = document.querySelector('.d300-constellation-count');
-    expect(hudEl?.textContent).toMatch(new RegExp(`^${VALIDATE_GOAL - 1} / ${VALIDATE_GOAL}`));
+    expect(hudEl?.textContent).toMatch(new RegExp(`^${VALIDATE_GOAL - 1}/${VALIDATE_GOAL}`));
     expect(localStorage.getItem('day300_challenge_done')).toBeNull();
   });
 
