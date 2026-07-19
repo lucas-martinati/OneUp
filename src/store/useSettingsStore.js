@@ -3,6 +3,19 @@ import { createLogger } from '@utils/logger';
 
 const logger = createLogger('SettingsStore');
 
+const getOptimalPerformanceMode = () => {
+  if (typeof window === 'undefined') return 'high';
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const hardwareConcurrency = navigator.hardwareConcurrency || 4;
+  const deviceMemory = navigator.deviceMemory || 4;
+  
+  // Auto-detect lower-end devices to save them from expensive backdrop-filters
+  if (isAndroid && (deviceMemory <= 4 || hardwareConcurrency <= 4)) return 'low';
+  if (hardwareConcurrency <= 2) return 'low';
+  
+  return 'high';
+};
+
 const defaultSettings = {
   notificationsEnabled: false,
   soundsEnabled: true,
@@ -10,7 +23,8 @@ const defaultSettings = {
   notificationTime: { hour: 9, minute: 0 },
   leaderboardEnabled: false,
   leaderboardPseudo: '',
-  performanceMode: 'high',
+  performanceMode: getOptimalPerformanceMode(),
+  hasAutoDetectedPerf: true,
   exerciseDifficulties: {},
   keepScreenOn: true,
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
@@ -54,6 +68,13 @@ function cleanSettings(raw) {
   if (!raw || typeof raw !== 'object') return { ...defaultSettings };
   const cleaned = { ...raw };
   for (const key of LEGACY_KEYS) delete cleaned[key];
+  
+  // Force a one-time auto-detection for existing users who upgrade to this version
+  if (!cleaned.hasAutoDetectedPerf) {
+    cleaned.performanceMode = getOptimalPerformanceMode();
+    cleaned.hasAutoDetectedPerf = true;
+  }
+  
   return { ...defaultSettings, ...cleaned };
 }
 
