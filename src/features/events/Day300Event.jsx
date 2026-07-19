@@ -271,11 +271,11 @@ const Day300Styles = () => (
            Mobile : pastille DANS le flux (placée par l'hôte). Desktop : épinglée
            dans la gouttière GAUCHE, en colonne. Jamais en superposition. */
         .d300-constellation {
-          display: flex; flex-direction: column; align-items: center; gap: 5px;
+          display: flex; flex-direction: row; align-items: center; gap: 12px;
           margin: 6px auto;
-          width: fit-content; max-width: 92vw;
+          width: 94vw; max-width: 500px;
           pointer-events: none;
-          padding: 7px 14px;
+          padding: 8px 16px;
           border-radius: 16px;
           background: rgba(8, 10, 28, 0.55);
           backdrop-filter: blur(8px);
@@ -288,18 +288,23 @@ const Day300Styles = () => (
           .d300-constellation {
             position: fixed; left: 12px; top: 50%; transform: translateY(-50%);
             margin: 0;
+            flex-direction: column;
+            width: fit-content;
+            padding: 10px 14px;
+            gap: 8px;
           }
           .d300-constellation--dashboard { z-index: 50; }
           .d300-constellation--panel { z-index: 1100; }
-          .d300-constellation .d300-constellation-stars { flex-direction: column; }
+          .d300-constellation .d300-constellation-stars { flex-direction: column; flex: none; }
         }
         .d300-constellation-label {
           font-family: 'Inter', system-ui, sans-serif;
           font-size: 11px; font-weight: 700; letter-spacing: 1px;
           color: #7dd3fc;
           text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+          flex-shrink: 0;
         }
-        .d300-constellation-stars { display: flex; gap: 10px; }
+        .d300-constellation-stars { display: flex; gap: 8px; flex: 1; justify-content: center; }
         .d300-cstar {
           width: clamp(16px, 5vw, 22px);
           height: clamp(16px, 5vw, 22px);
@@ -323,7 +328,10 @@ const Day300Styles = () => (
           font-size: 12px; font-weight: 800;
           color: #e0f2fe;
           text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+          white-space: nowrap;
+          flex-shrink: 0;
         }
+        .d300-constellation-count small { opacity: 0.7; }
         @keyframes d300ConstellationIn {
           0%   { opacity: 0; }
           100% { opacity: 1; }
@@ -466,7 +474,9 @@ function ExerciseConstellation({ validated = 0, goal = VALIDATE_GOAL, onSolve, p
                     <span key={i} className={i < lit ? 'd300-cstar d300-cstar-lit' : 'd300-cstar'} />
                 ))}
             </div>
-            <div className="d300-constellation-count">{lit} / {goal} exercices validés</div>
+            <div className="d300-constellation-count">
+                {lit}<small>/{goal} ✧</small>
+            </div>
         </div>
     );
 }
