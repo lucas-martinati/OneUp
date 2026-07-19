@@ -297,11 +297,11 @@ const Day200Styles = () => (
            épinglé dans la gouttière GAUCHE. Le remplissage est piloté par --fill
            (largeur en horizontal, hauteur en vertical). Jamais en superposition. */
         .d200-thermo {
-          display: flex; flex-direction: column; align-items: center; gap: 5px;
+          display: flex; flex-direction: row; align-items: center; gap: 12px;
           margin: 6px auto;
-          width: fit-content; max-width: 94vw;
+          width: 94vw; max-width: 500px;
           pointer-events: none;
-          padding: 7px 14px;
+          padding: 8px 16px;
           border-radius: 16px;
           background: rgba(28, 10, 4, 0.55);
           backdrop-filter: blur(8px);
@@ -315,9 +315,10 @@ const Day200Styles = () => (
           font-size: 15px; font-weight: 900;
           text-shadow: 0 0 10px currentColor;
           transition: color 0.5s ease;
+          flex-shrink: 0;
         }
         /* Corps HORIZONTAL (mobile / défaut) */
-        .d200-thermo-body { position: relative; width: clamp(180px, 60vw, 300px); height: 32px; }
+        .d200-thermo-body { position: relative; flex: 1; height: 26px; }
         .d200-thermo-tube {
           position: absolute;
           top: 50%; transform: translateY(-50%);
@@ -347,6 +348,7 @@ const Day200Styles = () => (
           color: #fed7aa;
           text-shadow: 0 0 8px rgba(249, 115, 22, 0.5);
           white-space: nowrap;
+          flex-shrink: 0;
         }
         .d200-thermo-reps small { opacity: 0.7; }
         @keyframes d200ThermoIn {
@@ -358,11 +360,15 @@ const Day200Styles = () => (
           .d200-thermo {
             position: fixed; left: 12px; top: 50%; transform: translateY(-50%);
             margin: 0;
+            flex-direction: column;
+            width: fit-content;
+            padding: 10px 14px;
+            gap: 8px;
           }
           .d200-thermo--dashboard { z-index: 50; }
           .d200-thermo--panel { z-index: 1100; }
           /* Corps VERTICAL */
-          .d200-thermo .d200-thermo-body { width: 38px; height: clamp(150px, 38vh, 260px); }
+          .d200-thermo .d200-thermo-body { flex: none; width: 38px; height: clamp(150px, 38vh, 260px); }
           .d200-thermo .d200-thermo-tube {
             top: 0; bottom: 26px; left: 50%; right: auto;
             transform: translateX(-50%);
