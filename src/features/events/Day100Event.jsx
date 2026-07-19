@@ -70,13 +70,14 @@ const Day100Styles = () => (
                       radial-gradient(ellipse at 70% 80%, rgba(239, 68, 68, 0.08) 0%, transparent 60%);
           pointer-events: none;
           z-index: 0;
+          will-change: opacity;
           animation: bgPulseHack 4s ease-in-out infinite alternate;
         }
 
         @keyframes bgPulseHack {
-          0%   { opacity: 0.5; filter: hue-rotate(0deg); }
-          50%  { opacity: 1;   filter: hue-rotate(10deg); }
-          100% { opacity: 0.6; filter: hue-rotate(-5deg); }
+          0%   { opacity: 0.5; }
+          50%  { opacity: 1; }
+          100% { opacity: 0.6; }
         }
 
         /* ── CRT Scanlines overlay ── */
@@ -109,7 +110,8 @@ const Day100Styles = () => (
           pointer-events: none;
           z-index: 9998;
           background: linear-gradient(90deg, transparent 5%, rgba(239, 68, 68, 0.6) 15%, rgba(14, 165, 233, 0.4) 50%, rgba(239, 68, 68, 0.5) 85%, transparent 95%);
-          mix-blend-mode: screen;
+          opacity: 0.5;
+          will-change: transform, opacity;
         }
         .day100-glitch-bar-1 { animation: glitchBar1 3.5s infinite; }
         .day100-glitch-bar-2 { animation: glitchBar2 4.2s infinite 0.8s; }
@@ -153,6 +155,7 @@ const Day100Styles = () => (
           text-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
           writing-mode: vertical-rl;
           white-space: nowrap;
+          will-change: transform;
           animation: matrixFall linear infinite;
           user-select: none;
         }
@@ -208,26 +211,26 @@ const Day100Styles = () => (
 
         @keyframes textGlitch {
           0%  { transform: translate(0); text-shadow: 3px 3px #0ea5e9, -3px -3px #10b981; }
-          20% { transform: translate(-4px, 3px); text-shadow: -3px 3px #0ea5e9, 3px -3px #10b981; }
-          40% { transform: translate(4px, -2px); text-shadow: 4px -3px #0ea5e9, -4px 3px #10b981; }
-          60% { transform: translate(-2px, -4px) skewX(4deg); text-shadow: 2px 2px #0ea5e9, -2px -2px #10b981; opacity: 0.85; }
-          80% { transform: translate(3px, 4px) skewX(-2deg); text-shadow: -3px 3px #0ea5e9, 3px -3px #10b981; opacity: 1; }
+          20% { transform: translate(-2px, 2px); text-shadow: -2px 2px #0ea5e9, 2px -2px #10b981; }
+          40% { transform: translate(2px, -1px); text-shadow: 2px -2px #0ea5e9, -2px 2px #10b981; }
+          60% { transform: translate(-1px, -2px) skewX(2deg); opacity: 0.85; }
+          80% { transform: translate(2px, 2px) skewX(-1deg); opacity: 1; }
           100%{ transform: translate(0); text-shadow: 3px 3px #0ea5e9, -3px -3px #10b981; }
         }
 
         @keyframes glitchClip1 {
-          0%   { clip-path: inset(0 0 80% 0); transform: translate(-4px, -2px); }
-          25%  { clip-path: inset(20% 0 50% 0); transform: translate(3px, 1px); }
-          50%  { clip-path: inset(50% 0 20% 0); transform: translate(-2px, 3px); }
-          75%  { clip-path: inset(10% 0 70% 0); transform: translate(4px, -1px); }
-          100% { clip-path: inset(0 0 80% 0); transform: translate(-4px, -2px); }
+          0%   { clip-path: inset(0 0 80% 0); transform: translate(-2px, -1px); }
+          25%  { clip-path: inset(20% 0 50% 0); transform: translate(1px, 0px); }
+          50%  { clip-path: inset(50% 0 20% 0); transform: translate(-1px, 2px); }
+          75%  { clip-path: inset(10% 0 70% 0); transform: translate(2px, -1px); }
+          100% { clip-path: inset(0 0 80% 0); transform: translate(-2px, -1px); }
         }
         @keyframes glitchClip2 {
-          0%   { clip-path: inset(60% 0 0 0); transform: translate(4px, 2px); }
-          25%  { clip-path: inset(30% 0 40% 0); transform: translate(-3px, -1px); }
-          50%  { clip-path: inset(70% 0 10% 0); transform: translate(2px, -3px); }
-          75%  { clip-path: inset(45% 0 25% 0); transform: translate(-4px, 1px); }
-          100% { clip-path: inset(60% 0 0 0); transform: translate(4px, 2px); }
+          0%   { clip-path: inset(60% 0 0 0); transform: translate(2px, 1px); }
+          25%  { clip-path: inset(30% 0 40% 0); transform: translate(-1px, 0px); }
+          50%  { clip-path: inset(70% 0 10% 0); transform: translate(1px, -2px); }
+          75%  { clip-path: inset(45% 0 25% 0); transform: translate(-2px, 1px); }
+          100% { clip-path: inset(60% 0 0 0); transform: translate(2px, 1px); }
         }
 
         /* ── Text overrides via CSS (Plug & Play) ── */
@@ -273,8 +276,8 @@ const Day100Styles = () => (
         /* ── Central button hacked style (le border est laissé à l'anneau) ── */
         .day100-global .counter-button {
           background: repeating-radial-gradient(circle, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.1) 4px, transparent 4px, transparent 8px) !important;
-          box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), inset 0 0 25px rgba(239, 68, 68, 0.4) !important;
-          animation: counterBlobMorph 9s ease-in-out infinite, buttonGlitch 3s infinite !important;
+          box-shadow: 0 0 35px rgba(239, 68, 68, 0.6), inset 0 0 25px rgba(239, 68, 68, 0.4) !important;
+          animation: counterBlobMorph 9s ease-in-out infinite, buttonGlitchTransform 3s infinite !important;
         }
         /* ── Year-progress ring: glitch-red tint ── */
         .day100-global .counter-ring {
@@ -294,13 +297,13 @@ const Day100Styles = () => (
           filter: drop-shadow(0 0 5px #ef4444) !important;
         }
 
-        @keyframes buttonGlitch {
-          0%, 100% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), inset 0 0 25px rgba(239, 68, 68, 0.4); transform: scale(1); }
+        @keyframes buttonGlitchTransform {
+          0%, 100% { transform: scale(1); }
           88% { transform: scale(1) translate(0); }
-          90% { transform: scale(1.05) translate(4px, -3px); box-shadow: 0 0 50px rgba(239, 68, 68, 0.9), inset 0 0 40px rgba(239, 68, 68, 0.6); }
-          92% { transform: scale(0.95) translate(-5px, 4px); box-shadow: 0 0 15px rgba(14, 165, 233, 0.7); }
-          94% { transform: scale(1.02) translate(3px, 3px); box-shadow: 0 0 35px rgba(239, 68, 68, 0.8); }
-          96% { transform: scale(1) translate(-2px, -2px); box-shadow: 0 0 30px rgba(239, 68, 68, 0.6); }
+          90% { transform: scale(1.05) translate(4px, -3px); }
+          92% { transform: scale(0.95) translate(-5px, 4px); }
+          94% { transform: scale(1.02) translate(3px, 3px); }
+          96% { transform: scale(1) translate(-2px, -2px); }
         }
 
         /* ── Hacked header style ── */
@@ -308,17 +311,17 @@ const Day100Styles = () => (
           border-color: rgba(239, 68, 68, 0.3) !important;
           background: rgba(239, 68, 68, 0.04) !important;
           box-shadow: 0 0 15px rgba(239, 68, 68, 0.1), inset 0 0 30px rgba(239, 68, 68, 0.03) !important;
-          animation: headerFlicker 4s infinite !important;
+          animation: headerFlickerOpacity 4s infinite !important;
         }
 
-        @keyframes headerFlicker {
-          0%, 100% { border-color: rgba(239, 68, 68, 0.3); }
-          48% { border-color: rgba(239, 68, 68, 0.3); }
-          50% { border-color: rgba(14, 165, 233, 0.5); box-shadow: 0 0 20px rgba(14, 165, 233, 0.15); }
-          52% { border-color: rgba(239, 68, 68, 0.3); }
-          75% { border-color: rgba(239, 68, 68, 0.3); }
-          76% { border-color: rgba(16, 185, 129, 0.4); }
-          78% { border-color: rgba(239, 68, 68, 0.3); }
+        @keyframes headerFlickerOpacity {
+          0%, 100% { opacity: 1; }
+          48% { opacity: 1; }
+          50% { opacity: 0.8; }
+          52% { opacity: 1; }
+          75% { opacity: 1; }
+          76% { opacity: 0.9; }
+          78% { opacity: 1; }
         }
 
         /* ── Hacked exercise buttons (Premium Glitch Style) ── */
@@ -396,10 +399,10 @@ const Day100Styles = () => (
         }
         
         @keyframes exBtnCorrupt {
-          0%, 92%, 100% { filter: none; transform: none; }
-          94% { filter: hue-rotate(90deg) brightness(1.5); transform: skewX(2deg); }
-          96% { filter: hue-rotate(-90deg) contrast(1.5); transform: skewX(-2deg); }
-          98% { filter: invert(1); transform: none; }
+          0%, 92%, 100% { transform: none; opacity: 1; }
+          94% { transform: skewX(2deg); opacity: 0.8; }
+          96% { transform: skewX(-2deg); opacity: 0.9; }
+          98% { transform: scale(0.98); opacity: 1; }
         }
 
         /* ── Hacked bottom actions bar ── */
@@ -452,6 +455,7 @@ const Day100Styles = () => (
           pointer-events: none;
           z-index: 9997;
           white-space: nowrap;
+          will-change: transform, opacity;
           animation: msgFloat 6s ease-in-out infinite;
         }
 
@@ -465,6 +469,7 @@ const Day100Styles = () => (
 
         /* ── Screen-wide flicker effect ── */
         .day100-flicker {
+          will-change: opacity;
           animation: screenFlicker 8s infinite;
         }
 
@@ -505,10 +510,10 @@ const Day100Styles = () => (
           100% { opacity: 1; }
         }
         @keyframes hackModalOut {
-          0%   { opacity: 1; filter: none; }
-          30%  { opacity: 0.8; filter: hue-rotate(40deg) brightness(1.5); }
-          60%  { opacity: 0.3; filter: hue-rotate(90deg) brightness(2); }
-          100% { opacity: 0; filter: hue-rotate(180deg) brightness(3); }
+          0%   { opacity: 1; transform: scale(1); }
+          30%  { opacity: 0.8; transform: scale(1.02); }
+          60%  { opacity: 0.3; transform: scale(1.05); }
+          100% { opacity: 0; transform: scale(1.1); }
         }
         @keyframes terminalLineIn {
           0%   { opacity: 0; transform: translateX(-8px); }
@@ -554,9 +559,9 @@ const Day100Styles = () => (
           animation: unhackCleanup 1.5s ease-out forwards;
         }
         @keyframes unhackCleanup {
-          0%   { filter: hue-rotate(0deg) saturate(1); }
-          50%  { filter: hue-rotate(30deg) saturate(1.5) brightness(1.1); }
-          100% { filter: none; }
+          0%   { opacity: 0.8; transform: scale(1.02); }
+          50%  { opacity: 1; transform: scale(1); }
+          100% { opacity: 1; }
         }
     `}} />
 );
