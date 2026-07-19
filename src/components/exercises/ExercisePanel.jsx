@@ -138,7 +138,7 @@ export function ExercisePanel({
     const [gradStart, gradEnd] = exerciseConfig?.gradient || (isTimer ? ['#7c3aed', '#8b5cf6'] : ['#667eea', '#818cf8']);
     const exerciseLabel = getExerciseLabel(exerciseConfig);
     const gradientId = 'exercisePanelGrad';
-    const ringSize = 'clamp(150px, 26vh, 200px)';
+    const ringSize = 'clamp(110px, 20vh, 200px)';
     const ringRadius = 100;
     const ringCircumference = 2 * Math.PI * ringRadius;
     const displayTime = formatTime(displayCount);
@@ -153,11 +153,11 @@ export function ExercisePanel({
     // Rep count font scales down with digit count (based on the goal, so the
     // size stays stable while counting up) to keep large values inside the ring.
     const goalDigits = String(dailyGoal || 0).length;
-    let countFontSize = 'clamp(4rem, 12vw, 6rem)';
+    let countFontSize = 'clamp(3rem, 45cqw, 6rem)';
     if (goalDigits >= 4) {
-        countFontSize = 'clamp(2.5rem, 7.5vw, 3.6rem)';
+        countFontSize = 'clamp(2rem, 28cqw, 3.6rem)';
     } else if (goalDigits === 3) {
-        countFontSize = 'clamp(3.1rem, 9.5vw, 4.6rem)';
+        countFontSize = 'clamp(2.5rem, 35cqw, 4.6rem)';
     }
 
     const handleValidateWeight = () => {
@@ -277,7 +277,7 @@ export function ExercisePanel({
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 'clamp(10px, 2vh, 18px)'
+                gap: 'clamp(8px, 1.5vh, 18px)'
             }}>
                 {isPushups && (
                     <CameraModeBar
