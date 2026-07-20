@@ -138,7 +138,7 @@ export function ExercisePanel({
     const [gradStart, gradEnd] = exerciseConfig?.gradient || (isTimer ? ['#7c3aed', '#8b5cf6'] : ['#667eea', '#818cf8']);
     const exerciseLabel = getExerciseLabel(exerciseConfig);
     const gradientId = 'exercisePanelGrad';
-    const ringSize = 'clamp(160px, 32vh, 280px)';
+
     const ringRadius = 100;
     const ringCircumference = 2 * Math.PI * ringRadius;
     const displayTime = formatTime(displayCount);

@@ -16,7 +16,7 @@ export function ProgressRing({
     progress,
     ringCircumference,
     ringRadius,
-    ringSize,
+
     timeFontSize,
     countFontSize = 'clamp(4rem, 12vw, 6rem)',
     // Camera props
