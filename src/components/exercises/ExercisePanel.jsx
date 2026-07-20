@@ -138,7 +138,7 @@ export function ExercisePanel({
     const [gradStart, gradEnd] = exerciseConfig?.gradient || (isTimer ? ['#7c3aed', '#8b5cf6'] : ['#667eea', '#818cf8']);
     const exerciseLabel = getExerciseLabel(exerciseConfig);
     const gradientId = 'exercisePanelGrad';
-    const ringSize = 'clamp(110px, 20vh, 200px)';
+    const ringSize = 'clamp(160px, 32vh, 280px)';
     const ringRadius = 100;
     const ringCircumference = 2 * Math.PI * ringRadius;
     const displayTime = formatTime(displayCount);
@@ -238,7 +238,7 @@ export function ExercisePanel({
             role="dialog"
             aria-modal="true"
             aria-label={exerciseLabel}
-            style={{ '--ex': activeColor, '--ex2': gradEnd }}
+            style={{ '--ex': activeColor, '--ex2': gradEnd, minHeight: 0 }}
         >
             {/* Atmospheric backdrop — a pool of the exercise colour that gives
                 the flat overlay depth and intensifies on completion. */}
@@ -277,6 +277,8 @@ export function ExercisePanel({
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
+                minHeight: 0,
+                width: '100%',
                 gap: 'clamp(8px, 1.5vh, 18px)'
             }}>
                 {isPushups && (
@@ -291,33 +293,34 @@ export function ExercisePanel({
                     />
                 )}
 
-                <ProgressRing
-                    activeColor={activeColor}
-                    displayCount={displayCount}
-                    displayTime={displayTime}
-                    goalTime={goalTime}
-                    gradEnd={gradEnd}
-                    gradStart={gradStart}
-                    gradientId={gradientId}
-                    isAnimating={isAnimating}
-                    isCompleted={isCompleted}
-                    isRunning={isRunning}
-                    isTimer={isTimer}
-                    progress={progress}
-                    ringCircumference={ringCircumference}
-                    ringRadius={ringRadius}
-                    ringSize={ringSize}
-                    dailyGoal={dailyGoal}
-                    timeFontSize={timeFontSize}
-                    countFontSize={countFontSize}
-                    isCameraActive={isCameraActive}
-                    videoRef={videoRef}
-                    cameraError={cameraError}
-                    isCalibrated={isCalibrated}
-                    calibrateCountdown={calibrateCountdown}
-                    pushupState={pushupState}
-                    t={t}
-                />
+                <div style={{ width: '100%', flex: '0 1 240px', minHeight: 0, position: 'relative' }}>
+                    <ProgressRing
+                        activeColor={activeColor}
+                        displayCount={displayCount}
+                        displayTime={displayTime}
+                        goalTime={goalTime}
+                        gradEnd={gradEnd}
+                        gradStart={gradStart}
+                        gradientId={gradientId}
+                        isAnimating={isAnimating}
+                        isCompleted={isCompleted}
+                        isRunning={isRunning}
+                        isTimer={isTimer}
+                        progress={progress}
+                        ringCircumference={ringCircumference}
+                        ringRadius={ringRadius}
+                        dailyGoal={dailyGoal}
+                        timeFontSize={timeFontSize}
+                        countFontSize={countFontSize}
+                        isCameraActive={isCameraActive}
+                        videoRef={videoRef}
+                        cameraError={cameraError}
+                        isCalibrated={isCalibrated}
+                        calibrateCountdown={calibrateCountdown}
+                        pushupState={pushupState}
+                        t={t}
+                    />
+                </div>
 
                 {isCameraActive ? (
                     <CameraLiveStats
@@ -370,28 +373,27 @@ export function ExercisePanel({
                         t={t}
                     />
                 )}
+                {!isCameraActive && (
+                    <div style={{
+                        marginTop: '12px',
+                        marginBottom: '8px',
+                        padding: '10px 18px',
+                        borderRadius: 'var(--radius-md)',
+                        background: 'rgba(255,255,255,0.035)',
+                        color: 'var(--text-secondary)',
+                        fontSize: '0.8rem',
+                        lineHeight: 1.45,
+                        textAlign: 'center',
+                        alignSelf: 'center',
+                        width: '90%',
+                        maxWidth: '320px',
+                        border: '1px solid rgba(255,255,255,0.06)'
+                    }}>
+                        <span style={{ marginRight: '4px' }}>{'\u{1F4A1}'}</span>
+                        {t('common.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
+                    </div>
+                )}
             </div>
-
-            {!isCameraActive && (
-                <div className={`${styles.rise} ${styles.rise3}`} style={{
-                    marginTop: 'auto',
-                    marginBottom: '8px',
-                    padding: '10px 18px',
-                    borderRadius: 'var(--radius-md)',
-                    background: 'rgba(255,255,255,0.035)',
-                    color: 'var(--text-secondary)',
-                    fontSize: '0.8rem',
-                    lineHeight: 1.45,
-                    textAlign: 'center',
-                    alignSelf: 'center',
-                    width: '90%',
-                    maxWidth: '320px',
-                    border: '1px solid rgba(255,255,255,0.06)'
-                }}>
-                    <span style={{ marginRight: '4px' }}>{'\u{1F4A1}'}</span>
-                    {t('common.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
-                </div>
-            )}
         </div>
     );
 

@@ -40,12 +40,13 @@ export function ProgressRing({
     return (
         <div
             style={{
-                position: 'relative',
-                width: ringSize,
-                height: ringSize,
-                // Keep the ring at full size whatever the controls' height, and
-                // expose the accent colour to the halo / container-query units.
-                flexShrink: 0,
+                position: 'absolute',
+                inset: 0,
+                margin: 'auto',
+                maxHeight: '100%',
+                maxWidth: '100%',
+                aspectRatio: '1 / 1',
+                // Expose the accent colour to the halo / container-query units.
                 containerType: 'inline-size',
                 display: 'flex',
                 flexDirection: 'column',
@@ -111,7 +112,7 @@ export function ProgressRing({
             {isCameraActive && (
                 <div
                     className={`camera-video-wrapper${isCalibrated && pushupState === 'down' ? ' is-down' : ''}`}
-                    style={{ width: `calc(${ringSize} - 24px)`, height: `calc(${ringSize} - 24px)`, '--exercise-color': activeColor }}
+                    style={{ width: `calc(100% - 24px)`, height: `calc(100% - 24px)`, '--exercise-color': activeColor }}
                 >
                     <video
                         ref={videoRef}
