@@ -16,6 +16,19 @@ vi.mock('@capacitor/local-notifications', () => ({
   }
 }));
 
+// Mock useComputedStatsStore
+const { mockStats } = vi.hoisted(() => ({
+  mockStats: { displayStreak: 0 }
+}));
+
+vi.mock('@store/useComputedStatsStore', () => ({
+  useComputedStatsStore: {
+    getState: () => ({
+      stats: { displayStreak: mockStats.displayStreak }
+    })
+  }
+}));
+
 // Mock i18n
 vi.mock('../../i18n', () => ({
   default: {
@@ -203,6 +216,7 @@ describe('useNotificationManager', () => {
       // 1. Comeback (streak 0)
       mockCheckPermissions.mockResolvedValueOnce({ display: 'granted' });
       mockSchedule.mockClear();
+      mockStats.displayStreak = 0;
       let { result } = renderHook(() => useNotificationManager({
         isDayDone: () => false, // streak 0
         getDayNumber: () => 1,
@@ -212,6 +226,7 @@ describe('useNotificationManager', () => {
       // 2. Milestone
       mockCheckPermissions.mockResolvedValueOnce({ display: 'granted' });
       mockSchedule.mockClear();
+      mockStats.displayStreak = 7;
       result = renderHook(() => useNotificationManager({
         isDayDone: (dateStr) => {
            const tomorrowStr = getLocalDateStr(new Date(Date.now() + 86400000));
@@ -224,6 +239,7 @@ describe('useNotificationManager', () => {
       // 3. Streak >= 3
       mockCheckPermissions.mockResolvedValueOnce({ display: 'granted' });
       mockSchedule.mockClear();
+      mockStats.displayStreak = 4;
       result = renderHook(() => useNotificationManager({
         isDayDone: (dateStr) => {
            const tomorrowStr = getLocalDateStr(new Date(Date.now() + 86400000));
@@ -236,6 +252,7 @@ describe('useNotificationManager', () => {
       // 4. Random (streak < 3, not milestone)
       mockCheckPermissions.mockResolvedValueOnce({ display: 'granted' });
       mockSchedule.mockClear();
+      mockStats.displayStreak = 1;
       result = renderHook(() => useNotificationManager({
         isDayDone: (dateStr) => {
            const tomorrowStr = getLocalDateStr(new Date(Date.now() + 86400000));
@@ -265,6 +282,7 @@ describe('useNotificationManager', () => {
       const settings = { notificationsEnabled: true, notificationTime: { hour: 10, minute: 30 } };
       mockCheckPermissions.mockResolvedValueOnce({ display: 'granted' });
       mockSchedule.mockClear();
+      mockStats.displayStreak = 5;
 
       const { result } = renderHook(() => useNotificationManager({
         // Yesterday and earlier are done; today (and future) not done yet.

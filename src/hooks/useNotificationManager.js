@@ -1,6 +1,7 @@
 import { useCallback, useRef, useEffect } from 'react';
 import i18n from '../i18n';
 import { getLocalDateStr } from '@shared/dateUtils';
+import { useComputedStatsStore } from '@store/useComputedStatsStore';
 
 // Starting ID for daily notifications. The range [NOTIFICATION_ID, NOTIFICATION_ID + 6]
 // is reserved exclusively for the 7 days of daily reminders.
@@ -194,26 +195,9 @@ export function useNotificationManager({ isDayDone, getDayNumber }) {
 
           const notificationsList = [];
 
-          // Compute the active streak once (avoids redundant 7 x 365 iterations).
-          // Anchor the count on today only if it's already done; otherwise count
-          // up to yesterday. Not having done today yet does NOT break the streak —
-          // that's precisely what the reminder is for. Mirrors the canonical
-          // `todayDone ? currentStreak : yesterdayStreak` logic in useComputedStats.
-          const todayStr = getLocalDateStr(new Date());
-          let streak = 0;
-          const streakAnchor = new Date(todayStr);
-          if (!isDayDoneRef.current(todayStr)) {
-            streakAnchor.setDate(streakAnchor.getDate() - 1);
-          }
-          for (let j = 0; j < 365; j++) {
-            const checkDate = new Date(streakAnchor);
-            checkDate.setDate(checkDate.getDate() - j);
-            if (isDayDoneRef.current(getLocalDateStr(checkDate))) {
-              streak++;
-            } else {
-              break;
-            }
-          }
+          // Retrieve the active streak. This correctly takes freezes into account
+          // unlike a naive loop.
+          const streak = useComputedStatsStore.getState().stats?.displayStreak || 0;
 
           // Track the count of successfully scheduled notifications to maintain cohesive narrative progression.
           // Using scheduledCount for dayIndex ensures the user receives the motivational/challenge steps
