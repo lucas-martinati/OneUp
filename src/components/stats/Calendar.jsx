@@ -159,7 +159,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 
     const todayStr = getLocalDateStr(new Date());
 
-    const { days, monthCompleted, completionRate, monthPerfect } = useMemo(() => {
+    const { days, monthCompleted, completionRate, monthPerfect, perfectSet } = useMemo(() => {
         const daysInMonth = getDaysInMonth(year, month);
         const firstDay = getFirstDayOfMonth(year, month);
 
@@ -169,6 +169,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 
         const todayStr = getLocalDateStr(new Date());
         let completed = 0, total = 0, perfect = 0;
+        const pSet = new Set();
 
         daysArr.filter(Boolean).forEach(date => {
             const dStr = getLocalDateStr(date);
@@ -178,13 +179,16 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                 total++;
                 if (getDayStatus(dStr, completions, frozenDays, todayStr) === DAY_STATUS.DONE) completed++;
                 const day = completions[dStr] || {};
-                if (!isCustom && isPerfectDay(day, exercises)) perfect++;
+                if (isPerfectDay(day, exercises)) {
+                    pSet.add(dStr);
+                    if (!isCustom) perfect++;
+                }
             }
         });
 
         const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-        return { days: daysArr, monthCompleted: completed, completionRate: rate, monthPerfect: perfect };
+        return { days: daysArr, monthCompleted: completed, completionRate: rate, monthPerfect: perfect, perfectSet: pSet };
     }, [year, month, startDate, completions, exercises, isCustom, frozenDays]);
 
     // Slide-in animation for button navigation
@@ -282,7 +286,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 
                         if (isCustom) {
                             // Custom routine view (subset of exercises)
-                            isPerfect = isPerfectDay(dayCompletions, exercises);
+                            isPerfect = perfectSet.has(dateString);
                             isAnyDone = !isPerfect && Object.values(dayCompletions).some(ex => ex?.isCompleted);
                             isMuted = isFuture || isBeforeStart;
                             isMissed = !isPerfect && !isAnyDone && !isMuted && !isToday;
@@ -294,7 +298,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                             } else if (status === DAY_STATUS.FUTURE) {
                                 isMuted = true;
                             } else if (status === DAY_STATUS.DONE) {
-                                isPerfect = isPerfectDay(dayCompletions, exercises);
+                                isPerfect = perfectSet.has(dateString);
                                 isAnyDone = !isPerfect;
                                 isCaughtUp = isCaughtUpDay(dayCompletions, dateString);
                             } else if (status === DAY_STATUS.FROZEN) {
@@ -349,8 +353,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                                                     className={styles.dot}
                                                     style={{
                                                         width: dotPx, height: dotPx,
-                                                        background: ex.color,
-                                                        boxShadow: `0 0 4px ${ex.color}99`
+                                                        background: ex.color
                                                     }}
                                                 />
                                             ) : null
