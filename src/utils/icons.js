@@ -33,7 +33,7 @@ import {
 // ============ INDIVIDUAL EXPORTS ============
 export {
   Activity, AlertCircle, AlertTriangle, ArrowLeft, ArrowRight, Award,
-  Bell,
+  Bell, Bike,
   Calendar, Check, CheckCheck, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, Cloud, CloudOff, Code, Copy, Crown,
   Download, Dumbbell,
   Edit2,
@@ -42,7 +42,7 @@ export {
   Hash, Heart, HeartHandshake, History,
   Image, FileText,
   Link, Loader2, Lock, LogIn, LogOut,
-  Maximize2, Medal, Minus, Moon,
+  MapPin, Maximize2, Medal, Minus, Moon,
   Palette, Pause, PieChart, Play, Plus,
   RefreshCw, Rocket, RotateCcw,
   Save, Settings, Settings2, Share2, Shield, ShieldAlert, ShoppingBag, Shuffle, Smartphone, Snowflake, Sparkles, Star, Sun,

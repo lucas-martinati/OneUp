@@ -20,7 +20,6 @@ export function ExerciseBreakdown({
     return (
         <div className="glass-premium" style={{
             padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-            marginBottom: 'var(--spacing-md)',
             background: 'var(--surface-section)'
         }}>
             <div className="flex-col gap-8">

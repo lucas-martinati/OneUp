@@ -49,7 +49,7 @@ export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExR
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: champion?.totalReps > 0 && bestDayDate ? '1fr 1fr' : '1fr',
-                    gap: '10px', marginBottom: 'var(--spacing-md)'
+                    gap: '10px'
                 }}>
                     {champion && champion.totalReps > 0 && (
                         <div className="glass-premium scale-in" style={{ ...cardBase, animationDelay: '0.3s' }}>

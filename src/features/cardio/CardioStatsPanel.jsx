@@ -1,7 +1,123 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, TrendingUp } from '@utils/icons';
+import { Clock, TrendingUp, Footprints, Bike, MapPin, Gauge } from '@utils/icons';
 import { useCardio } from './useCardio';
+
+function ActivityCard({ icon: Icon, title, color, stats, hasData, totalSessionsCount, t }) {
+    return (
+        <div
+            className="glass-premium scale-in"
+            style={{
+                position: 'relative',
+                overflow: 'hidden',
+                padding: 'var(--spacing-md)',
+                borderRadius: 'var(--radius-xl)',
+                background: 'var(--surface-section)',
+                border: '1px solid var(--border-subtle)',
+            }}
+        >
+            {/* Soft corner glow matching StatCard */}
+            <div
+                aria-hidden="true"
+                style={{
+                    position: 'absolute',
+                    top: '-32px',
+                    right: '-32px',
+                    width: '100px',
+                    height: '100px',
+                    borderRadius: '50%',
+                    background: `radial-gradient(circle, ${color}26 0%, transparent 70%)`,
+                    pointerEvents: 'none',
+                }}
+            />
+
+            {/* Header row */}
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: 'var(--space-4)',
+                    position: 'relative',
+                    zIndex: 1,
+                }}
+            >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div
+                        style={{
+                            width: '38px',
+                            height: '38px',
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: `${color}1f`,
+                            border: `1px solid ${color}3a`,
+                            color: color,
+                        }}
+                    >
+                        <Icon size={20} />
+                    </div>
+                    <div>
+                        <div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+                            {title}
+                        </div>
+                        {hasData && (
+                            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                {t('cardio.overSessions', { count: totalSessionsCount })}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Grid Metrics */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', position: 'relative', zIndex: 1 }}>
+                {stats.map((stat, idx) => {
+                    const StatIcon = stat.icon;
+                    return (
+                        <div
+                            key={idx}
+                            style={{
+                                padding: '12px 10px',
+                                borderRadius: 'var(--radius-lg)',
+                                background: 'var(--surface-muted)',
+                                border: '1px solid var(--border-subtle)',
+                                textAlign: 'center',
+                            }}
+                        >
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '6px',
+                                    marginBottom: '6px',
+                                }}
+                            >
+                                <StatIcon size={14} color={color} />
+                                <span
+                                    style={{
+                                        fontSize: '0.68rem',
+                                        fontWeight: '600',
+                                        color: 'var(--text-secondary)',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.5px',
+                                    }}
+                                >
+                                    {stat.label}
+                                </span>
+                            </div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)', lineHeight: 1.1 }}>
+                                {stat.value}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
 
 export function CardioStatsPanel() {
     const { allSessions, loading } = useCardio();
@@ -12,25 +128,29 @@ export function CardioStatsPanel() {
         let cyclingTime = 0;
         let runningDistance = 0;
         let cyclingDistance = 0;
+        let runningCount = 0;
+        let cyclingCount = 0;
 
         allSessions.forEach(s => {
-            if (s.movingTime) {
-                if (s.type === 'running') {
-                    runningTime += s.movingTime;
-                    runningDistance += s.distance || 0;
-                }
-                if (s.type === 'cycling') {
-                    cyclingTime += s.movingTime;
-                    cyclingDistance += s.distance || 0;
-                }
+            if (s.type === 'running') {
+                runningCount++;
+                runningDistance += s.distance || 0;
+                if (s.movingTime) runningTime += s.movingTime;
+            } else if (s.type === 'cycling') {
+                cyclingCount++;
+                cyclingDistance += s.distance || 0;
+                if (s.movingTime) cyclingTime += s.movingTime;
             }
         });
 
-        const runningHours = Math.floor(runningTime / 3600);
-        const runningMins = Math.floor((runningTime % 3600) / 60);
-        const cyclingHours = Math.floor(cyclingTime / 3600);
-        const cyclingMins = Math.floor((cyclingTime % 3600) / 60);
+        const formatTime = (seconds) => {
+            if (!seconds || seconds <= 0) return '0h 00m';
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            return h > 0 ? `${h}h ${m.toString().padStart(2, '0')}m` : `${m}m`;
+        };
 
+        // Running Pace
         let runningPaceStr = '—';
         if (runningTime > 0 && runningDistance > 0) {
             const secondsPerKm = runningTime / (runningDistance / 1000);
@@ -39,13 +159,23 @@ export function CardioStatsPanel() {
             runningPaceStr = `${paceMins}:${paceSecs.toString().padStart(2, '0')} ${t('cardio.units.minKm')}`;
         }
 
-        const cyclingSpeed = cyclingTime > 0 ? (cyclingDistance / 1000) / (cyclingTime / 3600) : 0;
+        // Cycling Speed
+        const cyclingSpeedVal = cyclingTime > 0 ? (cyclingDistance / 1000) / (cyclingTime / 3600) : 0;
+        const cyclingSpeedStr = cyclingSpeedVal > 0 ? `${cyclingSpeedVal.toFixed(1)} ${t('cardio.units.kmh')}` : '—';
 
         return {
-            runningTimeStr: `${runningHours}h ${runningMins}m`,
-            cyclingTimeStr: `${cyclingHours}h ${cyclingMins}m`,
-            runningPaceStr: runningPaceStr,
-            cyclingSpeed: cyclingSpeed > 0 ? `${cyclingSpeed.toFixed(1)} ${t('cardio.units.kmh')}` : '—',
+            running: {
+                distanceKm: (runningDistance / 1000).toFixed(1),
+                timeStr: formatTime(runningTime),
+                paceStr: runningPaceStr,
+                count: runningCount,
+            },
+            cycling: {
+                distanceKm: (cyclingDistance / 1000).toFixed(1),
+                timeStr: formatTime(cyclingTime),
+                speedStr: cyclingSpeedStr,
+                count: cyclingCount,
+            }
         };
     }, [allSessions, t]);
 
@@ -53,65 +183,39 @@ export function CardioStatsPanel() {
         return <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>{t('cardio.loading')}</div>;
     }
 
-    const statCardStyle = (bg1, bg2) => ({
-        padding: '14px 12px', borderRadius: 'var(--radius-lg)',
-        background: `linear-gradient(135deg, ${bg1}, ${bg2})`, textAlign: 'center'
-    });
-
-    const statLabelStyle = {
-        fontSize: 'clamp(0.6rem, 1.5vw, 0.7rem)', color: 'var(--text-secondary)',
-        textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '4px'
-    };
+    const kmUnit = t('cardio.units.km');
 
     return (
-        <div className="fade-in">
-            {/* 🏃 Course */}
-            <div className="glass-premium" style={{
-                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                marginBottom: 'var(--spacing-md)',
-                background: 'linear-gradient(135deg, rgba(249,115,22,0.12), rgba(239,68,68,0.08))'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '1.2rem' }}>🏃</span>
-                    <span style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)' }}>{t('exercises.running')}</span>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
-                    <div className="glass-premium scale-in" style={statCardStyle('rgba(249,115,22,0.15)', 'rgba(239,68,68,0.15)')}>
-                        <Clock size={20} color="#f97316" style={{ marginBottom: '4px' }} />
-                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#f97316', lineHeight: 1 }}>{stats.runningTimeStr}</div>
-                        <div style={statLabelStyle}>{t('cardio.duration')}</div>
-                    </div>
-                    <div className="glass-premium scale-in" style={statCardStyle('rgba(249,115,22,0.15)', 'rgba(239,68,68,0.15)')}>
-                        <TrendingUp size={20} color="#f97316" style={{ marginBottom: '4px' }} />
-                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#f97316', lineHeight: 1 }}>{stats.runningPaceStr}</div>
-                        <div style={statLabelStyle}>{t('cardio.pace') || t('cardio.avgSpeed')}</div>
-                    </div>
-                </div>
-            </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+            {/* 🏃 Course à pied */}
+            <ActivityCard
+                icon={Footprints}
+                title={t('exercises.running')}
+                color="#f97316"
+                stats={[
+                    { label: t('cardio.distance'), value: `${stats.running.distanceKm} ${kmUnit}`, icon: MapPin },
+                    { label: t('cardio.duration'), value: stats.running.timeStr, icon: Clock },
+                    { label: t('cardio.pace'), value: stats.running.paceStr, icon: Gauge },
+                ]}
+                hasData={stats.running.count > 0}
+                totalSessionsCount={stats.running.count}
+                t={t}
+            />
 
-            {/* 🚴 Vélo */}
-            <div className="glass-premium" style={{
-                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                marginBottom: 'var(--spacing-md)',
-                background: 'linear-gradient(135deg, rgba(6,182,212,0.12), rgba(6,182,212,0.08))'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '1.2rem' }}>🚴</span>
-                    <span style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)' }}>{t('exercises.cycling')}</span>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
-                    <div className="glass-premium scale-in" style={statCardStyle('rgba(6,182,212,0.15)', 'rgba(6,182,212,0.15)')}>
-                        <Clock size={20} color="#06b6d4" style={{ marginBottom: '4px' }} />
-                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#06b6d4', lineHeight: 1 }}>{stats.cyclingTimeStr}</div>
-                        <div style={statLabelStyle}>{t('cardio.duration')}</div>
-                    </div>
-                    <div className="glass-premium scale-in" style={statCardStyle('rgba(6,182,212,0.15)', 'rgba(6,182,212,0.15)')}>
-                        <TrendingUp size={20} color="#06b6d4" style={{ marginBottom: '4px' }} />
-                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#06b6d4', lineHeight: 1 }}>{stats.cyclingSpeed}</div>
-                        <div style={statLabelStyle}>{t('cardio.avgSpeed') || t('cardio.speed')}</div>
-                    </div>
-                </div>
-            </div>
+            {/* 🚴 Cyclisme */}
+            <ActivityCard
+                icon={Bike}
+                title={t('exercises.cycling')}
+                color="#06b6d4"
+                stats={[
+                    { label: t('cardio.distance'), value: `${stats.cycling.distanceKm} ${kmUnit}`, icon: MapPin },
+                    { label: t('cardio.duration'), value: stats.cycling.timeStr, icon: Clock },
+                    { label: t('cardio.avgSpeed'), value: stats.cycling.speedStr, icon: TrendingUp },
+                ]}
+                hasData={stats.cycling.count > 0}
+                totalSessionsCount={stats.cycling.count}
+                t={t}
+            />
         </div>
     );
 }

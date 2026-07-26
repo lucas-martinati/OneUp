@@ -224,7 +224,6 @@ button:focus:not(:focus-visible) {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: var(--spacing-md);
 }
 
 .chart-title {

@@ -102,7 +102,6 @@ export function AchievementsShowcase({ stats, onOpen }) {
         <div className="glass-premium slide-up" style={{
             position: 'relative', overflow: 'hidden',
             padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-            marginBottom: 'var(--spacing-md)',
             background: 'linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.04))',
             border: '1px solid rgba(251,191,36,0.22)',
         }}>

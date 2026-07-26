@@ -69,13 +69,12 @@ export function StatsOverviewCards({
     const heroNumberColor = isCardioHero ? '#f97316' : '#818cf8';
 
     return (
-        <>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             {/* ── Hero: Global Total Reps ─────────────────────────────── */}
             <div className="glass-premium scale-in" style={{
                 position: 'relative', overflow: 'hidden',
                 padding: 'var(--spacing-lg) var(--spacing-md)',
                 borderRadius: 'var(--radius-xl)', textAlign: 'center',
-                marginBottom: 'var(--spacing-md)',
                 border: '1px solid var(--border-subtle)'
             }}>
                 {/* Layered ambient glow */}
@@ -112,7 +111,7 @@ export function StatsOverviewCards({
             {/* ── Six stat cards (2 columns) ──────────────────────────── */}
             <div style={{
                 display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '10px', marginBottom: 'var(--spacing-md)'
+                gap: '10px'
             }}>
                 <StatCard icon={Flame} value={displayStreak} format={intFormat} label={t('stats.currentStreak')}
                     color="#f97316" dim={!streakActive} delay={0} pending={pending} />
@@ -127,6 +126,6 @@ export function StatsOverviewCards({
                 <StatCard icon={Star} value={perfectDays} format={intFormat} label={t('common.perfectDays')}
                     color="#ec4899" delay={0.25} pending={pending} />
             </div>
-        </>
+        </div>
     );
 }

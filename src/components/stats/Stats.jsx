@@ -211,15 +211,13 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
     // Share button reused at the bottom of every tab (consistent spacing).
     const shareBlock = (
-        <div style={{ marginBottom: 'var(--spacing-md)' }}>
-            <SharePanel
-                sessionData={{ date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') }}
-                stats={globalStats}
-                variant="stats"
-                mode="global"
-                activeCategories={activeCategories}
-            />
-        </div>
+        <SharePanel
+            sessionData={{ date: new Date().toISOString(), exercises: [], duration: 0, name: t('stats.title') }}
+            stats={globalStats}
+            variant="stats"
+            mode="global"
+            activeCategories={activeCategories}
+        />
     );
 
     return (
@@ -277,7 +275,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
                 {/* ── Tab: Overview ─────────────────────────────────────── */}
                 {activeTab === 'overview' && (
-                    <>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
                         <AchievementsShowcase stats={globalStats} onOpen={onOpenAchievements} />
 
                         <StatsOverviewCards
@@ -299,7 +297,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
                         {/* ── Motivational footer ───────────────────────── */}
                         <div className="glass slide-up" style={{
-                            marginBottom: 'var(--spacing-md)', padding: 'var(--spacing-sm) var(--spacing-md)',
+                            padding: 'var(--spacing-sm) var(--spacing-md)',
                             borderRadius: 'var(--radius-lg)', textAlign: 'center',
                             background: 'linear-gradient(135deg, rgba(14,165,233,0.1), rgba(6,182,212,0.1))'
                         }}>
@@ -310,66 +308,68 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                 {t('stats.quoteSub')}
                             </p>
                         </div>
-                    </>
+                    </div>
                 )}
 
                 {/* ── Tab: Charts (heavy Recharts only mount on demand) ── */}
                 {activeTab === 'charts' && (
-                    <Suspense fallback={
-                        <div className="glass-premium" style={{
-                            padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                            display: 'flex', justifyContent: 'center', alignItems: 'center',
-                            height: '200px', marginBottom: 'var(--spacing-md)'
-                        }}>
-                            <div style={{ color: 'var(--text-secondary)' }}>{t('stats.loadingCharts')}</div>
-                        </div>
-                    }>
-                        <MonthlyActivityChart
-                            monthlyActivityTotal={monthlyActivityTotal}
-                            monthlyActivityByExercise={monthlyActivityByExercise}
-                            exercises={exercises}
-                        />
-                        <DailyRepsChart
-                            dailyRepsData={dailyRepsData}
-                            title={t('stats.dailyReps')}
-                            t={t}
-                        />
-                        {activeCategories.includes('weights') && hasProAccess && (
-                            <WeightEvolutionChart
-                                title={t('weight.title')}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                        <Suspense fallback={
+                            <div className="glass-premium" style={{
+                                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                                display: 'flex', justifyContent: 'center', alignItems: 'center',
+                                height: '200px'
+                            }}>
+                                <div style={{ color: 'var(--text-secondary)' }}>{t('stats.loadingCharts')}</div>
+                            </div>
+                        }>
+                            <MonthlyActivityChart
+                                monthlyActivityTotal={monthlyActivityTotal}
+                                monthlyActivityByExercise={monthlyActivityByExercise}
+                                exercises={exercises}
+                            />
+                            <DailyRepsChart
+                                dailyRepsData={dailyRepsData}
+                                title={t('stats.dailyReps')}
+                                t={t}
+                            />
+                            {activeCategories.includes('weights') && hasProAccess && (
+                                <WeightEvolutionChart
+                                    title={t('weight.title')}
+                                    t={t}
+                                    getConfig={getConfig}
+                                    completions={completions}
+                                />
+                            )}
+                            <DifficultyEvolutionChart
+                                title={t('stats.difficultyEvolution')}
                                 t={t}
                                 getConfig={getConfig}
                                 completions={completions}
+                                exercises={exercises}
                             />
-                        )}
-                        <DifficultyEvolutionChart
-                            title={t('stats.difficultyEvolution')}
-                            t={t}
-                            getConfig={getConfig}
-                            completions={completions}
-                            exercises={exercises}
-                        />
-                        <RadarChartPanel
-                            radarData={translatedRadarData}
-                            globalTotalReps={globalTotalReps}
-                            title={t('stats.muscleBalance')}
-                        />
-                        <ConsistencyPieChart
-                            activeData={activeData}
-                            trackedCount={trackedCount}
-                            title={t('stats.consistency')}
-                            subTitle={t('stats.basedOnManual', { count: trackedCount })}
-                            emptyTitle={t('stats.notEnoughData')}
-                            emptySub={t('stats.completeForHabits')}
-                        />
-                        {hasCardio && <CardioStatsPanel />}
-                    </Suspense>
+                            <RadarChartPanel
+                                radarData={translatedRadarData}
+                                globalTotalReps={globalTotalReps}
+                                title={t('stats.muscleBalance')}
+                            />
+                            <ConsistencyPieChart
+                                activeData={activeData}
+                                trackedCount={trackedCount}
+                                title={t('stats.consistency')}
+                                subTitle={t('stats.basedOnManual', { count: trackedCount })}
+                                emptyTitle={t('stats.notEnoughData')}
+                                emptySub={t('stats.completeForHabits')}
+                            />
+                            {hasCardio && <CardioStatsPanel />}
+                        </Suspense>
+                        {shareBlock}
+                    </div>
                 )}
-                {activeTab === 'charts' && shareBlock}
 
                 {/* ── Tab: Details (per-exercise breakdown + history) ──── */}
                 {activeTab === 'details' && (
-                    <>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
                         <ExerciseBreakdown
                             enrichedExerciseStats={enrichedExerciseStats}
                             fullCategoryOrder={fullCategoryOrder} fullCategoryColors={fullCategoryColors}
@@ -378,15 +378,13 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         />
 
                         {/* ── Session History ──────────────────────────── */}
-                        <div style={{ marginBottom: 'var(--spacing-md)' }}>
-                            <SessionHistoryList
-                                sessionHistory={sessionHistory}
-                                onSelectSession={setSelectedSession}
-                            />
-                        </div>
+                        <SessionHistoryList
+                            sessionHistory={sessionHistory}
+                            onSelectSession={setSelectedSession}
+                        />
 
                         {shareBlock}
-                    </>
+                    </div>
                 )}
 
                 {/* ── Session Detail Modal (lazy) ──────────────────────────── */}
