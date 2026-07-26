@@ -30,7 +30,7 @@ export function StoreView() {
     }, []);
 
     return (
-        <div className="fade-in slide-up" style={{ animationDuration: '0.4s' }}>
+        <div className="fade-in slide-up" style={{ animationDuration: '0.4s', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <StoreCard
                 isActive={isSupporter}
                 title={t('supporter.title')}
@@ -88,14 +88,14 @@ export function StoreView() {
                 fullWidth
                 icon={RotateCcw}
                 onClick={onRestorePurchases}
-                style={{ border: '1px solid var(--border-default)', marginBottom: 'var(--spacing-md)' }}
+                style={{ border: '1px solid var(--border-default)' }}
             >
                 {t('supporter.restore')}
             </Button>
 
             {/* --- Historique des achats --- */}
             {displayHistory && displayHistory.length > 0 && (
-                <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
+                <Card variant="glass" padding="md">
                     <div style={{
                         fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)',
                         textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'

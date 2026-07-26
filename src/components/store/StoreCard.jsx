@@ -56,7 +56,6 @@ export function StoreCard({
     return (
         <div className="glass-premium" style={{
             padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-            marginBottom: 'var(--spacing-md)',
             background: isActive
                 ? `linear-gradient(135deg, rgba(${colorRGB},0.08), rgba(${colorRGB},0.02))`
                 : 'var(--glass-bg, var(--card-bg))',
