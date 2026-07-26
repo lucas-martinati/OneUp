@@ -5,10 +5,22 @@ import { FrozenFlame } from '@components/ui';
 import { useUIStore } from '@store/useUIStore';
 import { useProgressStore } from '@store/useProgressStore';
 import { useAuth } from '@contexts/AuthContext';
-import { Card, IconButton } from '@components/ui';
+import { Card } from '@components/ui';
 import { StreakFreezeInfo } from './StreakFreezeInfo';
 
 const filterOutIds = (idsToRemove) => (p) => p.filter(particle => !idsToRemove.has(particle.id));
+
+/** Shared style for every pill badge in the header right side. */
+const BADGE_BASE = {
+    display: 'flex', alignItems: 'center', gap: '5px',
+    padding: 'clamp(4px, 0.7vh, 8px) clamp(8px, 1.2vw, 14px)',
+    borderRadius: '16px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)',
+    fontWeight: '700', lineHeight: 1.5, flexShrink: 0, cursor: 'pointer',
+    // Button resets — all badges are <button> for accessibility.
+    color: 'inherit', fontFamily: 'inherit',
+    boxSizing: 'border-box', margin: 0,
+    appearance: 'none', WebkitAppearance: 'none',
+};
 
 export const DashboardHeader = React.memo(({
     isAdmin,
@@ -137,32 +149,23 @@ export const DashboardHeader = React.memo(({
 
             <div ref={rightSideRef} style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 0, justifyContent: 'flex-end' }}>
                 {isAdmin && (
-                    <IconButton
-                        icon={Shield}
-                        variant="danger"
+                    <button
+                        type="button"
                         onClick={() => openModal('admin')}
                         aria-label="Admin Panel"
                         className="hover-lift"
-                    />
+                        style={{
+                            ...BADGE_BASE,
+                            gap: 0,
+                            background: 'linear-gradient(135deg, rgba(239,68,68,0.22), rgba(220,38,38,0.22))',
+                            border: '1px solid rgba(239,68,68,0.3)',
+                            boxShadow: '0 2px 8px rgba(239,68,68,0.15)'
+                        }}
+                    >
+                        <Shield size={16} color="#ef4444" />
+                        <span aria-hidden="true">{'\u200b'}</span>
+                    </button>
                 )}
-
-                {/* Global streak badge — three states: active (fire), frozen but
-                    safe (snowflake/blue), or pending today (grey). */}
-                <div
-                    onClick={handleStreakClick}
-                    style={{
-                    background: streakBadge.bg,
-                    padding: 'clamp(4px, 0.7vh, 8px) clamp(8px, 1.2vw, 14px)', borderRadius: '16px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)',
-                    display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '700',
-                    border: streakBadge.border,
-                    boxShadow: streakBadge.shadow,
-                    opacity: streakActive || isStreakFrozen ? 1 : 0.7, flexShrink: 0, cursor: 'pointer'
-                }}>
-                    {isStreakFrozen
-                        ? <FrozenFlame size={16} color={streakBadge.fg} />
-                        : <Flame size={16} color={streakBadge.fg} />}
-                    <span style={{ color: streakBadge.fg }}>{displayStreak}</span>
-                </div>
 
                 {/* Streak Freeze inventory — tap to learn how freezes are earned
                     (and that Pro earns 3× more). Hidden at zero. */}
@@ -173,16 +176,10 @@ export const DashboardHeader = React.memo(({
                         aria-label={t('streakFreeze.available', { count: displayFreezeCount })}
                         title={t('streakFreeze.available', { count: displayFreezeCount })}
                         style={{
+                            ...BADGE_BASE,
                             background: 'linear-gradient(135deg, rgba(56,189,248,0.20), rgba(14,165,233,0.20))',
-                            padding: 'clamp(4px, 0.7vh, 8px) clamp(8px, 1.2vw, 14px)', borderRadius: '16px',
-                            fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)', display: 'flex', alignItems: 'center',
-                            gap: '5px', fontWeight: '700', border: '1px solid rgba(56,189,248,0.3)', flexShrink: 0,
-                            cursor: 'pointer', color: 'inherit', fontFamily: 'inherit',
-                            // Match the sibling <div> badges' height exactly: neutralise the
-                            // native button box that makes it render taller. Line-height is
-                            // left to inherit so the text box matches the sibling divs.
-                            boxSizing: 'border-box', margin: 0,
-                            appearance: 'none', WebkitAppearance: 'none'
+                            border: '1px solid rgba(56,189,248,0.3)',
+                            boxShadow: '0 2px 8px rgba(56,189,248,0.15)'
                         }}>
                         <Snowflake size={16} color="#38bdf8" />
                         <span style={{ color: '#38bdf8' }}>{displayFreezeCount}</span>
@@ -191,18 +188,41 @@ export const DashboardHeader = React.memo(({
 
                 {showFreezeInfo && <StreakFreezeInfo open={showFreezeInfo} onClose={() => setShowFreezeInfo(false)} />}
 
+                {/* Global streak badge — three states: active (fire), frozen but
+                    safe (snowflake/blue), or pending today (grey). */}
+                <button
+                    type="button"
+                    onClick={handleStreakClick}
+                    aria-label="Streak"
+                    style={{
+                        ...BADGE_BASE,
+                        background: streakBadge.bg,
+                        border: streakBadge.border,
+                        boxShadow: streakBadge.shadow,
+                        opacity: streakActive || isStreakFrozen ? 1 : 0.7
+                    }}>
+                    {isStreakFrozen
+                        ? <FrozenFlame size={16} color={streakBadge.fg} />
+                        : <Flame size={16} color={streakBadge.fg} />}
+                    <span style={{ color: streakBadge.fg }}>{displayStreak}</span>
+                </button>
 
                 {/* Total reps badge */}
-                <div className="shimmer" style={{
-                    background: `linear-gradient(135deg, ${selectedExercise.color}33, ${selectedExercise.gradient[0]}33)`,
-                    padding: 'clamp(4px, 0.7vh, 8px) clamp(8px, 1.2vw, 14px)', borderRadius: '16px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)',
-                    display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '600',
-                    border: '1px solid var(--border-strong)',
-                    boxShadow: `0 2px 8px ${selectedExercise.color}33`, flexShrink: 0
-                }}>
+                <button
+                    type="button"
+                    tabIndex={-1}
+                    className="shimmer"
+                    style={{
+                        ...BADGE_BASE,
+                        cursor: 'default',
+                        pointerEvents: 'none',
+                        background: `linear-gradient(135deg, ${selectedExercise.color}33, ${selectedExercise.gradient[0]}33)`,
+                        border: `1px solid ${selectedExercise.color}44`,
+                        boxShadow: `0 2px 8px ${selectedExercise.color}33`
+                    }}>
                     <Trophy size={16} color={selectedExercise.color} />
                     <span>{totalReps}</span>
-                </div>
+                </button>
             </div>
 
             {/* Render streak easter egg particles */}
