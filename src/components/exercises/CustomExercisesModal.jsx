@@ -150,7 +150,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                 <p>{t('customExercises.empty')}</p>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {customExercises.map(ex => {
                   const IconComponent = CUSTOM_EXERCISE_ICONS[ex.icon] || Star;
                   return (

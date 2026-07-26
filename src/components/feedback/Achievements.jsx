@@ -263,12 +263,11 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
 
     return createPortal(
         <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.ACHIEVEMENTS }}>
-            <div ref={contentRef} className="modal-content">
+            <div ref={contentRef} className="modal-content" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
 
                 {/* ── Header ─────────────────────────────────────────────── */}
                 <div style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    marginBottom: 'var(--spacing-md)'
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                 }}>
                     <h2 className="panel-title" style={{ margin: 0 }}>
                         {t('common.achievements')}
@@ -280,7 +279,6 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                 <div className="glass-premium slide-up" style={{
                     display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)',
                     padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                    marginBottom: 'var(--spacing-md)',
                     background: 'linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.04))',
                     border: '1px solid rgba(251,191,36,0.22)',
                 }}>
@@ -329,7 +327,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                 </div>
 
                 {/* ── Status filter ───────────────────────────────────────── */}
-                <div style={{ marginBottom: 'var(--spacing-sm)' }}>
+                <div>
                     <SegmentedControl
                         options={[
                             { id: 'all', label: t('achievements.filterAll') },
@@ -344,8 +342,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
 
                 {/* ── Category rail ───────────────────────────────────────── */}
                 <div style={{
-                    display: 'flex', flexWrap: 'wrap', gap: '6px',
-                    marginBottom: 'var(--spacing-lg)'
+                    display: 'flex', flexWrap: 'wrap', gap: '6px'
                 }}>
                     <CategoryChip
                         label={t('achievements.filterAll')}
@@ -370,44 +367,46 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                 </div>
 
                 {/* ── Categories listing ──────────────────────────────────── */}
-                {visibleCategories.map(cat => {
-                    if (effectiveCatFilter && effectiveCatFilter !== cat.id) return null;
-                    const catBadges = badges.filter(b => b.category === cat.id);
-                    const shown = catBadges.filter(matchesFilter);
-                    if (shown.length === 0) return null;
-                    const catUnlocked = catBadges.filter(b => b.unlocked).length;
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                    {visibleCategories.map(cat => {
+                        if (effectiveCatFilter && effectiveCatFilter !== cat.id) return null;
+                        const catBadges = badges.filter(b => b.category === cat.id);
+                        const shown = catBadges.filter(matchesFilter);
+                        if (shown.length === 0) return null;
+                        const catUnlocked = catBadges.filter(b => b.unlocked).length;
 
-                    return (
-                        <div key={cat.id} style={{ marginBottom: 'var(--spacing-xl)' }}>
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: '10px',
-                                marginBottom: 'var(--spacing-sm)', paddingLeft: '4px'
-                            }}>
+                        return (
+                            <div key={cat.id}>
                                 <div style={{
-                                    fontSize: '0.82rem', fontWeight: '800',
-                                    color: cat.color, textTransform: 'uppercase', letterSpacing: '1px'
+                                    display: 'flex', alignItems: 'center', gap: '10px',
+                                    marginBottom: 'var(--spacing-sm)', paddingLeft: '4px'
                                 }}>
-                                    {t(cat.titleKey)}
+                                    <div style={{
+                                        fontSize: '0.82rem', fontWeight: '800',
+                                        color: cat.color, textTransform: 'uppercase', letterSpacing: '1px'
+                                    }}>
+                                        {t(cat.titleKey)}
+                                    </div>
+                                    <div style={{
+                                        fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-secondary)',
+                                        background: `${cat.color}1a`, border: `1px solid ${cat.color}33`,
+                                        padding: '2px 8px', borderRadius: '20px'
+                                    }}>
+                                        {catUnlocked}/{catBadges.length}
+                                    </div>
+                                    <div style={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${cat.color}40, transparent)` }} />
                                 </div>
                                 <div style={{
-                                    fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-secondary)',
-                                    background: `${cat.color}1a`, border: `1px solid ${cat.color}33`,
-                                    padding: '2px 8px', borderRadius: '20px'
+                                    display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px'
                                 }}>
-                                    {catUnlocked}/{catBadges.length}
+                                    {shown.map((badge) => (
+                                        <BadgeItem key={badge.id} badge={badge} highlighted={badge.id === highlightedBadgeId} />
+                                    ))}
                                 </div>
-                                <div style={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${cat.color}40, transparent)` }} />
                             </div>
-                            <div style={{
-                                display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px'
-                            }}>
-                                {shown.map((badge) => (
-                                    <BadgeItem key={badge.id} badge={badge} highlighted={badge.id === highlightedBadgeId} />
-                                ))}
-                            </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
         </div>,
         document.body

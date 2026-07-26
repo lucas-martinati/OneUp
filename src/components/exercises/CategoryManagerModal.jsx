@@ -219,7 +219,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
           {/* ═══════ LIST VIEW ═══════ */}
           {view === 'list' && (
             <div style={{ width: '100%', maxWidth: '440px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {[
                   { id: 'custom', name: t('common.custom'), color: '#34d399', ...customCategories.find(c => c.id === 'custom') },
                   ...customCategories.filter(c => c.id !== 'custom')
