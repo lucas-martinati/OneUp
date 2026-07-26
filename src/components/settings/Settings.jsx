@@ -71,7 +71,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                 {showStore ? (
                     <StoreView />
                 ) : (
-                    <>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
                         <PreferencesSection settings={settings} onSave={onSave} />
                         <LanguageSection />
                         <PerformanceSection settings={settings} onSave={onSave} />
@@ -85,7 +85,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
 
                         {/* ── Données & Cloud ─────────────────────────────────────── */}
                         {cloudAuth && cloudSync && (
-                            <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
+                            <Card variant="glass" padding="md">
                                 <CloudSyncPanel
                                     authState={cloudAuth}
                                     onSignIn={() => cloudAuth.signIn()}
@@ -115,8 +115,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             gap: '16px',
                             justifyContent: 'center',
                             alignItems: 'center',
-                            marginTop: 'var(--spacing-lg)',
-                            marginBottom: 'var(--spacing-md)',
+                            paddingTop: 'var(--spacing-xs)',
                             opacity: 0.6,
                             fontSize: '0.78rem'
                         }}>
@@ -154,7 +153,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                 {t('settings.privacyPolicy')}
                             </button>
                         </div>
-                    </>
+                    </div>
                 )}
             </div>
         </div>

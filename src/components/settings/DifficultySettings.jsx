@@ -36,7 +36,6 @@ export function DifficultySettings() {
 
     return (
         <Card variant="glass" padding="md" style={{
-            marginBottom: 'var(--space-4)',
             border: isMultiplierUnlocked ? '1px solid rgba(239, 68, 68, 0.4)' : undefined,
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             position: 'relative',

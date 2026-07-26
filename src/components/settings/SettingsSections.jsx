@@ -13,7 +13,7 @@ export function PreferencesSection({ settings, onSave }) {
     const { t } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
+        <Card variant="glass" padding="md">
             <h3 style={sectionTitleStyle}>{t('settings.preferences')}</h3>
 
             <SettingRow
@@ -141,7 +141,7 @@ export function LanguageSection() {
     const { t, i18n } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
+        <Card variant="glass" padding="md">
             <h3 style={sectionTitleStyle}>{t('settings.language')}</h3>
             <SettingRow
                 icon={Globe}
@@ -186,7 +186,7 @@ export function PerformanceSection({ settings, onSave }) {
     const { t } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
+        <Card variant="glass" padding="md">
             <h3 style={sectionTitleStyle}>{t('settings.performance')}</h3>
 
             <SettingRow
@@ -243,7 +243,7 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
     const { t } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
+        <Card variant="glass" padding="md">
             <h3 style={sectionTitleStyle}>{t('settings.community')}</h3>
 
             <SettingRow
@@ -284,7 +284,7 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
     const currentTheme = settings.appTheme || 'dark';
 
     return (
-        <Card variant="glass" padding="md" style={{ position: 'relative', overflow: 'hidden', marginBottom: 'var(--space-4)' }}>
+        <Card variant="glass" padding="md" style={{ position: 'relative', overflow: 'hidden' }}>
             <h3 style={sectionTitleStyle}>
                 {t('settings.appTheme')} {!isPro && <Lock size={14} color="var(--accent)" style={{ marginLeft: 'auto', opacity: 0.8 }} />}
             </h3>
@@ -361,7 +361,7 @@ export function DataSection() {
     };
 
     return (
-        <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
+        <Card variant="glass" padding="md">
             <h3 style={sectionTitleStyle}>{t('settings.dataTitle')}</h3>
 
             <SettingRow
