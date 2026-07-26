@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Plus, Settings2, Trash2, Edit2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, Check } from '@utils/icons';
-import { Button, IconButton, Slider } from '@components/ui';
+import { Plus, Settings2, Trash2, Edit2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, Check } from '@utils/icons';
+import { Button, IconButton, Slider, Input, ModalHeader } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { MAX_EXERCISES_PER_CATEGORY } from '@store/useExercisesStore';
@@ -24,7 +24,6 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
 
   const { customCategories } = customCategoriesHook;
 
-  // Filter exercises by categoryId — if categoryId is provided, show only that category's exercises
   const effectiveCatId = categoryId || 'custom';
   const customExercises = allCustomExercises.filter(ex => (ex.categoryId || 'custom') === effectiveCatId);
   
@@ -40,7 +39,6 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
   const [error, setError] = useState('');
   const nameInputRef = useRef(null);
 
-  // Handle back button to switch view or close modal
   useBackHandler(() => {
     if (confirmDeleteEx) {
       setConfirmDeleteEx(null);
@@ -62,10 +60,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
       return;
     }
     
-    // Auto-generate gradient based on selected color (simplified)
-    const gradient = [color, color]; // We could use a slightly darker shade for the first one
-    
-    // Check capacity if moving to a different category
+    const gradient = [color, color];
     const targetCatCount = allCustomExercises.filter(ex => (ex.categoryId || 'custom') === selectedCatId).length;
     
     if (editingId) {
@@ -143,33 +138,28 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
   return (
     <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
       <div className="modal-content">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-md)' }}>
-        <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
-          {t('customExercises.title')}
-        </h2>
-        <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
-      </div>
+        <ModalHeader title={t('customExercises.title')} onClose={onClose} />
 
       <div style={{ flex: 1, overflow: confirmDeleteEx ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         
         {view === 'list' && (
-          <div style={{ width: '100%', maxWidth: '400px' }}>
+          <div style={{ width: '100%', maxWidth: '440px' }}>
             {customExercises.length === 0 ? (
               <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 20px' }}>
                 <Settings2 size={48} style={{ opacity: 0.5, marginBottom: '16px' }} />
                 <p>{t('customExercises.empty')}</p>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
                 {customExercises.map(ex => {
                   const IconComponent = CUSTOM_EXERCISE_ICONS[ex.icon] || Star;
                   return (
                     <div key={ex.id} style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      padding: '16px', borderRadius: 'var(--radius-lg)',
-                      background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)'
+                      padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)',
+                      background: 'var(--surface-muted)', border: '1px solid var(--border-default)'
                     }}>
-                      <div className="row gap-12">
+                      <div className="row gap-12" style={{ alignItems: 'center' }}>
                         <div style={{
                           width: '40px', height: '40px', borderRadius: '50%',
                           background: `${ex.color}20`, color: ex.color,
@@ -185,18 +175,8 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '4px' }}>
-                        <button onClick={() => handleEdit(ex)} style={{
-                          background: 'transparent', border: 'none', color: 'var(--text-secondary)',
-                          padding: '8px', cursor: 'pointer', opacity: 0.8
-                        }}>
-                          <Edit2 size={20} />
-                        </button>
-                        <button onClick={() => handleDelete(ex)} style={{
-                          background: 'transparent', border: 'none', color: 'var(--error)',
-                          padding: '8px', cursor: 'pointer', opacity: 0.8
-                        }}>
-                          <Trash2 size={20} />
-                        </button>
+                        <IconButton icon={Edit2} onClick={() => handleEdit(ex)} variant="ghost" size="sm" aria-label="Modifier" />
+                        <IconButton icon={Trash2} onClick={() => handleDelete(ex)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
                       </div>
                     </div>
                   );
@@ -205,23 +185,25 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
             )}
 
             {customExercises.length < maxCustomExercises && (
-              <button onClick={() => {
-                setEditingId(null);
-                setLabel('');
-                const iconKeys = Object.keys(CUSTOM_EXERCISE_ICONS);
-                setIconName(iconKeys[Math.floor(Math.random() * iconKeys.length)]);
-                setColor(PRESET_COLORS[Math.floor(Math.random() * PRESET_COLORS.length)]);
-                setType('counter');
-                setMultiplier(1.0);
-                setError('');
-                setView('create');
-              }} className="hover-lift" style={{
-                width: '100%', padding: '16px', borderRadius: 'var(--radius-lg)',
-                background: 'linear-gradient(135deg, var(--accent-glow), var(--color-indigo))', border: 'none', color: 'white',
-                fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
-              }}>
-                <Plus size={20} /> {t('customExercises.create')}
-              </button>
+              <Button
+                variant="primary"
+                size="lg"
+                fullWidth
+                icon={Plus}
+                onClick={() => {
+                  setEditingId(null);
+                  setLabel('');
+                  const iconKeys = Object.keys(CUSTOM_EXERCISE_ICONS);
+                  setIconName(iconKeys[Math.floor(Math.random() * iconKeys.length)]);
+                  setColor(PRESET_COLORS[Math.floor(Math.random() * PRESET_COLORS.length)]);
+                  setType('counter');
+                  setMultiplier(1.0);
+                  setError('');
+                  setView('create');
+                }}
+              >
+                {t('customExercises.create')}
+              </Button>
             )}
             {customExercises.length >= maxCustomExercises && (
               <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
@@ -232,10 +214,10 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
         )}
 
         {view === 'create' && (
-          <div className="fade-in" style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="fade-in" style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
             {/* CATEGORY SELECTOR */}
             <div>
-              <label className="section-label" style={{ marginBottom: '8px' }}>
+              <label className="input-label" style={{ marginBottom: 'var(--space-2)' }}>
                 {t('common.category')}
               </label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -249,18 +231,12 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                   );
                   const isFull = catExs.length >= MAX_EXERCISES_PER_CATEGORY;
                   
-                  let borderStyle = 'rgba(255,255,255,0.1)';
+                  const borderStyle = isSelected ? cat.color : 'var(--border-subtle)';
+                  let colorStyle = 'var(--text-primary)';
                   if (isSelected) {
-                      borderStyle = cat.color;
+                    colorStyle = cat.color;
                   } else if (isFull) {
-                      borderStyle = 'rgba(255,255,255,0.05)';
-                  }
-
-                  let colorStyle = 'white';
-                  if (isSelected) {
-                      colorStyle = cat.color;
-                  } else if (isFull) {
-                      colorStyle = 'var(--text-secondary)';
+                    colorStyle = 'var(--text-disabled)';
                   }
 
                   return (
@@ -269,8 +245,8 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                       disabled={isFull}
                       onClick={() => setSelectedCatId(cat.id)}
                       style={{
-                        padding: '8px 12px', borderRadius: '12px',
-                        background: isSelected ? `${cat.color}20` : 'rgba(255,255,255,0.03)',
+                        padding: '8px 12px', borderRadius: 'var(--radius-md)',
+                        background: isSelected ? `${cat.color}20` : 'var(--surface-muted)',
                         border: `1px solid ${borderStyle}`,
                         color: colorStyle,
                         fontSize: '0.85rem', fontWeight: '700', cursor: isFull ? 'default' : 'pointer',
@@ -287,39 +263,26 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
               </div>
             </div>
             {/* NAME */}
-            <div style={{ position: 'relative' }}>
-              <label className="section-label" style={{ marginBottom: '8px' }}>
-                {t('customExercises.nameLabel')}
-              </label>
-              <div style={{ position: 'relative' }}>
-                <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: color }}>
-                  {(() => { const SelectedIcon = CUSTOM_EXERCISE_ICONS[iconName] || Star; return <SelectedIcon size={20} />; })()}
-                </div>
-                <input
-                  ref={nameInputRef}
-                  type="text"
-                  maxLength={20}
-                  value={label}
-                  onChange={e => setLabel(e.target.value)}
-                  placeholder={t('customExercises.namePlaceholder')}
-                  style={{
-                    width: '100%', padding: '16px 16px 16px 44px', borderRadius: 'var(--radius-lg)',
-                    border: `2px solid ${label ? color + '50' : 'var(--border-subtle)'}`,
-                    background: 'rgba(255,255,255,0.03)', color: 'white', fontSize: '1.05rem', fontWeight: '600',
-                    outline: 'none', boxSizing: 'border-box', transition: 'all 0.3s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = color}
-                  onBlur={(e) => e.target.style.borderColor = label ? color + '50' : 'var(--border-subtle)'}
-                />
-              </div>
+            <div>
+              <Input
+                ref={nameInputRef}
+                label={t('customExercises.nameLabel')}
+                type="text"
+                maxLength={20}
+                value={label}
+                onChange={e => setLabel(e.target.value)}
+                placeholder={t('customExercises.namePlaceholder')}
+                icon={CUSTOM_EXERCISE_ICONS[iconName] || Star}
+                error={error}
+              />
             </div>
 
             {/* COLOR */}
             <div>
-              <label className="section-label">
+              <label className="input-label" style={{ marginBottom: 'var(--space-2)' }}>
                 {t('customExercises.colorLabel')}
               </label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'space-between' }}>
                 {PRESET_COLORS.map(c => (
                   <button key={c} onClick={() => setColor(c)} className="hover-lift" style={{
                     width: '38px', height: '38px', borderRadius: '50%',
@@ -333,7 +296,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
 
             {/* ICON */}
             <div>
-              <label className="section-label">
+              <label className="input-label" style={{ marginBottom: 'var(--space-2)' }}>
                 {t('customExercises.iconLabel')}
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', maxHeight: '240px', overflowY: 'auto', padding: '4px', paddingRight: '8px' }}>
@@ -343,8 +306,8 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                   return (
                     <button key={name} onClick={() => setIconName(name)} className={isSelected ? 'hover-lift' : ''} style={{
                       aspectRatio: '1', borderRadius: 'var(--radius-md)',
-                      background: isSelected ? `${color}20` : 'rgba(255,255,255,0.03)',
-                      border: isSelected ? `2px solid ${color}` : '1px solid transparent',
+                      background: isSelected ? `${color}20` : 'var(--surface-muted)',
+                      border: isSelected ? `2px solid ${color}` : '1px solid var(--border-subtle)',
                       color: isSelected ? color : 'var(--text-secondary)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       cursor: 'pointer', transition: 'all 0.2s', padding: 0
@@ -358,10 +321,10 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
 
             {/* TYPE */}
             <div>
-              <label className="section-label">
+              <label className="input-label" style={{ marginBottom: 'var(--space-2)' }}>
                 {t('customExercises.typeLabel')}
               </label>
-              <div style={{ display: 'flex', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-lg)', padding: '4px' }}>
+              <div style={{ display: 'flex', background: 'var(--surface-muted)', borderRadius: 'var(--radius-lg)', padding: '4px' }}>
                 <button
                   onClick={() => setType('counter')}
                   style={{
@@ -387,9 +350,9 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
               </div>
             </div>
 
-            {/* MULTIPLIER (Only show when creating a new exercise) */}
+            {/* MULTIPLIER */}
             {!editingId && (
-              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 'var(--radius-lg)' }}>
+              <div style={{ background: 'var(--surface-muted)', padding: '16px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-subtle)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                   <label style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                     {t('customExercises.multiplierLabel')}
@@ -398,7 +361,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                     x{multiplier.toFixed(1)}
                   </div>
                 </div>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '16px', marginTop: 0, lineHeight: 1.4 }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: '16px', marginTop: 0, lineHeight: 1.4 }}>
                   {t('customExercises.multiplierHint', { value: multiplier.toFixed(1), unit: type === 'timer' ? `(${t('customExercises.seconds')})` : `(${t('customExercises.repetitions')})` })}
                 </p>
                 <Slider
@@ -408,32 +371,33 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                   value={multiplier}
                   color={color}
                   onChange={setMultiplier}
-                  // On release, take focus out of the name field (and dismiss the
-                  // mobile keyboard) if it was being edited — done on pointer-up so
-                  // the keyboard doesn't close mid-drag and shift the layout.
                   onPointerUp={() => nameInputRef.current?.blur()}
                   style={{ width: '100%' }}
                 />
               </div>
             )}
 
-            {error && <div style={{ color: 'var(--error)', fontSize: '0.85rem', textAlign: 'center' }}>{error}</div>}
-
-            <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+            <div style={{ display: 'flex', gap: '12px', marginTop: 'var(--space-3)' }}>
               <Button
                 variant="secondary"
+                size="md"
+                fullWidth
                 onClick={() => {
                   setEditingId(null);
                   setView('list');
                 }}
-                style={{ flex: 1, padding: '14px', fontSize: '1rem' }}
-              >{t('common.cancel')}</Button>
+              >
+                {t('common.cancel')}
+              </Button>
 
               <Button
                 variant="primary"
+                size="md"
+                fullWidth
                 onClick={handleSave}
-                style={{ flex: 1, padding: '14px', fontSize: '1rem' }}
-              >{t('common.save')}</Button>
+              >
+                {t('common.save')}
+              </Button>
             </div>
           </div>
         )}
@@ -442,7 +406,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
       {/* Delete Confirmation Modal */}
       {confirmDeleteEx && (
         <div className="fade-in" style={{
-          position: 'fixed', inset: 0, background: 'rgba(5,5,5,0.94)',
+          position: 'fixed', inset: 0, background: 'var(--overlay-bg-heavy)',
           zIndex: Z_INDEX.DELETE_MODAL, display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center', padding: 'var(--spacing-md)',
           overflow: 'hidden', touchAction: 'none', overscrollBehavior: 'none'
@@ -450,12 +414,12 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
           onTouchMove={(e) => e.preventDefault()}
         >
           <div style={{
-            background: 'var(--surface-primary)', border: '1px solid var(--border-subtle)',
+            background: 'var(--sheet-bg)', border: '1px solid var(--border-default)',
             borderRadius: 'var(--radius-lg)', padding: '24px', width: '100%', maxWidth: '340px',
             textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px'
           }}>
             <div style={{
-              width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(239,68,68,0.1)',
+              width: '64px', height: '64px', borderRadius: '50%', background: 'color-mix(in srgb, var(--error) 15%, transparent)',
               color: 'var(--error)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto'
             }}>
               <Trash2 size={32} />
@@ -468,37 +432,32 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
             <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
               {t('customExercises.deleteConfirm', { name: confirmDeleteEx.label })}
               {computedStats?.exerciseReps?.[confirmDeleteEx.id] > 0 && (
-                <span style={{ display: 'block', marginTop: '12px', color: 'var(--color-amber)', fontSize: '0.85rem', fontWeight: '700', padding: '8px', background: 'rgba(251,191,36,0.1)', borderRadius: '8px' }}>
+                <span style={{ display: 'block', marginTop: '12px', color: 'var(--warning)', fontSize: '0.85rem', fontWeight: '700', padding: '8px', background: 'color-mix(in srgb, var(--warning) 15%, transparent)', borderRadius: '8px' }}>
                   {t('customExercises.deleteWarning', { count: computedStats.exerciseReps[confirmDeleteEx.id].toLocaleString(i18n.language), unit: confirmDeleteEx.type === 'timer' ? t('customExercises.seconds') : t('customExercises.repetitions') })}
                 </span>
               )}
             </p>
             
             <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-              <button 
+              <Button 
+                variant="secondary"
+                size="md"
+                fullWidth
                 onClick={() => setConfirmDeleteEx(null)}
-                className="hover-lift"
-                style={{
-                  flex: 1, padding: '12px', borderRadius: 'var(--radius-md)',
-                  background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
-                  color: 'white', fontWeight: '700'
-                }}
               >
                 {t('common.cancel')}
-              </button>
-              <button 
+              </Button>
+              <Button 
+                variant="danger"
+                size="md"
+                fullWidth
                 onClick={() => {
                   deleteCustomExercise(confirmDeleteEx.id);
                   setConfirmDeleteEx(null);
                 }}
-                className="hover-lift"
-                style={{
-                  flex: 1, padding: '12px', borderRadius: 'var(--radius-md)',
-                  background: 'var(--error)', border: 'none', color: 'white', fontWeight: '700'
-                }}
               >
                 {t('common.delete')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -507,3 +466,4 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
     </div>
   );
 }
+

@@ -1,37 +1,13 @@
 import React, { useState } from 'react';
-import { Sparkles, Heart, Save, Calendar, Loader2, Crown, Copy, Check, Activity, Award, Clock, Dumbbell, RotateCcw, Trash2, AlertTriangle, Trophy, Bell, Volume2, Palette } from '@utils/icons';
-import { ToggleSwitch } from '@components/ui/ToggleSwitch';
-import { SettingRow } from '@components/ui/SettingRow';
-import { ThemeSwatch } from '@components/ui';
+import { Sparkles, Heart, Save, Calendar, Crown, Copy, Check, Activity, Award, Clock, Dumbbell, RotateCcw, Trash2, AlertTriangle, Trophy, Bell, Volume2, Palette } from '@utils/icons';
+import { ToggleSwitch, SettingRow, ThemeSwatch, Input, Button, Card } from '@components/ui';
 import { THEMES } from '@config/themes';
 
 const sectionTitleStyle = {
-  marginBottom: 'var(--spacing-md)', fontSize: '0.85rem', fontWeight: '700',
+  marginBottom: 'var(--space-4)', fontSize: '0.85rem', fontWeight: '700',
   textTransform: 'uppercase', letterSpacing: '1px',
   color: 'var(--text-secondary)'
 };
-
-const inputStyle = {
-  width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-md)',
-  border: '1px solid var(--border-subtle)', background: 'var(--surface-muted)',
-  color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: '600', outline: 'none', boxSizing: 'border-box'
-};
-
-const labelStyle = {
-  fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: '600', display: 'block', marginBottom: '6px'
-};
-
-const cardStyle = {
-  padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)', background: 'var(--surface-section)'
-};
-
-const timeInputStyle = {
-  width: '52px', padding: '8px', textAlign: 'center', borderRadius: 'var(--radius-md)',
-  border: '1px solid var(--border-subtle)', background: 'var(--surface-muted)',
-  color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: '700', outline: 'none', boxSizing: 'border-box'
-};
-
-
 
 function clampInt(value, min, max) {
   const n = parseInt(value, 10);
@@ -68,27 +44,22 @@ function StatTile({ icon: Icon, label, value, color = 'var(--text-secondary)' })
 function CopyLine({ label, value, k, copiedKey, onCopy }) {
   const isCopied = copiedKey === k;
   return (
-    <div className="row gap-8">
+    <div className="row gap-8" style={{ alignItems: 'center' }}>
       <code style={{
         flex: 1, minWidth: 0, fontSize: '0.7rem', color: 'var(--text-secondary)',
         fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
       }}>
         {label}: {value || '—'}
       </code>
-      <button
-        onClick={() => onCopy(k, value)}
+      <Button
+        variant="ghost"
+        size="sm"
         disabled={!value}
-        className="hover-lift"
-        style={{
-          display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0,
-          padding: '6px 12px', borderRadius: 'var(--radius-md)', cursor: value ? 'pointer' : 'not-allowed',
-          background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
-          color: isCopied ? 'var(--success)' : 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: '700'
-        }}
+        icon={isCopied ? Check : Copy}
+        onClick={() => onCopy(k, value)}
       >
-        {isCopied ? <Check size={14} /> : <Copy size={14} />}
         {isCopied ? 'Copié' : 'Copier'}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -106,11 +77,11 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
 
       {/* Read-only metadata overview */}
       {meta && (
-        <div className="glass-premium" style={cardStyle}>
+        <Card variant="glass" padding="md">
           <h3 style={sectionTitleStyle}>Aperçu</h3>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
@@ -130,15 +101,15 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
             <CopyLine label="Photo" value={formState.photoURL} k="photo" copiedKey={copiedKey} onCopy={copy} />
           </div>
           {meta.lastCompletionChange && (
-            <div style={{ marginTop: '8px', fontSize: '0.7rem', color: 'var(--text-secondary)', opacity: 0.6 }}>
+            <div style={{ marginTop: '8px', fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
               Dernière modif. progression : {fmtDate(meta.lastCompletionChange, true)}
             </div>
           )}
-        </div>
+        </Card>
       )}
 
       {/* Section Abonnements / Droits */}
-      <div className="glass-premium" style={cardStyle}>
+      <Card variant="glass" padding="md">
         <h3 style={sectionTitleStyle}>Abonnements & Droits</h3>
 
         <SettingRow
@@ -182,23 +153,20 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
             activeGradient="linear-gradient(135deg, var(--error), #dc2626)"
           />
         </SettingRow>
-      </div>
+      </Card>
 
       {/* Section Configuration settings */}
-      <div className="glass-premium" style={cardStyle}>
+      <Card variant="glass" padding="md">
         <h3 style={sectionTitleStyle}>Préférences App</h3>
 
         <div style={{ marginBottom: '12px' }}>
-          <label style={labelStyle}>
-            Pseudo pour le Classement (Leaderboard)
-          </label>
-          <input
+          <Input
+            label="Pseudo pour le Classement (Leaderboard)"
             type="text"
             value={formState.leaderboardPseudo}
             onChange={(e) => setFormState(prev => ({ ...prev, leaderboardPseudo: e.target.value.slice(0, 20) }))}
             placeholder="Pseudo du classement"
             maxLength={20}
-            style={inputStyle}
           />
         </div>
 
@@ -240,14 +208,14 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
               type="number" min={0} max={23}
               value={formState.notificationTime?.hour ?? 9}
               onChange={(e) => setFormState(prev => ({ ...prev, notificationTime: { ...prev.notificationTime, hour: clampInt(e.target.value, 0, 23) } }))}
-              style={timeInputStyle}
+              style={{ width: '52px', padding: '8px', textAlign: 'center', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--surface-muted)', color: 'var(--text-primary)', fontWeight: '700' }}
             />
             <span style={{ fontWeight: '800', color: 'var(--text-secondary)' }}>:</span>
             <input
               type="number" min={0} max={59}
               value={formState.notificationTime?.minute ?? 0}
               onChange={(e) => setFormState(prev => ({ ...prev, notificationTime: { ...prev.notificationTime, minute: clampInt(e.target.value, 0, 59) } }))}
-              style={timeInputStyle}
+              style={{ width: '52px', padding: '8px', textAlign: 'center', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--surface-muted)', color: 'var(--text-primary)', fontWeight: '700' }}
             />
           </div>
         </div>
@@ -284,25 +252,20 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
             ))}
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Section Progrès */}
-      <div className="glass-premium" style={cardStyle}>
+      <Card variant="glass" padding="md">
         <h3 style={sectionTitleStyle}>Progression</h3>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
-          <div>
-            <label style={labelStyle}>
-              Date de commencement du défi (Format YYYY-MM-DD)
-            </label>
-            <input
-              type="text"
-              value={formState.startDate}
-              onChange={(e) => setFormState(prev => ({ ...prev, startDate: e.target.value }))}
-              placeholder="Ex: 2026-01-01"
-              style={inputStyle}
-            />
-          </div>
+          <Input
+            label="Date de commencement du défi (Format YYYY-MM-DD)"
+            type="text"
+            value={formState.startDate}
+            onChange={(e) => setFormState(prev => ({ ...prev, startDate: e.target.value }))}
+            placeholder="Ex: 2026-01-01"
+          />
         </div>
 
         <SettingRow
@@ -318,48 +281,33 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
             activeGradient="linear-gradient(135deg, var(--success), #059669)"
           />
         </SettingRow>
-      </div>
+      </Card>
 
       {/* Form Save Button */}
       <div style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
-        <button
-          disabled={saveLoading}
+        <Button
+          variant="danger"
+          size="lg"
+          fullWidth
+          loading={saveLoading}
+          icon={Save}
           onClick={onSave}
-          className="hover-lift"
-          style={{
-            flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
-            background: 'linear-gradient(135deg, var(--error), #dc2626)',
-            color: 'white', fontWeight: '800', fontSize: '0.95rem',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: '8px', cursor: saveLoading ? 'not-allowed' : 'pointer', border: 'none',
-            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
-          }}
         >
-          {saveLoading ? (
-            <Loader2 size={18} className="spin" />
-          ) : (
-            <Save size={18} />
-          )}
-          <span>Enregistrer Profil & Droits</span>
-        </button>
-        <button
+          Enregistrer Profil & Droits
+        </Button>
+        <Button
+          variant="secondary"
+          size="lg"
           onClick={onBack}
-          style={{
-            padding: '14px 24px', borderRadius: 'var(--radius-lg)',
-            background: 'transparent',
-            border: '1px solid var(--border-default)',
-            color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.95rem',
-            cursor: 'pointer'
-          }}
         >
           Retour
-        </button>
+        </Button>
       </div>
 
       {/* Danger zone */}
       <div style={{
-        padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-        background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.25)'
+        padding: 'var(--space-4)', borderRadius: 'var(--radius-xl)',
+        background: 'color-mix(in srgb, var(--error) 5%, transparent)', border: '1px solid color-mix(in srgb, var(--error) 25%, transparent)'
       }}>
         <h3 style={{ ...sectionTitleStyle, color: 'var(--error)', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <AlertTriangle size={14} /> Zone de danger
@@ -367,20 +315,26 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
 
         {confirm === null && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <button
+            <Button
+              variant="danger-ghost"
+              size="md"
+              fullWidth
+              icon={RotateCcw}
               onClick={() => setConfirm('reset')}
               disabled={saveLoading}
-              style={dangerBtnStyle('var(--warning)')}
             >
-              <RotateCcw size={16} /> Réinitialiser la progression
-            </button>
-            <button
+              Réinitialiser la progression
+            </Button>
+            <Button
+              variant="danger"
+              size="md"
+              fullWidth
+              icon={Trash2}
               onClick={() => setConfirm('delete')}
               disabled={saveLoading}
-              style={dangerBtnStyle('var(--error)', true)}
             >
-              <Trash2 size={16} /> Supprimer les données du compte
-            </button>
+              Supprimer les données du compte
+            </Button>
           </div>
         )}
 
@@ -411,47 +365,20 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
   );
 }
 
-function dangerBtnStyle(color, filled = false) {
-  return {
-    width: '100%', padding: '12px', borderRadius: 'var(--radius-lg)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-    fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer',
-    background: filled ? `color-mix(in srgb, ${color} 10%, transparent)` : 'transparent',
-    border: `1px solid color-mix(in srgb, ${color} 33%, transparent)`, color,
-  };
-}
-
 /** Inline confirmation row used by the danger-zone actions. */
-function ConfirmRow({ text, confirmLabel, color, loading, onConfirm, onCancel }) {
+function ConfirmRow({ text, confirmLabel, loading, onConfirm, onCancel }) {
   return (
     <div className="scale-in flex-col gap-12">
       <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-primary)', lineHeight: 1.5 }}>{text}</p>
       <div style={{ display: 'flex', gap: '10px' }}>
-        <button
-          onClick={onCancel}
-          disabled={loading}
-          style={{
-            flex: 1, padding: '12px', borderRadius: 'var(--radius-lg)',
-            background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
-            color: 'var(--text-primary)', fontWeight: '700', cursor: 'pointer'
-          }}
-        >
+        <Button variant="secondary" size="md" fullWidth disabled={loading} onClick={onCancel}>
           Annuler
-        </button>
-        <button
-          onClick={onConfirm}
-          disabled={loading}
-          style={{
-            flex: 1, padding: '12px', borderRadius: 'var(--radius-lg)',
-            background: color, border: 'none', color: '#fff', fontWeight: '800',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-            cursor: loading ? 'not-allowed' : 'pointer'
-          }}
-        >
-          {loading && <Loader2 size={16} className="spin" />}
+        </Button>
+        <Button variant="danger" size="md" fullWidth loading={loading} onClick={onConfirm}>
           {confirmLabel}
-        </button>
+        </Button>
       </div>
     </div>
   );
 }
+

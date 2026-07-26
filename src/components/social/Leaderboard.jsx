@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { X, Trophy, LogOut, Activity } from '@utils/icons';
-import { IconButton, Spinner, GoogleSignInButton } from '@components/ui';
+import { Button, IconButton, Spinner, GoogleSignInButton } from '@components/ui';
 import { EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { getLocalDateStr } from '@shared/dateUtils';
@@ -316,56 +316,59 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
             {/* Footer */}
             {clanData && communityContext !== 'manage' && (
                 <div style={{ paddingTop: 'var(--spacing-sm)' }}>
-                    <button onClick={() => setShowLeaveConfirm(true)} style={{
-                        width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
-                        background: 'transparent', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444',
-                        fontSize: '0.9rem', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer'
-                    }}>
-                        <LogOut size={16} /> {t('leaderboard.leaveClan')}
-                    </button>
+                    <Button
+                        variant="danger-ghost"
+                        size="md"
+                        fullWidth
+                        icon={LogOut}
+                        onClick={() => setShowLeaveConfirm(true)}
+                    >
+                        {t('leaderboard.leaveClan')}
+                    </Button>
                 </div>
             )}
 
             {/* Leave Clan Confirmation */}
             {showLeaveConfirm && (
                 <div className="fade-in" style={{
-                    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
+                    position: 'fixed', inset: 0, background: 'var(--overlay-bg-heavy)',
                     zIndex: Z_INDEX.DELETE_MODAL, display: 'flex', alignItems: 'center', justifyContent: 'center',
                     padding: 'var(--spacing-lg)'
                 }}>
                     <div className="scale-in" style={{
-                        background: 'linear-gradient(135deg, rgba(30,30,30,0.95), rgba(20,20,20,0.95))',
-                        border: '1px solid rgba(255,255,255,0.1)',
+                        background: 'var(--sheet-bg)',
+                        border: '1px solid var(--border-default)',
                         borderRadius: 'var(--radius-xl)', padding: '24px',
-                        width: '100%', maxWidth: '320px', textAlign: 'center',
-                        boxShadow: '0 20px 40px rgba(0,0,0,0.5)'
+                        width: '100%', maxWidth: '340px', textAlign: 'center',
+                        boxShadow: 'var(--shadow-lg)'
                     }}>
-                        <LogOut size={48} color="#ef4444" style={{ marginBottom: '16px' }} />
-                        <h3 style={{ margin: '0 0 12px 0', fontSize: '1.4rem', color: 'white' }}>{t('leaderboard.leaveClanConfirm')}</h3>
+                        <LogOut size={48} color="var(--error)" style={{ marginBottom: '16px' }} />
+                        <h3 style={{ margin: '0 0 12px 0', fontSize: '1.4rem', color: 'var(--text-primary)' }}>{t('leaderboard.leaveClanConfirm')}</h3>
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px', lineHeight: '1.5' }}>
                             <Trans i18nKey="leaderboard.leaveClanWarning" values={{ name: clanData.name }}>
                                 Es-tu sûr de vouloir quitter <strong>{{name: clanData.name}}</strong> ? Tes statistiques personnelles sont protégées, mais tu n'apparaîtras plus dans leur classement.
                             </Trans>
                         </p>
                         <div style={{ display: 'flex', gap: '12px' }}>
-                            <button onClick={() => setShowLeaveConfirm(false)} className="hover-lift" style={{
-                                flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
-                                background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white',
-                                fontWeight: '600', cursor: 'pointer', minHeight: 'var(--touch-min)'
-                            }}>{t('common.cancel')}</button>
-                            <button onClick={async () => {
-                                setShowLeaveConfirm(false);
-                                const res = await cloudSync.leaveClan(clanData.id);
-                                if (res.success) {
-                                    await refreshUserClans();
-                                    setCommunityContext('global');
-                                }
-                                if (onLeaveClan) onLeaveClan();
-                            }} className="hover-lift" style={{
-                                flex: 1, padding: '14px', borderRadius: 'var(--radius-lg)',
-                                background: '#ef4444', border: 'none', color: 'white',
-                                fontWeight: '700', cursor: 'pointer', minHeight: 'var(--touch-min)'
-                            }}>{t('leaderboard.leaveClan')}</button>
+                            <Button variant="secondary" size="md" fullWidth onClick={() => setShowLeaveConfirm(false)}>
+                                {t('common.cancel')}
+                            </Button>
+                            <Button
+                                variant="danger"
+                                size="md"
+                                fullWidth
+                                onClick={async () => {
+                                    setShowLeaveConfirm(false);
+                                    const res = await cloudSync.leaveClan(clanData.id);
+                                    if (res.success) {
+                                        await refreshUserClans();
+                                        setCommunityContext('global');
+                                    }
+                                    if (onLeaveClan) onLeaveClan();
+                                }}
+                            >
+                                {t('leaderboard.leaveClan')}
+                            </Button>
                         </div>
                     </div>
                 </div>

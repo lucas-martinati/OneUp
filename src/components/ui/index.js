@@ -17,5 +17,8 @@ export { Spinner } from './Spinner';
 export { Stack } from './Stack';
 export { StreakFlame } from './StreakFlame';
 export { ToggleSwitch } from './ToggleSwitch';
+export { Input } from './Input';
+export { Badge } from './Badge';
+export { ModalHeader } from './ModalHeader';
 export { ThemeSwatch } from './ThemeSwatch';
 export { WeightBadge } from './WeightBadge';

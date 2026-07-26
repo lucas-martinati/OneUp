@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { Clock, Filter, X, ChevronDown, ChevronUp } from '@utils/icons';
-import { Avatar } from '@components/ui/Avatar';
+import { Avatar, Input, Badge, IconButton } from '@components/ui';
 import { FILTER_OPTIONS } from './useAdminPanel';
 
 const SORT_OPTIONS = [
@@ -19,56 +19,42 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
   return (
     <>
       {/* Search Bar + Filter toggle */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexShrink: 0 }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
-          <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
-          <input
-            type="text"
-            placeholder="Rechercher par pseudo, email ou UID..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: '100%', padding: '12px 16px 12px 42px',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid var(--border-subtle)',
-              background: 'var(--surface-muted)',
-              color: 'var(--text-primary)',
-              fontSize: '1rem', fontWeight: '600',
-              outline: 'none', boxSizing: 'border-box'
-            }}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: 'var(--space-3)', flexShrink: 0, alignItems: 'center' }}>
+        <Input
+          type="search"
+          placeholder="Rechercher par pseudo, email ou UID..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          icon={Search}
+          fullWidth
+        />
+        <div style={{ position: 'relative' }}>
+          <IconButton
+            icon={Filter}
+            onClick={() => setShowFilters(s => !s)}
+            aria-label="Filtres"
+            variant={showFilters || filterCount ? 'primary' : 'glass'}
+            className="hover-lift"
           />
-        </div>
-        <button
-          onClick={() => setShowFilters(s => !s)}
-          aria-label="Filtres"
-          style={{
-            position: 'relative', flexShrink: 0, width: '48px', borderRadius: 'var(--radius-lg)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-            background: (showFilters || filterCount) ? 'var(--surface-hover)' : 'var(--surface-muted)',
-            border: `1px solid ${filterCount ? 'var(--accent)' : 'var(--border-subtle)'}`,
-            color: filterCount ? 'var(--accent-glow)' : 'var(--text-secondary)'
-          }}
-        >
-          <Filter size={18} />
           {filterCount > 0 && (
             <span style={{
-              position: 'absolute', top: '-6px', right: '-6px', minWidth: '18px', height: '18px',
-              padding: '0 4px', borderRadius: '9px', background: 'var(--accent)', color: '#fff',
+              position: 'absolute', top: '-4px', right: '-4px', minWidth: '18px', height: '18px',
+              padding: '0 4px', borderRadius: '999px', background: 'var(--accent-glow)', color: '#fff',
               fontSize: '0.65rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>
               {filterCount}
             </span>
           )}
-        </button>
+        </div>
       </div>
 
       {/* Filter panel */}
       {showFilters && (
         <div className="scale-in" style={{
-          marginBottom: '10px', padding: '12px', borderRadius: 'var(--radius-lg)',
-          background: 'var(--surface-section)', border: '1px solid var(--border-subtle)', flexShrink: 0
+          marginBottom: 'var(--space-3)', padding: 'var(--space-3)', borderRadius: 'var(--radius-lg)',
+          background: 'var(--surface-muted)', border: '1px solid var(--border-default)', flexShrink: 0
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
             <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Filtres
             </span>
@@ -93,7 +79,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
                   key={opt.id}
                   onClick={() => toggleFilter(opt.id)}
                   style={{
-                    padding: '6px 14px', borderRadius: '999px', cursor: 'pointer',
+                    padding: '6px 14px', borderRadius: 'var(--radius-full)', cursor: 'pointer',
                     fontSize: '0.78rem', fontWeight: '700', whiteSpace: 'nowrap',
                     background: active ? 'var(--accent)' : 'transparent',
                     border: `1px solid ${active ? 'var(--accent)' : 'var(--border-subtle)'}`,
@@ -110,7 +96,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
       )}
 
       {/* Sort selector */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--spacing-md)', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-4)', flexShrink: 0 }}>
         <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', flexShrink: 0 }}>
           Trier
         </span>
@@ -124,10 +110,10 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
                 title={active ? 'Cliquer pour inverser l\'ordre' : undefined}
                 style={{
                   flexShrink: 0, display: 'flex', alignItems: 'center', gap: '2px',
-                  padding: '6px 12px', borderRadius: '999px', cursor: 'pointer',
+                  padding: '6px 12px', borderRadius: 'var(--radius-full)', cursor: 'pointer',
                   fontSize: '0.78rem', fontWeight: '700', whiteSpace: 'nowrap',
                   background: active ? 'var(--surface-hover)' : 'transparent',
-                  border: `1px solid ${active ? 'rgba(255,255,255,0.2)' : 'var(--border-subtle)'}`,
+                  border: `1px solid ${active ? 'var(--border-strong)' : 'var(--border-subtle)'}`,
                   color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
                   transition: 'all 0.15s ease'
                 }}
@@ -141,7 +127,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
       </div>
 
       {/* List */}
-      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '4px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', paddingRight: '4px' }}>
         {filteredUsers.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)', fontWeight: '600' }}>
             Aucun utilisateur trouvé
@@ -151,11 +137,11 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
             <div
               key={user.uid}
               onClick={() => onSelectUser(user)}
-              className="hover-lift glass-premium"
+              className="hover-lift glass"
               style={{
-                padding: '16px', borderRadius: 'var(--radius-lg)',
-                background: 'var(--surface-section)',
-                border: '1px solid var(--border-subtle)',
+                padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)',
+                background: 'var(--card-bg)',
+                border: '1px solid var(--border-default)',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 cursor: 'pointer', transition: 'background-color 0.2s ease, border-color 0.2s ease'
               }}
@@ -169,15 +155,15 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {user.email || "Email non renseigné"}
                   </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
-                    <span style={metaChip(user.isSetup ? '#10b981' : '#6b7280')}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px' }}>
+                    <Badge variant={user.isSetup ? 'success' : 'default'} size="sm">
                       {user.isSetup ? '✓ Configuré' : '✗ Non configuré'}
-                    </span>
+                    </Badge>
                     {user.startDate && (
-                      <span style={metaChip('#06b6d4')}>Début&nbsp;{user.startDate}</span>
+                      <Badge variant="info" size="sm">Début {user.startDate}</Badge>
                     )}
                   </div>
-                  <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.25)', fontFamily: 'monospace', marginTop: '4px' }}>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontFamily: 'monospace', marginTop: '4px' }}>
                     UID: {user.uid}
                   </div>
                 </div>
@@ -186,14 +172,10 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', flexShrink: 0 }}>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   {user.isPro && (
-                    <span style={{ fontSize: '0.65rem', background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', color: '#a78bfa', padding: '2px 8px', borderRadius: '12px', fontWeight: '800' }}>
-                      PRO
-                    </span>
+                    <Badge variant="pro" size="sm">PRO</Badge>
                   )}
                   {user.isSupporter && (
-                    <span style={{ fontSize: '0.65rem', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5', padding: '2px 8px', borderRadius: '12px', fontWeight: '800' }}>
-                      SUPPORT
-                    </span>
+                    <Badge variant="warning" size="sm">SUPPORT</Badge>
                   )}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
@@ -203,7 +185,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
                   Reps: <strong style={{ color: 'var(--text-primary)' }}>{(user.totalReps || 0).toLocaleString()}</strong>
                 </div>
                 {user.lastSeen && (
-                  <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', gap: '3px' }}>
                     <Clock size={10} />
                     {new Date(user.lastSeen).toLocaleDateString()}
                   </div>
@@ -217,10 +199,3 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
   );
 }
 
-function metaChip(color) {
-  return {
-    fontSize: '0.6rem', fontWeight: '700', padding: '1px 7px', borderRadius: '10px',
-    background: `${color}1f`, border: `1px solid ${color}40`, color,
-    whiteSpace: 'nowrap'
-  };
-}

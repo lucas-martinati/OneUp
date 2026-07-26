@@ -4,13 +4,25 @@ import React, { useState, useEffect } from 'react';
  * A premium segmented control (switch/tabs) used across the app.
  * Based on the Cardio dashboard design.
  */
-export function SegmentedControl({ options, value, onChange, style = {} }) {
+export function SegmentedControl({
+  options,
+  value,
+  activeId,
+  onChange,
+  fullWidth,
+  size = 'md',
+  className = '',
+  style = {}
+}) {
+  const effectiveValue = value !== undefined ? value : activeId;
+  const isFullWidth = fullWidth !== undefined ? fullWidth : style?.width === '100%';
+
   const [isBumping, setIsBumping] = useState(false);
-  const [prevValue, setPrevValue] = useState(value);
+  const [prevValue, setPrevValue] = useState(effectiveValue);
 
   // Sync state with prop change during render to avoid useEffect cascading renders
-  if (value !== prevValue) {
-    setPrevValue(value);
+  if (effectiveValue !== prevValue) {
+    setPrevValue(effectiveValue);
     setIsBumping(true);
   }
 
@@ -21,28 +33,47 @@ export function SegmentedControl({ options, value, onChange, style = {} }) {
     }
   }, [isBumping]);
 
-  const activeIndex = options.findIndex(o => o.id === value);
+  const rawIndex = options.findIndex(o => o.id === effectiveValue);
+  const activeIndex = rawIndex >= 0 ? rawIndex : 0;
   const activeOption = options[activeIndex] || options[0];
+
+  const handleOptionClick = (clickedId) => {
+    if (options.length === 2) {
+      if (clickedId === effectiveValue) {
+        const other = options.find(o => o.id !== clickedId) || options[0];
+        onChange(other.id);
+      } else {
+        onChange(clickedId);
+      }
+    } else {
+      onChange(clickedId);
+    }
+  };
+
+  const PADS = { sm: 3, lg: 5, md: 4 };
+  const PADDINGS = { sm: '4px 10px', lg: '8px 18px', md: '6px 14px' };
+  const FONT_SIZES = { sm: '0.75rem', lg: '0.88rem', md: '0.82rem' };
+
+  const pad = PADS[size] || 4;
+  const count = options.length || 1;
+
+  const buttonPadding = PADDINGS[size] || '6px 14px';
+  const fontSize = FONT_SIZES[size] || '0.82rem';
 
   return (
     <div
-      onClick={() => {
-        if (options.length === 2) {
-          const nextIndex = activeIndex === 0 ? 1 : 0;
-          onChange(options[nextIndex].id);
-        }
-      }}
-      className={isBumping ? 'bump' : ''}
+      className={`${isBumping ? 'bump' : ''} ${className}`.trim() || undefined}
       style={{
-        display: 'flex',
+        display: isFullWidth ? 'grid' : 'inline-grid',
+        gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))`,
         background: 'var(--surface-subtle)',
         borderRadius: 'var(--radius-full)',
-        padding: '3px',
+        padding: `${pad}px`,
         border: '1px solid var(--border-subtle)',
-        cursor: 'pointer',
-        width: 'fit-content',
         position: 'relative',
-        minWidth: '160px', // Ensure a minimum width for the slide effect
+        width: isFullWidth ? '100%' : 'fit-content',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
         ...style
       }}
     >
@@ -50,54 +81,55 @@ export function SegmentedControl({ options, value, onChange, style = {} }) {
       <div 
         style={{
           position: 'absolute',
-          top: '3px',
-          bottom: '3px',
-          left: `calc(${(activeIndex * 100) / options.length}% + ${3 - (activeIndex * 6 / options.length)}px)`,
-          width: `calc(${100 / options.length}% - ${6 / options.length}px)`,
+          top: `${pad}px`,
+          bottom: `${pad}px`,
+          left: `calc(${(activeIndex * 100) / count}% + ${pad}px)`,
+          width: `calc(${100 / count}% - ${2 * pad}px)`,
           background: activeOption.activeBg || 'var(--gradient-glow)',
           borderRadius: 'var(--radius-full)',
-          transition: 'left 0.30s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.30s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.30s ease',
+          transition: 'left 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.28s ease',
           zIndex: 0,
-          boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)'
         }}
       />
 
       {options.map((option) => {
-        const isActive = value === option.id;
+        const isActive = option.id === effectiveValue;
         return (
           <button
             key={option.id}
-            onClick={(e) => {
-              if (options.length === 2) return; // Let it bubble to container for toggle logic
-              e.stopPropagation();
-              onChange(option.id);
-            }}
-            className=""
+            type="button"
+            onClick={() => handleOptionClick(option.id)}
             style={{
-              padding: '6px 16px',
+              padding: buttonPadding,
               borderRadius: 'var(--radius-full)',
-              fontSize: 'clamp(0.7rem, 1.3vh, 0.85rem)',
+              fontSize: fontSize,
               fontWeight: '800',
               border: 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              transition: 'color 0.35s ease',
-              background: 'transparent', // Indicator handles the background
+              transition: 'color 0.25s ease',
+              background: 'transparent',
               color: isActive 
-                ? (option.activeColor || '#fff') 
+                ? (option.activeColor || '#ffffff') 
                 : 'var(--text-secondary)',
               cursor: 'pointer',
               minHeight: 'unset',
-              flex: 1,
               position: 'relative',
               zIndex: 1,
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              width: '100%',
+              boxSizing: 'border-box'
             }}
           >
             {option.icon && <span>{option.icon}</span>}
-            {option.label}
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {option.label}
+            </span>
           </button>
         );
       })}

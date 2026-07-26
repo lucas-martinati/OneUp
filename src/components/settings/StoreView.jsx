@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Heart, RotateCcw, Sparkles } from '@utils/icons';
-import { Button } from '@components/ui';
+import { Button, Card } from '@components/ui';
 import { getPurchaseHistory } from '@services/purchaseService';
 import { StoreCard } from '../store//StoreCard';
 import { useAuth } from '@contexts/AuthContext';
@@ -95,11 +95,7 @@ export function StoreView() {
 
             {/* --- Historique des achats --- */}
             {displayHistory && displayHistory.length > 0 && (
-                <div className="glass-premium" style={{
-                    padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                    marginBottom: 'var(--spacing-md)',
-                    background: 'var(--surface-section)'
-                }}>
+                <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
                     <div style={{
                         fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)',
                         textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'
@@ -184,7 +180,7 @@ export function StoreView() {
                             </div>
                         ))}
                     </div>
-                </div>
+                </Card>
             )}
         </div>
     );

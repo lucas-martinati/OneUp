@@ -1,41 +1,19 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, Volume2, Vibrate, Clock, Users, Lock, Gauge, Globe, Smartphone, Download, Upload } from '@utils/icons';
-import { ToggleSwitch } from '@components/ui/ToggleSwitch';
-import { SettingRow } from '@components/ui/SettingRow';
-import { ThemeSwatch } from '@components/ui';
+import { ToggleSwitch, SettingRow, ThemeSwatch, Card, Button, Input } from '@components/ui';
 import { LANGUAGES } from '@config/languages';
 import { THEMES } from '@config/themes';
 import { isNativePlatform } from '@utils/platform';
 import { downloadBackup, parseBackup, restoreBackup, readFileText } from '@utils/dataBackup';
 import { sectionTitleStyle } from './settingsStyles';
 
-const sectionCardStyle = {
-    padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-    marginBottom: 'var(--spacing-md)',
-    background: 'var(--surface-section)'
-};
-
 /** Notifications (+ time picker), sounds and keep-screen-on toggles. */
 export function PreferencesSection({ settings, onSave }) {
     const { t } = useTranslation();
 
-    const timeSelectStyle = {
-        padding: '10px 14px',
-        borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--border-subtle)',
-        background: 'var(--surface-muted)',
-        color: 'var(--text-primary)',
-        fontSize: '1.1rem',
-        fontWeight: '700',
-        cursor: 'pointer',
-        outline: 'none',
-        textAlign: 'center',
-        flex: 1
-    };
-
     return (
-        <div className="glass-premium" style={sectionCardStyle}>
+        <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.preferences')}</h3>
 
             <SettingRow
@@ -74,10 +52,16 @@ export function PreferencesSection({ settings, onSave }) {
                                 ...settings,
                                 notificationTime: { ...settings.notificationTime, hour: parseInt(e.target.value) }
                             })}
-                            style={timeSelectStyle}
+                            className="input-field input-field--select"
+                            style={{
+                                padding: '10px 14px', borderRadius: 'var(--radius-md)',
+                                border: '1px solid var(--border-default)', background: 'var(--surface-muted)',
+                                color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700',
+                                textAlign: 'center', flex: 1
+                            }}
                         >
                             {Array.from({ length: 24 }, (_, i) => (
-                                <option key={i} value={i} style={{ background: 'var(--surface-muted)', color: 'var(--text-primary)' }}>
+                                <option key={i} value={i}>
                                     {String(i).padStart(2, '0')}
                                 </option>
                             ))}
@@ -89,10 +73,16 @@ export function PreferencesSection({ settings, onSave }) {
                                 ...settings,
                                 notificationTime: { ...settings.notificationTime, minute: parseInt(e.target.value) }
                             })}
-                            style={timeSelectStyle}
+                            className="input-field input-field--select"
+                            style={{
+                                padding: '10px 14px', borderRadius: 'var(--radius-md)',
+                                border: '1px solid var(--border-default)', background: 'var(--surface-muted)',
+                                color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700',
+                                textAlign: 'center', flex: 1
+                            }}
                         >
                             {[0, 15, 30, 45].map(minute => (
-                                <option key={minute} value={minute} style={{ background: 'var(--surface-muted)', color: 'var(--text-primary)' }}>
+                                <option key={minute} value={minute}>
                                     {String(minute).padStart(2, '0')}
                                 </option>
                             ))}
@@ -142,7 +132,7 @@ export function PreferencesSection({ settings, onSave }) {
                     activeGradient="linear-gradient(135deg, var(--warning), #d97706)"
                 />
             </SettingRow>
-        </div>
+        </Card>
     );
 }
 
@@ -151,7 +141,7 @@ export function LanguageSection() {
     const { t, i18n } = useTranslation();
 
     return (
-        <div className="glass-premium" style={sectionCardStyle}>
+        <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.language')}</h3>
             <SettingRow
                 icon={Globe}
@@ -166,29 +156,28 @@ export function LanguageSection() {
                         i18n.changeLanguage(e.target.value);
                         localStorage.setItem('oneup_language', e.target.value);
                     }}
+                    className="input-field input-field--select"
                     style={{
-                        padding: '8px 12px',
-                        borderRadius: '10px',
-                        border: '2px solid var(--border-subtle)',
-                        background: 'var(--surface-elevated)',
+                        width: 'fit-content',
+                        padding: '8px 30px 8px 12px',
+                        borderRadius: 'var(--radius-md)',
+                        border: '1px solid var(--border-default)',
+                        background: 'var(--surface-muted)',
                         color: 'var(--text-primary)',
                         fontSize: '0.85rem',
                         fontWeight: '600',
                         cursor: 'pointer',
-                        transition: 'all 0.2s ease',
                         minHeight: 'var(--touch-min)',
-                        minWidth: '140px',
-                        outline: 'none'
                     }}
                 >
                     {LANGUAGES.map(lang => (
-                        <option key={lang.code} value={lang.code} style={{ background: '#0a0a0f', color: '#ffffff' }}>
+                        <option key={lang.code} value={lang.code}>
                             {lang.label}
                         </option>
                     ))}
                 </select>
             </SettingRow>
-        </div>
+        </Card>
     );
 }
 
@@ -197,7 +186,7 @@ export function PerformanceSection({ settings, onSave }) {
     const { t } = useTranslation();
 
     return (
-        <div className="glass-premium" style={sectionCardStyle}>
+        <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.performance')}</h3>
 
             <SettingRow
@@ -211,17 +200,19 @@ export function PerformanceSection({ settings, onSave }) {
                 color="var(--success)"
                 isLast={true}
             >
-                <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
+                <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
                     {[
                         { value: 'low', label: t('settings.eco'), color: 'var(--warning)' },
                         { value: 'high', label: t('common.max'), color: 'var(--accent-glow)' }
                     ].map(opt => (
                         <button
                             key={opt.value}
+                            type="button"
                             onClick={() => onSave({ ...settings, performanceMode: opt.value })}
+                            className="hover-lift"
                             style={{
                                 padding: '6px 16px',
-                                borderRadius: '10px',
+                                borderRadius: 'var(--radius-md)',
                                 border: settings.performanceMode === opt.value
                                     ? `2px solid ${opt.color}`
                                     : '2px solid var(--border-subtle)',
@@ -243,7 +234,7 @@ export function PerformanceSection({ settings, onSave }) {
                     ))}
                 </div>
             </SettingRow>
-        </div>
+        </Card>
     );
 }
 
@@ -252,7 +243,7 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
     const { t } = useTranslation();
 
     return (
-        <div className="glass-premium" style={sectionCardStyle}>
+        <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.community')}</h3>
 
             <SettingRow
@@ -271,43 +262,18 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
 
             {settings.leaderboardEnabled && (
                 <div className="scale-in" style={{ padding: '12px 0 4px 0' }}>
-                    <label style={{
-                        fontSize: '0.8rem', color: 'var(--text-secondary)',
-                        fontWeight: '600', marginBottom: '8px', display: 'block',
-                        textTransform: 'uppercase', letterSpacing: '0.5px'
-                    }}>
-                        {t('settings.displayName')}
-                    </label>
-                    <input
+                    <Input
+                        label={t('settings.displayName')}
                         type="text"
                         value={settings.leaderboardPseudo || ''}
                         onChange={(e) => onSave({ ...settings, leaderboardPseudo: e.target.value.slice(0, 20) })}
                         placeholder={cloudAuth?.user?.displayName || t('common.yourPseudo')}
                         maxLength={20}
-                        style={{
-                            width: '100%', padding: '12px 16px',
-                            borderRadius: 'var(--radius-md)',
-                            border: '1px solid var(--border-subtle)',
-                            background: 'var(--surface-muted)',
-                            color: 'var(--text-primary)',
-                            fontSize: '1rem', fontWeight: '600',
-                            outline: 'none', boxSizing: 'border-box',
-                            transition: 'all 0.2s ease'
-                        }}
-                        onFocus={(e) => {
-                            e.target.style.borderColor = 'var(--color-amber)';
-                            e.target.style.background = 'var(--surface-hover)';
-                        }}
+                        helperText={t('settings.maxChars')}
                     />
-                    <div style={{
-                        fontSize: '0.75rem', color: 'var(--text-secondary)',
-                        marginTop: '8px', opacity: 0.8
-                    }}>
-                        {t('settings.maxChars')}
-                    </div>
                 </div>
             )}
-        </div>
+        </Card>
     );
 }
 
@@ -318,11 +284,7 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
     const currentTheme = settings.appTheme || 'dark';
 
     return (
-        <div className="glass-premium" style={{
-            ...sectionCardStyle,
-            position: 'relative',
-            overflow: 'hidden'
-        }}>
+        <Card variant="glass" padding="md" style={{ position: 'relative', overflow: 'hidden', marginBottom: 'var(--space-4)' }}>
             <h3 style={sectionTitleStyle}>
                 {t('settings.appTheme')} {!isPro && <Lock size={14} color="var(--accent)" style={{ marginLeft: 'auto', opacity: 0.8 }} />}
             </h3>
@@ -349,32 +311,28 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
                 >
                     <div style={{
                         background: 'var(--surface-elevated)', color: 'var(--text-primary)',
-                        padding: '8px 16px', borderRadius: '20px',
+                        padding: '8px 16px', borderRadius: 'var(--radius-full)',
                         fontSize: '0.85rem', fontWeight: 'bold',
                         display: 'flex', alignItems: 'center', gap: '8px',
                         border: '1px solid var(--border-default)',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                        boxShadow: 'var(--shadow-md)',
                         marginTop: '24px'
                     }}>
                         <Lock size={14} color="var(--accent)" /> PRO
                     </div>
                 </div>
             )}
-        </div>
+        </Card>
     );
 }
 
 /**
  * Export / import the full local data store as a JSON backup file.
- *
- * Web-only: local data is origin-scoped (see {@link downloadBackup}), so this
- * lets a signed-out user carry their data to a new domain. On native there is no
- * "old domain" and the real data lives in native Preferences, so it is hidden.
  */
 export function DataSection() {
     const { t } = useTranslation();
     const fileInputRef = useRef(null);
-    const [status, setStatus] = useState(null); // { type: 'success' | 'error', msg }
+    const [status, setStatus] = useState(null);
 
     if (isNativePlatform()) return null;
 
@@ -389,7 +347,7 @@ export function DataSection() {
 
     const handleFile = async (e) => {
         const file = e.target.files?.[0];
-        e.target.value = ''; // let the user re-pick the same file later
+        e.target.value = '';
         if (!file) return;
         try {
             const parsed = parseBackup(await readFileText(file));
@@ -402,21 +360,8 @@ export function DataSection() {
         }
     };
 
-    const actionButtonStyle = {
-        padding: '8px 16px',
-        borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--border-subtle)',
-        background: 'var(--surface-muted)',
-        color: 'var(--text-primary)',
-        fontWeight: 700,
-        fontSize: '0.85rem',
-        cursor: 'pointer',
-        fontFamily: 'inherit',
-        whiteSpace: 'nowrap',
-    };
-
     return (
-        <div className="glass-premium" style={sectionCardStyle}>
+        <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.dataTitle')}</h3>
 
             <SettingRow
@@ -425,9 +370,9 @@ export function DataSection() {
                 description={t('settings.exportDataDesc')}
                 color="var(--color-emerald)"
             >
-                <button type="button" style={actionButtonStyle} className="hover-lift" onClick={handleExport}>
+                <Button variant="secondary" size="sm" onClick={handleExport}>
                     {t('settings.exportButton')}
-                </button>
+                </Button>
             </SettingRow>
 
             <SettingRow
@@ -437,9 +382,9 @@ export function DataSection() {
                 color="#60a5fa"
                 isLast
             >
-                <button type="button" style={actionButtonStyle} className="hover-lift" onClick={() => fileInputRef.current?.click()}>
+                <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
                     {t('settings.importButton')}
-                </button>
+                </Button>
             </SettingRow>
 
             <input
@@ -460,7 +405,8 @@ export function DataSection() {
                     {status.msg}
                 </div>
             )}
-        </div>
+        </Card>
     );
 }
+
 

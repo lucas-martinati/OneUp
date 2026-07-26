@@ -38,7 +38,15 @@ const SIZES = {
 const ICON_PX = { sm: 18, md: 20, lg: 22 };
 
 // Variants backed by an existing utility class inherit its perf-mode overrides.
-const VARIANT_CLASS = { surface: '', glass: 'glass', ghost: '', danger: '' };
+const VARIANT_CLASS = {
+  surface: '',
+  glass: 'glass',
+  ghost: '',
+  danger: '',
+  'danger-ghost': '',
+  primary: '',
+  secondary: ''
+};
 
 const VARIANTS = {
   surface: {
@@ -55,13 +63,30 @@ const VARIANTS = {
   },
   ghost: {
     background: 'none',
+    border: 'none',
     color: 'var(--text-secondary)',
   },
   danger: {
-    background: 'var(--surface-muted)',
-    borderColor: 'rgba(239, 68, 68, 0.3)',
+    background: 'color-mix(in srgb, var(--error) 15%, transparent)',
+    borderColor: 'color-mix(in srgb, var(--error) 35%, transparent)',
     color: 'var(--error)',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
+  },
+  'danger-ghost': {
+    background: 'transparent',
+    border: 'none',
+    color: 'var(--error)',
+  },
+  primary: {
+    background: 'var(--accent)',
+    borderColor: 'var(--accent)',
+    color: '#ffffff',
+    boxShadow: '0 2px 8px color-mix(in srgb, var(--accent) 40%, transparent)',
+  },
+  secondary: {
+    background: 'var(--surface-muted)',
+    borderColor: 'var(--border-default)',
+    color: 'var(--text-primary)',
   },
 };
 

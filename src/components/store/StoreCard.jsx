@@ -59,7 +59,7 @@ export function StoreCard({
             marginBottom: 'var(--spacing-md)',
             background: isActive
                 ? `linear-gradient(135deg, rgba(${colorRGB},0.08), rgba(${colorRGB},0.02))`
-                : 'var(--surface-section)',
+                : 'var(--glass-bg, var(--card-bg))',
             border: isActive ? `1px solid rgba(${colorRGB},0.2)` : '1px solid var(--border-subtle)'
         }}>
             <h3 style={sectionTitleStyle}>{title}</h3>

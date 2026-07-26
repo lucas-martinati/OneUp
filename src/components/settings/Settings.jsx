@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Z_INDEX } from '@utils/zIndex';
-import { X, ShoppingBag, ArrowLeft } from '@utils/icons';
-import { Button, IconButton } from '@components/ui';
+import { ShoppingBag } from '@utils/icons';
+import { Button, ModalHeader, Card } from '@components/ui';
 import { CloudSyncPanel } from './CloudSyncPanel';
 import { StoreView } from './StoreView';
 import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection, DataSection } from './SettingsSections';
@@ -49,46 +49,22 @@ export function Settings({ defaultShowStore = false, onClose }) {
         <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.MODAL }}>
             <div className="modal-content">
                 {/* ── Header ──────────────────────────────────────────────── */}
-                <div style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    marginBottom: 'var(--spacing-md)'
-                }}>
-                    <div className="row gap-12">
-                        {showStore && (
-                            <IconButton
-                                icon={ArrowLeft}
-                                variant="glass"
-                                onClick={() => setShowStore(false)}
-                                className="hover-lift"
-                                aria-label="Back"
-                            />
-                        )}
-                        <h2 className="panel-title" style={{ margin: 0 }}>
-                            {showStore ? t('store.title') : t('settings.title')}
-                        </h2>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                            {!showStore && (
-                                <Button
-                                    variant="premium"
-                                    icon={ShoppingBag}
-                                    onClick={() => setShowStore(true)}
-                                    className="hover-lift"
-                                >
-                                    {t('store.title')}
-                                </Button>
-                            )}
-                            <IconButton
-                                icon={X}
-                                variant="glass"
-                                onClick={onClose}
-                                className="hover-lift"
-                                aria-label="Close"
-                            />
-                        </div>
-                    </div>
-                </div>
+                <ModalHeader
+                    title={showStore ? t('store.title') : t('settings.title')}
+                    onClose={onClose}
+                    onBack={showStore ? () => setShowStore(false) : undefined}
+                    actions={
+                        !showStore && (
+                            <Button
+                                variant="premium"
+                                icon={ShoppingBag}
+                                onClick={() => setShowStore(true)}
+                            >
+                                {t('store.title')}
+                            </Button>
+                        )
+                    }
+                />
 
                 {/* ── Settings Content ────────────────────────────────────── */}
 
@@ -109,11 +85,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
 
                         {/* ── Données & Cloud ─────────────────────────────────────── */}
                         {cloudAuth && cloudSync && (
-                            <div className="glass-premium" style={{
-                                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-                                marginBottom: 'var(--spacing-md)',
-                                background: 'var(--surface-section)'
-                            }}>
+                            <Card variant="glass" padding="md" style={{ marginBottom: 'var(--space-4)' }}>
                                 <CloudSyncPanel
                                     authState={cloudAuth}
                                     onSignIn={() => cloudAuth.signIn()}
@@ -130,7 +102,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                         window.location.reload();
                                     } : undefined}
                                 />
-                            </div>
+                            </Card>
                         )}
 
                         <DataSection />

@@ -72,19 +72,33 @@
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
 
-  /* Spacing */
+  /* Spacing (Base 4px grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
   --spacing-md: 1.5rem;
   --spacing-lg: 2rem;
   --spacing-xl: 3rem;
 
-  /* Radius */
+  /* Radius System */
+  --radius-xs: 6px;
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 20px;
+  --radius-lg: 16px;
   --radius-xl: 24px;
   --radius-full: 9999px;
+
+  /* Text Hierarchy Tokens */
+  --text-tertiary: rgba(255, 255, 255, 0.45);
+  --text-disabled: rgba(255, 255, 255, 0.3);
 
   /* Theme-dependent surfaces */
   --overlay-bg: rgb(5, 5, 5);

@@ -855,3 +855,219 @@ button:focus:not(:focus-visible) {
     width: 32px !important;
   }
 }
+
+/* ── Standardized Form Input Control Primitive ── */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.input-group--full {
+  width: 100%;
+}
+
+.input-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  transition: border-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease, background var(--motion-fast) ease;
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-glow) 20%, transparent);
+  background: var(--surface-hover);
+}
+
+.input-wrapper--error {
+  border-color: var(--error) !important;
+}
+
+.input-wrapper--error:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--error) 25%, transparent) !important;
+}
+
+.input-wrapper--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.input-wrapper--sm { min-height: 36px; padding: 0 10px; }
+.input-wrapper--md { min-height: 42px; padding: 0 14px; }
+.input-wrapper--lg { min-height: 50px; padding: 0 16px; }
+
+.input-field {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.input-field::placeholder {
+  color: var(--text-tertiary);
+}
+
+.input-field--select {
+  cursor: pointer;
+  appearance: none;
+  padding-right: 20px;
+}
+
+.input-field--select option {
+  background: var(--select-option-bg, #1a1a2e);
+  color: var(--text-primary);
+}
+
+.input-icon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.input-icon--left { margin-right: 8px; }
+.input-icon--right { margin-left: 8px; }
+
+.input-error {
+  font-size: 0.75rem;
+  color: var(--error);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.input-helper {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+/* ── Standardized Badge Primitive ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+
+.badge--sm { padding: 2px 8px; font-size: 0.72rem; }
+.badge--md { padding: 4px 12px; font-size: 0.8rem; }
+
+.badge--default {
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  border-color: var(--border-subtle);
+}
+
+.badge--primary {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent-glow);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.badge--success {
+  background: color-mix(in srgb, var(--success) 18%, transparent);
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 35%, transparent);
+}
+
+.badge--warning {
+  background: color-mix(in srgb, var(--warning) 18%, transparent);
+  color: var(--warning);
+  border-color: color-mix(in srgb, var(--warning) 35%, transparent);
+}
+
+.badge--error {
+  background: color-mix(in srgb, var(--error) 18%, transparent);
+  color: var(--error);
+  border-color: color-mix(in srgb, var(--error) 35%, transparent);
+}
+
+.badge--info {
+  background: color-mix(in srgb, var(--color-blue) 18%, transparent);
+  color: var(--color-blue);
+  border-color: color-mix(in srgb, var(--color-blue) 35%, transparent);
+}
+
+.badge--gold {
+  background: var(--gradient-gold-trans);
+  color: var(--color-gold);
+  border-color: color-mix(in srgb, var(--color-gold) 35%, transparent);
+}
+
+.badge--pro,
+.badge--purple {
+  background: color-mix(in srgb, #8b5cf6 20%, transparent);
+  color: #a78bfa;
+  border-color: color-mix(in srgb, #8b5cf6 40%, transparent);
+}
+
+/* ── Standardized Modal Header Shell ── */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--spacing-md);
+}
+
+.modal-header-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.modal-header-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.modal-header-title {
+  font-size: clamp(1.3rem, 3.5vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.3;
+  background: var(--gradient-glow);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--accent-glow);
+}
+
+.modal-header-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 2px 0 0;
+}
+
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+

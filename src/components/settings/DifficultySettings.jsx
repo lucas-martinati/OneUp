@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Lock, Unlock } from '@utils/icons';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
-import { Slider } from '@components/ui';
+import { Slider, Card } from '@components/ui';
 import { useSubscription } from '@contexts/SubscriptionContext';
 import { EXERCISES, CARDIO_EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
@@ -35,11 +35,9 @@ export function DifficultySettings() {
     const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
 
     return (
-        <div className="glass-premium" style={{
-            padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
-            marginBottom: 'var(--spacing-md)',
-            background: 'var(--surface-section)',
-            border: isMultiplierUnlocked ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--border-subtle)',
+        <Card variant="glass" padding="md" style={{
+            marginBottom: 'var(--space-4)',
+            border: isMultiplierUnlocked ? '1px solid rgba(239, 68, 68, 0.4)' : undefined,
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             position: 'relative',
             overflow: 'hidden',
@@ -142,6 +140,7 @@ export function DifficultySettings() {
                     </div>
                 </div>
             )}
-        </div>
+        </Card>
     );
 }
+

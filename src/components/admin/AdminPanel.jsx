@@ -1,25 +1,11 @@
 import React from 'react';
 import { X, Shield, ArrowLeft, RefreshCw } from '@utils/icons';
 import { Z_INDEX } from '@utils/zIndex';
-import { Spinner } from '@components/ui';
+import { Spinner, IconButton, SegmentedControl } from '@components/ui';
 import { useAdminPanel } from './useAdminPanel';
 import { AdminUserList } from './AdminUserList';
 import { AdminUserForm } from './AdminUserForm';
 import { AdminJsonSectionsEditor } from './AdminJsonSectionsEditor';
-
-const tabButtonStyle = (isActive) => ({
-  flex: 1, padding: '10px', borderRadius: 'var(--radius-md)',
-  background: isActive ? 'var(--surface-hover)' : 'transparent',
-  border: `1px solid ${isActive ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)'}`,
-  color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
-  fontSize: '0.85rem', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s ease'
-});
-
-const roundButtonStyle = {
-  background: 'var(--surface-hover)', border: 'none', borderRadius: '50%',
-  width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-  color: 'var(--text-primary)', cursor: 'pointer'
-};
 
 export function AdminPanel({ onClose }) {
   const {
@@ -39,42 +25,44 @@ export function AdminPanel({ onClose }) {
 
   return (
     <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.MODAL }}>
-      <div className="modal-content" style={{ maxWidth: '800px', display: 'flex', flexDirection: 'column', height: '90vh' }}>
+      <div className="modal-content" style={{ maxWidth: '840px', display: 'flex', flexDirection: 'column', height: '90vh' }}>
 
         {/* Header */}
-        <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          marginBottom: 'var(--spacing-md)', flexShrink: 0
-        }}>
-          <div className="row gap-12">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexShrink: 0 }}>
+          <div className="row gap-12" style={{ alignItems: 'center' }}>
             {selectedUid && (
-              <button onClick={() => setSelectedUid(null)} className="hover-lift glass" style={{
-                ...roundButtonStyle,
-                width: 'var(--touch-min)', height: 'var(--touch-min)'
-              }}>
-                <ArrowLeft size={22} />
-              </button>
+              <IconButton
+                icon={ArrowLeft}
+                onClick={() => setSelectedUid(null)}
+                aria-label="Retour"
+                variant="glass"
+                className="hover-lift"
+              />
             )}
             <h2 className="panel-title" style={{ margin: 0, fontSize: '1.4rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Shield size={22} color="#ef4444" />
+              <Shield size={22} color="var(--error)" />
               {selectedUid ? 'Modifier Utilisateur' : "Panel d'Administration"}
             </h2>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {!selectedUid && (
-              <button
+              <IconButton
+                icon={RefreshCw}
                 onClick={() => loadData(true)}
                 disabled={refreshing || loading}
-                className="hover-lift glass"
-                style={roundButtonStyle}
-              >
-                <RefreshCw size={18} className={refreshing ? 'spin' : ''} />
-              </button>
+                aria-label="Actualiser"
+                variant="glass"
+                className={`hover-lift ${refreshing ? 'spin' : ''}`}
+              />
             )}
-            <button onClick={onClose} className="hover-lift glass" style={{ ...roundButtonStyle, flexShrink: 0 }}>
-              <X size={22} />
-            </button>
+            <IconButton
+              icon={X}
+              onClick={onClose}
+              aria-label="Fermer"
+              variant="glass"
+              className="hover-lift"
+            />
           </div>
         </div>
 
@@ -83,12 +71,12 @@ export function AdminPanel({ onClose }) {
           <div className="scale-in" style={{
             padding: '12px 16px',
             borderRadius: 'var(--radius-md)',
-            background: message.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-            border: `1px solid ${message.type === 'success' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-            color: message.type === 'success' ? '#10b981' : '#fca5a5',
+            background: message.type === 'success' ? 'color-mix(in srgb, var(--success) 15%, transparent)' : 'color-mix(in srgb, var(--error) 15%, transparent)',
+            border: `1px solid ${message.type === 'success' ? 'color-mix(in srgb, var(--success) 35%, transparent)' : 'color-mix(in srgb, var(--error) 35%, transparent)'}`,
+            color: message.type === 'success' ? 'var(--success)' : 'var(--error)',
             fontSize: '0.9rem',
             fontWeight: '600',
-            marginBottom: 'var(--spacing-md)',
+            marginBottom: 'var(--space-4)',
             flexShrink: 0
           }}>
             {message.text}
@@ -98,7 +86,7 @@ export function AdminPanel({ onClose }) {
         {/* Content Workspace */}
         {loading && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-            <Spinner size={36} color="#ef4444" label="Chargement de la base de données..." />
+            <Spinner size={36} color="var(--error)" label="Chargement de la base de données..." />
           </div>
         )}
         {!loading && !selectedUid && (
@@ -118,17 +106,19 @@ export function AdminPanel({ onClose }) {
         {!loading && selectedUid && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             {/* Tabs Selector */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: 'var(--spacing-md)', flexShrink: 0 }}>
-              <button onClick={() => setEditMode('form')} style={tabButtonStyle(editMode === 'form')}>
-                Formulaire
-              </button>
-              <button onClick={() => setEditMode('json')} style={tabButtonStyle(editMode === 'json')}>
-                Éditeur JSON Sections
-              </button>
+            <div style={{ marginBottom: 'var(--space-4)', flexShrink: 0 }}>
+              <SegmentedControl
+                options={[
+                  { id: 'form', label: 'Formulaire' },
+                  { id: 'json', label: 'Éditeur JSON Sections' },
+                ]}
+                value={editMode}
+                onChange={(id) => setEditMode(id)}
+              />
             </div>
 
             {/* Scrollable Workspace */}
-            <div style={{ flex: 1, overflowY: 'auto', marginBottom: 'var(--spacing-md)', paddingRight: '4px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', marginBottom: 'var(--space-4)', paddingRight: '4px' }}>
               {editMode === 'form' ? (
                 <AdminUserForm
                   formState={formState}
@@ -167,3 +157,4 @@ export function AdminPanel({ onClose }) {
     </div>
   );
 }
+
