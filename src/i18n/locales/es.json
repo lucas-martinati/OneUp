@@ -311,6 +311,7 @@
   },
   "common": {
     "achievements": "Logros",
+    "add": "Añadir",
     "anonymous": "Anónimo",
     "bestStreak": "Mejor Racha",
     "bodyweight": "Peso corporal",
@@ -753,7 +754,8 @@
     "limitReached": "Límite de {{count}} categorías alcanzado.",
     "nameLabel": "Nombre de la categoría",
     "namePlaceholder": "Ej: Tren superior, Estiramientos...",
-    "title": "Categorías Personalizadas"
+    "title": "Categorías personalizadas",
+    "titleShort": "Categorías"
   },
   "sessionNames": {
     "light": {

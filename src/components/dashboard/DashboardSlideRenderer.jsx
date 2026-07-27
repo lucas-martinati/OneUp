@@ -150,6 +150,7 @@ export function DashboardSlideRenderer({
                             activeExerciseId={selId} onSelectExercise={handleSelectExercise}
                             exercisesList={catExercises} exercisesMap={catExMap}
                             onManageCustom={() => { openCustomExercises(catKey); pauseCloudSync?.(); }}
+                            onManageCategories={() => { openModal('categoryManager'); }}
                             getConfig={getConfig}
                         />
                     ) : (

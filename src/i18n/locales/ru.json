@@ -311,6 +311,7 @@
   },
   "common": {
     "achievements": "Достижения",
+    "add": "Добавить",
     "anonymous": "Аноним",
     "bestStreak": "Лучшая серия",
     "bodyweight": "С весом тела",
@@ -753,7 +754,8 @@
     "limitReached": "Лимит в {{count}} категорий достигнут.",
     "nameLabel": "Название категории",
     "namePlaceholder": "Напр.: Верх тела, Растяжка...",
-    "title": "Пользовательские категории"
+    "title": "Свои категории",
+    "titleShort": "Категории"
   },
   "sessionNames": {
     "light": {

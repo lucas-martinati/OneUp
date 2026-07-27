@@ -311,6 +311,7 @@
   },
   "common": {
     "achievements": "Conquistas",
+    "add": "Adicionar",
     "anonymous": "Anônimo",
     "bestStreak": "Melhor sequência",
     "bodyweight": "Peso corporal",
@@ -753,7 +754,8 @@
     "limitReached": "Limite de {{count}} categorias atingido.",
     "nameLabel": "Nome da categoria",
     "namePlaceholder": "Ex: Tronco, Alongamentos...",
-    "title": "Categorias Personalizadas"
+    "title": "Categorias personalizadas",
+    "titleShort": "Categorias"
   },
   "sessionNames": {
     "light": {

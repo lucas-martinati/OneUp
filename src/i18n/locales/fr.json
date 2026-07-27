@@ -311,6 +311,7 @@
   },
   "common": {
     "achievements": "Succès",
+    "add": "Ajouter",
     "anonymous": "Anonyme",
     "bestStreak": "Meilleure série",
     "bodyweight": "Poids du corps",
@@ -381,7 +382,8 @@
     "limitReached": "Limite de {{count}} catégories atteinte.",
     "nameLabel": "Nom de la catégorie",
     "namePlaceholder": "Ex: Haut du corps, Étirements...",
-    "title": "Catégories Personnalisées"
+    "title": "Catégories Personnalisées",
+    "titleShort": "Catégories"
   },
   "customExercises": {
     "colorLabel": "Couleur de thème",

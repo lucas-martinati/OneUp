@@ -311,6 +311,7 @@
   },
   "common": {
     "achievements": "実績",
+    "add": "追加",
     "anonymous": "匿名",
     "bestStreak": "ベストストリーク",
     "bodyweight": "体重",
@@ -753,7 +754,8 @@
     "limitReached": "カテゴリー数は{{count}}個までです。",
     "nameLabel": "カテゴリー名",
     "namePlaceholder": "例：上半身、ストレッチ...",
-    "title": "カスタムカテゴリー"
+    "title": "カスタムカテゴリー",
+    "titleShort": "カテゴリー"
   },
   "sessionNames": {
     "light": {

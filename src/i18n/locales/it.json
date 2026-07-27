@@ -310,7 +310,8 @@
     "backOnline": "Di nuovo online"
   },
   "common": {
-    "achievements": "Risultati",
+    "achievements": "Obiettivi",
+    "add": "Aggiungi",
     "anonymous": "Anonimo",
     "bestStreak": "Miglior serie",
     "bodyweight": "Peso corporeo",
@@ -753,7 +754,8 @@
     "limitReached": "Limite di {{count}} categorie raggiunto.",
     "nameLabel": "Nome della categoria",
     "namePlaceholder": "Es: Parte superiore, Stretching...",
-    "title": "Categorie Personalizzate"
+    "title": "Categorie personalizzate",
+    "titleShort": "Categorie"
   },
   "sessionNames": {
     "light": {

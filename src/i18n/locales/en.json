@@ -311,6 +311,7 @@
   },
   "common": {
     "achievements": "Achievements",
+    "add": "Add",
     "anonymous": "Anonymous",
     "bestStreak": "Best Streak",
     "bodyweight": "Bodyweight",
@@ -381,7 +382,8 @@
     "limitReached": "Limit of {{count}} categories reached.",
     "nameLabel": "Category name",
     "namePlaceholder": "Ex: Upper body, Stretching...",
-    "title": "Custom Categories"
+    "title": "Custom Categories",
+    "titleShort": "Categories"
   },
   "customExercises": {
     "colorLabel": "Theme color",

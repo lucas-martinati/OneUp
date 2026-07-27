@@ -311,6 +311,7 @@
   },
   "common": {
     "achievements": "Erfolge",
+    "add": "Hinzufügen",
     "anonymous": "Anonym",
     "bestStreak": "Beste Serie",
     "bodyweight": "Körpergewicht",
@@ -753,7 +754,8 @@
     "limitReached": "Limit von {{count}} Kategorien erreicht.",
     "nameLabel": "Kategoriename",
     "namePlaceholder": "Z.B. Oberkörper, Dehnen...",
-    "title": "Benutzerdefinierte Kategorien"
+    "title": "Benutzerdefinierte Kategorien",
+    "titleShort": "Kategorien"
   },
   "sessionNames": {
     "light": {

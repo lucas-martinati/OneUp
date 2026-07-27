@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Settings, Star, FolderPlus } from '@utils/icons';
+import { Settings, Star, FolderPlus, Plus } from '@utils/icons';
 import { UI_ICONS, DynamicIcon } from '@utils/icons';
 import { getDailyGoal } from '@config/exercises';
 import { parseTimestamp } from '@shared/dateUtils';
@@ -108,24 +108,58 @@ export const DashboardSlide = React.memo(({
                 </>
             )}
             {title && (
-                <div className="flex-align-center" style={{ gap: '8px' }}>
+                <div className="flex-align-center" style={{ gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
                     <div style={{
-                        fontSize: 'var(--category-title-size, 0.8rem)', fontWeight: '800',
+                        fontSize: 'var(--category-title-size, 0.82rem)', fontWeight: '800',
                         color: isDayPerfect ? '#ffdf00' : (categoryColor || 'var(--text-secondary)'),
-                        textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8,
+                        textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.9,
                         textShadow: isDayPerfect ? '0 0 10px rgba(255,223,0,0.5)' : 'none'
                     }}>
                         {title}
                     </div>
-                    {onManageCustom && (
-                        <button onClick={onManageCustom} aria-label="Manage custom exercises" style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', opacity: 0.6, padding: '4px' }}>
-                            <Settings size={14} />
-                        </button>
-                    )}
-                    {onManageCategories && (
-                        <button onClick={onManageCategories} aria-label="Manage categories" style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', opacity: 0.6, padding: '4px' }}>
-                            <FolderPlus size={14} />
-                        </button>
+                    {(onManageCustom || onManageCategories) && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            {onManageCustom && (
+                                <button
+                                    onClick={onManageCustom}
+                                    aria-label={t('customExercises.title')}
+                                    title={t('customExercises.title')}
+                                    className="hover-lift"
+                                    style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '5px',
+                                        padding: '3px 10px', borderRadius: '12px',
+                                        background: 'rgba(255, 255, 255, 0.08)',
+                                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                                        color: 'var(--text-primary)', fontSize: '0.72rem', fontWeight: '700',
+                                        cursor: 'pointer', transition: 'all 0.2s ease',
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.25)'
+                                    }}
+                                >
+                                    <Settings size={12} />
+                                    <span>{t('common.edit')}</span>
+                                </button>
+                            )}
+                            {onManageCategories && (
+                                <button
+                                    onClick={onManageCategories}
+                                    aria-label={t('customCategories.title')}
+                                    title={t('customCategories.title')}
+                                    className="hover-lift"
+                                    style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '5px',
+                                        padding: '3px 10px', borderRadius: '12px',
+                                        background: 'rgba(139, 92, 246, 0.15)',
+                                        border: '1px solid rgba(139, 92, 246, 0.35)',
+                                        color: '#a78bfa', fontSize: '0.72rem', fontWeight: '700',
+                                        cursor: 'pointer', transition: 'all 0.2s ease',
+                                        boxShadow: '0 2px 8px rgba(109, 40, 217, 0.25)'
+                                    }}
+                                >
+                                    <FolderPlus size={12} />
+                                    <span>{t('customCategories.titleShort') || 'Catégories'}</span>
+                                </button>
+                            )}
+                        </div>
                     )}
                 </div>
             )}
@@ -191,6 +225,35 @@ export const DashboardSlide = React.memo(({
                                 getConfig={getConfig}
                             />
                         ))}
+                        {onManageCustom && exercisesList.length < 12 && (
+                            <button
+                                onClick={onManageCustom}
+                                className="exercise-button hover-lift"
+                                aria-label={t('customExercises.create')}
+                                title={t('customExercises.create')}
+                                style={{
+                                    flex: '1 1 calc(33.333% - 8px)',
+                                    minWidth: 'clamp(60px, 18vw, 100px)',
+                                    maxWidth: '130px',
+                                    display: 'flex', flexDirection: 'column',
+                                    alignItems: 'center', justifyContent: 'center',
+                                    gap: 'var(--exercise-btn-gap, clamp(2px, 0.4vh, 5px))',
+                                    padding: 'var(--exercise-btn-padding, clamp(8px, 1.2vh, 12px) clamp(4px, 0.8vw, 8px))',
+                                    borderRadius: 'var(--radius-md)',
+                                    minHeight: 'var(--exercise-btn-min-height, clamp(44px, 7.2vh, 58px))',
+                                    background: 'rgba(255, 255, 255, 0.03)',
+                                    border: '1.5px dashed rgba(255, 255, 255, 0.25)',
+                                    cursor: 'pointer',
+                                    color: 'var(--text-secondary)',
+                                    transition: 'all 0.2s ease'
+                                }}
+                            >
+                                <Plus size={18} style={{ opacity: 0.8 }} />
+                                <span style={{ fontSize: 'var(--tile-label-size, clamp(0.55rem, 1.25vh, 0.78rem))', fontWeight: '700' }}>
+                                    {t('common.add')}
+                                </span>
+                            </button>
+                        )}
                     </div>
 
                     {/* ── Progress ring + Counter button + Completion status (grouped) ── */}

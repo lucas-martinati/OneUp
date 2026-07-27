@@ -311,6 +311,7 @@
   },
   "common": {
     "achievements": "업적",
+    "add": "추가",
     "anonymous": "익명의",
     "bestStreak": "최고의 연속",
     "bodyweight": "체중",
@@ -753,7 +754,8 @@
     "limitReached": "카테고리는 최대 {{count}}개까지 가능합니다.",
     "nameLabel": "카테고리 이름",
     "namePlaceholder": "예: 상체, 스트레칭...",
-    "title": "커스텀 카테고리"
+    "title": "커스텀 카테고리",
+    "titleShort": "카테고리"
   },
   "sessionNames": {
     "light": {
