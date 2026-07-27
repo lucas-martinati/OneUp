@@ -128,9 +128,10 @@ export const DashboardSlide = React.memo(({
                         {/* Ambient halo behind the counter button */}
                         <div style={{
                             position: 'absolute', inset: '-45%', borderRadius: '50%',
-                            background: `radial-gradient(circle, ${safeSelectedExercise.color}${isExerciseDone ? '38' : '24'} 0%, transparent 62%)`,
+                            background: `radial-gradient(circle, ${safeSelectedExercise.color}${isExerciseDone ? '35' : '20'} 0%, transparent 65%)`,
                             pointerEvents: 'none',
-                            transition: 'background 0.6s ease'
+                            transition: 'background 0.6s ease',
+                            animation: 'blobHaloPulse 4s ease-in-out infinite'
                         }} />
                         {/* Counter open button */}
                         <button
@@ -141,16 +142,16 @@ export const DashboardSlide = React.memo(({
                                 width: '100%', height: '100%',
                                 background: isExerciseDone
                                     ? `linear-gradient(135deg, ${safeSelectedExercise.color} 0%, ${safeSelectedExercise.gradient[1]} 100%)`
-                                    : 'transparent',
-                                border: 'none',
+                                    : 'linear-gradient(135deg, #161726 0%, #0c0d16 100%)',
+                                border: isExerciseDone ? 'none' : `2px solid ${safeSelectedExercise.color}50`,
                                 display: 'flex', flexDirection: 'column',
                                 alignItems: 'center', justifyContent: 'center', gap: '2px',
-                                transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease',
                                 willChange: 'transform',
                                 transform: isExerciseDone ? 'scale(1.1)' : 'scale(1)',
                                 boxShadow: isExerciseDone
-                                    ? `0 0 50px ${safeSelectedExercise.color}aa, 0 8px 30px ${safeSelectedExercise.color}55, 0 0 0 4px ${safeSelectedExercise.color}33, inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.1)`
-                                    : `0 0 16px ${safeSelectedExercise.color}33`,
+                                    ? `0 0 45px ${safeSelectedExercise.color}99, 0 8px 28px ${safeSelectedExercise.color}55, 0 0 0 4px ${safeSelectedExercise.color}33`
+                                    : `0 8px 24px rgba(0, 0, 0, 0.45), 0 0 20px ${safeSelectedExercise.color}30`,
                                 cursor: 'pointer',
                                 position: 'relative',
                                 overflow: 'hidden'
@@ -170,12 +171,6 @@ export const DashboardSlide = React.memo(({
                             )}
                             {isExerciseDone ? (
                                 <>
-                                    <div style={{
-                                        position: 'absolute',
-                                        inset: 0,
-                                        background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
-                                        pointerEvents: 'none'
-                                    }} />
                                     <UI_ICONS.Check size={28} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
                                     <span style={{
                                         fontSize: 'clamp(0.65rem, 1.4vh, 0.82rem)',
@@ -193,8 +188,8 @@ export const DashboardSlide = React.memo(({
                                 </>
                             ) : (
                                 <>
-                                    <DynamicIcon icon={safeSelectedExercise.icon} size={25} color={safeSelectedExercise.color} />
-                                    <span style={{ fontSize: 'clamp(0.6rem, 1.3vh, 0.78rem)', color: safeSelectedExercise.color, fontWeight: '800' }}>
+                                    <DynamicIcon icon={safeSelectedExercise.icon} size={25} color={safeSelectedExercise.color} style={{ filter: `drop-shadow(0 0 8px ${safeSelectedExercise.color}80)`, position: 'relative', zIndex: 1 }} />
+                                    <span style={{ fontSize: 'clamp(0.6rem, 1.3vh, 0.78rem)', color: safeSelectedExercise.color, fontWeight: '800', position: 'relative', zIndex: 1, textShadow: `0 0 10px ${safeSelectedExercise.color}40` }}>
                                         {safeSelectedExercise.type === 'timer'
                                             ? `${formatTime(currentCount)}/${formatTime(dailyGoal)}`
                                             : `${currentCount}/${dailyGoal}`}
@@ -372,7 +367,7 @@ const getTileSizing = (count) => {
     return {
         flex: '1 1 calc(33.333% - 8px)',
         maxWidth: '172px',
-        minHeight: 'var(--exercise-btn-min-height, clamp(54px, 8.2vh, 68px))',
+        minHeight: 'var(--exercise-btn-min-height, clamp(48px, 7.5vh, 64px))',
     };
 };
 

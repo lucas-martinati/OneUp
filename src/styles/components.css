@@ -191,11 +191,11 @@ button:focus:not(:focus-visible) {
   left: 4px;
   width: 22px;
   height: 22px;
-  border-radius: 58% 42% 56% 44% / 53% 47%;
+  border-radius: 60% 40% 55% 45% / 50% 52% 48% 50%;
   background:
     radial-gradient(circle at 32% 28%, #ffffff 0%, #eceef4 65%, #dcdfe8 100%);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-  animation: counterBlobMorph 9s ease-in-out infinite;
+  animation: counterBlobMorph 10s ease-in-out infinite;
   transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -207,7 +207,7 @@ button:focus:not(:focus-visible) {
 .toggle-knob--squish {
   animation:
     dropletSquish 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
-    counterBlobMorph 9s ease-in-out infinite;
+    counterBlobMorph 10s ease-in-out infinite;
 }
 
 [data-perf="low"] .toggle-knob {
@@ -547,7 +547,7 @@ button:focus:not(:focus-visible) {
   appearance: none;
   width: 20px;
   height: 20px;
-  border-radius: 58% 42% 56% 44% / 53% 47%;
+  border-radius: 60% 40% 55% 45% / 50% 52% 48% 50%;
   background:
     radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.55), transparent 60%),
     var(--slider-color, var(--accent));
@@ -556,7 +556,7 @@ button:focus:not(:focus-visible) {
   border: 2px solid var(--bg-color);
   transition: transform 0.15s ease, box-shadow 0.2s ease;
   pointer-events: auto;
-  animation: counterBlobMorph 9s ease-in-out infinite;
+  animation: counterBlobMorph 10s ease-in-out infinite;
 }
 
 .premium-slider::-webkit-slider-thumb:hover {
@@ -573,7 +573,7 @@ button:focus:not(:focus-visible) {
   width: 20px;
   height: 20px;
   border: 2px solid var(--bg-color);
-  border-radius: 58% 42% 56% 44% / 53% 47%;
+  border-radius: 60% 40% 55% 45% / 50% 52% 48% 50%;
   background:
     radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.55), transparent 60%),
     var(--slider-color, var(--accent));
@@ -581,7 +581,7 @@ button:focus:not(:focus-visible) {
   box-shadow: 0 0 10px var(--slider-color, var(--accent));
   transition: transform 0.15s ease, box-shadow 0.2s ease;
   pointer-events: auto;
-  animation: counterBlobMorph 9s ease-in-out infinite;
+  animation: counterBlobMorph 10s ease-in-out infinite;
 }
 
 .premium-slider::-moz-range-thumb:hover {
