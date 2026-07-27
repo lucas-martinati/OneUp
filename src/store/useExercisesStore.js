@@ -344,6 +344,14 @@ export const useExercisesStore = create((set, get) => ({
     get()._persistCustomCategories();
   },
 
+  reorderCategories: (newCategories) => {
+    set({
+      customCategories: newCategories,
+      customCategoriesMap: updateCategoriesMap(newCategories)
+    });
+    get()._persistCustomCategories();
+  },
+
   setCategoriesFromCloud: (cloudData) => {
     if (Array.isArray(cloudData)) {
       let changed = false;

@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, Edit2, Check, ChevronRight, ChevronUp, ChevronDown } from '@utils/icons';
+import { Plus, Trash2, Edit2, Check, ChevronRight, ChevronUp, ChevronDown, GripVertical } from '@utils/icons';
 import { IconButton, Button, Input, ModalHeader } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
@@ -15,13 +15,86 @@ const PRESET_COLORS = [
 
 export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesByUserCategory, defaultCustomExercises = [] }) {
   const { t } = useTranslation();
-  const { customCategories, addCategory, updateCategory, deleteCategory, moveCategory, maxCustomCategories } = customCategoriesHook;
+  const { customCategories, addCategory, updateCategory, deleteCategory, moveCategory, reorderCategories, maxCustomCategories } = customCategoriesHook;
 
   const [view, setView] = useState('list'); // 'list' | 'create' | 'delete'
   const [editingId, setEditingId] = useState(null);
   const [name, setName] = useState('');
   const [color, setColor] = useState('#8b5cf6');
   const [error, setError] = useState('');
+
+  // Drag & Drop reorder state
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const listContainerRef = useRef(null);
+  const touchRef = useRef({ startIndex: null, currentIndex: null });
+
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(index));
+    }
+  };
+
+  const handleDragOver = (e, targetIndex) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === targetIndex || targetIndex === 0 || draggedIndex === 0) return;
+
+    const userCats = customCategories.filter(c => c.id !== 'custom');
+    const fromIndex = draggedIndex - 1;
+    const toIndex = targetIndex - 1;
+
+    if (fromIndex < 0 || toIndex < 0) return;
+
+    const newArr = [...userCats];
+    const [moved] = newArr.splice(fromIndex, 1);
+    newArr.splice(toIndex, 0, moved);
+
+    const customCat = customCategories.find(c => c.id === 'custom');
+    const updatedAll = customCat ? [customCat, ...newArr] : newArr;
+
+    setDraggedIndex(targetIndex);
+    if (typeof reorderCategories === 'function') {
+      reorderCategories(updatedAll);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
+  const handleTouchStart = (index) => {
+    if (index === 0) return;
+    touchRef.current = { startIndex: index, currentIndex: index };
+    setDraggedIndex(index);
+  };
+
+  const handleTouchMove = (e) => {
+    if (touchRef.current.startIndex === null) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    const container = listContainerRef.current;
+    if (!container) return;
+
+    const children = Array.from(container.children).filter(child => child.dataset.catId);
+    for (let i = 0; i < children.length; i++) {
+      const rect = children[i].getBoundingClientRect();
+      if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        const targetIndex = i;
+        if (targetIndex !== touchRef.current.currentIndex && targetIndex !== 0) {
+          handleDragOver(e, targetIndex);
+          touchRef.current.currentIndex = targetIndex;
+        }
+        break;
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    touchRef.current = { startIndex: null, currentIndex: null };
+    setDraggedIndex(null);
+  };
 
   // Delete flow state
   const [deletingCat, setDeletingCat] = useState(null);
@@ -218,34 +291,68 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
 
           {/* ═══════ LIST VIEW ═══════ */}
           {view === 'list' && (
-            <div style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            <div
+              ref={listContainerRef}
+              style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}
+            >
               {[
                 { id: 'custom', name: t('common.custom'), color: '#34d399', ...customCategories.find(c => c.id === 'custom') },
                 ...customCategories.filter(c => c.id !== 'custom')
-              ].map(cat => {
+              ].map((cat, index) => {
                 const isBuiltIn = cat.id === 'custom';
                 const exerciseCount = isBuiltIn ? defaultCustomExercises.length : (exercisesByUserCategory?.[cat.id]?.length || 0);
+                const isDragging = draggedIndex === index;
+
                 return (
-                  <div key={cat.id} style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)',
-                    background: 'var(--surface-muted)', border: `1px solid ${cat.color}30`
-                  }}>
+                  <div
+                    key={cat.id}
+                    data-cat-id={cat.id}
+                    draggable={!isBuiltIn}
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDragEnd={handleDragEnd}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-lg)',
+                      background: isDragging ? 'rgba(139, 92, 246, 0.15)' : 'var(--surface-muted)',
+                      border: `1px solid ${cat.color}${isDragging ? '80' : '30'}`,
+                      opacity: isDragging ? 0.6 : 1,
+                      cursor: !isBuiltIn ? 'grab' : 'default',
+                      userSelect: 'none',
+                      transition: 'transform 0.15s ease, background-color 0.15s ease, opacity 0.15s ease'
+                    }}
+                  >
                     <div className="row gap-12" style={{ alignItems: 'center' }}>
+                      {!isBuiltIn && (
+                        <div
+                          onTouchStart={() => handleTouchStart(index)}
+                          onTouchMove={handleTouchMove}
+                          onTouchEnd={handleTouchEnd}
+                          title="Glisser pour réordonner"
+                          aria-label="Glisser pour réordonner"
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: 'rgba(255, 255, 255, 0.35)',
+                            cursor: 'grab', touchAction: 'none', paddingRight: '2px'
+                          }}
+                        >
+                          <GripVertical size={18} />
+                        </div>
+                      )}
                       <div style={{
-                        width: '40px', height: '40px', borderRadius: 'var(--radius-md)',
+                        width: '36px', height: '36px', borderRadius: 'var(--radius-md)',
                         background: `${cat.color}20`, border: `2px solid ${cat.color}50`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                       }}>
                         <div style={{
-                          width: '16px', height: '16px', borderRadius: '50%',
+                          width: '14px', height: '14px', borderRadius: '50%',
                           background: cat.color,
                           boxShadow: `0 0 8px ${cat.color}66`
                         }} />
                       </div>
                       <div>
-                        <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{cat.name || (isBuiltIn ? t('common.custom') : '')}</div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                        <div style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '0.95rem' }}>{cat.name || (isBuiltIn ? t('common.custom') : '')}</div>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
                           {t('common.exerciseCount', { count: exerciseCount })}
                         </div>
                       </div>

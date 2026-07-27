@@ -105,6 +105,7 @@ export function useExercises() {
       updateCategory: store.updateCategory,
       deleteCategory: store.deleteCategory,
       moveCategory: store.moveCategory,
+      reorderCategories: store.reorderCategories,
       setCategoriesFromCloud: store.setCategoriesFromCloud,
       maxCustomCategories: store.maxCustomCategories,
     },
