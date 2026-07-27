@@ -252,28 +252,64 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                     </div>
                     <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                       {!isBuiltIn && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginRight: '4px' }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '2px',
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          borderRadius: 'var(--radius-md)',
+                          padding: '2px',
+                          marginRight: '4px'
+                        }}>
                           {(() => {
                             const userCatsOnly = customCategories.filter(c => c.id !== 'custom');
                             const userIndex = userCatsOnly.findIndex(c => c.id === cat.id);
                             return (
                               <>
-                                <IconButton
-                                  icon={ChevronUp}
+                                <button
+                                  type="button"
                                   onClick={() => moveCategory(cat.id, 'up')}
                                   disabled={userIndex === 0}
-                                  variant="ghost"
-                                  size="sm"
                                   aria-label="Monter"
-                                />
-                                <IconButton
-                                  icon={ChevronDown}
+                                  style={{
+                                    width: '26px',
+                                    height: '26px',
+                                    borderRadius: 'var(--radius-sm)',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    color: userIndex === 0 ? 'var(--text-disabled)' : 'var(--text-primary)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: userIndex === 0 ? 'default' : 'pointer',
+                                    opacity: userIndex === 0 ? 0.35 : 1,
+                                    transition: 'background-color 0.2s'
+                                  }}
+                                >
+                                  <ChevronUp size={15} />
+                                </button>
+                                <button
+                                  type="button"
                                   onClick={() => moveCategory(cat.id, 'down')}
                                   disabled={userIndex === userCatsOnly.length - 1}
-                                  variant="ghost"
-                                  size="sm"
                                   aria-label="Descendre"
-                                />
+                                  style={{
+                                    width: '26px',
+                                    height: '26px',
+                                    borderRadius: 'var(--radius-sm)',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    color: userIndex === userCatsOnly.length - 1 ? 'var(--text-disabled)' : 'var(--text-primary)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: userIndex === userCatsOnly.length - 1 ? 'default' : 'pointer',
+                                    opacity: userIndex === userCatsOnly.length - 1 ? 0.35 : 1,
+                                    transition: 'background-color 0.2s'
+                                  }}
+                                >
+                                  <ChevronDown size={15} />
+                                </button>
                               </>
                             );
                           })()}
