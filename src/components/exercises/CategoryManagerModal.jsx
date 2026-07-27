@@ -218,77 +218,75 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
 
           {/* ═══════ LIST VIEW ═══════ */}
           {view === 'list' && (
-            <div style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                {[
-                  { id: 'custom', name: t('common.custom'), color: '#34d399', ...customCategories.find(c => c.id === 'custom') },
-                  ...customCategories.filter(c => c.id !== 'custom')
-                ].map(cat => {
-                  const isBuiltIn = cat.id === 'custom';
-                  const exerciseCount = isBuiltIn ? defaultCustomExercises.length : (exercisesByUserCategory?.[cat.id]?.length || 0);
-                  return (
-                    <div key={cat.id} style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)',
-                      background: 'var(--surface-muted)', border: `1px solid ${cat.color}30`
-                    }}>
-                      <div className="row gap-12" style={{ alignItems: 'center' }}>
+            <div style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+              {[
+                { id: 'custom', name: t('common.custom'), color: '#34d399', ...customCategories.find(c => c.id === 'custom') },
+                ...customCategories.filter(c => c.id !== 'custom')
+              ].map(cat => {
+                const isBuiltIn = cat.id === 'custom';
+                const exerciseCount = isBuiltIn ? defaultCustomExercises.length : (exercisesByUserCategory?.[cat.id]?.length || 0);
+                return (
+                  <div key={cat.id} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)',
+                    background: 'var(--surface-muted)', border: `1px solid ${cat.color}30`
+                  }}>
+                    <div className="row gap-12" style={{ alignItems: 'center' }}>
+                      <div style={{
+                        width: '40px', height: '40px', borderRadius: 'var(--radius-md)',
+                        background: `${cat.color}20`, border: `2px solid ${cat.color}50`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                      }}>
                         <div style={{
-                          width: '40px', height: '40px', borderRadius: 'var(--radius-md)',
-                          background: `${cat.color}20`, border: `2px solid ${cat.color}50`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center'
-                        }}>
-                          <div style={{
-                            width: '16px', height: '16px', borderRadius: '50%',
-                            background: cat.color,
-                            boxShadow: `0 0 8px ${cat.color}66`
-                          }} />
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{cat.name || (isBuiltIn ? t('common.custom') : '')}</div>
-                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                            {t('common.exerciseCount', { count: exerciseCount })}
-                          </div>
-                        </div>
+                          width: '16px', height: '16px', borderRadius: '50%',
+                          background: cat.color,
+                          boxShadow: `0 0 8px ${cat.color}66`
+                        }} />
                       </div>
-                      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                        {!isBuiltIn && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginRight: '4px' }}>
-                            {(() => {
-                              const userCatsOnly = customCategories.filter(c => c.id !== 'custom');
-                              const userIndex = userCatsOnly.findIndex(c => c.id === cat.id);
-                              return (
-                                <>
-                                  <IconButton
-                                    icon={ChevronUp}
-                                    onClick={() => moveCategory(cat.id, 'up')}
-                                    disabled={userIndex === 0}
-                                    variant="ghost"
-                                    size="sm"
-                                    aria-label="Monter"
-                                  />
-                                  <IconButton
-                                    icon={ChevronDown}
-                                    onClick={() => moveCategory(cat.id, 'down')}
-                                    disabled={userIndex === userCatsOnly.length - 1}
-                                    variant="ghost"
-                                    size="sm"
-                                    aria-label="Descendre"
-                                  />
-                                </>
-                              );
-                            })()}
-                          </div>
-                        )}
-                        <IconButton icon={Edit2} onClick={() => handleEdit(cat)} variant="ghost" size="sm" aria-label="Modifier" />
-                        {!isBuiltIn && (
-                          <IconButton icon={Trash2} onClick={() => handleStartDelete(cat)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
-                        )}
+                      <div>
+                        <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{cat.name || (isBuiltIn ? t('common.custom') : '')}</div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                          {t('common.exerciseCount', { count: exerciseCount })}
+                        </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                      {!isBuiltIn && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginRight: '4px' }}>
+                          {(() => {
+                            const userCatsOnly = customCategories.filter(c => c.id !== 'custom');
+                            const userIndex = userCatsOnly.findIndex(c => c.id === cat.id);
+                            return (
+                              <>
+                                <IconButton
+                                  icon={ChevronUp}
+                                  onClick={() => moveCategory(cat.id, 'up')}
+                                  disabled={userIndex === 0}
+                                  variant="ghost"
+                                  size="sm"
+                                  aria-label="Monter"
+                                />
+                                <IconButton
+                                  icon={ChevronDown}
+                                  onClick={() => moveCategory(cat.id, 'down')}
+                                  disabled={userIndex === userCatsOnly.length - 1}
+                                  variant="ghost"
+                                  size="sm"
+                                  aria-label="Descendre"
+                                />
+                              </>
+                            );
+                          })()}
+                        </div>
+                      )}
+                      <IconButton icon={Edit2} onClick={() => handleEdit(cat)} variant="ghost" size="sm" aria-label="Modifier" />
+                      {!isBuiltIn && (
+                        <IconButton icon={Trash2} onClick={() => handleStartDelete(cat)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
 
               {customCategories.filter(c => c.id !== 'custom').length < maxCustomCategories && (
                 <Button

@@ -143,45 +143,43 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
       <div style={{ flex: 1, overflow: confirmDeleteEx ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         
         {view === 'list' && (
-          <div style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          <div style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             {customExercises.length === 0 ? (
               <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 20px' }}>
                 <Settings2 size={48} style={{ opacity: 0.5, marginBottom: '16px' }} />
                 <p>{t('customExercises.empty')}</p>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                {customExercises.map(ex => {
-                  const IconComponent = CUSTOM_EXERCISE_ICONS[ex.icon] || Star;
-                  return (
-                    <div key={ex.id} style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)',
-                      background: 'var(--surface-muted)', border: '1px solid var(--border-default)'
-                    }}>
-                      <div className="row gap-12" style={{ alignItems: 'center' }}>
-                        <div style={{
-                          width: '40px', height: '40px', borderRadius: '50%',
-                          background: `${ex.color}20`, color: ex.color,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center'
-                        }}>
-                          <IconComponent size={20} />
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{ex.label}</div>
-                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                            {ex.type === 'timer' ? t('customExercises.typeTimer') : t('customExercises.typeCounter')} • {t('customExercises.multiplierShort')}: x{ex.multiplier}
-                          </div>
-                        </div>
+              customExercises.map(ex => {
+                const IconComponent = CUSTOM_EXERCISE_ICONS[ex.icon] || Star;
+                return (
+                  <div key={ex.id} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)',
+                    background: 'var(--surface-muted)', border: '1px solid var(--border-default)'
+                  }}>
+                    <div className="row gap-12" style={{ alignItems: 'center' }}>
+                      <div style={{
+                        width: '40px', height: '40px', borderRadius: '50%',
+                        background: `${ex.color}20`, color: ex.color,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                      }}>
+                        <IconComponent size={20} />
                       </div>
-                      <div style={{ display: 'flex', gap: '4px' }}>
-                        <IconButton icon={Edit2} onClick={() => handleEdit(ex)} variant="ghost" size="sm" aria-label="Modifier" />
-                        <IconButton icon={Trash2} onClick={() => handleDelete(ex)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
+                      <div>
+                        <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{ex.label}</div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                          {ex.type === 'timer' ? t('customExercises.typeTimer') : t('customExercises.typeCounter')} • {t('customExercises.multiplierShort')}: x{ex.multiplier}
+                        </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <IconButton icon={Edit2} onClick={() => handleEdit(ex)} variant="ghost" size="sm" aria-label="Modifier" />
+                      <IconButton icon={Trash2} onClick={() => handleDelete(ex)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
+                    </div>
+                  </div>
+                );
+              })
             )}
 
             {customExercises.length < maxCustomExercises && (
