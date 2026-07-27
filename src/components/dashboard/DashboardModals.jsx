@@ -11,7 +11,6 @@ import { useUIStore } from '@store/useUIStore';
 import { useSubscription } from '@contexts/SubscriptionContext';
 import { useExercises } from '@contexts/ExercisesContext';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
-import { SkeletonCard } from '@components/ui';
 
 const Calendar = lazy(() => import('@components/stats/Calendar').then(m => ({ default: m.Calendar })));
 const Stats = lazy(() => import('@components/stats/Stats').then(m => ({ default: m.Stats })));
@@ -82,7 +81,7 @@ export function DashboardModals({
                 </Suspense>
             )}
             {modals.stats && (
-                <Suspense fallback={<SkeletonCard />}>
+                <Suspense fallback={null}>
                     <Stats
                         initialCategory={isUserCategory(currentCatKey) ? currentCatKey : {
                             [CATEGORIES.BODYWEIGHT]: 'standard',
