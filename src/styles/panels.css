@@ -193,7 +193,7 @@ body.exercise-panel-active::before {
 .btn-conflict span { font-size: 13px; opacity: 0.8; }
 
 .btn-merge {
-  background: linear-gradient(135deg, var(--success), #059669);
+  background: linear-gradient(135deg, var(--success), color-mix(in srgb, var(--success) 80%, black));
   color: white;
 }
 
@@ -289,7 +289,7 @@ body.exercise-panel-active::before {
   border: none;
   border-radius: 12px;
   background: white;
-  color: #1f1f1f;
+  color: rgb(31, 31, 31);
   font-size: 15px;
   font-weight: 600;
   font-family: var(--font-primary);
@@ -391,12 +391,12 @@ body.exercise-panel-active::before {
 }
 
 .btn-restore {
-  background: linear-gradient(135deg, var(--color-blue), #2563eb);
+  background: linear-gradient(135deg, var(--color-blue), color-mix(in srgb, var(--color-blue) 80%, black));
   color: white;
 }
 
 .btn-restore.confirming {
-  background: linear-gradient(135deg, var(--error), #dc2626) !important;
+  background: linear-gradient(135deg, var(--error), color-mix(in srgb, var(--error) 80%, black)) !important;
 }
 
 .btn-restore:hover:not(:disabled) {

@@ -2,8 +2,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Capacitor plugin (iOS native path).
 const hapticsVibrate = vi.fn(() => Promise.resolve());
+const hapticsImpact = vi.fn(() => Promise.resolve());
 vi.mock('@capacitor/haptics', () => ({
-  Haptics: { vibrate: (...a) => hapticsVibrate(...a) },
+  ImpactStyle: { Light: 'LIGHT', Medium: 'MEDIUM', Heavy: 'HEAVY' },
+  Haptics: {
+    vibrate: (...a) => hapticsVibrate(...a),
+    impact: (...a) => hapticsImpact(...a),
+  },
 }));
 
 // Platform detection — both flags overridable per test.
@@ -56,7 +61,8 @@ describe('hapticsManager', () => {
     isNativePlatform.mockReturnValue(true); // native but not android
     const { haptics } = await load();
     await haptics.light();
-    expect(hapticsVibrate).toHaveBeenCalledWith({ duration: 40 });
+    expect(hapticsImpact).toHaveBeenCalledWith({ style: 'LIGHT' });
+    expect(hapticsVibrate).not.toHaveBeenCalled();
     expect(navVibrate).not.toHaveBeenCalled();
   });
 

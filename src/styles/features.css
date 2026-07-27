@@ -94,7 +94,7 @@
   font-weight: 700;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--text-primary);
   border-radius: 999px;
   background: var(--gradient-glow);
   box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 45%, transparent);
@@ -191,7 +191,7 @@
   border: none;
   border-radius: 15px;
   overflow: hidden;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
@@ -308,7 +308,7 @@
   left: 18%;
   right: 18%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--cardio-accent, #4285F4), transparent);
+  background: linear-gradient(90deg, transparent, var(--cardio-accent, var(--color-blue)), transparent);
   opacity: 0.6;
 }
 
@@ -585,7 +585,7 @@
   height: calc(100% - 24px);
   border-radius: 50%;
   overflow: hidden;
-  background: #0d0d13;
+  background: var(--surface-dark, rgb(13, 13, 19));
   box-shadow: inset 0 0 24px rgba(0,0,0,0.85);
   display: flex;
   align-items: center;
@@ -636,8 +636,8 @@
   top: 0;
   height: 2px;
   border-radius: 2px;
-  background: linear-gradient(90deg, transparent, var(--exercise-color, #818cf8), transparent);
-  box-shadow: 0 0 10px var(--exercise-color, #818cf8);
+  background: linear-gradient(90deg, transparent, var(--exercise-color, var(--color-indigo-light)), transparent);
+  box-shadow: 0 0 10px var(--exercise-color, var(--color-indigo-light));
   animation: cameraScan 2.2s infinite ease-in-out;
   pointer-events: none;
   z-index: 10;
@@ -668,7 +668,7 @@
   font-size: 4.5rem;
   font-weight: 800;
   line-height: 1;
-  color: #fff;
+  color: var(--text-primary);
   text-shadow: 0 0 24px color-mix(in srgb, var(--exercise-color) 70%, transparent);
   animation: countdownPop 1s infinite ease-out;
 }
@@ -690,7 +690,7 @@
 .camera-overlay-error {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #f87171;
+  color: var(--error);
 }
 
 .camera-spinner {
@@ -698,7 +698,7 @@
   height: 22px;
   border-radius: 50%;
   border: 2.5px solid rgba(255,255,255,0.18);
-  border-top-color: var(--exercise-color, #818cf8);
+  border-top-color: var(--exercise-color, var(--color-indigo-light));
   animation: spin 0.8s linear infinite;
 }
 

@@ -9,7 +9,7 @@ import { isPerfectDay } from '@utils/statUtils';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
-import { StreakFlame, WeightBadge } from '@components/ui';
+import { StreakFlame, WeightBadge, EmptyState } from '@components/ui';
 import styles from '@styles/DashboardSlide.module.css';
 
 export const DashboardSlide = React.memo(({
@@ -24,14 +24,11 @@ export const DashboardSlide = React.memo(({
         return (
             <div className="flex-col flex-center full-height text-center" style={{ padding: '20px' }}>
                 {title && <h2 className="panel-title">{title}</h2>}
-                <div style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>{t('dashboard.noExercisesConfigured')}</div>
-                {onManageCustom && (
-                    <button onClick={onManageCustom} className="hover-lift" style={{
-                        padding: '12px 24px', borderRadius: 'var(--radius-md)', background: '#8b5cf6', color: 'white', fontWeight: '700', border: 'none'
-                    }}>
-                        {t('dashboard.configure')}
-                    </button>
-                )}
+                <EmptyState
+                    title={t('dashboard.noExercisesConfigured')}
+                    actionLabel={onManageCustom ? t('dashboard.configure') : undefined}
+                    onAction={onManageCustom}
+                />
             </div>
         );
     }

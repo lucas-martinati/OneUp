@@ -1,25 +1,12 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { createPortal } from 'react-dom';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from '@utils/icons';
 import { Button } from './Button';
+import { ModalContainer } from './ModalContainer';
 
 /**
  * Custom confirm dialog replacing window.confirm().
- * Renders on the shared .dialog-backdrop / .dialog-card pattern so it follows
- * the active theme (the previous inline version was hard-coded purple).
- *
- * @param {boolean}  open         – Whether the dialog is visible
- * @param {string}   [title]      – Optional heading above the message
- * @param {ReactNode} message     – The confirmation message to display
- * @param {string}   [warning]    – Optional error-tinted notice strip (e.g. "cannot be undone")
- * @param {Component} [icon]      – Icon component in the header circle (default AlertTriangle)
- * @param {boolean}  [loading=false] – Confirm in progress: spinner + inputs locked
- * @param {function} onConfirm    – Called when the user confirms
- * @param {function} onCancel     – Called when the user cancels
- * @param {boolean}  [destructive=false] – If true, confirm button uses red/danger styling
- * @param {string}   [confirmLabel] – Override the confirm button text
- * @param {string}   [cancelLabel]  – Override the cancel button text
+ * Renders on the shared ModalContainer pattern so it follows the active theme.
  */
 export function ConfirmDialog({
     open,
@@ -35,36 +22,13 @@ export function ConfirmDialog({
     cancelLabel,
 }) {
     const { t } = useTranslation();
-    const overlayRef = useRef(null);
-
-    // Close on Escape key (unless a confirm is in flight)
-    const handleKeyDown = useCallback((e) => {
-        if (e.key === 'Escape' && !loading) onCancel();
-    }, [onCancel, loading]);
-
-    useEffect(() => {
-        if (open) {
-            document.addEventListener('keydown', handleKeyDown);
-            // Prevent body scroll while dialog is open
-            document.body.style.overflow = 'hidden';
-        }
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = '';
-        };
-    }, [open, handleKeyDown]);
-
-    // Close when clicking backdrop (not the panel)
-    const handleBackdropClick = (e) => {
-        if (e.target === overlayRef.current && !loading) onCancel();
-    };
 
     if (!open) return null;
 
     const accentTint = destructive ? 'var(--error)' : 'var(--accent-glow)';
 
-    return createPortal(
-        <div ref={overlayRef} onClick={handleBackdropClick} className="dialog-backdrop">
+    return (
+        <ModalContainer open={open} onClose={onCancel} closeOnEscape={!loading} closeOnBackdrop={!loading}>
             <div
                 className={`dialog-card${destructive ? ' dialog-card--danger' : ''}`}
                 style={{
@@ -140,7 +104,6 @@ export function ConfirmDialog({
                     </Button>
                 </div>
             </div>
-        </div>,
-        document.body
+        </ModalContainer>
     );
 }

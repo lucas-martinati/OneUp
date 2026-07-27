@@ -1,4 +1,5 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useMemo, useCallback } from 'react';
+import { haptics } from '@utils/hapticsManager';
 
 /**
  * Round, icon-only button primitive.
@@ -91,9 +92,17 @@ const VARIANTS = {
 };
 
 export const IconButton = forwardRef(function IconButton(
-  { icon: Icon, variant = 'surface', size = 'md', color, disabled = false, className = '', children, style, type = 'button', ...rest },
+  { icon: Icon, variant = 'surface', size = 'md', color, disabled = false, className = '', children, style, type = 'button', onClick, ...rest },
   ref,
 ) {
+  const handleClick = useCallback(
+    (e) => {
+      haptics.light();
+      onClick?.(e);
+    },
+    [onClick],
+  );
+
   const composed = useMemo(
     () => ({
       ...BASE,
@@ -110,7 +119,7 @@ export const IconButton = forwardRef(function IconButton(
   const classes = [VARIANT_CLASS[variant], className].filter(Boolean).join(' ');
 
   return (
-    <button ref={ref} type={type} disabled={disabled} className={classes || undefined} style={composed} {...rest}>
+    <button ref={ref} type={type} disabled={disabled} onClick={handleClick} className={classes || undefined} style={composed} {...rest}>
       {Icon ? <Icon size={ICON_PX[size]} /> : children}
     </button>
   );

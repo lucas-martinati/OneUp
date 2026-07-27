@@ -143,7 +143,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
       <div style={{ flex: 1, overflow: confirmDeleteEx ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         
         {view === 'list' && (
-          <div style={{ width: '100%', maxWidth: '440px' }}>
+          <div style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             {customExercises.length === 0 ? (
               <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 20px' }}>
                 <Settings2 size={48} style={{ opacity: 0.5, marginBottom: '16px' }} />
