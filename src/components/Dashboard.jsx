@@ -18,11 +18,13 @@ import { useNewAchievement } from '@hooks/useNewAchievement';
 import { useAnnouncement } from '@features/announcements/useAnnouncement';
 import { AnnouncementOverlay } from '@features/announcements/AnnouncementOverlay';
 
-// New Extracted Hooks/Components
 import { useDashboardState } from '@hooks/useDashboardState';
 import { useDashboardSelection } from '@hooks/useDashboardSelection';
 import { DashboardSlideRenderer } from './dashboard/DashboardSlideRenderer';
 import { DashboardModals } from './dashboard/DashboardModals';
+import { isPerfectDay } from '@utils/statUtils';
+import { EXERCISES as BODYWEIGHT_EXERCISES } from '@config/exercises';
+import { WEIGHT_EXERCISES } from '@config/weights';
 
 // Contexts
 import { useAuth } from '@contexts/AuthContext';
@@ -146,7 +148,12 @@ export function Dashboard() {
     useLayoutEffect(() => {
         const el = scrollContainerRef.current;
         if (el) {
-            el.scrollTo({ top: el.clientHeight * defaultSlide, behavior: 'instant' });
+            const targetChild = el.querySelector(`[data-slide-index="${defaultSlide}"]`) || el.children[defaultSlide];
+            if (targetChild && typeof targetChild.offsetTop === 'number') {
+                el.scrollTo({ top: targetChild.offsetTop, behavior: 'instant' });
+            } else {
+                el.scrollTo({ top: el.clientHeight * defaultSlide, behavior: 'instant' });
+            }
         }
     }, [defaultSlide]);
 
@@ -190,6 +197,24 @@ export function Dashboard() {
     }, [detectedAchievement, showAchievement, clearAchievement]);
 
     const dayNumber = useMemo(() => getDayNumber(today), [getDayNumber, today]);
+
+    const defaultCustomExercises = useMemo(
+        () => customExercises.filter(ex => !ex.categoryId || ex.categoryId === 'custom'),
+        [customExercises]
+    );
+
+    const currentCategoryExercises = useMemo(() => {
+        if (currentCatKey === CATEGORIES.BODYWEIGHT) return BODYWEIGHT_EXERCISES;
+        if (currentCatKey === CATEGORIES.WEIGHTS) return WEIGHT_EXERCISES;
+        if (currentCatKey === CATEGORIES.CUSTOM) return defaultCustomExercises;
+        if (isUserCategory(currentCatKey)) return exercisesByUserCategory[currentCatKey] || [];
+        return [];
+    }, [currentCatKey, defaultCustomExercises, exercisesByUserCategory]);
+
+    const isDayPerfect = useMemo(
+        () => isPerfectDay(completions[today], currentCategoryExercises),
+        [completions, today, currentCategoryExercises]
+    );
 
     const isExerciseDone = completions[today]?.[globalSelectedId]?.isCompleted || false;
     const currentCount = getExerciseCount(today, globalSelectedId);
@@ -256,6 +281,12 @@ export function Dashboard() {
                     displayStreak={computedStats.displayStreak}
                     selectedExercise={selectedExercise}
                     totalReps={totalReps}
+                    dayNumber={dayNumber}
+                    prevDayNumber={prevDayNumber}
+                    isCounterTransitioning={isCounterTransitioning}
+                    isDayPerfect={isDayPerfect}
+                    isFuture={isFuture}
+                    effectiveStart={effectiveStart}
                 />
 
                 {sessionInProgress && !anyModalOpen && (
@@ -276,7 +307,9 @@ export function Dashboard() {
                             flex: 1, overflowY: anyModalOpen ? 'hidden' : 'auto', overflowX: 'hidden',
                             scrollSnapType: 'y mandatory',
                             display: 'flex', flexDirection: 'column', width: '100%',
-                            scrollbarWidth: 'none', msOverflowStyle: 'none'
+                            scrollbarWidth: 'none', msOverflowStyle: 'none',
+                            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0px, black 32px, black calc(100% - 32px), transparent 100%)',
+                            maskImage: 'linear-gradient(to bottom, transparent 0px, black 32px, black calc(100% - 32px), transparent 100%)'
                         }}
                     >
                         <DashboardSlideRenderer

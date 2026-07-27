@@ -7,6 +7,7 @@ import { useProgressStore } from '@store/useProgressStore';
 import { useAuth } from '@contexts/AuthContext';
 import { Card } from '@components/ui';
 import { StreakFreezeInfo } from './StreakFreezeInfo';
+import { DayHeroHeader } from './DayHeroHeader';
 
 const filterOutIds = (idsToRemove) => (p) => p.filter(particle => !idsToRemove.has(particle.id));
 
@@ -24,7 +25,8 @@ const BADGE_BASE = {
 
 export const DashboardHeader = React.memo(({
     isAdmin,
-    streakActive, streakFrozen, displayStreak, selectedExercise, totalReps
+    streakActive, streakFrozen, displayStreak, selectedExercise, totalReps,
+    dayNumber, prevDayNumber, isCounterTransitioning, isDayPerfect, isFuture, effectiveStart
 }) => {
     const openModal = useUIStore(s => s.openModal);
     const { t } = useTranslation();
@@ -124,105 +126,139 @@ export const DashboardHeader = React.memo(({
     }
 
     return (
-        <Card as="header" ref={headerRef} variant="glass" padding="none"
-            className="dashboard-header"
-            style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: 'clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 20px)',
-                minWidth: 0, position: 'relative', zIndex: 10
-            }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1 }}>
-                {showLogo && (
-                    <img
-                        onClick={() => window.location.reload()}
-                        src={`${import.meta.env.BASE_URL}logo-64x64.webp`} alt="OneUp Logo"
-                        className="bounce-on-hover"
-                        style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', cursor: 'pointer', transition: 'transform 0.3s ease' }}
-                    />
-                )}
-                {showText && (
-                    <span className="app-logo-text" style={{ 
-                        fontWeight: '800', fontSize: 'clamp(1.1rem, 2.5vh, 1.5rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0
-                    }}>OneUp</span>
-                )}
-            </div>
+        <header ref={headerRef} className="dashboard-header-wrapper" style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            width: '100%', position: 'relative', zIndex: 10
+        }}>
+            {/* Top Bar of the T */}
+            <Card as="div" variant="glass" padding="none"
+                className="dashboard-header-top-bar"
+                style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    width: '100%',
+                    padding: 'clamp(8px, 1.2vh, 12px) clamp(12px, 3vw, 20px)',
+                    minWidth: 0, position: 'relative', zIndex: 2,
+                    animation: 'headerUnfold 0.5s ease-out forwards, headerAuraPulse 1.6s ease-out'
+                }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1 }}>
+                    {showLogo && (
+                        <img
+                            onClick={() => window.location.reload()}
+                            src={`${import.meta.env.BASE_URL}logo-64x64.webp`} alt="OneUp Logo"
+                            className="bounce-on-hover"
+                            style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', cursor: 'pointer', transition: 'transform 0.3s ease' }}
+                        />
+                    )}
+                    {showText && (
+                        <span className="app-logo-text" style={{ 
+                            fontWeight: '800', fontSize: 'clamp(1.1rem, 2.5vh, 1.5rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0
+                        }}>OneUp</span>
+                    )}
+                </div>
 
-            <div ref={rightSideRef} style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 0, justifyContent: 'flex-end' }}>
-                {isAdmin && (
+                <div ref={rightSideRef} style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 0, justifyContent: 'flex-end' }}>
+                    {isAdmin && (
+                        <button
+                            type="button"
+                            onClick={() => openModal('admin')}
+                            aria-label="Admin Panel"
+                            className="hover-lift"
+                            style={{
+                                ...BADGE_BASE,
+                                gap: 0,
+                                background: 'linear-gradient(135deg, rgba(239,68,68,0.22), rgba(220,38,38,0.22))',
+                                border: '1px solid rgba(239,68,68,0.3)',
+                                boxShadow: '0 2px 8px rgba(239,68,68,0.15)'
+                            }}
+                        >
+                            <Shield size={16} color="#ef4444" />
+                            <span aria-hidden="true">{'\u200b'}</span>
+                        </button>
+                    )}
+
+                    {/* Streak Freeze inventory — tap to learn how freezes are earned
+                        (and that Pro earns 3× more). Hidden at zero. */}
+                    {showFreezeBadge && (
+                        <button
+                            type="button"
+                            onClick={() => setShowFreezeInfo(true)}
+                            aria-label={t('streakFreeze.available', { count: displayFreezeCount })}
+                            title={t('streakFreeze.available', { count: displayFreezeCount })}
+                            style={{
+                                ...BADGE_BASE,
+                                background: 'linear-gradient(135deg, rgba(56,189,248,0.20), rgba(14,165,233,0.20))',
+                                border: '1px solid rgba(56,189,248,0.3)',
+                                boxShadow: '0 2px 8px rgba(56,189,248,0.15)'
+                            }}>
+                            <Snowflake size={16} color="#38bdf8" />
+                            <span style={{ color: '#38bdf8' }}>{displayFreezeCount}</span>
+                        </button>
+                    )}
+
+                    {showFreezeInfo && <StreakFreezeInfo open={showFreezeInfo} onClose={() => setShowFreezeInfo(false)} />}
+
+                    {/* Global streak badge — three states: active (fire), frozen but
+                        safe (snowflake/blue), or pending today (grey). */}
                     <button
                         type="button"
-                        onClick={() => openModal('admin')}
-                        aria-label="Admin Panel"
-                        className="hover-lift"
+                        onClick={handleStreakClick}
+                        aria-label="Streak"
                         style={{
                             ...BADGE_BASE,
-                            gap: 0,
-                            background: 'linear-gradient(135deg, rgba(239,68,68,0.22), rgba(220,38,38,0.22))',
-                            border: '1px solid rgba(239,68,68,0.3)',
-                            boxShadow: '0 2px 8px rgba(239,68,68,0.15)'
-                        }}
-                    >
-                        <Shield size={16} color="#ef4444" />
-                        <span aria-hidden="true">{'\u200b'}</span>
-                    </button>
-                )}
-
-                {/* Streak Freeze inventory — tap to learn how freezes are earned
-                    (and that Pro earns 3× more). Hidden at zero. */}
-                {showFreezeBadge && (
-                    <button
-                        type="button"
-                        onClick={() => setShowFreezeInfo(true)}
-                        aria-label={t('streakFreeze.available', { count: displayFreezeCount })}
-                        title={t('streakFreeze.available', { count: displayFreezeCount })}
-                        style={{
-                            ...BADGE_BASE,
-                            background: 'linear-gradient(135deg, rgba(56,189,248,0.20), rgba(14,165,233,0.20))',
-                            border: '1px solid rgba(56,189,248,0.3)',
-                            boxShadow: '0 2px 8px rgba(56,189,248,0.15)'
+                            background: streakBadge.bg,
+                            border: streakBadge.border,
+                            boxShadow: streakBadge.shadow,
+                            opacity: streakActive || isStreakFrozen ? 1 : 0.7
                         }}>
-                        <Snowflake size={16} color="#38bdf8" />
-                        <span style={{ color: '#38bdf8' }}>{displayFreezeCount}</span>
+                        {isStreakFrozen
+                            ? <FrozenFlame size={16} color={streakBadge.fg} />
+                            : <Flame size={16} color={streakBadge.fg} />}
+                        <span style={{ color: streakBadge.fg }}>{displayStreak}</span>
                     </button>
-                )}
 
-                {showFreezeInfo && <StreakFreezeInfo open={showFreezeInfo} onClose={() => setShowFreezeInfo(false)} />}
+                    {/* Total reps badge */}
+                    <button
+                        type="button"
+                        tabIndex={-1}
+                        className="shimmer"
+                        style={{
+                            ...BADGE_BASE,
+                            cursor: 'default',
+                            pointerEvents: 'none',
+                            background: `linear-gradient(135deg, ${selectedExercise.color}33, ${selectedExercise.gradient[0]}33)`,
+                            border: `1px solid ${selectedExercise.color}44`,
+                            boxShadow: `0 2px 8px ${selectedExercise.color}33`
+                        }}>
+                        <Trophy size={16} color={selectedExercise.color} />
+                        <span>{totalReps}</span>
+                    </button>
+                </div>
+            </Card>
 
-                {/* Global streak badge — three states: active (fire), frozen but
-                    safe (snowflake/blue), or pending today (grey). */}
-                <button
-                    type="button"
-                    onClick={handleStreakClick}
-                    aria-label="Streak"
-                    style={{
-                        ...BADGE_BASE,
-                        background: streakBadge.bg,
-                        border: streakBadge.border,
-                        boxShadow: streakBadge.shadow,
-                        opacity: streakActive || isStreakFrozen ? 1 : 0.7
-                    }}>
-                    {isStreakFrozen
-                        ? <FrozenFlame size={16} color={streakBadge.fg} />
-                        : <Flame size={16} color={streakBadge.fg} />}
-                    <span style={{ color: streakBadge.fg }}>{displayStreak}</span>
-                </button>
-
-                {/* Total reps badge */}
-                <button
-                    type="button"
-                    tabIndex={-1}
-                    className="shimmer"
-                    style={{
-                        ...BADGE_BASE,
-                        cursor: 'default',
-                        pointerEvents: 'none',
-                        background: `linear-gradient(135deg, ${selectedExercise.color}33, ${selectedExercise.gradient[0]}33)`,
-                        border: `1px solid ${selectedExercise.color}44`,
-                        boxShadow: `0 2px 8px ${selectedExercise.color}33`
-                    }}>
-                    <Trophy size={16} color={selectedExercise.color} />
-                    <span>{totalReps}</span>
-                </button>
+            {/* Vertical Stem of the T — Centered Glass Pod wrapping Day Hero */}
+            <div style={{
+                display: 'flex', justifyContent: 'center', width: '100%',
+                marginTop: '-1px', zIndex: 1
+            }}>
+                <div className="glass" style={{
+                    display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
+                    padding: '2px clamp(18px, 4vw, 36px) 6px',
+                    borderRadius: '0 0 20px 20px',
+                    borderTop: 'none',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
+                    animation: 'heroSectionExpand 0.5s ease-out forwards',
+                    width: 'fit-content'
+                }}>
+                    <DayHeroHeader
+                        dayNumber={dayNumber}
+                        prevDayNumber={prevDayNumber}
+                        isCounterTransitioning={isCounterTransitioning}
+                        isDayPerfect={isDayPerfect}
+                        isFuture={isFuture}
+                        effectiveStart={effectiveStart}
+                        hidden={false}
+                    />
+                </div>
             </div>
 
             {/* Render streak easter egg particles */}
@@ -236,6 +272,6 @@ export const DashboardHeader = React.memo(({
                     {p.emoji}
                 </div>
             ))}
-        </Card>
+        </header>
     );
 });

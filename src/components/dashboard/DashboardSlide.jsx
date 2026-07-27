@@ -14,7 +14,7 @@ import styles from '@styles/DashboardSlide.module.css';
 
 export const DashboardSlide = React.memo(({
     isFuture, effectiveStart, dayNumber, today, getExerciseCount, completions, computedStats,
-    isCounterTransitioning, prevDayNumber, pauseCloudSync, setShowCounter,
+    pauseCloudSync, setShowCounter,
     activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, categoryColor, onManageCustom, onManageCategories, getConfig
 }) => {
     const { t, i18n } = useTranslation();
@@ -46,24 +46,6 @@ export const DashboardSlide = React.memo(({
     // tiles (e.g. weights) keep the same sizes as a small category.
     const gridRows = Math.ceil(exercisesList.length / 3);
     const isCompact = gridRows >= 4;
-
-    let dayNumAnimation = '';
-    if (isCounterTransitioning) {
-        dayNumAnimation = isDayPerfect
-            ? 'gradientShift 4s ease infinite, counterSlideUp 1s ease-out'
-            : 'rainbowFlow 6s ease infinite, counterSlideUp 1s ease-out';
-    } else {
-        dayNumAnimation = isDayPerfect
-            ? 'gradientShift 4s ease infinite, numberRoll 0.5s ease-out'
-            : 'rainbowFlow 6s ease infinite, numberRoll 0.5s ease-out';
-    }
-
-    let prevDayNumAnimation = '';
-    if (isDayPerfect) {
-        prevDayNumAnimation = 'gradientShift 4s ease infinite, counterSlideDown 1s ease-out forwards';
-    } else {
-        prevDayNumAnimation = 'rainbowFlow 6s ease infinite, counterSlideDown 1s ease-out forwards';
-    }
 
     return (
         <div
@@ -165,47 +147,6 @@ export const DashboardSlide = React.memo(({
             )}
             {!isFuture ? (
                 <>
-                    {/* Day & Goal Hero Section */}
-                    <div style={{ textAlign: 'center', position: 'relative' }}>
-                        <div style={{
-                            fontSize: 'var(--day-label-size, clamp(0.75rem, 1.6vh, 1rem))',
-                            lineHeight: 1.2,
-                            color: isDayPerfect ? '#ffdf00' : 'var(--text-secondary)',
-                            textTransform: 'uppercase', letterSpacing: '4px',
-                            marginBottom: '2px', fontWeight: '700',
-                            textShadow: isDayPerfect ? '0 0 8px rgba(255,223,0,0.4)' : 'none',
-                        }} className="day-label">
-                            <span className="day-label-text">{t('dashboard.day')}</span>
-                        </div>
-
-                        {/* Big animated day number */}
-                        <div className="flex-center pos-relative overflow-hidden day-number-container" style={{
-                            height: 'var(--day-num-height, clamp(2.4rem, 8vh, 6.5rem))',
-                            marginBottom: 'clamp(2px, 0.4vh, 6px)',
-                            filter: isDayPerfect ? 'drop-shadow(0 0 15px rgba(251,191,36,0.2))' : 'none'
-                        }}>
-                            {isCounterTransitioning && prevDayNumber && (
-                                <div className={`day-number-anim ${isDayPerfect ? 'gold-text' : 'rainbow-gradient'}`} style={{
-                                    position: 'absolute', fontSize: 'var(--day-num-font-size, clamp(2.2rem, 7.5vh, 6rem))', fontWeight: '800', lineHeight: 1,
-                                    animation: prevDayNumAnimation
-                                }}>
-                                    {prevDayNumber}
-                                </div>
-                            )}
-                            <div
-                                key={dayNumber}
-                                className={`day-number ${isDayPerfect ? 'gold-text' : 'rainbow-gradient'}`}
-                                data-text={dayNumber}
-                                style={{
-                                    fontSize: 'var(--day-num-font-size, clamp(2.2rem, 7.5vh, 6rem))', fontWeight: '800', lineHeight: 1,
-                                    animation: dayNumAnimation
-                                }}
-                            >
-                                {dayNumber}
-                            </div>
-                        </div>
-                    </div>
-
                     {/* ── Exercise Selector ── */}
                     <div className="exercise-grid flex-row flex-wrap flex-justify-center" style={{
                         gap: 'var(--exercise-btn-gap, clamp(4px, 1vh, 8px))', width: '100%', maxWidth: '640px',

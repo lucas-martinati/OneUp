@@ -6,7 +6,17 @@ import { CATEGORIES, isUserCategory } from '@config/categories';
  * CategoryNav - A high-performance, isolated navigation scrubber.
  * Handles touch interactions smoothly without lagging the main application.
  */
-export const CategoryNav = ({ 
+const scrollToCategoryIndex = (container, index, behavior = 'smooth') => {
+    if (!container) return;
+    const targetChild = container.querySelector(`[data-slide-index="${index}"]`) || container.children[index];
+    if (targetChild && typeof targetChild.offsetTop === 'number') {
+        container.scrollTo({ top: targetChild.offsetTop, behavior });
+    } else {
+        container.scrollTo({ top: container.clientHeight * index, behavior });
+    }
+};
+
+export const CategoryNav = React.memo(({ 
     fullCategoryOrder, 
     activeSlide, 
     customCategories, 
@@ -75,7 +85,7 @@ export const CategoryNav = ({
                     
                     setDragIndex(closest);
                     if (closest !== activeSlide) {
-                        scrollContainerRef.current?.scrollTo({ top: scrollContainerRef.current.clientHeight * closest, behavior: 'smooth' });
+                        scrollToCategoryIndex(scrollContainerRef.current, closest, 'smooth');
                     }
                 }, delay);
             }}
@@ -128,7 +138,7 @@ export const CategoryNav = ({
                     if (prevIndex !== index) {
                         const el = scrollContainerRef.current;
                         if (el) {
-                            el.scrollTo({ top: el.clientHeight * index, behavior: 'smooth' });
+                            scrollToCategoryIndex(el, index, 'smooth');
                         }
                         if (window.navigator.vibrate && e.pointerType !== 'mouse' && navigator.userActivation?.hasBeenActive) {
                             window.navigator.vibrate(5);
@@ -187,7 +197,7 @@ export const CategoryNav = ({
                             e.stopPropagation();
                             const el = scrollContainerRef.current;
                             if (el) {
-                                el.scrollTo({ top: el.clientHeight * i, behavior: 'smooth' });
+                                scrollToCategoryIndex(el, i, 'smooth');
                             }
                         }}
                         style={{ background: dotColor }}
@@ -200,4 +210,4 @@ export const CategoryNav = ({
             })}
         </div>
     );
-};
+});
