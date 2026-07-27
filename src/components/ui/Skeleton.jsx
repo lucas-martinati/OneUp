@@ -30,27 +30,3 @@ export function Skeleton({
     />
   );
 }
-
-export function SkeletonCard({ height = '120px', className = '', ...props }) {
-  return (
-    <div
-      className={`skeleton-card ${className}`}
-      style={{
-        width: '100%',
-        height,
-        borderRadius: 'var(--radius-lg)',
-        padding: 'var(--space-4)',
-        background: 'var(--card-bg, rgba(255, 255, 255, 0.03))',
-        border: '1px solid rgba(255, 255, 255, 0.06)',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 'var(--space-3)',
-      }}
-      {...props}
-    >
-      <Skeleton width="40%" height="1.2rem" />
-      <Skeleton width="85%" height="0.9rem" />
-      <Skeleton width="60%" height="0.9rem" />
-    </div>
-  );
-}

@@ -8,10 +8,18 @@ import { CATEGORIES, isUserCategory } from '@config/categories';
  */
 const scrollToCategoryIndex = (container, index, behavior = 'smooth') => {
     if (!container) return;
-    const targetChild = container.querySelector(`[data-slide-index="${index}"]`) || container.children[index];
+
+    let targetChild = null;
+    if (typeof container.querySelector === 'function') {
+        targetChild = container.querySelector(`[data-slide-index="${index}"]`);
+    }
+    if (!targetChild && container.children) {
+        targetChild = container.children[index];
+    }
+
     if (targetChild && typeof targetChild.offsetTop === 'number') {
         container.scrollTo({ top: targetChild.offsetTop, behavior });
-    } else {
+    } else if (typeof container.clientHeight === 'number') {
         container.scrollTo({ top: container.clientHeight * index, behavior });
     }
 };

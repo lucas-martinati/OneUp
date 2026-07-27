@@ -1,11 +1,12 @@
 import React, { useRef, useState, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Shield, Flame, Trophy, Snowflake } from '@utils/icons';
-import { FrozenFlame } from '@components/ui';
+import { Card, FrozenFlame } from '@components/ui';
 import { useUIStore } from '@store/useUIStore';
 import { useProgressStore } from '@store/useProgressStore';
 import { useAuth } from '@contexts/AuthContext';
 import { StreakFreezeInfo } from './StreakFreezeInfo';
+import { DayHeroHeader } from './DayHeroHeader';
 
 const filterOutIds = (idsToRemove) => (p) => p.filter(particle => !idsToRemove.has(particle.id));
 
@@ -24,7 +25,7 @@ const BADGE_BASE = {
 export const DashboardHeader = React.memo(({
     isAdmin,
     streakActive, streakFrozen, displayStreak, selectedExercise, totalReps,
-    dayNumber, isDayPerfect, isFuture, effectiveStart
+    dayNumber, prevDayNumber, isCounterTransitioning, isDayPerfect, isFuture, effectiveStart
 }) => {
     const openModal = useUIStore(s => s.openModal);
     const { t } = useTranslation();
@@ -129,27 +130,36 @@ export const DashboardHeader = React.memo(({
     return (
         <header
             ref={headerRef}
-            className="glass dashboard-header-wrapper"
+            className="dashboard-header-wrapper"
             style={{
                 display: 'flex',
                 flexDirection: 'column',
+                alignItems: 'center',
                 width: '100%',
                 position: 'relative',
                 zIndex: 10,
-                borderRadius: 'var(--radius-lg)',
-                animation: entranceAnimation,
-                overflow: 'visible',
+                boxSizing: 'border-box',
             }}
         >
-            {/* Row 1 — Logo left, Badges right */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: '100%',
-                padding: 'clamp(8px, 1.2vh, 12px) clamp(10px, 2.5vw, 16px) clamp(2px, 0.4vh, 4px)',
-                boxSizing: 'border-box',
-            }}>
+            {/* Top Bar in glass Card */}
+            <Card
+                as="div"
+                variant="glass"
+                padding="none"
+                className="dashboard-header-top-bar"
+                style={{
+                    display: 'flex',
+                    justify: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    padding: 'clamp(8px, 1.2vh, 12px) clamp(12px, 3vw, 20px)',
+                    minWidth: 0,
+                    position: 'relative',
+                    zIndex: 2,
+                    animation: `${entranceAnimation}, headerUnfold 0.5s ease-out forwards`,
+                }}
+            >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1 }}>
                     {showLogo && (
                         <img
@@ -191,6 +201,8 @@ export const DashboardHeader = React.memo(({
                         gap: 'clamp(4px, 0.8vw, 8px)',
                         alignItems: 'center',
                         flexShrink: 0,
+                        justifyContent: 'flex-end',
+                        marginLeft: 'auto',
                     }}
                 >
                     {isAdmin && (
@@ -270,56 +282,32 @@ export const DashboardHeader = React.memo(({
                         <span>{totalReps}</span>
                     </button>
                 </div>
-            </div>
+            </Card>
 
-            {/* Row 2 — Compact centered Day counter */}
+            {/* Vertical Stem of the T — Centered Glass Pod wrapping Day Hero (separate cube/card) */}
             <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'baseline',
-                gap: 'clamp(5px, 1vw, 8px)',
-                padding: 'clamp(10px, 2.5vw, 16px) clamp(6px, 1vh, 10px)',
-                boxSizing: 'border-box',
+                display: 'flex', justifyContent: 'center', width: '100%',
+                marginTop: '-1px', zIndex: 1
             }}>
-                {!isFuture ? (
-                    <>
-                        <span style={{
-                            fontSize: 'clamp(0.85rem, 1.8vh, 1.1rem)',
-                            fontWeight: '800',
-                            textTransform: 'uppercase',
-                            letterSpacing: '3px',
-                            color: isDayPerfect ? '#ffdf00' : 'var(--text-secondary)',
-                            textShadow: isDayPerfect ? '0 0 8px rgba(255,223,0,0.4)' : 'none',
-                        }}>
-                            {t('dashboard.day')}
-                        </span>
-                        <span
-                            key={dayNumber}
-                            className={isDayPerfect ? 'gold-text' : 'rainbow-gradient'}
-                            style={{
-                                fontSize: 'clamp(2.6rem, 6.5vh, 4.5rem)',
-                                fontWeight: '900',
-                                lineHeight: 1,
-                                animation: isDayPerfect
-                                    ? 'gradientShift 4s ease infinite'
-                                    : 'rainbowFlow 6s ease infinite',
-                                filter: isDayPerfect
-                                    ? 'drop-shadow(0 2px 10px rgba(251,191,36,0.35))'
-                                    : 'drop-shadow(0 2px 10px rgba(168,85,247,0.25))',
-                            }}
-                        >
-                            {dayNumber}
-                        </span>
-                    </>
-                ) : (
-                    <span style={{
-                        fontSize: 'clamp(0.75rem, 1.4vh, 0.9rem)',
-                        color: 'var(--text-secondary)',
-                        fontWeight: '600',
-                    }}>
-                        {t('dashboard.challengeStarts')} <strong style={{ color: 'var(--text-primary)' }}>{effectiveStart}</strong>
-                    </span>
-                )}
+                <div className="glass" style={{
+                    display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
+                    padding: '2px clamp(18px, 4vw, 36px) 6px',
+                    borderRadius: '0 0 20px 20px',
+                    borderTop: 'none',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
+                    animation: 'heroSectionExpand 0.5s ease-out forwards',
+                    width: 'fit-content'
+                }}>
+                    <DayHeroHeader
+                        dayNumber={dayNumber}
+                        prevDayNumber={prevDayNumber}
+                        isCounterTransitioning={isCounterTransitioning}
+                        isDayPerfect={isDayPerfect}
+                        isFuture={isFuture}
+                        effectiveStart={effectiveStart}
+                        hidden={false}
+                    />
+                </div>
             </div>
 
             {/* Render streak easter egg particles */}
@@ -336,5 +324,3 @@ export const DashboardHeader = React.memo(({
         </header>
     );
 });
-
-
