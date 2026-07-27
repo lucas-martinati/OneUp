@@ -57,7 +57,6 @@ vi.mock('@utils/workoutSessionStorage', () => ({
 
 import { useWorkoutSession } from '../useWorkoutSession';
 import { addSession } from '@features/share/services/sessionHistoryService';
-import { isCustomExercise } from '@utils/exerciseLabel';
 
 const bwId = EXERCISES[0].id;
 const bwId2 = EXERCISES[1].id;
@@ -376,8 +375,6 @@ describe('additional coverage', () => {
     exCtx.defaultCustomExercises = [{ id: 'custom_1', name: 'Cust1' }];
     exCtx.allExercisesMap['custom_1'] = { id: 'custom_1', name: 'Cust1' };
     const { result } = setup();
-    console.log('Test setup: isPro=', sub.isPro);
-    console.log('isCustom 1:', isCustomExercise('custom_1'));
     act(() => result.current.loadRoutine({ name: 'r', exerciseIds: [bwId, weightId, 'custom_1'] }));
     expect(result.current.queue).toEqual([bwId]);
   });
