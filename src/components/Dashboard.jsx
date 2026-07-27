@@ -308,8 +308,8 @@ export function Dashboard() {
                             scrollSnapType: 'y mandatory',
                             display: 'flex', flexDirection: 'column', width: '100%',
                             scrollbarWidth: 'none', msOverflowStyle: 'none',
-                            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0px, black 32px, black calc(100% - 32px), transparent 100%)',
-                            maskImage: 'linear-gradient(to bottom, transparent 0px, black 32px, black calc(100% - 32px), transparent 100%)'
+                            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0px, black 12px, black calc(100% - 12px), transparent 100%)',
+                            maskImage: 'linear-gradient(to bottom, transparent 0px, black 12px, black calc(100% - 12px), transparent 100%)'
                         }}
                     >
                         <DashboardSlideRenderer

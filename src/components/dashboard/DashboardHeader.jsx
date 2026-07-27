@@ -147,7 +147,7 @@ export const DashboardHeader = React.memo(({
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 width: '100%',
-                padding: 'clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 20px)',
+                padding: 'clamp(8px, 1.2vh, 12px) clamp(10px, 2.5vw, 16px) clamp(2px, 0.4vh, 4px)',
                 boxSizing: 'border-box',
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1 }}>
@@ -278,7 +278,7 @@ export const DashboardHeader = React.memo(({
                 justifyContent: 'center',
                 alignItems: 'baseline',
                 gap: 'clamp(5px, 1vw, 8px)',
-                padding: '0 clamp(12px, 3vw, 20px) clamp(8px, 1.2vh, 14px)',
+                padding: 'clamp(10px, 2.5vw, 16px) clamp(6px, 1vh, 10px)',
                 boxSizing: 'border-box',
             }}>
                 {!isFuture ? (

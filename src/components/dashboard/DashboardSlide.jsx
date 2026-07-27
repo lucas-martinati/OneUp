@@ -20,23 +20,10 @@ export const DashboardSlide = React.memo(({
     const { t, i18n } = useTranslation();
     const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
 
-    if (!safeSelectedExercise) {
-        return (
-            <div className="flex-col flex-center full-height text-center" style={{ padding: '20px' }}>
-                {title && <h2 className="panel-title">{title}</h2>}
-                <EmptyState
-                    title={t('dashboard.noExercisesConfigured')}
-                    actionLabel={onManageCustom ? t('dashboard.configure') : undefined}
-                    onAction={onManageCustom}
-                />
-            </div>
-        );
-    }
-
-    const currentDiff = getConfig(safeSelectedExercise.id, today).difficulty;
-    const dailyGoal = getDailyGoal(safeSelectedExercise, dayNumber, currentDiff) || 1;
-    const currentCount = getExerciseCount(today, safeSelectedExercise.id);
-    const isExerciseDone = completions[today]?.[safeSelectedExercise.id]?.isCompleted || currentCount >= dailyGoal;
+    const currentDiff = safeSelectedExercise ? getConfig(safeSelectedExercise.id, today).difficulty : 1;
+    const dailyGoal = safeSelectedExercise ? (getDailyGoal(safeSelectedExercise, dayNumber, currentDiff) || 1) : 1;
+    const currentCount = safeSelectedExercise ? getExerciseCount(today, safeSelectedExercise.id) : 0;
+    const isExerciseDone = safeSelectedExercise ? (completions[today]?.[safeSelectedExercise.id]?.isCompleted || currentCount >= dailyGoal) : false;
     const progress = Math.min((dayNumber / 365) * 100, 100);
 
     const isDayPerfect = isPerfectDay(completions[today], exercisesList);
@@ -146,7 +133,15 @@ export const DashboardSlide = React.memo(({
                     )}
                 </div>
             )}
-            {!isFuture ? (
+            {exercisesList.length === 0 ? (
+                <div className="flex-col flex-center" style={{ padding: '16px' }}>
+                    <EmptyState
+                        title={t('dashboard.noExercisesConfigured')}
+                        actionLabel={onAddCustom || onManageCustom ? t('customExercises.create') : undefined}
+                        onAction={onAddCustom || onManageCustom}
+                    />
+                </div>
+            ) : !isFuture ? (
                 <>
                     {/* ── Exercise Selector ── */}
                     {(() => {
