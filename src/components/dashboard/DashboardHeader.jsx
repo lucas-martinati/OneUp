@@ -127,6 +127,10 @@ export const DashboardHeader = React.memo(({
         ? 'goldHeaderGlowEntrance 1.8s ease-out'
         : 'headerGlowEntrance 1.8s ease-out';
 
+    const dayPodEntranceAnimation = isDayPerfect
+        ? 'goldDayPodGlowEntrance 1.8s ease-out'
+        : 'dayPodGlowEntrance 1.8s ease-out';
+
     return (
         <header
             ref={headerRef}
@@ -295,7 +299,7 @@ export const DashboardHeader = React.memo(({
                     borderRadius: '0 0 20px 20px',
                     borderTop: 'none',
                     boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
-                    animation: 'heroSectionExpand 0.5s ease-out forwards',
+                    animation: `${dayPodEntranceAnimation}, heroSectionExpand 0.5s ease-out forwards`,
                     width: 'fit-content'
                 }}>
                     <DayHeroHeader

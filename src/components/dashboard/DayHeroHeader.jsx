@@ -89,8 +89,7 @@ export const DayHeroHeader = React.memo(({
                         minHeight: 'var(--day-num-height, clamp(2.2rem, 7vh, 4.8rem))',
                         padding: '2px 12px 0px 12px',
                         marginBottom: '0',
-                        overflow: 'visible',
-                        filter: isDayPerfect ? 'drop-shadow(0 2px 10px rgba(251,191,36,0.3))' : 'drop-shadow(0 2px 10px rgba(168,85,247,0.2))'
+                        overflow: 'visible'
                     }}>
                         {isCounterTransitioning && prevDayNumber && (
                             <div className={`day-number-anim ${isDayPerfect ? 'gold-text' : 'rainbow-gradient'}`} style={{
