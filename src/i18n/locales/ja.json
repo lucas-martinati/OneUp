@@ -399,7 +399,6 @@
   "dashboard": {
     "calendar": "カレンダー",
     "challengeStarts": "あなたの挑戦は次から始まります",
-    "configure": "設定する",
     "day": "日",
     "doneAt": "{{time}} に完了",
     "noExercisesConfigured": "ここではまだ演習を設定していません。",

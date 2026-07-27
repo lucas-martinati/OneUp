@@ -399,7 +399,6 @@
   "dashboard": {
     "calendar": "日历",
     "challengeStarts": "你的挑战开始于",
-    "configure": "配置",
     "day": "天",
     "doneAt": "完成于 {{time}}",
     "noExercisesConfigured": "您尚未在此处配置任何练习。",

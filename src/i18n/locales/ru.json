@@ -399,7 +399,6 @@
   "dashboard": {
     "calendar": "Календарь",
     "challengeStarts": "Ваш челлендж начинается",
-    "configure": "Настроить",
     "day": "День",
     "doneAt": "Выполнено в {{time}}",
     "noExercisesConfigured": "Вы еще не настроили упражнения здесь.",

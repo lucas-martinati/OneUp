@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Settings, Star, FolderPlus, Plus } from '@utils/icons';
 import { UI_ICONS, DynamicIcon } from '@utils/icons';
 import { getDailyGoal } from '@config/exercises';
-import { parseTimestamp } from '@shared/dateUtils';
 import { formatTime } from '@utils/formatters';
 import { isPerfectDay } from '@utils/statUtils';
 import { getExerciseLabel } from '@utils/exerciseLabel';
@@ -17,7 +16,7 @@ export const DashboardSlide = React.memo(({
     pauseCloudSync, setShowCounter,
     activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, categoryColor, onManageCustom, onAddCustom, onManageCategories, getConfig
 }) => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
 
     const currentDiff = safeSelectedExercise ? getConfig(safeSelectedExercise.id, today).difficulty : 1;
@@ -33,6 +32,212 @@ export const DashboardSlide = React.memo(({
     // tiles (e.g. weights) keep the same sizes as a small category.
     const gridRows = Math.ceil(exercisesList.length / 3);
     const isCompact = gridRows >= 4;
+
+    const renderContent = () => {
+        if (exercisesList.length === 0) {
+            return (
+                <div className="flex-col flex-center" style={{ padding: '16px' }}>
+                    <EmptyState
+                        title={t('dashboard.noExercisesConfigured')}
+                        actionLabel={onAddCustom || onManageCustom ? t('customExercises.create') : undefined}
+                        onAction={onAddCustom || onManageCustom}
+                    />
+                </div>
+            );
+        }
+
+        if (isFuture) {
+            return (
+                <div className="glass-premium" style={{
+                    textAlign: 'center', padding: 'var(--spacing-xl)',
+                    borderRadius: 'var(--radius-xl)', maxWidth: '320px'
+                }}>
+                    <h2 className="panel-title">{t('dashboard.waiting')}</h2>
+                    <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                        {t('dashboard.challengeStarts')} <br />
+                        <strong style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>{effectiveStart}</strong>
+                    </p>
+                </div>
+            );
+        }
+
+        const showAddBtn = onManageCustom && exercisesList.length < 12;
+        const itemCount = exercisesList.length + (showAddBtn ? 1 : 0);
+        const addBtnSizing = getTileSizing(itemCount);
+
+        return (
+            <>
+                {/* ── Exercise Selector ── */}
+                <div className="exercise-grid flex-row flex-wrap flex-justify-center" style={{
+                    gap: 'var(--exercise-btn-gap, clamp(4px, 1vh, 8px))', width: '100%', maxWidth: '640px',
+                    padding: '2px'
+                }}>
+                    {exercisesList.map(ex => (
+                        <ExerciseButton
+                            key={ex.id}
+                            ex={ex}
+                            isActive={ex.id === activeExerciseId}
+                            dayNumber={dayNumber}
+                            today={today}
+                            getExerciseCount={getExerciseCount}
+                            completions={completions}
+                            computedStats={computedStats}
+                            onSelect={onSelectExercise}
+                            getConfig={getConfig}
+                            itemCount={itemCount}
+                        />
+                    ))}
+                    {showAddBtn && (
+                        <button
+                            onClick={onAddCustom || onManageCustom}
+                            className="exercise-button hover-lift"
+                            aria-label={t('customExercises.create')}
+                            title={t('customExercises.create')}
+                            style={{
+                                flex: addBtnSizing.flex,
+                                minWidth: 'clamp(60px, 18vw, 100px)',
+                                maxWidth: addBtnSizing.maxWidth,
+                                display: 'flex', flexDirection: 'column',
+                                alignItems: 'center', justifyContent: 'center',
+                                gap: 'var(--exercise-btn-gap, clamp(2px, 0.4vh, 5px))',
+                                padding: 'var(--exercise-btn-padding, clamp(8px, 1.2vh, 12px) clamp(4px, 0.8vw, 8px))',
+                                borderRadius: 'var(--radius-md)',
+                                minHeight: addBtnSizing.minHeight,
+                                background: 'rgba(255, 255, 255, 0.03)',
+                                border: '1.5px dashed rgba(255, 255, 255, 0.25)',
+                                cursor: 'pointer',
+                                color: 'var(--text-secondary)',
+                                transition: 'all 0.2s ease'
+                            }}
+                        >
+                            <Plus size={18} style={{ opacity: 0.8 }} />
+                            <span style={{ fontSize: 'var(--tile-label-size, clamp(0.55rem, 1.25vh, 0.78rem))', fontWeight: '700' }}>
+                                {t('common.add')}
+                            </span>
+                        </button>
+                    )}
+                </div>
+
+                {/* ── Progress ring + Counter button + Completion status (grouped) ── */}
+                <div className="flex-col flex-align-center gap-responsive">
+                    <div className="flex-center pos-relative" style={{
+                        width: 'var(--bottom-btn-size, clamp(96px, 16vh, 140px))',
+                        height: 'var(--bottom-btn-size, clamp(96px, 16vh, 140px))'
+                    }}>
+                        {/* Ambient halo behind the counter button */}
+                        <div style={{
+                            position: 'absolute', inset: '-45%', borderRadius: '50%',
+                            background: `radial-gradient(circle, ${safeSelectedExercise.color}${isExerciseDone ? '38' : '24'} 0%, transparent 62%)`,
+                            pointerEvents: 'none',
+                            transition: 'background 0.6s ease'
+                        }} />
+                        {/* Counter open button */}
+                        <button
+                            aria-label={`${getExerciseLabel(safeSelectedExercise)} counter`}
+                            onClick={() => { pauseCloudSync?.(); setShowCounter(true); }}
+                            className="ripple counter-button"
+                            style={{
+                                width: '100%', height: '100%',
+                                background: isExerciseDone
+                                    ? `linear-gradient(135deg, ${safeSelectedExercise.color} 0%, ${safeSelectedExercise.gradient[1]} 100%)`
+                                    : 'transparent',
+                                border: 'none',
+                                display: 'flex', flexDirection: 'column',
+                                alignItems: 'center', justifyContent: 'center', gap: '2px',
+                                transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                willChange: 'transform',
+                                transform: isExerciseDone ? 'scale(1.1)' : 'scale(1)',
+                                boxShadow: isExerciseDone
+                                    ? `0 0 50px ${safeSelectedExercise.color}aa, 0 8px 30px ${safeSelectedExercise.color}55, 0 0 0 4px ${safeSelectedExercise.color}33, inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.1)`
+                                    : `0 0 16px ${safeSelectedExercise.color}33`,
+                                cursor: 'pointer',
+                                position: 'relative',
+                                overflow: 'hidden'
+                            }}
+                        >
+                            {!isExerciseDone && (
+                                <div
+                                    className="counter-ring"
+                                    aria-hidden="true"
+                                    style={{
+                                        '--ring-c1': safeSelectedExercise.gradient[0],
+                                        '--ring-c2': safeSelectedExercise.gradient[1],
+                                        '--ring-track': `${safeSelectedExercise.color}26`,
+                                        '--ring-progress': `${Math.min(progress, 100)}%`
+                                    }}
+                                />
+                            )}
+                            {isExerciseDone ? (
+                                <>
+                                    <div style={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
+                                        pointerEvents: 'none'
+                                    }} />
+                                    <UI_ICONS.Check size={28} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
+                                    <span style={{
+                                        fontSize: 'clamp(0.65rem, 1.4vh, 0.82rem)',
+                                        color: 'white',
+                                        fontWeight: '800',
+                                        textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                                        position: 'relative',
+                                        zIndex: 1
+                                    }}>
+                                        {safeSelectedExercise.type === 'timer'
+                                            ? `${formatTime(dailyGoal)}/${formatTime(dailyGoal)}`
+                                            : `${dailyGoal}/${dailyGoal}`
+                                        }
+                                    </span>
+                                </>
+                            ) : (
+                                <>
+                                    <DynamicIcon icon={safeSelectedExercise.icon} size={25} color={safeSelectedExercise.color} />
+                                    <span style={{ fontSize: 'clamp(0.6rem, 1.3vh, 0.78rem)', color: safeSelectedExercise.color, fontWeight: '800' }}>
+                                        {safeSelectedExercise.type === 'timer'
+                                            ? `${formatTime(currentCount)}/${formatTime(dailyGoal)}`
+                                            : `${currentCount}/${dailyGoal}`}
+                                    </span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+
+                    {/* Completion status */}
+                    {(() => {
+                        let statusColor = 'var(--text-secondary)';
+                        if (isExerciseDone) {
+                            statusColor = safeSelectedExercise.color;
+                        }
+
+                        const completedTime = completions[today]?.[safeSelectedExercise.id]?.completedAt;
+                        const timeStr = completedTime ? new Date(completedTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null;
+                        const showDoneText = isExerciseDone && timeStr;
+
+                        return (
+                            <div
+                                className="done-status-text flex-align-center"
+                                style={{
+                                    color: statusColor,
+                                    fontWeight: '700',
+                                    fontSize: 'var(--done-text-size, clamp(0.65rem, 2.2vw, 0.85rem))',
+                                    margin: 'var(--done-text-margin, clamp(2px, 0.4vh, 6px)) 0 0 0',
+                                    opacity: isExerciseDone ? 1 : 0.6,
+                                    height: '1.2em',
+                                    lineHeight: '1.2em',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                {showDoneText ? t('dashboard.doneAt', { time: timeStr }) : '\u00A0'}
+                            </div>
+                        );
+                    })()}
+                </div>
+            </>
+        );
+    };
 
     return (
         <div
@@ -133,206 +338,7 @@ export const DashboardSlide = React.memo(({
                     )}
                 </div>
             )}
-            {exercisesList.length === 0 ? (
-                <div className="flex-col flex-center" style={{ padding: '16px' }}>
-                    <EmptyState
-                        title={t('dashboard.noExercisesConfigured')}
-                        actionLabel={onAddCustom || onManageCustom ? t('customExercises.create') : undefined}
-                        onAction={onAddCustom || onManageCustom}
-                    />
-                </div>
-            ) : !isFuture ? (
-                <>
-                    {/* ── Exercise Selector ── */}
-                    {(() => {
-                        const showAddBtn = onManageCustom && exercisesList.length < 12;
-                        const itemCount = exercisesList.length + (showAddBtn ? 1 : 0);
-                        const addBtnSizing = getTileSizing(itemCount);
-
-                        return (
-                            <div className="exercise-grid flex-row flex-wrap flex-justify-center" style={{
-                                gap: 'var(--exercise-btn-gap, clamp(4px, 1vh, 8px))', width: '100%', maxWidth: '640px',
-                                padding: '2px'
-                            }}>
-                                {exercisesList.map(ex => (
-                                    <ExerciseButton
-                                        key={ex.id}
-                                        ex={ex}
-                                        isActive={ex.id === activeExerciseId}
-                                        dayNumber={dayNumber}
-                                        today={today}
-                                        getExerciseCount={getExerciseCount}
-                                        completions={completions}
-                                        computedStats={computedStats}
-                                        onSelect={onSelectExercise}
-                                        getConfig={getConfig}
-                                        itemCount={itemCount}
-                                    />
-                                ))}
-                                {showAddBtn && (
-                                    <button
-                                        onClick={onAddCustom || onManageCustom}
-                                        className="exercise-button hover-lift"
-                                        aria-label={t('customExercises.create')}
-                                        title={t('customExercises.create')}
-                                        style={{
-                                            flex: addBtnSizing.flex,
-                                            minWidth: 'clamp(60px, 18vw, 100px)',
-                                            maxWidth: addBtnSizing.maxWidth,
-                                            display: 'flex', flexDirection: 'column',
-                                            alignItems: 'center', justifyContent: 'center',
-                                            gap: 'var(--exercise-btn-gap, clamp(2px, 0.4vh, 5px))',
-                                            padding: 'var(--exercise-btn-padding, clamp(8px, 1.2vh, 12px) clamp(4px, 0.8vw, 8px))',
-                                            borderRadius: 'var(--radius-md)',
-                                            minHeight: addBtnSizing.minHeight,
-                                            background: 'rgba(255, 255, 255, 0.03)',
-                                            border: '1.5px dashed rgba(255, 255, 255, 0.25)',
-                                            cursor: 'pointer',
-                                            color: 'var(--text-secondary)',
-                                            transition: 'all 0.2s ease'
-                                        }}
-                                    >
-                                        <Plus size={18} style={{ opacity: 0.8 }} />
-                                        <span style={{ fontSize: 'var(--tile-label-size, clamp(0.55rem, 1.25vh, 0.78rem))', fontWeight: '700' }}>
-                                            {t('common.add')}
-                                        </span>
-                                    </button>
-                                )}
-                            </div>
-                        );
-                    })()}
-
-                    {/* ── Progress ring + Counter button + Completion status (grouped) ── */}
-                    <div className="flex-col flex-align-center gap-responsive">
-                        <div className="flex-center pos-relative" style={{
-                            width: 'var(--bottom-btn-size, clamp(96px, 16vh, 140px))',
-                            height: 'var(--bottom-btn-size, clamp(96px, 16vh, 140px))'
-                        }}>
-                            {/* Ambient halo behind the counter button */}
-                            <div style={{
-                                position: 'absolute', inset: '-45%', borderRadius: '50%',
-                                background: `radial-gradient(circle, ${safeSelectedExercise.color}${isExerciseDone ? '38' : '24'} 0%, transparent 62%)`,
-                                pointerEvents: 'none',
-                                transition: 'background 0.6s ease'
-                            }} />
-                            {/* Counter open button */}
-                            <button
-                                aria-label={`${getExerciseLabel(safeSelectedExercise)} counter`}
-                                onClick={() => { pauseCloudSync?.(); setShowCounter(true); }}
-                                className="ripple counter-button"
-                                style={{
-                                    width: '100%', height: '100%',
-                                    background: isExerciseDone
-                                        ? `linear-gradient(135deg, ${safeSelectedExercise.color} 0%, ${safeSelectedExercise.gradient[1]} 100%)`
-                                        : 'transparent',
-                                    border: 'none',
-                                    display: 'flex', flexDirection: 'column',
-                                    alignItems: 'center', justifyContent: 'center', gap: '2px',
-                                    transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                                    willChange: 'transform',
-                                    transform: isExerciseDone ? 'scale(1.1)' : 'scale(1)',
-                                    boxShadow: isExerciseDone
-                                        ? `0 0 50px ${safeSelectedExercise.color}aa, 0 8px 30px ${safeSelectedExercise.color}55, 0 0 0 4px ${safeSelectedExercise.color}33, inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.1)`
-                                        : `0 0 16px ${safeSelectedExercise.color}33`,
-                                    cursor: 'pointer',
-                                    position: 'relative',
-                                    overflow: 'hidden'
-                                }}
-                            >
-                                {/* Year progress ring — child of the button so it inherits the
-                                    exact blob shape (border-radius: inherit). Filled arc = day/365.
-                                    Hidden once the exercise is done (no longer relevant). Colors via
-                                    CSS variables (per-exercise; event themes may override them). */}
-                                {!isExerciseDone && (
-                                    <div
-                                        className="counter-ring"
-                                        aria-hidden="true"
-                                        style={{
-                                            '--ring-c1': safeSelectedExercise.gradient[0],
-                                            '--ring-c2': safeSelectedExercise.gradient[1],
-                                            '--ring-track': `${safeSelectedExercise.color}26`,
-                                            '--ring-progress': `${Math.min(progress, 100)}%`
-                                        }}
-                                    />
-                                )}
-                                {isExerciseDone ? (
-                                    <>
-                                        <div style={{
-                                            position: 'absolute',
-                                            inset: 0,
-                                            background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
-                                            pointerEvents: 'none'
-                                        }} />
-                                        <UI_ICONS.Check size={28} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
-                                        <span style={{
-                                            fontSize: 'clamp(0.65rem, 1.4vh, 0.82rem)',
-                                            color: 'white',
-                                            fontWeight: '800',
-                                            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-                                            position: 'relative',
-                                            zIndex: 1
-                                        }}>
-                                            {safeSelectedExercise.type === 'timer'
-                                                ? `${formatTime(dailyGoal)}/${formatTime(dailyGoal)}`
-                                                : `${dailyGoal}/${dailyGoal}`
-                                            }
-                                        </span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <DynamicIcon icon={safeSelectedExercise.icon} size={25} color={safeSelectedExercise.color} />
-                                        <span style={{ fontSize: 'clamp(0.6rem, 1.3vh, 0.78rem)', color: safeSelectedExercise.color, fontWeight: '800' }}>
-                                            {safeSelectedExercise.type === 'timer'
-                                                ? `${formatTime(currentCount)}/${formatTime(dailyGoal)}`
-                                                : `${currentCount}/${dailyGoal}`}
-                                        </span>
-                                    </>
-                                )}
-                            </button>
-                        </div>
-
-                        {/* Completion status (under button with spacing) */}
-                        {(() => {
-                            const exData = completions[today]?.[activeExerciseId];
-                            const completedAt = exData?.timestamp ? parseTimestamp(exData.timestamp) : null;
-                            const timeStr = completedAt
-                                ? completedAt.toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' })
-                                : null;
-                            const showDoneText = isExerciseDone && !!timeStr;
-                            return (
-                                <div
-                                    className={showDoneText ? "scale-in" : ""}
-                                    style={{
-                                        color: 'var(--text-secondary)',
-                                        fontWeight: '500',
-                                        marginTop: 'var(--done-text-margin, clamp(4px, 0.8vh, 6px))',
-                                        opacity: showDoneText ? 0.75 : 0,
-                                        visibility: showDoneText ? 'visible' : 'hidden',
-                                        fontSize: 'var(--done-text-size, clamp(0.65rem, 2.5vw, 0.85rem))',
-                                        transition: 'opacity 0.2s ease, visibility 0.2s ease',
-                                        pointerEvents: 'none',
-                                        textAlign: 'center',
-                                        minHeight: '1.2em'
-                                    }}
-                                >
-                                    {showDoneText ? t('dashboard.doneAt', { time: timeStr }) : '\u00A0'}
-                                </div>
-                            );
-                        })()}
-                    </div>
-                </>
-            ) : (
-                <div className="glass-premium" style={{
-                    textAlign: 'center', padding: 'var(--spacing-xl)',
-                    borderRadius: 'var(--radius-xl)', maxWidth: '320px'
-                }}>
-                    <h2 className="panel-title">{t('dashboard.waiting')}</h2>
-                    <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                        {t('dashboard.challengeStarts')} <br />
-                        <strong style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>{effectiveStart}</strong>
-                    </p>
-                </div>
-            )}
+            {renderContent()}
         </div>
     );
 });
@@ -341,28 +347,28 @@ const getTileSizing = (count) => {
     if (count === 1) {
         return {
             flex: '1 1 min(280px, 100%)',
-            maxWidth: '340px',
-            minHeight: 'clamp(56px, 9.2vh, 76px)',
+            maxWidth: '360px',
+            minHeight: 'clamp(68px, 11vh, 92px)',
         };
     }
     if (count === 2) {
         return {
             flex: '1 1 calc(50% - 10px)',
-            maxWidth: '240px',
-            minHeight: 'clamp(50px, 8.2vh, 68px)',
+            maxWidth: '260px',
+            minHeight: 'clamp(62px, 10vh, 84px)',
         };
     }
     if (count === 3) {
         return {
             flex: '1 1 calc(33.333% - 8px)',
-            maxWidth: '185px',
-            minHeight: 'clamp(48px, 7.5vh, 62px)',
+            maxWidth: '195px',
+            minHeight: 'clamp(58px, 9vh, 78px)',
         };
     }
     return {
         flex: '1 1 calc(33.333% - 8px)',
-        maxWidth: '150px',
-        minHeight: 'var(--exercise-btn-min-height, clamp(44px, 7.2vh, 58px))',
+        maxWidth: '175px',
+        minHeight: 'var(--exercise-btn-min-height, clamp(54px, 8.5vh, 72px))',
     };
 };
 

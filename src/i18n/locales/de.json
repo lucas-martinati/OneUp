@@ -399,7 +399,6 @@
   "dashboard": {
     "calendar": "Kalender",
     "challengeStarts": "Ihre Herausforderung beginnt am",
-    "configure": "Konfigurieren",
     "day": "Tag",
     "doneAt": "Geschehen am {{time}}",
     "noExercisesConfigured": "Sie haben hier noch keine Übungen konfiguriert.",

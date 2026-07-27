@@ -399,7 +399,6 @@
   "dashboard": {
     "calendar": "Calendario",
     "challengeStarts": "La tua sfida inizia",
-    "configure": "Configura",
     "day": "Giorno",
     "doneAt": "Fatto a {{time}}",
     "noExercisesConfigured": "Non hai ancora configurato alcun esercizio qui.",

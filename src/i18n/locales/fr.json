@@ -414,7 +414,6 @@
   "dashboard": {
     "calendar": "Calendrier",
     "challengeStarts": "Ton défi commence le",
-    "configure": "Configurer",
     "day": "Jour",
     "doneAt": "Fait à {{time}}",
     "noExercisesConfigured": "Tu n'as pas encore configuré d'exercices ici.",

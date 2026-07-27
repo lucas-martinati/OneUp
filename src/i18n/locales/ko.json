@@ -399,7 +399,6 @@
   "dashboard": {
     "calendar": "달력",
     "challengeStarts": "귀하의 도전은 다음 날짜에 시작됩니다",
-    "configure": "구성",
     "day": "낮",
     "doneAt": "{{time}}에 완료됨",
     "noExercisesConfigured": "여기에는 아직 어떤 운동도 구성하지 않았습니다.",

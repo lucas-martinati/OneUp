@@ -414,7 +414,6 @@
   "dashboard": {
     "calendar": "Calendar",
     "challengeStarts": "Your challenge starts on",
-    "configure": "Configure",
     "day": "Day",
     "doneAt": "Done at {{time}}",
     "noExercisesConfigured": "You haven't configured any exercises here yet.",
