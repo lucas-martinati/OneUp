@@ -1,13 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Shield, Flame, Trophy, Snowflake } from '@utils/icons';
 import { FrozenFlame } from '@components/ui';
 import { useUIStore } from '@store/useUIStore';
 import { useProgressStore } from '@store/useProgressStore';
 import { useAuth } from '@contexts/AuthContext';
-import { Card } from '@components/ui';
 import { StreakFreezeInfo } from './StreakFreezeInfo';
-import { DayHeroHeader } from './DayHeroHeader';
 
 const filterOutIds = (idsToRemove) => (p) => p.filter(particle => !idsToRemove.has(particle.id));
 
@@ -26,7 +24,7 @@ const BADGE_BASE = {
 export const DashboardHeader = React.memo(({
     isAdmin,
     streakActive, streakFrozen, displayStreak, selectedExercise, totalReps,
-    dayNumber, prevDayNumber, isCounterTransitioning, isDayPerfect, isFuture, effectiveStart
+    dayNumber, isDayPerfect, isFuture, effectiveStart
 }) => {
     const openModal = useUIStore(s => s.openModal);
     const { t } = useTranslation();
@@ -44,13 +42,14 @@ export const DashboardHeader = React.memo(({
 
     const headerRef = useRef(null);
     const rightSideRef = useRef(null);
+
     const [availableSpace, setAvailableSpace] = useState(500);
     const [particles, setParticles] = useState([]);
 
     const handleStreakClick = (e) => {
         if (!streakActive || displayStreak == 0 || displayStreak == '0') return;
         const rect = e.currentTarget.getBoundingClientRect();
-        const headerRect = headerRef.current.getBoundingClientRect();
+        const headerRect = headerRef.current ? headerRef.current.getBoundingClientRect() : { left: 0, top: 0 };
         const cx = (rect.left + rect.width / 2) - headerRect.left;
         const cy = (rect.top + rect.height / 2) - headerRect.top;
         
@@ -80,33 +79,30 @@ export const DashboardHeader = React.memo(({
         }, 1200);
     };
 
-    useEffect(() => {
-        if (!headerRef.current || !rightSideRef.current) return;
-        
-        const observer = new ResizeObserver(() => {
-            if (headerRef.current && rightSideRef.current) {
-                const headerWidth = headerRef.current.getBoundingClientRect().width;
+    useLayoutEffect(() => {
+        const updateSpace = () => {
+            if (!headerRef.current || !rightSideRef.current) return;
+            const w = headerRef.current.getBoundingClientRect().width;
+            if (w > 0) {
                 const rightWidth = rightSideRef.current.getBoundingClientRect().width;
-                const newSpace = headerWidth - rightWidth - 40;
-                
-                setAvailableSpace(prev => {
-                    // Only update if difference is more than 2px to avoid micro-loops
-                    if (Math.abs(prev - newSpace) < 2) return prev;
-                    return newSpace;
-                });
+                const newSpace = w - rightWidth - 40;
+                setAvailableSpace(prev => (Math.abs(prev - newSpace) < 2 ? prev : newSpace));
             }
-        });
+        };
 
-        observer.observe(headerRef.current);
-        observer.observe(rightSideRef.current);
+        updateSpace();
+
+        const observer = new ResizeObserver(updateSpace);
+        if (headerRef.current) observer.observe(headerRef.current);
+        if (rightSideRef.current) observer.observe(rightSideRef.current);
 
         return () => observer.disconnect();
     }, []);
 
-    const showText = availableSpace >= 93; // Need at least ~90px for Logo + Gap + Text
-    const showLogo = availableSpace >= 35;  // Need at least ~35px for Logo alone
+    const showText = availableSpace >= 93;
+    const showLogo = availableSpace >= 35;
 
-    // Streak badge palette by state (avoids nested ternaries in the JSX).
+    // Streak badge palette by state
     let streakBadge;
     if (streakActive) {
         streakBadge = {
@@ -125,38 +121,78 @@ export const DashboardHeader = React.memo(({
         };
     }
 
+    // Entrance glow animation — one-shot slide + glow, no 'forwards' to avoid overriding event themes
+    const entranceAnimation = isDayPerfect
+        ? 'goldHeaderGlowEntrance 1.8s ease-out'
+        : 'headerGlowEntrance 1.8s ease-out';
+
     return (
-        <header ref={headerRef} className="dashboard-header-wrapper" style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            width: '100%', position: 'relative', zIndex: 10
-        }}>
-            {/* Top Bar of the T */}
-            <Card as="div" variant="glass" padding="none"
-                className="dashboard-header-top-bar"
-                style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    width: '100%',
-                    padding: 'clamp(8px, 1.2vh, 12px) clamp(12px, 3vw, 20px)',
-                    minWidth: 0, position: 'relative', zIndex: 2,
-                    animation: 'headerUnfold 0.5s ease-out forwards, headerAuraPulse 1.6s ease-out'
-                }}>
+        <header
+            ref={headerRef}
+            className="glass dashboard-header-wrapper"
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+                position: 'relative',
+                zIndex: 10,
+                borderRadius: 'var(--radius-lg)',
+                animation: entranceAnimation,
+                overflow: 'visible',
+            }}
+        >
+            {/* Row 1 — Logo left, Badges right */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+                padding: 'clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 20px)',
+                boxSizing: 'border-box',
+            }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1 }}>
                     {showLogo && (
                         <img
                             onClick={() => window.location.reload()}
-                            src={`${import.meta.env.BASE_URL}logo-64x64.webp`} alt="OneUp Logo"
+                            src={`${import.meta.env.BASE_URL}logo-64x64.webp`}
+                            alt="OneUp Logo"
                             className="bounce-on-hover"
-                            style={{ width: 'clamp(28px, 4vh, 40px)', height: 'clamp(28px, 4vh, 40px)', flexShrink: 0, borderRadius: '10px', cursor: 'pointer', transition: 'transform 0.3s ease' }}
+                            style={{
+                                width: 'clamp(28px, 4vh, 40px)',
+                                height: 'clamp(28px, 4vh, 40px)',
+                                flexShrink: 0,
+                                borderRadius: '10px',
+                                cursor: 'pointer',
+                                transition: 'transform 0.3s ease'
+                            }}
                         />
                     )}
                     {showText && (
-                        <span className="app-logo-text" style={{ 
-                            fontWeight: '800', fontSize: 'clamp(1.1rem, 2.5vh, 1.5rem)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0
-                        }}>OneUp</span>
+                        <span
+                            className="app-logo-text"
+                            style={{
+                                fontWeight: '800',
+                                fontSize: 'clamp(1.1rem, 2.5vh, 1.5rem)',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                minWidth: 0
+                            }}
+                        >
+                            OneUp
+                        </span>
                     )}
                 </div>
 
-                <div ref={rightSideRef} style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 8px)', alignItems: 'center', flexShrink: 0, justifyContent: 'flex-end' }}>
+                <div
+                    ref={rightSideRef}
+                    style={{
+                        display: 'flex',
+                        gap: 'clamp(4px, 0.8vw, 8px)',
+                        alignItems: 'center',
+                        flexShrink: 0,
+                    }}
+                >
                     {isAdmin && (
                         <button
                             type="button"
@@ -176,8 +212,7 @@ export const DashboardHeader = React.memo(({
                         </button>
                     )}
 
-                    {/* Streak Freeze inventory — tap to learn how freezes are earned
-                        (and that Pro earns 3× more). Hidden at zero. */}
+                    {/* Streak Freeze inventory */}
                     {showFreezeBadge && (
                         <button
                             type="button"
@@ -189,7 +224,8 @@ export const DashboardHeader = React.memo(({
                                 background: 'linear-gradient(135deg, rgba(56,189,248,0.20), rgba(14,165,233,0.20))',
                                 border: '1px solid rgba(56,189,248,0.3)',
                                 boxShadow: '0 2px 8px rgba(56,189,248,0.15)'
-                            }}>
+                            }}
+                        >
                             <Snowflake size={16} color="#38bdf8" />
                             <span style={{ color: '#38bdf8' }}>{displayFreezeCount}</span>
                         </button>
@@ -197,8 +233,7 @@ export const DashboardHeader = React.memo(({
 
                     {showFreezeInfo && <StreakFreezeInfo open={showFreezeInfo} onClose={() => setShowFreezeInfo(false)} />}
 
-                    {/* Global streak badge — three states: active (fire), frozen but
-                        safe (snowflake/blue), or pending today (grey). */}
+                    {/* Global streak badge */}
                     <button
                         type="button"
                         onClick={handleStreakClick}
@@ -209,7 +244,8 @@ export const DashboardHeader = React.memo(({
                             border: streakBadge.border,
                             boxShadow: streakBadge.shadow,
                             opacity: streakActive || isStreakFrozen ? 1 : 0.7
-                        }}>
+                        }}
+                    >
                         {isStreakFrozen
                             ? <FrozenFlame size={16} color={streakBadge.fg} />
                             : <Flame size={16} color={streakBadge.fg} />}
@@ -228,37 +264,62 @@ export const DashboardHeader = React.memo(({
                             background: `linear-gradient(135deg, ${selectedExercise.color}33, ${selectedExercise.gradient[0]}33)`,
                             border: `1px solid ${selectedExercise.color}44`,
                             boxShadow: `0 2px 8px ${selectedExercise.color}33`
-                        }}>
+                        }}
+                    >
                         <Trophy size={16} color={selectedExercise.color} />
                         <span>{totalReps}</span>
                     </button>
                 </div>
-            </Card>
+            </div>
 
-            {/* Vertical Stem of the T — Centered Glass Pod wrapping Day Hero */}
+            {/* Row 2 — Compact centered Day counter */}
             <div style={{
-                display: 'flex', justifyContent: 'center', width: '100%',
-                marginTop: '-1px', zIndex: 1
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'baseline',
+                gap: 'clamp(5px, 1vw, 8px)',
+                padding: '0 clamp(12px, 3vw, 20px) clamp(8px, 1.2vh, 14px)',
+                boxSizing: 'border-box',
             }}>
-                <div className="glass" style={{
-                    display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
-                    padding: '2px clamp(18px, 4vw, 36px) 6px',
-                    borderRadius: '0 0 20px 20px',
-                    borderTop: 'none',
-                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
-                    animation: 'heroSectionExpand 0.5s ease-out forwards',
-                    width: 'fit-content'
-                }}>
-                    <DayHeroHeader
-                        dayNumber={dayNumber}
-                        prevDayNumber={prevDayNumber}
-                        isCounterTransitioning={isCounterTransitioning}
-                        isDayPerfect={isDayPerfect}
-                        isFuture={isFuture}
-                        effectiveStart={effectiveStart}
-                        hidden={false}
-                    />
-                </div>
+                {!isFuture ? (
+                    <>
+                        <span style={{
+                            fontSize: 'clamp(0.85rem, 1.8vh, 1.1rem)',
+                            fontWeight: '800',
+                            textTransform: 'uppercase',
+                            letterSpacing: '3px',
+                            color: isDayPerfect ? '#ffdf00' : 'var(--text-secondary)',
+                            textShadow: isDayPerfect ? '0 0 8px rgba(255,223,0,0.4)' : 'none',
+                        }}>
+                            {t('dashboard.day')}
+                        </span>
+                        <span
+                            key={dayNumber}
+                            className={isDayPerfect ? 'gold-text' : 'rainbow-gradient'}
+                            style={{
+                                fontSize: 'clamp(2.6rem, 6.5vh, 4.5rem)',
+                                fontWeight: '900',
+                                lineHeight: 1,
+                                animation: isDayPerfect
+                                    ? 'gradientShift 4s ease infinite'
+                                    : 'rainbowFlow 6s ease infinite',
+                                filter: isDayPerfect
+                                    ? 'drop-shadow(0 2px 10px rgba(251,191,36,0.35))'
+                                    : 'drop-shadow(0 2px 10px rgba(168,85,247,0.25))',
+                            }}
+                        >
+                            {dayNumber}
+                        </span>
+                    </>
+                ) : (
+                    <span style={{
+                        fontSize: 'clamp(0.75rem, 1.4vh, 0.9rem)',
+                        color: 'var(--text-secondary)',
+                        fontWeight: '600',
+                    }}>
+                        {t('dashboard.challengeStarts')} <strong style={{ color: 'var(--text-primary)' }}>{effectiveStart}</strong>
+                    </span>
+                )}
             </div>
 
             {/* Render streak easter egg particles */}
@@ -275,3 +336,5 @@ export const DashboardHeader = React.memo(({
         </header>
     );
 });
+
+

@@ -143,11 +143,13 @@ describe('openCustomExercises / closeCustomExercises', () => {
     expect(useUIStore.getState().customExModalCatId).toBe(null);
   });
 
-  it('close resets the target category', () => {
-    useUIStore.getState().openCustomExercises('cat_abc');
+  it('close resets the target category and initial view', () => {
+    useUIStore.getState().openCustomExercises('cat_abc', 'create');
+    expect(useUIStore.getState().customExModalInitialView).toBe('create');
     useUIStore.getState().closeCustomExercises();
     expect(useUIStore.getState().modals.customExercises).toBe(false);
     expect(useUIStore.getState().customExModalCatId).toBe(null);
+    expect(useUIStore.getState().customExModalInitialView).toBe('list');
   });
 });
 

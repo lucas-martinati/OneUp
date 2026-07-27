@@ -307,7 +307,7 @@ const Day100Styles = memo(() => (
         }
 
         /* ── Hacked header style ── */
-        .day100-global .dashboard-header {
+        .day100-global .dashboard-header-wrapper {
           border-color: rgba(239, 68, 68, 0.3) !important;
           background: rgba(239, 68, 68, 0.04) !important;
           box-shadow: 0 0 15px rgba(239, 68, 68, 0.1), inset 0 0 30px rgba(239, 68, 68, 0.03) !important;

@@ -234,7 +234,7 @@ const Day200Styles = memo(() => (
         }
 
         /* ── Header ── */
-        .day200-global .dashboard-header {
+        .day200-global .dashboard-header-wrapper {
           border-color: rgba(249, 115, 22, 0.3) !important;
           background: rgba(48, 18, 8, 0.85) !important;
           box-shadow: 0 0 18px rgba(249, 115, 22, 0.10), inset 0 0 30px rgba(251, 191, 36, 0.05) !important;

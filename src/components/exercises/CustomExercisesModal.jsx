@@ -12,7 +12,7 @@ const PRESET_COLORS = [
   '#f43f5e', '#6366f1', '#14b8a6', '#64748b'
 ];
 
-export function CustomExercisesModal({ onClose, customExercisesHook, customCategoriesHook, computedStats, categoryId }) {
+export function CustomExercisesModal({ onClose, customExercisesHook, customCategoriesHook, computedStats, categoryId, initialView = 'list' }) {
   const { t, i18n } = useTranslation();
   const { 
     customExercises: allCustomExercises, 
@@ -29,7 +29,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
   
   const [editingId, setEditingId] = useState(null);
   const [confirmDeleteEx, setConfirmDeleteEx] = useState(null);
-  const [view, setView] = useState('list'); // 'list' | 'create'
+  const [view, setView] = useState(initialView); // 'list' | 'create'
   const [label, setLabel] = useState('');
   const [iconName, setIconName] = useState('Star');
   const [color, setColor] = useState('#8b5cf6');

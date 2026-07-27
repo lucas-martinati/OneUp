@@ -50,6 +50,7 @@ export function DashboardModals({
     const closeSettings = useUIStore(s => s.closeSettings);
     const openStoreDirectly = useUIStore(s => s.openStoreDirectly);
     const customExModalCatId = useUIStore(s => s.customExModalCatId);
+    const customExModalInitialView = useUIStore(s => s.customExModalInitialView);
     const closeCustomExercises = useUIStore(s => s.closeCustomExercises);
     const openAchievements = useUIStore(s => s.openAchievements);
     const closeAchievements = useUIStore(s => s.closeAchievements);
@@ -162,6 +163,7 @@ export function DashboardModals({
                         customCategoriesHook={customCategoriesHook}
                         computedStats={computedStats}
                         categoryId={customExModalCatId}
+                        initialView={customExModalInitialView}
                     />
                 </Suspense>
             )}

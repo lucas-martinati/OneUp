@@ -15,7 +15,7 @@ import styles from '@styles/DashboardSlide.module.css';
 export const DashboardSlide = React.memo(({
     isFuture, effectiveStart, dayNumber, today, getExerciseCount, completions, computedStats,
     pauseCloudSync, setShowCounter,
-    activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, categoryColor, onManageCustom, onManageCategories, getConfig
+    activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, categoryColor, onManageCustom, onAddCustom, onManageCategories, getConfig
 }) => {
     const { t, i18n } = useTranslation();
     const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
@@ -90,17 +90,18 @@ export const DashboardSlide = React.memo(({
                 </>
             )}
             {title && (
-                <div className="flex-align-center" style={{ gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
                     <div style={{
                         fontSize: 'var(--category-title-size, 0.82rem)', fontWeight: '800',
                         color: isDayPerfect ? '#ffdf00' : (categoryColor || 'var(--text-secondary)'),
                         textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.9,
-                        textShadow: isDayPerfect ? '0 0 10px rgba(255,223,0,0.5)' : 'none'
+                        textShadow: isDayPerfect ? '0 0 10px rgba(255,223,0,0.5)' : 'none',
+                        textAlign: 'center'
                     }}>
                         {title}
                     </div>
                     {(onManageCustom || onManageCategories) && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                             {onManageCustom && (
                                 <button
                                     onClick={onManageCustom}
@@ -148,60 +149,69 @@ export const DashboardSlide = React.memo(({
             {!isFuture ? (
                 <>
                     {/* ── Exercise Selector ── */}
-                    <div className="exercise-grid flex-row flex-wrap flex-justify-center" style={{
-                        gap: 'var(--exercise-btn-gap, clamp(4px, 1vh, 8px))', width: '100%', maxWidth: '640px',
-                        padding: '2px'
-                    }}>
-                        {exercisesList.map(ex => (
-                            <ExerciseButton
-                                key={ex.id}
-                                ex={ex}
-                                isActive={ex.id === activeExerciseId}
-                                dayNumber={dayNumber}
-                                today={today}
-                                getExerciseCount={getExerciseCount}
-                                completions={completions}
-                                computedStats={computedStats}
-                                onSelect={onSelectExercise}
-                                getConfig={getConfig}
-                            />
-                        ))}
-                        {onManageCustom && exercisesList.length < 12 && (
-                            <button
-                                onClick={onManageCustom}
-                                className="exercise-button hover-lift"
-                                aria-label={t('customExercises.create')}
-                                title={t('customExercises.create')}
-                                style={{
-                                    flex: '1 1 calc(33.333% - 8px)',
-                                    minWidth: 'clamp(60px, 18vw, 100px)',
-                                    maxWidth: '130px',
-                                    display: 'flex', flexDirection: 'column',
-                                    alignItems: 'center', justifyContent: 'center',
-                                    gap: 'var(--exercise-btn-gap, clamp(2px, 0.4vh, 5px))',
-                                    padding: 'var(--exercise-btn-padding, clamp(8px, 1.2vh, 12px) clamp(4px, 0.8vw, 8px))',
-                                    borderRadius: 'var(--radius-md)',
-                                    minHeight: 'var(--exercise-btn-min-height, clamp(44px, 7.2vh, 58px))',
-                                    background: 'rgba(255, 255, 255, 0.03)',
-                                    border: '1.5px dashed rgba(255, 255, 255, 0.25)',
-                                    cursor: 'pointer',
-                                    color: 'var(--text-secondary)',
-                                    transition: 'all 0.2s ease'
-                                }}
-                            >
-                                <Plus size={18} style={{ opacity: 0.8 }} />
-                                <span style={{ fontSize: 'var(--tile-label-size, clamp(0.55rem, 1.25vh, 0.78rem))', fontWeight: '700' }}>
-                                    {t('common.add')}
-                                </span>
-                            </button>
-                        )}
-                    </div>
+                    {(() => {
+                        const showAddBtn = onManageCustom && exercisesList.length < 12;
+                        const itemCount = exercisesList.length + (showAddBtn ? 1 : 0);
+                        const addBtnSizing = getTileSizing(itemCount);
+
+                        return (
+                            <div className="exercise-grid flex-row flex-wrap flex-justify-center" style={{
+                                gap: 'var(--exercise-btn-gap, clamp(4px, 1vh, 8px))', width: '100%', maxWidth: '640px',
+                                padding: '2px'
+                            }}>
+                                {exercisesList.map(ex => (
+                                    <ExerciseButton
+                                        key={ex.id}
+                                        ex={ex}
+                                        isActive={ex.id === activeExerciseId}
+                                        dayNumber={dayNumber}
+                                        today={today}
+                                        getExerciseCount={getExerciseCount}
+                                        completions={completions}
+                                        computedStats={computedStats}
+                                        onSelect={onSelectExercise}
+                                        getConfig={getConfig}
+                                        itemCount={itemCount}
+                                    />
+                                ))}
+                                {showAddBtn && (
+                                    <button
+                                        onClick={onAddCustom || onManageCustom}
+                                        className="exercise-button hover-lift"
+                                        aria-label={t('customExercises.create')}
+                                        title={t('customExercises.create')}
+                                        style={{
+                                            flex: addBtnSizing.flex,
+                                            minWidth: 'clamp(60px, 18vw, 100px)',
+                                            maxWidth: addBtnSizing.maxWidth,
+                                            display: 'flex', flexDirection: 'column',
+                                            alignItems: 'center', justifyContent: 'center',
+                                            gap: 'var(--exercise-btn-gap, clamp(2px, 0.4vh, 5px))',
+                                            padding: 'var(--exercise-btn-padding, clamp(8px, 1.2vh, 12px) clamp(4px, 0.8vw, 8px))',
+                                            borderRadius: 'var(--radius-md)',
+                                            minHeight: addBtnSizing.minHeight,
+                                            background: 'rgba(255, 255, 255, 0.03)',
+                                            border: '1.5px dashed rgba(255, 255, 255, 0.25)',
+                                            cursor: 'pointer',
+                                            color: 'var(--text-secondary)',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                    >
+                                        <Plus size={18} style={{ opacity: 0.8 }} />
+                                        <span style={{ fontSize: 'var(--tile-label-size, clamp(0.55rem, 1.25vh, 0.78rem))', fontWeight: '700' }}>
+                                            {t('common.add')}
+                                        </span>
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })()}
 
                     {/* ── Progress ring + Counter button + Completion status (grouped) ── */}
                     <div className="flex-col flex-align-center gap-responsive">
                         <div className="flex-center pos-relative" style={{
-                            width: 'var(--bottom-btn-size, clamp(72px, 12vh, 110px))',
-                            height: 'var(--bottom-btn-size, clamp(72px, 12vh, 110px))'
+                            width: 'var(--bottom-btn-size, clamp(96px, 16vh, 140px))',
+                            height: 'var(--bottom-btn-size, clamp(96px, 16vh, 140px))'
                         }}>
                             {/* Ambient halo behind the counter button */}
                             <div style={{
@@ -222,7 +232,7 @@ export const DashboardSlide = React.memo(({
                                         : 'transparent',
                                     border: 'none',
                                     display: 'flex', flexDirection: 'column',
-                                    alignItems: 'center', justifyContent: 'center', gap: '1px',
+                                    alignItems: 'center', justifyContent: 'center', gap: '2px',
                                     transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
                                     willChange: 'transform',
                                     transform: isExerciseDone ? 'scale(1.1)' : 'scale(1)',
@@ -258,9 +268,9 @@ export const DashboardSlide = React.memo(({
                                             background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
                                             pointerEvents: 'none'
                                         }} />
-                                        <UI_ICONS.Check size={26} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
+                                        <UI_ICONS.Check size={28} color="white" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))', position: 'relative', zIndex: 1 }} />
                                         <span style={{
-                                            fontSize: 'clamp(0.5rem, 1.2vh, 0.7rem)',
+                                            fontSize: 'clamp(0.65rem, 1.4vh, 0.82rem)',
                                             color: 'white',
                                             fontWeight: '800',
                                             textShadow: '0 1px 2px rgba(0,0,0,0.3)',
@@ -275,8 +285,8 @@ export const DashboardSlide = React.memo(({
                                     </>
                                 ) : (
                                     <>
-                                        <DynamicIcon icon={safeSelectedExercise.icon} size={22} color={safeSelectedExercise.color} />
-                                        <span style={{ fontSize: 'clamp(0.45rem, 1.2vh, 0.65rem)', color: safeSelectedExercise.color, fontWeight: '700' }}>
+                                        <DynamicIcon icon={safeSelectedExercise.icon} size={25} color={safeSelectedExercise.color} />
+                                        <span style={{ fontSize: 'clamp(0.6rem, 1.3vh, 0.78rem)', color: safeSelectedExercise.color, fontWeight: '800' }}>
                                             {safeSelectedExercise.type === 'timer'
                                                 ? `${formatTime(currentCount)}/${formatTime(dailyGoal)}`
                                                 : `${currentCount}/${dailyGoal}`}
@@ -332,9 +342,38 @@ export const DashboardSlide = React.memo(({
     );
 });
 
+const getTileSizing = (count) => {
+    if (count === 1) {
+        return {
+            flex: '1 1 min(280px, 100%)',
+            maxWidth: '340px',
+            minHeight: 'clamp(56px, 9.2vh, 76px)',
+        };
+    }
+    if (count === 2) {
+        return {
+            flex: '1 1 calc(50% - 10px)',
+            maxWidth: '240px',
+            minHeight: 'clamp(50px, 8.2vh, 68px)',
+        };
+    }
+    if (count === 3) {
+        return {
+            flex: '1 1 calc(33.333% - 8px)',
+            maxWidth: '185px',
+            minHeight: 'clamp(48px, 7.5vh, 62px)',
+        };
+    }
+    return {
+        flex: '1 1 calc(33.333% - 8px)',
+        maxWidth: '150px',
+        minHeight: 'var(--exercise-btn-min-height, clamp(44px, 7.2vh, 58px))',
+    };
+};
+
 const ExerciseButton = React.memo(({
     ex, isActive, dayNumber, today,
-    getExerciseCount, completions, computedStats, onSelect, getConfig
+    getExerciseCount, completions, computedStats, onSelect, getConfig, itemCount
 }) => {
     const statsEx = computedStats.exerciseStats?.find(e => e.id === ex.id);
     const exStreak = statsEx ? statsEx.streak : 0;
@@ -344,6 +383,8 @@ const ExerciseButton = React.memo(({
     const exGoal = getDailyGoal(ex, dayNumber, exDiff);
     const exDone = completions[today]?.[ex.id]?.isCompleted || exCount >= exGoal;
     const exPct = exDone ? 100 : Math.min(100, (exCount / Math.max(exGoal, 1)) * 100);
+
+    const tileSizing = getTileSizing(itemCount || 4);
 
     let btnBg = `linear-gradient(160deg, ${ex.color}0d 0%, var(--surface-subtle) 80%)`;
     if (exDone) {
@@ -382,14 +423,14 @@ const ExerciseButton = React.memo(({
             onClick={() => onSelect(ex.id)}
             className={`hover-lift exercise-button${exDone ? ' exercise-done' : ''}`}
             style={{
-                flex: '1 1 calc(33.333% - 8px)',
+                flex: tileSizing.flex,
                 minWidth: 'clamp(60px, 18vw, 100px)',
-                maxWidth: '130px',
+                maxWidth: tileSizing.maxWidth,
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', gap: 'var(--exercise-btn-gap, clamp(2px, 0.4vh, 5px))',
                 padding: 'var(--exercise-btn-padding, clamp(8px, 1.2vh, 12px) clamp(4px, 0.8vw, 8px))',
                 borderRadius: 'var(--radius-md)',
-                minHeight: 'var(--exercise-btn-min-height, clamp(44px, 7.2vh, 58px))',
+                minHeight: tileSizing.minHeight,
                 background: btnBg,
                 border: btnBorder,
                 cursor: 'pointer',

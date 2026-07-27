@@ -62,13 +62,14 @@ export const useUIStore = create((set, get) => ({
   // ── Custom exercises modal target category ──────────────────────────
   // null targets the default "custom" category.
   customExModalCatId: null,
-  openCustomExercises: (catId = null) => {
-    set({ customExModalCatId: catId });
+  customExModalInitialView: 'list',
+  openCustomExercises: (catId = null, initialView = 'list') => {
+    set({ customExModalCatId: catId, customExModalInitialView: initialView });
     get().openModal('customExercises');
   },
   closeCustomExercises: () => {
     get().closeModal('customExercises');
-    set({ customExModalCatId: null });
+    set({ customExModalCatId: null, customExModalInitialView: 'list' });
   },
 
   // ── Workout session UI state ─────────────────────────────────────────

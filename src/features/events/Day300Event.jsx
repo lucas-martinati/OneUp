@@ -206,7 +206,7 @@ const Day300Styles = memo(() => (
         }
 
         /* ── Header : verre cosmique ── */
-        .day300-global .dashboard-header {
+        .day300-global .dashboard-header-wrapper {
           border-color: rgba(129, 140, 248, 0.3) !important;
           background: rgba(18, 20, 48, 0.85) !important;
           box-shadow: 0 0 18px rgba(56, 189, 248, 0.10), inset 0 0 30px rgba(129, 140, 248, 0.05) !important;

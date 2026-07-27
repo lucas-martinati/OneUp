@@ -116,7 +116,8 @@ export function DashboardSlideRenderer({
                             pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                             activeExerciseId={customExercisesMap[customSelected] ? customSelected : (defaultCustomExercises[0]?.id || null)} onSelectExercise={handleSelectExercise}
                             exercisesList={defaultCustomExercises} exercisesMap={customExercisesMap}
-                            onManageCustom={() => { openCustomExercises(null); pauseCloudSync?.(); }}
+                            onManageCustom={() => { openCustomExercises(null, 'list'); pauseCloudSync?.(); }}
+                            onAddCustom={() => { openCustomExercises(null, 'create'); pauseCloudSync?.(); }}
                             onManageCategories={() => { openModal('categoryManager'); }}
                             getConfig={getConfig}
                         />
@@ -149,7 +150,8 @@ export function DashboardSlideRenderer({
                             pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                             activeExerciseId={selId} onSelectExercise={handleSelectExercise}
                             exercisesList={catExercises} exercisesMap={catExMap}
-                            onManageCustom={() => { openCustomExercises(catKey); pauseCloudSync?.(); }}
+                            onManageCustom={() => { openCustomExercises(catKey, 'list'); pauseCloudSync?.(); }}
+                            onAddCustom={() => { openCustomExercises(catKey, 'create'); pauseCloudSync?.(); }}
                             onManageCategories={() => { openModal('categoryManager'); }}
                             getConfig={getConfig}
                         />
