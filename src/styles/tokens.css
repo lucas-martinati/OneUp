@@ -36,13 +36,13 @@
   --touch-min: 40px;
 
   /* Dashboard sizes */
-  --exercise-btn-min-height: clamp(62px, 9.5vh, 84px);
+  --exercise-btn-min-height: clamp(62px, 9.2vh, 80px);
   --bottom-btn-size: clamp(96px, 16vh, 145px);
   --category-title-size: clamp(0.95rem, 2.2vh, 1.15rem);
   --day-label-size-with-title: clamp(0.7rem, 1.45vh, 0.9rem);
   --day-num-height-with-title: clamp(2rem, 6.5vh, 5.5rem);
   --day-num-font-size-with-title: clamp(1.8rem, 6vh, 5rem);
-  --exercise-btn-min-height-with-title: clamp(56px, 8.5vh, 76px);
+  --exercise-btn-min-height-with-title: clamp(56px, 8.5vh, 72px);
   --done-text-margin-with-title: clamp(2px, 0.4vh, 4px);
   --done-text-size-with-title: clamp(0.6rem, 2.2vw, 0.78rem);
   --bottom-btn-size-with-title: clamp(88px, 14.5vh, 135px);

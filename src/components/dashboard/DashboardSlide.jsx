@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Settings, Star, FolderPlus, Plus } from '@utils/icons';
 import { UI_ICONS, DynamicIcon } from '@utils/icons';
 import { getDailyGoal } from '@config/exercises';
+import { parseTimestamp } from '@shared/dateUtils';
 import { formatTime } from '@utils/formatters';
 import { isPerfectDay } from '@utils/statUtils';
 import { getExerciseLabel } from '@utils/exerciseLabel';
@@ -16,7 +17,7 @@ export const DashboardSlide = React.memo(({
     pauseCloudSync, setShowCounter,
     activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, categoryColor, onManageCustom, onAddCustom, onManageCategories, getConfig
 }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
 
     const currentDiff = safeSelectedExercise ? getConfig(safeSelectedExercise.id, today).difficulty : 1;
@@ -210,9 +211,12 @@ export const DashboardSlide = React.memo(({
                             statusColor = safeSelectedExercise.color;
                         }
 
-                        const completedTime = completions[today]?.[safeSelectedExercise.id]?.completedAt;
-                        const timeStr = completedTime ? new Date(completedTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null;
-                        const showDoneText = isExerciseDone && timeStr;
+                        const completedTime = completions[today]?.[safeSelectedExercise.id]?.timestamp;
+                        const parsedDate = completedTime ? parseTimestamp(completedTime) : null;
+                        const timeStr = (parsedDate && !Number.isNaN(parsedDate.getTime()))
+                            ? parsedDate.toLocaleTimeString(i18n.language || [], { hour: '2-digit', minute: '2-digit' })
+                            : null;
+                        const showDoneText = isExerciseDone && !!timeStr;
 
                         return (
                             <div
@@ -344,31 +348,31 @@ export const DashboardSlide = React.memo(({
 });
 
 const getTileSizing = (count) => {
-    if (count === 1) {
+    if (count <= 2) {
         return {
-            flex: '1 1 min(280px, 100%)',
-            maxWidth: '360px',
-            minHeight: 'clamp(68px, 11vh, 92px)',
+            flex: count === 1 ? '1 1 min(280px, 100%)' : '1 1 calc(50% - 10px)',
+            maxWidth: count === 1 ? '350px' : '255px',
+            minHeight: 'clamp(68px, 10.5vh, 88px)',
         };
     }
-    if (count === 2) {
+    if (count <= 4) {
         return {
             flex: '1 1 calc(50% - 10px)',
-            maxWidth: '260px',
-            minHeight: 'clamp(62px, 10vh, 84px)',
+            maxWidth: '230px',
+            minHeight: 'clamp(62px, 9.5vh, 80px)',
         };
     }
-    if (count === 3) {
+    if (count <= 6) {
         return {
             flex: '1 1 calc(33.333% - 8px)',
-            maxWidth: '195px',
-            minHeight: 'clamp(58px, 9vh, 78px)',
+            maxWidth: '188px',
+            minHeight: 'clamp(58px, 8.8vh, 74px)',
         };
     }
     return {
         flex: '1 1 calc(33.333% - 8px)',
-        maxWidth: '175px',
-        minHeight: 'var(--exercise-btn-min-height, clamp(54px, 8.5vh, 72px))',
+        maxWidth: '172px',
+        minHeight: 'var(--exercise-btn-min-height, clamp(54px, 8.2vh, 68px))',
     };
 };
 
@@ -428,8 +432,9 @@ const ExerciseButton = React.memo(({
                 minWidth: 'clamp(60px, 18vw, 100px)',
                 maxWidth: tileSizing.maxWidth,
                 display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: 'var(--exercise-btn-gap, clamp(2px, 0.4vh, 5px))',
-                padding: 'var(--exercise-btn-padding, clamp(8px, 1.2vh, 12px) clamp(4px, 0.8vw, 8px))',
+                alignItems: 'center', justifyContent: 'center',
+                gap: 'var(--exercise-btn-gap, clamp(3px, 0.5vh, 6px))',
+                padding: 'var(--exercise-btn-padding, clamp(8px, 1.2vh, 13px) clamp(6px, 0.9vw, 11px))',
                 borderRadius: 'var(--radius-md)',
                 minHeight: tileSizing.minHeight,
                 background: btnBg,
@@ -467,7 +472,7 @@ const ExerciseButton = React.memo(({
             />
             {/* Icon in a tinted chip — always carries the exercise color */}
             <div style={{
-                width: 'var(--tile-icon-size, clamp(24px, 3.6vh, 30px))', height: 'var(--tile-icon-size, clamp(24px, 3.6vh, 30px))',
+                width: 'var(--tile-icon-size, clamp(28px, 4.2vh, 35px))', height: 'var(--tile-icon-size, clamp(28px, 4.2vh, 35px))',
                 borderRadius: '30%',
                 background: `${ex.color}${exDone || isActive ? '2e' : '16'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -476,13 +481,13 @@ const ExerciseButton = React.memo(({
             }}>
                 <DynamicIcon
                     icon={ex.icon}
-                    size={16}
+                    size={18}
                     color={ex.color}
                     style={{ transition: 'opacity 0.2s ease', opacity: exDone || isActive ? 1 : 0.85 }}
                 />
             </div>
             <span style={{
-                fontSize: 'var(--tile-label-size, clamp(0.55rem, 1.25vh, 0.78rem))', fontWeight: '600',
+                fontSize: 'var(--tile-label-size, clamp(0.68rem, 1.4vh, 0.85rem))', fontWeight: '700',
                 color: textThemeColor,
                 textAlign: 'center', lineHeight: '1.1',
                 transition: 'color 0.2s ease'
@@ -490,7 +495,7 @@ const ExerciseButton = React.memo(({
                 {getExerciseLabel(ex)}
             </span>
             <span style={{
-                fontSize: 'var(--tile-count-size, clamp(0.6rem, 1.35vh, 0.82rem))', fontWeight: '700',
+                fontSize: 'var(--tile-count-size, clamp(0.72rem, 1.5vh, 0.9rem))', fontWeight: '800',
                 lineHeight: 1.2,
                 color: textPrimaryColor,
                 opacity: textOpacity,
