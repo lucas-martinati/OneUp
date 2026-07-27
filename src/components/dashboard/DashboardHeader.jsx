@@ -293,7 +293,7 @@ export const DashboardHeader = React.memo(({
                 display: 'flex', justifyContent: 'center', width: '100%',
                 marginTop: '-1px', zIndex: 1
             }}>
-                <div className="glass" style={{
+                <div className="glass dashboard-header-day-pod" style={{
                     display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
                     padding: '2px clamp(18px, 4vw, 36px) 6px',
                     borderRadius: '0 0 20px 20px',
