@@ -42,6 +42,7 @@ export const DashboardHeader = React.memo(({
     // "Frozen but safe": streak preserved by a freeze, not active today. Computed
     // in the stats layer (keeps date math out of render). Falls back to false.
     const isStreakFrozen = !streakActive && !!streakFrozen;
+    const isCardio = currentCatKey === CATEGORIES.CARDIO;
 
     const headerRef = useRef(null);
     const rightSideRef = useRef(null);
@@ -295,11 +296,13 @@ export const DashboardHeader = React.memo(({
                 display: 'flex', justifyContent: 'center', width: '100%',
                 position: 'absolute', top: 'calc(100% - 1px)', left: 0, right: 0,
                 zIndex: 5,
-                pointerEvents: currentCatKey === CATEGORIES.CARDIO ? 'none' : 'auto',
-                transform: currentCatKey === CATEGORIES.CARDIO ? 'translateY(-30px)' : 'translateY(0)',
-                opacity: currentCatKey === CATEGORIES.CARDIO ? 0 : 1,
-                clipPath: currentCatKey === CATEGORIES.CARDIO ? 'inset(0% 0% 100% 0%)' : 'inset(0% -20px -30px -20px)',
-                transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, clip-path 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                overflow: 'hidden',
+                paddingBottom: '24px',
+                pointerEvents: isCardio ? 'none' : 'auto',
+                transform: isCardio ? 'translateY(-100%)' : 'translateY(0)',
+                opacity: isCardio ? 0 : 1,
+                transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease-out',
+                willChange: 'transform, opacity',
             }}>
                 <div className="glass dashboard-header-day-pod" style={{
                     display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
@@ -307,7 +310,7 @@ export const DashboardHeader = React.memo(({
                     borderRadius: '0 0 20px 20px',
                     borderTop: 'none',
                     boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
-                    animation: `${dayPodEntranceAnimation}`,
+                    animation: dayPodEntranceAnimation,
                     width: 'fit-content'
                 }}>
                     <DayHeroHeader
