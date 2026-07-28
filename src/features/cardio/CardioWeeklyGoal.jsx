@@ -10,22 +10,22 @@ export const CardioWeeklyGoal = React.memo(({
   const isComplete = distance >= goal;
 
   return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 'clamp(4px, 0.8vh, 8px)' }}>
       <div style={{ width: '100%' }}>
         {/* Label row */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-          marginBottom: '8px'
+          marginBottom: 'clamp(2px, 0.5vh, 6px)'
         }}>
           <span style={{
-            fontSize: 'clamp(0.7rem, 1.4vh, 0.85rem)',
+            fontSize: 'clamp(0.65rem, 1.2vh, 0.8rem)',
             color: 'var(--text-secondary)', fontWeight: '600',
             textTransform: 'uppercase', letterSpacing: '1.5px'
           }}>
             {t('cardio.weeklyGoal')}
           </span>
           <span style={{
-            fontSize: 'clamp(0.6rem, 1.1vh, 0.7rem)',
+            fontSize: 'clamp(0.55rem, 1vh, 0.65rem)',
             color: 'var(--text-secondary)', opacity: 0.6
           }}>
             {t('common.weeksAbbr')} {weekNumber}
@@ -34,10 +34,10 @@ export const CardioWeeklyGoal = React.memo(({
 
         {/* Big distance number */}
         <div style={{
-          display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '10px'
+          display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: 'clamp(4px, 0.8vh, 8px)'
         }}>
           <span style={{
-            fontSize: 'clamp(1.6rem, 3.5vh, 2.4rem)',
+            fontSize: 'clamp(1.3rem, 2.8vh, 2.2rem)',
             fontWeight: '800',
             color: isComplete ? 'var(--success)' : 'var(--text-primary)',
             lineHeight: 1,
@@ -46,7 +46,7 @@ export const CardioWeeklyGoal = React.memo(({
             {distance.toFixed(1)}
           </span>
           <span style={{
-            fontSize: 'clamp(0.85rem, 1.8vh, 1.1rem)',
+            fontSize: 'clamp(0.75rem, 1.5vh, 1rem)',
             fontWeight: '600',
             color: 'var(--text-secondary)',
             opacity: 0.8

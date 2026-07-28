@@ -157,8 +157,8 @@ export function CardioModule() {
         style={{
         width: '100%', height: '100%',
         display: 'flex', flexDirection: 'column',
-        padding: 'clamp(14px, 2vh, 22px)',
-        gap: 'clamp(8px, 1.2vh, 14px)',
+        padding: 'clamp(8px, 1.4vh, 20px)',
+        gap: 'clamp(6px, 1vh, 12px)',
         position: 'relative',
         overflow: 'hidden',
         boxSizing: 'border-box',
@@ -178,7 +178,7 @@ export function CardioModule() {
           opacity: isDemo ? 0.4 : 1, pointerEvents: isDemo ? 'none' : 'auto'
         }}>
           <h2 style={{
-            fontSize: 'clamp(0.85rem, 1.8vh, 1.1rem)',
+            fontSize: 'clamp(0.8rem, 1.6vh, 1.1rem)',
             fontWeight: '800',
             color: 'var(--text-primary)',
             margin: 0,
@@ -212,8 +212,8 @@ export function CardioModule() {
             <div className="custom-scrollbar" style={{
               flex: 1, overflowY: isDemo ? 'hidden' : 'auto', overflowX: 'hidden',
               display: 'flex', flexDirection: 'column',
-              gap: 'clamp(8px, 1.2vh, 14px)',
-              paddingBottom: '8px',
+              gap: 'clamp(6px, 1vh, 12px)',
+              paddingBottom: '6px',
               scrollbarWidth: 'none',
               pointerEvents: isDemo ? 'none' : 'auto',
               userSelect: isDemo ? 'none' : 'auto',

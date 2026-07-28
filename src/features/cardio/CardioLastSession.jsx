@@ -41,23 +41,23 @@ const StatCard = ({ icon: Icon, label, value, color }) => (
     flex: '1 1 45%',
     background: 'var(--surface-subtle)',
     borderRadius: 'var(--radius-md)',
-    padding: 'clamp(10px, 1.5vh, 16px)',
+    padding: 'clamp(6px, 1.2vh, 14px)',
     border: '1px solid var(--border-subtle)',
-    display: 'flex', flexDirection: 'column', gap: '4px',
+    display: 'flex', flexDirection: 'column', gap: '2px',
     minWidth: '0',
     transition: 'background-color 0.2s ease, border-color 0.2s ease'
   }}>
     <div style={{
-      display: 'flex', alignItems: 'center', gap: '6px',
+      display: 'flex', alignItems: 'center', gap: '5px',
       color: 'var(--text-secondary)',
-      fontSize: 'clamp(0.6rem, 1.2vh, 0.75rem)',
+      fontSize: 'clamp(0.55rem, 1vh, 0.7rem)',
       fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px'
     }}>
-      <Icon size={14} color={color || 'var(--accent-glow)'} />
+      <Icon size={12} color={color || 'var(--accent-glow)'} />
       {label}
     </div>
     <div style={{
-      fontSize: 'clamp(1rem, 2.2vh, 1.4rem)',
+      fontSize: 'clamp(0.85rem, 1.8vh, 1.3rem)',
       fontWeight: '800',
       color: 'var(--text-primary)',
       lineHeight: 1.1
