@@ -23,7 +23,7 @@ function FitBounds({ gpsTrack }) {
   return null;
 }
 
-export const CardioMap = React.memo(({ gpsTrack, height = 'var(--cardio-map-height, clamp(100px, 18vh, 160px))', onShowFullscreen, onExpandChange, session }) => {
+export const CardioMap = React.memo(({ gpsTrack, height = 'var(--cardio-map-height, clamp(110px, 20vh, 220px))', style: styleProp, onShowFullscreen, onExpandChange, session }) => {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
@@ -60,12 +60,13 @@ export const CardioMap = React.memo(({ gpsTrack, height = 'var(--cardio-map-heig
   if (!gpsTrack || gpsTrack.length < 2) {
     return (
       <div style={{
-        width: '100%', height,
+        width: '100%', height, flex: 1, minHeight: '110px',
         borderRadius: 'var(--radius-md)',
         background: '#1a1a24',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         border: '1px solid var(--border-subtle)',
-        color: 'var(--text-secondary)', fontSize: '0.75rem', opacity: 0.5
+        color: 'var(--text-secondary)', fontSize: '0.75rem', opacity: 0.5,
+        ...styleProp
       }}>
         {t('cardio.noGpsTrack')}
       </div>
@@ -88,12 +89,13 @@ export const CardioMap = React.memo(({ gpsTrack, height = 'var(--cardio-map-heig
     <div
       onClick={handleExpand}
       style={{
-        width: '100%', height,
+        width: '100%', height, flex: 1, minHeight: '110px',
         borderRadius: 'var(--radius-md)',
         overflow: 'hidden',
         position: 'relative',
         border: '1px solid var(--border-subtle)',
         cursor: 'pointer',
+        ...styleProp
       }}
       className="hover-lift"
     >

@@ -10,23 +10,23 @@ export const CardioWeeklyGoal = React.memo(({
   const isComplete = distance >= goal;
 
   return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 'clamp(4px, 0.8vh, 8px)' }}>
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 'clamp(6px, 1vh, 10px)' }}>
       <div style={{ width: '100%' }}>
         {/* Label row */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-          marginBottom: 'clamp(2px, 0.5vh, 6px)'
+          marginBottom: 'clamp(4px, 0.8vh, 8px)'
         }}>
           <span style={{
-            fontSize: 'clamp(0.65rem, 1.2vh, 0.8rem)',
-            color: 'var(--text-secondary)', fontWeight: '600',
+            fontSize: 'clamp(0.72rem, 1.5vh, 0.88rem)',
+            color: 'var(--text-secondary)', fontWeight: '700',
             textTransform: 'uppercase', letterSpacing: '1.5px'
           }}>
             {t('cardio.weeklyGoal')}
           </span>
           <span style={{
-            fontSize: 'clamp(0.55rem, 1vh, 0.65rem)',
-            color: 'var(--text-secondary)', opacity: 0.6
+            fontSize: 'clamp(0.65rem, 1.3vh, 0.75rem)',
+            color: 'var(--text-secondary)', opacity: 0.7, fontWeight: '600'
           }}>
             {t('common.weeksAbbr')} {weekNumber}
           </span>
@@ -34,10 +34,10 @@ export const CardioWeeklyGoal = React.memo(({
 
         {/* Big distance number */}
         <div style={{
-          display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: 'clamp(4px, 0.8vh, 8px)'
+          display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: 'clamp(6px, 1vh, 10px)'
         }}>
           <span style={{
-            fontSize: 'clamp(1.3rem, 2.8vh, 2.2rem)',
+            fontSize: 'clamp(1.7rem, 3.8vh, 2.6rem)',
             fontWeight: '800',
             color: isComplete ? 'var(--success)' : 'var(--text-primary)',
             lineHeight: 1,
@@ -46,10 +46,10 @@ export const CardioWeeklyGoal = React.memo(({
             {distance.toFixed(1)}
           </span>
           <span style={{
-            fontSize: 'clamp(0.75rem, 1.5vh, 1rem)',
-            fontWeight: '600',
+            fontSize: 'clamp(0.95rem, 2vh, 1.25rem)',
+            fontWeight: '700',
             color: 'var(--text-secondary)',
-            opacity: 0.8
+            opacity: 0.85
           }}>
             / {goal.toFixed(1)} {t('cardio.units.km')}
           </span>
@@ -57,7 +57,7 @@ export const CardioWeeklyGoal = React.memo(({
 
         {/* Progress bar */}
         <div style={{
-          width: '100%', height: '8px',
+          width: '100%', height: '10px',
           borderRadius: 'var(--radius-full)',
           background: 'var(--progress-track)',
           overflow: 'hidden',

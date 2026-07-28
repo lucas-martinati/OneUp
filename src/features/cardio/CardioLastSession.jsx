@@ -41,23 +41,23 @@ const StatCard = ({ icon: Icon, label, value, color }) => (
     flex: '1 1 45%',
     background: 'var(--surface-subtle)',
     borderRadius: 'var(--radius-md)',
-    padding: 'clamp(6px, 1.2vh, 14px)',
+    padding: 'clamp(8px, 1.4vh, 14px)',
     border: '1px solid var(--border-subtle)',
-    display: 'flex', flexDirection: 'column', gap: '2px',
+    display: 'flex', flexDirection: 'column', gap: '4px',
     minWidth: '0',
     transition: 'background-color 0.2s ease, border-color 0.2s ease'
   }}>
     <div style={{
-      display: 'flex', alignItems: 'center', gap: '5px',
+      display: 'flex', alignItems: 'center', gap: '6px',
       color: 'var(--text-secondary)',
-      fontSize: 'clamp(0.55rem, 1vh, 0.7rem)',
-      fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px'
+      fontSize: 'clamp(0.65rem, 1.2vh, 0.78rem)',
+      fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px'
     }}>
-      <Icon size={12} color={color || 'var(--accent-glow)'} />
+      <Icon size={14} color={color || 'var(--accent-glow)'} />
       {label}
     </div>
     <div style={{
-      fontSize: 'clamp(0.85rem, 1.8vh, 1.3rem)',
+      fontSize: 'clamp(1rem, 2.2vh, 1.45rem)',
       fontWeight: '800',
       color: 'var(--text-primary)',
       lineHeight: 1.1
@@ -78,10 +78,10 @@ export const CardioLastSession = React.memo(({ session }) => {
   return (
     <div style={{ width: '100%' }}>
       <div style={{
-        fontSize: 'clamp(0.7rem, 1.4vh, 0.85rem)',
-        color: 'var(--text-secondary)', fontWeight: '600',
+        fontSize: 'clamp(0.72rem, 1.5vh, 0.88rem)',
+        color: 'var(--text-secondary)', fontWeight: '700',
         textTransform: 'uppercase', letterSpacing: '1.5px',
-        marginBottom: '10px'
+        marginBottom: 'clamp(6px, 1vh, 10px)'
       }}>
         {t('cardio.lastSession')}
       </div>

@@ -21,7 +21,7 @@ export const CardioStreak = React.memo(({ streak }) => {
       width: '100%',
     }}>
       <div style={{
-        width: '36px', height: '36px', borderRadius: '50%',
+        width: '40px', height: '40px', borderRadius: '50%',
         background: isActive
           ? 'linear-gradient(135deg, rgba(249,115,22,0.25), rgba(239,68,68,0.25))'
           : 'var(--surface-muted)',
@@ -29,7 +29,7 @@ export const CardioStreak = React.memo(({ streak }) => {
         flexShrink: 0
       }}>
         <Flame
-          size={18}
+          size={20}
           color={isActive ? '#f97316' : 'var(--text-secondary)'}
           style={{ opacity: isActive ? 1 : 0.4 }}
         />
@@ -37,22 +37,22 @@ export const CardioStreak = React.memo(({ streak }) => {
 
       <div className="flex-1-min0">
         <div style={{
-          fontSize: 'clamp(0.65rem, 1.2vh, 0.8rem)',
-          color: 'var(--text-secondary)', fontWeight: '600',
+          fontSize: 'clamp(0.68rem, 1.3vh, 0.82rem)',
+          color: 'var(--text-secondary)', fontWeight: '700',
           textTransform: 'uppercase', letterSpacing: '1px',
           marginBottom: '2px'
         }}>
           {t('cardio.streak')}
         </div>
         <div style={{
-          fontSize: 'clamp(1.1rem, 2.4vh, 1.5rem)',
+          fontSize: 'clamp(1.15rem, 2.5vh, 1.55rem)',
           fontWeight: '800',
           color: isActive ? '#f97316' : 'var(--text-secondary)',
           lineHeight: 1
         }}>
           {streak} <span style={{
-            fontSize: 'clamp(0.65rem, 1.2vh, 0.8rem)',
-            fontWeight: '600', opacity: 0.7
+            fontSize: 'clamp(0.7rem, 1.3vh, 0.85rem)',
+            fontWeight: '600', opacity: 0.75
           }}>{t('common.weeksAbbr')}</span>
         </div>
       </div>

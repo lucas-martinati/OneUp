@@ -287,6 +287,7 @@ export function Dashboard() {
                     isDayPerfect={isDayPerfect}
                     isFuture={isFuture}
                     effectiveStart={effectiveStart}
+                    currentCatKey={currentCatKey}
                 />
 
                 {sessionInProgress && !anyModalOpen && (

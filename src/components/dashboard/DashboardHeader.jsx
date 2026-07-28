@@ -7,6 +7,7 @@ import { useProgressStore } from '@store/useProgressStore';
 import { useAuth } from '@contexts/AuthContext';
 import { StreakFreezeInfo } from './StreakFreezeInfo';
 import { DayHeroHeader } from './DayHeroHeader';
+import { CATEGORIES } from '@config/categories';
 
 const filterOutIds = (idsToRemove) => (p) => p.filter(particle => !idsToRemove.has(particle.id));
 
@@ -25,7 +26,8 @@ const BADGE_BASE = {
 export const DashboardHeader = React.memo(({
     isAdmin,
     streakActive, streakFrozen, displayStreak, selectedExercise, totalReps,
-    dayNumber, prevDayNumber, isCounterTransitioning, isDayPerfect, isFuture, effectiveStart
+    dayNumber, prevDayNumber, isCounterTransitioning, isDayPerfect, isFuture, effectiveStart,
+    currentCatKey
 }) => {
     const openModal = useUIStore(s => s.openModal);
     const { t } = useTranslation();
@@ -160,7 +162,7 @@ export const DashboardHeader = React.memo(({
                     padding: 'clamp(8px, 1.2vh, 12px) clamp(12px, 3vw, 20px)',
                     minWidth: 0,
                     position: 'relative',
-                    zIndex: 2,
+                    zIndex: 10,
                     animation: `${entranceAnimation}, headerUnfold 0.5s ease-out forwards`,
                 }}
             >
@@ -291,7 +293,13 @@ export const DashboardHeader = React.memo(({
             {/* Vertical Stem of the T — Centered Glass Pod wrapping Day Hero (separate cube/card) */}
             <div style={{
                 display: 'flex', justifyContent: 'center', width: '100%',
-                marginTop: '-1px', zIndex: 1
+                position: 'absolute', top: 'calc(100% - 1px)', left: 0, right: 0,
+                zIndex: 5,
+                pointerEvents: currentCatKey === CATEGORIES.CARDIO ? 'none' : 'auto',
+                transform: currentCatKey === CATEGORIES.CARDIO ? 'translateY(-30px)' : 'translateY(0)',
+                opacity: currentCatKey === CATEGORIES.CARDIO ? 0 : 1,
+                clipPath: currentCatKey === CATEGORIES.CARDIO ? 'inset(0% 0% 100% 0%)' : 'inset(0% -20px -30px -20px)',
+                transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, clip-path 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
             }}>
                 <div className="glass dashboard-header-day-pod" style={{
                     display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
@@ -299,7 +307,7 @@ export const DashboardHeader = React.memo(({
                     borderRadius: '0 0 20px 20px',
                     borderTop: 'none',
                     boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
-                    animation: `${dayPodEntranceAnimation}, heroSectionExpand 0.5s ease-out forwards`,
+                    animation: `${dayPodEntranceAnimation}`,
                     width: 'fit-content'
                 }}>
                     <DayHeroHeader
