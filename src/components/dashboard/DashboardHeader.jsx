@@ -296,13 +296,9 @@ export const DashboardHeader = React.memo(({
                 display: 'flex', justifyContent: 'center', width: '100%',
                 position: 'absolute', top: 'calc(100% - 1px)', left: 0, right: 0,
                 zIndex: 5,
-                overflow: 'hidden',
                 paddingBottom: '24px',
+                overflow: 'hidden',
                 pointerEvents: isCardio ? 'none' : 'auto',
-                transform: isCardio ? 'translateY(-100%)' : 'translateY(0)',
-                opacity: isCardio ? 0 : 1,
-                transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease-out',
-                willChange: 'transform, opacity',
             }}>
                 <div className="glass dashboard-header-day-pod" style={{
                     display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
@@ -311,7 +307,11 @@ export const DashboardHeader = React.memo(({
                     borderTop: 'none',
                     boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
                     animation: dayPodEntranceAnimation,
-                    width: 'fit-content'
+                    width: 'fit-content',
+                    transform: isCardio ? 'translateY(-100%) scale(0.92)' : 'translateY(0) scale(1)',
+                    opacity: isCardio ? 0 : 1,
+                    transition: 'transform 0.38s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out',
+                    willChange: 'transform, opacity',
                 }}>
                     <DayHeroHeader
                         dayNumber={dayNumber}
