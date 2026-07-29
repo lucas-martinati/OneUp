@@ -22,6 +22,7 @@ const mocks = vi.hoisted(() => ({
   purchaseSupporter: vi.fn(),
   restorePurchases: vi.fn(),
   loadPurchase: vi.fn(),
+  listenToPurchaseFromCloud: vi.fn(() => () => {}),
   getCurrentUserId: vi.fn(),
 }));
 
@@ -42,7 +43,11 @@ vi.mock('@services/purchaseService', () => ({
 }));
 
 vi.mock('@services/cloudSync', () => ({
-  cloudSync: { loadPurchase: mocks.loadPurchase, getCurrentUserId: mocks.getCurrentUserId },
+  cloudSync: {
+    loadPurchase: mocks.loadPurchase,
+    listenToPurchaseFromCloud: mocks.listenToPurchaseFromCloud,
+    getCurrentUserId: mocks.getCurrentUserId,
+  },
 }));
 
 // entitlements.js (localStorage) is intentionally NOT mocked — the anti-cheat
@@ -225,3 +230,81 @@ describe('Sign-out gating', () => {
     expect(ctx().hadPro).toBe(false);
   });
 });
+
+// ── Realtime Firebase Listener & Pro Unlock Modal ─────────────────────────
+describe('Realtime Pro Activation', () => {
+  it('grants Pro instantly and triggers unlock modal when Pro is updated live', async () => {
+    let fireRealtimeUpdate = null;
+    mocks.listenToPurchaseFromCloud.mockImplementation((callback) => {
+      fireRealtimeUpdate = callback;
+      return () => {};
+    });
+
+    await mountAndSettle();
+    expect(ctx().isPro).toBe(false);
+    expect(ctx().showProUnlockedModal).toBe(false);
+
+    // Simulate an admin granting Pro in Realtime Database during an active session
+    await act(async () => {
+      fireRealtimeUpdate?.({ isPro: true, hadPro: true });
+    });
+
+    expect(ctx().isPro).toBe(true);
+    expect(ctx().hadPro).toBe(true);
+    expect(ctx().showProUnlockedModal).toBe(true);
+
+    // Test closing the modal
+    act(() => {
+      ctx().closeProUnlockedModal();
+    });
+    expect(ctx().showProUnlockedModal).toBe(false);
+  });
+
+  it('triggers expired modal when Pro lapses live', async () => {
+    let fireRealtimeUpdate = null;
+    mocks.listenToPurchaseFromCloud.mockImplementation((callback) => {
+      fireRealtimeUpdate = callback;
+      return () => {};
+    });
+
+    // Start with Pro active
+    mocks.checkProStatus.mockResolvedValue({ active: true, verified: true });
+    await mountAndSettle();
+    expect(ctx().isPro).toBe(true);
+    expect(ctx().showProExpiredModal).toBe(false);
+
+    // Live update: subscription expires
+    await act(async () => {
+      fireRealtimeUpdate?.({ isPro: false, hadPro: true });
+    });
+
+    expect(ctx().isPro).toBe(false);
+    expect(ctx().hadPro).toBe(true);
+    expect(ctx().showProExpiredModal).toBe(true);
+
+    act(() => {
+      ctx().closeProExpiredModal();
+    });
+    expect(ctx().showProExpiredModal).toBe(false);
+  });
+
+  it('triggers supporter modal when Supporter status is acquired', async () => {
+    await mountAndSettle();
+    expect(ctx().isSupporter).toBe(false);
+    expect(ctx().showSupporterUnlockedModal).toBe(false);
+
+    await act(async () => {
+      await ctx().purchaseSupporter();
+    });
+
+    expect(ctx().isSupporter).toBe(true);
+    expect(ctx().showSupporterUnlockedModal).toBe(true);
+
+    act(() => {
+      ctx().closeSupporterUnlockedModal();
+    });
+    expect(ctx().showSupporterUnlockedModal).toBe(false);
+  });
+});
+
+

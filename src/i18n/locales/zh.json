@@ -541,7 +541,45 @@
     "priceYearly": "€19.99/年",
     "promotionalDesc": "OneUp 团队赠送",
     "title": "Pro 订阅",
-    "yearlySavings": "-17%"
+    "yearlySavings": "-17%",
+    "unlockedModal": {
+      "title": "欢迎使用 OneUp Pro！",
+      "subtitle": "已激活无限制访问！🎉",
+      "description": "感谢您的支持。以下是您解锁的所有内容：",
+      "features": {
+        "custom": {
+          "title": "自定义动作与分类",
+          "desc": "创建专属动作，按您的喜好组织训练。"
+        },
+        "weights": {
+          "title": "负重与渐进过载看板",
+          "desc": "精准记录重量，提供渐进超负荷建议。"
+        },
+        "stats": {
+          "title": "整合统计与历史记录",
+          "desc": "通过详细图表直观展示您的全部进步。"
+        },
+        "themes": {
+          "title": "专属高级主题",
+          "desc": "使用独具特色的高端主题美化应用界面。"
+        },
+        "freeze": {
+          "title": "连胜冻结保护 (Streak Freeze)",
+          "desc": "即使在休息日也能保护您的连续打卡记录。"
+        }
+      },
+      "cta": "探索 Pro 功能"
+    },
+    "expiredModal": {
+      "title": "您的 Pro 访问权限已到期",
+      "subtitle": "您的订阅已结束，但不必担心！",
+      "statsTitle": "访问您的统计数据：",
+      "statsDesc": "您仍可在“统计”面板中随时查看所有数据和进度。",
+      "repsTitle": "保留历史次数：",
+      "repsDesc": "您完成的所有次数和训练记录都会完好保存在历史中。",
+      "renewCta": "续费 Pro 订阅",
+      "dismissCta": "继续使用免费版"
+    }
   },
   "routines": {
     "load": "加载",
@@ -700,7 +738,17 @@
     "historyTitle": "支持 OneUp ❤️",
     "restore": "恢复购买",
     "thankYou": "感谢你的支持！❤️",
-    "title": "支持开发者 ❤️"
+    "title": "支持开发者 ❤️",
+    "unlockedModal": {
+      "title": "非常感谢！",
+      "subtitle": "您现已成为支持者会员 ❤️",
+      "description": "您的支持让 OneUp 能够独立运营与持续更新。以下是您解锁的权益：",
+      "badgeTitle": "专属支持者徽章",
+      "badgeDesc": "在您的个人资料和互动中荣誉展示。",
+      "indieTitle": "支持独立开发",
+      "indieDesc": "您直接资助了服务器运营与后续新功能开发。",
+      "cta": "乐意之至！"
+    }
   },
   "timer": {
     "remaining": "还需保持 {{time}}",

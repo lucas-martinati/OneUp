@@ -556,7 +556,45 @@
     "priceYearly": "€19.99/year",
     "promotionalDesc": "Gifted by OneUp Team",
     "title": "Pro Subscription",
-    "yearlySavings": "-17%"
+    "yearlySavings": "-17%",
+    "unlockedModal": {
+      "title": "Congratulations!",
+      "subtitle": "You are now a Pro member 🎉",
+      "description": "Your OneUp Pro access is now active. Here is everything unlocked for you:",
+      "features": {
+        "custom": {
+          "title": "Custom Exercises & Categories",
+          "desc": "Create your own custom exercises and organize workout categories without limits."
+        },
+        "weights": {
+          "title": "Weight Training Dashboard",
+          "desc": "Track your reps and workout weights with precision."
+        },
+        "stats": {
+          "title": "Merged & Advanced Stats",
+          "desc": "Analyze your historical progress with comprehensive charts."
+        },
+        "themes": {
+          "title": "Exclusive Visual Themes",
+          "desc": "Personalize the app look and feel with premium themes."
+        },
+        "freeze": {
+          "title": "Streak Freeze Protection",
+          "desc": "Protect your workout streak even on rest days."
+        }
+      },
+      "cta": "Explore Pro Features"
+    },
+    "expiredModal": {
+      "title": "Your Pro access has expired",
+      "subtitle": "Your subscription has ended, but no worries!",
+      "statsTitle": "Access to your stats:",
+      "statsDesc": "You can still access all your statistics and progress in the Stats panel.",
+      "repsTitle": "Reps preserved:",
+      "repsDesc": "All your completed reps and workout history remain safely saved.",
+      "renewCta": "Renew Pro Subscription",
+      "dismissCta": "Continue with Free Version"
+    }
   },
   "routines": {
     "load": "Load",
@@ -715,7 +753,17 @@
     "historyTitle": "OneUp Support ❤️",
     "restore": "Restore my purchases",
     "thankYou": "Thank you for your support! ❤️",
-    "title": "Support the developer ❤️"
+    "title": "Support the developer ❤️",
+    "unlockedModal": {
+      "title": "Thank You So Much!",
+      "subtitle": "You are now a Supporter Member ❤️",
+      "description": "Your support helps keep OneUp growing independently. Here is what you unlocked:",
+      "badgeTitle": "Exclusive Supporter Badge",
+      "badgeDesc": "Proudly displayed on your profile and interactions.",
+      "indieTitle": "Indie Development Support",
+      "indieDesc": "You directly help fund servers and upcoming features.",
+      "cta": "My Pleasure!"
+    }
   },
   "timer": {
     "remaining": "{{time}} left to hold",

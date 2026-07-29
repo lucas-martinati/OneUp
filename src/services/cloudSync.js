@@ -274,6 +274,20 @@ class CloudSyncService {
     return this._userDataService.loadPurchase(...args);
   };
 
+  listenToPurchaseFromCloud = (callback) => {
+    let unsubscribed = false;
+    let actualUnsubscribe = null;
+    this.ensureInitialized().then(() => {
+      if (unsubscribed) return;
+      actualUnsubscribe = this._userDataService.listenToPurchaseFromCloud(callback);
+    });
+    return () => {
+      unsubscribed = true;
+      if (actualUnsubscribe) actualUnsubscribe();
+    };
+  };
+
+
   saveAchievementsToCloud = async (...args) => {
     await this.ensureInitialized();
     return this._userDataService.saveAchievementsToCloud(...args);

@@ -33,7 +33,7 @@ import {
 // ============ INDIVIDUAL EXPORTS ============
 export {
   Activity, AlertCircle, AlertTriangle, ArrowLeft, ArrowRight, Award,
-  Bell, Bike,
+  BarChart3, Bell, Bike,
   Calendar, Check, CheckCheck, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, Cloud, CloudOff, Code, Copy, Crown,
   Download, Dumbbell,
   Edit2,

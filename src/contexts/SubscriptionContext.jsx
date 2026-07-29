@@ -28,6 +28,10 @@ export function SubscriptionProvider({ children }) {
   const [isPro, setIsPro] = useState(false);
   const [hadPro, setHadPro] = useState(false);
   const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true);
+  const [showProUnlockedModal, setShowProUnlockedModal] = useState(false);
+  const [showProExpiredModal, setShowProExpiredModal] = useState(false);
+  const [showSupporterUnlockedModal, setShowSupporterUnlockedModal] = useState(false);
+  const isInitialCheckDone = useRef(false);
 
   const isSupporterRef = useRef(isSupporter);
   const isProRef = useRef(isPro);
@@ -35,6 +39,51 @@ export function SubscriptionProvider({ children }) {
   useEffect(() => { isSupporterRef.current = isSupporter; }, [isSupporter]);
   useEffect(() => { isProRef.current = isPro; }, [isPro]);
   useEffect(() => { hadProRef.current = hadPro; }, [hadPro]);
+
+  // Helper pour scoper les clés de vue de modale par utilisateur (uid)
+  const getModalSeenKey = useCallback((modalName) => {
+    const uid = auth.user?.uid || 'guest';
+    return `oneup_seen_${modalName}_${uid}`;
+  }, [auth.user?.uid]);
+
+  const isModalSeen = useCallback((modalName) => {
+    const scopedKey = getModalSeenKey(modalName);
+    const legacyKey = `oneup_seen_${modalName}`;
+    return localStorage.getItem(scopedKey) === 'true' || localStorage.getItem(legacyKey) === 'true';
+  }, [getModalSeenKey]);
+
+  const setModalSeen = useCallback((modalName) => {
+    const scopedKey = getModalSeenKey(modalName);
+    localStorage.setItem(scopedKey, 'true');
+  }, [getModalSeenKey]);
+
+  const clearModalSeen = useCallback((modalName) => {
+    const scopedKey = getModalSeenKey(modalName);
+    const legacyKey = `oneup_seen_${modalName}`;
+    localStorage.removeItem(scopedKey);
+    localStorage.removeItem(legacyKey);
+  }, [getModalSeenKey]);
+
+  const openProUnlockedModal = useCallback(() => setShowProUnlockedModal(true), []);
+  const closeProUnlockedModal = useCallback(() => setShowProUnlockedModal(false), []);
+  const confirmProUnlockedModal = useCallback(() => {
+    setModalSeen('pro_unlocked');
+    setShowProUnlockedModal(false);
+  }, [setModalSeen]);
+
+  const openProExpiredModal = useCallback(() => setShowProExpiredModal(true), []);
+  const closeProExpiredModal = useCallback(() => setShowProExpiredModal(false), []);
+  const confirmProExpiredModal = useCallback(() => {
+    setModalSeen('pro_expired');
+    setShowProExpiredModal(false);
+  }, [setModalSeen]);
+
+  const openSupporterUnlockedModal = useCallback(() => setShowSupporterUnlockedModal(true), []);
+  const closeSupporterUnlockedModal = useCallback(() => setShowSupporterUnlockedModal(false), []);
+  const confirmSupporterUnlockedModal = useCallback(() => {
+    setModalSeen('supporter_unlocked');
+    setShowSupporterUnlockedModal(false);
+  }, [setModalSeen]);
 
   const saveAndPublish = useCallback(async ({ isSupporter: sup, isPro: pr, hadPro: hp }) => {
     // If pr is true, hp must be true
@@ -54,6 +103,10 @@ export function SubscriptionProvider({ children }) {
         setIsPro(false);
         // keep hadPro in state as it might be loaded next session, but typically auth reset means clearing it
         setHadPro(false);
+        setShowProUnlockedModal(false);
+        setShowProExpiredModal(false);
+        setShowSupporterUnlockedModal(false);
+        isInitialCheckDone.current = false;
         clearCachedEntitlements();
       });
     }
@@ -110,12 +163,32 @@ export function SubscriptionProvider({ children }) {
           setIsPro(resolved.isPro);
           setHadPro(resolved.hadPro);
 
+          // Check if modals should be opened on startup (only if NOT confirmed before)
+          if (resolved.isPro) {
+            clearModalSeen('pro_expired');
+            if (!isModalSeen('pro_unlocked')) {
+              setShowProUnlockedModal(true);
+            }
+          } else if (resolved.hadPro) {
+            clearModalSeen('pro_unlocked');
+            if (!isModalSeen('pro_expired')) {
+              setShowProExpiredModal(true);
+            }
+          }
+
+          if (resolved.isSupporter) {
+            if (!isModalSeen('supporter_unlocked')) {
+              setShowSupporterUnlockedModal(true);
+            }
+          }
+
           // Always update cache to correct any stale localStorage entries
           await saveAndPublish(resolved);
         } catch (error) {
           logger.error('Purchase init error:', error);
         } finally {
           setIsSubscriptionLoading(false);
+          isInitialCheckDone.current = true;
         }
       };
       initAndCheck();
@@ -126,36 +199,91 @@ export function SubscriptionProvider({ children }) {
     // initPurchases, cloudSync, resolveEntitlements are stable references (module-level
     // singletons or useState setters). Adding them would cause spurious re-inits.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth.isSignedIn, auth.authConfirmed, auth.user?.uid]);
+  }, [auth.isSignedIn, auth.authConfirmed, auth.user?.uid, isModalSeen, clearModalSeen]);
+
+  // Realtime Firebase listener for live entitlements updates (e.g. gifted Pro by admin or webhook update)
+  useEffect(() => {
+    if (auth.isSignedIn && auth.authConfirmed && auth.user?.uid) {
+      const unsubscribe = cloudSync.listenToPurchaseFromCloud((cloudPurchase) => {
+        if (!cloudPurchase) return;
+        const newPro = !!cloudPurchase.isPro;
+        const newSupporter = !!cloudPurchase.isSupporter;
+        const newHadPro = newPro || !!cloudPurchase.hadPro;
+
+        if (isInitialCheckDone.current) {
+          // If Pro is granted live (false -> true), open Pro Unlocked Modal if not confirmed
+          if (!isProRef.current && newPro) {
+            logger.info('Pro granted in real-time, opening unlock modal');
+            clearModalSeen('pro_expired');
+            if (!isModalSeen('pro_unlocked')) {
+              setShowProUnlockedModal(true);
+            }
+          }
+          // If Pro expired live (true -> false), open Pro Expired Modal if not confirmed
+          else if (isProRef.current && !newPro) {
+            logger.info('Pro expired in real-time, opening expired modal');
+            clearModalSeen('pro_unlocked');
+            if (!isModalSeen('pro_expired')) {
+              setShowProExpiredModal(true);
+            }
+          }
+
+          // If Supporter granted live (false -> true), open Supporter Unlocked Modal if not confirmed
+          if (!isSupporterRef.current && newSupporter) {
+            logger.info('Supporter granted in real-time, opening supporter modal');
+            if (!isModalSeen('supporter_unlocked')) {
+              setShowSupporterUnlockedModal(true);
+            }
+          }
+        }
+
+        if (newPro !== isProRef.current) setIsPro(newPro);
+        if (newSupporter !== isSupporterRef.current) setIsSupporter(newSupporter);
+        if (newHadPro && !hadProRef.current) setHadPro(true);
+
+        saveAndPublish({ isSupporter: newSupporter, isPro: newPro, hadPro: newHadPro });
+      });
+
+      return () => {
+        if (typeof unsubscribe === 'function') unsubscribe();
+      };
+    }
+  }, [auth.isSignedIn, auth.authConfirmed, auth.user?.uid, saveAndPublish, isModalSeen, clearModalSeen]);
 
   const handlePurchaseSupporter = useCallback(async () => {
     const result = await purchaseSupporter();
     if (result.success || result.isSupporter || result.isActive) {
+      clearModalSeen('supporter_unlocked');
+      setShowSupporterUnlockedModal(true);
       setIsSupporter(true);
       await saveAndPublish({ isSupporter: true, isPro: isProRef.current, hadPro: hadProRef.current });
     }
     return result;
-  }, [saveAndPublish]);
+  }, [saveAndPublish, clearModalSeen]);
 
   const handlePurchasePro = useCallback(async () => {
     const result = await purchasePro();
     if (result.success || result.isActive) {
+      clearModalSeen('pro_unlocked');
+      setShowProUnlockedModal(true);
       setIsPro(true);
       setHadPro(true);
       await saveAndPublish({ isSupporter: isSupporterRef.current, isPro: true, hadPro: true });
     }
     return result;
-  }, [saveAndPublish]);
+  }, [saveAndPublish, clearModalSeen]);
 
   const handlePurchaseProYearly = useCallback(async () => {
     const result = await purchaseProYearly();
     if (result.success || result.isActive) {
+      clearModalSeen('pro_unlocked');
+      setShowProUnlockedModal(true);
       setIsPro(true);
       setHadPro(true);
       await saveAndPublish({ isSupporter: isSupporterRef.current, isPro: true, hadPro: true });
     }
     return result;
-  }, [saveAndPublish]);
+  }, [saveAndPublish, clearModalSeen]);
 
   const handleRestorePurchases = useCallback(async () => {
     const result = await restorePurchases();
@@ -194,19 +322,44 @@ export function SubscriptionProvider({ children }) {
 
     resolved.hasAnyEntitlement = resolved.isSupporter || resolved.hadPro;
 
+    if (!isProRef.current && resolved.isPro) {
+      clearModalSeen('pro_unlocked');
+      setShowProUnlockedModal(true);
+    } else if (isProRef.current && !resolved.isPro) {
+      clearModalSeen('pro_expired');
+      setShowProExpiredModal(true);
+    }
+
+    if (!isSupporterRef.current && resolved.isSupporter) {
+      clearModalSeen('supporter_unlocked');
+      setShowSupporterUnlockedModal(true);
+    }
+
     setIsSupporter(resolved.isSupporter);
     setIsPro(resolved.isPro);
     setHadPro(resolved.hadPro);
 
     await saveAndPublish(resolved);
     return result;
-  }, [saveAndPublish]);
+  }, [saveAndPublish, clearModalSeen]);
 
   const value = useMemo(() => ({
     isSupporter: auth.isSignedIn ? isSupporter : false,
     isPro: auth.isSignedIn ? isPro : false,
     hadPro: auth.isSignedIn ? hadPro : false,
     isSubscriptionLoading,
+    showProUnlockedModal,
+    openProUnlockedModal,
+    closeProUnlockedModal,
+    confirmProUnlockedModal,
+    showProExpiredModal,
+    openProExpiredModal,
+    closeProExpiredModal,
+    confirmProExpiredModal,
+    showSupporterUnlockedModal,
+    openSupporterUnlockedModal,
+    closeSupporterUnlockedModal,
+    confirmSupporterUnlockedModal,
     rawIsSupporter: isSupporter,
     rawIsPro: isPro,
     rawHadPro: hadPro,
@@ -214,7 +367,14 @@ export function SubscriptionProvider({ children }) {
     purchasePro: handlePurchasePro,
     purchaseProYearly: handlePurchaseProYearly,
     restorePurchases: handleRestorePurchases,
-  }), [auth.isSignedIn, isSupporter, isPro, hadPro, isSubscriptionLoading, handlePurchaseSupporter, handlePurchasePro, handlePurchaseProYearly, handleRestorePurchases]);
+  }), [
+    auth.isSignedIn, isSupporter, isPro, hadPro, isSubscriptionLoading,
+    showProUnlockedModal, openProUnlockedModal, closeProUnlockedModal, confirmProUnlockedModal,
+    showProExpiredModal, openProExpiredModal, closeProExpiredModal, confirmProExpiredModal,
+    showSupporterUnlockedModal, openSupporterUnlockedModal, closeSupporterUnlockedModal, confirmSupporterUnlockedModal,
+    handlePurchaseSupporter, handlePurchasePro, handlePurchaseProYearly, handleRestorePurchases
+  ]);
+
 
   return (
     <SubscriptionContext.Provider value={value}>

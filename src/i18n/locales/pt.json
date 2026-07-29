@@ -541,7 +541,45 @@
     "priceYearly": "19,99€/ano",
     "promotionalDesc": "Presenteado pela equipe OneUp",
     "title": "Assinatura Profissional",
-    "yearlySavings": "-17%"
+    "yearlySavings": "-17%",
+    "unlockedModal": {
+      "title": "Bem-vindo ao OneUp Pro!",
+      "subtitle": "Acesso ilimitado ativado! 🎉",
+      "description": "Obrigado pelo teu apoio. Aqui está tudo o que desbloqueaste:",
+      "features": {
+        "custom": {
+          "title": "Exercícios e Categorias Personalizados",
+          "desc": "Cria os teus próprios exercícios e organiza os teus treinos como quiseres."
+        },
+        "weights": {
+          "title": "Painel de Pesos e Sobrecarga",
+          "desc": "Registo preciso de cargas com sugestões de sobrecarga progressiva."
+        },
+        "stats": {
+          "title": "Estatísticas Unificadas e Histórico",
+          "desc": "Visualiza toda a tua progressão em gráficos detalhados."
+        },
+        "themes": {
+          "title": "Temas Premium Exclusivos",
+          "desc": "Personaliza a aplicação com temas estéticos únicos."
+        },
+        "freeze": {
+          "title": "Proteção de Sequência (Streak Freeze)",
+          "desc": "Protege a tua sequência de dias ativos mesmo nos dias de descanso."
+        }
+      },
+      "cta": "Explorar Funcionalidades Pro"
+    },
+    "expiredModal": {
+      "title": "O teu acesso Pro expirou",
+      "subtitle": "A tua subscrição terminou, mas não te preocupes!",
+      "statsTitle": "Acesso às tuas estatísticas:",
+      "statsDesc": "Podes continuar a consultar todas as tuas estatísticas e progressos no painel Stats.",
+      "repsTitle": "Repetições conservadas:",
+      "repsDesc": "Todas as tuas repetições e sessões já realizadas continuam guardadas no teu histórico.",
+      "renewCta": "Renovar subscrição Pro",
+      "dismissCta": "Continuar com a versão gratuita"
+    }
   },
   "routines": {
     "load": "Carregar",
@@ -700,7 +738,17 @@
     "historyTitle": "Suporte OneUp ❤️",
     "restore": "Restaurar minhas compras",
     "thankYou": "Obrigado pelo seu apoio! ❤️",
-    "title": "Apoie o desenvolvedor ❤️"
+    "title": "Apoie o desenvolvedor ❤️",
+    "unlockedModal": {
+      "title": "Muito Obrigado!",
+      "subtitle": "És agora um Membro Apoiante ❤️",
+      "description": "O teu apoio permite manter e evoluir o OneUp de forma independente. Aqui está o que desbloqueaste:",
+      "badgeTitle": "Crachá Exclusivo de Apoiante",
+      "badgeDesc": "Exibido com orgulho no teu perfil e interações.",
+      "indieTitle": "Apoio ao Desenvolvimento Independente",
+      "indieDesc": "Ajudas diretamente a financiar os servidores e futuras funcionalidades.",
+      "cta": "Com todo o prazer!"
+    }
   },
   "timer": {
     "remaining": "{{time}} restante para segurar",

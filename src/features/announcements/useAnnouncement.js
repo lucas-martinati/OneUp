@@ -41,15 +41,20 @@ export function useAnnouncement() {
     }
   }, []);
 
-  const dismiss = () => {
+  const confirm = () => {
     setShow(false);
     const seenKey = STORAGE_PREFIX + CURRENT_ANNOUNCEMENT.id;
     localStorage.setItem(seenKey, '1');
+  };
+
+  const dismiss = () => {
+    setShow(false);
   };
 
   return {
     showAnnouncement: show,
     announcement: CURRENT_ANNOUNCEMENT,
     dismissAnnouncement: dismiss,
+    confirmAnnouncement: confirm,
   };
 }

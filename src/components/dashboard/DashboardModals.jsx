@@ -22,6 +22,9 @@ const WorkoutSession = lazy(() => import('@components/exercises/WorkoutSession')
 const CustomExercisesModal = lazy(() => import('@components/exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
 const CategoryManagerModal = lazy(() => import('@components/exercises/CategoryManagerModal').then(m => ({ default: m.CategoryManagerModal })));
 const AdminPanel = lazy(() => import('@components/admin/AdminPanel').then(m => ({ default: m.AdminPanel })));
+const ProUnlockedModal = lazy(() => import('@components/dashboard/ProUnlockedModal').then(m => ({ default: m.ProUnlockedModal })));
+const ProExpiredModal = lazy(() => import('@components/dashboard/ProExpiredModal').then(m => ({ default: m.ProExpiredModal })));
+const SupporterUnlockedModal = lazy(() => import('@components/dashboard/SupporterUnlockedModal').then(m => ({ default: m.SupporterUnlockedModal })));
 
 export function DashboardModals({
     currentCatKey, effectiveSlide,
@@ -36,7 +39,12 @@ export function DashboardModals({
     const resumeCloudSync = useCloudSyncStore(s => s.resumeCloudSync);
     const computedStats = useComputedStatsStore(s => s.stats);
     const { getConfig } = useExerciseConfig();
-    const { isPro } = useSubscription();
+    const {
+        isPro,
+        showProUnlockedModal, closeProUnlockedModal, confirmProUnlockedModal,
+        showProExpiredModal, closeProExpiredModal, confirmProExpiredModal,
+        showSupporterUnlockedModal, closeSupporterUnlockedModal, confirmSupporterUnlockedModal
+    } = useSubscription();
     const {
         customExercisesHook, customCategoriesHook,
         defaultCustomExercises, exercisesByUserCategory
@@ -56,6 +64,40 @@ export function DashboardModals({
     const highlightedBadgeId = useUIStore(s => s.highlightedBadgeId);
     const sessionMode = useUIStore(s => s.sessionMode);
     const setSessionInProgress = useUIStore(s => s.setSessionInProgress);
+
+    let activeStatusModal = null;
+    if (showProUnlockedModal) {
+        activeStatusModal = (
+            <Suspense fallback={null}>
+                <ProUnlockedModal
+                    open={showProUnlockedModal}
+                    onClose={closeProUnlockedModal}
+                    onConfirm={confirmProUnlockedModal}
+                />
+            </Suspense>
+        );
+    } else if (showProExpiredModal) {
+        activeStatusModal = (
+            <Suspense fallback={null}>
+                <ProExpiredModal
+                    open={showProExpiredModal}
+                    onClose={closeProExpiredModal}
+                    onConfirm={confirmProExpiredModal}
+                    onReSubscribe={openStore}
+                />
+            </Suspense>
+        );
+    } else if (showSupporterUnlockedModal) {
+        activeStatusModal = (
+            <Suspense fallback={null}>
+                <SupporterUnlockedModal
+                    open={showSupporterUnlockedModal}
+                    onClose={closeSupporterUnlockedModal}
+                    onConfirm={confirmSupporterUnlockedModal}
+                />
+            </Suspense>
+        );
+    }
 
     return (
         <>
@@ -183,6 +225,8 @@ export function DashboardModals({
                     />
                 </Suspense>
             )}
+            {/* Affichage séquentiel de la modale de statut active (file d'attente sans superposition) */}
+            {activeStatusModal}
         </>
     );
 }

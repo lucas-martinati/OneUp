@@ -54,6 +54,17 @@ export async function loadPurchase() {
   return null;
 }
 
+export function listenToPurchaseFromCloud(callback) {
+  const auth = getAuthInstance();
+  const database = getDatabaseInstance();
+  if (!auth?.currentUser || !database) return () => {};
+
+  return onValue(ref(database, paths.userPurchase(auth.currentUser.uid)), (snapshot) => {
+    callback(snapshot.exists() ? snapshot.val() : null);
+  });
+}
+
+
 // ── Routines ────────────────────────────────────────────────────────────
 
 export async function saveRoutinesToCloud(routines) {

@@ -541,7 +541,45 @@
     "priceYearly": "€ 19,99/anno",
     "promotionalDesc": "Donato dal team OneUp",
     "title": "Abbonamento Pro",
-    "yearlySavings": "-17%"
+    "yearlySavings": "-17%",
+    "unlockedModal": {
+      "title": "Benvenuto in OneUp Pro!",
+      "subtitle": "Accesso illimitato attivato! 🎉",
+      "description": "Grazie per il tuo supporto. Ecco tutto ciò che hai sbloccato:",
+      "features": {
+        "custom": {
+          "title": "Esercizi e Categorie Personalizzati",
+          "desc": "Crea i tuoi esercizi e organizza i tuoi allenamenti come preferisci."
+        },
+        "weights": {
+          "title": "Dashboard Pesi e Sovraccarico",
+          "desc": "Tracciamento preciso dei carichi con suggerimenti di sovraccarico progressivo."
+        },
+        "stats": {
+          "title": "Statistiche Unificate e Cronologia",
+          "desc": "Visualizza tutta la tua progressione in grafici dettagliati."
+        },
+        "themes": {
+          "title": "Temi Premium Esclusivi",
+          "desc": "Personalizza l'app con temi estetici unici."
+        },
+        "freeze": {
+          "title": "Protezione Serie (Streak Freeze)",
+          "desc": "Proteggi la tua serie di giorni attivi anche nei giorni di riposo."
+        }
+      },
+      "cta": "Esplora le Funzioni Pro"
+    },
+    "expiredModal": {
+      "title": "Il tuo accesso Pro è scaduto",
+      "subtitle": "Il tuo abbonamento è terminato, ma niente paura!",
+      "statsTitle": "Accesso alle tue statistiche:",
+      "statsDesc": "Puoi sempre consultare tutte le tue statistiche e progressi nel pannello Stats.",
+      "repsTitle": "Ripetizioni conservate:",
+      "repsDesc": "Tutte le tue ripetizioni e sessioni completate rimangono salvate nella cronologia.",
+      "renewCta": "Rinnova abbonamento Pro",
+      "dismissCta": "Continua con la versione gratuita"
+    }
   },
   "routines": {
     "load": "Carico",
@@ -700,7 +738,17 @@
     "historyTitle": "Supporto OneUp ❤️",
     "restore": "Ripristina i miei acquisti",
     "thankYou": "Grazie per il vostro supporto! ❤️",
-    "title": "Supporta lo sviluppatore ❤️"
+    "title": "Supporta lo sviluppatore ❤️",
+    "unlockedModal": {
+      "title": "Un Grande Grazie!",
+      "subtitle": "Ora sei un Membro Sostenitore ❤️",
+      "description": "Il tuo supporto permette a OneUp di crescere in modo indipendente. Ecco cosa hai sbloccato:",
+      "badgeTitle": "Badge Sostenitore Esclusivo",
+      "badgeDesc": "Mostrato con orgoglio sul tuo profilo e nelle tue interazioni.",
+      "indieTitle": "Sostegno allo Sviluppo Indipendente",
+      "indieDesc": "Aiuti direttamente a finanziare i server e le prossime funzionalità.",
+      "cta": "È un piacere!"
+    }
   },
   "timer": {
     "remaining": "{{time}} rimasto da tenere premuto",

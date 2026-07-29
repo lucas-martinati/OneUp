@@ -556,7 +556,45 @@
     "priceYearly": "19,99€/an",
     "promotionalDesc": "Offert par l'équipe OneUp",
     "title": "Abonnement Pro",
-    "yearlySavings": "-17%"
+    "yearlySavings": "-17%",
+    "unlockedModal": {
+      "title": "Félicitations !",
+      "subtitle": "Vous êtes désormais membre Pro 🎉",
+      "description": "Votre accès OneUp Pro est maintenant actif. Voici tout ce qui vient d'être débloqué pour vous :",
+      "features": {
+        "custom": {
+          "title": "Exercices & Catégories Sur-Mesure",
+          "desc": "Créez vos propres exercices et organisez des catégories d'entraînement sans limite."
+        },
+        "weights": {
+          "title": "Dashboard Musculation (Poids)",
+          "desc": "Suivez vos répétitions et charges de travail avec précision."
+        },
+        "stats": {
+          "title": "Statistiques Fusionnées & Avancées",
+          "desc": "Analysez votre évolution historique grâce aux graphiques complets."
+        },
+        "themes": {
+          "title": "Thèmes Visuels Exclusifs",
+          "desc": "Personnalisez l'apparence de l'application selon vos envies."
+        },
+        "freeze": {
+          "title": "Protection de Série (Streak Freeze)",
+          "desc": "Conservez votre série d'entraînement même lors des jours de repos."
+        }
+      },
+      "cta": "Découvrir mes avantages"
+    },
+    "expiredModal": {
+      "title": "Votre accès Pro a expiré",
+      "subtitle": "Votre abonnement s'est terminé, mais pas d'inquiétude !",
+      "statsTitle": "Accès à vos statistiques :",
+      "statsDesc": "Vous pouvez toujours consulter l'ensemble de vos statistiques et progressions dans le panneau Stats.",
+      "repsTitle": "Répétitions conservées :",
+      "repsDesc": "Toutes vos répétitions et séances déjà effectuées restent comptabilisées dans votre historique.",
+      "renewCta": "Renouveler mon abonnement Pro",
+      "dismissCta": "Continuer en version gratuite"
+    }
   },
   "routines": {
     "load": "Charger",
@@ -715,7 +753,17 @@
     "historyTitle": "Soutien OneUp ❤️",
     "restore": "Restaurer mes achats",
     "thankYou": "Merci pour ton soutien ! ❤️",
-    "title": "Soutenir le développeur ❤️"
+    "title": "Soutenir le développeur ❤️",
+    "unlockedModal": {
+      "title": "Un Grand Merci !",
+      "subtitle": "Vous êtes désormais Membre Supporteur ❤️",
+      "description": "Votre soutien permet de faire vivre et évoluer OneUp de manière indépendante. Voici ce que vous avez débloqué :",
+      "badgeTitle": "Badge Supporteur Exclusif",
+      "badgeDesc": "Affiché fièrement sur votre profil et vos interactions.",
+      "indieTitle": "Soutien au Développement Indépendant",
+      "indieDesc": "Vous aidez directement à financer les serveurs et les futures fonctionnalités.",
+      "cta": "C'est un plaisir !"
+    }
   },
   "timer": {
     "remaining": "Encore {{time}} à tenir",

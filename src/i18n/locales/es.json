@@ -541,7 +541,45 @@
     "priceYearly": "69,99€/año",
     "promotionalDesc": "Regalo del equipo OneUp",
     "title": "Suscripción Pro",
-    "yearlySavings": "-17%"
+    "yearlySavings": "-17%",
+    "unlockedModal": {
+      "title": "¡Bienvenido a OneUp Pro!",
+      "subtitle": "¡Acceso ilimitado activado! 🎉",
+      "description": "Gracias por tu apoyo. Aquí tienes todo lo que has desbloqueado:",
+      "features": {
+        "custom": {
+          "title": "Ejercicios y Categorías Personalizados",
+          "desc": "Crea tus propios ejercicios y organiza tus entrenamientos a tu manera."
+        },
+        "weights": {
+          "title": "Panel de Pesos y Sobrecarga",
+          "desc": "Seguimiento preciso de cargas con sugerencias de sobrecarga progresiva."
+        },
+        "stats": {
+          "title": "Estadísticas Fusionadas e Historial",
+          "desc": "Visualiza toda tu progresión en gráficos detallados."
+        },
+        "themes": {
+          "title": "Temas Premium Exclusivos",
+          "desc": "Personaliza la aplicación con temas estéticos únicos."
+        },
+        "freeze": {
+          "title": "Protección de Racha (Streak Freeze)",
+          "desc": "Protege tu racha de días activos incluso en días de descanso."
+        }
+      },
+      "cta": "Explorar Funciones Pro"
+    },
+    "expiredModal": {
+      "title": "Tu acceso Pro ha expirado",
+      "subtitle": "Tu suscripción ha finalizado, ¡pero no te preocupes!",
+      "statsTitle": "Acceso a tus estadísticas:",
+      "statsDesc": "Puedes seguir consultando todas tus estadísticas y progresos en el panel Stats.",
+      "repsTitle": "Repeticiones conservadas:",
+      "repsDesc": "Todas tus repeticiones y sesiones realizadas siguen registradas en tu historial.",
+      "renewCta": "Renovar mi suscripción Pro",
+      "dismissCta": "Continuar con la versión gratuita"
+    }
   },
   "routines": {
     "load": "Cargar",
@@ -700,7 +738,17 @@
     "historyTitle": "Apoyo a OneUp ❤️",
     "restore": "Restaurar mis compras",
     "thankYou": "¡Gracias por tu apoyo! ❤️",
-    "title": "Apoya al desarrollador ❤️"
+    "title": "Apoya al desarrollador ❤️",
+    "unlockedModal": {
+      "title": "¡Muchas Gracias!",
+      "subtitle": "Ahora eres Miembro Partidario ❤️",
+      "description": "Tu apoyo permite mantener y hacer evolucionar OneUp de forma independiente. Esto es lo que has desbloqueado:",
+      "badgeTitle": "Insignia Exclusiva de Partidario",
+      "badgeDesc": "Mostrada con orgullo en tu perfil e interacciones.",
+      "indieTitle": "Apoyo al Desarrollo Independiente",
+      "indieDesc": "Ayudas directamente a financiar los servidores y las futuras funciones.",
+      "cta": "¡Es un placer!"
+    }
   },
   "timer": {
     "remaining": "{{time}} restantes para mantener",

@@ -94,7 +94,7 @@ export function Dashboard() {
       loadFromCloud, syncWithCloud, hasGuestData, clearAnonymousData, mergeWithAnonymousData, updateSettings,
     }), [rawResolveConflict, loadFromCloud, syncWithCloud, hasGuestData, clearAnonymousData, mergeWithAnonymousData, updateSettings]);
 
-    const { showAnnouncement, announcement, dismissAnnouncement } = useAnnouncement();
+    const { showAnnouncement, announcement, dismissAnnouncement, confirmAnnouncement } = useAnnouncement();
 
     // ── Slides State ──
     const fullCategoryOrder = useMemo(() => buildFullCategoryOrder(customCategories), [customCategories]);
@@ -251,7 +251,7 @@ export function Dashboard() {
     return (
         <>
             <ConflictOverlay conflictData={conflictData} onResolveConflict={onResolveConflict} />
-            {showAnnouncement && <AnnouncementOverlay announcement={announcement} onDismiss={dismissAnnouncement} />}
+            {showAnnouncement && <AnnouncementOverlay announcement={announcement} onDismiss={dismissAnnouncement} onConfirm={confirmAnnouncement} />}
             <NotificationManager />
             <CSSConfetti
                 active={showDayConfetti}

@@ -541,7 +541,45 @@
     "priceYearly": "19,99 €/Jahr",
     "promotionalDesc": "Geschenkt vom OneUp-Team",
     "title": "Pro-Abonnement",
-    "yearlySavings": "-17%"
+    "yearlySavings": "-17%",
+    "unlockedModal": {
+      "title": "Willkommen bei OneUp Pro!",
+      "subtitle": "Unbegrenzter Zugang aktiviert! 🎉",
+      "description": "Vielen Dank für deine Unterstützung. Das hast du freigeschaltet:",
+      "features": {
+        "custom": {
+          "title": "Eigene Übungen & Kategorien",
+          "desc": "Erstelle eigene Übungen und organisiere dein Training nach deinen Wünschen."
+        },
+        "weights": {
+          "title": "Gewichts- & Überlastungs-Dashboard",
+          "desc": "Präzises Gewichtstracking mit Vorschlägen zur progressiven Überlastung."
+        },
+        "stats": {
+          "title": "Zusammengeführte Statistiken & Verlauf",
+          "desc": "Visualisiere deinen gesamten Fortschritt in detaillierten Diagrammen."
+        },
+        "themes": {
+          "title": "Exklusive Premium-Themes",
+          "desc": "Personalisiere das Erscheinungsbild der App mit einzigartigen Themes."
+        },
+        "freeze": {
+          "title": "Streak-Schutz (Streak Freeze)",
+          "desc": "Schütze deine Serie auch an Ruhetagen."
+        }
+      },
+      "cta": "Pro-Funktionen entdecken"
+    },
+    "expiredModal": {
+      "title": "Dein Pro-Zugang ist abgelaufen",
+      "subtitle": "Dein Abonnement ist beendet, aber keine Sorge!",
+      "statsTitle": "Zugriff auf deine Statistiken:",
+      "statsDesc": "Du kannst weiterhin all deine Statistiken und Fortschritte im Stats-Bereich einsehen.",
+      "repsTitle": "Gespeicherte Wiederholungen:",
+      "repsDesc": "Alle deine absolvierten Wiederholungen und Einheiten bleiben in deinem Verlauf gespeichert.",
+      "renewCta": "Pro-Abonnement verlängern",
+      "dismissCta": "Mit Gratis-Version fortfahren"
+    }
   },
   "routines": {
     "load": "Laden",
@@ -700,7 +738,17 @@
     "historyTitle": "OneUp-Support ❤️",
     "restore": "Meine Einkäufe wiederherstellen",
     "thankYou": "Vielen Dank für Ihre Unterstützung! ❤️",
-    "title": "Unterstützen Sie den Entwickler ❤️"
+    "title": "Unterstützen Sie den Entwickler ❤️",
+    "unlockedModal": {
+      "title": "Vielen Herzlichen Dank!",
+      "subtitle": "Du bist jetzt ein Unterstützer-Mitglied ❤️",
+      "description": "Deine Unterstützung hilft OneUp unabhängig zu halten und weiterzuentwickeln. Das hast du freigeschaltet:",
+      "badgeTitle": "Exklusives Unterstützer-Badge",
+      "badgeDesc": "Stolz in deinem Profil und bei Interaktionen angezeigt.",
+      "indieTitle": "Unterstützung für Indie-Entwicklung",
+      "indieDesc": "Du hilfst direkt bei der Finanzierung von Servern und kommenden Funktionen.",
+      "cta": "Sehr gerne!"
+    }
   },
   "timer": {
     "remaining": "{{time}} bleibt zu halten",

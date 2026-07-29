@@ -22,13 +22,18 @@ import { useBackHandler } from '@hooks/useBackHandler';
  *
  * @param {{ announcement: object, onDismiss: () => void }} props
  */
-export function AnnouncementOverlay({ announcement, onDismiss }) {
+export function AnnouncementOverlay({ announcement, onDismiss, onConfirm }) {
   const { t } = useTranslation();
   const [exiting, setExiting] = useState(false);
 
   const handleDismiss = () => {
     setExiting(true);
     setTimeout(onDismiss, 400);
+  };
+
+  const handleConfirm = () => {
+    setExiting(true);
+    setTimeout(() => (onConfirm ? onConfirm() : onDismiss()), 400);
   };
 
   // Handle back button to dismiss announcement
@@ -118,7 +123,7 @@ export function AnnouncementOverlay({ announcement, onDismiss }) {
         {/* CTA Button */}
         <button
           className="ann-cta"
-          onClick={handleDismiss}
+          onClick={handleConfirm}
           onPointerDown={(e) => { e.currentTarget.style.transform = 'scale(0.97)'; }}
           onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
           onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}

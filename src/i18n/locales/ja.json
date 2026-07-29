@@ -541,7 +541,45 @@
     "priceYearly": "€19.99/年",
     "promotionalDesc": "OneUp チームからの贈り物",
     "title": "プロのサブスクリプション",
-    "yearlySavings": "-17%"
+    "yearlySavings": "-17%",
+    "unlockedModal": {
+      "title": "OneUp Proへようこそ！",
+      "subtitle": "無制限アクセスが有効化されました！🎉",
+      "description": "ご支援ありがとうございます。解放された機能はこちらです：",
+      "features": {
+        "custom": {
+          "title": "カスタム種目＆カテゴリー",
+          "desc": "オリジナル種目を作成し、自由なスタイルでトレーニングを整理。"
+        },
+        "weights": {
+          "title": "重量＆プログレッシブオーバーロード看板",
+          "desc": "負荷を正確に記録し、漸進的過負荷の提案を受けられます。"
+        },
+        "stats": {
+          "title": "統合統計＆履歴",
+          "desc": "詳細なグラフで成長の軌跡をすべて可視化。"
+        },
+        "themes": {
+          "title": "限定プレミアムテーマ",
+          "desc": "洗練された限定テーマでアプリをカスタマイズ。"
+        },
+        "freeze": {
+          "title": "ストリーク保護 (Streak Freeze)",
+          "desc": "休養日でも継続記録（ストリーク）をしっかり保護。"
+        }
+      },
+      "cta": "Pro機能を探索する"
+    },
+    "expiredModal": {
+      "title": "Proアクセス期限が切れました",
+      "subtitle": "サブスクリプションは終了しましたが、ご安心ください！",
+      "statsTitle": "統計へのアクセス：",
+      "statsDesc": "Statsタブでいつでもこれまでの全統計や成長グラフを確認できます。",
+      "repsTitle": "回数・履歴の保持：",
+      "repsDesc": "完了した回数やセッション履歴はすべて安全に保存されています。",
+      "renewCta": "Proサブスクリプションを更新",
+      "dismissCta": "無料版で継続する"
+    }
   },
   "routines": {
     "load": "負荷",
@@ -700,7 +738,17 @@
     "historyTitle": "ワンアップサポート❤️",
     "restore": "購入したものを復元する",
     "thankYou": "ご支援ありがとうございます！ ❤️",
-    "title": "開発者をサポートします❤️"
+    "title": "開発者をサポートします❤️",
+    "unlockedModal": {
+      "title": "心より感謝いたします！",
+      "subtitle": "サポーターメンバーになりました ❤️",
+      "description": "皆様のご支援がOneUpの独立した開発と運営を支えています。解放された特典：",
+      "badgeTitle": "限定サポーターバッジ",
+      "badgeDesc": "プロフィールやランキングで誇らしく表示されます。",
+      "indieTitle": "個人開発への支援",
+      "indieDesc": "サーバー費用や今後の新機能開発に直接役立てられます。",
+      "cta": "どういたしまして！"
+    }
   },
   "timer": {
     "remaining": "{{time}} はまだ保持されています",

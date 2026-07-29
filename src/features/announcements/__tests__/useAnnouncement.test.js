@@ -79,7 +79,7 @@ describe('useAnnouncement', () => {
     expect(result.current.showAnnouncement).toBe(false);
   });
 
-  it('dismissing the announcement hides it and saves to localStorage', () => {
+  it('dismissing the announcement hides it for session without saving to localStorage', () => {
     localStorage.setItem(RETURNING_USER_KEY, '1');
 
     const { result } = renderHook(() => useAnnouncement());
@@ -92,6 +92,26 @@ describe('useAnnouncement', () => {
 
     act(() => {
       result.current.dismissAnnouncement();
+    });
+
+    expect(result.current.showAnnouncement).toBe(false);
+    // Dismissing without validating does NOT mark as permanently seen
+    expect(localStorage.getItem(STORAGE_PREFIX + CURRENT_ANNOUNCEMENT.id)).toBeNull();
+  });
+
+  it('confirming the announcement hides it and saves permanently to localStorage', () => {
+    localStorage.setItem(RETURNING_USER_KEY, '1');
+
+    const { result } = renderHook(() => useAnnouncement());
+
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
+
+    expect(result.current.showAnnouncement).toBe(true);
+
+    act(() => {
+      result.current.confirmAnnouncement();
     });
 
     expect(result.current.showAnnouncement).toBe(false);
