@@ -233,18 +233,46 @@ set_secret() {
     echo -e "  ${RED}✗${RESET}  Erreur lors de la vérification du secret ${BOLD}${name}${RESET} (HTTP $check_status)"
     return 1
   else
-    # Étape 2 : Vérifier si la valeur de la dernière version active est identique
-    local latest_payload
-    latest_payload=$(curl -s \
+    # Étape 2 : Vérifier si la version active (ENABLED) contient déjà la même valeur
+    local enabled_ver
+    enabled_ver=$(curl -s \
       -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-      "${SM_API}/projects/${PROJECT_ID}/secrets/${name}/versions/latest/access")
+      "${SM_API}/projects/${PROJECT_ID}/secrets/${name}/versions?filter=state%3DENABLED" | python3 -c "
+import sys, json
+try:
+    v = json.load(sys.stdin).get('versions', [])
+    print(v[0]['name'] if v else '')
+except Exception:
+    pass
+" 2>/dev/null)
 
-    local current_b64
-    current_b64=$(echo "$latest_payload" | python3 -c "import sys,json; print(json.load(sys.stdin).get('payload',{}).get('data',''))" 2>/dev/null)
+    if [ -n "$enabled_ver" ]; then
+      local is_match
+      is_match=$(curl -s \
+        -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+        "${SM_API}/${enabled_ver}:access" | python3 -c "
+import sys, json, base64
+try:
+    data = json.load(sys.stdin)
+    b64 = data.get('payload', {}).get('data', '')
+    if not b64:
+        sys.exit(1)
+    b64_clean = b64.replace('-', '+').replace('_', '/')
+    pad = len(b64_clean) % 4
+    if pad:
+        b64_clean += '=' * (4 - pad)
+    decoded = base64.b64decode(b64_clean).decode('utf-8')
+    target = sys.argv[1] if len(sys.argv) > 1 else ''
+    if decoded.strip() == target.strip():
+        print('MATCH')
+except Exception:
+    pass
+" "$value" 2>/dev/null)
 
-    if [ "$current_b64" = "$b64_value" ]; then
-      echo -e "  ${GREEN}✓${RESET}  ${name} — ${GRAY}inchangé (déjà à jour)${RESET}"
-      return 0
+      if [ "$is_match" = "MATCH" ]; then
+        echo -e "  ${GREEN}✓${RESET}  ${name} — ${GRAY}inchangé (déjà à jour)${RESET}"
+        return 0
+      fi
     fi
   fi
 
