@@ -13,6 +13,7 @@ set -euo pipefail
 # Liste des secrets à configurer
 declare -a SECRET_NAMES=(
   "ADMIN_API_KEY"
+  "REVENUECAT_WEBHOOK_SECRET"
 )
 
 # ─── Résoudre le répertoire racine du projet ─────────────────────────────────
