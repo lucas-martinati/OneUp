@@ -7,7 +7,7 @@ import { haptics } from '@utils/hapticsManager';
  * jellies (dropletSquish) each time the state flips. Chrome lives in
  * components.css (.toggle*); only the per-row active gradient stays inline.
  */
-export function ToggleSwitch({ enabled, onClick, activeGradient = 'var(--gradient-glow)' }) {
+export function ToggleSwitch({ enabled, onClick, activeGradient = 'var(--gradient-primary)' }) {
     const { t } = useTranslation();
     const [squishing, setSquishing] = useState(false);
     const [prevEnabled, setPrevEnabled] = useState(enabled);

@@ -174,6 +174,9 @@ button:focus:not(:focus-visible) {
   padding: 0 4px;
   border: none;
   border-radius: var(--radius-full);
+  background-origin: border-box;
+  background-clip: border-box;
+  background-repeat: no-repeat;
   cursor: pointer;
   background: var(--surface-hover);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
@@ -182,6 +185,7 @@ button:focus:not(:focus-visible) {
 
 .toggle--on {
   box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.25),
     0 2px 10px rgba(0, 0, 0, 0.2);
 }
