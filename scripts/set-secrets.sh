@@ -197,12 +197,16 @@ fi
 echo ""
 
 # ─── Fonction pour créer/mettre à jour un secret via l'API ───────────────────
-# L'API Secret Manager fonctionne en deux étapes :
+# L'API Secret Manager fonctionne en plusieurs étapes :
 #   1. Créer le secret (si pas encore existant)
-#   2. Ajouter une nouvelle version avec la valeur
+#   2. Vérifier si la valeur actuelle (latest) est identique -> si oui, ne rien faire
+#   3. Ajouter la nouvelle version si la valeur a changé
+#   4. Détruire les anciennes versions ENABLED pour éviter toute facturation
 set_secret() {
   local name="$1"
   local value="$2"
+  local b64_value
+  b64_value=$(echo -n "$value" | openssl base64 -A)
 
   # Étape 1 : Créer le secret s'il n'existe pas
   local check_status
@@ -231,12 +235,23 @@ set_secret() {
   elif [ "$check_status" != "200" ]; then
     echo -e "  ${RED}✗${RESET}  Erreur lors de la vérification du secret ${BOLD}${name}${RESET} (HTTP $check_status)"
     return 1
+  else
+    # Étape 2 : Vérifier si la valeur de la dernière version active est identique
+    local latest_payload
+    latest_payload=$(curl -s \
+      -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+      "${SM_API}/projects/${PROJECT_ID}/secrets/${name}/versions/latest/access")
+
+    local current_b64
+    current_b64=$(echo "$latest_payload" | python3 -c "import sys,json; print(json.load(sys.stdin).get('payload',{}).get('data',''))" 2>/dev/null)
+
+    if [ "$current_b64" = "$b64_value" ]; then
+      echo -e "  ${GREEN}✓${RESET}  ${name} — ${GRAY}inchangé (déjà à jour)${RESET}"
+      return 0
+    fi
   fi
 
-  # Étape 2 : Ajouter une nouvelle version avec la valeur en base64
-  local b64_value
-  b64_value=$(echo -n "$value" | openssl base64 -A)
-
+  # Étape 3 : Ajouter une nouvelle version avec la valeur en base64
   local add_response
   add_response=$(curl -s -w "\n%{http_code}" \
     -X POST \
@@ -248,12 +263,39 @@ set_secret() {
   local add_status
   add_status=$(echo "$add_response" | tail -1)
 
-  if [ "$add_status" = "200" ]; then
-    return 0
-  else
+  if [ "$add_status" != "200" ]; then
+    echo -e "  ${RED}✗${RESET}  Impossible d'ajouter une version pour ${BOLD}${name}${RESET}"
     echo "$add_response" | head -n -1 | head -3
     return 1
   fi
+
+  local new_version_name
+  new_version_name=$(echo "$add_response" | head -n -1 | python3 -c "import sys,json; print(json.load(sys.stdin).get('name',''))" 2>/dev/null)
+
+  # Étape 4 : Nettoyer automatiquement les anciennes versions encore actives
+  local versions_json
+  versions_json=$(curl -s \
+    -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+    "${SM_API}/projects/${PROJECT_ID}/secrets/${name}/versions?filter=state%3DENABLED")
+
+  echo "$versions_json" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+new_ver = '$new_version_name'
+for v in data.get('versions', []):
+    vname = v.get('name', '')
+    if vname and vname != new_ver and v.get('state') == 'ENABLED':
+        print(vname)
+" 2>/dev/null | while read -r old_ver; do
+    if [ -n "$old_ver" ]; then
+      curl -s -X POST \
+        -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+        "${SM_API}/${old_ver}:destroy" >/dev/null
+    fi
+  done
+
+  echo -e "  ${GREEN}✓${RESET}  ${name} — ${GREEN}mis à jour (anciennes versions nettoyées)${RESET}"
+  return 0
 }
 
 # ─── Envoi des secrets ───────────────────────────────────────────────────────
@@ -272,14 +314,12 @@ for SECRET_NAME in "${SECRET_NAMES[@]}"; do
   fi
 
   TOTAL=$((TOTAL + 1))
-  echo -e "  ${BLUE}▸${RESET}  Envoi de ${BOLD}${SECRET_NAME}${RESET}..."
+  echo -e "  ${BLUE}▸${RESET}  Traitement de ${BOLD}${SECRET_NAME}${RESET}..."
 
   if set_secret "$SECRET_NAME" "$VALUE"; then
     SUCCESS=$((SUCCESS + 1))
-    echo -e "  ${GREEN}✓${RESET}  ${SECRET_NAME} — ${GREEN}configuré${RESET}"
   else
     FAILED=$((FAILED + 1))
-    echo -e "  ${RED}✗${RESET}  ${SECRET_NAME} — ${RED}échec${RESET}"
   fi
 
   echo ""
