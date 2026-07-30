@@ -10,6 +10,11 @@
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
+# Liste des secrets à configurer
+declare -a SECRET_NAMES=(
+  "ADMIN_API_KEY"
+)
+
 # ─── Résoudre le répertoire racine du projet ─────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -141,15 +146,6 @@ if [ -z "$PROJECT_ID" ]; then
 fi
 
 SM_API="https://secretmanager.googleapis.com/v1"
-
-# Liste des secrets à configurer
-declare -a SECRET_NAMES=(
-  "STRAVA_CLIENT_ID"
-  "STRAVA_CLIENT_SECRET"
-  "GOOGLE_HEALTH_CLIENT_ID"
-  "GOOGLE_HEALTH_CLIENT_SECRET"
-  "ADMIN_API_KEY"
-)
 
 # Mapping vers les clés .env (avec fallback VITE_ → sans VITE_)
 get_secret_value() {
