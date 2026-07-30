@@ -6,92 +6,163 @@
    tokens so buttons follow the active theme. */
 
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  box-sizing: border-box;
   font-family: inherit;
   font-weight: 700;
-  border: 1px solid transparent;
   border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background-clip: padding-box;
   cursor: pointer;
   white-space: nowrap;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  backface-visibility: hidden;
   transition:
     background var(--motion-fast) ease,
     border-color var(--motion-fast) ease,
     box-shadow var(--motion-fast) ease,
     opacity var(--motion-fast) ease,
-    filter var(--motion-fast) ease,
     transform var(--motion-fast) ease;
 }
 
+.btn:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 2px;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
+  cursor: not-allowed;
   pointer-events: none;
 }
 
-.btn--full { width: 100%; }
+.btn--full {
+  width: 100%;
+}
 
 /* Sizes */
-.btn--sm { padding: 8px 14px; font-size: var(--text-sm); min-height: 36px; }
-.btn--md { padding: 12px 20px; font-size: var(--text-md); min-height: var(--touch-min); }
-.btn--lg { padding: 16px 24px; font-size: 1rem; min-height: 52px; }
+.btn--sm {
+  padding: 6px 14px;
+  font-size: var(--text-sm);
+  min-height: 36px;
+  border-radius: var(--radius-sm);
+}
+
+.btn--md {
+  padding: 10px 18px;
+  font-size: var(--text-md);
+  min-height: var(--touch-min);
+  border-radius: var(--radius-md);
+}
+
+.btn--lg {
+  padding: 14px 24px;
+  font-size: 1rem;
+  min-height: 50px;
+  border-radius: var(--radius-lg);
+}
 
 /* Variants */
-/* Soft two-tone gradient + discreet colored shadow: the previous
-   --gradient-glow + --glow-accent halo made every primary CTA shout
-   compared to the rest of the UI. */
+
+/* Primary CTA: Theme gradient + subtle top inner highlight + crisp border */
 .btn--primary {
   background: var(--gradient-primary);
-  color: #fff;
-  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 25%, transparent);
+  color: var(--text-on-surface, #ffffff);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--accent) 28%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .btn--primary:hover:not(:disabled) {
-  filter: brightness(1.07);
+  opacity: 0.94;
+  box-shadow:
+    0 6px 18px color-mix(in srgb, var(--accent) 40%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
+/* Secondary: Subtle glass surface with soft border */
 .btn--secondary {
   background: var(--surface-muted);
   color: var(--text-primary);
   border-color: var(--border-default);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .btn--secondary:hover:not(:disabled) {
   background: var(--surface-hover);
   border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
+/* Success CTA: Vibrant green gradient */
 .btn--success {
   background: linear-gradient(135deg, var(--success), #059669);
-  color: #fff;
-  box-shadow: var(--glow-success-sm);
+  color: #ffffff;
+  border-color: color-mix(in srgb, var(--success) 35%, transparent);
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--success) 28%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
+.btn--success:hover:not(:disabled) {
+  opacity: 0.94;
+  box-shadow:
+    0 6px 18px color-mix(in srgb, var(--success) 40%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/* Danger CTA: Destructive red gradient */
 .btn--danger {
   background: linear-gradient(135deg, var(--error), #dc2626);
-  color: #fff;
-  box-shadow: var(--glow-error);
+  color: #ffffff;
+  border-color: color-mix(in srgb, var(--error) 35%, transparent);
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--error) 28%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* Gold-tinted glass pill for store entry points — gold is the app-wide
-   premium accent (.gold-text, --glow-gold), unlike the success green. */
+.btn--danger:hover:not(:disabled) {
+  opacity: 0.94;
+  box-shadow:
+    0 6px 18px color-mix(in srgb, var(--error) 40%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/* Premium: Gold-tinted glass pill */
 .btn--premium {
   background: var(--gradient-gold-trans);
   color: var(--color-gold);
-  border-color: color-mix(in srgb, var(--color-gold) 30%, transparent);
+  border-color: color-mix(in srgb, var(--color-gold) 40%, transparent);
   border-radius: var(--radius-full);
   letter-spacing: 0.5px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .btn--premium:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-gold) 55%, transparent);
+  border-color: color-mix(in srgb, var(--color-gold) 65%, transparent);
   box-shadow: var(--glow-gold);
+  opacity: 0.94;
 }
 
+/* Ghost: Borderless light surface */
 .btn--ghost {
   background: transparent;
   color: var(--text-secondary);
+  border-color: transparent;
 }
 
 .btn--ghost:hover:not(:disabled) {
@@ -99,14 +170,17 @@
   color: var(--text-primary);
 }
 
-/* Red-tinted ghost for destructive secondary actions (delete account…). */
+/* Danger Ghost: Red-tinted outlined ghost */
 .btn--danger-ghost {
   background: transparent;
   color: var(--error);
-  border-color: color-mix(in srgb, var(--error) 20%, transparent);
+  border-color: color-mix(in srgb, var(--error) 25%, transparent);
 }
 
 .btn--danger-ghost:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--error) 10%, transparent);
-  border-color: color-mix(in srgb, var(--error) 40%, transparent);
+  background: color-mix(in srgb, var(--error) 12%, transparent);
+  border-color: color-mix(in srgb, var(--error) 45%, transparent);
+  color: var(--error);
 }
+
+

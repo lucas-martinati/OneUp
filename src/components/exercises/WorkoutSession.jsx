@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { X, Play, Check, Save, Trash2, GripVertical, Pencil, Shuffle, ChevronUp, ChevronDown, DynamicIcon } from '@utils/icons';
 import { Button, IconButton, ToggleSwitch } from '@components/ui';
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
@@ -15,8 +15,6 @@ import styles from '@styles/WorkoutSession.module.css';
 const MAX_ICON_DOTS = 5;
 
 // Lets mouse users scroll the horizontal routines strip with the wheel.
-// Native non-passive listener: React registers onWheel as passive, so
-// preventDefault() (needed to stop the page scrolling too) would be ignored.
 function useHorizontalWheelScroll(ref, enabled) {
     useEffect(() => {
         const el = ref.current;
@@ -32,17 +30,51 @@ function useHorizontalWheelScroll(ref, enabled) {
     }, [ref, enabled]);
 }
 
+// Helper to pre-group exercises by category for cleaner JSX
+function useCategorySections(fullCategoryOrder, exerciseInfo, customCategories, t) {
+    return useMemo(() => {
+        const categoryMap = {
+            [CATEGORIES.CUSTOM]: 'custom',
+            [CATEGORIES.BODYWEIGHT]: 'bodyweight',
+            [CATEGORIES.WEIGHTS]: 'weights'
+        };
+
+        return fullCategoryOrder
+            .map(catId => {
+                if (catId === CATEGORIES.CARDIO) return null;
+                const targetCategory = categoryMap[catId] || catId;
+                const catExercises = exerciseInfo.filter(ex => ex.category === targetCategory);
+                if (catExercises.length === 0) return null;
+
+                const catDef = customCategories.find(c => c.id === catId);
+                let catTitle;
+                if (isUserCategory(catId)) {
+                    catTitle = catDef?.name || catId;
+                } else {
+                    let fallbackTitle = t('workout.custom');
+                    if (catId === CATEGORIES.BODYWEIGHT) {
+                        fallbackTitle = t('common.bodyweight');
+                    } else if (catId === CATEGORIES.WEIGHTS) {
+                        fallbackTitle = t('common.weights');
+                    }
+                    catTitle = catDef?.name || fallbackTitle;
+                }
+
+                return { catId, catTitle, catExercises };
+            })
+            .filter(Boolean);
+    }, [fullCategoryOrder, exerciseInfo, customCategories, t]);
+}
+
 // ── Routine card ────────────────────────────────────────────────────────
-// The whole card loads the routine; edit/delete are small secondary
-// actions and the delete confirmation swaps in over the card itself.
 function RoutineCard({ routine, index, allExercisesMap, confirming, onLoad, onEdit, onDelete, onCancelDelete, onAskDelete, t }) {
-    const exercises = routine.exerciseIds
-        .map(exId => allExercisesMap[exId])
-        .filter(Boolean);
-    // Max 5 dots in total: when overflowing, the "+N" dot takes the 5th slot.
-    const shown = exercises.length > MAX_ICON_DOTS
-        ? exercises.slice(0, MAX_ICON_DOTS - 1)
-        : exercises;
+    const exercises = useMemo(() => (
+        routine.exerciseIds
+            .map(exId => allExercisesMap[exId])
+            .filter(Boolean)
+    ), [routine.exerciseIds, allExercisesMap]);
+
+    const shown = exercises.length > MAX_ICON_DOTS ? exercises.slice(0, MAX_ICON_DOTS - 1) : exercises;
     const extra = exercises.length - shown.length;
 
     return (
@@ -53,20 +85,22 @@ function RoutineCard({ routine, index, allExercisesMap, confirming, onLoad, onEd
         >
             <div className={styles.routineTop}>
                 <div className={styles.routineName}>{routine.name}</div>
-                <button
-                    className={styles.cardActionBtn}
-                    onClick={(e) => { e.stopPropagation(); onEdit(routine); }}
-                    aria-label={t('common.edit')}
-                >
-                    <Pencil size={14} />
-                </button>
-                <button
-                    className={`${styles.cardActionBtn} ${styles.cardActionBtnDanger}`}
-                    onClick={(e) => { e.stopPropagation(); onAskDelete(routine.id); }}
-                    aria-label={t('common.delete')}
-                >
-                    <Trash2 size={14} />
-                </button>
+                <div className="row gap-4">
+                    <button
+                        className={styles.cardActionBtn}
+                        onClick={(e) => { e.stopPropagation(); onEdit(routine); }}
+                        aria-label={t('common.edit')}
+                    >
+                        <Pencil size={14} />
+                    </button>
+                    <button
+                        className={`${styles.cardActionBtn} ${styles.cardActionBtnDanger}`}
+                        onClick={(e) => { e.stopPropagation(); onAskDelete(routine.id); }}
+                        aria-label={t('common.delete')}
+                    >
+                        <Trash2 size={14} />
+                    </button>
+                </div>
             </div>
             <div className={styles.routineMeta}>
                 {t('common.exerciseCount', { count: exercises.length })}
@@ -170,103 +204,78 @@ export function WorkoutSession(props) {
     const routinesStripRef = useRef(null);
     useHorizontalWheelScroll(routinesStripRef, phase === 'config' && routines.length > 0);
 
+    const categorySections = useCategorySections(fullCategoryOrder, exerciseInfo, customCategories, t);
 
     if (phase === 'config') {
         return (
             <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
-                <div className="modal-content">
-                {/* Header */}
-                <div className={styles.header}>
-                    <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
-                        {isStarted ? t('common.edit') : t('dashboard.session')}
-                    </h2>
-                    <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label={t('common.close')} />
-                </div>
+                <div className={`modal-content ${styles.modalContent}`}>
+                    {/* Header */}
+                    <div className={styles.header}>
+                        <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
+                            {isStarted ? t('common.edit') : t('dashboard.session')}
+                        </h2>
+                        <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label={t('common.close')} />
+                    </div>
 
-                <div className={styles.body}>
-                    {/* ── Routines: always visible, one tap to load ── */}
-                    {routines.length > 0 && (
-                        <div className="flex-col gap-8">
-                            <div className="section-label" style={{ margin: 0 }}>
-                                {t('routines.title')}
+                    <div className={styles.body}>
+                        {/* ── Routines: strip list ── */}
+                        {routines.length > 0 && (
+                            <div className={styles.sectionCol}>
+                                <div className="section-label" style={{ margin: 0 }}>
+                                    {t('routines.title')}
+                                </div>
+                                <div ref={routinesStripRef} className={styles.routinesStrip}>
+                                    {routines.map((routine, i) => (
+                                        <RoutineCard
+                                            key={routine.id}
+                                            routine={routine}
+                                            index={i}
+                                            allExercisesMap={allExercisesMap}
+                                            confirming={confirmDeleteId === routine.id}
+                                            onLoad={loadRoutine}
+                                            onEdit={editRoutine}
+                                            onAskDelete={setConfirmDeleteId}
+                                            onDelete={(id) => { deleteRoutine?.(id); setConfirmDeleteId(null); }}
+                                            onCancelDelete={() => setConfirmDeleteId(null)}
+                                            t={t}
+                                        />
+                                    ))}
+                                </div>
                             </div>
-                            <div ref={routinesStripRef} className={styles.routinesStrip}>
-                                {routines.map((routine, i) => (
-                                    <RoutineCard
-                                        key={routine.id}
-                                        routine={routine}
-                                        index={i}
-                                        allExercisesMap={allExercisesMap}
-                                        confirming={confirmDeleteId === routine.id}
-                                        onLoad={loadRoutine}
-                                        onEdit={editRoutine}
-                                        onAskDelete={setConfirmDeleteId}
-                                        onDelete={(id) => { deleteRoutine?.(id); setConfirmDeleteId(null); }}
-                                        onCancelDelete={() => setConfirmDeleteId(null)}
-                                        t={t}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                        )}
 
-                    {/* Inter-Dashboard Toggle for Pro Users */}
-                    {canMixDashboards && (
-                        <div className={styles.mixRow}>
-                            <div>
-                                <div className={styles.mixTitle}>{t('workout.interDashboard')}</div>
-                                <div className="hint-text">{t('workout.interDashboardDesc')}</div>
-                            </div>
-                            <ToggleSwitch
-                                enabled={showAll}
-                                onClick={() => {
-                                    const checked = !showAll;
-                                    setShowAll(checked);
-                                    if (!checked) {
-                                        const localIds = new Set(localExercises.map(ex => ex.id));
-                                        setQueue(prev => prev.filter(id => localIds.has(id)));
-                                    }
-                                }}
-                            />
-                        </div>
-                    )}
-
-                    {/* ── Exercise selection grid ── */}
-                    <div className="flex-col gap-8">
-                        <div className="section-label" style={{ margin: 0 }}>
-                            {t('workout.selectExercises')}
-                        </div>
-
-                        {showAll ? (
-                            <div className="flex-col" style={{ gap: '16px' }}>
-                                {fullCategoryOrder.map(catId => {
-                                    if (catId === CATEGORIES.CARDIO) return null;
-                                    const categoryMap = {
-                                        [CATEGORIES.CUSTOM]: 'custom',
-                                        [CATEGORIES.BODYWEIGHT]: 'bodyweight',
-                                        [CATEGORIES.WEIGHTS]: 'weights'
-                                    };
-                                    const targetCategory = categoryMap[catId] || catId;
-                                    const catExercises = exerciseInfo.filter(ex => ex.category === targetCategory);
-                                    if (catExercises.length === 0) return null;
-
-                                    let catTitle;
-                                    if (isUserCategory(catId)) {
-                                        const catDef = customCategories.find(c => c.id === catId);
-                                        catTitle = catDef?.name || catId;
-                                    } else {
-                                        const catDef = customCategories.find(c => c.id === catId);
-                                        let fallbackTitle = t('workout.custom');
-                                        if (catId === CATEGORIES.BODYWEIGHT) {
-                                            fallbackTitle = t('common.bodyweight');
-                                        } else if (catId === CATEGORIES.WEIGHTS) {
-                                            fallbackTitle = t('common.weights');
+                        {/* Inter-Dashboard Toggle for Pro Users */}
+                        {canMixDashboards && (
+                            <div className={styles.mixRow}>
+                                <div className={styles.mixInfo}>
+                                    <div className={styles.mixTitle}>{t('workout.interDashboard')}</div>
+                                    <div className="hint-text">{t('workout.interDashboardDesc')}</div>
+                                </div>
+                                <ToggleSwitch
+                                    enabled={showAll}
+                                    onClick={() => {
+                                        const checked = !showAll;
+                                        setShowAll(checked);
+                                        if (!checked) {
+                                            const localIds = new Set(localExercises.map(ex => ex.id));
+                                            setQueue(prev => prev.filter(id => localIds.has(id)));
                                         }
-                                        catTitle = catDef?.name || fallbackTitle;
-                                    }
+                                    }}
+                                />
+                            </div>
+                        )}
 
-                                    return (
-                                        <div key={catId} className="flex-col gap-8">
+                        {/* ── Exercise selection grid ── */}
+                        <div className={styles.sectionCol}>
+                            <div className="section-label" style={{ margin: 0 }}>
+                                {t('workout.selectExercises')}
+                            </div>
+
+                            {showAll ? (
+                                <div className={styles.categoryStack}>
+                                    {categorySections.map(({ catId, catTitle, catExercises }) => (
+                                        <div key={catId} className={styles.categoryBlock}>
                                             <div
                                                 className={styles.categoryTitle}
                                                 style={{ color: fullCategoryColors[catId] || 'var(--text-secondary)' }}
@@ -281,183 +290,182 @@ export function WorkoutSession(props) {
                                                 })}
                                             </div>
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        ) : (
-                            <div className={styles.grid}>
-                                {exerciseInfo.map(ex => {
-                                    const selected = queue.includes(ex.id);
-                                    const orderNum = selected ? queue.indexOf(ex.id) + 1 : null;
-                                    return <ExerciseGridItem key={ex.id} ex={ex} selected={selected} orderNum={orderNum} onToggle={toggleExercise} t={t} />;
-                                })}
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className={styles.grid}>
+                                    {exerciseInfo.map(ex => {
+                                        const selected = queue.includes(ex.id);
+                                        const orderNum = selected ? queue.indexOf(ex.id) + 1 : null;
+                                        return <ExerciseGridItem key={ex.id} ex={ex} selected={selected} orderNum={orderNum} onToggle={toggleExercise} t={t} />;
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* ── Selected queue ("your order") ── */}
+                        {queue.length > 0 && (
+                            <div className={styles.sectionCol}>
+                                <div className={styles.queueHeader}>
+                                    <div className="section-label" style={{ margin: 0 }}>
+                                        {t('workout.yourOrder')} ({queue.length})
+                                    </div>
+                                    <div className={styles.queueActions}>
+                                        {queue.length >= 2 && (
+                                            <Button size="sm" variant="ghost" icon={Shuffle} onClick={shuffleQueue}>
+                                                {t('workout.shuffle')}
+                                            </Button>
+                                        )}
+                                        <Button size="sm" variant="danger-ghost" icon={Trash2} onClick={clearQueue}>
+                                            {t('workout.clearAll')}
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div ref={queueListRef} className={styles.queuePanel}>
+                                    {queue.map((id, i) => {
+                                        const ex = allExercisesMap[id];
+                                        if (!ex) return null;
+                                        const isDragging = dragIdx === i;
+                                        const isDragOver = dragOverIdx === i;
+                                        const isFirst = i === 0;
+                                        const isLast = i === queue.length - 1;
+
+                                        let itemBg = `color-mix(in srgb, ${ex.color} 5%, transparent)`;
+                                        if (isDragging) {
+                                            itemBg = `color-mix(in srgb, ${ex.color} 14%, transparent)`;
+                                        } else if (isDragOver) {
+                                            itemBg = 'color-mix(in srgb, var(--accent-glow) 18%, transparent)';
+                                        }
+
+                                        return (
+                                            <div
+                                                key={id}
+                                                ref={el => itemRefs.current[i] = el}
+                                                draggable
+                                                onDragStart={() => handleDragStart(i)}
+                                                onDragOver={(e) => { e.preventDefault(); handleDragOver(i); }}
+                                                onDragEnd={handleDragEnd}
+                                                onTouchStart={(e) => handleTouchStart(e, i)}
+                                                onTouchMove={handleTouchMove}
+                                                onTouchEnd={handleTouchEnd}
+                                                className={styles.queueItem}
+                                                style={{
+                                                    background: itemBg,
+                                                    border: isDragOver
+                                                        ? '1.5px dashed color-mix(in srgb, var(--accent-glow) 50%, transparent)'
+                                                        : `1px solid color-mix(in srgb, ${ex.color} 12%, transparent)`,
+                                                    opacity: isDragging ? 0.5 : 1,
+                                                    transform: isDragging ? 'scale(0.97)' : undefined,
+                                                }}
+                                            >
+                                                <GripVertical size={14} color="var(--text-secondary)" style={{ opacity: 0.3, flexShrink: 0 }} />
+
+                                                <div className={styles.numBadge} style={{ background: ex.color }}>
+                                                    {i + 1}
+                                                </div>
+
+                                                <DynamicIcon icon={ex.icon} size={16} color={ex.color} />
+                                                <span className={styles.queueItemName} style={{ color: ex.color }}>
+                                                    {getExerciseLabel(ex, t)}
+                                                </span>
+
+                                                {WEIGHT_EXERCISES_MAP[id] && (
+                                                    <span
+                                                        className={styles.weightChip}
+                                                        style={{
+                                                            background: `color-mix(in srgb, ${ex.color} 8%, transparent)`,
+                                                            border: `1px solid color-mix(in srgb, ${ex.color} 12%, transparent)`
+                                                        }}
+                                                    >
+                                                        {getConfig(id)?.weight || 0} {t('weight.kg')}
+                                                    </span>
+                                                )}
+
+                                                <div className={styles.arrowCol}>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); moveItem(i, i - 1); }}
+                                                        disabled={isFirst}
+                                                        aria-label="Move up"
+                                                        className={styles.arrowBtn}
+                                                    >
+                                                        <ChevronUp size={12} />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); moveItem(i, i + 1); }}
+                                                        disabled={isLast}
+                                                        aria-label="Move down"
+                                                        className={styles.arrowBtn}
+                                                    >
+                                                        <ChevronDown size={12} />
+                                                    </button>
+                                                </div>
+
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
+                                                    className={styles.removeBtn}
+                                                    aria-label={t('common.delete')}
+                                                >
+                                                    <X size={10} />
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                {queue.length >= 2 && (
+                                    <div className={styles.reorderHint}>{t('workout.reorderHint')}</div>
+                                )}
                             </div>
                         )}
                     </div>
 
-                    {/* ── Selected order (drag & drop) — below grid ── */}
-                    {queue.length > 0 && (
-                        <div className="flex-col gap-8">
-                            <div className={styles.queueHeader}>
-                                <div className="section-label" style={{ margin: 0 }}>
-                                    {t('workout.yourOrder')} ({queue.length})
-                                </div>
-                                <div className="row gap-4">
-                                    {queue.length >= 2 && (
-                                        <Button size="sm" variant="ghost" icon={Shuffle} onClick={shuffleQueue}>
-                                            {t('workout.shuffle')}
-                                        </Button>
-                                    )}
-                                    <Button size="sm" variant="danger-ghost" icon={Trash2} onClick={clearQueue}>
-                                        {t('workout.clearAll')}
-                                    </Button>
-                                </div>
-                            </div>
-                            <div ref={queueListRef} className={styles.queuePanel}>
-                                {queue.map((id, i) => {
-                                    const ex = allExercisesMap[id];
-                                    if (!ex) return null;
-                                    const isDragging = dragIdx === i;
-                                    const isDragOver = dragOverIdx === i;
-                                    const isFirst = i === 0;
-                                    const isLast = i === queue.length - 1;
-
-                                    let itemBg = `color-mix(in srgb, ${ex.color} 5%, transparent)`;
-                                    if (isDragging) {
-                                        itemBg = `color-mix(in srgb, ${ex.color} 14%, transparent)`;
-                                    } else if (isDragOver) {
-                                        itemBg = 'color-mix(in srgb, var(--accent-glow) 18%, transparent)';
-                                    }
-
-                                    return (
-                                        <div
-                                            key={id}
-                                            ref={el => itemRefs.current[i] = el}
-                                            draggable
-                                            onDragStart={() => handleDragStart(i)}
-                                            onDragOver={(e) => { e.preventDefault(); handleDragOver(i); }}
-                                            onDragEnd={handleDragEnd}
-                                            onTouchStart={(e) => handleTouchStart(e, i)}
-                                            onTouchMove={handleTouchMove}
-                                            onTouchEnd={handleTouchEnd}
-                                            className={styles.queueItem}
-                                            style={{
-                                                background: itemBg,
-                                                border: isDragOver
-                                                    ? '1.5px dashed color-mix(in srgb, var(--accent-glow) 50%, transparent)'
-                                                    : `1px solid color-mix(in srgb, ${ex.color} 12%, transparent)`,
-                                                opacity: isDragging ? 0.5 : 1,
-                                                transform: isDragging ? 'scale(0.97)' : undefined,
-                                            }}
-                                        >
-                                            <GripVertical size={14} color="var(--text-secondary)" style={{ opacity: 0.3, flexShrink: 0 }} />
-
-                                            <div className={styles.numBadge} style={{ background: ex.color }}>
-                                                {i + 1}
-                                            </div>
-
-                                            <DynamicIcon icon={ex.icon} size={16} color={ex.color} />
-                                            <span className={styles.queueItemName} style={{ color: ex.color }}>
-                                                {getExerciseLabel(ex, t)}
-                                            </span>
-
-                                            {WEIGHT_EXERCISES_MAP[id] && (
-                                                <span
-                                                    className={styles.weightChip}
-                                                    style={{
-                                                        background: `color-mix(in srgb, ${ex.color} 8%, transparent)`,
-                                                        border: `1px solid color-mix(in srgb, ${ex.color} 12%, transparent)`
-                                                    }}
-                                                >
-                                                    {getConfig(id)?.weight || 0} {t('weight.kg')}
-                                                </span>
-                                            )}
-
-                                            <div className={styles.arrowCol}>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); moveItem(i, i - 1); }}
-                                                    disabled={isFirst}
-                                                    aria-label="Move up"
-                                                    className={styles.arrowBtn}
-                                                >
-                                                    <ChevronUp size={12} />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); moveItem(i, i + 1); }}
-                                                    disabled={isLast}
-                                                    aria-label="Move down"
-                                                    className={styles.arrowBtn}
-                                                >
-                                                    <ChevronDown size={12} />
-                                                </button>
-                                            </div>
-
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
-                                                className={styles.removeBtn}
-                                                aria-label={t('common.delete')}
-                                            >
-                                                <X size={10} />
-                                            </button>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            {queue.length >= 2 && (
-                                <div className={styles.reorderHint}>{t('workout.reorderHint')}</div>
-                            )}
+                    {/* ── Save routine inline form ── */}
+                    {showSaveRoutine && (
+                        <div className={styles.saveForm}>
+                            <input
+                                value={routineName}
+                                onChange={e => setRoutineName(e.target.value.slice(0, 30))}
+                                placeholder={t('routines.namePlaceholder')}
+                                autoFocus
+                                className={styles.saveInput}
+                                onKeyDown={e => e.key === 'Enter' && handleSaveRoutine()}
+                                maxLength={30}
+                            />
+                            <Button variant="success" icon={Check} onClick={handleSaveRoutine} disabled={!routineName.trim()} aria-label={t('common.save')} />
+                            <IconButton
+                                icon={X}
+                                variant="ghost"
+                                onClick={() => { setShowSaveRoutine(false); setRoutineName(''); }}
+                                aria-label={t('common.cancel')}
+                            />
                         </div>
                     )}
-                </div>
 
-                {/* ── Save routine inline form ── */}
-                {showSaveRoutine && (
-                    <div className={styles.saveForm}>
-                        <input
-                            value={routineName}
-                            onChange={e => setRoutineName(e.target.value.slice(0, 30))}
-                            placeholder={t('routines.namePlaceholder')}
-                            autoFocus
-                            className={styles.saveInput}
-                            onKeyDown={e => e.key === 'Enter' && handleSaveRoutine()}
-                            maxLength={30}
-                        />
-                        <Button variant="success" icon={Check} onClick={handleSaveRoutine} disabled={!routineName.trim()} aria-label={t('common.save')} />
-                        <IconButton
-                            icon={X}
-                            variant="ghost"
-                            onClick={() => { setShowSaveRoutine(false); setRoutineName(''); }}
-                            aria-label={t('common.cancel')}
-                        />
-                    </div>
-                )}
+                    {/* Bottom buttons */}
+                    <div className={styles.footer}>
+                        {!showSaveRoutine && queue.length >= 1 && (
+                            <Button
+                                variant="secondary"
+                                icon={Save}
+                                disabled={routines.length >= maxRoutines}
+                                onClick={() => {
+                                    if (routines.length >= maxRoutines) return;
+                                    setShowSaveRoutine(true);
+                                }}
+                                aria-label={t('common.save')}
+                            />
+                        )}
 
-                {/* Bottom buttons */}
-                <div className={styles.footer}>
-                    {!showSaveRoutine && queue.length >= 1 && (
                         <Button
-                            variant="secondary"
-                            icon={Save}
-                            disabled={routines.length >= maxRoutines}
-                            onClick={() => {
-                                if (routines.length >= maxRoutines) return;
-                                setShowSaveRoutine(true);
-                            }}
-                            aria-label={t('common.save')}
-                        />
-                    )}
-
-                    <Button
-                        size="lg"
-                        icon={Play}
-                        onClick={startSession}
-                        disabled={queue.length < 1}
-                        style={{ flex: 1 }}
-                    >
-                        {t('workout.launch', { count: queue.length })}
-                    </Button>
-                </div>
+                            size="lg"
+                            icon={Play}
+                            onClick={startSession}
+                            disabled={queue.length < 1}
+                            style={{ flex: 1 }}
+                        >
+                            {t('workout.launch', { count: queue.length })}
+                        </Button>
+                    </div>
                 </div>
             </div>
         );
@@ -473,8 +481,6 @@ export function WorkoutSession(props) {
                     dailyGoal={currentGoal}
                     currentCount={currentCount}
                     onUpdateCount={(newCount) => {
-                        // Use `today` so an already-completed exercise keeps its locked
-                        // completion-day weight (currentDifficulty is already date-aware).
                         const { weight } = getConfig(currentExId, today);
                         updateExerciseCount(today, currentExId, newCount, currentGoal, weight, currentDifficulty);
                     }}
@@ -526,10 +532,10 @@ export function WorkoutSession(props) {
                 sessionHistory={getSessionHistory()}
                 isPro={isPro}
                 defaultSessionName={savedSession?.name || sessionName}
-
             />
         );
     }
 
     return null;
 }
+
