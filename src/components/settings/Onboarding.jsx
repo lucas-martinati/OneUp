@@ -72,7 +72,7 @@ export function Onboarding({ onStart }) {
         fontWeight: '700',
         fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-        boxShadow: '0 6px 24px rgba(245, 87, 108, 0.45)',
+        boxShadow: 'var(--glow-accent)',
         border: 'none', cursor: 'pointer', minHeight: 'var(--touch-min)',
     };
 
@@ -163,7 +163,7 @@ export function Onboarding({ onStart }) {
                                     <div style={{
                                         width: '100%', height: bar.h, borderRadius: '6px 6px 3px 3px',
                                         background: ACCENT, opacity: 0.55 + i * 0.11,
-                                        boxShadow: i === 4 ? '0 4px 16px rgba(245,87,108,0.45)' : 'none'
+                                        boxShadow: i === 4 ? 'var(--glow-accent)' : 'none'
                                     }} />
                                 </div>
                             ))}
