@@ -65,7 +65,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
         }}>
           {t('common.share')}
         </h2>
-        <Button icon={X} variant="glass" onClick={onClose} aria-label="Close" />
+        <Button iconOnly icon={X} variant="glass" onClick={onClose} aria-label="Close" />
       </div>
 
       <div className={styles.layout}>

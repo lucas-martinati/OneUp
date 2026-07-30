@@ -174,8 +174,8 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: '4px' }}>
-                      <Button icon={Edit2} onClick={() => handleEdit(ex)} variant="ghost" size="sm" aria-label="Modifier" />
-                      <Button icon={Trash2} onClick={() => handleDelete(ex)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
+                      <Button iconOnly icon={Edit2} onClick={() => handleEdit(ex)} variant="ghost" size="sm" aria-label="Modifier" />
+                      <Button iconOnly icon={Trash2} onClick={() => handleDelete(ex)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
                     </div>
                   </div>
                 );

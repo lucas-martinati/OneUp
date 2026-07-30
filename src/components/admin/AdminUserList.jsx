@@ -30,6 +30,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
         />
         <div style={{ position: 'relative' }}>
           <Button
+            iconOnly
             icon={Filter}
             onClick={() => setShowFilters(s => !s)}
             aria-label="Filtres"

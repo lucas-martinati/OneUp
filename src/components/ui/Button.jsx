@@ -42,7 +42,7 @@ export const Button = forwardRef(function Button(
   },
   ref,
 ) {
-  const isIconOnly = iconOnly || (!children && Boolean(Icon));
+  const isIconOnly = Boolean(iconOnly);
   const isDisabled = disabled || loading;
 
   // Light physical tap on every press (no-op on web / when haptics are off).

@@ -81,7 +81,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
           <h2 className={`panel-title ${styles.title}`}>
             {t('share.sessionDetail')}
           </h2>
-          <Button icon={X} variant="glass" onClick={onClose} aria-label={t('common.close')} />
+          <Button iconOnly icon={X} variant="glass" onClick={onClose} aria-label={t('common.close')} />
         </div>
 
         <div className={styles.body}>

@@ -219,7 +219,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                     <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
                         {t('dashboard.calendar')}
                     </h2>
-                    <Button icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" style={{ flexShrink: 0 }} />
+                    <Button iconOnly icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" style={{ flexShrink: 0 }} />
                 </div>
 
                 {/* Month navigation — the hero */}

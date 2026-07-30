@@ -242,7 +242,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
             <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
               {t('cardio.history')}
             </h2>
-            <Button icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
+            <Button iconOnly icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
           </div>
 
           {sessions.length > 0 && (

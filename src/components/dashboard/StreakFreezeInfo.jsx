@@ -73,7 +73,7 @@ export function StreakFreezeInfo({ open, onClose }) {
                 padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px',
                 animation: 'dialogPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
             }}>
-                <Button icon={X} variant="glass" onClick={onClose} aria-label={t('common.close')}
+                <Button iconOnly icon={X} variant="glass" onClick={onClose} aria-label={t('common.close')}
                     style={{ position: 'absolute', top: '12px', right: '12px' }} />
 
                 <div style={{

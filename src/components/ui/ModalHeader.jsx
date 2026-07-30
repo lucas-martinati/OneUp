@@ -20,6 +20,7 @@ export function ModalHeader({
       <div className="modal-header-title-group">
         {onBack && (
           <Button
+            iconOnly
             icon={ArrowLeft}
             onClick={onBack}
             aria-label="Back"
@@ -42,6 +43,7 @@ export function ModalHeader({
         {actions}
         {onClose && (
           <Button
+            iconOnly
             icon={X}
             onClick={onClose}
             aria-label="Close modal"

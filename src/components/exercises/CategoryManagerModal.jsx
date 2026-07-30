@@ -422,9 +422,9 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                           })()}
                         </div>
                       )}
-                      <Button icon={Edit2} onClick={() => handleEdit(cat)} variant="ghost" size="sm" aria-label="Modifier" />
+                      <Button iconOnly icon={Edit2} onClick={() => handleEdit(cat)} variant="ghost" size="sm" aria-label="Modifier" />
                       {!isBuiltIn && (
-                        <Button icon={Trash2} onClick={() => handleStartDelete(cat)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
+                        <Button iconOnly icon={Trash2} onClick={() => handleStartDelete(cat)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
                       )}
                     </div>
                   </div>

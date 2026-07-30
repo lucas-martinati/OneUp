@@ -127,8 +127,8 @@ function RoutineCard({ routine, index, allExercisesMap, confirming, onLoad, onEd
                 <div className={styles.confirmOverlay} onClick={(e) => e.stopPropagation()}>
                     <div className={styles.confirmLabel}>{t('common.delete')} ?</div>
                     <div className={styles.confirmActions}>
-                        <Button icon={Check} variant="danger" size="sm" onClick={() => onDelete(routine.id)} aria-label={t('common.confirm')} />
-                        <Button icon={X} variant="surface" size="sm" onClick={onCancelDelete} aria-label={t('common.cancel')} />
+                        <Button iconOnly icon={Check} variant="danger" size="sm" onClick={() => onDelete(routine.id)} aria-label={t('common.confirm')} />
+                        <Button iconOnly icon={X} variant="surface" size="sm" onClick={onCancelDelete} aria-label={t('common.cancel')} />
                     </div>
                 </div>
             )}
@@ -215,7 +215,7 @@ export function WorkoutSession(props) {
                         <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
                             {isStarted ? t('common.edit') : t('dashboard.session')}
                         </h2>
-                        <Button icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label={t('common.close')} />
+                        <Button iconOnly icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label={t('common.close')} />
                     </div>
 
                     <div className={styles.body}>
@@ -442,6 +442,7 @@ export function WorkoutSession(props) {
                                 {t('common.save')}
                             </Button>
                             <Button
+                                iconOnly
                                 icon={X}
                                 size="lg"
                                 variant="ghost"

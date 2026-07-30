@@ -32,6 +32,7 @@ export function AdminPanel({ onClose }) {
           <div className="row gap-12" style={{ alignItems: 'center' }}>
             {selectedUid && (
               <Button
+                iconOnly
                 icon={ArrowLeft}
                 onClick={() => setSelectedUid(null)}
                 aria-label="Retour"
@@ -48,6 +49,7 @@ export function AdminPanel({ onClose }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {!selectedUid && (
               <Button
+                iconOnly
                 icon={RefreshCw}
                 onClick={() => loadData(true)}
                 disabled={refreshing || loading}
@@ -57,6 +59,7 @@ export function AdminPanel({ onClose }) {
               />
             )}
             <Button
+              iconOnly
               icon={X}
               onClick={onClose}
               aria-label="Fermer"
