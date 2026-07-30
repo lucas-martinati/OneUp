@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2, Check, ShieldAlert, Star, Snowflake, FileText } from '@utils/icons';
-import { IconButton } from '@components/ui';
+import { Button } from '@components/ui';
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr } from '@shared/dateUtils';
 import { useBackHandler } from '@hooks/useBackHandler';
@@ -219,7 +219,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                     <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
                         {t('dashboard.calendar')}
                     </h2>
-                    <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" style={{ flexShrink: 0 }} />
+                    <Button icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" style={{ flexShrink: 0 }} />
                 </div>
 
                 {/* Month navigation — the hero */}

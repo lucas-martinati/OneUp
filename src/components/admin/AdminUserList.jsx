@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { Clock, Filter, X, ChevronDown, ChevronUp } from '@utils/icons';
-import { Avatar, Input, Badge, IconButton } from '@components/ui';
+import { Avatar, Input, Badge, Button } from '@components/ui';
 import { FILTER_OPTIONS } from './useAdminPanel';
 
 const SORT_OPTIONS = [
@@ -29,7 +29,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
           fullWidth
         />
         <div style={{ position: 'relative' }}>
-          <IconButton
+          <Button
             icon={Filter}
             onClick={() => setShowFilters(s => !s)}
             aria-label="Filtres"

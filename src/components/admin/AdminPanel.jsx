@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Shield, ArrowLeft, RefreshCw } from '@utils/icons';
 import { Z_INDEX } from '@utils/zIndex';
-import { Spinner, IconButton, SegmentedControl } from '@components/ui';
+import { Spinner, Button, SegmentedControl } from '@components/ui';
 import { useAdminPanel } from './useAdminPanel';
 import { AdminUserList } from './AdminUserList';
 import { AdminUserForm } from './AdminUserForm';
@@ -31,7 +31,7 @@ export function AdminPanel({ onClose }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexShrink: 0 }}>
           <div className="row gap-12" style={{ alignItems: 'center' }}>
             {selectedUid && (
-              <IconButton
+              <Button
                 icon={ArrowLeft}
                 onClick={() => setSelectedUid(null)}
                 aria-label="Retour"
@@ -47,7 +47,7 @@ export function AdminPanel({ onClose }) {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {!selectedUid && (
-              <IconButton
+              <Button
                 icon={RefreshCw}
                 onClick={() => loadData(true)}
                 disabled={refreshing || loading}
@@ -56,7 +56,7 @@ export function AdminPanel({ onClose }) {
                 className={`hover-lift ${refreshing ? 'spin' : ''}`}
               />
             )}
-            <IconButton
+            <Button
               icon={X}
               onClick={onClose}
               aria-label="Fermer"

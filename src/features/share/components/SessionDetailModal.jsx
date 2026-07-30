@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Clock, Trash2, Dumbbell, Zap } from '@utils/icons';
 import { getIcon } from '@utils/icons';
-import { IconButton, Button, ConfirmDialog, WeightBadge, InlineNameEditor } from '@components/ui';
+import { Button, ConfirmDialog, WeightBadge, InlineNameEditor } from '@components/ui';
 import { Z_INDEX } from '@utils/zIndex';
 import { updateSessionName } from '@features/share/services/sessionHistoryService';
 import { getExerciseLabel, getExerciseColor } from '@utils/exerciseLabel';
@@ -81,7 +81,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
           <h2 className={`panel-title ${styles.title}`}>
             {t('share.sessionDetail')}
           </h2>
-          <IconButton icon={X} variant="glass" onClick={onClose} aria-label={t('common.close')} />
+          <Button icon={X} variant="glass" onClick={onClose} aria-label={t('common.close')} />
         </div>
 
         <div className={styles.body}>

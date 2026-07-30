@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Award, Lock, X } from '@utils/icons';
 import { useBackHandler } from '@hooks/useBackHandler';
-import { IconButton } from '@components/ui';
+import { Button } from '@components/ui';
 import { SegmentedControl } from '@components/ui/SegmentedControl';
 import { Z_INDEX } from '@utils/zIndex';
 import { buildBadges } from './buildBadges';
@@ -272,7 +272,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                     <h2 className="panel-title" style={{ margin: 0 }}>
                         {t('common.achievements')}
                     </h2>
-                    <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
+                    <Button icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
                 </div>
 
                 {/* ── Hero: progress ring + counters in one gold card ────── */}

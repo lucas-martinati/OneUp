@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Settings2, Trash2, Edit2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, Check } from '@utils/icons';
-import { Button, IconButton, Slider, Input, ModalHeader } from '@components/ui';
+import { Button, Slider, Input, ModalHeader } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { MAX_EXERCISES_PER_CATEGORY } from '@store/useExercisesStore';
@@ -174,8 +174,8 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: '4px' }}>
-                      <IconButton icon={Edit2} onClick={() => handleEdit(ex)} variant="ghost" size="sm" aria-label="Modifier" />
-                      <IconButton icon={Trash2} onClick={() => handleDelete(ex)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
+                      <Button icon={Edit2} onClick={() => handleEdit(ex)} variant="ghost" size="sm" aria-label="Modifier" />
+                      <Button icon={Trash2} onClick={() => handleDelete(ex)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
                     </div>
                   </div>
                 );

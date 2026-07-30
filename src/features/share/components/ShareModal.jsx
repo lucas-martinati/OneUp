@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Share2, Download, X, Loader2 } from '@utils/icons';
-import { IconButton } from '@components/ui';
+import { Button } from '@components/ui';
 import { Z_INDEX } from '@utils/zIndex';
 import { ShareCard } from './ShareCard';
 import { SharePreview } from './SharePreview';
@@ -65,7 +65,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
         }}>
           {t('common.share')}
         </h2>
-        <IconButton icon={X} variant="glass" onClick={onClose} aria-label="Close" />
+        <Button icon={X} variant="glass" onClick={onClose} aria-label="Close" />
       </div>
 
       <div className={styles.layout}>

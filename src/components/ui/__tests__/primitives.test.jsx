@@ -1,7 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, fireEvent, cleanup } from '@testing-library/react';
 import { Button } from '../Button';
-import { IconButton } from '../IconButton';
 import { Card } from '../Card';
 import { Stack } from '../Stack';
 import { Spinner } from '../Spinner';
@@ -70,39 +69,10 @@ describe('Button', () => {
     expect(cls).toContain('btn--lg');
     expect(cls).toContain('extra');
   });
-});
 
-// ── IconButton ──────────────────────────────────────────────────────────
-
-describe('IconButton', () => {
-  it('renders the icon component when provided', () => {
-    const { getByTestId } = render(<IconButton icon={FakeIcon} size="sm" aria-label="a" />);
-    expect(getByTestId('icon').getAttribute('data-size')).toBe('18');
-  });
-
-  it('renders children when no icon is given', () => {
-    const { getByRole } = render(<IconButton aria-label="a">★</IconButton>);
-    expect(getByRole('button').textContent).toBe('★');
-  });
-
-  it('adds the glass utility class for the glass variant and merges className', () => {
-    const { getByRole } = render(<IconButton variant="glass" className="extra" aria-label="a" />);
-    const cls = getByRole('button').className;
-    expect(cls).toContain('glass');
-    expect(cls).toContain('extra');
-  });
-
-  it('has no class attribute for the surface variant without className', () => {
-    const { getByRole } = render(<IconButton variant="surface" aria-label="a" />);
-    expect(getByRole('button').getAttribute('class')).toBe(null);
-  });
-
-  it('applies a color override and disabled styling', () => {
-    const { getByRole } = render(<IconButton color="rgb(1, 2, 3)" disabled aria-label="a" />);
-    const btn = getByRole('button');
-    expect(btn.style.color).toBe('rgb(1, 2, 3)');
-    expect(btn.disabled).toBe(true);
-    expect(btn.style.opacity).toBe('0.5');
+  it('applies iconOnly class when iconOnly is true', () => {
+    const { getByRole } = render(<Button icon={FakeIcon} iconOnly aria-label="test" />);
+    expect(getByRole('button').className).toContain('btn--icon-only');
   });
 });
 

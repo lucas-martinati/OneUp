@@ -1,6 +1,6 @@
 import { useRef, useEffect, useMemo } from 'react';
 import { X, Play, Check, Save, Trash2, GripVertical, Pencil, Shuffle, ChevronUp, ChevronDown, DynamicIcon } from '@utils/icons';
-import { Button, IconButton, ToggleSwitch } from '@components/ui';
+import { Button, ToggleSwitch } from '@components/ui';
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { Z_INDEX } from '@utils/zIndex';
 import { SessionSummary } from './SessionSummary';
@@ -127,8 +127,8 @@ function RoutineCard({ routine, index, allExercisesMap, confirming, onLoad, onEd
                 <div className={styles.confirmOverlay} onClick={(e) => e.stopPropagation()}>
                     <div className={styles.confirmLabel}>{t('common.delete')} ?</div>
                     <div className={styles.confirmActions}>
-                        <IconButton icon={Check} variant="danger" size="sm" onClick={() => onDelete(routine.id)} aria-label={t('common.confirm')} />
-                        <IconButton icon={X} variant="surface" size="sm" onClick={onCancelDelete} aria-label={t('common.cancel')} />
+                        <Button icon={Check} variant="danger" size="sm" onClick={() => onDelete(routine.id)} aria-label={t('common.confirm')} />
+                        <Button icon={X} variant="surface" size="sm" onClick={onCancelDelete} aria-label={t('common.cancel')} />
                     </div>
                 </div>
             )}
@@ -215,7 +215,7 @@ export function WorkoutSession(props) {
                         <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
                             {isStarted ? t('common.edit') : t('dashboard.session')}
                         </h2>
-                        <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label={t('common.close')} />
+                        <Button icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label={t('common.close')} />
                     </div>
 
                     <div className={styles.body}>
@@ -441,7 +441,7 @@ export function WorkoutSession(props) {
                             >
                                 {t('common.save')}
                             </Button>
-                            <IconButton
+                            <Button
                                 icon={X}
                                 size="lg"
                                 variant="ghost"

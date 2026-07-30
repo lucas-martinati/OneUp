@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Snowflake, Crown, X } from '@utils/icons';
-import { Button, IconButton } from '@components/ui';
+import { Button } from '@components/ui';
 import { GoogleSignInButton } from '@components/ui/GoogleSignInButton';
 import { useUIStore } from '@store/useUIStore';
 import { useProgressStore } from '@store/useProgressStore';
@@ -73,7 +73,7 @@ export function StreakFreezeInfo({ open, onClose }) {
                 padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px',
                 animation: 'dialogPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
             }}>
-                <IconButton icon={X} variant="glass" onClick={onClose} aria-label={t('common.close')}
+                <Button icon={X} variant="glass" onClick={onClose} aria-label={t('common.close')}
                     style={{ position: 'absolute', top: '12px', right: '12px' }} />
 
                 <div style={{

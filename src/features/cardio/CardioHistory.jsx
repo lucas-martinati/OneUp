@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import 'leaflet/dist/leaflet.css';
 import { X, Clock, Target, TrendingUp, Gauge, ChevronDown, Activity } from '@utils/icons';
 import { updateCardioSessionName } from '@services/cardioService';
-import { IconButton, InlineNameEditor } from '@components/ui';
+import { Button, InlineNameEditor } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { CardioMap } from './CardioMap';
 import { CardioFullscreenMap } from './CardioFullscreenMap';
@@ -242,7 +242,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
             <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
               {t('cardio.history')}
             </h2>
-            <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
+            <Button icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
           </div>
 
           {sessions.length > 0 && (

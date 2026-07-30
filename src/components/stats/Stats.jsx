@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useDeferredValue, Suspense, lazy } from 'react';
 import { X, Award } from '@utils/icons';
-import { IconButton } from '@components/ui';
+import { Button } from '@components/ui';
 import { SegmentedControl } from '@components/ui/SegmentedControl';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '@hooks/useComputedStats';
@@ -247,7 +247,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                 {globalStats.badgeCount}/{BADGE_DEFINITIONS.length}
                             </span>
                         </button>
-                        <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
+                        <Button icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
                     </div>
                 </div>
 

@@ -5,7 +5,7 @@ import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-l
 import 'leaflet/dist/leaflet.css';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { X, Clock, Target, TrendingUp, Footprints } from '@utils/icons';
-import { IconButton } from'@components/ui';
+import { Button } from '@components/ui';
 import { MAP_TILES } from '@config/mapTiles';
 
 const TILE_URL = MAP_TILES.dark;
@@ -215,7 +215,7 @@ export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
           </div>
 
           {/* Close button (Right) */}
-          <IconButton icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
+          <Button icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
         </div>
 
         {/* Floating stats bar */}

@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, Edit2, Check, ChevronRight, ChevronUp, ChevronDown, GripVertical } from '@utils/icons';
-import { IconButton, Button, Input, ModalHeader } from '@components/ui';
+import { Button, Input, ModalHeader } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { DynamicIcon } from '@utils/icons';
@@ -422,9 +422,9 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                           })()}
                         </div>
                       )}
-                      <IconButton icon={Edit2} onClick={() => handleEdit(cat)} variant="ghost" size="sm" aria-label="Modifier" />
+                      <Button icon={Edit2} onClick={() => handleEdit(cat)} variant="ghost" size="sm" aria-label="Modifier" />
                       {!isBuiltIn && (
-                        <IconButton icon={Trash2} onClick={() => handleStartDelete(cat)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
+                        <Button icon={Trash2} onClick={() => handleStartDelete(cat)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
                       )}
                     </div>
                   </div>

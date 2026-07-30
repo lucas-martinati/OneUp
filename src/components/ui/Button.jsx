@@ -20,16 +20,19 @@ import { haptics } from '@utils/hapticsManager';
  * @param {object} [style] – escape hatch for one-off overrides
  */
 const ICON_SIZE = { sm: 16, md: 18, lg: 20 };
+const ICON_ONLY_SIZE = { sm: 18, md: 20, lg: 22 };
 
 export const Button = forwardRef(function Button(
   {
     variant = 'primary',
     size = 'md',
     fullWidth = false,
+    iconOnly = false,
     icon: Icon,
     iconRight: IconRight,
     loading = false,
     disabled = false,
+    color,
     children,
     className,
     style,
@@ -39,7 +42,9 @@ export const Button = forwardRef(function Button(
   },
   ref,
 ) {
+  const isIconOnly = iconOnly || (!children && Boolean(Icon));
   const isDisabled = disabled || loading;
+
   // Light physical tap on every press (no-op on web / when haptics are off).
   const handleClick = useCallback(
     (e) => {
@@ -54,10 +59,12 @@ export const Button = forwardRef(function Button(
     `btn--${size}`,
     `btn--${variant}`,
     fullWidth && 'btn--full',
+    isIconOnly && 'btn--icon-only',
     className,
   ].filter(Boolean).join(' ');
 
-  const iconPx = ICON_SIZE[size];
+  const iconPx = isIconOnly ? ICON_ONLY_SIZE[size] : ICON_SIZE[size];
+  const combinedStyle = color ? { color, ...style } : style;
 
   return (
     <button
@@ -66,7 +73,7 @@ export const Button = forwardRef(function Button(
       disabled={isDisabled}
       onClick={handleClick}
       className={classes}
-      style={style}
+      style={combinedStyle}
       {...rest}
     >
       {loading ? (

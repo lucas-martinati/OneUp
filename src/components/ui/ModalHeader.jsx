@@ -1,4 +1,4 @@
-import { IconButton } from './IconButton';
+import { Button } from './Button';
 import { X, ArrowLeft } from '@utils/icons';
 
 /**
@@ -19,7 +19,7 @@ export function ModalHeader({
     <div className={`modal-header ${className}`} style={style}>
       <div className="modal-header-title-group">
         {onBack && (
-          <IconButton
+          <Button
             icon={ArrowLeft}
             onClick={onBack}
             aria-label="Back"
@@ -41,7 +41,7 @@ export function ModalHeader({
       <div className="modal-header-actions">
         {actions}
         {onClose && (
-          <IconButton
+          <Button
             icon={X}
             onClick={onClose}
             aria-label="Close modal"
