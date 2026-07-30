@@ -510,7 +510,6 @@
   align-items: stretch;
   gap: 10px;
   width: 100%;
-  padding-top: 10px;
 }
 
 .saveBtn {
@@ -526,8 +525,6 @@
   min-width: 0;
   min-height: 48px;
 }
-
-
 
 /* ── Kill-switches ─────────────────────────────────────────────────── */
 :global([data-perf='low']) .routineCard,
