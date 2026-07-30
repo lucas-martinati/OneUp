@@ -215,16 +215,3 @@ jobs:
           # keep the automatic behaviour.
           changesNotSentForReview: ${{ github.event.inputs.send_for_review == 'false' }}
           whatsNewDirectory: ${{ (github.event.inputs.release_notes_fr != '' || github.event.inputs.release_notes_en != '') && 'distribution/whatsnew' || '' }}
-
-      # ── Commit updated versionCode back to repo ────────────────
-      - name: Push updated versionCode & version description
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Commit build.gradle and package files
-          git add android/app/build.gradle package.json package-lock.json
-          git commit -m "chore: bump version to ${{ env.VERSION_NAME }} (code ${{ env.VERSION_CODE }}) [skip ci]"
-          git stash --include-untracked
-          git pull --rebase origin main
-          git push origin HEAD:main
