@@ -285,6 +285,9 @@
     "areYouSure": "您确定吗？",
     "autoBackup": "自动备份",
     "autoSyncEnabled": "自动同步已启用",
+    "backupBannerSubtitle": "登录以保护您的数据",
+    "backupBannerTitle": "保存您的进度",
+    "backupButton": "保存",
     "cannotBeUndone": "您的本地数据和云端数据将被合并。",
     "cloudBackup": "云端备份",
     "connectedGooglePlay": "已连接 Google Play",
@@ -342,6 +345,7 @@
     "reps": "次",
     "repsCount": "{{count}} 次",
     "save": "保存",
+    "scrubberHint": "按住滑动",
     "share": "分享",
     "tips": [
       "喝水能提升表现。",

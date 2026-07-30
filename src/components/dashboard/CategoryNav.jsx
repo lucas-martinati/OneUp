@@ -24,6 +24,8 @@ const scrollToCategoryIndex = (container, index, behavior = 'smooth') => {
     }
 };
 
+const HINT_KEY = 'oneup_category_nav_hint_seen';
+
 export const CategoryNav = React.memo(({ 
     fullCategoryOrder, 
     activeSlide, 
@@ -34,6 +36,24 @@ export const CategoryNav = React.memo(({
     const { t } = useTranslation();
     const [isNavExpanded, setIsNavExpanded] = useState(false);
     const [dragIndex, setDragIndex] = useState(null);
+    const [showDiscoveryHint, setShowDiscoveryHint] = useState(() => {
+        try {
+            return !localStorage.getItem(HINT_KEY);
+        } catch {
+            return false;
+        }
+    });
+
+    const dismissHint = () => {
+        if (!showDiscoveryHint) return;
+        setShowDiscoveryHint(false);
+        try {
+            localStorage.setItem(HINT_KEY, '1');
+        } catch {
+            /* ignore */
+        }
+    };
+
     const navInteractionRef = useRef({ timer: null, startY: 0, startX: 0, isLongPress: false });
     const navContainerRef = useRef(null);
 
@@ -64,9 +84,11 @@ export const CategoryNav = React.memo(({
     return (
         <div 
             ref={navContainerRef}
-            className={`category-nav-container ${isNavExpanded ? 'expanded' : ''}`}
+            className={`category-nav-container ${isNavExpanded ? 'expanded' : ''} ${showDiscoveryHint ? 'discovery-pulse' : ''}`}
             onPointerDown={(e) => {
+                dismissHint();
                 const y = e.clientY;
+
                 const x = e.clientX;
                 const target = e.currentTarget;
                 const isMouse = e.pointerType === 'mouse';
@@ -216,6 +238,12 @@ export const CategoryNav = React.memo(({
                     </div>
                 );
             })}
+            {showDiscoveryHint && (
+                <div className="category-nav-hint-tooltip" role="tooltip">
+                    {t('common.scrubberHint', 'Maintenez pour glisser')}
+                </div>
+            )}
         </div>
     );
 });
+

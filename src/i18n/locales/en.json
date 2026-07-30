@@ -285,6 +285,9 @@
     "areYouSure": "Are you sure?",
     "autoBackup": "Automatic backup",
     "autoSyncEnabled": "Auto-sync enabled",
+    "backupBannerSubtitle": "Sign in to keep your data safe",
+    "backupBannerTitle": "Save your progress",
+    "backupButton": "Save",
     "cannotBeUndone": "Your local and cloud data will be merged.",
     "cloudBackup": "Cloud Backup",
     "connectedGooglePlay": "Connected with Google Play",
@@ -342,6 +345,7 @@
     "reps": "reps",
     "repsCount": "{{count}} reps",
     "save": "Save",
+    "scrubberHint": "Hold to slide",
     "share": "Share",
     "tips": [
       "Drinking water boosts performance.",

@@ -184,20 +184,29 @@ export default function LineChart({
                             vectorEffect="non-scaling-stroke"
                         />
                         {showDots && s.pts.map((p) => (
-                            <circle
-                                key={p.i}
-                                cx={p.x}
-                                cy={p.y}
-                                r="2.6"
-                                fill={s.color}
-                                stroke="var(--surface-card, #1a1a2e)"
-                                strokeWidth="1.2"
-                                className="svg-chart-dot"
-                                style={{
-                                    animationDelay: `${(p.i / (data.length - 1 || 1)) * 0.85}s`,
-                                }}
-                            />
+                            <g key={p.i}>
+                                <circle
+                                    cx={p.x}
+                                    cy={p.y}
+                                    r="16"
+                                    fill="transparent"
+                                    style={{ cursor: 'pointer', pointerEvents: 'all' }}
+                                />
+                                <circle
+                                    cx={p.x}
+                                    cy={p.y}
+                                    r="2.6"
+                                    fill={s.color}
+                                    stroke="var(--surface-card, #1a1a2e)"
+                                    strokeWidth="1.2"
+                                    className="svg-chart-dot"
+                                    style={{
+                                        animationDelay: `${(p.i / (data.length - 1 || 1)) * 0.85}s`,
+                                    }}
+                                />
+                            </g>
                         ))}
+
                         {active != null && (() => {
                             const val = getSeriesValueAtActive(s, active);
                             if (val == null) return null;

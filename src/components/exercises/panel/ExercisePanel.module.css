@@ -100,3 +100,13 @@
 @media (prefers-reduced-motion: reduce) {
   .rise { animation: none; }
 }
+
+.oledSaverMode {
+  background: #000000 !important;
+}
+
+.oledSaverMode .atmosphere,
+.oledSaverMode .vignette {
+  opacity: 0.1 !important;
+}
+

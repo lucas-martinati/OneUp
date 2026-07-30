@@ -285,6 +285,9 @@
     "areYouSure": "Tem certeza?",
     "autoBackup": "Backup automático",
     "autoSyncEnabled": "Sincronização automática ativada",
+    "backupBannerSubtitle": "Conecte-se para não perder nada",
+    "backupBannerTitle": "Salve seu progresso",
+    "backupButton": "Salvar",
     "cannotBeUndone": "Seus dados locais e na nuvem serão mesclados.",
     "cloudBackup": "Backup na nuvem",
     "connectedGooglePlay": "Conectado ao Google Play",
@@ -342,6 +345,7 @@
     "reps": "repetições",
     "repsCount": "{{count}} repetições",
     "save": "Salvar",
+    "scrubberHint": "Segure para deslizar",
     "share": "Compartilhar",
     "tips": [
       "Beber água aumenta o desempenho.",

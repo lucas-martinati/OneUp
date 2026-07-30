@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from './feedback/CSSConfetti';
 import { OfflineBanner } from './feedback/OfflineBanner';
 import { MigrationBanner } from './feedback/MigrationBanner';
+import { GuestCloudBackupBanner } from './feedback/GuestCloudBackupBanner';
 import { NotificationManager } from './social/NotificationManager';
 import { ConflictOverlay } from './ui/ConflictOverlay';
 import { ConfirmDialog } from './ui/ConfirmDialog';
@@ -273,6 +274,8 @@ export function Dashboard() {
             }}>
                 <MigrationBanner />
                 <OfflineBanner />
+                <GuestCloudBackupBanner displayStreak={computedStats.displayStreak} totalReps={totalReps} />
+
 
                 <DashboardHeader
                     isAdmin={isAdmin}

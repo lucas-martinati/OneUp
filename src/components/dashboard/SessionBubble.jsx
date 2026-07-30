@@ -114,8 +114,11 @@ export const SessionBubble = React.memo(({ onResume, onDiscard }) => {
     // ── Helpers (stable — no deps that change) ──
     const getSafeY = useCallback((y) => {
         const vh = window.innerHeight;
-        return Math.max(70, Math.min(vh - 90, y));
+        const SAFE_TOP = 70;
+        const SAFE_BOTTOM = Math.max(SAFE_TOP, vh - 100 - BUBBLE_SIZE);
+        return Math.max(SAFE_TOP, Math.min(SAFE_BOTTOM, y));
     }, []);
+
 
     const applyBubblePos = useCallback((pos) => {
         if (containerRef.current) {
@@ -159,7 +162,8 @@ export const SessionBubble = React.memo(({ onResume, onDiscard }) => {
         const s = sessionStorage.getItem(SNAP_SIDE_KEY) || 'right';
         const yFrac = parseFloat(sessionStorage.getItem(SNAP_Y_KEY) || '0.3');
         const x = s === 'right' ? vw - BUBBLE_SIZE - EDGE_MARGIN : EDGE_MARGIN;
-        const y = Math.max(70, Math.min(vh - 90, yFrac * vh - BUBBLE_SIZE / 2));
+        const y = getSafeY(yFrac * vh - BUBBLE_SIZE / 2);
+
         const rest = { x, y };
 
         bubblePos.current = { ...rest };

@@ -172,7 +172,11 @@ export function ExercisePanel({
     const handleIncrement = (amount) => {
         setIsAnimating(true);
         haptics.light();
-        onUpdateCount(Math.min(currentCount + amount, dailyGoal));
+        const newCount = Math.min(currentCount + amount, dailyGoal);
+        if (newCount > 0 && (newCount % 10 === 0 || newCount === dailyGoal)) {
+            haptics.success();
+        }
+        onUpdateCount(newCount);
         setTimeout(() => setIsAnimating(false), 200);
     };
 
@@ -234,7 +238,8 @@ export function ExercisePanel({
 
     const content = (
         <div
-            className={`modal-content ${styles.content} ${isSession && fadeIn ? 'fade-in' : ''}`}
+            className={`modal-content ${styles.content} ${isSession && fadeIn ? 'fade-in' : ''} ${isTimer && isRunning ? styles.oledSaverMode : ''}`}
+
             role="dialog"
             aria-modal="true"
             aria-label={exerciseLabel}

@@ -285,6 +285,9 @@
     "areYouSure": "확실합니까?",
     "autoBackup": "자동 백업",
     "autoSyncEnabled": "자동 동기화 활성화됨",
+    "backupBannerSubtitle": "로그인하여 데이터를 안전하게 보관하세요",
+    "backupBannerTitle": "진행 상황 저장",
+    "backupButton": "저장",
     "cannotBeUndone": "로컬 및 클라우드 데이터가 병합됩니다.",
     "cloudBackup": "클라우드 백업",
     "connectedGooglePlay": "Google Play와 연결됨",
@@ -342,6 +345,7 @@
     "reps": "담당자",
     "repsCount": "{{count}} 담당자",
     "save": "구하다",
+    "scrubberHint": "길게 눌러 슬라이드",
     "share": "공유하다",
     "tips": [
       "물을 마시면 성능이 향상됩니다.",

@@ -285,6 +285,9 @@
     "areYouSure": "Вы уверены?",
     "autoBackup": "Автоматическое резервное копирование",
     "autoSyncEnabled": "Автосинхронизация включена",
+    "backupBannerSubtitle": "Войдите, чтобы не потерять данные",
+    "backupBannerTitle": "Сохраните свой прогресс",
+    "backupButton": "Сохранить",
     "cannotBeUndone": "Ваши локальные и облачные данные будут объединены.",
     "cloudBackup": "Резервное копирование",
     "connectedGooglePlay": "Подключено через Google Play",
@@ -342,6 +345,7 @@
     "reps": "повт.",
     "repsCount": "{{count}} повторений",
     "save": "Сохранить",
+    "scrubberHint": "Удерживайте для прокрутки",
     "share": "Поделиться",
     "tips": [
       "Вода улучшает результаты.",

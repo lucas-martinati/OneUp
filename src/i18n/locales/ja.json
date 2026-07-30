@@ -285,6 +285,9 @@
     "areYouSure": "本気ですか？",
     "autoBackup": "自動バックアップ",
     "autoSyncEnabled": "自動同期が有効になっています",
+    "backupBannerSubtitle": "サインインしてデータを安全に保持",
+    "backupBannerTitle": "進行状況を保存",
+    "backupButton": "保存",
     "cannotBeUndone": "ローカル データとクラウド データが統合されます。",
     "cloudBackup": "クラウドバックアップ",
     "connectedGooglePlay": "Google Playに接続しました",
@@ -343,6 +346,7 @@
     "repsCount": "{{count}} 担当者",
     "save": "保存",
     "share": "共有",
+    "scrubberHint": "長押しでスライド",
     "tips": [
       "水を飲むとパフォーマンスが向上します。",
       "背中をまっすぐにしてください！",

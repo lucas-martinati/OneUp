@@ -285,6 +285,9 @@
     "areYouSure": "Es-tu sûr(e) ?",
     "autoBackup": "Sauvegarde automatique",
     "autoSyncEnabled": "Synchronisation automatique activée",
+    "backupBannerSubtitle": "Connectez-vous pour ne rien perdre",
+    "backupBannerTitle": "Sauvegardez vos progrès",
+    "backupButton": "Sauvegarder",
     "cannotBeUndone": "Vos données locales et cloud seront fusionnées.",
     "cloudBackup": "Sauvegarde Cloud",
     "connectedGooglePlay": "Connecté avec Google Play",
@@ -342,6 +345,7 @@
     "reps": "reps",
     "repsCount": "{{count}} reps",
     "save": "Enregistrer",
+    "scrubberHint": "Maintenez pour glisser",
     "share": "Partager",
     "tips": [
       "Boire de l'eau booste les performances.",

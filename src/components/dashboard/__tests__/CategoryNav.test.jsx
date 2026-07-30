@@ -97,4 +97,19 @@ describe('CategoryNav', () => {
     const nav = container.querySelector('.category-nav-container');
     expect(nav.style.pointerEvents).toBe('none');
   });
+
+  it('shows discovery hint and pulse on first load, then dismisses on pointerDown', () => {
+    localStorage.clear();
+    const { container } = renderNav();
+    const nav = container.querySelector('.category-nav-container');
+    expect(nav.className).toContain('discovery-pulse');
+    expect(container.querySelector('.category-nav-hint-tooltip')).toBeTruthy();
+
+    fireEvent.pointerDown(nav, { clientY: 10, clientX: 5, pointerType: 'touch', pointerId: 1 });
+    expect(nav.className).not.toContain('discovery-pulse');
+    expect(container.querySelector('.category-nav-hint-tooltip')).toBeNull();
+    expect(localStorage.getItem('oneup_category_nav_hint_seen')).toBe('1');
+  });
+
 });
+

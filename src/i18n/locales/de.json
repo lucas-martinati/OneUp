@@ -285,6 +285,9 @@
     "areYouSure": "Bist du sicher?",
     "autoBackup": "Automatische Sicherung",
     "autoSyncEnabled": "Automatische Synchronisierung aktiviert",
+    "backupBannerSubtitle": "Anmelden, um nichts zu verlieren",
+    "backupBannerTitle": "Fortschritt sichern",
+    "backupButton": "Sichern",
     "cannotBeUndone": "Ihre lokalen und Cloud-Daten werden zusammengeführt.",
     "cloudBackup": "Cloud-Backup",
     "connectedGooglePlay": "Verbunden mit Google Play",
@@ -342,6 +345,7 @@
     "reps": "Vertreter",
     "repsCount": "{{count}} Wiederholungen",
     "save": "Speichern",
+    "scrubberHint": "Gedrückt halten zum Wischen",
     "share": "Aktie",
     "tips": [
       "Trinkwasser steigert die Leistung.",
