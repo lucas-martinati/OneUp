@@ -473,12 +473,13 @@
   height: 100%;
 }
 
-/* ── Save-routine inline form ──────────────────────────────────────── */
+/* ── Save-routine inline form ── */
 .saveForm {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 0;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 0 4px 0;
   border-top: 1px solid var(--border-muted);
   animation: confirmIn var(--motion-fast) ease-out;
 }
@@ -486,13 +487,14 @@
 .saveInput {
   flex: 1;
   min-width: 0;
-  padding: 10px 14px;
-  background: var(--surface-muted);
-  border: 1.5px solid color-mix(in srgb, var(--accent-glow) 40%, transparent);
+  height: 48px;
+  padding: 0 16px;
+  background: var(--surface-dim);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-md);
   color: var(--text-primary);
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 600;
   outline: none;
   box-sizing: border-box;
@@ -505,9 +507,27 @@
 /* ── Footer ────────────────────────────────────────────────────────── */
 .footer {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 10px;
+  width: 100%;
+  padding-top: 10px;
 }
+
+.saveBtn {
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.launchBtn {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+}
+
+
 
 /* ── Kill-switches ─────────────────────────────────────────────────── */
 :global([data-perf='low']) .routineCard,

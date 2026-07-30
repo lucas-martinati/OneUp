@@ -431,9 +431,19 @@ export function WorkoutSession(props) {
                                 onKeyDown={e => e.key === 'Enter' && handleSaveRoutine()}
                                 maxLength={30}
                             />
-                            <Button variant="success" icon={Check} onClick={handleSaveRoutine} disabled={!routineName.trim()} aria-label={t('common.save')} />
+                            <Button
+                                size="lg"
+                                variant="success"
+                                icon={Check}
+                                onClick={handleSaveRoutine}
+                                disabled={!routineName.trim()}
+                                aria-label={t('common.save')}
+                            >
+                                {t('common.save')}
+                            </Button>
                             <IconButton
                                 icon={X}
+                                size="lg"
                                 variant="ghost"
                                 onClick={() => { setShowSaveRoutine(false); setRoutineName(''); }}
                                 aria-label={t('common.cancel')}
@@ -445,6 +455,7 @@ export function WorkoutSession(props) {
                     <div className={styles.footer}>
                         {!showSaveRoutine && queue.length >= 1 && (
                             <Button
+                                size="lg"
                                 variant="secondary"
                                 icon={Save}
                                 disabled={routines.length >= maxRoutines}
@@ -453,6 +464,7 @@ export function WorkoutSession(props) {
                                     setShowSaveRoutine(true);
                                 }}
                                 aria-label={t('common.save')}
+                                className={styles.saveBtn}
                             />
                         )}
 
@@ -461,11 +473,13 @@ export function WorkoutSession(props) {
                             icon={Play}
                             onClick={startSession}
                             disabled={queue.length < 1}
-                            style={{ flex: 1 }}
+                            className={styles.launchBtn}
                         >
                             {t('workout.launch', { count: queue.length })}
                         </Button>
                     </div>
+
+
                 </div>
             </div>
         );
