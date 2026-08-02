@@ -237,7 +237,7 @@ export const DashboardSlide = React.memo(({
         <div
             className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative hide-scrollbar gap-responsive dashboard-slide-bg ${isDayPerfect ? styles.goldBg : ''}`}
             style={{
-                paddingTop: title ? 'clamp(58px, 10vh, 82px)' : 'clamp(52px, 9vh, 74px)',
+                paddingTop: title ? '64px' : '56px',
                 transition: 'all 0.6s ease-in-out',
                 overflow: 'hidden'
             }}

@@ -18,6 +18,7 @@ import { StatusLine } from './panel/StatusLine';
 import { TimerControls, CounterControls } from './panel/Controls';
 import { CameraModeBar, CameraLiveStats } from './panel/CameraControls';
 import { EventHud } from '@features/events';
+import { FitToView } from '@components/ui';
 import styles from './panel/ExercisePanel.module.css';
 
 export function ExercisePanel({
@@ -239,7 +240,6 @@ export function ExercisePanel({
     const content = (
         <div
             className={`modal-content ${styles.content} ${isSession && fadeIn ? 'fade-in' : ''} ${isTimer && isRunning ? styles.oledSaverMode : ''}`}
-
             role="dialog"
             aria-modal="true"
             aria-label={exerciseLabel}
@@ -250,155 +250,157 @@ export function ExercisePanel({
             <div className={`${styles.atmosphere} ${isCompleted ? styles.atmosphereDone : ''}`} />
             <div className={styles.vignette} />
 
-            <div className={`${styles.rise} ${styles.rise1}`}>
-            <ExercisePanelHeader
-                activeColor={activeColor}
-                exerciseConfig={exerciseConfig}
-                exerciseLabel={exerciseLabel}
-                onClose={onClose}
-                onNext={onNext}
-                hideNextButton={hideNextButton}
-                t={t}
-            />
-            </div>
-
-            {/* HUD d'événement spécial (thermomètre / constellation) intégré au panneau */}
-            <EventHud placement="panel" />
-
-            {isWeightExercise && currentWeight !== null && (
-                <WeightSelector
-                    activeColor={activeColor}
-                    currentWeight={currentWeight}
-                    handleValidateWeight={handleValidateWeight}
-                    localWeightStr={localWeightStr}
-                    setLocalWeightStr={setLocalWeightStr}
-                    t={t}
-                />
-            )}
-
-            <div className={`${styles.rise} ${styles.rise2}`} style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: 0,
-                width: '100%',
-                gap: 'clamp(8px, 1.5vh, 18px)'
-            }}>
-                {isPushups && (
-                    <CameraModeBar
+            <FitToView style={{ flex: 1, minHeight: 0, height: '100%' }} contentStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'space-between', gap: 'clamp(6px, 1.2vh, 16px)' }}>
+                <div className={`${styles.rise} ${styles.rise1}`} style={{ width: '100%' }}>
+                    <ExercisePanelHeader
                         activeColor={activeColor}
-                        isCameraActive={isCameraActive}
-                        isCalibrated={isCalibrated}
-                        startCamera={startCamera}
-                        stopCamera={stopCamera}
-                        recalibrate={recalibrate}
-                        t={t}
-                    />
-                )}
-
-                <div style={{ width: '100%', flex: '0 1 240px', minHeight: 0, position: 'relative' }}>
-                    <ProgressRing
-                        activeColor={activeColor}
-                        displayCount={displayCount}
-                        displayTime={displayTime}
-                        goalTime={goalTime}
-                        gradEnd={gradEnd}
-                        gradStart={gradStart}
-                        gradientId={gradientId}
-                        isAnimating={isAnimating}
-                        isCompleted={isCompleted}
-                        isRunning={isRunning}
-                        isTimer={isTimer}
-                        progress={progress}
-                        ringCircumference={ringCircumference}
-                        ringRadius={ringRadius}
-                        dailyGoal={dailyGoal}
-                        timeFontSize={timeFontSize}
-                        countFontSize={countFontSize}
-                        isCameraActive={isCameraActive}
-                        videoRef={videoRef}
-                        cameraError={cameraError}
-                        isCalibrated={isCalibrated}
-                        calibrateCountdown={calibrateCountdown}
-                        pushupState={pushupState}
+                        exerciseConfig={exerciseConfig}
+                        exerciseLabel={exerciseLabel}
+                        onClose={onClose}
+                        onNext={onNext}
+                        hideNextButton={hideNextButton}
                         t={t}
                     />
                 </div>
 
-                {isCameraActive ? (
-                    <CameraLiveStats
+                {/* HUD d'événement spécial (thermomètre / constellation) intégré au panneau */}
+                <EventHud placement="panel" />
+
+                {isWeightExercise && currentWeight !== null && (
+                    <WeightSelector
                         activeColor={activeColor}
-                        displayCount={displayCount}
-                        dailyGoal={dailyGoal}
-                        proximity={proximity}
-                        isCalibrated={isCalibrated}
-                        calibrateCountdown={calibrateCountdown}
-                        pushupState={pushupState}
-                        t={t}
-                    />
-                ) : (
-                    <StatusLine
-                        activeColor={activeColor}
-                        exerciseLabel={exerciseLabel}
-                        gradEnd={gradEnd}
-                        gradStart={gradStart}
-                        isCompleted={isCompleted}
-                        isTimer={isTimer}
-                        remaining={remaining}
+                        currentWeight={currentWeight}
+                        handleValidateWeight={handleValidateWeight}
+                        localWeightStr={localWeightStr}
+                        setLocalWeightStr={setLocalWeightStr}
                         t={t}
                     />
                 )}
 
-                {isTimer ? (
-                    <TimerControls
-                        activeColor={activeColor}
-                        completeFlash={completeFlash}
-                        displayCount={displayCount}
-                        gradEnd={gradEnd}
-                        handleCompleteAll={handleCompleteAll}
-                        handleReset={handleReset}
-                        isCompleted={isCompleted}
-                        isRunning={isRunning}
-                        setIsRunning={setIsRunning}
-                        t={t}
-                    />
-                ) : (
-                    <CounterControls
-                        activeColor={activeColor}
-                        completeFlash={completeFlash}
-                        displayCount={displayCount}
-                        gradEnd={gradEnd}
-                        handleCompleteAll={handleCompleteAll}
-                        handleDecrement={handleDecrement}
-                        handleIncrement={handleIncrement}
-                        handleReset={handleReset}
-                        isCompleted={isCompleted}
-                        t={t}
-                    />
-                )}
-                {!isCameraActive && (
-                    <div style={{
-                        marginTop: '12px',
-                        marginBottom: '8px',
-                        padding: '10px 18px',
-                        borderRadius: 'var(--radius-md)',
-                        background: 'rgba(255,255,255,0.035)',
-                        color: 'var(--text-secondary)',
-                        fontSize: '0.8rem',
-                        lineHeight: 1.45,
-                        textAlign: 'center',
-                        alignSelf: 'center',
-                        width: '90%',
-                        maxWidth: '320px',
-                        border: '1px solid rgba(255,255,255,0.06)'
-                    }}>
-                        <span style={{ marginRight: '4px' }}>{'\u{1F4A1}'}</span>
-                        {t('common.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
+                <div className={`${styles.rise} ${styles.rise2}`} style={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: 0,
+                    width: '100%',
+                    gap: 'clamp(6px, 1.2vh, 16px)'
+                }}>
+                    {isPushups && (
+                        <CameraModeBar
+                            activeColor={activeColor}
+                            isCameraActive={isCameraActive}
+                            isCalibrated={isCalibrated}
+                            startCamera={startCamera}
+                            stopCamera={stopCamera}
+                            recalibrate={recalibrate}
+                            t={t}
+                        />
+                    )}
+
+                    <div style={{ width: '100%', flex: '0 1 240px', minHeight: 0, position: 'relative' }}>
+                        <ProgressRing
+                            activeColor={activeColor}
+                            displayCount={displayCount}
+                            displayTime={displayTime}
+                            goalTime={goalTime}
+                            gradEnd={gradEnd}
+                            gradStart={gradStart}
+                            gradientId={gradientId}
+                            isAnimating={isAnimating}
+                            isCompleted={isCompleted}
+                            isRunning={isRunning}
+                            isTimer={isTimer}
+                            progress={progress}
+                            ringCircumference={ringCircumference}
+                            ringRadius={ringRadius}
+                            dailyGoal={dailyGoal}
+                            timeFontSize={timeFontSize}
+                            countFontSize={countFontSize}
+                            isCameraActive={isCameraActive}
+                            videoRef={videoRef}
+                            cameraError={cameraError}
+                            isCalibrated={isCalibrated}
+                            calibrateCountdown={calibrateCountdown}
+                            pushupState={pushupState}
+                            t={t}
+                        />
                     </div>
-                )}
-            </div>
+
+                    {isCameraActive ? (
+                        <CameraLiveStats
+                            activeColor={activeColor}
+                            displayCount={displayCount}
+                            dailyGoal={dailyGoal}
+                            proximity={proximity}
+                            isCalibrated={isCalibrated}
+                            calibrateCountdown={calibrateCountdown}
+                            pushupState={pushupState}
+                            t={t}
+                        />
+                    ) : (
+                        <StatusLine
+                            activeColor={activeColor}
+                            exerciseLabel={exerciseLabel}
+                            gradEnd={gradEnd}
+                            gradStart={gradStart}
+                            isCompleted={isCompleted}
+                            isTimer={isTimer}
+                            remaining={remaining}
+                            t={t}
+                        />
+                    )}
+
+                    {isTimer ? (
+                        <TimerControls
+                            activeColor={activeColor}
+                            completeFlash={completeFlash}
+                            displayCount={displayCount}
+                            gradEnd={gradEnd}
+                            handleCompleteAll={handleCompleteAll}
+                            handleReset={handleReset}
+                            isCompleted={isCompleted}
+                            isRunning={isRunning}
+                            setIsRunning={setIsRunning}
+                            t={t}
+                        />
+                    ) : (
+                        <CounterControls
+                            activeColor={activeColor}
+                            completeFlash={completeFlash}
+                            displayCount={displayCount}
+                            gradEnd={gradEnd}
+                            handleCompleteAll={handleCompleteAll}
+                            handleDecrement={handleDecrement}
+                            handleIncrement={handleIncrement}
+                            handleReset={handleReset}
+                            isCompleted={isCompleted}
+                            t={t}
+                        />
+                    )}
+                    {!isCameraActive && (
+                        <div style={{
+                            marginTop: '8px',
+                            marginBottom: '4px',
+                            padding: '8px 16px',
+                            borderRadius: 'var(--radius-md)',
+                            background: 'rgba(255,255,255,0.035)',
+                            color: 'var(--text-secondary)',
+                            fontSize: '0.8rem',
+                            lineHeight: 1.45,
+                            textAlign: 'center',
+                            alignSelf: 'center',
+                            width: '90%',
+                            maxWidth: '320px',
+                            border: '1px solid rgba(255,255,255,0.06)'
+                        }}>
+                            <span style={{ marginRight: '4px' }}>{'\u{1F4A1}'}</span>
+                            {t('common.tips', { returnObjects: true })[(dayNumber || 0) % 5]}
+                        </div>
+                    )}
+                </div>
+            </FitToView>
         </div>
     );
 
