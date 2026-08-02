@@ -38,13 +38,13 @@ function formatSpeed(speedMs, type, t) {
 
 const StatCard = ({ icon: Icon, label, value, color }) => (
   <div style={{
-    flex: '1 1 45%',
+    flex: '1 1 calc(50% - 4px)',
     background: 'var(--surface-subtle)',
     borderRadius: 'var(--radius-md)',
-    padding: 'clamp(8px, 1.4vh, 14px)',
+    padding: 'clamp(6px, 1.2vh, 12px)',
     border: '1px solid var(--border-subtle)',
-    display: 'flex', flexDirection: 'column', gap: '4px',
-    minWidth: '0',
+    display: 'flex', flexDirection: 'column', gap: '2px',
+    minWidth: '0', flexShrink: 0,
     transition: 'background-color 0.2s ease, border-color 0.2s ease'
   }}>
     <div style={{
@@ -57,7 +57,7 @@ const StatCard = ({ icon: Icon, label, value, color }) => (
       {label}
     </div>
     <div style={{
-      fontSize: 'clamp(1rem, 2.2vh, 1.45rem)',
+      fontSize: 'clamp(0.95rem, 2vh, 1.35rem)',
       fontWeight: '800',
       color: 'var(--text-primary)',
       lineHeight: 1.1
@@ -76,18 +76,18 @@ export const CardioLastSession = React.memo(({ session }) => {
   const elevation = session.elevationGain || session.elevation || 0;
 
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ width: '100%', flexShrink: 0 }}>
       <div style={{
         fontSize: 'clamp(0.72rem, 1.5vh, 0.88rem)',
         color: 'var(--text-secondary)', fontWeight: '700',
         textTransform: 'uppercase', letterSpacing: '1.5px',
-        marginBottom: 'clamp(6px, 1vh, 10px)'
+        marginBottom: 'clamp(4px, 0.8vh, 8px)'
       }}>
         {t('cardio.lastSession')}
       </div>
 
       <div style={{
-        display: 'flex', flexWrap: 'wrap', gap: '8px',
+        display: 'flex', flexWrap: 'wrap', gap: '6px',
         width: '100%'
       }}>
         <StatCard

@@ -10,12 +10,12 @@ export const CardioWeeklyGoal = React.memo(({
   const isComplete = distance >= goal;
 
   return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 'clamp(6px, 1vh, 10px)' }}>
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 'clamp(4px, 0.8vh, 8px)', flexShrink: 0 }}>
       <div style={{ width: '100%' }}>
         {/* Label row */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-          marginBottom: 'clamp(4px, 0.8vh, 8px)'
+          marginBottom: 'clamp(3px, 0.6vh, 6px)'
         }}>
           <span style={{
             fontSize: 'clamp(0.72rem, 1.5vh, 0.88rem)',
@@ -34,10 +34,10 @@ export const CardioWeeklyGoal = React.memo(({
 
         {/* Big distance number */}
         <div style={{
-          display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: 'clamp(6px, 1vh, 10px)'
+          display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: 'clamp(4px, 0.8vh, 8px)'
         }}>
           <span style={{
-            fontSize: 'clamp(1.7rem, 3.8vh, 2.6rem)',
+            fontSize: 'clamp(1.6rem, 3.6vh, 2.5rem)',
             fontWeight: '800',
             color: isComplete ? 'var(--success)' : 'var(--text-primary)',
             lineHeight: 1,
@@ -46,7 +46,7 @@ export const CardioWeeklyGoal = React.memo(({
             {distance.toFixed(1)}
           </span>
           <span style={{
-            fontSize: 'clamp(0.95rem, 2vh, 1.25rem)',
+            fontSize: 'clamp(0.9rem, 2vh, 1.2rem)',
             fontWeight: '700',
             color: 'var(--text-secondary)',
             opacity: 0.85
@@ -57,7 +57,7 @@ export const CardioWeeklyGoal = React.memo(({
 
         {/* Progress bar */}
         <div style={{
-          width: '100%', height: '10px',
+          width: '100%', height: '8px',
           borderRadius: 'var(--radius-full)',
           background: 'var(--progress-track)',
           overflow: 'hidden',
@@ -80,11 +80,11 @@ export const CardioWeeklyGoal = React.memo(({
           />
         </div>
 
-        {/* Difficulty Mismatch Alert - Integrated between progress and map */}
+        {/* Difficulty Mismatch Alert */}
         {isDifficultyMismatch && (
           <div className="fade-in" style={{
-            marginTop: '12px',
-            padding: '10px 14px',
+            marginTop: '8px',
+            padding: '8px 12px',
             borderRadius: 'var(--radius-md)',
             background: 'rgba(139, 92, 246, 0.08)',
             border: '1px solid rgba(139, 92, 246, 0.2)',
@@ -93,7 +93,7 @@ export const CardioWeeklyGoal = React.memo(({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '12px',
+            gap: '8px',
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
             position: 'relative',
             overflow: 'hidden'
@@ -104,13 +104,13 @@ export const CardioWeeklyGoal = React.memo(({
               background: 'var(--gradient-glow)'
             }} />
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
               <span style={{ 
-                fontSize: '1.1rem', 
+                fontSize: '1rem', 
                 filter: 'drop-shadow(0 0 8px var(--accent-glow))',
                 animation: 'pulse 2s infinite' 
               }}>⚙️</span>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                 <span style={{ 
                   fontSize: '0.65rem', 
                   color: 'var(--text-primary)', 
@@ -124,7 +124,7 @@ export const CardioWeeklyGoal = React.memo(({
                 <span style={{ 
                   fontSize: '0.6rem', 
                   color: 'var(--text-secondary)',
-                  lineHeight: '1.3',
+                  lineHeight: '1.2',
                   opacity: 0.8
                 }}>
                   {t('cardio.difficultyMismatchDesc', { saved: savedDifficulty, current: currentDifficulty })}
@@ -136,7 +136,7 @@ export const CardioWeeklyGoal = React.memo(({
               onClick={onInvalidate}
               className="hover-lift"
               style={{
-                padding: '6px 14px',
+                padding: '4px 10px',
                 borderRadius: 'var(--radius-full)',
                 background: 'var(--gradient-glow)',
                 color: 'white',
@@ -157,7 +157,7 @@ export const CardioWeeklyGoal = React.memo(({
 
         {isComplete && !isDifficultyMismatch && (
           <div className="scale-in" style={{
-            marginTop: '8px',
+            marginTop: '6px',
             fontSize: 'clamp(0.65rem, 1.3vh, 0.8rem)',
             color: 'var(--success)',
             fontWeight: '700',

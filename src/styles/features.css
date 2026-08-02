@@ -828,7 +828,7 @@
     --done-text-margin-with-title: 2px;
     --done-text-size-with-title: 0.62rem;
     --bottom-btn-size-with-title: clamp(68px, 11vh, 98px);
-    --cardio-map-height: clamp(100px, 22vh, 200px);
+    --cardio-map-height: clamp(60px, 11vh, 90px);
   }
   #root {
     padding: 6px !important;
@@ -853,7 +853,7 @@
     --done-text-margin-with-title: 1px;
     --done-text-size-with-title: 0.58rem;
     --bottom-btn-size-with-title: clamp(56px, 8.5vh, 80px);
-    --cardio-map-height: clamp(90px, 18vh, 150px);
+    --cardio-map-height: clamp(50px, 9vh, 75px);
   }
   #root {
     padding: 4px !important;
@@ -889,7 +889,7 @@
     --bottom-btn-size: clamp(80px, 14.5cqh, 125px);
     --done-text-margin: clamp(3px, 0.9cqh, 7px);
     --done-text-size: clamp(0.65rem, 2.5vw, 0.85rem);
-    --cardio-map-height: clamp(110px, 25cqh, 220px);
+    --cardio-map-height: clamp(60px, 12cqh, 95px);
 
     /* Tile internals (the real height of a tile is content-bound) */
     --tile-icon-size: clamp(27px, 4.2cqh, 35px);

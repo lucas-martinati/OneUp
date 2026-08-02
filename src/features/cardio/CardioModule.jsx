@@ -157,8 +157,8 @@ export function CardioModule() {
         style={{
         width: '100%', height: '100%',
         display: 'flex', flexDirection: 'column',
-        padding: 'clamp(8px, 1.4vh, 20px)',
-        gap: 'clamp(6px, 1vh, 12px)',
+        padding: 'clamp(8px, 1.4vh, 18px)',
+        gap: 'clamp(6px, 1vh, 10px)',
         position: 'relative',
         overflow: 'hidden',
         boxSizing: 'border-box',
@@ -208,13 +208,14 @@ export function CardioModule() {
           </div>
           );
           return (
-          <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-            <div className="custom-scrollbar" style={{
-              flex: 1, overflowY: isDemo ? 'hidden' : 'auto', overflowX: 'hidden',
+          <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+            <div style={{
+              flex: 1, minHeight: 0,
+              overflow: 'hidden',
               display: 'flex', flexDirection: 'column',
-              gap: 'clamp(6px, 1vh, 12px)',
-              paddingBottom: '6px',
-              scrollbarWidth: 'none',
+              justifyContent: 'space-between',
+              gap: 'clamp(4px, 0.8vh, 10px)',
+              paddingBottom: '2px',
               pointerEvents: isDemo ? 'none' : 'auto',
               userSelect: isDemo ? 'none' : 'auto',
               opacity: isDemo ? 0.8 : 1
@@ -241,20 +242,20 @@ export function CardioModule() {
                 display: 'flex', gap: '8px',
                 flexShrink: 0
               }}>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <CardioStreak streak={displayStreak} />
                 </div>
                 <button
                   onClick={() => !isDemo && setShowHistory(true)}
                   className="hover-lift"
                   style={{
-                    padding: 'clamp(8px, 1.2vh, 14px) clamp(14px, 2vw, 20px)',
+                    padding: 'clamp(6px, 1.2vh, 12px) clamp(12px, 1.8vw, 18px)',
                     borderRadius: 'var(--radius-md)',
                     background: 'var(--surface-subtle)',
                     border: '1px solid var(--border-muted)',
                     color: 'var(--text-primary)',
                     fontWeight: '700',
-                    fontSize: 'clamp(0.65rem, 1.2vh, 0.8rem)',
+                    fontSize: 'clamp(0.65rem, 1.2vh, 0.78rem)',
                     display: 'flex', alignItems: 'center',
                     gap: '4px',
                     cursor: isDemo ? 'default' : 'pointer',
@@ -274,11 +275,11 @@ export function CardioModule() {
                   <button
                     onClick={handleConnectHealth}
                     style={{
-                      flex: 1, padding: '8px', borderRadius: 'var(--radius-sm)',
+                      flex: 1, padding: '6px', borderRadius: 'var(--radius-sm)',
                       background: healthConnected ? 'rgba(66, 133, 244, 0.1)' : 'var(--surface-subtle)',
                       border: `1px solid ${healthConnected ? '#4285F4' : 'var(--border-muted)'}`,
                       color: healthConnected ? '#4285F4' : 'var(--text-primary)',
-                      fontSize: '0.7rem', fontWeight: '700',
+                      fontSize: 'clamp(0.6rem, 1.1cqh, 0.7rem)', fontWeight: '700',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                       cursor: 'pointer', transition: 'all 0.2s ease'
                     }}
@@ -305,7 +306,7 @@ export function CardioModule() {
                         gap: '10px',
                         background: '#0a0a0a',
                         border: '1px solid rgba(255, 255, 255, 0.12)',
-                        padding: '8px 16px',
+                        padding: '6px 12px',
                         borderRadius: 'var(--radius-sm)',
                         textDecoration: 'none',
                         color: '#ffffff',
@@ -313,7 +314,7 @@ export function CardioModule() {
                         transition: 'all 0.25s ease',
                       }}
                     >
-                      <svg viewBox="0 0 29 32" width="16" height="18" style={{ flexShrink: 0 }}>
+                      <svg viewBox="0 0 29 32" width="14" height="16" style={{ flexShrink: 0 }}>
                         <path d="M13.54 15.28.12 29.34a3.64 3.64 0 0 0 5.33 2.16l15.1-8.6z" fill="#ea4335"/>
                         <path d="m27.11 12.89-6.53-3.74-7.35 6.45 7.38 7.28 6.48-3.7a3.55 3.55 0 0 0 0-6.29z" fill="#fbbc04"/>
                         <path d="M.12 2.66a3.46 3.46 0 0 0-.12.92v24.84a3.66 3.66 0 0 0 .12.92L14 15.64Z" fill="#4285f4"/>
@@ -331,7 +332,7 @@ export function CardioModule() {
                           {i18n.language?.startsWith('fr') ? 'Disponible sur' : 'Get it on'}
                         </span>
                         <span style={{ 
-                          fontSize: '0.85rem', 
+                          fontSize: '0.8rem', 
                           fontWeight: '700', 
                           color: '#ffffff',
                           letterSpacing: '0.2px'
@@ -347,9 +348,9 @@ export function CardioModule() {
               {!isDemo && sessions.length === 0 && (
                 <div style={{
                   textAlign: 'center',
-                  padding: '6px 0',
+                  padding: '4px 0',
                   color: 'var(--text-secondary)',
-                  fontSize: 'clamp(0.65rem, 1.2vh, 0.8rem)',
+                  fontSize: 'clamp(0.6rem, 1.1cqh, 0.75rem)',
                   opacity: 0.6
                 }}>
                   {t('cardio.noSessions')}

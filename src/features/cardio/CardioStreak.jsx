@@ -9,7 +9,7 @@ export const CardioStreak = React.memo(({ streak }) => {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: '8px',
-      padding: 'clamp(8px, 1.2vh, 14px) clamp(12px, 2vw, 18px)',
+      padding: 'clamp(6px, 1.2vh, 12px) clamp(10px, 1.8vw, 16px)',
       borderRadius: 'var(--radius-md)',
       background: isActive
         ? 'linear-gradient(135deg, rgba(249,115,22,0.12), rgba(239,68,68,0.08))'
@@ -18,10 +18,10 @@ export const CardioStreak = React.memo(({ streak }) => {
         ? '1px solid rgba(249,115,22,0.2)'
         : '1px solid var(--border-subtle)',
       transition: 'all 0.3s ease',
-      width: '100%',
+      width: '100%', flexShrink: 0
     }}>
       <div style={{
-        width: '40px', height: '40px', borderRadius: '50%',
+        width: '36px', height: '36px', borderRadius: '50%',
         background: isActive
           ? 'linear-gradient(135deg, rgba(249,115,22,0.25), rgba(239,68,68,0.25))'
           : 'var(--surface-muted)',
@@ -29,7 +29,7 @@ export const CardioStreak = React.memo(({ streak }) => {
         flexShrink: 0
       }}>
         <Flame
-          size={20}
+          size={18}
           color={isActive ? '#f97316' : 'var(--text-secondary)'}
           style={{ opacity: isActive ? 1 : 0.4 }}
         />
@@ -37,7 +37,7 @@ export const CardioStreak = React.memo(({ streak }) => {
 
       <div className="flex-1-min0">
         <div style={{
-          fontSize: 'clamp(0.68rem, 1.3vh, 0.82rem)',
+          fontSize: 'clamp(0.65rem, 1.2vh, 0.78rem)',
           color: 'var(--text-secondary)', fontWeight: '700',
           textTransform: 'uppercase', letterSpacing: '1px',
           marginBottom: '2px'
@@ -45,13 +45,13 @@ export const CardioStreak = React.memo(({ streak }) => {
           {t('cardio.streak')}
         </div>
         <div style={{
-          fontSize: 'clamp(1.15rem, 2.5vh, 1.55rem)',
+          fontSize: 'clamp(1.05rem, 2.2vh, 1.45rem)',
           fontWeight: '800',
           color: isActive ? '#f97316' : 'var(--text-secondary)',
           lineHeight: 1
         }}>
           {streak} <span style={{
-            fontSize: 'clamp(0.7rem, 1.3vh, 0.85rem)',
+            fontSize: 'clamp(0.7rem, 1.3vh, 0.82rem)',
             fontWeight: '600', opacity: 0.75
           }}>{t('common.weeksAbbr')}</span>
         </div>
