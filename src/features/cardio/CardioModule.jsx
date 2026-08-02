@@ -212,6 +212,7 @@ export function CardioModule() {
             <div style={{
               flex: 1, minHeight: 0,
               overflow: 'hidden',
+              overflowY: 'auto',
               display: 'flex', flexDirection: 'column',
               justifyContent: 'space-between',
               gap: 'clamp(4px, 0.8vh, 10px)',
