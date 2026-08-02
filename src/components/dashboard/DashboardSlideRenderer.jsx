@@ -16,6 +16,8 @@ import { useSubscription } from '@contexts/SubscriptionContext';
 import { useExercises } from '@contexts/ExercisesContext';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 
+import { FitToView } from '@components/ui';
+
 const CardioModule = lazy(() => import('@features/cardio/CardioModule').then(m => ({ default: m.CardioModule })));
 
 export function DashboardSlideRenderer({
@@ -51,9 +53,11 @@ export function DashboardSlideRenderer({
         if (catKey === CATEGORIES.CARDIO) {
             return (
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
-                    <Suspense fallback={null}>
-                        <CardioModule />
-                    </Suspense>
+                    <FitToView>
+                        <Suspense fallback={null}>
+                            <CardioModule />
+                        </Suspense>
+                    </FitToView>
                 </div>
             );
         }
@@ -61,15 +65,17 @@ export function DashboardSlideRenderer({
         if (catKey === CATEGORIES.BODYWEIGHT) {
             return (
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
-                    <DashboardSlide
-                        isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
-                        getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
-                        isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
-                        pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
-                        activeExerciseId={classicSelected} onSelectExercise={handleSelectExercise}
-                        exercisesList={EXERCISES} exercisesMap={EXERCISES_MAP}
-                        getConfig={getConfig}
-                    />
+                    <FitToView>
+                        <DashboardSlide
+                            isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
+                            getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
+                            isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
+                            pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
+                            activeExerciseId={classicSelected} onSelectExercise={handleSelectExercise}
+                            exercisesList={EXERCISES} exercisesMap={EXERCISES_MAP}
+                            getConfig={getConfig}
+                        />
+                    </FitToView>
                 </div>
             );
         }
@@ -77,24 +83,26 @@ export function DashboardSlideRenderer({
         if (catKey === CATEGORIES.WEIGHTS) {
             return (
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
-                    {canAccessFeature(FEATURES.WEIGHTS, { isPro }) ? (
-                        <DashboardSlide
-                            title={t('common.weights')}
-                            categoryColor={CATEGORY_COLORS[CATEGORIES.WEIGHTS]}
-                            isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
-                            getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
-                            isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
-                            pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
-                            activeExerciseId={weightsSelected} onSelectExercise={handleSelectExercise}
-                            exercisesList={WEIGHT_EXERCISES} exercisesMap={WEIGHT_EXERCISES_MAP}
-                            getConfig={getConfig}
-                        />
-                    ) : (
-                        <ProPaywall
-                            title={t('common.weights')}
-                            onOpenStore={openStore}
-                        />
-                    )}
+                    <FitToView>
+                        {canAccessFeature(FEATURES.WEIGHTS, { isPro }) ? (
+                            <DashboardSlide
+                                title={t('common.weights')}
+                                categoryColor={CATEGORY_COLORS[CATEGORIES.WEIGHTS]}
+                                isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
+                                getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
+                                isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
+                                pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
+                                activeExerciseId={weightsSelected} onSelectExercise={handleSelectExercise}
+                                exercisesList={WEIGHT_EXERCISES} exercisesMap={WEIGHT_EXERCISES_MAP}
+                                getConfig={getConfig}
+                            />
+                        ) : (
+                            <ProPaywall
+                                title={t('common.weights')}
+                                onOpenStore={openStore}
+                            />
+                        )}
+                    </FitToView>
                 </div>
             );
         }
@@ -106,27 +114,29 @@ export function DashboardSlideRenderer({
 
             return (
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
-                    {canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) ? (
-                        <DashboardSlide
-                            title={title}
-                            categoryColor={color}
-                            isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
-                            getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
-                            isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
-                            pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
-                            activeExerciseId={customExercisesMap[customSelected] ? customSelected : (defaultCustomExercises[0]?.id || null)} onSelectExercise={handleSelectExercise}
-                            exercisesList={defaultCustomExercises} exercisesMap={customExercisesMap}
-                            onManageCustom={() => { openCustomExercises(null, 'list'); pauseCloudSync?.(); }}
-                            onAddCustom={() => { openCustomExercises(null, 'create'); pauseCloudSync?.(); }}
-                            onManageCategories={() => { openModal('categoryManager'); }}
-                            getConfig={getConfig}
-                        />
-                    ) : (
-                        <ProPaywall
-                            title={title}
-                            onOpenStore={openStore}
-                        />
-                    )}
+                    <FitToView>
+                        {canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) ? (
+                            <DashboardSlide
+                                title={title}
+                                categoryColor={color}
+                                isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
+                                getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
+                                isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
+                                pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
+                                activeExerciseId={customExercisesMap[customSelected] ? customSelected : (defaultCustomExercises[0]?.id || null)} onSelectExercise={handleSelectExercise}
+                                exercisesList={defaultCustomExercises} exercisesMap={customExercisesMap}
+                                onManageCustom={() => { openCustomExercises(null, 'list'); pauseCloudSync?.(); }}
+                                onAddCustom={() => { openCustomExercises(null, 'create'); pauseCloudSync?.(); }}
+                                onManageCategories={() => { openModal('categoryManager'); }}
+                                getConfig={getConfig}
+                            />
+                        ) : (
+                            <ProPaywall
+                                title={title}
+                                onOpenStore={openStore}
+                            />
+                        )}
+                    </FitToView>
                 </div>
             );
         }
@@ -140,27 +150,29 @@ export function DashboardSlideRenderer({
             const selId = userCatSelected[catKey] || catExercises[0]?.id || null;
             return (
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
-                    {canAccessFeature(FEATURES.CUSTOM_CATEGORIES, { isPro }) ? (
-                        <DashboardSlide
-                            title={catDef.name}
-                            categoryColor={catDef.color}
-                            isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
-                            getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
-                            isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
-                            pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
-                            activeExerciseId={selId} onSelectExercise={handleSelectExercise}
-                            exercisesList={catExercises} exercisesMap={catExMap}
-                            onManageCustom={() => { openCustomExercises(catKey, 'list'); pauseCloudSync?.(); }}
-                            onAddCustom={() => { openCustomExercises(catKey, 'create'); pauseCloudSync?.(); }}
-                            onManageCategories={() => { openModal('categoryManager'); }}
-                            getConfig={getConfig}
-                        />
-                    ) : (
-                        <ProPaywall
-                            title={catDef.name}
-                            onOpenStore={openStore}
-                        />
-                    )}
+                    <FitToView>
+                        {canAccessFeature(FEATURES.CUSTOM_CATEGORIES, { isPro }) ? (
+                            <DashboardSlide
+                                title={catDef.name}
+                                categoryColor={catDef.color}
+                                isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
+                                getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
+                                isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
+                                pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
+                                activeExerciseId={selId} onSelectExercise={handleSelectExercise}
+                                exercisesList={catExercises} exercisesMap={catExMap}
+                                onManageCustom={() => { openCustomExercises(catKey, 'list'); pauseCloudSync?.(); }}
+                                onAddCustom={() => { openCustomExercises(catKey, 'create'); pauseCloudSync?.(); }}
+                                onManageCategories={() => { openModal('categoryManager'); }}
+                                getConfig={getConfig}
+                            />
+                        ) : (
+                            <ProPaywall
+                                title={catDef.name}
+                                onOpenStore={openStore}
+                            />
+                        )}
+                    </FitToView>
                 </div>
             );
         }

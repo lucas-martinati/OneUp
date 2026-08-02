@@ -28,11 +28,6 @@ export const DashboardSlide = React.memo(({
 
     const isDayPerfect = isPerfectDay(completions[today], exercisesList);
 
-    // Compact sizes whenever the tile grid is at full height (4 rows = 10+
-    // exercises) — with or without a category title row. Pages with fewer
-    // tiles (e.g. weights) keep the same sizes as a small category.
-    const gridRows = Math.ceil(exercisesList.length / 3);
-    const isCompact = gridRows >= 4;
 
     const renderContent = () => {
         if (exercisesList.length === 0) {
@@ -244,19 +239,7 @@ export const DashboardSlide = React.memo(({
             style={{
                 paddingTop: title ? 'clamp(58px, 10vh, 82px)' : 'clamp(52px, 9vh, 74px)',
                 transition: 'all 0.6s ease-in-out',
-                overflow: 'hidden',
-                ...(isCompact ? {
-                    '--exercise-btn-min-height': 'var(--exercise-btn-min-height-with-title, var(--exercise-btn-min-height))',
-                    '--done-text-margin': 'var(--done-text-margin-with-title, var(--done-text-margin))',
-                    '--done-text-size': 'var(--done-text-size-with-title, var(--done-text-size))'
-                } : {}),
-                // Hero + counter button only shrink when a title row eats space on top
-                ...(isCompact && title ? {
-                    '--day-label-size': 'var(--day-label-size-with-title, var(--day-label-size))',
-                    '--day-num-height': 'var(--day-num-height-with-title, var(--day-num-height))',
-                    '--day-num-font-size': 'var(--day-num-font-size-with-title, var(--day-num-font-size))',
-                    '--bottom-btn-size': 'var(--bottom-btn-size-with-title, var(--bottom-btn-size))'
-                } : {})
+                overflow: 'hidden'
             }}
         >
             {isDayPerfect && (

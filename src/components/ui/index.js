@@ -24,3 +24,4 @@ export { WeightBadge } from './WeightBadge';
 export { Skeleton } from './Skeleton';
 export { EmptyState } from './EmptyState';
 export { ModalContainer } from './ModalContainer';
+export { FitToView } from './FitToView';
