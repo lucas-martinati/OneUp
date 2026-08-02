@@ -6,6 +6,7 @@ import { createLogger } from '@utils/logger';
 import { getLocalDateStr, parseLocalDate, isDayDoneFromCompletions } from '@shared/dateUtils';
 import { STORAGE_KEY_BASE, getDefaultState, parseProgressData, validateProgressData } from '@hooks/useProgressStorage';
 import { cloudSync } from '@services/cloudSync';
+import { reconcileStreakFreezeState } from '@shared/streakFreeze';
 
 const logger = createLogger('ProgressStore');
 
@@ -274,12 +275,30 @@ export const useProgressStore = create((set, get) => ({
 
   // ── Streak Freeze ───────────────────────────────────────────────────
 
-  /**
-   * Apply the monthly freeze refill and auto-consume freezes to protect the
-   * streak across a gap of missed days ending yesterday. Idempotent and safe to
-   * call repeatedly (on load and at each day rollover). Returns the list of days
-   * newly frozen this run, so the caller can surface a notification/toast.
-   */
+  reconcileStreakFreezes: (isPro = false, todayStr = getLocalDateStr(new Date())) => {
+    const state = get();
+    if (!state.isSetup) return [];
+
+    const result = reconcileStreakFreezeState({
+      frozenDays: state.frozenDays,
+      streakFreezes: state.streakFreezes,
+      startDate: state.userStartDate || state.startDate,
+      isPro,
+      todayStr,
+      isDayDone: (dateStr) => isDayDoneFromCompletions(state.completions, dateStr),
+    });
+
+    if (result.changed) {
+      set({
+        frozenDays: result.frozenDays,
+        streakFreezes: result.streakFreezes,
+        lastCompletionChange: serverTimestamp(),
+      });
+      get()._persist();
+    }
+
+    return result.frozeDates;
+  },
 
 
   // Streak freezes are a signed-in-only feature. When the user is a guest (or

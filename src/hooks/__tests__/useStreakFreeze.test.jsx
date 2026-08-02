@@ -15,14 +15,17 @@ vi.mock('../useToastGestures', () => ({ useToastGestures: () => ({ exit: false, 
 
 describe('useStreakFreeze', () => {
     let mockClearStreakFreezes;
+    let mockReconcileStreakFreezes;
 
     beforeEach(() => {
         mockClearStreakFreezes = vi.fn();
+        mockReconcileStreakFreezes = vi.fn();
         useProgressStore.mockImplementation((selector) => {
             const state = {
                 isSetup: true,
                 isStoreInitialized: true,
                 clearStreakFreezes: mockClearStreakFreezes,
+                reconcileStreakFreezes: mockReconcileStreakFreezes,
                 frozenDays: {}
             };
             return selector(state);
@@ -39,6 +42,11 @@ describe('useStreakFreeze', () => {
         useAuth.mockReturnValue({ isSignedIn: false });
         renderHook(() => useStreakFreeze());
         expect(mockClearStreakFreezes).toHaveBeenCalled();
+    });
+
+    it('calls reconcileStreakFreezes when ready', () => {
+        renderHook(() => useStreakFreeze());
+        expect(mockReconcileStreakFreezes).toHaveBeenCalledWith(false);
     });
 
     it('triggers a toast when frozenDays increases', () => {

@@ -201,6 +201,21 @@ describe('reconcileStreakFreezeState — auto-freeze', () => {
         expect(r.frozeDates.sort()).toEqual(['2026-06-20', '2026-06-21', '2026-06-22']);
         expect(r.streakFreezes.count).toBe(0);
     });
+
+    it('does not consume current month refilled freezes for missed days in prior months on subsequent reconciliations', () => {
+        // User opens app in July (07-02) after missing May/June with lastRefill = '2026-07' and count = 1.
+        // The July freeze MUST NOT be used for May or June missed days.
+        const completions = { '2026-05-20': done() };
+        const r = testReconcile({
+            ...base,
+            todayStr: '2026-07-02',
+            completions, frozenDays: {},
+            streakFreezes: { count: 1, lastRefill: '2026-07' },
+        });
+        expect(r.frozeDates).toEqual([]);
+        expect(r.frozenDays).toEqual({});
+        expect(r.streakFreezes.count).toBe(1);
+    });
 });
 
 describe('frozen days keep the streak alive', () => {

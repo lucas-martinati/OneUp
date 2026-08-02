@@ -88,11 +88,12 @@ function StreakFreezeNotification({ count, onClose }) {
  * render). Reconciliation is idempotent, so repeated calls are harmless.
  */
 export function useStreakFreeze() {
-    const { isSubscriptionLoading } = useSubscription();
+    const { isSubscriptionLoading, isPro = false } = useSubscription();
     const auth = useAuth();
     const isSetup = useProgressStore(s => s.isSetup);
     const isStoreInitialized = useProgressStore(s => s.isStoreInitialized);
     const clearStreakFreezes = useProgressStore(s => s.clearStreakFreezes);
+    const reconcileStreakFreezes = useProgressStore(s => s.reconcileStreakFreezes);
     const frozenDays = useProgressStore(s => s.frozenDays);
     const isInitialSyncDone = useCloudSyncStore(s => s.isInitialSyncDone);
 
@@ -115,6 +116,10 @@ export function useStreakFreeze() {
     useEffect(() => {
         if (!ready) return;
 
+        if (reconcileStreakFreezes) {
+            reconcileStreakFreezes(isPro);
+        }
+
         if (prevFrozenDaysRef.current === null) {
             prevFrozenDaysRef.current = frozenDays;
             return;
@@ -131,7 +136,7 @@ export function useStreakFreeze() {
         }
 
         prevFrozenDaysRef.current = frozenDays;
-    }, [ready, frozenDays]);
+    }, [ready, frozenDays, reconcileStreakFreezes, isPro]);
 
     const StreakFreezeToast = useCallback(() => {
         if (!toast) return null;

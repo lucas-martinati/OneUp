@@ -136,14 +136,22 @@ export function reconcileStreakFreezeState({ frozenDays, streakFreezes, startDat
   }
 
   // Consume freezes sequentially from the OLDEST missed day forward. The first day
-  // we can't cover breaks the streak, so we stop there and leave the rest unfrozen.
+  // we can't cover (or that belongs to a month prior to the freeze allotment's refill)
+  // breaks the streak, so we stop there and leave the rest unfrozen.
   const frozeDates = [];
   if (bridgeable) {
-    for (let j = gap.length - 1; j >= 0 && available > 0; j--) {
+    const refillMonth = streakFreezes?.lastRefill || null;
+    for (let j = gap.length - 1; j >= 0; j--) {
       const ds = gap[j];
-      nextFrozen[ds] = true;
-      frozeDates.push(ds);
-      available -= 1;
+      const isEligibleMonth = !refillMonth || monthKey(ds) >= refillMonth;
+      if (available > 0 && isEligibleMonth) {
+        nextFrozen[ds] = true;
+        frozeDates.push(ds);
+        available -= 1;
+      } else {
+        // Missed day cannot be covered — breaks the streak, so stop bridging.
+        break;
+      }
     }
   }
 

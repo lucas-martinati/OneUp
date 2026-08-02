@@ -816,6 +816,20 @@ describe('streak freezes and notes', () => {
     // second call should just return
     useProgressStore.getState().clearStreakFreezes();
   });
+
+  it('reconcileStreakFreezes runs reconciliation and updates state', () => {
+    useProgressStore.setState({
+      isSetup: true,
+      userStartDate: '2026-01-01',
+      completions: { '2026-06-20': { pushups: { isCompleted: true } } },
+      frozenDays: {},
+      streakFreezes: { count: 1, lastRefill: '2026-06' }
+    });
+    const frozeDates = useProgressStore.getState().reconcileStreakFreezes(false, '2026-06-22');
+    expect(frozeDates).toEqual(['2026-06-21']);
+    expect(useProgressStore.getState().frozenDays['2026-06-21']).toBe(true);
+    expect(useProgressStore.getState().streakFreezes.count).toBe(0);
+  });
 });
 
   it('mergeWithAnonymousData aborts if guest JSON is identical to user JSON', async () => {
