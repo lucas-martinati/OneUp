@@ -16,6 +16,57 @@ const getOptimalPerformanceMode = () => {
   return 'high';
 };
 
+/**
+ * Auto-detect whether the user's country/locale starts the week on Sunday or Monday.
+ * Countries like US, Canada, Brazil, Mexico, Japan, South Korea, etc. start on Sunday.
+ * Most of Europe, UK, Australia, etc. use ISO Monday start.
+ */
+export const getAutoDetectedWeekStartDay = () => {
+  if (typeof window === 'undefined') return 'monday';
+
+  try {
+    const localeStr = navigator.language || (navigator.languages && navigator.languages[0]) || '';
+
+    // Modern Intl.Locale API check (if supported by JS engine)
+    if (typeof Intl !== 'undefined' && Intl.Locale) {
+      const loc = new Intl.Locale(localeStr);
+      if (loc.weekInfo && loc.weekInfo.firstDay !== undefined) {
+        // 7 = Sunday (JS Intl spec: 1=Mon, 7=Sun)
+        return loc.weekInfo.firstDay === 7 ? 'sunday' : 'monday';
+      }
+    }
+
+    // Country / region fallback check
+    const parts = localeStr.split('-');
+    const region = parts.length > 1 ? parts[parts.length - 1].toUpperCase() : '';
+
+    const sundayRegions = new Set([
+      'US', 'CA', 'BR', 'MX', 'JP', 'KR', 'TW', 'PH', 'IL', 'IN', 'SA', 'AE', 'HK', 'SG', 'CO', 'CL', 'PE', 'VE', 'ZA'
+    ]);
+    if (region && sundayRegions.has(region)) {
+      return 'sunday';
+    }
+
+    // Timezone fallback check
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    if (
+      tz.startsWith('America/New_York') ||
+      tz.startsWith('America/Los_Angeles') ||
+      tz.startsWith('America/Chicago') ||
+      tz.startsWith('America/Denver') ||
+      tz.startsWith('America/Sao_Paulo') ||
+      tz.startsWith('Asia/Tokyo') ||
+      tz.startsWith('Asia/Seoul')
+    ) {
+      return 'sunday';
+    }
+  } catch (error) {
+    logger.error('Failed to auto-detect week start day:', error);
+  }
+
+  return 'monday';
+};
+
 const defaultSettings = {
   notificationsEnabled: false,
   soundsEnabled: true,
@@ -28,7 +79,7 @@ const defaultSettings = {
   exerciseDifficulties: {},
   keepScreenOn: true,
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-  weekStartDay: 'monday',
+  weekStartDay: getAutoDetectedWeekStartDay(),
 };
 
 /** Keys that were stored in older versions and should be stripped on load */

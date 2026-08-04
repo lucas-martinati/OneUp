@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useSettingsStore } from '../useSettingsStore';
+import { useSettingsStore, getAutoDetectedWeekStartDay } from '../useSettingsStore';
 
 // Mock dependencies
 vi.mock('@utils/logger', () => ({
@@ -20,6 +20,22 @@ describe('useSettingsStore', () => {
       setItem: vi.fn((key, value) => { store[key] = value.toString(); }),
       removeItem: vi.fn((key) => { delete store[key]; }),
     };
+  });
+
+  describe('Auto-detection', () => {
+    it('detects Sunday for US region', () => {
+      const origLang = navigator.language;
+      Object.defineProperty(navigator, 'language', { value: 'en-US', configurable: true });
+      expect(getAutoDetectedWeekStartDay()).toBe('sunday');
+      Object.defineProperty(navigator, 'language', { value: origLang, configurable: true });
+    });
+
+    it('detects Monday for FR region', () => {
+      const origLang = navigator.language;
+      Object.defineProperty(navigator, 'language', { value: 'fr-FR', configurable: true });
+      expect(getAutoDetectedWeekStartDay()).toBe('monday');
+      Object.defineProperty(navigator, 'language', { value: origLang, configurable: true });
+    });
   });
 
   describe('Initialization', () => {
