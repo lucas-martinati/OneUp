@@ -36,6 +36,9 @@ export function DifficultySettings() {
 
     return (
         <Card variant="glass" padding="md" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--spacing-md)',
             border: isMultiplierUnlocked ? '1px solid rgba(239, 68, 68, 0.4)' : undefined,
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             position: 'relative',
@@ -44,7 +47,7 @@ export function DifficultySettings() {
         }}>
             <h3 style={{ ...sectionTitleStyle, color: isMultiplierUnlocked ? '#ef4444' : 'var(--text-secondary)' }}>{t('common.difficulty')}</h3>
 
-            <div style={{ marginBottom: '16px' }}>
+            <div>
                 <div style={{
                     background: isMultiplierUnlocked ? 'rgba(239, 68, 68, 0.15)' : 'rgba(239, 68, 68, 0.05)',
                     border: `1px solid ${isMultiplierUnlocked ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.1)'}`,

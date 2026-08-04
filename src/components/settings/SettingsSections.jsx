@@ -13,167 +13,180 @@ export function PreferencesSection({ settings, onSave }) {
     const { t } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md">
+        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.preferences')}</h3>
 
-            <SettingRow
-                icon={Bell}
-                title={t('settings.notifications')}
-                description={t('settings.reminder')}
-                color="var(--accent-glow)"
-                isLast={!settings.notificationsEnabled}
-            >
-                <ToggleSwitch
-                    enabled={settings.notificationsEnabled}
-                    onClick={() => onSave({ ...settings, notificationsEnabled: !settings.notificationsEnabled })}
-                    activeGradient="linear-gradient(135deg, var(--accent-glow), var(--accent))"
-                />
-            </SettingRow>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+                <SettingRow
+                    icon={Bell}
+                    title={t('settings.notifications')}
+                    description={t('settings.reminder')}
+                    color="var(--accent-glow)"
+                    isLast={!settings.notificationsEnabled}
+                >
+                    <ToggleSwitch
+                        enabled={settings.notificationsEnabled}
+                        onClick={() => onSave({ ...settings, notificationsEnabled: !settings.notificationsEnabled })}
+                        activeGradient="linear-gradient(135deg, var(--accent-glow), var(--accent))"
+                    />
+                </SettingRow>
 
-            {/* Notification Time Picker */}
-            {settings?.notificationsEnabled && settings?.notificationTime && (
-                <div className="scale-in" style={{
-                    padding: '12px 0 16px 0',
-                    borderBottom: '1px solid var(--border-subtle)',
-                }}>
-                    <div style={{
-                        display: 'flex', alignItems: 'center', gap: '8px',
-                        marginBottom: '10px', color: 'var(--text-secondary)'
+                {/* Notification Time Picker */}
+                {settings?.notificationsEnabled && settings?.notificationTime && (
+                    <div className="scale-in" style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px',
+                        padding: '12px',
+                        borderRadius: 'var(--radius-md)',
+                        background: 'var(--surface-muted)',
+                        border: '1px solid var(--border-subtle)',
                     }}>
-                        <Clock size={14} />
-                        <div style={{ fontWeight: '600', fontSize: '0.8rem' }}>{t('settings.reminderTime')}</div>
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            color: 'var(--text-secondary)'
+                        }}>
+                            <Clock size={14} />
+                            <div style={{ fontWeight: '600', fontSize: '0.8rem' }}>{t('settings.reminderTime')}</div>
+                        </div>
+                        <div style={{
+                            display: 'flex', gap: '12px', alignItems: 'center',
+                        }}>
+                            <select
+                                value={settings.notificationTime.hour}
+                                onChange={(e) => onSave({
+                                    ...settings,
+                                    notificationTime: { ...settings.notificationTime, hour: parseInt(e.target.value) }
+                                })}
+                                className="input-field input-field--select"
+                                style={{
+                                    padding: '10px 14px', borderRadius: 'var(--radius-md)',
+                                    border: '1px solid var(--border-default)', background: 'var(--surface-elevated)',
+                                    color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700',
+                                    textAlign: 'center', flex: 1
+                                }}
+                            >
+                                {Array.from({ length: 24 }, (_, i) => (
+                                    <option key={i} value={i}>
+                                        {String(i).padStart(2, '0')}
+                                    </option>
+                                ))}
+                            </select>
+                            <span style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--text-secondary)' }}>:</span>
+                            <select
+                                value={settings.notificationTime.minute}
+                                onChange={(e) => onSave({
+                                    ...settings,
+                                    notificationTime: { ...settings.notificationTime, minute: parseInt(e.target.value) }
+                                })}
+                                className="input-field input-field--select"
+                                style={{
+                                    padding: '10px 14px', borderRadius: 'var(--radius-md)',
+                                    border: '1px solid var(--border-default)', background: 'var(--surface-elevated)',
+                                    color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700',
+                                    textAlign: 'center', flex: 1
+                                }}
+                            >
+                                {[0, 15, 30, 45].map(minute => (
+                                    <option key={minute} value={minute}>
+                                        {String(minute).padStart(2, '0')}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
+                )}
+
+                <SettingRow
+                    icon={Volume2}
+                    title={t('settings.soundEffects')}
+                    description={t('settings.soundsDescription')}
+                    color="#0ea5e9"
+                    isLast={false}
+                >
+                    <ToggleSwitch
+                        enabled={settings.soundsEnabled}
+                        onClick={() => onSave({ ...settings, soundsEnabled: !settings.soundsEnabled })}
+                        activeGradient="linear-gradient(135deg, #0ea5e9, #0284c7)"
+                    />
+                </SettingRow>
+
+                <SettingRow
+                    icon={Vibrate}
+                    title={t('settings.hapticFeedback')}
+                    description={t('settings.hapticsDescription')}
+                    color="#a855f7"
+                    isLast={false}
+                >
+                    <ToggleSwitch
+                        enabled={settings.hapticsEnabled ?? true}
+                        onClick={() => onSave({ ...settings, hapticsEnabled: !(settings.hapticsEnabled ?? true) })}
+                        activeGradient="linear-gradient(135deg, #a855f7, #9333ea)"
+                    />
+                </SettingRow>
+
+                <SettingRow
+                    icon={Smartphone}
+                    title={t('settings.keepScreenOn')}
+                    description={t('settings.keepScreenOnDesc')}
+                    color="var(--warning)"
+                    isLast={false}
+                >
+                    <ToggleSwitch
+                        enabled={settings.keepScreenOn ?? true}
+                        onClick={() => onSave({ ...settings, keepScreenOn: !settings.keepScreenOn })}
+                        activeGradient="linear-gradient(135deg, var(--warning), #d97706)"
+                    />
+                </SettingRow>
+
+                <SettingRow
+                    icon={Calendar}
+                    title={t('settings.weekStartDay')}
+                    description={t('settings.weekStartDayDesc')}
+                    color="#06b6d4"
+                    isLast={true}
+                >
                     <div style={{
-                        display: 'flex', gap: '12px', alignItems: 'center',
+                        display: 'flex',
+                        gap: '4px',
+                        padding: '3px',
+                        background: 'var(--surface-muted)',
+                        borderRadius: 'var(--radius-lg)',
+                        border: '1px solid var(--border-subtle)',
+                        flexShrink: 0
                     }}>
-                        <select
-                            value={settings.notificationTime.hour}
-                            onChange={(e) => onSave({
-                                ...settings,
-                                notificationTime: { ...settings.notificationTime, hour: parseInt(e.target.value) }
-                            })}
-                            className="input-field input-field--select"
-                            style={{
-                                padding: '10px 14px', borderRadius: 'var(--radius-md)',
-                                border: '1px solid var(--border-default)', background: 'var(--surface-muted)',
-                                color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700',
-                                textAlign: 'center', flex: 1
-                            }}
-                        >
-                            {Array.from({ length: 24 }, (_, i) => (
-                                <option key={i} value={i}>
-                                    {String(i).padStart(2, '0')}
-                                </option>
-                            ))}
-                        </select>
-                        <span style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--text-secondary)' }}>:</span>
-                        <select
-                            value={settings.notificationTime.minute}
-                            onChange={(e) => onSave({
-                                ...settings,
-                                notificationTime: { ...settings.notificationTime, minute: parseInt(e.target.value) }
-                            })}
-                            className="input-field input-field--select"
-                            style={{
-                                padding: '10px 14px', borderRadius: 'var(--radius-md)',
-                                border: '1px solid var(--border-default)', background: 'var(--surface-muted)',
-                                color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700',
-                                textAlign: 'center', flex: 1
-                            }}
-                        >
-                            {[0, 15, 30, 45].map(minute => (
-                                <option key={minute} value={minute}>
-                                    {String(minute).padStart(2, '0')}
-                                </option>
-                            ))}
-                        </select>
+                        {[
+                            { value: 'sunday', label: t('settings.sunday'), color: '#f59e0b' },
+                            { value: 'monday', label: t('settings.monday'), color: '#06b6d4' }
+                        ].map(opt => {
+                            const isActive = settings.weekStartDay === opt.value;
+                            return (
+                                <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() => onSave({ ...settings, weekStartDay: opt.value })}
+                                    className="hover-lift"
+                                    style={{
+                                        padding: '6px 14px',
+                                        borderRadius: 'var(--radius-md)',
+                                        border: isActive ? '1px solid var(--border-default)' : '1px solid transparent',
+                                        background: isActive ? 'var(--surface-elevated)' : 'transparent',
+                                        color: isActive ? opt.color : 'var(--text-secondary)',
+                                        fontSize: '0.82rem',
+                                        fontWeight: isActive ? '700' : '600',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
+                                        minHeight: 'var(--touch-min)'
+                                    }}
+                                >
+                                    {opt.label}
+                                </button>
+                            );
+                        })}
                     </div>
-                </div>
-            )}
-
-            <SettingRow
-                icon={Volume2}
-                title={t('settings.soundEffects')}
-                description={t('settings.soundsDescription')}
-                color="#0ea5e9"
-                isLast={false}
-            >
-                <ToggleSwitch
-                    enabled={settings.soundsEnabled}
-                    onClick={() => onSave({ ...settings, soundsEnabled: !settings.soundsEnabled })}
-                    activeGradient="linear-gradient(135deg, #0ea5e9, #0284c7)"
-                />
-            </SettingRow>
-
-            <SettingRow
-                icon={Vibrate}
-                title={t('settings.hapticFeedback')}
-                description={t('settings.hapticsDescription')}
-                color="#a855f7"
-                isLast={false}
-            >
-                <ToggleSwitch
-                    enabled={settings.hapticsEnabled ?? true}
-                    onClick={() => onSave({ ...settings, hapticsEnabled: !(settings.hapticsEnabled ?? true) })}
-                    activeGradient="linear-gradient(135deg, #a855f7, #9333ea)"
-                />
-            </SettingRow>
-
-            <SettingRow
-                icon={Smartphone}
-                title={t('settings.keepScreenOn')}
-                description={t('settings.keepScreenOnDesc')}
-                color="var(--warning)"
-                isLast={false}
-            >
-                <ToggleSwitch
-                    enabled={settings.keepScreenOn ?? true}
-                    onClick={() => onSave({ ...settings, keepScreenOn: !settings.keepScreenOn })}
-                    activeGradient="linear-gradient(135deg, var(--warning), #d97706)"
-                />
-            </SettingRow>
-
-            <SettingRow
-                icon={Calendar}
-                title={t('settings.weekStartDay')}
-                description={t('settings.weekStartDayDesc')}
-                color="#06b6d4"
-                isLast={true}
-            >
-                <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
-                    {[
-                        { value: 'sunday', label: t('settings.sunday'), color: '#f59e0b' },
-                        { value: 'monday', label: t('settings.monday'), color: '#06b6d4' }
-                    ].map(opt => (
-                        <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => onSave({ ...settings, weekStartDay: opt.value })}
-                            className="hover-lift"
-                            style={{
-                                padding: '6px 16px',
-                                borderRadius: 'var(--radius-md)',
-                                border: settings.weekStartDay === opt.value
-                                    ? `2px solid ${opt.color}`
-                                    : '2px solid var(--border-subtle)',
-                                background: settings.weekStartDay === opt.value
-                                    ? `color-mix(in srgb, ${opt.color} 13%, transparent)`
-                                    : 'transparent',
-                                color: settings.weekStartDay === opt.value
-                                    ? opt.color
-                                    : 'var(--text-secondary)',
-                                fontSize: '0.85rem',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                minHeight: 'var(--touch-min)'
-                            }}
-                        >
-                            {opt.label}
-                        </button>
-                    ))}
-                </div>
-            </SettingRow>
+                </SettingRow>
+            </div>
         </Card>
     );
 }
@@ -183,7 +196,7 @@ export function LanguageSection() {
     const { t, i18n } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md">
+        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.language')}</h3>
             <SettingRow
                 icon={Globe}
@@ -198,18 +211,19 @@ export function LanguageSection() {
                         i18n.changeLanguage(e.target.value);
                         localStorage.setItem('oneup_language', e.target.value);
                     }}
-                    className="input-field input-field--select"
+                    className="input-field input-field--select hover-lift"
                     style={{
                         width: 'fit-content',
-                        padding: '8px 30px 8px 12px',
+                        height: '34px',
+                        padding: '4px 28px 4px 10px',
                         borderRadius: 'var(--radius-md)',
-                        border: '1px solid var(--border-default)',
+                        border: '1px solid var(--border-subtle)',
                         background: 'var(--surface-muted)',
                         color: 'var(--text-primary)',
-                        fontSize: '0.85rem',
+                        fontSize: '0.82rem',
                         fontWeight: '600',
                         cursor: 'pointer',
-                        minHeight: 'var(--touch-min)',
+                        flexShrink: 0
                     }}
                 >
                     {LANGUAGES.map(lang => (
@@ -228,7 +242,7 @@ export function PerformanceSection({ settings, onSave }) {
     const { t } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md">
+        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.performance')}</h3>
 
             <SettingRow
@@ -242,38 +256,44 @@ export function PerformanceSection({ settings, onSave }) {
                 color="var(--success)"
                 isLast={true}
             >
-                <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                <div style={{
+                    display: 'flex',
+                    gap: '4px',
+                    padding: '3px',
+                    background: 'var(--surface-muted)',
+                    borderRadius: 'var(--radius-lg)',
+                    border: '1px solid var(--border-subtle)',
+                    flexShrink: 0
+                }}>
                     {[
                         { value: 'low', label: t('settings.eco'), color: 'var(--warning)' },
                         { value: 'high', label: t('common.max'), color: 'var(--accent-glow)' }
-                    ].map(opt => (
-                        <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => onSave({ ...settings, performanceMode: opt.value })}
-                            className="hover-lift"
-                            style={{
-                                padding: '6px 16px',
-                                borderRadius: 'var(--radius-md)',
-                                border: settings.performanceMode === opt.value
-                                    ? `2px solid ${opt.color}`
-                                    : '2px solid var(--border-subtle)',
-                                background: settings.performanceMode === opt.value
-                                    ? `color-mix(in srgb, ${opt.color} 13%, transparent)`
-                                    : 'transparent',
-                                color: settings.performanceMode === opt.value
-                                    ? opt.color
-                                    : 'var(--text-secondary)',
-                                fontSize: '0.85rem',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                minHeight: 'var(--touch-min)'
-                            }}
-                        >
-                            {opt.label}
-                        </button>
-                    ))}
+                    ].map(opt => {
+                        const isActive = settings.performanceMode === opt.value;
+                        return (
+                            <button
+                                key={opt.value}
+                                type="button"
+                                onClick={() => onSave({ ...settings, performanceMode: opt.value })}
+                                className="hover-lift"
+                                style={{
+                                    padding: '6px 14px',
+                                    borderRadius: 'var(--radius-md)',
+                                    border: isActive ? '1px solid var(--border-default)' : '1px solid transparent',
+                                    background: isActive ? 'var(--surface-elevated)' : 'transparent',
+                                    color: isActive ? opt.color : 'var(--text-secondary)',
+                                    fontSize: '0.82rem',
+                                    fontWeight: isActive ? '700' : '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
+                                    minHeight: 'var(--touch-min)'
+                                }}
+                            >
+                                {opt.label}
+                            </button>
+                        );
+                    })}
                 </div>
             </SettingRow>
         </Card>
@@ -285,36 +305,38 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
     const { t } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md">
+        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.community')}</h3>
 
-            <SettingRow
-                icon={Users}
-                title={t('leaderboard.title')}
-                description={t('settings.leaderboardDesc')}
-                color="var(--color-amber)"
-                isLast={!settings.leaderboardEnabled}
-            >
-                <ToggleSwitch
-                    enabled={settings.leaderboardEnabled}
-                    onClick={() => onSave({ ...settings, leaderboardEnabled: !settings.leaderboardEnabled })}
-                    activeGradient="linear-gradient(135deg, var(--color-amber), #d97706)"
-                />
-            </SettingRow>
-
-            {settings.leaderboardEnabled && (
-                <div className="scale-in" style={{ padding: '12px 0 4px 0' }}>
-                    <Input
-                        label={t('settings.displayName')}
-                        type="text"
-                        value={settings.leaderboardPseudo || ''}
-                        onChange={(e) => onSave({ ...settings, leaderboardPseudo: e.target.value.slice(0, 20) })}
-                        placeholder={cloudAuth?.user?.displayName || t('common.yourPseudo')}
-                        maxLength={20}
-                        helperText={t('settings.maxChars')}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+                <SettingRow
+                    icon={Users}
+                    title={t('leaderboard.title')}
+                    description={t('settings.leaderboardDesc')}
+                    color="var(--color-amber)"
+                    isLast={!settings.leaderboardEnabled}
+                >
+                    <ToggleSwitch
+                        enabled={settings.leaderboardEnabled}
+                        onClick={() => onSave({ ...settings, leaderboardEnabled: !settings.leaderboardEnabled })}
+                        activeGradient="linear-gradient(135deg, var(--color-amber), #d97706)"
                     />
-                </div>
-            )}
+                </SettingRow>
+
+                {settings.leaderboardEnabled && (
+                    <div className="scale-in" style={{ paddingTop: '4px' }}>
+                        <Input
+                            label={t('settings.displayName')}
+                            type="text"
+                            value={settings.leaderboardPseudo || ''}
+                            onChange={(e) => onSave({ ...settings, leaderboardPseudo: e.target.value.slice(0, 20) })}
+                            placeholder={cloudAuth?.user?.displayName || t('common.yourPseudo')}
+                            maxLength={20}
+                            helperText={t('settings.maxChars')}
+                        />
+                    </div>
+                )}
+            </div>
         </Card>
     );
 }
@@ -326,11 +348,12 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
     const currentTheme = settings.appTheme || 'dark';
 
     return (
-        <Card variant="glass" padding="md" style={{ position: 'relative', overflow: 'hidden' }}>
-            <h3 style={sectionTitleStyle}>
-                {t('settings.appTheme')} {!isPro && <Lock size={14} color="var(--accent)" style={{ marginLeft: 'auto', opacity: 0.8 }} />}
+        <Card variant="glass" padding="md" style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+            <h3 style={{ ...sectionTitleStyle, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>{t('settings.appTheme')}</span>
+                {!isPro && <Lock size={14} color="var(--accent)" style={{ opacity: 0.8 }} />}
             </h3>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px', opacity: isPro ? 1 : 0.6, pointerEvents: isPro ? 'auto' : 'none' }}>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', opacity: isPro ? 1 : 0.6, pointerEvents: isPro ? 'auto' : 'none' }}>
                 {THEMES.map(theme => (
                     <ThemeSwatch
                         key={theme.key}
@@ -403,31 +426,33 @@ export function DataSection() {
     };
 
     return (
-        <Card variant="glass" padding="md">
+        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.dataTitle')}</h3>
 
-            <SettingRow
-                icon={Download}
-                title={t('settings.exportData')}
-                description={t('settings.exportDataDesc')}
-                color="var(--color-emerald)"
-            >
-                <Button variant="secondary" size="sm" onClick={handleExport}>
-                    {t('settings.exportButton')}
-                </Button>
-            </SettingRow>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+                <SettingRow
+                    icon={Download}
+                    title={t('settings.exportData')}
+                    description={t('settings.exportDataDesc')}
+                    color="var(--color-emerald)"
+                >
+                    <Button variant="secondary" size="sm" onClick={handleExport}>
+                        {t('settings.exportButton')}
+                    </Button>
+                </SettingRow>
 
-            <SettingRow
-                icon={Upload}
-                title={t('settings.importData')}
-                description={t('settings.importDataDesc')}
-                color="#60a5fa"
-                isLast
-            >
-                <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
-                    {t('settings.importButton')}
-                </Button>
-            </SettingRow>
+                <SettingRow
+                    icon={Upload}
+                    title={t('settings.importData')}
+                    description={t('settings.importDataDesc')}
+                    color="#60a5fa"
+                    isLast
+                >
+                    <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
+                        {t('settings.importButton')}
+                    </Button>
+                </SettingRow>
+            </div>
 
             <input
                 ref={fileInputRef}
@@ -439,7 +464,7 @@ export function DataSection() {
 
             {status && (
                 <div style={{
-                    marginTop: '10px',
+                    marginTop: '4px',
                     fontSize: '0.8rem',
                     fontWeight: 600,
                     color: status.type === 'error' ? 'var(--error)' : 'var(--color-emerald)',
@@ -450,5 +475,6 @@ export function DataSection() {
         </Card>
     );
 }
+
 
 

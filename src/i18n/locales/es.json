@@ -644,8 +644,8 @@
     "importConfirm": "¿Reemplazar todos los datos actuales con esta copia? Esta acción no se puede deshacer.",
     "exportSuccess": "Copia de seguridad descargada ({{count}} elementos)",
     "importError": "Archivo de copia no válido o ilegible.",
-    "weekStartDay": "La semana comienza el",
-    "weekStartDayDesc": "Primer día de la semana para el calendario y los objetivos cardio"
+    "weekStartDay": "Inicio de semana",
+    "weekStartDayDesc": "Primer día para calendario & objetivos"
   },
   "share": {
     "backgroundImage": "Imagen de fondo",

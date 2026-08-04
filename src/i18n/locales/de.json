@@ -644,8 +644,8 @@
     "importConfirm": "Alle aktuellen Daten durch diese Sicherung ersetzen? Das kann nicht rückgängig gemacht werden.",
     "exportSuccess": "Sicherung heruntergeladen ({{count}} Einträge)",
     "importError": "Ungültige oder unlesbare Sicherungsdatei.",
-    "weekStartDay": "Woche beginnt am",
-    "weekStartDayDesc": "Erster Tag der Woche für Kalender und Cardio-Ziele"
+    "weekStartDay": "Wochenbeginn",
+    "weekStartDayDesc": "Erster Tag für Kalender & Ziele"
   },
   "share": {
     "backgroundImage": "Hintergrundbild",

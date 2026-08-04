@@ -659,8 +659,8 @@
     "importConfirm": "Replace all current data with this backup? This cannot be undone.",
     "exportSuccess": "Backup downloaded ({{count}} items)",
     "importError": "Invalid or unreadable backup file.",
-    "weekStartDay": "Week starts on",
-    "weekStartDayDesc": "First day of the week for calendar and cardio goals"
+    "weekStartDay": "Start of week",
+    "weekStartDayDesc": "First day for calendar & targets"
   },
   "share": {
     "backgroundImage": "Background image",

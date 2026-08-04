@@ -659,8 +659,8 @@
     "importConfirm": "Remplacer toutes les données actuelles par cette sauvegarde ? Action irréversible.",
     "exportSuccess": "Sauvegarde téléchargée ({{count}} éléments)",
     "importError": "Fichier de sauvegarde invalide ou illisible.",
-    "weekStartDay": "La semaine commence le",
-    "weekStartDayDesc": "Premier jour de la semaine pour le calendrier et les objectifs cardio"
+    "weekStartDay": "Début de semaine",
+    "weekStartDayDesc": "Premier jour du calendrier & objectifs"
   },
   "share": {
     "backgroundImage": "Image de fond",

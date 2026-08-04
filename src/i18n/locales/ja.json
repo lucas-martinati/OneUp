@@ -644,8 +644,8 @@
     "importConfirm": "現在のすべてのデータをこのバックアップで置き換えますか？この操作は元に戻せません。",
     "exportSuccess": "バックアップをダウンロードしました（{{count}}件）",
     "importError": "バックアップファイルが無効か読み取れません。",
-    "weekStartDay": "週の始まり",
-    "weekStartDayDesc": "カレンダーと有酸素運動の目標の週の開始日"
+    "weekStartDay": "週の開始日",
+    "weekStartDayDesc": "カレンダーと目標の開始日"
   },
   "share": {
     "backgroundImage": "背景画像",

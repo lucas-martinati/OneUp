@@ -644,8 +644,8 @@
     "importConfirm": "用此备份替换当前所有数据？此操作无法撤销。",
     "exportSuccess": "备份已下载（{{count}} 项）",
     "importError": "备份文件无效或无法读取。",
-    "weekStartDay": "一周开始于",
-    "weekStartDayDesc": "日历和有氧目标的一周起始日"
+    "weekStartDay": "一周起始日",
+    "weekStartDayDesc": "日历和目标的起始日"
   },
   "share": {
     "backgroundImage": "背景图片",

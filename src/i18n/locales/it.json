@@ -644,8 +644,8 @@
     "importConfirm": "Sostituire tutti i dati attuali con questo backup? Operazione irreversibile.",
     "exportSuccess": "Backup scaricato ({{count}} elementi)",
     "importError": "File di backup non valido o illeggibile.",
-    "weekStartDay": "La settimana inizia il",
-    "weekStartDayDesc": "Primo giorno della settimana per il calendario e gli obiettivi cardio"
+    "weekStartDay": "Inizio settimana",
+    "weekStartDayDesc": "Primo giorno per calendario & obiettivi"
   },
   "share": {
     "backgroundImage": "Immagine di sfondo",

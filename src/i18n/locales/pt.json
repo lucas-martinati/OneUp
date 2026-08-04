@@ -644,8 +644,8 @@
     "importConfirm": "Substituir todos os dados atuais por esta cópia? Esta ação é irreversível.",
     "exportSuccess": "Cópia transferida ({{count}} itens)",
     "importError": "Ficheiro de cópia inválido ou ilegível.",
-    "weekStartDay": "A semana começa na",
-    "weekStartDayDesc": "Primeiro dia da semana para o calendário e os objetivos cardio"
+    "weekStartDay": "Início da semana",
+    "weekStartDayDesc": "Primeiro dia para calendário & objetivos"
   },
   "share": {
     "backgroundImage": "Imagem de fundo",
