@@ -143,10 +143,12 @@ export function PreferencesSection({ settings, onSave }) {
                 <div style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '10px',
-                    padding: '8px 0 4px 0'
+                    gap: '12px',
+                    padding: '8px 0 4px 0',
+                    width: '100%',
+                    boxSizing: 'border-box'
                 }}>
-                    <div className="row gap-12" style={{ alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', boxSizing: 'border-box' }}>
                         <div style={{
                             background: `linear-gradient(135deg, color-mix(in srgb, #06b6d4 13%, transparent), color-mix(in srgb, #06b6d4 3%, transparent))`,
                             padding: '10px',
@@ -159,7 +161,7 @@ export function PreferencesSection({ settings, onSave }) {
                         }}>
                             <Calendar size={20} color="#06b6d4" />
                         </div>
-                        <div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-primary)', lineHeight: 1.2 }}>
                                 {t('settings.weekStartDay')}
                             </div>
@@ -176,7 +178,8 @@ export function PreferencesSection({ settings, onSave }) {
                         background: 'var(--surface-muted)',
                         borderRadius: 'var(--radius-lg)',
                         border: '1px solid var(--border-subtle)',
-                        width: '100%'
+                        width: '100%',
+                        boxSizing: 'border-box'
                     }}>
                         {[
                             { value: 'sunday', label: t('settings.sunday'), color: '#f59e0b' },
@@ -191,9 +194,11 @@ export function PreferencesSection({ settings, onSave }) {
                                         haptics.light();
                                         onSave({ ...settings, weekStartDay: opt.value });
                                     }}
-                                    className="hover-lift"
                                     style={{
                                         flex: 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justify: 'center',
                                         padding: '8px 12px',
                                         borderRadius: 'var(--radius-md)',
                                         border: isActive ? '1px solid var(--border-default)' : '1px solid transparent',
@@ -203,13 +208,15 @@ export function PreferencesSection({ settings, onSave }) {
                                         fontWeight: isActive ? '700' : '600',
                                         cursor: 'pointer',
                                         textAlign: 'center',
-                                        transform: isActive ? 'scale(1.02)' : 'scale(0.97)',
-                                        transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
                                         boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
-                                        minHeight: 'var(--touch-min)'
+                                        minHeight: 'var(--touch-min)',
+                                        boxSizing: 'border-box',
+                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                     }}
                                 >
-                                    {opt.label}
+                                    <span style={{ width: '100%', textAlign: 'center', display: 'inline-block' }}>
+                                        {opt.label}
+                                    </span>
                                 </button>
                             );
                         })}
