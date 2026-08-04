@@ -7,6 +7,7 @@ import { THEMES } from '@config/themes';
 import { isNativePlatform } from '@utils/platform';
 import { downloadBackup, parseBackup, restoreBackup, readFileText } from '@utils/dataBackup';
 import { sectionTitleStyle } from './settingsStyles';
+import { haptics } from '@utils/hapticsManager';
 
 /** Notifications (+ time picker), sounds and keep-screen-on toggles. */
 export function PreferencesSection({ settings, onSave }) {
@@ -139,13 +140,35 @@ export function PreferencesSection({ settings, onSave }) {
                     />
                 </SettingRow>
 
-                <SettingRow
-                    icon={Calendar}
-                    title={t('settings.weekStartDay')}
-                    description={t('settings.weekStartDayDesc')}
-                    color="#06b6d4"
-                    isLast={true}
-                >
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    padding: '8px 0 4px 0'
+                }}>
+                    <div className="row gap-12" style={{ alignItems: 'center' }}>
+                        <div style={{
+                            background: `linear-gradient(135deg, color-mix(in srgb, #06b6d4 13%, transparent), color-mix(in srgb, #06b6d4 3%, transparent))`,
+                            padding: '10px',
+                            borderRadius: '12px',
+                            border: `1px solid color-mix(in srgb, #06b6d4 19%, transparent)`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justify: 'center',
+                            flexShrink: 0
+                        }}>
+                            <Calendar size={20} color="#06b6d4" />
+                        </div>
+                        <div>
+                            <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-primary)', lineHeight: 1.2 }}>
+                                {t('settings.weekStartDay')}
+                            </div>
+                            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px', lineHeight: 1.3 }}>
+                                {t('settings.weekStartDayDesc')}
+                            </div>
+                        </div>
+                    </div>
+
                     <div style={{
                         display: 'flex',
                         gap: '4px',
@@ -153,7 +176,7 @@ export function PreferencesSection({ settings, onSave }) {
                         background: 'var(--surface-muted)',
                         borderRadius: 'var(--radius-lg)',
                         border: '1px solid var(--border-subtle)',
-                        flexShrink: 0
+                        width: '100%'
                     }}>
                         {[
                             { value: 'sunday', label: t('settings.sunday'), color: '#f59e0b' },
@@ -164,18 +187,24 @@ export function PreferencesSection({ settings, onSave }) {
                                 <button
                                     key={opt.value}
                                     type="button"
-                                    onClick={() => onSave({ ...settings, weekStartDay: opt.value })}
+                                    onClick={() => {
+                                        haptics.light();
+                                        onSave({ ...settings, weekStartDay: opt.value });
+                                    }}
                                     className="hover-lift"
                                     style={{
-                                        padding: '6px 14px',
+                                        flex: 1,
+                                        padding: '8px 12px',
                                         borderRadius: 'var(--radius-md)',
                                         border: isActive ? '1px solid var(--border-default)' : '1px solid transparent',
                                         background: isActive ? 'var(--surface-elevated)' : 'transparent',
                                         color: isActive ? opt.color : 'var(--text-secondary)',
-                                        fontSize: '0.82rem',
+                                        fontSize: '0.85rem',
                                         fontWeight: isActive ? '700' : '600',
                                         cursor: 'pointer',
-                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        textAlign: 'center',
+                                        transform: isActive ? 'scale(1.02)' : 'scale(0.97)',
+                                        transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
                                         boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
                                         minHeight: 'var(--touch-min)'
                                     }}
@@ -185,7 +214,7 @@ export function PreferencesSection({ settings, onSave }) {
                             );
                         })}
                     </div>
-                </SettingRow>
+                </div>
             </div>
         </Card>
     );
@@ -208,6 +237,7 @@ export function LanguageSection() {
                 <select
                     value={i18n.language}
                     onChange={(e) => {
+                        haptics.light();
                         i18n.changeLanguage(e.target.value);
                         localStorage.setItem('oneup_language', e.target.value);
                     }}
@@ -223,7 +253,8 @@ export function LanguageSection() {
                         fontSize: '0.82rem',
                         fontWeight: '600',
                         cursor: 'pointer',
-                        flexShrink: 0
+                        flexShrink: 0,
+                        transition: 'all 0.2s ease'
                     }}
                 >
                     {LANGUAGES.map(lang => (
@@ -274,7 +305,10 @@ export function PerformanceSection({ settings, onSave }) {
                             <button
                                 key={opt.value}
                                 type="button"
-                                onClick={() => onSave({ ...settings, performanceMode: opt.value })}
+                                onClick={() => {
+                                    haptics.light();
+                                    onSave({ ...settings, performanceMode: opt.value });
+                                }}
                                 className="hover-lift"
                                 style={{
                                     padding: '6px 14px',
@@ -285,7 +319,8 @@ export function PerformanceSection({ settings, onSave }) {
                                     fontSize: '0.82rem',
                                     fontWeight: isActive ? '700' : '600',
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    transform: isActive ? 'scale(1.02)' : 'scale(0.97)',
+                                    transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
                                     boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
                                     minHeight: 'var(--touch-min)'
                                 }}
