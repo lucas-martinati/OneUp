@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import 'leaflet/dist/leaflet.css';
-import { X, Clock, Target, TrendingUp, Gauge, ChevronDown, Activity } from '@utils/icons';
+import { Clock, Target, TrendingUp, Gauge, ChevronDown, Activity } from '@utils/icons';
 import { updateCardioSessionName } from '@services/cardioService';
-import { Button, InlineNameEditor } from '@components/ui';
+import { Button, InlineNameEditor, ModalHeader } from '@components/ui';
+import { Z_INDEX } from '@utils/zIndex';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { CardioMap } from './CardioMap';
 import { CardioFullscreenMap } from './CardioFullscreenMap';
@@ -230,20 +232,20 @@ export function CardioHistory({ sessions, mode, onClose }) {
     return true;
   }, true);
 
-  return (
+  return createPortal(
     <>
-      <div className="modal-overlay" style={{ zIndex: 200 }}>
+      <div
+        className="fade-in modal-overlay"
+        style={{ zIndex: Z_INDEX.TOAST }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+      >
         <div className="modal-content">
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            marginBottom: 'var(--spacing-md)',
-            flexShrink: 0
-          }}>
-            <h2 className="panel-title rainbow-gradient" style={{ margin: 0 }}>
-              {t('cardio.history')}
-            </h2>
-            <Button iconOnly icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
-          </div>
+          <ModalHeader
+            title={t('cardio.history')}
+            onClose={onClose}
+          />
 
           {sessions.length > 0 && (
             <div className="cardio-hist-summary">
@@ -314,6 +316,17 @@ export function CardioHistory({ sessions, mode, onClose }) {
             ))
           )}
         </div>
+
+        {/* Bottom Close Button */}
+        <div style={{ marginTop: 'var(--spacing-md)', paddingTop: 'var(--spacing-xs)', flexShrink: 0 }}>
+          <Button
+            variant="secondary"
+            fullWidth
+            onClick={onClose}
+          >
+            {t('common.close')}
+          </Button>
+        </div>
       </div>
     </div>
 
@@ -326,6 +339,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
           onClose={() => setFullscreenSession(null)}
         />
       )}
-    </>
+    </>,
+    document.body
   );
 }
