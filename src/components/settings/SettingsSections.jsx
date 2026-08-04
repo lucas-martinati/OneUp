@@ -211,7 +211,8 @@ export function PreferencesSection({ settings, onSave }) {
                                         boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
                                         minHeight: 'var(--touch-min)',
                                         boxSizing: 'border-box',
-                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        animation: isActive ? 'bump 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
                                     }}
                                 >
                                     <span style={{ width: '100%', textAlign: 'center', display: 'inline-block' }}>
@@ -326,10 +327,10 @@ export function PerformanceSection({ settings, onSave }) {
                                     fontSize: '0.82rem',
                                     fontWeight: isActive ? '700' : '600',
                                     cursor: 'pointer',
-                                    transform: isActive ? 'scale(1.02)' : 'scale(0.97)',
-                                    transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
                                     boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
-                                    minHeight: 'var(--touch-min)'
+                                    minHeight: 'var(--touch-min)',
+                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    animation: isActive ? 'bump 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
                                 }}
                             >
                                 {opt.label}
