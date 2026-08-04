@@ -28,6 +28,7 @@ const defaultSettings = {
   exerciseDifficulties: {},
   keepScreenOn: true,
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+  weekStartDay: 'monday',
 };
 
 /** Keys that were stored in older versions and should be stripped on load */

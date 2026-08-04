@@ -11,12 +11,14 @@ import { isPerfectDay, calculateRepsForDay, isCaughtUpDay } from '@utils/statUti
 import { getCurrentWeekNumber, getDayStatus, DAY_STATUS } from '@shared/dateUtils';
 import { DifficultyBadge } from '@components/ui/DifficultyBadge';
 import { useProgressStore } from '@store/useProgressStore';
+import { useSettingsStore } from '@store/useSettingsStore';
 import styles from '@styles/Calendar.module.css';
 
 export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, getConfig }) {
     const { t } = useTranslation();
     const frozenDays = useProgressStore(s => s.frozenDays);
     const notes = useProgressStore(s => s.notes);
+    const weekStartDay = useSettingsStore(s => s.settings.weekStartDay) || 'monday';
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(null);
     const [isClosing, setIsClosing] = useState(false);
@@ -164,7 +166,17 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
         const firstDay = getFirstDayOfMonth(year, month);
 
         const daysArr = [];
-        for (let i = 0; i < firstDay; i++) daysArr.push(null);
+        // Compute padding: how many empty cells before Day 1
+        // getDay() returns 0=Sun, 1=Mon, ... 6=Sat
+        let padding;
+        if (weekStartDay === 'sunday') {
+            // Sunday-first: column 0 is Sunday, so padding = firstDay directly
+            padding = firstDay;
+        } else {
+            // Monday-first: column 0 is Monday
+            padding = firstDay === 0 ? 6 : firstDay - 1;
+        }
+        for (let i = 0; i < padding; i++) daysArr.push(null);
         for (let i = 1; i <= daysInMonth; i++) daysArr.push(new Date(year, month, i));
 
         const todayStr = getLocalDateStr(new Date());
@@ -177,7 +189,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
             const isBeforeStart = dStr < startDate;
             if (!isFuture && !isBeforeStart) {
                 total++;
-                if (getDayStatus(dStr, completions, frozenDays, todayStr) === DAY_STATUS.DONE) completed++;
+                if (getDayStatus(dStr, completions, frozenDays, todayStr, weekStartDay) === DAY_STATUS.DONE) completed++;
                 const day = completions[dStr] || {};
                 if (isPerfectDay(day, exercises)) {
                     pSet.add(dStr);
@@ -189,7 +201,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
         const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
 
         return { days: daysArr, monthCompleted: completed, completionRate: rate, monthPerfect: perfect, perfectSet: pSet };
-    }, [year, month, startDate, completions, exercises, isCustom, frozenDays]);
+    }, [year, month, startDate, completions, exercises, isCustom, frozenDays, weekStartDay]);
 
     // Slide-in animation for button navigation
     const gridSlideStyle = slideDirection ? {
@@ -203,7 +215,11 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
         setCurrentDate(new Date());
     };
 
-    const weekdayLabels = t('calendar.weekdays', { returnObjects: true });
+    const rawWeekdayLabels = weekStartDay === 'monday'
+        ? t('calendar.weekdaysMon', { returnObjects: true })
+        : t('calendar.weekdays', { returnObjects: true });
+    // Fallback: if weekdaysMon doesn't exist yet, rotate the Sun-first array
+    const weekdayLabels = Array.isArray(rawWeekdayLabels) ? rawWeekdayLabels : t('calendar.weekdays', { returnObjects: true });
 
     return (
         <div
@@ -292,7 +308,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                             isMissed = !isPerfect && !isAnyDone && !isMuted && !isToday;
                         } else {
                             // Global stats view
-                            const status = getDayStatus(dateString, completions, frozenDays, todayStr);
+                            const status = getDayStatus(dateString, completions, frozenDays, todayStr, weekStartDay);
                             if (isBeforeStart && status === DAY_STATUS.MISSED) {
                                 isMuted = true;
                             } else if (status === DAY_STATUS.FUTURE) {

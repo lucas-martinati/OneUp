@@ -59,8 +59,8 @@ export function AppOrchestrator({ computedStats }) {
 
   // ── Push widget data ───────────────────────────────────────────────
   useEffect(() => {
-    updateWidgetData(computedStats, completions, frozenDays);
-  }, [computedStats, completions, frozenDays]);
+    updateWidgetData(computedStats, completions, frozenDays, settings.weekStartDay);
+  }, [computedStats, completions, frozenDays, settings.weekStartDay]);
 
   // ── Performance mode & Theme on document root ──────────────────────
   useEffect(() => {

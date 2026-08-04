@@ -210,6 +210,15 @@
       "金",
       "土"
     ],
+    "weekdaysMon": [
+      "月",
+      "火",
+      "水",
+      "木",
+      "金",
+      "土",
+      "日"
+    ],
     "notes": "メモ",
     "addNotePlaceholder": "この日のメモを追加...",
     "noteSaved": "保存しました！"
@@ -606,6 +615,7 @@
     "leaderboardDesc": "公開リーダーボードに表示される",
     "lock": "ロック",
     "maxChars": "最大 20 文字 · Google フォトが使用されます",
+    "monday": "月曜日",
     "multiplier": "乗数(最大1.0)",
     "notifications": "通知",
     "performance": "パフォーマンス",
@@ -619,6 +629,7 @@
     "soundsDescription": "アクション時のサウンド",
     "hapticFeedback": "触覚フィードバック",
     "hapticsDescription": "アクション時のバイブレーション",
+    "sunday": "日曜日",
     "title": "設定",
     "unlockSettings": "設定のロックを解除する",
     "privacyPolicy": "プライバシーポリシー",
@@ -632,7 +643,9 @@
     "importButton": "インポート",
     "importConfirm": "現在のすべてのデータをこのバックアップで置き換えますか？この操作は元に戻せません。",
     "exportSuccess": "バックアップをダウンロードしました（{{count}}件）",
-    "importError": "バックアップファイルが無効か読み取れません。"
+    "importError": "バックアップファイルが無効か読み取れません。",
+    "weekStartDay": "週の始まり",
+    "weekStartDayDesc": "カレンダーと有酸素運動の目標の週の開始日"
   },
   "share": {
     "backgroundImage": "背景画像",

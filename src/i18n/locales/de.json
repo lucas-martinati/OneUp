@@ -210,6 +210,15 @@
       "Fr",
       "Sa"
     ],
+    "weekdaysMon": [
+      "Mo",
+      "Di",
+      "Mi",
+      "Do",
+      "Fr",
+      "Sa",
+      "So"
+    ],
     "notes": "Notizen",
     "addNotePlaceholder": "Füge eine Notiz für diesen Tag hinzu...",
     "noteSaved": "Gespeichert!"
@@ -606,6 +615,7 @@
     "leaderboardDesc": "Erscheinen Sie in der öffentlichen Bestenliste",
     "lock": "Sperren",
     "maxChars": "Maximal 20 Zeichen · Ihr Google-Foto wird verwendet",
+    "monday": "Montag",
     "multiplier": "Multiplikator (max. 1,0)",
     "notifications": "Benachrichtigungen",
     "performance": "Leistung",
@@ -619,6 +629,7 @@
     "soundsDescription": "Geräusche bei Aktionen",
     "hapticFeedback": "Haptisches Feedback",
     "hapticsDescription": "Vibrationen bei Aktionen",
+    "sunday": "Sonntag",
     "title": "Einstellungen",
     "unlockSettings": "EINSTELLUNGEN ENTSPERREN",
     "privacyPolicy": "Datenschutzerklärung",
@@ -632,7 +643,9 @@
     "importButton": "Importieren",
     "importConfirm": "Alle aktuellen Daten durch diese Sicherung ersetzen? Das kann nicht rückgängig gemacht werden.",
     "exportSuccess": "Sicherung heruntergeladen ({{count}} Einträge)",
-    "importError": "Ungültige oder unlesbare Sicherungsdatei."
+    "importError": "Ungültige oder unlesbare Sicherungsdatei.",
+    "weekStartDay": "Woche beginnt am",
+    "weekStartDayDesc": "Erster Tag der Woche für Kalender und Cardio-Ziele"
   },
   "share": {
     "backgroundImage": "Hintergrundbild",

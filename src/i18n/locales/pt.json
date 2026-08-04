@@ -210,6 +210,15 @@
       "sex",
       "Sentado"
     ],
+    "weekdaysMon": [
+      "Seg",
+      "Ter",
+      "Qua",
+      "Qui",
+      "Sex",
+      "Sáb",
+      "Dom"
+    ],
     "notes": "Notas",
     "addNotePlaceholder": "Adicione uma nota para este dia...",
     "noteSaved": "Salvo!"
@@ -606,7 +615,8 @@
     "leaderboardDesc": "Aparecer na tabela de classificação pública",
     "lock": "Trancar",
     "maxChars": "Máximo de 20 caracteres · Sua foto do Google será usada",
-    "multiplier": "Multiplicador (máx. 1,0)",
+    "monday": "Segunda",
+    "multiplier": "Multiplicador (Máx. 1,0)",
     "notifications": "Notificações",
     "performance": "Desempenho",
     "preferences": "Preferências",
@@ -619,6 +629,7 @@
     "soundsDescription": "Sons em ações",
     "hapticFeedback": "Resposta tátil",
     "hapticsDescription": "Vibrações em ações",
+    "sunday": "Domingo",
     "title": "Configurações",
     "unlockSettings": "DESBLOQUEAR CONFIGURAÇÕES",
     "privacyPolicy": "Política de Privacidade",
@@ -632,7 +643,9 @@
     "importButton": "Importar",
     "importConfirm": "Substituir todos os dados atuais por esta cópia? Esta ação é irreversível.",
     "exportSuccess": "Cópia transferida ({{count}} itens)",
-    "importError": "Ficheiro de cópia inválido ou ilegível."
+    "importError": "Ficheiro de cópia inválido ou ilegível.",
+    "weekStartDay": "A semana começa na",
+    "weekStartDayDesc": "Primeiro dia da semana para o calendário e os objetivos cardio"
   },
   "share": {
     "backgroundImage": "Imagem de fundo",

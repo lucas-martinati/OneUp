@@ -210,6 +210,15 @@
       "금",
       "앉았다"
     ],
+    "weekdaysMon": [
+      "월",
+      "화",
+      "수",
+      "목",
+      "금",
+      "토",
+      "일"
+    ],
     "notes": "메모",
     "addNotePlaceholder": "이 날짜에 메모 추가...",
     "noteSaved": "저장됨!"
@@ -606,6 +615,7 @@
     "leaderboardDesc": "공개 리더보드에 표시",
     "lock": "잠그다",
     "maxChars": "최대 20자 · Google 사진이 사용됩니다.",
+    "monday": "월요일",
     "multiplier": "승수(최대 1.0)",
     "notifications": "알림",
     "performance": "성능",
@@ -619,6 +629,7 @@
     "soundsDescription": "행동에 대한 소리",
     "hapticFeedback": "햅틱 피드백",
     "hapticsDescription": "행동에 대한 진동",
+    "sunday": "일요일",
     "title": "설정",
     "unlockSettings": "잠금 해제 설정",
     "privacyPolicy": "개인정보 처리방침",
@@ -632,7 +643,9 @@
     "importButton": "가져오기",
     "importConfirm": "현재 모든 데이터를 이 백업으로 교체할까요? 이 작업은 되돌릴 수 없습니다.",
     "exportSuccess": "백업을 다운로드했습니다 ({{count}}개 항목)",
-    "importError": "백업 파일이 잘못되었거나 읽을 수 없습니다."
+    "importError": "백업 파일이 잘못되었거나 읽을 수 없습니다.",
+    "weekStartDay": "주 시작 요일",
+    "weekStartDayDesc": "캘린더 및 유산소 목표의 주 시작 요일"
   },
   "share": {
     "backgroundImage": "배경 이미지",

@@ -20,10 +20,7 @@ export function FitToView({
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    if (disabled) {
-      setScale(1);
-      return;
-    }
+    if (disabled) return;
 
     const container = containerRef.current;
     const content = contentRef.current;
@@ -36,9 +33,9 @@ export function FitToView({
       if (contentHeight > availableHeight && availableHeight > 0) {
         const rawRatio = availableHeight / contentHeight;
         const newScale = Math.max(minScale, Math.min(maxScale, rawRatio));
-        setScale(newScale);
+        setScale(prev => (Math.abs(prev - newScale) > 0.001 ? newScale : prev));
       } else {
-        setScale(1);
+        setScale(prev => (prev !== 1 ? 1 : prev));
       }
     };
 

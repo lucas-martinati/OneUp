@@ -54,24 +54,33 @@ export async function getWidgetBridge() {
 }
 
 /**
- * Compute the week days status (Mon→Sun) for the current week.
+ * Compute the week days status for the current week.
+ * When weekStartDay is 'monday', order is Mon→Sun.
+ * When weekStartDay is 'sunday', order is Sun→Sat.
  * @param {Object} completions - { [dateStr]: { [exerciseId]: { isCompleted } } }
  * @param {Object} frozenDays - { [dateStr]: { consumedAt } }
+ * @param {string} weekStartDay - 'monday' or 'sunday'
  * @returns {number[]} Array of 7 integers (0=PENDING, 1=DONE, 2=FROZEN)
  */
-function getWeekDaysStatus(completions, frozenDays = {}) {
+function getWeekDaysStatus(completions, frozenDays = {}, weekStartDay = 'monday') {
   const today = new Date();
   const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ... 6=Sat
-  // Convert to Mon=0, Tue=1, ... Sun=6
-  const mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  let startOffset;
+  if (weekStartDay === 'sunday') {
+    // Sunday-start: offset from Sunday = dayOfWeek directly
+    startOffset = dayOfWeek;
+  } else {
+    // Monday-start: convert to Mon=0, Tue=1, ... Sun=6
+    startOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  }
 
   const weekDays = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(today);
-    d.setDate(d.getDate() - mondayOffset + i);
+    d.setDate(d.getDate() - startOffset + i);
     const dateStr = getLocalDateStr(d);
     
-    const status = getDayStatus(dateStr, completions, frozenDays, getLocalDateStr(today));
+    const status = getDayStatus(dateStr, completions, frozenDays, getLocalDateStr(today), weekStartDay);
     
     let state = 0; // PENDING
     if (status === DAY_STATUS.DONE) {
@@ -87,11 +96,17 @@ function getWeekDaysStatus(completions, frozenDays = {}) {
 }
 
 /**
- * Get the current day index in the week (0=Mon, 6=Sun).
+ * Get the current day index in the week.
+ * When weekStartDay is 'monday': 0=Mon, 6=Sun.
+ * When weekStartDay is 'sunday': 0=Sun, 6=Sat.
+ * @param {string} weekStartDay - 'monday' or 'sunday'
  * @returns {number}
  */
-function getTodayIndex() {
+function getTodayIndex(weekStartDay = 'monday') {
   const dayOfWeek = new Date().getDay(); // 0=Sun
+  if (weekStartDay === 'sunday') {
+    return dayOfWeek;
+  }
   return dayOfWeek === 0 ? 6 : dayOfWeek - 1;
 }
 
@@ -103,7 +118,7 @@ function getTodayIndex() {
  * @param {Object} completions - Raw completions data
  * @param {Object} frozenDays - Frozen days data
  */
-export async function updateWidgetData(computedStats, completions, frozenDays = {}) {
+export async function updateWidgetData(computedStats, completions, frozenDays = {}, weekStartDay = 'monday') {
   // Only run on native Android
   if (!isAndroidPlatform()) return;
 
@@ -120,14 +135,21 @@ export async function updateWidgetData(computedStats, completions, frozenDays = 
         || 0,
       streakActive: !!computedStats.streakActive,
       todayDone: !!computedStats.todayDone,
-      weekDays: getWeekDaysStatus(completions, frozenDays),
-      todayIndex: getTodayIndex(),
+      weekDays: getWeekDaysStatus(completions, frozenDays, weekStartDay),
+      todayIndex: getTodayIndex(weekStartDay),
       updatedAt: Date.now(),
       streakFrozen: !!computedStats.streakFrozen,
       // Translations
       streakLabel: i18n.t('widgets.streak'),
       daysLabel: i18n.t('widgets.days'),
-      weekdayLabels: i18n.t('widgets.weekdays', { returnObjects: true }),
+      weekdayLabels: (() => {
+        const labels = i18n.t('widgets.weekdays', { returnObjects: true });
+        // widgets.weekdays are Mon-first by default; rotate for Sunday-start
+        if (weekStartDay === 'sunday' && Array.isArray(labels)) {
+          return [labels[6], ...labels.slice(0, 6)];
+        }
+        return labels;
+      })(),
     };
 
     await Preferences.set({

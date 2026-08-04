@@ -12,10 +12,10 @@ import { getWeeklyGoalKm } from '@config/exercises';
  *
  * @returns {{ weekNum: number, achieved: boolean }}
  */
-export function evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions = {}) {
+export function evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions = {}, weekStartDay = 'monday') {
   const ref = new Date();
   ref.setDate(ref.getDate() - weekOffset * 7);
-  const { start, end } = getWeekBounds(ref);
+  const { start, end } = getWeekBounds(ref, weekStartDay);
 
   const weekNum = getCurrentWeekNumber(challengeStartDate) - weekOffset;
 

@@ -16,6 +16,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     }
     const todayStr = getLocalDateStr(new Date());
     const today = new Date(todayStr);
+    const weekStartDay = settings?.weekStartDay || 'monday';
 
     const isDayDoneLocal = (dateStr) => {
         const day = completions[dateStr];
@@ -274,7 +275,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     const exerciseDoneToday = {};
 
     function getWeeklyCompletion(comps, mode, date) {
-        const { start, end } = getWeekBounds(date);
+        const { start, end } = getWeekBounds(date, weekStartDay);
         let loop = new Date(start);
         while (loop <= end) {
             if (comps[getLocalDateStr(loop)]?.[mode]?.isCompleted) return true;
@@ -290,7 +291,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         let maxStreak = 0;
         let streak = 0;
         for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
-            const { achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions);
+            const { achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions, weekStartDay);
             if (achieved) {
                 streak++;
                 if (streak > maxStreak) maxStreak = streak;
@@ -306,7 +307,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         if (!sessions.length) return 0;
         let streak = 0;
         for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
-            const { achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions);
+            const { achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions, weekStartDay);
             if (achieved) {
                 streak++;
             } else if (weekOffset > 0) {

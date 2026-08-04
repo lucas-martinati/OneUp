@@ -210,6 +210,15 @@
       "Ven",
       "Sab"
     ],
+    "weekdaysMon": [
+      "Lu",
+      "Ma",
+      "Me",
+      "Gi",
+      "Ve",
+      "Sa",
+      "Do"
+    ],
     "notes": "Note",
     "addNotePlaceholder": "Aggiungi una nota per questo giorno...",
     "noteSaved": "Salvato!"
@@ -606,6 +615,7 @@
     "leaderboardDesc": "Appare nella classifica pubblica",
     "lock": "Serratura",
     "maxChars": "Massimo 20 caratteri · Verrà utilizzata la tua foto Google",
+    "monday": "Lunedì",
     "multiplier": "Moltiplicatore (massimo 1,0)",
     "notifications": "Notifiche",
     "performance": "Prestazione",
@@ -619,6 +629,7 @@
     "soundsDescription": "Suoni sulle azioni",
     "hapticFeedback": "Feedback aptico",
     "hapticsDescription": "Vibrazioni sulle azioni",
+    "sunday": "Domenica",
     "title": "Impostazioni",
     "unlockSettings": "SBLOCCA IMPOSTAZIONI",
     "privacyPolicy": "Informativa sulla privacy",
@@ -632,7 +643,9 @@
     "importButton": "Importa",
     "importConfirm": "Sostituire tutti i dati attuali con questo backup? Operazione irreversibile.",
     "exportSuccess": "Backup scaricato ({{count}} elementi)",
-    "importError": "File di backup non valido o illeggibile."
+    "importError": "File di backup non valido o illeggibile.",
+    "weekStartDay": "La settimana inizia il",
+    "weekStartDayDesc": "Primo giorno della settimana per il calendario e gli obiettivi cardio"
   },
   "share": {
     "backgroundImage": "Immagine di sfondo",

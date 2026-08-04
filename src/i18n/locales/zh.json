@@ -210,6 +210,15 @@
       "五",
       "六"
     ],
+    "weekdaysMon": [
+      "一",
+      "二",
+      "三",
+      "四",
+      "五",
+      "六",
+      "日"
+    ],
     "notes": "笔记",
     "addNotePlaceholder": "为这一天添加笔记...",
     "noteSaved": "已保存！"
@@ -606,6 +615,7 @@
     "leaderboardDesc": "在公开排行榜中显示",
     "lock": "锁定",
     "maxChars": "最多20个字符 · 将使用你的Google头像",
+    "monday": "周一",
     "multiplier": "倍率（最高1.0）",
     "notifications": "通知",
     "performance": "性能",
@@ -619,6 +629,7 @@
     "soundsDescription": "操作音效",
     "hapticFeedback": "触觉反馈",
     "hapticsDescription": "操作时震动",
+    "sunday": "周日",
     "title": "设置",
     "unlockSettings": "解锁设置",
     "privacyPolicy": "隐私政策",
@@ -632,7 +643,9 @@
     "importButton": "导入",
     "importConfirm": "用此备份替换当前所有数据？此操作无法撤销。",
     "exportSuccess": "备份已下载（{{count}} 项）",
-    "importError": "备份文件无效或无法读取。"
+    "importError": "备份文件无效或无法读取。",
+    "weekStartDay": "一周开始于",
+    "weekStartDayDesc": "日历和有氧目标的一周起始日"
   },
   "share": {
     "backgroundImage": "背景图片",

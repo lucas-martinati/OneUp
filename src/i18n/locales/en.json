@@ -210,6 +210,15 @@
       "Fri",
       "Sat"
     ],
+    "weekdaysMon": [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun"
+    ],
     "notes": "Notes",
     "addNotePlaceholder": "Add a note for this day...",
     "noteSaved": "Saved!"
@@ -621,6 +630,7 @@
     "leaderboardDesc": "Appear in the public leaderboard",
     "lock": "Lock",
     "maxChars": "Max 20 characters · Your Google photo will be used",
+    "monday": "Monday",
     "multiplier": "Multiplier (Max 1.0)",
     "notifications": "Notifications",
     "performance": "Performance",
@@ -634,6 +644,7 @@
     "soundsDescription": "Sounds on actions",
     "hapticFeedback": "Haptic feedback",
     "hapticsDescription": "Vibrations on actions",
+    "sunday": "Sunday",
     "title": "Settings",
     "unlockSettings": "UNLOCK SETTINGS",
     "privacyPolicy": "Privacy Policy",
@@ -647,7 +658,9 @@
     "importButton": "Import",
     "importConfirm": "Replace all current data with this backup? This cannot be undone.",
     "exportSuccess": "Backup downloaded ({{count}} items)",
-    "importError": "Invalid or unreadable backup file."
+    "importError": "Invalid or unreadable backup file.",
+    "weekStartDay": "Week starts on",
+    "weekStartDayDesc": "First day of the week for calendar and cardio goals"
   },
   "share": {
     "backgroundImage": "Background image",

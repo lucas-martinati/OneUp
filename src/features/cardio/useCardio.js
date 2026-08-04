@@ -4,6 +4,7 @@ import { getAllActivities } from '@services/cardioProviders';
 import { useAuth } from '@contexts/AuthContext';
 import { useProgressStore } from '@store/useProgressStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { useSettingsStore } from '@store/useSettingsStore';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '@shared/dateUtils';
 import { getWeeklyGoalKm, CARDIO_REPS_PER_KM } from '@config/exercises';
@@ -14,14 +15,14 @@ import { evaluateCardioWeek } from '@utils/cardioStreak';
  * where the weekly goal was met. The day that "counts" for the streak is the
  * day the user reached or exceeded the weekly goal.
  */
-function computeStreak(sessions, mode, challengeStartDate, currentDifficulty, completions = {}) {
+function computeStreak(sessions, mode, challengeStartDate, currentDifficulty, completions = {}, weekStartDay = 'monday') {
   if (!sessions.length) return 0;
 
   let streak = 0;
 
   // Walk backwards week by week
   for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
-    const { weekNum, achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions);
+    const { weekNum, achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions, weekStartDay);
     if (weekNum < 1) break;
 
     if (achieved) {
@@ -57,6 +58,7 @@ export function useCardio() {
   );
 
   const { getConfig } = useExerciseConfig();
+  const weekStartDay = useSettingsStore(s => s.settings.weekStartDay) || 'monday';
   const [sessions, setSessions] = useState(() => {
     // Initialize from context if available to avoid flicker/wiping during initial load
     return getSortedCardioSessions(cardio?.sessions);
@@ -180,7 +182,7 @@ export function useCardio() {
 
   const getWeeklyCompletion = useCallback((mode, refDate = new Date()) => {
     const currentCompletions = completionsRef.current;
-    const { start, end } = getWeekBounds(refDate);
+    const { start, end } = getWeekBounds(refDate, weekStartDay);
     const loop = new Date(start);
     while (loop <= end) {
       const dateStr = getLocalDateStr(loop);
@@ -189,7 +191,7 @@ export function useCardio() {
       loop.setDate(loop.getDate() + 1);
     }
     return null;
-  }, []);
+  }, [weekStartDay]);
 
   // Sync cardio sessions to global completions to update the global streak & firebase.
   // IMPORTANT: `completions` is intentionally NOT in the dependency array to prevent
@@ -202,7 +204,7 @@ export function useCardio() {
     const sessionsByWeek = {};
     sessions.forEach(s => {
       if (!s.startTime) return;
-      const { start } = getWeekBounds(new Date(s.startTime));
+      const { start } = getWeekBounds(new Date(s.startTime), weekStartDay);
       if (!sessionsByWeek[start]) sessionsByWeek[start] = [];
       sessionsByWeek[start].push(s);
     });
@@ -235,7 +237,7 @@ export function useCardio() {
         updateExerciseCount(existingComp.dateStr, activeMode, 0, 1, null, goalDifficulty);
       }
     });
-  }, [sessions, updateExerciseCount, activeMode, startDate, runningMultiplier, cyclingMultiplier, getWeeklyCompletion, isReady]);
+  }, [sessions, updateExerciseCount, activeMode, startDate, runningMultiplier, cyclingMultiplier, getWeeklyCompletion, isReady, weekStartDay]);
 
   // Current week number
   const weekNumber = useMemo(
@@ -264,7 +266,7 @@ export function useCardio() {
 
   // Weekly computations (show actual distance, goal is adjusted by difficulty)
   const weeklyData = useMemo(() => {
-    const { start, end } = getWeekBounds();
+    const { start, end } = getWeekBounds(undefined, weekStartDay);
     const weekSessions = modeSessions.filter(
       s => s.startTime >= start && s.startTime <= end
     );
@@ -275,7 +277,7 @@ export function useCardio() {
       distance: totalDistanceKm,
       sessionCount: weekSessions.length,
     };
-  }, [modeSessions]);
+  }, [modeSessions, weekStartDay]);
 
   // Last session
   const lastSession = useMemo(
@@ -285,8 +287,8 @@ export function useCardio() {
 
   // Streak
   const streak = useMemo(
-    () => computeStreak(sessions, activeMode, startDate, activeMode === 'running' ? runningMultiplier : cyclingMultiplier, completions),
-    [sessions, activeMode, startDate, runningMultiplier, cyclingMultiplier, completions]
+    () => computeStreak(sessions, activeMode, startDate, activeMode === 'running' ? runningMultiplier : cyclingMultiplier, completions, weekStartDay),
+    [sessions, activeMode, startDate, runningMultiplier, cyclingMultiplier, completions, weekStartDay]
   );
 
   return {

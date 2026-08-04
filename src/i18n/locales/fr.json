@@ -210,6 +210,15 @@
       "Ve",
       "Sa"
     ],
+    "weekdaysMon": [
+      "Lu",
+      "Ma",
+      "Me",
+      "Je",
+      "Ve",
+      "Sa",
+      "Di"
+    ],
     "notes": "Notes",
     "addNotePlaceholder": "Ajouter une note pour ce jour...",
     "noteSaved": "Sauvegardé !"
@@ -621,6 +630,7 @@
     "leaderboardDesc": "Apparaître dans le classement public",
     "lock": "Bloquer",
     "maxChars": "Max 20 caractères · Ta photo Google sera utilisée",
+    "monday": "Lundi",
     "multiplier": "Multiplicateur (Max 1.0)",
     "notifications": "Notifications",
     "performance": "Performance",
@@ -634,6 +644,7 @@
     "soundsDescription": "Sons lors des actions",
     "hapticFeedback": "Retours haptiques",
     "hapticsDescription": "Vibrations lors des actions",
+    "sunday": "Dimanche",
     "title": "Paramètres",
     "unlockSettings": "DÉBLOQUER LES PARAMÈTRES",
     "privacyPolicy": "Règles de Confidentialité",
@@ -647,7 +658,9 @@
     "importButton": "Importer",
     "importConfirm": "Remplacer toutes les données actuelles par cette sauvegarde ? Action irréversible.",
     "exportSuccess": "Sauvegarde téléchargée ({{count}} éléments)",
-    "importError": "Fichier de sauvegarde invalide ou illisible."
+    "importError": "Fichier de sauvegarde invalide ou illisible.",
+    "weekStartDay": "La semaine commence le",
+    "weekStartDayDesc": "Premier jour de la semaine pour le calendrier et les objectifs cardio"
   },
   "share": {
     "backgroundImage": "Image de fond",

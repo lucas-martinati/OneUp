@@ -41,11 +41,18 @@ export function shiftDateStr(dateStr, deltaDays) {
   return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
 }
 
-function getWeekBoundsStr(dateStr) {
+function getWeekBoundsStr(dateStr, weekStartDay = 'monday') {
   const [y, m, d] = dateStr.split('-').map(Number);
   const date = new Date(Date.UTC(y, m - 1, d));
   const day = date.getUTCDay();
-  const diff = date.getUTCDate() - day + (day === 0 ? -6 : 1);
+  let diff;
+  if (weekStartDay === 'sunday') {
+    // Sunday-start: subtract day-of-week to reach the preceding Sunday
+    diff = date.getUTCDate() - day;
+  } else {
+    // Monday-start (default / ISO)
+    diff = date.getUTCDate() - day + (day === 0 ? -6 : 1);
+  }
   date.setUTCDate(diff);
   const pad = n => String(n).padStart(2, '0');
   return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
@@ -55,14 +62,14 @@ function getWeekBoundsStr(dateStr) {
  * Returns true if ANY exercise is marked done for the given date.
  * Handles single day exercises and weekly cardio window.
  */
-function isDayDone(completions, dateStr) {
+function isDayDone(completions, dateStr, weekStartDay = 'monday') {
   const dayData = completions?.[dateStr];
   if (dayData && typeof dayData === 'object' && Object.values(dayData).some(e => e?.isCompleted)) {
     return true;
   }
   
-  const mondayStr = getWeekBoundsStr(dateStr);
-  let currentStr = mondayStr;
+  const weekStartStr = getWeekBoundsStr(dateStr, weekStartDay);
+  let currentStr = weekStartStr;
   while (currentStr <= dateStr) {
     const dData = completions?.[currentStr];
     if (dData && (dData.running?.isCompleted || dData.cycling?.isCompleted)) {
@@ -90,11 +97,11 @@ export const DAY_STATUS = {
  * @param {string} todayStr - The current local date string
  * @returns {number} DAY_STATUS enum
  */
-export function getDayStatus(dateStr, completions, frozenDays, todayStr) {
+export function getDayStatus(dateStr, completions, frozenDays, todayStr, weekStartDay = 'monday') {
   if (dateStr > todayStr) {
     return DAY_STATUS.FUTURE;
   }
-  if (isDayDone(completions, dateStr)) {
+  if (isDayDone(completions, dateStr, weekStartDay)) {
     return DAY_STATUS.DONE;
   }
   if (dateStr === todayStr) {
@@ -149,16 +156,23 @@ export function getCurrentWeekNumber(startDate, targetDate = new Date()) {
 /**
  * Returns the ISO week boundaries (Monday 00:00 → Sunday 23:59) for a given date.
  */
-export function getWeekBounds(date = new Date()) {
+export function getWeekBounds(date = new Date(), weekStartDay = 'monday') {
     const d = parseLocalDate(date);
     const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
-    const monday = new Date(d.getFullYear(), d.getMonth(), diff);
-    monday.setHours(0, 0, 0, 0);
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    sunday.setHours(23, 59, 59, 999);
-    return { start: monday.getTime(), end: sunday.getTime() };
+    let diff;
+    if (weekStartDay === 'sunday') {
+        // Sunday-start: subtract day-of-week to reach the preceding Sunday
+        diff = d.getDate() - day;
+    } else {
+        // Monday-start (default / ISO)
+        diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    }
+    const weekStart = new Date(d.getFullYear(), d.getMonth(), diff);
+    weekStart.setHours(0, 0, 0, 0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+    return { start: weekStart.getTime(), end: weekEnd.getTime() };
 }
 
 /**
@@ -182,7 +196,7 @@ export function getLocalDateStr(d) {
  * @param {Object} [frozenDays] - { [dateStr]: true } days protected by a Streak Freeze
  * @returns {number}
  */
-export function calculateStreak(completions, todayStr, frozenDays = {}) {
+export function calculateStreak(completions, todayStr, frozenDays = {}, weekStartDay = 'monday') {
     const todayDate = parseLocalDate(todayStr);
     const dateAt = (offset) => {
         const checkDate = new Date(todayDate);
@@ -191,7 +205,7 @@ export function calculateStreak(completions, todayStr, frozenDays = {}) {
     };
     return walkStreak(
         dateAt,
-        (dateStr) => isDayDone(completions, dateStr),
+        (dateStr) => isDayDone(completions, dateStr, weekStartDay),
         (dateStr) => !!frozenDays[dateStr],
         MAX_STREAK_WINDOW
     );
@@ -227,8 +241,8 @@ export function calculateExerciseStreak(completions, todayStr, exerciseId) {
  * @param {string} dateStr
  * @returns {boolean}
  */
-export function isDayDoneFromCompletions(completions, dateStr) {
-    return isDayDone(completions, dateStr);
+export function isDayDoneFromCompletions(completions, dateStr, weekStartDay = 'monday') {
+    return isDayDone(completions, dateStr, weekStartDay);
 }
 
 /**
@@ -238,7 +252,7 @@ export function isDayDoneFromCompletions(completions, dateStr) {
  * @param {Object} [frozenDays] - { [dateStr]: true } days protected by a Streak Freeze
  * @returns {number}
  */
-export function calculateMaxStreak(completions, frozenDays = {}) {
+export function calculateMaxStreak(completions, frozenDays = {}, weekStartDay = 'monday') {
     let max = 0;
     let temp = 0;
     const today = new Date();
@@ -249,7 +263,7 @@ export function calculateMaxStreak(completions, frozenDays = {}) {
         d.setDate(d.getDate() - i);
         const dateStr = getLocalDateStr(d);
 
-        if (isDayDone(completions, dateStr)) {
+        if (isDayDone(completions, dateStr, weekStartDay)) {
             temp++;
             if (temp > max) max = temp;
         } else if (frozenDays[dateStr]) {

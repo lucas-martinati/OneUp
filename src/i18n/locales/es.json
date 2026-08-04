@@ -210,6 +210,15 @@
       "Vie",
       "Sáb"
     ],
+    "weekdaysMon": [
+      "Lu",
+      "Ma",
+      "Mi",
+      "Ju",
+      "Vi",
+      "Sá",
+      "Do"
+    ],
     "notes": "Notas",
     "addNotePlaceholder": "Añade una nota para este día...",
     "noteSaved": "¡Guardado!"
@@ -606,6 +615,7 @@
     "leaderboardDesc": "Aparecer en la clasificación pública",
     "lock": "Bloquear",
     "maxChars": "Máx 20 caracteres · Se usará tu foto de Google",
+    "monday": "Lunes",
     "multiplier": "Multiplicador (Máx 1.0)",
     "notifications": "Notificaciones",
     "performance": "Rendimiento",
@@ -619,6 +629,7 @@
     "soundsDescription": "Sonidos en acciones",
     "hapticFeedback": "Respuesta háptica",
     "hapticsDescription": "Vibraciones en acciones",
+    "sunday": "Domingo",
     "title": "Ajustes",
     "unlockSettings": "DESBLOQUEAR AJUSTES",
     "privacyPolicy": "Política de privacidad",
@@ -631,8 +642,10 @@
     "importDataDesc": "Restaura tus datos desde un archivo de copia de seguridad.",
     "importButton": "Importar",
     "importConfirm": "¿Reemplazar todos los datos actuales con esta copia? Esta acción no se puede deshacer.",
-    "exportSuccess": "Copia descargada ({{count}} elementos)",
-    "importError": "Archivo de copia no válido o ilegible."
+    "exportSuccess": "Copia de seguridad descargada ({{count}} elementos)",
+    "importError": "Archivo de copia no válido o ilegible.",
+    "weekStartDay": "La semana comienza el",
+    "weekStartDayDesc": "Primer día de la semana para el calendario y los objetivos cardio"
   },
   "share": {
     "backgroundImage": "Imagen de fondo",

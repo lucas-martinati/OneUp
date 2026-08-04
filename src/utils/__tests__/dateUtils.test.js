@@ -213,6 +213,16 @@ describe('getWeekBounds', () => {
     const { start } = getWeekBounds(new Date(2025, 0, 19)); // Sunday
     expect(new Date(start).getDate()).toBe(13); // same Monday Jan 13
   });
+
+  it('supports Sunday as week start day', () => {
+    const { start, end } = getWeekBounds(new Date(2025, 0, 15), 'sunday'); // Wed Jan 15 2025
+    const s = new Date(start);
+    const e = new Date(end);
+    expect(s.getDay()).toBe(0);   // Sunday
+    expect(s.getDate()).toBe(12); // Sun Jan 12
+    expect(e.getDay()).toBe(6);   // Saturday
+    expect(e.getDate()).toBe(18); // Sat Jan 18
+  });
 });
 
 // ── isDayDoneFromCompletions — week-wide cardio rule ─────────────────────

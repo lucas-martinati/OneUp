@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bell, Volume2, Vibrate, Clock, Users, Lock, Gauge, Globe, Smartphone, Download, Upload } from '@utils/icons';
+import { Bell, Volume2, Vibrate, Clock, Users, Lock, Gauge, Globe, Smartphone, Download, Upload, Calendar } from '@utils/icons';
 import { ToggleSwitch, SettingRow, ThemeSwatch, Card, Button, Input } from '@components/ui';
 import { LANGUAGES } from '@config/languages';
 import { THEMES } from '@config/themes';
@@ -124,13 +124,55 @@ export function PreferencesSection({ settings, onSave }) {
                 title={t('settings.keepScreenOn')}
                 description={t('settings.keepScreenOnDesc')}
                 color="var(--warning)"
-                isLast={true}
+                isLast={false}
             >
                 <ToggleSwitch
                     enabled={settings.keepScreenOn ?? true}
                     onClick={() => onSave({ ...settings, keepScreenOn: !settings.keepScreenOn })}
                     activeGradient="linear-gradient(135deg, var(--warning), #d97706)"
                 />
+            </SettingRow>
+
+            <SettingRow
+                icon={Calendar}
+                title={t('settings.weekStartDay')}
+                description={t('settings.weekStartDayDesc')}
+                color="#06b6d4"
+                isLast={true}
+            >
+                <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                    {[
+                        { value: 'sunday', label: t('settings.sunday'), color: '#f59e0b' },
+                        { value: 'monday', label: t('settings.monday'), color: '#06b6d4' }
+                    ].map(opt => (
+                        <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => onSave({ ...settings, weekStartDay: opt.value })}
+                            className="hover-lift"
+                            style={{
+                                padding: '6px 16px',
+                                borderRadius: 'var(--radius-md)',
+                                border: settings.weekStartDay === opt.value
+                                    ? `2px solid ${opt.color}`
+                                    : '2px solid var(--border-subtle)',
+                                background: settings.weekStartDay === opt.value
+                                    ? `color-mix(in srgb, ${opt.color} 13%, transparent)`
+                                    : 'transparent',
+                                color: settings.weekStartDay === opt.value
+                                    ? opt.color
+                                    : 'var(--text-secondary)',
+                                fontSize: '0.85rem',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                minHeight: 'var(--touch-min)'
+                            }}
+                        >
+                            {opt.label}
+                        </button>
+                    ))}
+                </div>
             </SettingRow>
         </Card>
     );
