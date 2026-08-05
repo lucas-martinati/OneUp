@@ -52,8 +52,6 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                                 color={tab.color}
                                 selected={isActive}
                                 icon={tab.icon}
-                                variant="icon"
-                                special={tab.isSpecial}
                                 onClick={() => { setActiveTab(tab.id); setShowAll(false); }}
                             >
                                 {tab.customLabel ? tab.customLabel : t(tab.labelKey)}
@@ -70,7 +68,6 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                                 color={tab.color}
                                 selected={isActive}
                                 icon={tab.icon}
-                                variant="icon"
                                 onClick={() => setActiveTab(tab.id)}
                             >
                                 {tab.customLabel ? tab.customLabel : t(tab.labelKey)}
@@ -82,10 +79,8 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                         size="sm"
                         selected={false}
                         icon={showAll ? ChevronUp : Filter}
-                        variant="icon"
-                        dashed={!showAll}
                         onClick={() => setShowAll(!showAll)}
-                        style={{ background: 'transparent' }}
+                        style={{ borderStyle: 'dashed', background: 'transparent' }}
                     >
                         {showAll ? t('common.close') : t('share.exercises')}
                     </FilterChip>
