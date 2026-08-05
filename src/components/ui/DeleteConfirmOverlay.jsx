@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trash2 } from '@utils/icons';
-import { Z_INDEX } from '@config/constants';
+import { Z_INDEX } from '@utils/zIndex';
 import { Button } from './Button';
 
 export function DeleteConfirmOverlay({

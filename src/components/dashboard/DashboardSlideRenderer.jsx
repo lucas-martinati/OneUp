@@ -35,7 +35,7 @@ export function DashboardSlideRenderer({
     const computedStats = useComputedStatsStore(s => s.stats);
     const openModal = useUIStore(s => s.openModal);
     const openStore = useUIStore(s => s.openStore);
-    const openCustomExercises = useUIStore(s => s.openCustomExercises);
+    const openCustomManager = useUIStore(s => s.openCustomManager);
     const setShowCounter = (v) => v && openModal('counter');
     const { getConfig } = useExerciseConfig();
     const { isPro } = useSubscription();
@@ -125,9 +125,9 @@ export function DashboardSlideRenderer({
                                 pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                                 activeExerciseId={customExercisesMap[customSelected] ? customSelected : (defaultCustomExercises[0]?.id || null)} onSelectExercise={handleSelectExercise}
                                 exercisesList={defaultCustomExercises} exercisesMap={customExercisesMap}
-                                onManageCustom={() => { openCustomExercises(null, 'list'); pauseCloudSync?.(); }}
-                                onAddCustom={() => { openCustomExercises(null, 'create'); pauseCloudSync?.(); }}
-                                onManageCategories={() => { openModal('categoryManager'); }}
+                                onManageCustom={() => { openCustomManager('exercises', null, 'list'); pauseCloudSync?.(); }}
+                                onAddCustom={() => { openCustomManager('exercises', null, 'create'); pauseCloudSync?.(); }}
+                                onManageCategories={() => { openCustomManager('categories'); }}
                                 getConfig={getConfig}
                             />
                         ) : (
@@ -161,9 +161,9 @@ export function DashboardSlideRenderer({
                                 pauseCloudSync={pauseCloudSync} setShowCounter={setShowCounter}
                                 activeExerciseId={selId} onSelectExercise={handleSelectExercise}
                                 exercisesList={catExercises} exercisesMap={catExMap}
-                                onManageCustom={() => { openCustomExercises(catKey, 'list'); pauseCloudSync?.(); }}
-                                onAddCustom={() => { openCustomExercises(catKey, 'create'); pauseCloudSync?.(); }}
-                                onManageCategories={() => { openModal('categoryManager'); }}
+                                onManageCustom={() => { openCustomManager('exercises', catKey, 'list'); pauseCloudSync?.(); }}
+                                onAddCustom={() => { openCustomManager('exercises', catKey, 'create'); pauseCloudSync?.(); }}
+                                onManageCategories={() => { openCustomManager('categories'); }}
                                 getConfig={getConfig}
                             />
                         ) : (

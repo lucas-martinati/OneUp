@@ -19,8 +19,7 @@ const ExercisePanel = lazy(() => import('@components/exercises/ExercisePanel').t
 const Leaderboard = lazy(() => import('@components/social/Leaderboard').then(m => ({ default: m.Leaderboard })));
 const Achievements = lazy(() => import('@components/feedback/Achievements').then(m => ({ default: m.Achievements })));
 const WorkoutSession = lazy(() => import('@components/exercises/WorkoutSession').then(m => ({ default: m.WorkoutSession })));
-const CustomExercisesModal = lazy(() => import('@components/exercises/CustomExercisesModal').then(m => ({ default: m.CustomExercisesModal })));
-const CategoryManagerModal = lazy(() => import('@components/exercises/CategoryManagerModal').then(m => ({ default: m.CategoryManagerModal })));
+const CustomDataManagerModal = lazy(() => import('@components/exercises/CustomDataManagerModal').then(m => ({ default: m.CustomDataManagerModal })));
 const AdminPanel = lazy(() => import('@components/admin/AdminPanel').then(m => ({ default: m.AdminPanel })));
 const ProUnlockedModal = lazy(() => import('@components/dashboard/ProUnlockedModal').then(m => ({ default: m.ProUnlockedModal })));
 const ProExpiredModal = lazy(() => import('@components/dashboard/ProExpiredModal').then(m => ({ default: m.ProExpiredModal })));
@@ -56,9 +55,9 @@ export function DashboardModals({
     const openStore = useUIStore(s => s.openStore);
     const closeSettings = useUIStore(s => s.closeSettings);
     const openStoreDirectly = useUIStore(s => s.openStoreDirectly);
-    const customExModalCatId = useUIStore(s => s.customExModalCatId);
-    const customExModalInitialView = useUIStore(s => s.customExModalInitialView);
-    const closeCustomExercises = useUIStore(s => s.closeCustomExercises);
+    const customManagerCatId = useUIStore(s => s.customManagerCatId);
+    const customManagerInitialTab = useUIStore(s => s.customManagerInitialTab);
+    const customManagerInitialView = useUIStore(s => s.customManagerInitialView);
     const openAchievements = useUIStore(s => s.openAchievements);
     const closeAchievements = useUIStore(s => s.closeAchievements);
     const highlightedBadgeId = useUIStore(s => s.highlightedBadgeId);
@@ -196,26 +195,18 @@ export function DashboardModals({
                     />
                 </Suspense>
             )}
-            {modals.customExercises && isPro && (
+            {modals.customManager && isPro && (
                 <Suspense fallback={null}>
-                    <CustomExercisesModal
-                        onClose={() => { closeCustomExercises(); resumeCloudSync?.(); }}
+                    <CustomDataManagerModal
+                        onClose={() => { closeModal('customManager'); resumeCloudSync?.(); }}
                         customExercisesHook={customExercisesHook}
-                        customCategoriesHook={customCategoriesHook}
-                        computedStats={computedStats}
-                        categoryId={customExModalCatId}
-                        initialView={customExModalInitialView}
-                    />
-                </Suspense>
-            )}
-            {modals.categoryManager && isPro && (
-                <Suspense fallback={null}>
-                    <CategoryManagerModal
-                        onClose={() => closeModal('categoryManager')}
                         customCategoriesHook={customCategoriesHook}
                         exercisesByUserCategory={exercisesByUserCategory}
                         defaultCustomExercises={defaultCustomExercises}
                         computedStats={computedStats}
+                        categoryId={customManagerCatId}
+                        initialTab={customManagerInitialTab}
+                        initialView={customManagerInitialView}
                     />
                 </Suspense>
             )}
