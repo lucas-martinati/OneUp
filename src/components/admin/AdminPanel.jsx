@@ -142,7 +142,7 @@ export function AdminPanel({ onClose }) {
           />
         )}
         {!loading && selectedUid && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             {/* Tabs Selector */}
             <div style={{ marginBottom: 'var(--space-4)', flexShrink: 0 }}>
               <SegmentedControl
