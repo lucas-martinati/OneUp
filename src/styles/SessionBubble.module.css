@@ -35,7 +35,7 @@
     0 0 18px rgba(139, 92, 246, 0.35);
   transition: box-shadow 0.3s ease, transform 0.15s ease, border-color 0.3s ease;
   will-change: transform;
-  animation: bubbleEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: counterBlobMorph 15s ease-in-out infinite, bubbleEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .bubble:active {
@@ -68,6 +68,7 @@
   pointer-events: none;
   border-radius: 60% 40% 55% 45% / 50% 52% 48% 50%;
   filter: drop-shadow(0 0 4px rgba(167, 139, 250, 0.7));
+  animation: counterBlobMorph 15s ease-in-out infinite;
   z-index: 1;
   -webkit-mask:
     linear-gradient(white 0 0) content-box,
@@ -88,6 +89,7 @@
   pointer-events: none;
   border-radius: 60% 40% 55% 45% / 50% 52% 48% 50%;
   filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.85));
+  animation: counterBlobMorph 15s ease-in-out infinite;
   z-index: 3;
   -webkit-mask:
     linear-gradient(#ffffff 0 0) content-box,
@@ -149,7 +151,7 @@
   border-radius: 58% 42% 56% 44% / 53% 47%;
   border: 1.5px solid rgba(167, 139, 250, 0.35);
   background: radial-gradient(circle, rgba(167, 139, 250, 0.04) 0%, transparent 70%);
-  animation: bubblePulseGlow 2.5s cubic-bezier(0.25, 0, 0, 1) infinite;
+  animation: counterBlobMorph 15s ease-in-out infinite, bubblePulseGlow 2.5s cubic-bezier(0.25, 0, 0, 1) infinite;
   pointer-events: none;
 }
 
