@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Settings2, Trash2, Edit2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, Check } from '@utils/icons';
-import { Button, Slider, Input, ModalHeader, DeleteConfirmOverlay } from '@components/ui';
+import { Button, Slider, Input, ModalHeader, DeleteConfirmOverlay, ColorPicker } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { MAX_EXERCISES_PER_CATEGORY } from '@store/useExercisesStore';
@@ -280,16 +280,11 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
               <label className="input-label" style={{ marginBottom: 'var(--space-2)' }}>
                 {t('customExercises.colorLabel')}
               </label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'space-between' }}>
-                {PRESET_COLORS.map(c => (
-                  <button key={c} onClick={() => setColor(c)} className="hover-lift" style={{
-                    width: '38px', height: '38px', borderRadius: '50%',
-                    background: c, border: color === c ? '3px solid white' : 'none',
-                    boxShadow: color === c ? `0 0 0 3px ${c}50` : 'none',
-                    cursor: 'pointer', transition: 'all 0.2s', padding: 0
-                  }} />
-                ))}
-              </div>
+              <ColorPicker 
+                colors={PRESET_COLORS}
+                selectedColor={color}
+                onChange={setColor}
+              />
             </div>
 
             {/* ICON */}
