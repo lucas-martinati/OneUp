@@ -1,7 +1,7 @@
 import React, { useRef, useState, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Shield, Flame, Trophy, Snowflake } from '@utils/icons';
-import { Card, FrozenFlame } from '@components/ui';
+import { Card, FrozenFlame, Stack } from '@components/ui';
 import { useUIStore } from '@store/useUIStore';
 import { useProgressStore } from '@store/useProgressStore';
 import { useAuth } from '@contexts/AuthContext';
@@ -130,13 +130,12 @@ export const DashboardHeader = React.memo(({
     const dayPodEntranceAnimation = 'dayPodGlowEntrance 1.8s ease-out';
 
     return (
-        <header
+        <Stack
+            as="header"
             ref={headerRef}
             className="dashboard-header-wrapper"
+            align="center"
             style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
                 width: '100%',
                 position: 'relative',
                 zIndex: 10,
@@ -163,7 +162,7 @@ export const DashboardHeader = React.memo(({
                     animation: `${entranceAnimation}, headerUnfold 0.5s ease-out forwards`,
                 }}
             >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexShrink: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0, flexShrink: 1 }}>
                     {showLogo && (
                         <img
                             onClick={() => window.location.reload()}
@@ -197,14 +196,14 @@ export const DashboardHeader = React.memo(({
                     )}
                 </div>
 
-                <div
+                <Stack
+                    direction="row"
+                    align="center"
+                    justify="flex-end"
                     ref={rightSideRef}
                     style={{
-                        display: 'flex',
                         gap: 'clamp(4px, 0.8vw, 8px)',
-                        alignItems: 'center',
                         flexShrink: 0,
-                        justifyContent: 'flex-end',
                         marginLeft: 'auto',
                     }}
                 >
@@ -284,7 +283,7 @@ export const DashboardHeader = React.memo(({
                         <Trophy size={16} color={selectedExercise.color} />
                         <span>{totalReps}</span>
                     </button>
-                </div>
+                </Stack>
             </Card>
 
             {/* Vertical Stem of the T — Centered Glass Pod wrapping Day Hero (separate cube/card) */}
@@ -332,6 +331,6 @@ export const DashboardHeader = React.memo(({
                     {p.emoji}
                 </div>
             ))}
-        </header>
+        </Stack>
     );
 });

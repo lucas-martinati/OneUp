@@ -11,6 +11,7 @@
   isolation: isolate;
   display: flex;
   flex-direction: column;
+  gap: var(--space-6);
   min-height: 100%;
 }
 
@@ -42,7 +43,6 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  margin-bottom: var(--space-6);
 }
 /* ── Month navigation (hero) ─────────────────────────────────────────── */
 .monthNav {
@@ -50,7 +50,6 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  margin-bottom: var(--space-6);
 }
 .navBtn {
   flex-shrink: 0;
@@ -113,7 +112,6 @@
   align-items: stretch;
   gap: var(--space-2);
   padding: 14px var(--space-4);
-  margin-bottom: var(--space-6);
   border-radius: var(--radius-lg);
   background: var(--surface-elevated);
   border: 1px solid var(--border-default);
@@ -279,7 +277,6 @@
 
 /* ── Legend ──────────────────────────────────────────────────────────── */
 .legend {
-  margin-top: var(--space-6);
   display: flex;
   flex-wrap: wrap;
   gap: 10px 18px;
@@ -318,7 +315,6 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
 }
 .detailDate {
   font-size: 0.72rem;

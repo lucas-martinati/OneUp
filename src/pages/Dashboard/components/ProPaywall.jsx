@@ -7,7 +7,7 @@ export const ProPaywall = ({ title, onOpenStore }) => {
     const { t } = useTranslation();
 
     return (
-        <Stack align="center" justify="center" gap="sm" style={{ height: '100%', padding: '20px', textAlign: 'center' }}>
+        <Stack align="center" justify="center" gap="sm" style={{ height: '100%', padding: 'var(--space-5)', textAlign: 'center' }}>
             <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8 }}>
                 {title}
             </div>
@@ -15,7 +15,7 @@ export const ProPaywall = ({ title, onOpenStore }) => {
                 width: '64px', height: '64px', borderRadius: '50%',
                 background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.05))',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                border: '1px solid rgba(139,92,246,0.3)', marginBottom: '8px'
+                border: '1px solid rgba(139,92,246,0.3)'
             }}>
                 <Lock size={28} color="var(--accent-glow)" />
             </div>
@@ -30,7 +30,6 @@ export const ProPaywall = ({ title, onOpenStore }) => {
                 icon={ShoppingBag}
                 onClick={onOpenStore}
                 className="hover-lift"
-                style={{ marginTop: '8px' }}
             >
                 {t('paywall.viewStore')}
             </Button>

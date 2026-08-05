@@ -587,7 +587,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                 paddingTop: 0,
                 paddingBottom: 0,
                 maxWidth: 'none',
-                display: 'flex', flexDirection: 'column'
+                display: 'flex', flexDirection: 'column', gap: '20px'
             }}>
             <div className={styles.detailHead}>
                 <div style={{ minWidth: 0 }}>
@@ -613,7 +613,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
             </div>
 
             {/* Summary ribbon — at-a-glance recap */}
-            <div className={styles.stats} style={{ marginBottom: '14px' }}>
+            <div className={styles.stats}>
                 <div className={styles.stat}>
                     <div className={`${styles.statValue} ${styles.statValueAccent}`}>{doneCount}/{totalCount}</div>
                     <div className={styles.statLabel}>{t('share.exercises')}</div>

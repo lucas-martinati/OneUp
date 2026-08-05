@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Crown, Sparkles, Dumbbell, BarChart3, Palette, Snowflake, Plus, Check } from '@utils/icons';
 import { useHaptics } from '@hooks/useHaptics';
 import { GradientModal } from '@components/ui/GradientModal';
+import { Stack, Card } from '@components/ui';
 
 export function ProUnlockedModal({ open, onClose, onConfirm }) {
   const { t } = useTranslation();
@@ -72,15 +73,13 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
       shadowGlow="rgba(139, 92, 246, 0.25)"
     >
       {/* Header Hero */}
-      <div
+      <Stack
+        align="center"
+        gap="sm"
         style={{
-          padding: '32px 24px 20px',
+          padding: 'var(--space-8) var(--space-6) var(--space-5)',
           textAlign: 'center',
           background: 'radial-gradient(circle at top, rgba(139, 92, 246, 0.3) 0%, transparent 70%)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '12px',
         }}
       >
         <div
@@ -109,7 +108,7 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
           />
         </div>
 
-        <div>
+        <Stack gap="xs" align="center">
           <h2
             style={{
               margin: 0,
@@ -125,7 +124,7 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
           </h2>
           <p
             style={{
-              margin: '6px 0 0',
+              margin: 0,
               fontSize: '1.05rem',
               fontWeight: 600,
               color: '#a7f3d0',
@@ -137,17 +136,15 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
           >
             {t('pro.unlockedModal.subtitle')}
           </p>
-        </div>
-      </div>
+        </Stack>
+      </Stack>
 
       {/* Scrollable Feature List */}
-      <div
+      <Stack
+        gap="sm"
         style={{
-          padding: '0 24px 20px',
+          padding: '0 var(--space-6) var(--space-5)',
           overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px',
           maxHeight: '340px',
         }}
       >
@@ -166,16 +163,14 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
         {featureItems.map((item) => {
           const Icon = item.icon;
           return (
-            <div
+            <Card
               key={item.key}
+              variant="glass"
               style={{
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '14px',
-                padding: '12px 14px',
-                borderRadius: '16px',
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                padding: 'var(--space-3) var(--space-4)',
                 transition: 'transform 0.2s ease, background 0.2s ease',
               }}
             >
@@ -202,16 +197,16 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
                 </div>
               </div>
               <Check size={18} color="#a7f3d0" style={{ flexShrink: 0, marginTop: '2px' }} />
-            </div>
+            </Card>
           );
         })}
-      </div>
+      </Stack>
 
       {/* Footer CTA */}
       <div
         style={{
-          padding: '16px 24px 24px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          padding: 'var(--space-4) var(--space-6) var(--space-6)',
+          borderTop: '1px solid var(--border-default)',
           background: 'rgba(0, 0, 0, 0.2)',
         }}
       >
@@ -219,8 +214,8 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
           onClick={handleConfirm}
           style={{
             width: '100%',
-            padding: '14px 20px',
-            borderRadius: '16px',
+            padding: 'var(--space-4) var(--space-5)',
+            borderRadius: 'var(--radius-lg)',
             border: 'none',
             background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
             color: '#ffffff',
