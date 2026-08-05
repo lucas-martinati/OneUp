@@ -17,7 +17,7 @@ button:focus:not(:focus-visible) {
   font-size: clamp(1.4rem, 4vw, 1.8rem);
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin: 0 0 16px;
+  margin: 0 0 var(--space-4);
   text-align: center;
   background: var(--gradient-glow);
   -webkit-background-clip: text;
@@ -106,24 +106,20 @@ button:focus:not(:focus-visible) {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: var(--space-6);
+  background: rgba(0, 0, 0, 0.85);
   animation: overlayFadeIn 0.2s ease-out;
 }
 
 /* Darker variant for destructive or blocking flows. */
 .dialog-backdrop--heavy {
   background: var(--overlay-bg-heavy);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .dialog-card {
   width: 100%;
   max-width: 340px;
-  padding: 24px;
+  padding: var(--space-6);
   border-radius: var(--radius-lg);
   background: var(--sheet-bg);
   border: 1px solid color-mix(in srgb, var(--accent-glow) 20%, transparent);
@@ -142,10 +138,10 @@ button:focus:not(:focus-visible) {
 .dialog-warning {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   width: 100%;
-  padding: 10px 16px;
-  border-radius: 10px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--error) 10%, transparent);
   border: 1px solid color-mix(in srgb, var(--error) 20%, transparent);
   font-size: 12px;
@@ -217,7 +213,7 @@ button:focus:not(:focus-visible) {
 
 /* --- Chart Components --- */
 .chart-card {
-    padding: 12px 14px;
+    padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
@@ -241,7 +237,7 @@ button:focus:not(:focus-visible) {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     color: var(--text-secondary);
 }
 
@@ -381,8 +377,8 @@ button:focus:not(:focus-visible) {
     pointer-events: none;
     background: var(--tooltip-bg);
     border: 1px solid var(--border-default);
-    border-radius: 8px;
-    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    padding: var(--space-2);
     min-width: 90px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
@@ -442,8 +438,8 @@ button:focus:not(:focus-visible) {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 6px 12px;
-    margin-top: 10px;
+    gap: var(--space-2) var(--space-3);
+    margin-top: var(--space-2);
 }
 
 .svg-donut-legend-item {
@@ -617,12 +613,11 @@ button:focus:not(:focus-visible) {
 
 /* ── Cardio Module ──────────────────────────────────────────────────── */
 .dashboard-slide-bg, .cardio-module {
-  border-radius: 28px;
+  border-radius: var(--radius-xl);
 }
 
 .cardio-module {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(10, 10, 15, 0.6);
 }
 
 
@@ -668,9 +663,9 @@ button:focus:not(:focus-visible) {
   right: 6px;
   top: 50%;
   transform: translateY(-50%);
-  gap: 10px;
+  gap: var(--space-2);
   z-index: 100;
-  padding: 12px 6px; /* Tighter padding around the elements */
+  padding: var(--space-3) 6px; /* Tighter padding around the elements */
   background: rgba(10, 10, 15, 0.4);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -702,8 +697,8 @@ button:focus:not(:focus-visible) {
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(99, 102, 241, 0.4);
   color: #f8fafc;
-  padding: 6px 12px;
-  border-radius: 12px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
   font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;

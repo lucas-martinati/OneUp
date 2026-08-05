@@ -61,9 +61,12 @@
   --glow-accent: 0 6px 24px rgba(245, 87, 108, 0.45);
   --glow-gold: 0 4px 15px rgba(255, 215, 0, 0.3);
   --glow-error: 0 4px 16px rgba(239, 68, 68, 0.3);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  
+  /* Unified Elevation / Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.5);
 
   /* Spacing (Base 4px grid) */
   --space-1: 4px;
@@ -74,11 +77,14 @@
   --space-6: 24px;
   --space-8: 32px;
   --space-10: 40px;
+  --space-12: 48px;
 
   /* Radius System */
+  --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
+  --radius-xl: 24px;
   --radius-full: 9999px;
 
   /* Text Hierarchy Tokens */

@@ -7,7 +7,13 @@
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
+
 *::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -24,14 +30,6 @@
 }
 *::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.25); /* brighter when actively dragging */
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
 }
 
 /* Hide spin buttons for input[type=number] */
