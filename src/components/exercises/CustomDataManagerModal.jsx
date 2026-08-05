@@ -357,7 +357,7 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
 
   return (
     <>
-      <div className="tab-view-content" style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+      <div className="tab-view-content">
 
         <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
@@ -911,7 +911,7 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
   };
 
   return (
-    <div className="tab-view-content" style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+    <div className="tab-view-content">
 
       <div style={{ flex: 1, overflow: confirmDeleteEx ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         

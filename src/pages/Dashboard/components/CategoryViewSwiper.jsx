@@ -47,12 +47,12 @@ export function CategoryViewSwiper({
     return fullCategoryOrder.map((catKey, i) => {
         const isRendered = renderedSlides.has(i);
         if (!isRendered) {
-            return <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}></div>;
+            return <div key={catKey} className="dashboard-slide-container" data-slide-index={i}></div>;
         }
 
         if (catKey === CATEGORIES.CARDIO) {
             return (
-                <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                <div key={catKey} className="dashboard-slide-container" data-slide-index={i}>
                     <FitToView>
                         <Suspense fallback={null}>
                             <CardioModule />
@@ -64,7 +64,7 @@ export function CategoryViewSwiper({
 
         if (catKey === CATEGORIES.BODYWEIGHT) {
             return (
-                <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                <div key={catKey} className="dashboard-slide-container" data-slide-index={i}>
                     <FitToView>
                         <CategoryProgressView
                             isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
@@ -82,7 +82,7 @@ export function CategoryViewSwiper({
 
         if (catKey === CATEGORIES.WEIGHTS) {
             return (
-                <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                <div key={catKey} className="dashboard-slide-container" data-slide-index={i}>
                     <FitToView>
                         {canAccessFeature(FEATURES.WEIGHTS, { isPro }) ? (
                             <CategoryProgressView
@@ -113,7 +113,7 @@ export function CategoryViewSwiper({
             const color = catDef?.color || CATEGORY_COLORS[CATEGORIES.CUSTOM];
 
             return (
-                <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                <div key={catKey} className="dashboard-slide-container" data-slide-index={i}>
                     <FitToView>
                         {canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) ? (
                             <CategoryProgressView
@@ -149,7 +149,7 @@ export function CategoryViewSwiper({
             const catExMap = exercisesMapByUserCategory[catKey] || {};
             const selId = userCatSelected[catKey] || catExercises[0]?.id || null;
             return (
-                <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
+                <div key={catKey} className="dashboard-slide-container" data-slide-index={i}>
                     <FitToView>
                         {canAccessFeature(FEATURES.CUSTOM_CATEGORIES, { isPro }) ? (
                             <CategoryProgressView

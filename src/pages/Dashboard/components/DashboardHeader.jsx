@@ -180,17 +180,7 @@ export const DashboardHeader = React.memo(({
                         />
                     )}
                     {showText && (
-                        <span
-                            className="app-logo-text"
-                            style={{
-                                fontWeight: '800',
-                                fontSize: 'clamp(1.1rem, 2.5vh, 1.5rem)',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                minWidth: 0
-                            }}
-                        >
+                        <span className="app-logo-text">
                             OneUp
                         </span>
                     )}

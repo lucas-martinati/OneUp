@@ -304,7 +304,7 @@ export function Dashboard() {
                     quand une modale est ouverte — l'ExercisePanel affiche le sien. */}
                 <EventHud placement="dashboard" hidden={anyModalOpen} />
 
-                <main className="flex-1 flex-col pos-relative" style={{ minHeight: 0 }}>
+                <main className="flex-1 flex-col pos-relative dashboard-main">
                     <div
                         ref={scrollContainerRef}
                         style={{

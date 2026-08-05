@@ -69,7 +69,7 @@
   font-size: var(--text-sm);
   font-weight: 800;
   color: var(--text-secondary);
-  margin-bottom: var(--space-3);
+  margin: 0; /* Updated from margin-bottom to fix inline styles */
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -89,4 +89,47 @@
 
 .section-stack--compact {
   gap: var(--space-4);
+}
+
+/* ── Inline Style Replacements ── */
+.tab-view-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.modal-header-title {
+  margin: 0;
+  text-align: left;
+}
+
+.custom-flame {
+  margin-top: 10px;
+}
+
+.dashboard-slide-container {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  height: 100%;
+}
+
+.dashboard-main {
+  min-height: 0;
+}
+
+.app-logo-text {
+  font-weight: 800;
+  font-size: clamp(1.1rem, 2.5vh, 1.5rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.exercise-grid {
+  gap: var(--exercise-btn-gap, clamp(4px, 1vh, 8px));
+  width: 100%;
+  max-width: 640px;
+  padding: 2px;
 }

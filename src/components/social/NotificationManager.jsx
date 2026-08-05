@@ -173,7 +173,7 @@ export function NotificationManager() {
     // Portal into the shared toast stack (below achievement toasts) so all
     // toasts share one flex column and reflow when any of them disappears.
     return createPortal(
-        <div className={styles.stack} style={{ order: 1 }}>
+        <div className={styles.stack}>
             {activeToasts.map(toast => (
                 // Include count in the key so a new poke from the same person
                 // remounts the toast: timer resets, the ×N badge re-animates,

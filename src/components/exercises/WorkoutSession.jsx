@@ -222,7 +222,7 @@ export function WorkoutSession(props) {
                         {/* ── Routines: strip list ── */}
                         {routines.length > 0 && (
                             <div className={styles.sectionCol}>
-                                <div className="section-label" style={{ margin: 0 }}>
+                                <div className="section-label">
                                     {t('routines.title')}
                                 </div>
                                 <div ref={routinesStripRef} className={styles.routinesStrip}>
@@ -268,7 +268,7 @@ export function WorkoutSession(props) {
 
                         {/* ── Exercise selection grid ── */}
                         <div className={styles.sectionCol}>
-                            <div className="section-label" style={{ margin: 0 }}>
+                            <div className="section-label">
                                 {t('workout.selectExercises')}
                             </div>
 
@@ -307,7 +307,7 @@ export function WorkoutSession(props) {
                         {queue.length > 0 && (
                             <div className={styles.sectionCol}>
                                 <div className={styles.queueHeader}>
-                                    <div className="section-label" style={{ margin: 0 }}>
+                                    <div className="section-label">
                                         {t('workout.yourOrder')} ({queue.length})
                                     </div>
                                     <div className={styles.queueActions}>

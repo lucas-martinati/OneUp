@@ -34,7 +34,7 @@ export function ModalHeader({
           </div>
         )}
         <div>
-          {title && <h2 className="modal-header-title panel-title" style={{ margin: 0, textAlign: 'left' }}>{title}</h2>}
+          {title && <h2 className="modal-header-title panel-title">{title}</h2>}
           {subtitle && <p className="modal-header-subtitle">{subtitle}</p>}
         </div>
       </div>

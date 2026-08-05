@@ -63,10 +63,7 @@ export const CategoryProgressView = React.memo(({
         return (
             <>
                 {/* ── Exercise Selector ── */}
-                <div className="exercise-grid flex-row flex-wrap flex-justify-center" style={{
-                    gap: 'var(--exercise-btn-gap, clamp(4px, 1vh, 8px))', width: '100%', maxWidth: '640px',
-                    padding: '2px'
-                }}>
+                <div className="exercise-grid flex-row flex-wrap flex-justify-center">
                     {exercisesList.map(ex => (
                         <ExerciseButton
                             key={ex.id}
