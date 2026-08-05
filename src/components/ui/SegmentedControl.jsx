@@ -123,7 +123,9 @@ export function SegmentedControl({
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               width: '100%',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
+              WebkitTapHighlightColor: 'transparent',
+              outline: 'none'
             }}
           >
             {option.icon && <span>{option.icon}</span>}

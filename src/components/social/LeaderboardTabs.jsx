@@ -22,7 +22,8 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
         border: `1px solid ${active ? domainActive[key].border : 'var(--border-default)'}`,
         fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-        transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease'
+        transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease',
+        WebkitTapHighlightColor: 'transparent', outline: 'none'
     });
 
     const chipStyle = (isActive, color, special = false, dashed = false) => ({
@@ -37,7 +38,8 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
         letterSpacing: special ? '0.06em' : 'normal',
         cursor: 'pointer', minHeight: 'var(--touch-min)',
         boxShadow: isActive && special ? `0 0 14px ${color}33` : 'none',
-        transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease'
+        transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease',
+        WebkitTapHighlightColor: 'transparent', outline: 'none'
     });
 
     return (
