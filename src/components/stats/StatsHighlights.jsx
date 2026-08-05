@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Trophy, Crown, DynamicIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { AnimatedNumber } from '@components/ui/AnimatedNumber';
+import { Card } from '@components/ui';
 
 const intFormat = (v) => v.toLocaleString();
 
@@ -34,8 +35,6 @@ export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExR
 
     const cardBase = {
         position: 'relative', overflow: 'hidden',
-        padding: '15px 14px', borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-default)',
         display: 'flex', flexDirection: 'column', gap: '10px'
     };
     const labelStyle = {
@@ -52,7 +51,7 @@ export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExR
                     gap: '10px'
                 }}>
                     {champion && champion.totalReps > 0 && (
-                        <div className="glass-premium scale-in" style={{ ...cardBase, animationDelay: '0.3s' }}>
+                        <Card variant="premium" padding="sm" className="scale-in" style={{ ...cardBase, animationDelay: '0.3s' }}>
                             <div aria-hidden="true" style={{
                                 position: 'absolute', top: '-28px', right: '-28px',
                                 width: '86px', height: '86px', borderRadius: '50%',
@@ -78,10 +77,10 @@ export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExR
                             <div style={{ fontSize: '1.3rem', fontWeight: '800', color: 'var(--text-primary)', position: 'relative', zIndex: 1 }}>
                                 <AnimatedNumber value={champion.totalReps} format={intFormat} pending={pending} /> <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)' }}>{t('common.reps')}</span>
                             </div>
-                        </div>
+                        </Card>
                     )}
                     {bestDayDate && (
-                        <div className="glass-premium scale-in" style={{ ...cardBase, animationDelay: '0.35s' }}>
+                        <Card variant="premium" padding="sm" className="scale-in" style={{ ...cardBase, animationDelay: '0.35s' }}>
                             <div aria-hidden="true" style={{
                                 position: 'absolute', top: '-28px', right: '-28px',
                                 width: '86px', height: '86px', borderRadius: '50%',
@@ -125,7 +124,7 @@ export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExR
                                     );
                                 })}
                             </div>
-                        </div>
+                        </Card>
                     )}
                 </div>
             )}

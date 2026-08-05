@@ -2,34 +2,19 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clock, TrendingUp, Footprints, Bike, MapPin, Gauge } from '@utils/icons';
 import { useCardio } from './useCardio';
+import { Card } from '@components/ui/Card';
 
 function ActivityCard({ icon: Icon, title, color, stats, hasData, totalSessionsCount, t }) {
     return (
-        <div
-            className="glass-premium scale-in"
+        <Card
+            className="scale-in"
+            variant="tinted"
+            tint={color}
             style={{
                 position: 'relative',
                 overflow: 'hidden',
-                padding: 'var(--space-6)',
-                borderRadius: 'var(--radius-lg)',
-                background: 'var(--surface-section)',
-                border: '1px solid var(--border-default)',
             }}
         >
-            {/* Soft corner glow matching StatCard */}
-            <div
-                aria-hidden="true"
-                style={{
-                    position: 'absolute',
-                    top: '-32px',
-                    right: '-32px',
-                    width: '100px',
-                    height: '100px',
-                    borderRadius: '50%',
-                    background: `radial-gradient(circle, ${color}26 0%, transparent 70%)`,
-                    pointerEvents: 'none',
-                }}
-            />
 
             {/* Header row */}
             <div
@@ -115,7 +100,7 @@ function ActivityCard({ icon: Icon, title, color, stats, hasData, totalSessionsC
                     );
                 })}
             </div>
-        </div>
+        </Card>
     );
 }
 

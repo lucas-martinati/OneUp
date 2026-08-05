@@ -71,7 +71,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                 {showStore ? (
                     <StoreView />
                 ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+                    <div className="section-stack">
                         <PreferencesSection settings={settings} onSave={onSave} />
                         <LanguageSection />
                         <PerformanceSection settings={settings} onSave={onSave} />

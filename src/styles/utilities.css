@@ -80,3 +80,13 @@
   color: var(--text-secondary);
 }
 
+/* Standardized vertical section spacing for scrollable panels. */
+.section-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.section-stack--compact {
+  gap: var(--space-4);
+}

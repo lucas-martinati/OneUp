@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SegmentedControl } from '@components/ui/SegmentedControl';
+import { SectionTitle } from '@components/ui';
 
 export function StoreCard({
     isActive,
@@ -31,11 +32,7 @@ export function StoreCard({
 }) {
     const [billingPeriod, setBillingPeriod] = useState('monthly');
 
-    const sectionTitleStyle = {
-        marginBottom: 'var(--space-6)', fontSize: '0.85rem', fontWeight: '700',
-        textTransform: 'uppercase', letterSpacing: '1px',
-        color: 'var(--text-secondary)'
-    };
+
 
     const handlePurchase = async () => {
         if (!cloudAuth?.isSignedIn) {
@@ -61,7 +58,7 @@ export function StoreCard({
                 : 'var(--glass-bg, var(--card-bg))',
             border: isActive ? `1px solid rgba(${colorRGB},0.2)` : '1px solid var(--border-default)'
         }}>
-            <h3 style={sectionTitleStyle}>{title}</h3>
+            <SectionTitle spacing="md">{title}</SectionTitle>
 
             {isActive && (
                 <div style={{

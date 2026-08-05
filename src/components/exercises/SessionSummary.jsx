@@ -8,7 +8,7 @@ import { updateSessionName } from '@features/share/services/sessionHistoryServic
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { SharePanel } from '@features/share/components/SharePanel';
-import { InlineNameEditor } from '@components/ui';
+import { InlineNameEditor, Card } from '@components/ui';
 import styles from '@styles/SessionSummary.module.css';
 
 function formatDuration(seconds) {
@@ -113,7 +113,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                     {recapExercises.map((ex, i) => {
                         const Icon = getIcon(ex.icon);
                         return (
-                            <div key={ex.id || i} className={styles.row} style={{ background: `${ex.color}16`, border: `1px solid ${ex.color}33` }}>
+                            <Card key={ex.id || i} variant="tinted" tint={ex.color} padding="xs" className={styles.row}>
                                 <div className={styles.rowIcon} style={{ background: `${ex.color}26` }}>
                                     <Icon size={18} color={ex.color} />
                                 </div>
@@ -123,7 +123,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                                     {ex.weight ? ` • ${ex.weight} ${t('weight.kg')}` : ''}
                                     <Check size={16} strokeWidth={2.5} />
                                 </span>
-                            </div>
+                            </Card>
                         );
                     })}
                 </div>

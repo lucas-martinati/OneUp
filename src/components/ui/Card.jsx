@@ -12,8 +12,8 @@ import { forwardRef, useMemo } from 'react';
  * `[data-perf="low"]` overrides in index.css that disable backdrop-blur on
  * low-end devices. The other variants are token-driven inline styles.
  *
- * @param {'glass'|'elevated'|'section'|'plain'} [variant='glass']
- * @param {'none'|'sm'|'md'|'lg'} [padding='md']
+ * @param {'glass'|'elevated'|'section'|'plain'|'premium'|'tinted'} [variant='glass']
+ * @param {'none'|'xs'|'sm'|'md'|'lg'|'xl'} [padding='md']
  * @param {boolean} [interactive=false] – adds hover-lift affordance
  * @param {React.ElementType} [as='div'] – render a different element/component
  */
@@ -23,9 +23,11 @@ const BASE = {
 
 const PADDING = {
   none: 0,
+  xs: 'var(--space-3)',
   sm: 'var(--space-4)',
   md: 'var(--space-6)',
   lg: 'var(--space-8)',
+  xl: 'var(--space-10)',
 };
 
 // Variants backed by an existing utility class inherit its perf-mode overrides.
@@ -34,6 +36,8 @@ const VARIANT_CLASS = {
   elevated: '',
   section: '',
   plain: '',
+  premium: 'glass-premium',
+  tinted: '',
 };
 
 const VARIANT_STYLE = {
@@ -52,15 +56,28 @@ const VARIANT_STYLE = {
     background: 'var(--card-bg)',
     border: '1px solid var(--border-default)',
   },
+  premium: {},
+  tinted: {},
 };
 
 export const Card = forwardRef(function Card(
-  { variant = 'glass', padding = 'md', interactive = false, as: Tag = 'div', className = '', style, children, ...rest },
+  { variant = 'glass', padding = 'md', interactive = false, as: Tag = 'div', className = '', style, children, tint, ...rest },
   ref,
 ) {
   const composed = useMemo(
-    () => ({ ...BASE, ...VARIANT_STYLE[variant], padding: PADDING[padding], ...style }),
-    [variant, padding, style],
+    () => ({
+      ...BASE,
+      ...VARIANT_STYLE[variant],
+      padding: PADDING[padding],
+      ...(variant === 'tinted' && tint
+        ? {
+            background: `linear-gradient(160deg, ${tint}2e, ${tint}12)`,
+            border: `1px solid ${tint}38`,
+          }
+        : {}),
+      ...style,
+    }),
+    [variant, padding, tint, style],
   );
 
   const classes = [VARIANT_CLASS[variant], interactive && 'hover-lift', className]

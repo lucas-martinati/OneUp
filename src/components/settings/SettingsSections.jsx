@@ -1,12 +1,11 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, Volume2, Vibrate, Clock, Users, Lock, Gauge, Globe, Smartphone, Download, Upload, Calendar } from '@utils/icons';
-import { ToggleSwitch, SettingRow, ThemeSwatch, Card, Button, Input } from '@components/ui';
+import { ToggleSwitch, SettingRow, ThemeSwatch, Card, Button, Input, SectionTitle } from '@components/ui';
 import { LANGUAGES } from '@config/languages';
 import { THEMES } from '@config/themes';
 import { isNativePlatform } from '@utils/platform';
 import { downloadBackup, parseBackup, restoreBackup, readFileText } from '@utils/dataBackup';
-import { sectionTitleStyle } from './settingsStyles';
 import { haptics } from '@utils/hapticsManager';
 
 /** Notifications (+ time picker), sounds and keep-screen-on toggles. */
@@ -15,7 +14,7 @@ export function PreferencesSection({ settings, onSave }) {
 
     return (
         <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-            <h3 style={sectionTitleStyle}>{t('settings.preferences')}</h3>
+            <SectionTitle>{t('settings.preferences')}</SectionTitle>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <SettingRow
@@ -234,7 +233,7 @@ export function LanguageSection() {
 
     return (
         <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-            <h3 style={sectionTitleStyle}>{t('settings.language')}</h3>
+            <SectionTitle>{t('settings.language')}</SectionTitle>
             <SettingRow
                 icon={Globe}
                 title={t('settings.language')}
@@ -282,7 +281,7 @@ export function PerformanceSection({ settings, onSave }) {
 
     return (
         <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-            <h3 style={sectionTitleStyle}>{t('settings.performance')}</h3>
+            <SectionTitle>{t('settings.performance')}</SectionTitle>
 
             <SettingRow
                 icon={Gauge}
@@ -349,7 +348,7 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
 
     return (
         <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-            <h3 style={sectionTitleStyle}>{t('settings.community')}</h3>
+            <SectionTitle>{t('settings.community')}</SectionTitle>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <SettingRow
@@ -392,10 +391,10 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
 
     return (
         <Card variant="glass" padding="md" style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-            <h3 style={{ ...sectionTitleStyle, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <SectionTitle style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span>{t('settings.appTheme')}</span>
                 {!isPro && <Lock size={14} color="var(--accent)" style={{ opacity: 0.8 }} />}
-            </h3>
+            </SectionTitle>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', opacity: isPro ? 1 : 0.6, pointerEvents: isPro ? 'auto' : 'none' }}>
                 {THEMES.map(theme => (
                     <ThemeSwatch
@@ -470,7 +469,7 @@ export function DataSection() {
 
     return (
         <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-            <h3 style={sectionTitleStyle}>{t('settings.dataTitle')}</h3>
+            <SectionTitle>{t('settings.dataTitle')}</SectionTitle>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <SettingRow

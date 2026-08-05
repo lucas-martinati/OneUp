@@ -1,8 +1,7 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { Snowflake, Crown, X } from '@utils/icons';
+import { Snowflake, Crown } from '@utils/icons';
 import { Button } from '@components/ui';
+import { DialogShell } from '@components/ui/DialogShell';
 import { GoogleSignInButton } from '@components/ui/GoogleSignInButton';
 import { useUIStore } from '@store/useUIStore';
 import { useProgressStore } from '@store/useProgressStore';
@@ -33,24 +32,9 @@ export function StreakFreezeInfo({ open, onClose }) {
     const auth = useAuth();
     const openStore = useUIStore(s => s.openStore);
     const freezeCount = useProgressStore(s => s.streakFreezes?.count || 0);
-    const overlayRef = useRef(null);
 
     const limits = getFreezeLimits(isPro);
     const proMultiplier = Math.round(STREAK_FREEZE_LIMITS.pro.perMonth / STREAK_FREEZE_LIMITS.free.perMonth);
-
-    const handleKeyDown = useCallback((e) => {
-        if (e.key === 'Escape') onClose();
-    }, [onClose]);
-
-    useEffect(() => {
-        if (!open) return undefined;
-        document.addEventListener('keydown', handleKeyDown);
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = '';
-        };
-    }, [open, handleKeyDown]);
 
     if (!open) return null;
 
@@ -59,23 +43,26 @@ export function StreakFreezeInfo({ open, onClose }) {
         openStore();
     };
 
-    return createPortal(
-        <div
-            ref={overlayRef}
-            onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
-            className="dialog-backdrop"
-        >
-            <div style={{
-                position: 'relative', width: '100%', maxWidth: '340px', borderRadius: '20px',
-                background: 'linear-gradient(145deg, rgba(20, 35, 50, 0.96), rgba(15, 25, 40, 0.98))',
-                border: `1px solid ${FREEZE_COLOR}33`,
-                boxShadow: `0 24px 64px rgba(0, 0, 0, 0.5), 0 0 40px ${FREEZE_COLOR}14`,
-                padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px',
-                animation: 'dialogPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            }}>
-                <Button iconOnly icon={X} variant="glass" onClick={onClose} aria-label={t('common.close')}
-                    style={{ position: 'absolute', top: '12px', right: '12px' }} />
+    const footerNode = !auth.isSignedIn ? (
+        <GoogleSignInButton
+            onClick={() => auth.signIn()}
+            className="hover-lift"
+            style={{ width: '100%' }}
+        />
+    ) : (!isPro ? (
+        <Button variant="primary" size="sm" fullWidth onClick={handleUpgrade}>
+            {t('streakFreeze.proCta')}
+        </Button>
+    ) : undefined);
 
+    return (
+        <DialogShell
+            open={open}
+            onClose={onClose}
+            size="md"
+            footer={footerNode}
+        >
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
                 <div style={{
                     width: '52px', height: '52px', borderRadius: '50%', flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -93,28 +80,18 @@ export function StreakFreezeInfo({ open, onClose }) {
                     {auth.isSignedIn ? t('streakFreeze.intro') : t('streakFreeze.guestDesc')}
                 </p>
 
-                {/* Guests don't earn freezes — invite them to sign in instead of
-                    showing the (empty) allotment. */}
-                {!auth.isSignedIn && (
-                    <GoogleSignInButton
-                        onClick={() => auth.signIn()}
-                        className="hover-lift"
-                        style={{ width: 'auto', marginTop: '2px' }}
-                    />
-                )}
-
                 {/* Current allotment for the user's tier (signed-in only) */}
                 {auth.isSignedIn && (
-                <div style={{
-                    display: 'flex', width: '100%', gap: '10px', padding: '14px',
-                    borderRadius: '14px', background: `${FREEZE_COLOR}12`, border: `1px solid ${FREEZE_COLOR}22`,
-                }}>
-                    <FreezeStat value={freezeCount} label={t('streakFreeze.statAvailable')} />
-                    <div style={{ width: '1px', background: 'var(--border-default)' }} />
-                    <FreezeStat value={`+${limits.perMonth}`} label={t('streakFreeze.statPerMonth')} />
-                    <div style={{ width: '1px', background: 'var(--border-default)' }} />
-                    <FreezeStat value={limits.maxStock} label={t('common.max')} />
-                </div>
+                    <div style={{
+                        display: 'flex', width: '100%', gap: '10px', padding: '14px',
+                        borderRadius: '14px', background: `${FREEZE_COLOR}12`, border: `1px solid ${FREEZE_COLOR}22`,
+                    }}>
+                        <FreezeStat value={freezeCount} label={t('streakFreeze.statAvailable')} />
+                        <div style={{ width: '1px', background: 'var(--border-default)' }} />
+                        <FreezeStat value={`+${limits.perMonth}`} label={t('streakFreeze.statPerMonth')} />
+                        <div style={{ width: '1px', background: 'var(--border-default)' }} />
+                        <FreezeStat value={limits.maxStock} label={t('common.max')} />
+                    </div>
                 )}
 
                 {/* Pro upsell — only for signed-in non-Pro users */}
@@ -131,13 +108,9 @@ export function StreakFreezeInfo({ open, onClose }) {
                                 {t('streakFreeze.proPitch', { multiplier: proMultiplier, count: STREAK_FREEZE_LIMITS.pro.perMonth })}
                             </span>
                         </div>
-                        <Button variant="primary" size="sm" fullWidth onClick={handleUpgrade}>
-                            {t('streakFreeze.proCta')}
-                        </Button>
                     </div>
                 )}
             </div>
-        </div>,
-        document.body
+        </DialogShell>
     );
 }

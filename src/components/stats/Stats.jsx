@@ -275,7 +275,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
                 {/* ── Tab: Overview ─────────────────────────────────────── */}
                 {activeTab === 'overview' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+                    <div className="section-stack">
                         <AchievementsShowcase stats={globalStats} onOpen={onOpenAchievements} />
 
                         <StatsOverviewCards
@@ -313,7 +313,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
                 {/* ── Tab: Charts (heavy Recharts only mount on demand) ── */}
                 {activeTab === 'charts' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+                    <div className="section-stack">
                         <Suspense fallback={
                             <div className="glass-premium" style={{
                                 padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)',
@@ -369,7 +369,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
                 {/* ── Tab: Details (per-exercise breakdown + history) ──── */}
                 {activeTab === 'details' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+                    <div className="section-stack">
                         <ExerciseBreakdown
                             enrichedExerciseStats={enrichedExerciseStats}
                             fullCategoryOrder={fullCategoryOrder} fullCategoryColors={fullCategoryColors}

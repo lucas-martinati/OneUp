@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Star } from '@utils/icons';
 import { Avatar } from '@components/ui/Avatar';
+import { Card } from '@components/ui/Card';
 import { Z_INDEX } from '@utils/zIndex';
 import { DifficultyBadge } from '@components/ui/DifficultyBadge';
 import { StreakFlame } from '@components/ui/StreakFlame';
@@ -90,10 +91,8 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
         const weight = details?.exerciseWeights?.[ex.id] || ex.defaultWeight;
         const isWeightEx = isWeightExercise(ex.id);
         return (
-            <div key={ex.id} style={{
-                display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px',
-                borderRadius: 'var(--radius-md)', background: `${ex.color}16`,
-                border: `1px solid ${ex.color}22`
+            <Card variant="tinted" tint={ex.color} padding="xs" key={ex.id} style={{
+                display: 'flex', alignItems: 'center', gap: '8px'
             }}>
                 <ExIcon size={16} color={ex.color} style={{ flexShrink: 0 }} />
                 <div className="flex-1-min0">
@@ -137,7 +136,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                         <div style={{ height: '100%', borderRadius: '2px', width: `${barWidth}%`, background: `linear-gradient(90deg, ${ex.color}, ${ex.color}88)`, transition: 'width 0.4s ease' }} />
                     </div>
                 </div>
-            </div>
+            </Card>
         );
     };
 
@@ -152,12 +151,13 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                 padding: 'var(--space-6)', zIndex: Z_INDEX.MODAL + 10
             }}
         >
-            <div
+            <Card
+                variant="premium"
+                padding="lg"
                 onClick={(e) => { e.stopPropagation(); setOpenBadge(null); }}
-                className="glass-premium slide-up"
+                className="slide-up"
                 style={{
                     width: '100%', maxWidth: '400px',
-                    borderRadius: 'var(--radius-lg)', padding: 'var(--space-8)',
                     boxShadow: isPerfect 
                         ? '0 0 30px rgba(255, 215, 0, 0.25), 0 20px 60px rgba(0,0,0,0.5)' 
                         : '0 20px 60px rgba(0,0,0,0.5)',
@@ -353,7 +353,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                         )}
                     </div>
                 </div>
-            </div>
+            </Card>
         </div>
     );
 }
@@ -365,10 +365,7 @@ const sectionLabelStyle = {
 
 function StatCard({ icon, label, value, color }) {
     return (
-        <div style={{
-            padding: '13px 10px', borderRadius: 'var(--radius-lg)',
-            background: `linear-gradient(160deg, ${color}2e, ${color}12)`,
-            border: `1px solid ${color}38`,
+        <Card variant="tinted" tint={color} padding="sm" style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '7px'
         }}>
             <div style={{
@@ -380,6 +377,6 @@ function StatCard({ icon, label, value, color }) {
             </div>
             <div style={{ fontSize: '1.4rem', fontWeight: '800', color, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{value}</div>
             <div style={{ fontSize: '0.56rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-secondary)', textAlign: 'center' }}>{label}</div>
-        </div>
+        </Card>
     );
 }

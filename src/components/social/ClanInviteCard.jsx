@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UserPlus, Link, Check } from '@utils/icons';
+import { Card } from '@components/ui';
 import { useTranslation } from 'react-i18next';
 
 export function ClanInviteCard({ clanData }) {
@@ -17,10 +18,7 @@ export function ClanInviteCard({ clanData }) {
 
     return (
         <div style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
-            <div style={{
-                background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.1))',
-                border: '1px solid rgba(245,158,11,0.2)',
-                borderRadius: 'var(--radius-lg)', padding: '16px',
+            <Card variant="tinted" tint="rgb(245,158,11)" padding="sm" style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between'
             }}>
                 <div>
@@ -40,7 +38,7 @@ export function ClanInviteCard({ clanData }) {
                 }}>
                     {copied ? <><Check size={16} /> {t('leaderboard.copied')}</> : <><Link size={16} /> {t('leaderboard.copy')}</>}
                 </button>
-            </div>
+            </Card>
         </div>
     );
 }

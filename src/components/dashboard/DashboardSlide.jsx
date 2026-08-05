@@ -9,7 +9,7 @@ import { isPerfectDay } from '@utils/statUtils';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
-import { StreakFlame, WeightBadge, EmptyState } from '@components/ui';
+import { StreakFlame, WeightBadge, EmptyState, Card } from '@components/ui';
 import styles from '@styles/DashboardSlide.module.css';
 
 export const DashboardSlide = React.memo(({
@@ -44,16 +44,15 @@ export const DashboardSlide = React.memo(({
 
         if (isFuture) {
             return (
-                <div className="glass-premium" style={{
-                    textAlign: 'center', padding: 'var(--space-10)',
-                    borderRadius: 'var(--radius-lg)', maxWidth: '320px'
+                <Card variant="premium" padding="xl" style={{
+                    textAlign: 'center', maxWidth: '320px'
                 }}>
                     <h2 className="panel-title">{t('dashboard.waiting')}</h2>
                     <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
                         {t('dashboard.challengeStarts')} <br />
                         <strong style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>{effectiveStart}</strong>
                     </p>
-                </div>
+                </Card>
             );
         }
 

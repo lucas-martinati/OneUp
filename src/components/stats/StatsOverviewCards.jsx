@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { TrendingUp, Award, Flame, Target, Hash, Star } from '@utils/icons';
 import { AnimatedNumber } from '@components/ui/AnimatedNumber';
+import { Card } from '@components/ui';
 
 /**
  * A single refined stat card: a tinted icon chip, a bold value and a label,
@@ -10,10 +11,8 @@ import { AnimatedNumber } from '@components/ui/AnimatedNumber';
 function StatCard({ icon: Icon, value, format, label, color, dim = false, delay = 0, pending = false }) {
     const c = dim ? '#8a8a93' : color;
     return (
-        <div className="glass-premium hover-lift scale-in" style={{
+        <Card variant="premium" padding="sm" className="hover-lift scale-in" style={{
             position: 'relative', overflow: 'hidden',
-            padding: '15px 14px', borderRadius: 'var(--radius-lg)',
-            border: '1px solid var(--border-default)',
             display: 'flex', flexDirection: 'column', gap: '11px',
             animationDelay: `${delay}s`
         }}>
@@ -47,7 +46,7 @@ function StatCard({ icon: Icon, value, format, label, color, dim = false, delay 
                     fontWeight: '600'
                 }}>{label}</div>
             </div>
-        </div>
+        </Card>
     );
 }
 
@@ -71,11 +70,9 @@ export function StatsOverviewCards({
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             {/* ── Hero: Global Total Reps ─────────────────────────────── */}
-            <div className="glass-premium scale-in" style={{
+            <Card variant="premium" padding="lg" className="scale-in" style={{
                 position: 'relative', overflow: 'hidden',
-                padding: 'var(--space-8) var(--space-6)',
-                borderRadius: 'var(--radius-lg)', textAlign: 'center',
-                border: '1px solid var(--border-default)'
+                textAlign: 'center'
             }}>
                 {/* Layered ambient glow */}
                 <div aria-hidden="true" style={{
@@ -106,7 +103,7 @@ export function StatsOverviewCards({
                         {isCardioHero ? t('cardio.overSessions', { count: cardioSessionsCount }) : `${t('stats.overExercises', { count: exercisesCount })} · ${t('stats.daysOfEffort', { count: totalDays })}`}
                     </div>
                 </div>
-            </div>
+            </Card>
 
             {/* ── Six stat cards (2 columns) ──────────────────────────── */}
             <div style={{

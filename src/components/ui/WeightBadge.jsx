@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { MetricBadge } from './MetricBadge';
 
 /**
  * Small rounded pill showing a weight value tinted with the exercise color,
@@ -16,14 +17,8 @@ export const WeightBadge = React.memo(({ weight, color, style = {} }) => {
     if (weight == null) return null;
 
     return (
-        <span style={{
-            fontSize: 'clamp(0.52rem, 1.2vh, 0.7rem)', fontWeight: '700',
-            padding: '1px 6px', borderRadius: '999px',
-            background: `${color}1f`, border: `1px solid ${color}30`,
-            color, verticalAlign: 'middle', whiteSpace: 'nowrap',
-            ...style
-        }}>
+        <MetricBadge color={color} size="sm" style={style}>
             {weight} {t('weight.kg')}
-        </span>
+        </MetricBadge>
     );
 });

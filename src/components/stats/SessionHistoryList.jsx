@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Clock, ChevronRight, DynamicIcon } from '@utils/icons';
 import { getExerciseColor } from '@utils/exerciseLabel';
-import { sectionTitleStyle } from './statsStyles';
+import { SectionTitle } from '@components/ui';
 
 /** Recent workout sessions list (last 10), opens the session detail modal. */
 export function SessionHistoryList({ sessionHistory, onSelectSession }) {
@@ -14,13 +14,10 @@ export function SessionHistoryList({ sessionHistory, onSelectSession }) {
             padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)',
             background: 'var(--surface-section)',
         }}>
-            <h3 style={{
-                ...sectionTitleStyle,
-                display: 'flex', alignItems: 'center', gap: '6px',
-            }}>
+            <SectionTitle spacing="md" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Clock size={14} />
                 {t('share.recentSessions')}
-            </h3>
+            </SectionTitle>
             <div className="flex-col gap-4">
                 {sessionHistory.slice(0, 10).map((session, i) => {
                     const exercises = session.exercises || [];

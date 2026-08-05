@@ -8,7 +8,7 @@ import { EXERCISES, CARDIO_EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '@config/categories';
-import { sectionTitleStyle } from './settingsStyles';
+import { SectionTitle } from '@components/ui';
 
 function CategorySeparator({ label, color }) {
     return (
@@ -45,7 +45,7 @@ export function DifficultySettings() {
             overflow: 'hidden',
             flexShrink: 0
         }}>
-            <h3 style={{ ...sectionTitleStyle, color: isMultiplierUnlocked ? '#ef4444' : 'var(--text-secondary)' }}>{t('common.difficulty')}</h3>
+            <SectionTitle style={{ color: isMultiplierUnlocked ? '#ef4444' : undefined }}>{t('common.difficulty')}</SectionTitle>
 
             <div>
                 <div style={{
