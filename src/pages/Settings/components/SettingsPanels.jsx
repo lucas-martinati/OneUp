@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, Volume2, Vibrate, Clock, Users, Lock, Gauge, Globe, Smartphone, Download, Upload, Calendar } from '@utils/icons';
 import { ToggleSwitch, SettingRow, ThemeSwatch, Card, Button, Input, SectionTitle, Stack } from '@components/ui';
+import { SegmentedControl } from '@components/ui/SegmentedControl';
 import { LANGUAGES } from '@config/languages';
 import { THEMES } from '@config/themes';
 import { isNativePlatform } from '@utils/platform';
@@ -160,57 +161,19 @@ export function PreferencesSection({ settings, onSave }) {
                         </div>
                     </div>
 
-                    <div style={{
-                        display: 'flex',
-                        gap: '4px',
-                        padding: '3px',
-                        background: 'var(--surface-muted)',
-                        borderRadius: 'var(--radius-lg)',
-                        border: '1px solid var(--border-default)',
-                        width: '100%',
-                        boxSizing: 'border-box'
-                    }}>
-                        {[
-                            { value: 'sunday', label: t('settings.sunday'), color: '#f59e0b' },
-                            { value: 'monday', label: t('settings.monday'), color: '#06b6d4' }
-                        ].map(opt => {
-                            const isActive = settings.weekStartDay === opt.value;
-                            return (
-                                <button
-                                    key={opt.value}
-                                    type="button"
-                                    onClick={() => {
-                                        haptics.light();
-                                        onSave({ ...settings, weekStartDay: opt.value });
-                                    }}
-                                    style={{
-                                        flex: 1,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justify: 'center',
-                                        padding: '8px 12px',
-                                        borderRadius: 'var(--radius-md)',
-                                        border: isActive ? '1px solid var(--border-default)' : '1px solid transparent',
-                                        background: isActive ? 'var(--surface-elevated)' : 'transparent',
-                                        color: isActive ? opt.color : 'var(--text-secondary)',
-                                        fontSize: '0.85rem',
-                                        fontWeight: isActive ? '700' : '600',
-                                        cursor: 'pointer',
-                                        textAlign: 'center',
-                                        boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
-                                        minHeight: 'var(--touch-min)',
-                                        boxSizing: 'border-box',
-                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        animation: isActive ? 'bump 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
-                                    }}
-                                >
-                                    <span style={{ width: '100%', textAlign: 'center', display: 'inline-block' }}>
-                                        {opt.label}
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
+                    <SegmentedControl
+                        value={settings.weekStartDay}
+                        onChange={(val) => {
+                            haptics.light();
+                            onSave({ ...settings, weekStartDay: val });
+                        }}
+                        variant="pills"
+                        fullWidth
+                        options={[
+                            { id: 'sunday', label: t('settings.sunday'), activeColor: '#f59e0b' },
+                            { id: 'monday', label: t('settings.monday'), activeColor: '#06b6d4' }
+                        ]}
+                    />
                 </Stack>
             </Stack>
         </Card>
@@ -284,49 +247,18 @@ export function PerformanceSection({ settings, onSave }) {
                 color="var(--success)"
                 isLast={true}
             >
-                <div style={{
-                    display: 'flex',
-                    gap: '4px',
-                    padding: '3px',
-                    background: 'var(--surface-muted)',
-                    borderRadius: 'var(--radius-lg)',
-                    border: '1px solid var(--border-default)',
-                    flexShrink: 0
-                }}>
-                    {[
-                        { value: 'low', label: t('settings.eco'), color: 'var(--warning)' },
-                        { value: 'high', label: t('common.max'), color: 'var(--accent-glow)' }
-                    ].map(opt => {
-                        const isActive = settings.performanceMode === opt.value;
-                        return (
-                            <button
-                                key={opt.value}
-                                type="button"
-                                onClick={() => {
-                                    haptics.light();
-                                    onSave({ ...settings, performanceMode: opt.value });
-                                }}
-                                className="hover-lift"
-                                style={{
-                                    padding: '6px 14px',
-                                    borderRadius: 'var(--radius-md)',
-                                    border: isActive ? '1px solid var(--border-default)' : '1px solid transparent',
-                                    background: isActive ? 'var(--surface-elevated)' : 'transparent',
-                                    color: isActive ? opt.color : 'var(--text-secondary)',
-                                    fontSize: '0.82rem',
-                                    fontWeight: isActive ? '700' : '600',
-                                    cursor: 'pointer',
-                                    boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
-                                    minHeight: 'var(--touch-min)',
-                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                                    animation: isActive ? 'bump 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
-                                }}
-                            >
-                                {opt.label}
-                            </button>
-                        );
-                    })}
-                </div>
+                <SegmentedControl
+                    value={settings.performanceMode}
+                    onChange={(val) => {
+                        haptics.light();
+                        onSave({ ...settings, performanceMode: val });
+                    }}
+                    variant="pills"
+                    options={[
+                        { id: 'low', label: t('settings.eco'), activeColor: 'var(--warning)' },
+                        { id: 'high', label: t('common.max'), activeColor: 'var(--accent-glow)' }
+                    ]}
+                />
             </SettingRow>
         </Card>
     );

@@ -31,6 +31,7 @@ export function CustomDataManagerModal({
           <div style={{ padding: '0 var(--space-4)', width: '100%', maxWidth: '440px', margin: '0 auto' }}>
             <SegmentedControl
               fullWidth
+              variant="tabs"
               options={[
                 { id: 'categories', label: t('common.categories') },
                 { id: 'exercises', label: t('common.exercises') }

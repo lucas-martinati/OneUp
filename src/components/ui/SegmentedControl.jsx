@@ -11,6 +11,7 @@ export function SegmentedControl({
   onChange,
   fullWidth,
   size = 'md',
+  variant = 'default',
   className = '',
   style = {}
 }) {
@@ -54,11 +55,74 @@ export function SegmentedControl({
   const PADDINGS = { sm: '4px 10px', lg: '8px 18px', md: '6px 14px' };
   const FONT_SIZES = { sm: '0.75rem', lg: '0.88rem', md: '0.82rem' };
 
-  const pad = PADS[size] || 4;
+  let pad = PADS[size] || 4;
   const count = options.length || 1;
 
-  const buttonPadding = PADDINGS[size] || '6px 14px';
   const fontSize = FONT_SIZES[size] || '0.82rem';
+
+  const getVariantStyles = () => {
+    switch (variant) {
+      case 'tabs':
+        return {
+          container: {
+            background: 'var(--surface-muted)',
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-md)',
+          },
+          indicator: {
+            background: activeOption.activeBg || 'var(--gradient-glow)',
+            boxShadow: 'var(--shadow-sm)',
+            border: 'none',
+            borderRadius: 'calc(var(--radius-md) - 2px)',
+            top: `${pad}px`,
+            bottom: `${pad}px`,
+            height: 'auto',
+          },
+          textInactive: 'var(--text-secondary)',
+          textActive: activeOption.activeColor || '#ffffff',
+          buttonPadding: '10px 16px',
+          buttonBorderRadius: 'calc(var(--radius-md) - 2px)',
+        };
+      case 'pills':
+        return {
+          container: {
+            background: 'var(--surface-muted)',
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-lg)',
+          },
+          indicator: {
+            background: activeOption.activeBg || 'var(--surface-elevated)',
+            boxShadow: 'var(--shadow-sm)',
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-md)',
+          },
+          textInactive: 'var(--text-secondary)',
+          textActive: activeOption.activeColor || 'var(--text-primary)',
+          buttonPadding: '10px 14px',
+          buttonBorderRadius: 'var(--radius-md)',
+        };
+      case 'default':
+      default:
+        return {
+          container: {
+            background: 'var(--surface-subtle)',
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-full)',
+          },
+          indicator: {
+            background: activeOption.activeBg || 'var(--gradient-glow)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+            border: 'none',
+            borderRadius: 'var(--radius-full)',
+          },
+          textInactive: 'var(--text-secondary)',
+          textActive: activeOption.activeColor || '#ffffff',
+        };
+    }
+  };
+
+  const vStyles = getVariantStyles();
+  const buttonPadding = vStyles.buttonPadding || PADDINGS[size] || '6px 14px';
 
   return (
     <div
@@ -66,14 +130,12 @@ export function SegmentedControl({
       style={{
         display: isFullWidth ? 'grid' : 'inline-grid',
         gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))`,
-        background: 'var(--surface-subtle)',
-        borderRadius: 'var(--radius-full)',
         padding: `${pad}px`,
-        border: '1px solid var(--border-default)',
         position: 'relative',
         width: isFullWidth ? '100%' : 'fit-content',
         maxWidth: '100%',
         boxSizing: 'border-box',
+        ...vStyles.container,
         ...style
       }}
     >
@@ -85,11 +147,9 @@ export function SegmentedControl({
           bottom: `${pad}px`,
           left: `calc(${(activeIndex * 100) / count}% + ${pad}px)`,
           width: `calc(${100 / count}% - ${2 * pad}px)`,
-          background: activeOption.activeBg || 'var(--gradient-glow)',
-          borderRadius: 'var(--radius-full)',
-          transition: 'left 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.28s ease',
+          transition: 'left 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.28s ease, bottom 0.28s ease',
           zIndex: 0,
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)'
+          ...vStyles.indicator
         }}
       />
 
@@ -102,7 +162,7 @@ export function SegmentedControl({
             onClick={() => handleOptionClick(option.id)}
             style={{
               padding: buttonPadding,
-              borderRadius: 'var(--radius-full)',
+              borderRadius: vStyles.buttonBorderRadius || vStyles.indicator.borderRadius || 'var(--radius-full)',
               fontSize: fontSize,
               fontWeight: '800',
               border: 'none',
@@ -112,9 +172,7 @@ export function SegmentedControl({
               gap: '6px',
               transition: 'color 0.25s ease',
               background: 'transparent',
-              color: isActive 
-                ? (option.activeColor || '#ffffff') 
-                : 'var(--text-secondary)',
+              color: isActive ? vStyles.textActive : vStyles.textInactive,
               cursor: 'pointer',
               minHeight: 'unset',
               position: 'relative',

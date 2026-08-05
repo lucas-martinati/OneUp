@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
 import { X, Shield, ArrowLeft, RefreshCw } from '@utils/icons';
 import { Z_INDEX } from '@utils/zIndex';
 import { Spinner, Button, SegmentedControl } from '@components/ui';
@@ -23,9 +23,44 @@ export function AdminPanel({ onClose }) {
     handleResetProgress, handleDeleteUser,
   } = useAdminPanel();
 
+  const touchStartRef = useRef({ x: 0, y: 0, time: 0 });
+
+  const handleTouchStart = useCallback((e) => {
+    const touch = e.touches[0];
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now()
+    };
+  }, []);
+
+  const handleTouchEnd = useCallback((e) => {
+    const touch = e.changedTouches[0];
+    const start = touchStartRef.current;
+    const diffX = start.x - touch.clientX;
+    const diffY = start.y - touch.clientY;
+    const duration = Date.now() - start.time;
+
+    if (Math.abs(diffX) > 60 && Math.abs(diffY) < Math.abs(diffX) * 0.6 && duration < 300) {
+      const tabs = ['form', 'json'];
+      const currentIndex = tabs.indexOf(editMode);
+      if (diffX > 0) {
+        if (currentIndex < tabs.length - 1) setEditMode(tabs[currentIndex + 1]);
+      } else {
+        if (currentIndex > 0) setEditMode(tabs[currentIndex - 1]);
+      }
+    }
+  }, [editMode, setEditMode]);
+
+
   return (
     <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.MODAL }}>
-      <div className="modal-content" style={{ maxWidth: '840px', display: 'flex', flexDirection: 'column', height: '90vh' }}>
+      <div 
+        className="modal-content" 
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        style={{ maxWidth: '840px', display: 'flex', flexDirection: 'column', height: '90vh' }}
+      >
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexShrink: 0 }}>
@@ -111,6 +146,8 @@ export function AdminPanel({ onClose }) {
             {/* Tabs Selector */}
             <div style={{ marginBottom: 'var(--space-4)', flexShrink: 0 }}>
               <SegmentedControl
+                variant="tabs"
+                fullWidth
                 options={[
                   { id: 'form', label: 'Formulaire' },
                   { id: 'json', label: 'Éditeur JSON Sections' },

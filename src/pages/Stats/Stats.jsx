@@ -269,6 +269,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         ]}
                         value={activeTab}
                         onChange={setActiveTab}
+                        variant="tabs"
                         style={{ width: '100%' }}
                     />
                 </div>
