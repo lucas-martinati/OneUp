@@ -19,7 +19,7 @@ export function getToastRoot() {
     root.id = 'oneup-toast-root';
     root.style.cssText = [
       'position:fixed',
-      'top:calc(var(--spacing-md) + env(safe-area-inset-top))',
+      'top:calc(var(--space-6) + env(safe-area-inset-top))',
       'left:0',
       'right:0',
       'z-index:9999',
@@ -27,7 +27,7 @@ export function getToastRoot() {
       'flex-direction:column',
       'align-items:center',
       'gap:10px',
-      'padding:0 var(--spacing-md)',
+      'padding:0 var(--space-6)',
       'pointer-events:none',
     ].join(';');
     document.body.appendChild(root);

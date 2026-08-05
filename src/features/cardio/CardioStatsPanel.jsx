@@ -10,10 +10,10 @@ function ActivityCard({ icon: Icon, title, color, stats, hasData, totalSessionsC
             style={{
                 position: 'relative',
                 overflow: 'hidden',
-                padding: 'var(--spacing-md)',
-                borderRadius: 'var(--radius-xl)',
+                padding: 'var(--space-6)',
+                borderRadius: 'var(--radius-lg)',
                 background: 'var(--surface-section)',
-                border: '1px solid var(--border-subtle)',
+                border: '1px solid var(--border-default)',
             }}
         >
             {/* Soft corner glow matching StatCard */}
@@ -82,7 +82,7 @@ function ActivityCard({ icon: Icon, title, color, stats, hasData, totalSessionsC
                                 padding: '12px 10px',
                                 borderRadius: 'var(--radius-lg)',
                                 background: 'var(--surface-muted)',
-                                border: '1px solid var(--border-subtle)',
+                                border: '1px solid var(--border-default)',
                                 textAlign: 'center',
                             }}
                         >
@@ -186,7 +186,7 @@ export function CardioStatsPanel() {
     const kmUnit = t('cardio.units.km');
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             {/* 🏃 Course à pied */}
             <ActivityCard
                 icon={Footprints}

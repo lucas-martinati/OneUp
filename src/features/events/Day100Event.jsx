@@ -41,8 +41,6 @@ const Day100Styles = memo(() => (
           --surface-hover: rgba(239, 68, 68, 0.16) !important;
 
           /* Bordures rouges */
-          --border-subtle: rgba(239, 68, 68, 0.10) !important;
-          --border-muted: rgba(239, 68, 68, 0.14) !important;
           --border-default: rgba(239, 68, 68, 0.22) !important;
           --border-strong: rgba(239, 68, 68, 0.35) !important;
 
@@ -277,7 +275,7 @@ const Day100Styles = memo(() => (
         .day100-global .counter-button {
           background: repeating-radial-gradient(circle, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.1) 4px, transparent 4px, transparent 8px) !important;
           box-shadow: 0 0 35px rgba(239, 68, 68, 0.6), inset 0 0 25px rgba(239, 68, 68, 0.4) !important;
-          animation: counterBlobMorph 9s ease-in-out infinite, buttonGlitchTransform 3s infinite !important;
+          animation: buttonGlitchTransform 3s infinite !important;
         }
         /* ── Year-progress ring: glitch-red tint ── */
         .day100-global .counter-ring {

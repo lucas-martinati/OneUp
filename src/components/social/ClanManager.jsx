@@ -91,7 +91,7 @@ export function ClanManager({ onClanJoined }) {
         }}>
             <CSSConfetti active={showConfetti} onDone={() => setShowConfetti(false)} />
 
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--spacing-lg)', gap: '24px' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--space-8)', gap: '24px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                     <Users size={56} color="var(--warning)" />
                     <h2 className="panel-title" style={{

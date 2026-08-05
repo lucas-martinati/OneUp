@@ -14,10 +14,10 @@ export function PreferencesSection({ settings, onSave }) {
     const { t } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.preferences')}</h3>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <SettingRow
                     icon={Bell}
                     title={t('settings.notifications')}
@@ -41,7 +41,7 @@ export function PreferencesSection({ settings, onSave }) {
                         padding: '12px',
                         borderRadius: 'var(--radius-md)',
                         background: 'var(--surface-muted)',
-                        border: '1px solid var(--border-subtle)',
+                        border: '1px solid var(--border-default)',
                     }}>
                         <div style={{
                             display: 'flex', alignItems: 'center', gap: '8px',
@@ -177,7 +177,7 @@ export function PreferencesSection({ settings, onSave }) {
                         padding: '3px',
                         background: 'var(--surface-muted)',
                         borderRadius: 'var(--radius-lg)',
-                        border: '1px solid var(--border-subtle)',
+                        border: '1px solid var(--border-default)',
                         width: '100%',
                         boxSizing: 'border-box'
                     }}>
@@ -233,7 +233,7 @@ export function LanguageSection() {
     const { t, i18n } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.language')}</h3>
             <SettingRow
                 icon={Globe}
@@ -255,7 +255,7 @@ export function LanguageSection() {
                         height: '34px',
                         padding: '4px 28px 4px 10px',
                         borderRadius: 'var(--radius-md)',
-                        border: '1px solid var(--border-subtle)',
+                        border: '1px solid var(--border-default)',
                         background: 'var(--surface-muted)',
                         color: 'var(--text-primary)',
                         fontSize: '0.82rem',
@@ -281,7 +281,7 @@ export function PerformanceSection({ settings, onSave }) {
     const { t } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.performance')}</h3>
 
             <SettingRow
@@ -301,7 +301,7 @@ export function PerformanceSection({ settings, onSave }) {
                     padding: '3px',
                     background: 'var(--surface-muted)',
                     borderRadius: 'var(--radius-lg)',
-                    border: '1px solid var(--border-subtle)',
+                    border: '1px solid var(--border-default)',
                     flexShrink: 0
                 }}>
                     {[
@@ -348,10 +348,10 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
     const { t } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.community')}</h3>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <SettingRow
                     icon={Users}
                     title={t('leaderboard.title')}
@@ -391,7 +391,7 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
     const currentTheme = settings.appTheme || 'dark';
 
     return (
-        <Card variant="glass" padding="md" style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+        <Card variant="glass" padding="md" style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <h3 style={{ ...sectionTitleStyle, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span>{t('settings.appTheme')}</span>
                 {!isPro && <Lock size={14} color="var(--accent)" style={{ opacity: 0.8 }} />}
@@ -469,10 +469,10 @@ export function DataSection() {
     };
 
     return (
-        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <h3 style={sectionTitleStyle}>{t('settings.dataTitle')}</h3>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <SettingRow
                     icon={Download}
                     title={t('settings.exportData')}

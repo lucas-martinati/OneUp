@@ -85,7 +85,7 @@ function RoutineCard({ routine, index, allExercisesMap, confirming, onLoad, onEd
         >
             <div className={styles.routineTop}>
                 <div className={styles.routineName}>{routine.name}</div>
-                <div className="row gap-4">
+                <div className="flex-align-center gap-4">
                     <button
                         className={styles.cardActionBtn}
                         onClick={(e) => { e.stopPropagation(); onEdit(routine); }}

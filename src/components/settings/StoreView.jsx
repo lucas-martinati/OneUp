@@ -30,7 +30,7 @@ export function StoreView() {
     }, []);
 
     return (
-        <div className="fade-in slide-up" style={{ animationDuration: '0.4s', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+        <div className="fade-in slide-up" style={{ animationDuration: '0.4s', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <StoreCard
                 isActive={isSupporter}
                 title={t('supporter.title')}
@@ -108,7 +108,7 @@ export function StoreView() {
                                 display: 'flex', flexDirection: 'column',
                                 padding: '14px', borderRadius: 'var(--radius-md)',
                                 background: 'var(--surface-muted)',
-                                border: `1px solid ${receipt.isActive ? 'rgba(16, 185, 129, 0.2)' : 'var(--border-subtle)'}`,
+                                border: `1px solid ${receipt.isActive ? 'rgba(16, 185, 129, 0.2)' : 'var(--border-default)'}`,
                             }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                                     <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-primary)' }}>

@@ -322,7 +322,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                       transition: 'transform 0.15s ease, background-color 0.15s ease, opacity 0.15s ease'
                     }}
                   >
-                    <div className="row gap-12" style={{ alignItems: 'center' }}>
+                    <div className="flex-align-center gap-12" style={{ alignItems: 'center' }}>
                       {!isBuiltIn && (
                         <div
                           onTouchStart={() => handleTouchStart(index)}
@@ -581,7 +581,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                     <div key={ex.id} style={{
                       borderRadius: 'var(--radius-md)',
                       background: isSelected ? 'var(--surface-muted)' : 'transparent',
-                      border: `1px solid ${isSelected ? (targetCat?.color || '#34d399') + '30' : 'var(--border-subtle)'}`,
+                      border: `1px solid ${isSelected ? (targetCat?.color || '#34d399') + '30' : 'var(--border-default)'}`,
                       overflow: 'hidden', transition: 'all 0.2s'
                     }}>
                       {/* Exercise row: checkbox + name */}
@@ -593,7 +593,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                         }}
                       >
                         <div style={{
-                          width: '24px', height: '24px', borderRadius: 'var(--radius-xs)',
+                          width: '24px', height: '24px', borderRadius: 'var(--radius-sm)',
                           background: isSelected ? 'var(--success)' : 'transparent',
                           border: isSelected ? '2px solid var(--success)' : '2px solid var(--border-default)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -603,7 +603,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                         </div>
 
                         <div style={{
-                          width: '32px', height: '32px', borderRadius: 'var(--radius-xs)',
+                          width: '32px', height: '32px', borderRadius: 'var(--radius-sm)',
                           background: `${ex.color || '#8b5cf6'}15`,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           flexShrink: 0

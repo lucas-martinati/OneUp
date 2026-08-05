@@ -58,7 +58,7 @@ const BadgeItem = React.memo(({ badge, highlighted }) => {
 
     const showProgress = !unlocked && !secret && badge.goal != null && badge.progress != null;
 
-    let borderStyle = '1px solid var(--border-subtle)';
+    let borderStyle = '1px solid var(--border-default)';
     if (highlighted) {
         borderStyle = `2px solid ${color}`;
     } else if (unlocked) {
@@ -72,7 +72,7 @@ const BadgeItem = React.memo(({ badge, highlighted }) => {
             style={{
                 position: 'relative', overflow: 'hidden',
                 padding: '16px 12px 14px',
-                borderRadius: 'var(--radius-xl)',
+                borderRadius: 'var(--radius-lg)',
                 textAlign: 'center',
                 background: unlocked ? `linear-gradient(160deg, ${color}26, ${color}0a)` : 'var(--surface-muted)',
                 border: borderStyle,
@@ -106,7 +106,7 @@ const BadgeItem = React.memo(({ badge, highlighted }) => {
                 width: '52px', height: '52px', borderRadius: '16px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 background: unlocked ? `${color}22` : 'var(--surface-hover)',
-                border: unlocked ? `1px solid ${color}44` : '1px solid var(--border-subtle)',
+                border: unlocked ? `1px solid ${color}44` : '1px solid var(--border-default)',
                 boxShadow: unlocked ? `0 4px 16px ${color}33` : 'none'
             }}>
                 {(!unlocked && secret)
@@ -116,7 +116,7 @@ const BadgeItem = React.memo(({ badge, highlighted }) => {
                     <div style={{
                         position: 'absolute', bottom: '-5px', right: '-5px',
                         width: '19px', height: '19px', borderRadius: '50%',
-                        background: 'var(--sheet-bg)', border: '1px solid var(--border-subtle)',
+                        background: 'var(--sheet-bg)', border: '1px solid var(--border-default)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
                         <Lock size={10} color="var(--text-secondary)" />
@@ -171,7 +171,7 @@ const CategoryChip = React.memo(({ label, color, count, active, onClick }) => (
             display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0,
             padding: '6px 12px', borderRadius: '20px', cursor: 'pointer',
             background: active ? `${color}26` : 'var(--surface-muted)',
-            border: active ? `1px solid ${color}` : '1px solid var(--border-subtle)',
+            border: active ? `1px solid ${color}` : '1px solid var(--border-default)',
             transition: 'background 0.2s ease, border-color 0.2s ease',
         }}
     >
@@ -263,7 +263,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
 
     return createPortal(
         <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.ACHIEVEMENTS }}>
-            <div ref={contentRef} className="modal-content" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+            <div ref={contentRef} className="modal-content" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
 
                 {/* ── Header ─────────────────────────────────────────────── */}
                 <div style={{
@@ -277,8 +277,8 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
 
                 {/* ── Hero: progress ring + counters in one gold card ────── */}
                 <div className="glass-premium slide-up" style={{
-                    display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)',
-                    padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                    display: 'flex', alignItems: 'center', gap: 'var(--space-6)',
+                    padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)',
                     background: 'linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.04))',
                     border: '1px solid rgba(251,191,36,0.22)',
                 }}>
@@ -367,7 +367,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                 </div>
 
                 {/* ── Categories listing ──────────────────────────────────── */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
                     {visibleCategories.map(cat => {
                         if (effectiveCatFilter && effectiveCatFilter !== cat.id) return null;
                         const catBadges = badges.filter(b => b.category === cat.id);
@@ -379,7 +379,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                             <div key={cat.id}>
                                 <div style={{
                                     display: 'flex', alignItems: 'center', gap: '10px',
-                                    marginBottom: 'var(--spacing-sm)', paddingLeft: '4px'
+                                    marginBottom: 'var(--space-4)', paddingLeft: '4px'
                                 }}>
                                     <div style={{
                                         fontSize: '0.82rem', fontWeight: '800',

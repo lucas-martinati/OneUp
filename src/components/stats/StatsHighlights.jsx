@@ -35,7 +35,7 @@ export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExR
     const cardBase = {
         position: 'relative', overflow: 'hidden',
         padding: '15px 14px', borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-subtle)',
+        border: '1px solid var(--border-default)',
         display: 'flex', flexDirection: 'column', gap: '10px'
     };
     const labelStyle = {
@@ -112,7 +112,7 @@ export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExR
                                             display: 'flex', alignItems: 'center', gap: '4px',
                                             fontSize: '0.6rem', color: 'var(--text-secondary)',
                                             background: 'var(--surface-subtle)',
-                                            border: '1px solid var(--border-subtle)',
+                                            border: '1px solid var(--border-default)',
                                             padding: '2px 7px', borderRadius: '20px'
                                         }}>
                                             <div style={{

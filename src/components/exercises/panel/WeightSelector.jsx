@@ -10,7 +10,7 @@ export function WeightSelector({ activeColor, currentWeight, handleValidateWeigh
             alignItems: 'center',
             justifyContent: 'center',
             gap: '10px',
-            marginBottom: 'var(--spacing-xs)'
+            marginBottom: 'var(--space-2)'
         }}>
             <div style={{
                 display: 'flex',

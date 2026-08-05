@@ -32,7 +32,7 @@ export function StoreCard({
     const [billingPeriod, setBillingPeriod] = useState('monthly');
 
     const sectionTitleStyle = {
-        marginBottom: 'var(--spacing-md)', fontSize: '0.85rem', fontWeight: '700',
+        marginBottom: 'var(--space-6)', fontSize: '0.85rem', fontWeight: '700',
         textTransform: 'uppercase', letterSpacing: '1px',
         color: 'var(--text-secondary)'
     };
@@ -55,11 +55,11 @@ export function StoreCard({
 
     return (
         <div className="glass-premium" style={{
-            padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+            padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)',
             background: isActive
                 ? `linear-gradient(135deg, rgba(${colorRGB},0.08), rgba(${colorRGB},0.02))`
                 : 'var(--glass-bg, var(--card-bg))',
-            border: isActive ? `1px solid rgba(${colorRGB},0.2)` : '1px solid var(--border-subtle)'
+            border: isActive ? `1px solid rgba(${colorRGB},0.2)` : '1px solid var(--border-default)'
         }}>
             <h3 style={sectionTitleStyle}>{title}</h3>
 

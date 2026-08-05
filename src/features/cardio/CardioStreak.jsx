@@ -16,7 +16,7 @@ export const CardioStreak = React.memo(({ streak }) => {
         : 'var(--surface-subtle)',
       border: isActive
         ? '1px solid rgba(249,115,22,0.2)'
-        : '1px solid var(--border-subtle)',
+        : '1px solid var(--border-default)',
       transition: 'all 0.3s ease',
       width: '100%', flexShrink: 0
     }}>

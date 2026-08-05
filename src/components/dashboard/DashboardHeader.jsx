@@ -126,13 +126,8 @@ export const DashboardHeader = React.memo(({
     }
 
     // Entrance glow animation — one-shot slide + glow, no 'forwards' to avoid overriding event themes
-    const entranceAnimation = isDayPerfect
-        ? 'goldHeaderGlowEntrance 1.8s ease-out'
-        : 'headerGlowEntrance 1.8s ease-out';
-
-    const dayPodEntranceAnimation = isDayPerfect
-        ? 'goldDayPodGlowEntrance 1.8s ease-out'
-        : 'dayPodGlowEntrance 1.8s ease-out';
+    const entranceAnimation = 'headerGlowEntrance 1.8s ease-out';
+    const dayPodEntranceAnimation = 'dayPodGlowEntrance 1.8s ease-out';
 
     return (
         <header
@@ -146,6 +141,7 @@ export const DashboardHeader = React.memo(({
                 position: 'relative',
                 zIndex: 10,
                 boxSizing: 'border-box',
+                ...(isDayPerfect ? { '--glow-c1': 'rgba(253, 185, 49, 0.2)', '--glow-c2': 'rgba(255, 215, 0, 0.15)' } : {})
             }}
         >
             {/* Top Bar in glass Card */}

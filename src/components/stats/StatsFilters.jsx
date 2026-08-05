@@ -35,7 +35,7 @@ export function StatsFilters({
     }));
 
     return (
-        <div style={{ marginBottom: 'var(--spacing-md)' }}>
+        <div style={{ marginBottom: 'var(--space-6)' }}>
             <button
                 onClick={() => {
                     haptics.light();

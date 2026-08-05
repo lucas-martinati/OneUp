@@ -28,8 +28,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 .headerLeft {
   display: flex;
@@ -190,7 +190,7 @@
   padding: 9px 12px;
   border-radius: var(--radius-md);
   background: var(--surface-subtle);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
   cursor: pointer;
   flex-shrink: 0;
   position: relative;
@@ -343,7 +343,7 @@
   justify-content: center;
   gap: 12px;
   text-align: center;
-  padding: var(--spacing-xl) var(--spacing-md);
+  padding: var(--space-10) var(--space-6);
   color: var(--text-secondary);
 }
 .emptyIcon {

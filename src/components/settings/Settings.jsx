@@ -71,7 +71,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                 {showStore ? (
                     <StoreView />
                 ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
                         <PreferencesSection settings={settings} onSave={onSave} />
                         <LanguageSection />
                         <PerformanceSection settings={settings} onSave={onSave} />
@@ -115,7 +115,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             gap: '16px',
                             justifyContent: 'center',
                             alignItems: 'center',
-                            paddingTop: 'var(--spacing-xs)',
+                            paddingTop: 'var(--space-2)',
                             opacity: 0.6,
                             fontSize: '0.78rem'
                         }}>

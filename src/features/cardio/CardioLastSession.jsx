@@ -42,7 +42,7 @@ const StatCard = ({ icon: Icon, label, value, color }) => (
     background: 'var(--surface-subtle)',
     borderRadius: 'var(--radius-md)',
     padding: 'clamp(6px, 1.2vh, 12px)',
-    border: '1px solid var(--border-subtle)',
+    border: '1px solid var(--border-default)',
     display: 'flex', flexDirection: 'column', gap: '2px',
     minWidth: '0', flexShrink: 0,
     transition: 'background-color 0.2s ease, border-color 0.2s ease'

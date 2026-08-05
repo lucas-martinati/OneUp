@@ -182,7 +182,7 @@ export function CloudSyncPanel({
 
           {/* Delete all local data button (offline mode) */}
           {onDeleteAllData && (
-            <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
+            <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-default)', paddingTop: '16px' }}>
               <Button
                 variant="danger-ghost"
                 size="sm"

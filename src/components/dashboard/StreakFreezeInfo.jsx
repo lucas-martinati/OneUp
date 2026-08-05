@@ -110,9 +110,9 @@ export function StreakFreezeInfo({ open, onClose }) {
                     borderRadius: '14px', background: `${FREEZE_COLOR}12`, border: `1px solid ${FREEZE_COLOR}22`,
                 }}>
                     <FreezeStat value={freezeCount} label={t('streakFreeze.statAvailable')} />
-                    <div style={{ width: '1px', background: 'var(--border-subtle)' }} />
+                    <div style={{ width: '1px', background: 'var(--border-default)' }} />
                     <FreezeStat value={`+${limits.perMonth}`} label={t('streakFreeze.statPerMonth')} />
-                    <div style={{ width: '1px', background: 'var(--border-subtle)' }} />
+                    <div style={{ width: '1px', background: 'var(--border-default)' }} />
                     <FreezeStat value={limits.maxStock} label={t('common.max')} />
                 </div>
                 )}
@@ -125,7 +125,7 @@ export function StreakFreezeInfo({ open, onClose }) {
                         background: 'linear-gradient(135deg, rgba(139,92,246,0.14), rgba(129,140,248,0.10))',
                         border: '1px solid rgba(139,92,246,0.3)',
                     }}>
-                        <div className="row gap-8">
+                        <div className="flex-align-center gap-8">
                             <Crown size={18} color="#a78bfa" />
                             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.4 }}>
                                 {t('streakFreeze.proPitch', { multiplier: proMultiplier, count: STREAK_FREEZE_LIMITS.pro.perMonth })}

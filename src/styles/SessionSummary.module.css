@@ -24,7 +24,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   background: var(--surface-section);
   border: 1px solid var(--border-default);
   box-shadow: var(--shadow-lg);
@@ -55,7 +55,7 @@
   align-items: center;
   gap: 10px;
   text-align: center;
-  padding: clamp(20px, 5vw, 30px) var(--spacing-md) var(--spacing-md);
+  padding: clamp(20px, 5vw, 30px) var(--space-6) var(--space-6);
 }
 .trophy {
   width: 70px;
@@ -98,7 +98,7 @@
   padding: 10px 6px;
   border-radius: var(--radius-md);
   background: var(--surface-subtle);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
 }
 .statVal {
   font-size: 1.2rem;
@@ -125,7 +125,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 4px var(--spacing-md) var(--spacing-md);
+  padding: 4px var(--space-6) var(--space-6);
 }
 .row {
   display: flex;
@@ -168,8 +168,8 @@
   flex-shrink: 0;
   display: flex;
   gap: 10px;
-  padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
-  border-top: 1px solid var(--border-subtle);
+  padding: var(--space-4) var(--space-6) var(--space-6);
+  border-top: 1px solid var(--border-default);
   background: var(--surface-section);
 }
 .closeBtn {

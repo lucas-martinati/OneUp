@@ -71,7 +71,7 @@
   margin-top: 8px;
   padding: 12px;
   background: var(--surface-subtle);
-  border: 1px solid var(--border-muted);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   transform-origin: top center;
   animation: panelIn var(--motion-panel) var(--ease-panel-in);

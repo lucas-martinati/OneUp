@@ -38,7 +38,7 @@ export function DifficultySettings() {
         <Card variant="glass" padding="md" style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--spacing-md)',
+            gap: 'var(--space-6)',
             border: isMultiplierUnlocked ? '1px solid rgba(239, 68, 68, 0.4)' : undefined,
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             position: 'relative',
@@ -81,7 +81,7 @@ export function DifficultySettings() {
             ) : (
                 <div className="scale-in">
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                        <div className="row gap-8">
+                        <div className="flex-align-center gap-8">
                             <span style={{ fontWeight: '700', color: 'white', fontSize: '0.9rem' }}>{t('settings.multiplier')}</span>
                             <button
                                 onClick={() => setIsMultiplierUnlocked(false)}

@@ -19,7 +19,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
         flex: 1, padding: '11px', borderRadius: 'var(--radius-md)',
         background: active ? domainActive[key].bg : 'var(--surface-subtle)',
         color: active ? domainActive[key].color : 'var(--text-secondary)',
-        border: `1px solid ${active ? domainActive[key].border : 'var(--border-subtle)'}`,
+        border: `1px solid ${active ? domainActive[key].border : 'var(--border-default)'}`,
         fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
         transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease'
@@ -30,7 +30,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
         padding: special ? '7px 15px' : '7px 12px',
         borderRadius: 'var(--radius-full)',
         background: isActive ? `linear-gradient(135deg, ${color}2e, ${color}14)` : 'var(--surface-subtle)',
-        border: `1.5px ${dashed ? 'dashed' : 'solid'} ${isActive ? color + '66' : 'var(--border-subtle)'}`,
+        border: `1.5px ${dashed ? 'dashed' : 'solid'} ${isActive ? color + '66' : 'var(--border-default)'}`,
         color: isActive ? color : 'var(--text-secondary)',
         fontSize: '0.75rem', fontWeight: special ? '800' : '600',
         textTransform: special ? 'uppercase' : 'none',
@@ -56,7 +56,7 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
 
             {/* ── Tabs (wrapping) ── */}
             {showExerciseTabs && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: showDomainFilter ? '0' : '4px 0 var(--spacing-sm)' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: showDomainFilter ? '0' : '4px 0 var(--space-4)' }}>
                     {globalTabs.map(tab => {
                         const isActive = tab.id === currentActiveId;
                         const Icon = tab.icon;

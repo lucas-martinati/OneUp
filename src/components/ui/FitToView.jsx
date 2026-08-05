@@ -56,7 +56,7 @@ export function FitToView({
       style={{
         width: '100%',
         height: '100%',
-        overflow: 'hidden',
+        overflow: 'visible',
         position: 'relative',
         boxSizing: 'border-box',
         ...style
@@ -70,7 +70,6 @@ export function FitToView({
           height: isScaled ? 'max-content' : '100%',
           transform: isScaled ? `scale(${scale})` : 'none',
           transformOrigin: 'top center',
-          transition: 'transform 0.15s ease-out, width 0.15s ease-out',
           boxSizing: 'border-box',
           ...contentStyle
         }}

@@ -24,7 +24,7 @@ export function EmptyState({
         justify: 'center',
         textAlign: 'center',
         padding: 'var(--space-8) var(--space-4)',
-        borderRadius: 'var(--radius-xl)',
+        borderRadius: 'var(--radius-lg)',
         background: 'var(--card-bg, rgba(255, 255, 255, 0.03))',
         border: '1px dashed rgba(255, 255, 255, 0.12)',
         gap: 'var(--space-3)',

@@ -2,13 +2,13 @@ export function SettingRow({ icon: IconComponent, title, description, color, chi
     return (
         <div style={{
             padding: '12px 0',
-            borderBottom: isLast ? 'none' : '1px solid var(--border-subtle)',
+            borderBottom: isLast ? 'none' : '1px solid var(--border-default)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '16px'
         }}>
-            <div className="row gap-12" style={{ flex: 1, minWidth: 0 }}>
+            <div className="flex-align-center gap-12" style={{ flex: 1, minWidth: 0 }}>
                 <div style={{
                     /* color-mix (pas de concat alpha) : accepte hex ET var(--token) */
                     background: `linear-gradient(135deg, color-mix(in srgb, ${color} 13%, transparent), color-mix(in srgb, ${color} 3%, transparent))`,

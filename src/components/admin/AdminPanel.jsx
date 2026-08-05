@@ -29,7 +29,7 @@ export function AdminPanel({ onClose }) {
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexShrink: 0 }}>
-          <div className="row gap-12" style={{ alignItems: 'center' }}>
+          <div className="flex-align-center gap-12" style={{ alignItems: 'center' }}>
             {selectedUid && (
               <Button
                 iconOnly

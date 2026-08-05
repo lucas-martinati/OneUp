@@ -9,7 +9,7 @@
 }
 
 .preview {
-  padding-bottom: var(--spacing-xs);
+  padding-bottom: var(--space-2);
 }
 
 /* Mobile: fixed-height stage so toggling options rescales the card without
@@ -35,7 +35,7 @@
   .layout {
     flex-direction: row;
     align-items: flex-start;
-    gap: var(--spacing-md);
+    gap: var(--space-6);
   }
 
   /* Exact 50/50 split: equal flex-basis so the gap is shared evenly. */

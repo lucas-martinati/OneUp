@@ -45,8 +45,8 @@ export const DashboardSlide = React.memo(({
         if (isFuture) {
             return (
                 <div className="glass-premium" style={{
-                    textAlign: 'center', padding: 'var(--spacing-xl)',
-                    borderRadius: 'var(--radius-xl)', maxWidth: '320px'
+                    textAlign: 'center', padding: 'var(--space-10)',
+                    borderRadius: 'var(--radius-lg)', maxWidth: '320px'
                 }}>
                     <h2 className="panel-title">{t('dashboard.waiting')}</h2>
                     <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
@@ -376,7 +376,7 @@ const ExerciseButton = React.memo(({
         btnBg = `linear-gradient(160deg, ${ex.color}2e 0%, ${ex.gradient[0]}16 100%)`;
     }
 
-    let btnBorder = '1.5px solid var(--border-muted)';
+    let btnBorder = '1.5px solid var(--border-default)';
     if (exDone) {
         btnBorder = `1.5px solid ${ex.color}66`;
     } else if (isActive) {

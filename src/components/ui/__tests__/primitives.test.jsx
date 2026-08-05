@@ -115,7 +115,7 @@ describe('Stack', () => {
     const el = container.firstChild;
     expect(el.style.display).toBe('flex');
     expect(el.style.flexDirection).toBe('column');
-    expect(el.style.gap).toBe('var(--spacing-sm)');
+    expect(el.style.gap).toBe('var(--space-4)');
   });
 
   it('switches to row direction', () => {

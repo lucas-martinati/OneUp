@@ -69,7 +69,7 @@ export function SegmentedControl({
         background: 'var(--surface-subtle)',
         borderRadius: 'var(--radius-full)',
         padding: `${pad}px`,
-        border: '1px solid var(--border-subtle)',
+        border: '1px solid var(--border-default)',
         position: 'relative',
         width: isFullWidth ? '100%' : 'fit-content',
         maxWidth: '100%',

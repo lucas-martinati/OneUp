@@ -35,8 +35,8 @@ body.exercise-panel-active::before {
 .cloud-sync-header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
 .cloud-sync-icon {
@@ -88,15 +88,15 @@ body.exercise-panel-active::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 40px 20px;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-5);
   color: var(--text-secondary);
 }
 
 .cloud-sync-content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 .cloud-user-info {
@@ -183,7 +183,7 @@ body.exercise-panel-active::before {
   border-radius: 12px;
   font-family: var(--font-primary);
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  transition: transform var(--motion-fast) ease, box-shadow var(--motion-fast) ease, border-color var(--motion-fast) ease, background var(--motion-fast) ease;
   text-align: left;
 }
 
@@ -238,7 +238,7 @@ body.exercise-panel-active::before {
   flex-direction: column;
   gap: 10px;
   padding-top: 16px;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border-default);
 }
 
 .cloud-promo { text-align: center; }
@@ -269,7 +269,7 @@ body.exercise-panel-active::before {
   color: var(--text-primary);
   font-weight: 500;
   background: var(--surface-muted);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
   border-radius: 12px;
 }
 
@@ -298,7 +298,7 @@ body.exercise-panel-active::before {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  transition: transform var(--motion-fast) ease, box-shadow var(--motion-fast) ease, opacity var(--motion-fast) ease;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
@@ -323,9 +323,9 @@ body.exercise-panel-active::before {
 }
 
 .sync-message.error {
-  background: hsl(0, 84%, 60%, 0.15);
-  color: hsl(0, 84%, 70%);
-  border: 1px solid hsl(0, 84%, 60%, 0.3);
+  background: color-mix(in srgb, var(--error) 15%, transparent);
+  color: var(--error);
+  border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
 }
 
 .sync-message svg { width: 18px; height: 18px; }

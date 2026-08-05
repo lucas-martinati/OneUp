@@ -47,7 +47,7 @@ const RestrictionSection = ({ title, children }) => (
     padding: '12px',
     borderRadius: 'var(--radius-md)',
     background: 'rgba(255,255,255,0.03)',
-    border: '1px dashed var(--border-subtle)',
+    border: '1px dashed var(--border-default)',
     marginTop: '8px'
   }}>
     <div style={{
@@ -253,7 +253,7 @@ export function CardioModule() {
                     padding: 'clamp(6px, 1.2vh, 12px) clamp(12px, 1.8vw, 18px)',
                     borderRadius: 'var(--radius-md)',
                     background: 'var(--surface-subtle)',
-                    border: '1px solid var(--border-muted)',
+                    border: '1px solid var(--border-default)',
                     color: 'var(--text-primary)',
                     fontWeight: '700',
                     fontSize: 'clamp(0.65rem, 1.2vh, 0.78rem)',
@@ -278,7 +278,7 @@ export function CardioModule() {
                     style={{
                       flex: 1, padding: '6px', borderRadius: 'var(--radius-sm)',
                       background: healthConnected ? 'rgba(66, 133, 244, 0.1)' : 'var(--surface-subtle)',
-                      border: `1px solid ${healthConnected ? '#4285F4' : 'var(--border-muted)'}`,
+                      border: `1px solid ${healthConnected ? '#4285F4' : 'var(--border-default)'}`,
                       color: healthConnected ? '#4285F4' : 'var(--text-primary)',
                       fontSize: 'clamp(0.6rem, 1.1cqh, 0.7rem)', fontWeight: '700',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
@@ -448,7 +448,7 @@ export function CardioModule() {
                        {i > 0 && (
                          <div style={{
                            width: '2px', height: '10px', marginLeft: '10px', borderRadius: '2px',
-                           background: steps[i - 1].done ? `${steps[i - 1].color}66` : 'var(--border-subtle)'
+                           background: steps[i - 1].done ? `${steps[i - 1].color}66` : 'var(--border-default)'
                          }} />
                        )}
                        <div style={{
@@ -460,7 +460,7 @@ export function CardioModule() {
                            display: 'flex', alignItems: 'center', justifyContent: 'center',
                            fontSize: '0.62rem', fontWeight: '900',
                            background: lit ? `${step.color}22` : 'var(--surface-muted)',
-                           border: `1px solid ${lit ? step.color + '55' : 'var(--border-subtle)'}`,
+                           border: `1px solid ${lit ? step.color + '55' : 'var(--border-default)'}`,
                            color: lit ? step.color : 'var(--text-secondary)'
                          }}>{step.done ? '✓' : i + 1}</span>
                          <span style={{

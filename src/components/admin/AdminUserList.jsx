@@ -83,7 +83,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
                     padding: '6px 14px', borderRadius: 'var(--radius-full)', cursor: 'pointer',
                     fontSize: '0.78rem', fontWeight: '700', whiteSpace: 'nowrap',
                     background: active ? 'var(--accent)' : 'transparent',
-                    border: `1px solid ${active ? 'var(--accent)' : 'var(--border-subtle)'}`,
+                    border: `1px solid ${active ? 'var(--accent)' : 'var(--border-default)'}`,
                     color: active ? '#fff' : 'var(--text-secondary)',
                     transition: 'all 0.15s ease'
                   }}
@@ -114,7 +114,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
                   padding: '6px 12px', borderRadius: 'var(--radius-full)', cursor: 'pointer',
                   fontSize: '0.78rem', fontWeight: '700', whiteSpace: 'nowrap',
                   background: active ? 'var(--surface-hover)' : 'transparent',
-                  border: `1px solid ${active ? 'var(--border-strong)' : 'var(--border-subtle)'}`,
+                  border: `1px solid ${active ? 'var(--border-strong)' : 'var(--border-default)'}`,
                   color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
                   transition: 'all 0.15s ease'
                 }}

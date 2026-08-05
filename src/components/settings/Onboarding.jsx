@@ -67,7 +67,7 @@ export function Onboarding({ onStart }) {
     const primaryBtn = {
         background: ACCENT,
         color: 'white',
-        padding: 'clamp(12px, 1.8vh, 16px) var(--spacing-md)',
+        padding: 'clamp(12px, 1.8vh, 16px) var(--space-6)',
         borderRadius: 'var(--radius-lg)',
         fontWeight: '700',
         fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
@@ -91,7 +91,7 @@ export function Onboarding({ onStart }) {
             height: '100%', textAlign: 'center',
             gap: 'clamp(12px, 2.5vh, 32px)',
             // Top padding clears the fixed language switcher when content scrolls
-            padding: '48px var(--spacing-md) var(--spacing-sm)',
+            padding: '48px var(--space-6) var(--space-4)',
             overflowY: 'auto', overflowX: 'hidden'
         }}>
             {/* Discreet language switcher */}
@@ -102,7 +102,7 @@ export function Onboarding({ onStart }) {
             <div style={{ maxWidth: '380px', marginTop: 'auto', flexShrink: 0 }}>
                 <h1 className="rainbow-gradient" style={{
                     fontSize: 'clamp(2.4rem, 7vw, 3.5rem)',
-                    marginBottom: 'var(--spacing-xs)', fontWeight: '800', letterSpacing: '-1px'
+                    marginBottom: 'var(--space-2)', fontWeight: '800', letterSpacing: '-1px'
                 }}>
                     OneUp
                 </h1>
@@ -121,7 +121,7 @@ export function Onboarding({ onStart }) {
                 key={step}
                 className={step === 1 ? 'glass-premium scale-in' : 'glass-premium flip-enter'}
                 style={{
-                    padding: 'clamp(14px, 3vw, 28px)', borderRadius: 'var(--radius-xl)',
+                    padding: 'clamp(14px, 3vw, 28px)', borderRadius: 'var(--radius-lg)',
                     width: '100%', maxWidth: '420px', flexShrink: 0,
                     display: 'flex', flexDirection: 'column', gap: 'clamp(12px, 2vh, 24px)',
                     minHeight: 'clamp(220px, 36vh, 320px)', justifyContent: 'center',
@@ -199,7 +199,7 @@ export function Onboarding({ onStart }) {
                                         background: 'rgba(255, 255, 255, 0.05)',
                                         border: '1px solid rgba(255, 255, 255, 0.1)',
                                         color: 'var(--text-primary)',
-                                        padding: 'clamp(10px, 1.5vh, 14px) var(--spacing-md)',
+                                        padding: 'clamp(10px, 1.5vh, 14px) var(--space-6)',
                                         borderRadius: 'var(--radius-lg)', fontWeight: '600',
                                         fontSize: 'clamp(0.9rem, 2.3vw, 1rem)',
                                         cursor: 'pointer', display: 'flex', alignItems: 'center',
@@ -347,7 +347,7 @@ export function Onboarding({ onStart }) {
                 {/* ───────────────── STEP 3b — Import history (past) ───────────────── */}
                 {step === 3 && mode === 'past' && (
                     <>
-                        <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+                        <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
                             {/* Start date */}
                             <div>
                                 <label style={{
@@ -365,7 +365,7 @@ export function Onboarding({ onStart }) {
                                 <div className="hover-lift" style={{
                                     display: 'flex', alignItems: 'center',
                                     background: 'linear-gradient(135deg, rgba(109, 40, 217, 0.15), rgba(139, 92, 246, 0.15))',
-                                    padding: 'var(--spacing-sm) var(--spacing-md)', borderRadius: 'var(--radius-lg)',
+                                    padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--radius-lg)',
                                     border: '2px solid rgba(139, 92, 246, 0.3)', minHeight: 'var(--touch-min)'
                                 }}>
                                     <Calendar size={22} style={{ color: 'var(--accent-glow)', marginRight: '12px', flexShrink: 0 }} />
@@ -389,7 +389,7 @@ export function Onboarding({ onStart }) {
                             <div style={{
                                 display: 'flex', gap: '10px', alignItems: 'flex-start',
                                 background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)',
-                                borderRadius: 'var(--radius-md)', padding: 'var(--spacing-sm)'
+                                borderRadius: 'var(--radius-md)', padding: 'var(--space-4)'
                             }}>
                                 <AlertCircle size={18} color="var(--warning)" style={{ flexShrink: 0, marginTop: '1px' }} />
                                 <div style={{ fontSize: 'clamp(0.76rem, 1.9vw, 0.86rem)', lineHeight: '1.5', color: 'var(--text-secondary)' }}>
@@ -601,7 +601,7 @@ function ModeCard({ active, onClick, icon, accent, title, desc, badge }) {
             className="hover-lift"
             style={{
                 position: 'relative', textAlign: 'left', display: 'flex', gap: '12px', alignItems: 'center',
-                padding: 'var(--spacing-sm) var(--spacing-md)', borderRadius: 'var(--radius-lg)',
+                padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--radius-lg)',
                 background: active ? `color-mix(in srgb, ${accent} 12%, transparent)` : 'rgba(255,255,255,0.04)',
                 border: `2px solid ${active ? accent : 'rgba(255,255,255,0.1)'}`,
                 cursor: 'pointer', transition: 'all 0.2s ease', minHeight: 'var(--touch-min)'
@@ -648,7 +648,7 @@ function ModeCard({ active, onClick, icon, accent, title, desc, badge }) {
 /** Back + primary action row shared by steps 2 and 3. */
 function NavRow({ onBack, t, children }) {
     return (
-        <div style={{ display: 'flex', gap: '10px', marginTop: 'var(--spacing-xs)' }}>
+        <div style={{ display: 'flex', gap: '10px', marginTop: 'var(--space-2)' }}>
             <Button variant="secondary" onClick={onBack} className="hover-lift" style={{ flex: 1, borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                 <ArrowLeft size={18} />
                 {t('onboarding.back')}

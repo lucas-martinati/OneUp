@@ -149,7 +149,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                 position: 'fixed', inset: 0,
                 background: 'rgba(0,0,0,0.82)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: 'var(--spacing-md)', zIndex: Z_INDEX.MODAL + 10
+                padding: 'var(--space-6)', zIndex: Z_INDEX.MODAL + 10
             }}
         >
             <div
@@ -157,7 +157,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                 className="glass-premium slide-up"
                 style={{
                     width: '100%', maxWidth: '400px',
-                    borderRadius: 'var(--radius-xl)', padding: 'var(--spacing-lg)',
+                    borderRadius: 'var(--radius-lg)', padding: 'var(--space-8)',
                     boxShadow: isPerfect 
                         ? '0 0 30px rgba(255, 215, 0, 0.25), 0 20px 60px rgba(0,0,0,0.5)' 
                         : '0 20px 60px rgba(0,0,0,0.5)',
@@ -210,7 +210,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
 
                 <div style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    gap: '10px', marginBottom: 'var(--spacing-md)'
+                    gap: '10px', marginBottom: 'var(--space-6)'
                 }}>
                     <div style={{
                         position: 'relative', borderRadius: '50%',
@@ -293,7 +293,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                 </div>
 
                 <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', paddingRight: '4px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: 'var(--spacing-md)', flexShrink: 0 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: 'var(--space-6)', flexShrink: 0 }}>
 
                         
                         {canAccessFeature(FEATURES.WEIGHTS, entry) && entry.weightsTotalReps > 0 && (

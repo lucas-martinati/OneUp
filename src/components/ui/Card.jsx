@@ -23,9 +23,9 @@ const BASE = {
 
 const PADDING = {
   none: 0,
-  sm: 'var(--spacing-sm)',
-  md: 'var(--spacing-md)',
-  lg: 'var(--spacing-lg)',
+  sm: 'var(--space-4)',
+  md: 'var(--space-6)',
+  lg: 'var(--space-8)',
 };
 
 // Variants backed by an existing utility class inherit its perf-mode overrides.
@@ -50,7 +50,7 @@ const VARIANT_STYLE = {
   },
   plain: {
     background: 'var(--card-bg)',
-    border: '1px solid var(--border-subtle)',
+    border: '1px solid var(--border-default)',
   },
 };
 

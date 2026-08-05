@@ -31,7 +31,7 @@ const Medallion = React.memo(({ badge, onSelect, t }) => {
                 background: unlocked
                     ? `radial-gradient(circle at 32% 28%, ${color}55, ${color}22)`
                     : 'var(--surface-muted)',
-                border: unlocked ? `1.5px solid ${color}` : '1.5px solid var(--border-subtle)',
+                border: unlocked ? `1.5px solid ${color}` : '1.5px solid var(--border-default)',
                 boxShadow: unlocked ? `0 4px 16px ${color}44` : 'none',
                 opacity: unlocked ? 1 : 0.7,
             }}>
@@ -42,7 +42,7 @@ const Medallion = React.memo(({ badge, onSelect, t }) => {
                     <div style={{
                         position: 'absolute', bottom: '-2px', right: '-2px',
                         width: '20px', height: '20px', borderRadius: '50%',
-                        background: 'var(--sheet-bg)', border: '1px solid var(--border-subtle)',
+                        background: 'var(--sheet-bg)', border: '1px solid var(--border-default)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
                         <Lock size={10} color="var(--text-secondary)" />
@@ -101,7 +101,7 @@ export function AchievementsShowcase({ stats, onOpen }) {
     return (
         <div className="glass-premium slide-up" style={{
             position: 'relative', overflow: 'hidden',
-            padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+            padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)',
             background: 'linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.04))',
             border: '1px solid rgba(251,191,36,0.22)',
         }}>
@@ -170,7 +170,7 @@ export function AchievementsShowcase({ stats, onOpen }) {
                     style={{
                         width: '100%', marginTop: '12px', padding: '10px 12px',
                         display: 'flex', alignItems: 'center', gap: '12px',
-                        background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)',
+                        background: 'var(--surface-muted)', border: '1px solid var(--border-default)',
                         borderRadius: 'var(--radius-lg)', cursor: 'pointer', textAlign: 'left',
                     }}
                 >

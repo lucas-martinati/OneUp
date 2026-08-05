@@ -561,7 +561,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                 background: 'var(--sheet-bg)',
                 backdropFilter: showBlur ? 'blur(20px)' : 'none',
                 WebkitBackdropFilter: showBlur ? 'blur(20px)' : 'none',
-                borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
+                borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0',
                 boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
                 transform: `translateY(${translateYPct}%)`,
                 transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), backdrop-filter 0.3s ease',
@@ -578,7 +578,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
             }} />
             <div style={{
                 width: '40px', height: '4px', borderRadius: '2px',
-                background: 'var(--sheet-handle)', margin: 'var(--spacing-sm) auto',
+                background: 'var(--sheet-handle)', margin: 'var(--space-4) auto',
                 cursor: 'grab'
             }} />
 

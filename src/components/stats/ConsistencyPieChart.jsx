@@ -22,7 +22,7 @@ export default function ConsistencyPieChart({ activeData, trackedCount, title, s
             ) : (
                 <div style={{
                     textAlign: 'center', color: 'var(--text-secondary)',
-                    padding: 'var(--spacing-lg)'
+                    padding: 'var(--space-8)'
                 }}>
                     <p style={{ fontSize: '0.9rem', marginBottom: '6px' }}>{emptyTitle}</p>
                     <p style={{ fontSize: '0.78rem', opacity: 0.7, lineHeight: '1.5' }}>{emptySub}</p>

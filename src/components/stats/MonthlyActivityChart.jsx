@@ -10,7 +10,7 @@ export function MonthlyActivityChart({ monthlyActivityTotal, monthlyActivityByEx
 
     return (
         <div className="glass-premium" style={{
-            padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+            padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)',
             background: 'var(--surface-section)'
         }}>
             <h3 style={sectionTitleStyle}>{t('stats.monthlyActivity')}</h3>

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { haptics } from '@utils/hapticsManager';
 
 /**
- * Organic toggle switch: a blob-shaped knob (shared counterBlobMorph) that
+ * Organic toggle switch: a blob-shaped knob that
  * jellies (dropletSquish) each time the state flips. Chrome lives in
  * components.css (.toggle*); only the per-row active gradient stays inline.
  */

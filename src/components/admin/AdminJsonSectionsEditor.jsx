@@ -78,7 +78,7 @@ export function AdminJsonSectionsEditor({
           }
         };
 
-        let borderStyle = '1px solid var(--border-subtle)';
+        let borderStyle = '1px solid var(--border-default)';
         if (isExpanded) {
           borderStyle = '1px solid rgba(167,139,250,0.3)';
         } else if (isDirty) {
@@ -325,7 +325,7 @@ export function AdminJsonSectionsEditor({
       })}
 
       {/* Cancel/Close Button */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--spacing-md)' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--space-6)' }}>
         <button
           onClick={onBack}
           style={{

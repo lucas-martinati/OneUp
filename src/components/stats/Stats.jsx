@@ -229,7 +229,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 {/* ── Header ──────────────────────────────────────────────── */}
                 <div style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    marginBottom: 'var(--spacing-md)'
+                    marginBottom: 'var(--space-6)'
                 }}>
                     <h2 className="panel-title" style={{ margin: 0 }}>
                         {t('stats.title')}
@@ -260,7 +260,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 />
 
                 {/* ── Section tabs: keep each view short, no endless scroll ── */}
-                <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                <div style={{ marginBottom: 'var(--space-6)' }}>
                     <SegmentedControl
                         options={[
                             { id: 'overview', label: t('common.overview') },
@@ -275,7 +275,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
                 {/* ── Tab: Overview ─────────────────────────────────────── */}
                 {activeTab === 'overview' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
                         <AchievementsShowcase stats={globalStats} onOpen={onOpenAchievements} />
 
                         <StatsOverviewCards
@@ -297,7 +297,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
                         {/* ── Motivational footer ───────────────────────── */}
                         <div className="glass slide-up" style={{
-                            padding: 'var(--spacing-sm) var(--spacing-md)',
+                            padding: 'var(--space-4) var(--space-6)',
                             borderRadius: 'var(--radius-lg)', textAlign: 'center',
                             background: 'linear-gradient(135deg, rgba(14,165,233,0.1), rgba(6,182,212,0.1))'
                         }}>
@@ -313,10 +313,10 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
                 {/* ── Tab: Charts (heavy Recharts only mount on demand) ── */}
                 {activeTab === 'charts' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
                         <Suspense fallback={
                             <div className="glass-premium" style={{
-                                padding: 'var(--spacing-md)', borderRadius: 'var(--radius-xl)',
+                                padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)',
                                 display: 'flex', justifyContent: 'center', alignItems: 'center',
                                 height: '200px'
                             }}>
@@ -369,7 +369,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
                 {/* ── Tab: Details (per-exercise breakdown + history) ──── */}
                 {activeTab === 'details' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
                         <ExerciseBreakdown
                             enrichedExerciseStats={enrichedExerciseStats}
                             fullCategoryOrder={fullCategoryOrder} fullCategoryColors={fullCategoryColors}

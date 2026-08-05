@@ -16,11 +16,11 @@ import { forwardRef, useMemo } from 'react';
  * @param {React.ElementType} [as='div']
  */
 const GAP_TOKENS = {
-  xs: 'var(--spacing-xs)',
-  sm: 'var(--spacing-sm)',
-  md: 'var(--spacing-md)',
-  lg: 'var(--spacing-lg)',
-  xl: 'var(--spacing-xl)',
+  xs: 'var(--space-2)',
+  sm: 'var(--space-4)',
+  md: 'var(--space-6)',
+  lg: 'var(--space-8)',
+  xl: 'var(--space-10)',
 };
 
 export const Stack = forwardRef(function Stack(

@@ -162,7 +162,7 @@ function SessionCard({ session, mode, t, lang }) {
       {/* Map (below stats) */}
       {hasGps && expanded && (
         <div style={{
-          borderTop: '1px solid var(--border-subtle)',
+          borderTop: '1px solid var(--border-default)',
           height: '190px',
           flexShrink: 0,
         }}>
@@ -287,7 +287,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '1.8rem',
                 background: 'var(--surface-subtle)',
-                border: '1px solid var(--border-subtle)',
+                border: '1px solid var(--border-default)',
               }}>
                 {mode === 'running' ? '🏃' : '🚴'}
               </div>
@@ -318,7 +318,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
         </div>
 
         {/* Bottom Close Button */}
-        <div style={{ marginTop: 'var(--spacing-md)', paddingTop: 'var(--spacing-xs)', flexShrink: 0 }}>
+        <div style={{ marginTop: 'var(--space-6)', paddingTop: 'var(--space-2)', flexShrink: 0 }}>
           <Button
             variant="secondary"
             fullWidth

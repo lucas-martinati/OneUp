@@ -315,7 +315,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
 
             {/* Footer */}
             {clanData && communityContext !== 'manage' && (
-                <div style={{ paddingTop: 'var(--spacing-sm)' }}>
+                <div style={{ paddingTop: 'var(--space-4)' }}>
                     <Button
                         variant="danger-ghost"
                         size="md"
@@ -333,12 +333,12 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                 <div className="fade-in" style={{
                     position: 'fixed', inset: 0, background: 'var(--overlay-bg-heavy)',
                     zIndex: Z_INDEX.DELETE_MODAL, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    padding: 'var(--spacing-lg)'
+                    padding: 'var(--space-8)'
                 }}>
                     <div className="scale-in" style={{
                         background: 'var(--sheet-bg)',
                         border: '1px solid var(--border-default)',
-                        borderRadius: 'var(--radius-xl)', padding: '24px',
+                        borderRadius: 'var(--radius-lg)', padding: '24px',
                         width: '100%', maxWidth: '340px', textAlign: 'center',
                         boxShadow: 'var(--shadow-lg)'
                     }}>

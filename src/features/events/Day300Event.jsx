@@ -52,8 +52,6 @@ const Day300Styles = memo(() => (
           --surface-dim: rgba(129, 140, 248, 0.13) !important;
           --surface-hover: rgba(56, 189, 248, 0.15) !important;
 
-          --border-subtle: rgba(129, 140, 248, 0.12) !important;
-          --border-muted: rgba(129, 140, 248, 0.16) !important;
           --border-default: rgba(56, 189, 248, 0.26) !important;
           --border-strong: rgba(56, 189, 248, 0.45) !important;
 
@@ -188,7 +186,6 @@ const Day300Styles = memo(() => (
         .day300-global .counter-button {
           background: radial-gradient(circle at 50% 38%, rgba(129, 140, 248, 0.3), rgba(10, 12, 34, 0.5)) !important;
           box-shadow: 0 0 42px rgba(56, 189, 248, 0.5), inset 0 0 26px rgba(129, 140, 248, 0.4) !important;
-          animation: counterBlobMorph 9s ease-in-out infinite !important;
         }
         /* ── Anneau de progression de l'année : teinte cosmique ── */
         .day300-global .counter-ring {

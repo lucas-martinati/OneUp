@@ -33,7 +33,7 @@ export function LineNumberTextarea({ value, onChange, placeholder, height = '350
   return (
     <div style={{
       display: 'flex',
-      border: '1px solid var(--border-subtle)',
+      border: '1px solid var(--border-default)',
       borderRadius: 'var(--radius-lg)',
       background: '#0a0a0f',
       overflow: 'hidden',

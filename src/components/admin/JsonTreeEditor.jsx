@@ -167,7 +167,7 @@ function JsonTreeNode({
           style={{
             width: '100%', height: '140px', background: '#020204', color: '#c084fc',
             fontFamily: 'Fira Code, Consolas, Monaco, monospace', fontSize: '0.8rem', padding: '8px',
-            border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', resize: 'vertical',
+            border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', resize: 'vertical',
             outline: 'none', boxSizing: 'border-box'
           }}
         />
@@ -437,7 +437,7 @@ export function JsonTreeEditor({ value, onChange }) {
   return (
     <div style={{
       background: '#040406',
-      border: '1px solid var(--border-subtle)',
+      border: '1px solid var(--border-default)',
       borderRadius: 'var(--radius-lg)',
       padding: '16px 12px',
       overflowX: 'auto',

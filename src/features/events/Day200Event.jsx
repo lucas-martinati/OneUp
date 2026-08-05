@@ -52,8 +52,6 @@ const Day200Styles = memo(() => (
           --surface-dim: rgba(251, 191, 36, 0.13) !important;
           --surface-hover: rgba(249, 115, 22, 0.16) !important;
 
-          --border-subtle: rgba(251, 146, 60, 0.14) !important;
-          --border-muted: rgba(251, 146, 60, 0.18) !important;
           --border-default: rgba(249, 115, 22, 0.30) !important;
           --border-strong: rgba(249, 115, 22, 0.50) !important;
 
@@ -216,7 +214,6 @@ const Day200Styles = memo(() => (
         .day200-global .counter-button {
           background: radial-gradient(circle at 50% 38%, rgba(249, 115, 22, 0.32), rgba(40, 12, 6, 0.5)) !important;
           box-shadow: 0 0 40px rgba(249, 115, 22, 0.6), inset 0 0 28px rgba(251, 191, 36, 0.45) !important;
-          animation: counterBlobMorph 9s ease-in-out infinite !important;
         }
         .day200-global .counter-button span {
           color: #fff7e0 !important;

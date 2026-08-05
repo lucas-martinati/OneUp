@@ -158,7 +158,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                     padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)',
                     background: 'var(--surface-muted)', border: '1px solid var(--border-default)'
                   }}>
-                    <div className="row gap-12" style={{ alignItems: 'center' }}>
+                    <div className="flex-align-center gap-12" style={{ alignItems: 'center' }}>
                       <div style={{
                         width: '40px', height: '40px', borderRadius: '50%',
                         background: `${ex.color}20`, color: ex.color,
@@ -229,7 +229,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                   );
                   const isFull = catExs.length >= MAX_EXERCISES_PER_CATEGORY;
                   
-                  const borderStyle = isSelected ? cat.color : 'var(--border-subtle)';
+                  const borderStyle = isSelected ? cat.color : 'var(--border-default)';
                   let colorStyle = 'var(--text-primary)';
                   if (isSelected) {
                     colorStyle = cat.color;
@@ -305,7 +305,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
                     <button key={name} onClick={() => setIconName(name)} className={isSelected ? 'hover-lift' : ''} style={{
                       aspectRatio: '1', borderRadius: 'var(--radius-md)',
                       background: isSelected ? `${color}20` : 'var(--surface-muted)',
-                      border: isSelected ? `2px solid ${color}` : '1px solid var(--border-subtle)',
+                      border: isSelected ? `2px solid ${color}` : '1px solid var(--border-default)',
                       color: isSelected ? color : 'var(--text-secondary)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       cursor: 'pointer', transition: 'all 0.2s', padding: 0
@@ -350,7 +350,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
 
             {/* MULTIPLIER */}
             {!editingId && (
-              <div style={{ background: 'var(--surface-muted)', padding: '16px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ background: 'var(--surface-muted)', padding: '16px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-default)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                   <label style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                     {t('customExercises.multiplierLabel')}
@@ -406,7 +406,7 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
         <div className="fade-in" style={{
           position: 'fixed', inset: 0, background: 'var(--overlay-bg-heavy)',
           zIndex: Z_INDEX.DELETE_MODAL, display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', padding: 'var(--spacing-md)',
+          alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)',
           overflow: 'hidden', touchAction: 'none', overscrollBehavior: 'none'
         }}
           onTouchMove={(e) => e.preventDefault()}

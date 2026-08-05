@@ -27,7 +27,7 @@ function StatTile({ icon: Icon, label, value, color = 'var(--text-secondary)' })
   return (
     <div style={{
       flex: '1 1 120px', minWidth: 0, padding: '10px 12px', borderRadius: 'var(--radius-md)',
-      background: 'var(--surface-muted)', border: '1px solid var(--border-subtle)'
+      background: 'var(--surface-muted)', border: '1px solid var(--border-default)'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color, marginBottom: '4px' }}>
         <Icon size={14} />
@@ -44,7 +44,7 @@ function StatTile({ icon: Icon, label, value, color = 'var(--text-secondary)' })
 function CopyLine({ label, value, k, copiedKey, onCopy }) {
   const isCopied = copiedKey === k;
   return (
-    <div className="row gap-8" style={{ alignItems: 'center' }}>
+    <div className="flex-align-center gap-8" style={{ alignItems: 'center' }}>
       <code style={{
         flex: 1, minWidth: 0, fontSize: '0.7rem', color: 'var(--text-secondary)',
         fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
@@ -95,7 +95,7 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
 
           <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <CopyLine label="UID" value={meta.uid} k="uid" copiedKey={copiedKey} onCopy={copy} />
-            <div style={{ height: '1px', background: 'var(--border-subtle)', margin: '4px 0' }} />
+            <div style={{ height: '1px', background: 'var(--border-default)', margin: '4px 0' }} />
             <CopyLine label="Email" value={formState.email} k="email" copiedKey={copiedKey} onCopy={copy} />
             <CopyLine label="Nom" value={formState.displayName} k="name" copiedKey={copiedKey} onCopy={copy} />
             <CopyLine label="Photo" value={formState.photoURL} k="photo" copiedKey={copiedKey} onCopy={copy} />
@@ -198,24 +198,24 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
           />
         </SettingRow>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '12px 0', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '12px 0', borderBottom: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Clock size={18} color="var(--color-cyan)" />
             <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>Heure de rappel</span>
           </div>
-          <div className="row gap-4">
+          <div className="flex-align-center gap-4">
             <input
               type="number" min={0} max={23}
               value={formState.notificationTime?.hour ?? 9}
               onChange={(e) => setFormState(prev => ({ ...prev, notificationTime: { ...prev.notificationTime, hour: clampInt(e.target.value, 0, 23) } }))}
-              style={{ width: '52px', padding: '8px', textAlign: 'center', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--surface-muted)', color: 'var(--text-primary)', fontWeight: '700' }}
+              style={{ width: '52px', padding: '8px', textAlign: 'center', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)', background: 'var(--surface-muted)', color: 'var(--text-primary)', fontWeight: '700' }}
             />
             <span style={{ fontWeight: '800', color: 'var(--text-secondary)' }}>:</span>
             <input
               type="number" min={0} max={59}
               value={formState.notificationTime?.minute ?? 0}
               onChange={(e) => setFormState(prev => ({ ...prev, notificationTime: { ...prev.notificationTime, minute: clampInt(e.target.value, 0, 59) } }))}
-              style={{ width: '52px', padding: '8px', textAlign: 'center', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--surface-muted)', color: 'var(--text-primary)', fontWeight: '700' }}
+              style={{ width: '52px', padding: '8px', textAlign: 'center', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)', background: 'var(--surface-muted)', color: 'var(--text-primary)', fontWeight: '700' }}
             />
           </div>
         </div>
@@ -235,7 +235,7 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
         </SettingRow>
 
         {/* App theme */}
-        <div style={{ paddingTop: '12px', borderTop: '1px solid var(--border-subtle)' }}>
+        <div style={{ paddingTop: '12px', borderTop: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
             <Palette size={18} color="var(--color-pink)" />
             <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>Thème de l'application</span>
@@ -306,7 +306,7 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
 
       {/* Danger zone */}
       <div style={{
-        padding: 'var(--space-4)', borderRadius: 'var(--radius-xl)',
+        padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)',
         background: 'color-mix(in srgb, var(--error) 5%, transparent)', border: '1px solid color-mix(in srgb, var(--error) 25%, transparent)'
       }}>
         <h3 style={{ ...sectionTitleStyle, color: 'var(--error)', display: 'flex', alignItems: 'center', gap: '6px' }}>

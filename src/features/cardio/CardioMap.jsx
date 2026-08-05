@@ -64,7 +64,7 @@ export const CardioMap = React.memo(({ gpsTrack, height = 'var(--cardio-map-heig
         borderRadius: 'var(--radius-md)',
         background: '#1a1a24',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        border: '1px solid var(--border-subtle)',
+        border: '1px solid var(--border-default)',
         color: 'var(--text-secondary)', fontSize: 'clamp(0.62rem, 1.2cqh, 0.75rem)', opacity: 0.5,
         flexShrink: 1,
         ...styleProp
@@ -94,7 +94,7 @@ export const CardioMap = React.memo(({ gpsTrack, height = 'var(--cardio-map-heig
         borderRadius: 'var(--radius-md)',
         overflow: 'hidden',
         position: 'relative',
-        border: '1px solid var(--border-subtle)',
+        border: '1px solid var(--border-default)',
         cursor: 'pointer',
         flexShrink: 1,
         ...styleProp

@@ -13,7 +13,7 @@ function StatCard({ icon: Icon, value, format, label, color, dim = false, delay 
         <div className="glass-premium hover-lift scale-in" style={{
             position: 'relative', overflow: 'hidden',
             padding: '15px 14px', borderRadius: 'var(--radius-lg)',
-            border: '1px solid var(--border-subtle)',
+            border: '1px solid var(--border-default)',
             display: 'flex', flexDirection: 'column', gap: '11px',
             animationDelay: `${delay}s`
         }}>
@@ -69,13 +69,13 @@ export function StatsOverviewCards({
     const heroNumberColor = isCardioHero ? '#f97316' : '#818cf8';
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             {/* ── Hero: Global Total Reps ─────────────────────────────── */}
             <div className="glass-premium scale-in" style={{
                 position: 'relative', overflow: 'hidden',
-                padding: 'var(--spacing-lg) var(--spacing-md)',
-                borderRadius: 'var(--radius-xl)', textAlign: 'center',
-                border: '1px solid var(--border-subtle)'
+                padding: 'var(--space-8) var(--space-6)',
+                borderRadius: 'var(--radius-lg)', textAlign: 'center',
+                border: '1px solid var(--border-default)'
             }}>
                 {/* Layered ambient glow */}
                 <div aria-hidden="true" style={{

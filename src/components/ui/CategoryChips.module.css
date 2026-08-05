@@ -18,7 +18,7 @@
   min-height: 38px;
   padding: 8px 14px;
   background: var(--surface-subtle);
-  border: 1px solid var(--border-muted);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   font-family: inherit;
