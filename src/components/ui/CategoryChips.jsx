@@ -1,8 +1,10 @@
+import { Check, Lock } from '@utils/icons';
 import { haptics } from '@utils/hapticsManager';
-import { FilterChip } from './FilterChip';
+import styles from './CategoryChips.module.css';
 
 /**
- * CategoryChips — the app-wide multi-select category filter using the unified FilterChip primitive.
+ * CategoryChips — the app-wide multi-select category filter: pill chips with
+ * a hollow ring that fills with the category color (plus check) when selected.
  * Purely controlled: callers own the selection state and any "min 1 selected"
  * rule. Locked chips (pro gating) render a padlock and route taps to
  * onLockedClick instead of toggling.
@@ -15,16 +17,19 @@ import { FilterChip } from './FilterChip';
  */
 export function CategoryChips({ items, selected = [], onToggle, onLockedClick }) {
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-      {items.map((item) => {
+    <div className={styles.chips}>
+      {items.map((item, index) => {
         const isSelected = selected.includes(item.id);
+        const classNames = [
+          styles.chip,
+          isSelected && styles.chipOn,
+          item.locked && styles.chipLocked,
+        ].filter(Boolean).join(' ');
         return (
-          <FilterChip
+          <button
             key={item.id}
-            size="sm"
-            color={item.color}
-            selected={isSelected}
-            locked={item.locked}
+            aria-pressed={isSelected}
+            aria-disabled={item.locked || undefined}
             onClick={() => {
               if (item.locked) {
                 onLockedClick?.(item.id);
@@ -33,9 +38,16 @@ export function CategoryChips({ items, selected = [], onToggle, onLockedClick })
               haptics.light();
               onToggle(item.id);
             }}
+            className={classNames}
+            style={{ '--c': item.color, '--i': index }}
           >
+            <span className={styles.chipDot}>
+              {item.locked
+                ? <Lock size={10} strokeWidth={3.5} />
+                : (isSelected && <Check size={10} strokeWidth={3.5} />)}
+            </span>
             {item.label}
-          </FilterChip>
+          </button>
         );
       })}
     </div>

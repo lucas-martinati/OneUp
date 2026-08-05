@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy, Dumbbell, Filter, ChevronUp } from '@utils/icons';
-import { FilterChip } from '@components/ui';
 
 const domainActive = {
     bodyweight: { bg: 'linear-gradient(135deg, rgba(251,191,36,0.22), rgba(245,158,11,0.08))', border: 'rgba(251,191,36,0.45)', color: '#fbbf24' },
@@ -26,6 +25,21 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
         transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease'
     });
 
+    const chipStyle = (isActive, color, special = false, dashed = false) => ({
+        display: 'inline-flex', alignItems: 'center', gap: '5px',
+        padding: special ? '7px 15px' : '7px 12px',
+        borderRadius: 'var(--radius-full)',
+        background: isActive ? `linear-gradient(135deg, ${color}2e, ${color}14)` : 'var(--surface-subtle)',
+        border: `1.5px ${dashed ? 'dashed' : 'solid'} ${isActive ? color + '66' : 'var(--border-default)'}`,
+        color: isActive ? color : 'var(--text-secondary)',
+        fontSize: '0.75rem', fontWeight: special ? '800' : '600',
+        textTransform: special ? 'uppercase' : 'none',
+        letterSpacing: special ? '0.06em' : 'normal',
+        cursor: 'pointer', minHeight: 'var(--touch-min)',
+        boxShadow: isActive && special ? `0 0 14px ${color}33` : 'none',
+        transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease'
+    });
+
     return (
         <>
             {/* ── Domain Filter ── */}
@@ -45,45 +59,30 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: showDomainFilter ? '0' : '4px 0 var(--space-4)' }}>
                     {globalTabs.map(tab => {
                         const isActive = tab.id === currentActiveId;
+                        const Icon = tab.icon;
                         return (
-                            <FilterChip
-                                key={tab.id}
-                                size="sm"
-                                color={tab.color}
-                                selected={isActive}
-                                icon={tab.icon}
-                                onClick={() => { setActiveTab(tab.id); setShowAll(false); }}
-                            >
+                            <button key={tab.id} onClick={() => { setActiveTab(tab.id); setShowAll(false); }} style={chipStyle(isActive, tab.color, tab.isSpecial)}>
+                                <Icon size={14} />
                                 {tab.customLabel ? tab.customLabel : t(tab.labelKey)}
-                            </FilterChip>
+                            </button>
                         );
                     })}
 
                     {exerciseTabs.filter(tab => showAll || tab.id === currentActiveId).map(tab => {
                         const isActive = tab.id === currentActiveId;
+                        const Icon = tab.icon;
                         return (
-                            <FilterChip
-                                key={tab.id}
-                                size="sm"
-                                color={tab.color}
-                                selected={isActive}
-                                icon={tab.icon}
-                                onClick={() => setActiveTab(tab.id)}
-                            >
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={chipStyle(isActive, tab.color)}>
+                                <Icon size={14} />
                                 {tab.customLabel ? tab.customLabel : t(tab.labelKey)}
-                            </FilterChip>
+                            </button>
                         );
                     })}
 
-                    <FilterChip
-                        size="sm"
-                        selected={false}
-                        icon={showAll ? ChevronUp : Filter}
-                        onClick={() => setShowAll(!showAll)}
-                        style={{ borderStyle: 'dashed', background: 'transparent' }}
-                    >
+                    <button onClick={() => setShowAll(!showAll)} style={chipStyle(false, '#ffffff', false, !showAll)}>
+                        {showAll ? <ChevronUp size={14} /> : <Filter size={14} />}
                         {showAll ? t('common.close') : t('share.exercises')}
-                    </FilterChip>
+                    </button>
                 </div>
             )}
         </>
