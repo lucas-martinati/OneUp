@@ -27,4 +27,4 @@ export { Skeleton } from './Skeleton';
 export { EmptyState } from './EmptyState';
 export { ModalContainer } from './ModalContainer';
 export { MetricBadge } from './MetricBadge';
-export { FitToView } from './FitToView';
+export { FitToView } from './FitToView';export { DeleteConfirmOverlay } from './DeleteConfirmOverlay';

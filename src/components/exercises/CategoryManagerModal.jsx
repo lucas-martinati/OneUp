@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, Edit2, Check, ChevronRight, ChevronUp, ChevronDown, GripVertical } from '@utils/icons';
-import { Button, Input, ModalHeader } from '@components/ui';
+import { Button, Input, ModalHeader, DeleteConfirmOverlay } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { DynamicIcon } from '@utils/icons';
@@ -721,62 +721,18 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {showConfirmDelete && (
-        <div className="fade-in" style={{
-          position: 'fixed', inset: 0, background: 'var(--overlay-bg-heavy)',
-          zIndex: Z_INDEX.DELETE_MODAL, display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)',
-          overflow: 'hidden', touchAction: 'none', overscrollBehavior: 'none'
+      <DeleteConfirmOverlay
+        open={showConfirmDelete}
+        title={t('customCategories.deleteTitle')}
+        message={t('customCategories.deleteConfirm', { name: deletingCat?.name })}
+        warningMessage={repsToLose > 0 ? t('customExercises.deleteWarning', { count: repsToLose.toLocaleString(i18n.language), unit: t('customExercises.repetitions') }) : undefined}
+        loading={deleteLoading}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          setShowConfirmDelete(false);
+          setDeletingCat(null);
         }}
-          onTouchMove={(e) => e.preventDefault()}
-        >
-          <div style={{
-            background: 'var(--sheet-bg)', border: '1px solid var(--border-default)',
-            borderRadius: 'var(--radius-lg)', padding: '24px', width: '100%', maxWidth: '340px',
-            textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px'
-          }}>
-            <div style={{
-              width: '64px', height: '64px', borderRadius: '50%', background: 'color-mix(in srgb, var(--error) 15%, transparent)',
-              color: 'var(--error)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto'
-            }}>
-              <Trash2 size={32} />
-            </div>
-            
-            <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '800' }}>
-              {t('customCategories.deleteTitle')}
-            </h3>
-            
-            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
-              {t('customCategories.deleteConfirm', { name: deletingCat?.name })}
-              {repsToLose > 0 && (
-                <span style={{ display: 'block', marginTop: '12px', color: 'var(--warning)', fontSize: '0.85rem', fontWeight: '700', padding: '8px', background: 'color-mix(in srgb, var(--warning) 15%, transparent)', borderRadius: '8px' }}>
-                  {t('customExercises.deleteWarning', { count: repsToLose.toLocaleString(i18n.language), unit: t('customExercises.repetitions') })}
-                </span>
-              )}
-            </p>
-            
-            <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-              <Button 
-                variant="secondary"
-                size="md"
-                fullWidth
-                onClick={() => setShowConfirmDelete(false)}
-              >
-                {t('common.cancel')}
-              </Button>
-              <Button 
-                variant="danger"
-                size="md"
-                fullWidth
-                onClick={handleConfirmDelete}
-              >
-                {t('common.delete')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      />
     </div>
   );
 }

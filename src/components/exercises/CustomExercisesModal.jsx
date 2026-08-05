@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Settings2, Trash2, Edit2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, Check } from '@utils/icons';
-import { Button, Slider, Input, ModalHeader } from '@components/ui';
+import { Button, Slider, Input, ModalHeader, DeleteConfirmOverlay } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { MAX_EXERCISES_PER_CATEGORY } from '@store/useExercisesStore';
@@ -402,64 +402,17 @@ export function CustomExercisesModal({ onClose, customExercisesHook, customCateg
       </div>
 
       {/* Delete Confirmation Modal */}
-      {confirmDeleteEx && (
-        <div className="fade-in" style={{
-          position: 'fixed', inset: 0, background: 'var(--overlay-bg-heavy)',
-          zIndex: Z_INDEX.DELETE_MODAL, display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)',
-          overflow: 'hidden', touchAction: 'none', overscrollBehavior: 'none'
+      <DeleteConfirmOverlay
+        open={!!confirmDeleteEx}
+        title={t('customExercises.deleteTitle')}
+        message={t('customExercises.deleteConfirm', { name: confirmDeleteEx?.label })}
+        warningMessage={confirmDeleteEx && computedStats?.exerciseReps?.[confirmDeleteEx.id] > 0 ? t('customExercises.deleteWarning', { count: computedStats.exerciseReps[confirmDeleteEx.id].toLocaleString(i18n.language), unit: confirmDeleteEx.type === 'timer' ? t('customExercises.seconds') : t('customExercises.repetitions') }) : undefined}
+        onConfirm={() => {
+          deleteCustomExercise(confirmDeleteEx.id);
+          setConfirmDeleteEx(null);
         }}
-          onTouchMove={(e) => e.preventDefault()}
-        >
-          <div style={{
-            background: 'var(--sheet-bg)', border: '1px solid var(--border-default)',
-            borderRadius: 'var(--radius-lg)', padding: '24px', width: '100%', maxWidth: '340px',
-            textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px'
-          }}>
-            <div style={{
-              width: '64px', height: '64px', borderRadius: '50%', background: 'color-mix(in srgb, var(--error) 15%, transparent)',
-              color: 'var(--error)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto'
-            }}>
-              <Trash2 size={32} />
-            </div>
-            
-            <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '800' }}>
-              {t('customExercises.deleteTitle')}
-            </h3>
-            
-            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
-              {t('customExercises.deleteConfirm', { name: confirmDeleteEx.label })}
-              {computedStats?.exerciseReps?.[confirmDeleteEx.id] > 0 && (
-                <span style={{ display: 'block', marginTop: '12px', color: 'var(--warning)', fontSize: '0.85rem', fontWeight: '700', padding: '8px', background: 'color-mix(in srgb, var(--warning) 15%, transparent)', borderRadius: '8px' }}>
-                  {t('customExercises.deleteWarning', { count: computedStats.exerciseReps[confirmDeleteEx.id].toLocaleString(i18n.language), unit: confirmDeleteEx.type === 'timer' ? t('customExercises.seconds') : t('customExercises.repetitions') })}
-                </span>
-              )}
-            </p>
-            
-            <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-              <Button 
-                variant="secondary"
-                size="md"
-                fullWidth
-                onClick={() => setConfirmDeleteEx(null)}
-              >
-                {t('common.cancel')}
-              </Button>
-              <Button 
-                variant="danger"
-                size="md"
-                fullWidth
-                onClick={() => {
-                  deleteCustomExercise(confirmDeleteEx.id);
-                  setConfirmDeleteEx(null);
-                }}
-              >
-                {t('common.delete')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+        onCancel={() => setConfirmDeleteEx(null)}
+      />
       </div>
     </div>
   );
