@@ -17,8 +17,6 @@ export const DifficultyBadge = ({ difficulty, style = {} }) => {
     const clampedDiff = Math.max(0.1, Math.min(1.0, difficulty));
     const hue = Math.round(((clampedDiff - 0.1) / 0.9) * 55);
     const color = `hsl(${hue}, 85%, 55%)`;
-    const bgColor = `hsla(${hue}, 85%, 55%, 0.15)`;
-    const borderColor = `hsla(${hue}, 85%, 55%, 0.25)`;
 
     return (
         <MetricBadge color={color} size="md" style={{ marginLeft: '4px', ...style }}>

@@ -13,8 +13,8 @@ const PRESET_COLORS = [
   '#f43f5e', '#6366f1', '#14b8a6', '#64748b'
 ];
 
-export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesByUserCategory, defaultCustomExercises = [] }) {
-  const { t } = useTranslation();
+export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesByUserCategory, defaultCustomExercises = [], computedStats }) {
+  const { t, i18n } = useTranslation();
   const { customCategories, addCategory, updateCategory, deleteCategory, moveCategory, reorderCategories, maxCustomCategories } = customCategoriesHook;
 
   const [view, setView] = useState('list'); // 'list' | 'create' | 'delete'
@@ -678,6 +678,28 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                   : t('customCategories.deleteSummaryAll', { count: deletingExercises.length })
                 }
               </div>
+
+              {(() => {
+                const repsToLose = deletingExercises.reduce((total, ex) => {
+                  if (!selectedExercises[ex.id]) {
+                    return total + (computedStats?.exerciseReps?.[ex.id] || 0);
+                  }
+                  return total;
+                }, 0);
+
+                if (repsToLose <= 0) return null;
+
+                return (
+                  <div style={{
+                    marginTop: '4px',
+                    padding: '12px 16px', borderRadius: 'var(--radius-md)',
+                    background: 'color-mix(in srgb, var(--error) 12%, transparent)', border: '1px solid color-mix(in srgb, var(--error) 30%, transparent)',
+                    fontSize: '0.8rem', color: 'var(--error)', fontWeight: '700', textAlign: 'center'
+                  }}>
+                    {t('customExercises.deleteWarning', { count: repsToLose.toLocaleString(i18n.language), unit: t('customExercises.repetitions') })}
+                  </div>
+                );
+              })()}
 
               {/* Actions */}
               <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>

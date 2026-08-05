@@ -75,6 +75,7 @@ export function DialogShell({
               display: 'flex',
               alignItems: 'flex-start',
               gap: 'var(--space-3)',
+              justifyContent: (!title && !subtitle && !showX) ? 'center' : 'flex-start',
             }}
           >
             {/* Icon */}

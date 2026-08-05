@@ -215,6 +215,7 @@ export function DashboardModals({
                         customCategoriesHook={customCategoriesHook}
                         exercisesByUserCategory={exercisesByUserCategory}
                         defaultCustomExercises={defaultCustomExercises}
+                        computedStats={computedStats}
                     />
                 </Suspense>
             )}
