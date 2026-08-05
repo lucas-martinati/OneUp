@@ -71,8 +71,8 @@ export function SegmentedControl({
           },
           indicator: {
             background: activeOption.activeBg || 'var(--gradient-glow)',
-            boxShadow: 'var(--shadow-sm)',
-            border: 'none',
+            boxShadow: activeOption.activeBg ? 'none' : 'var(--shadow-sm)',
+            border: activeOption.activeBorder || 'none',
             borderRadius: 'calc(var(--radius-md) - 2px)',
             top: `${pad}px`,
             bottom: `${pad}px`,
@@ -143,11 +143,12 @@ export function SegmentedControl({
       <div 
         style={{
           position: 'absolute',
+          boxSizing: 'border-box',
           top: `${pad}px`,
           bottom: `${pad}px`,
           left: `calc(${(activeIndex * 100) / count}% + ${pad}px)`,
-          width: `calc(${100 / count}% - ${2 * pad}px)`,
-          transition: 'left 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.28s ease, bottom 0.28s ease',
+          right: `calc(${((count - 1 - activeIndex) * 100) / count}% + ${pad}px)`,
+          transition: 'left 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.28s ease, bottom 0.28s ease',
           zIndex: 0,
           ...vStyles.indicator
         }}

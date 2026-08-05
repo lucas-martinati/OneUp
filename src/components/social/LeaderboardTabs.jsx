@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy, Dumbbell, Filter, ChevronUp } from '@utils/icons';
-
-const domainActive = {
-    bodyweight: { bg: 'linear-gradient(135deg, rgba(251,191,36,0.22), rgba(245,158,11,0.08))', border: 'rgba(251,191,36,0.45)', color: '#fbbf24' },
-    weights: { bg: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(234,88,12,0.08))', border: 'rgba(249,115,22,0.45)', color: '#fb923c' },
-};
+import { SegmentedControl } from '@components/ui/SegmentedControl';
 
 export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VISIBLE_TABS, showDomainFilter = true, showExerciseTabs = true }) {
     const { t } = useTranslation();
@@ -14,17 +10,6 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
     const currentActiveId = VISIBLE_TABS.find(t => t.id === activeTab) ? activeTab : VISIBLE_TABS[0].id;
     const globalTabs = VISIBLE_TABS.filter(tab => tab.isGlobal);
     const exerciseTabs = VISIBLE_TABS.filter(tab => !tab.isGlobal);
-
-    const domainBtnStyle = (active, key) => ({
-        flex: 1, padding: '11px', borderRadius: 'var(--radius-md)',
-        background: active ? domainActive[key].bg : 'var(--surface-subtle)',
-        color: active ? domainActive[key].color : 'var(--text-secondary)',
-        border: `1px solid ${active ? domainActive[key].border : 'var(--border-default)'}`,
-        fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-        transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease',
-        WebkitTapHighlightColor: 'transparent', outline: 'none'
-    });
 
     const chipStyle = (isActive, color, special = false, dashed = false) => ({
         display: 'inline-flex', alignItems: 'center', gap: '5px',
@@ -46,13 +31,33 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
         <>
             {/* ── Domain Filter ── */}
             {showDomainFilter && (
-                <div style={{ display: 'flex', gap: '8px', padding: '0 0 8px' }}>
-                    <button onClick={() => { setDomain('bodyweight'); setActiveTab('bodyweight'); setShowAll(false); }} style={domainBtnStyle(domain === 'bodyweight', 'bodyweight')}>
-                        <Trophy size={16} /> {t('common.bodyweight')}
-                    </button>
-                    <button onClick={() => { setDomain('weights'); setActiveTab('weights'); setShowAll(false); }} style={domainBtnStyle(domain === 'weights', 'weights')}>
-                        <Dumbbell size={16} /> {t('common.weights')}
-                    </button>
+                <div style={{ padding: '0 0 8px' }}>
+                    <SegmentedControl
+                        fullWidth
+                        variant="pills"
+                        value={domain}
+                        onChange={(val) => {
+                            setDomain(val);
+                            setActiveTab(val);
+                            setShowAll(false);
+                        }}
+                        options={[
+                            { 
+                                id: 'bodyweight', 
+                                label: t('common.bodyweight'), 
+                                icon: <Trophy size={16} />,
+                                activeBg: 'rgba(251, 191, 36, 0.15)',
+                                activeColor: '#fbbf24'
+                            },
+                            { 
+                                id: 'weights', 
+                                label: t('common.weights'), 
+                                icon: <Dumbbell size={16} />,
+                                activeBg: 'rgba(251, 146, 60, 0.15)',
+                                activeColor: '#fb923c'
+                            }
+                        ]}
+                    />
                 </div>
             )}
 
