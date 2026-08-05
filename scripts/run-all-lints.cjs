@@ -46,6 +46,12 @@ const tasks = [
     icon: '🎨'
   },
   {
+    name: 'check-mergable-styles',
+    cmd: 'node',
+    args: ['scripts/find-mergable-styles.js'],
+    icon: '🔗'
+  },
+  {
     name: 'Stylelint (lint:css)',
     cmd: 'npm',
     args: ['run', 'lint:css'],
