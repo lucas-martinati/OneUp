@@ -282,7 +282,9 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
     setExerciseTargets(prev => ({ ...prev, [exId]: targetCatId }));
   };
 
-  const deletingExercises = deletingCat ? (exercisesByUserCategory?.[deletingCat.id] || []) : [];
+  const deletingExercises = useMemo(() => {
+    return deletingCat ? (exercisesByUserCategory?.[deletingCat.id] || []) : [];
+  }, [deletingCat, exercisesByUserCategory]);
   const selectedCount = Object.values(selectedExercises).filter(Boolean).length;
 
   const repsToLose = useMemo(() => {

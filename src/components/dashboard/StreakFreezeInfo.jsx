@@ -43,17 +43,22 @@ export function StreakFreezeInfo({ open, onClose }) {
         openStore();
     };
 
-    const footerNode = !auth.isSignedIn ? (
-        <GoogleSignInButton
-            onClick={() => auth.signIn()}
-            className="hover-lift"
-            style={{ width: '100%' }}
-        />
-    ) : (!isPro ? (
-        <Button variant="primary" size="sm" fullWidth onClick={handleUpgrade}>
-            {t('streakFreeze.proCta')}
-        </Button>
-    ) : undefined);
+    let footerNode = undefined;
+    if (!auth.isSignedIn) {
+        footerNode = (
+            <GoogleSignInButton
+                onClick={() => auth.signIn()}
+                className="hover-lift"
+                style={{ width: '100%' }}
+            />
+        );
+    } else if (!isPro) {
+        footerNode = (
+            <Button variant="primary" size="sm" fullWidth onClick={handleUpgrade}>
+                {t('streakFreeze.proCta')}
+            </Button>
+        );
+    }
 
     return (
         <DialogShell

@@ -333,8 +333,8 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                 open={showLeaveConfirm}
                 title={t('leaderboard.leaveClanConfirm')}
                 message={
-                    <Trans i18nKey="leaderboard.leaveClanWarning" values={{ name: clanData.name }}>
-                        Es-tu sûr de vouloir quitter <strong>{{name: clanData.name}}</strong> ? Tes statistiques personnelles sont protégées, mais tu n'apparaîtras plus dans leur classement.
+                    <Trans i18nKey="leaderboard.leaveClanWarning" values={{ name: clanData?.name }}>
+                        Es-tu sûr de vouloir quitter <strong>{{name: clanData?.name}}</strong> ? Tes statistiques personnelles sont protégées, mais tu n'apparaîtras plus dans leur classement.
                     </Trans>
                 }
                 destructive
