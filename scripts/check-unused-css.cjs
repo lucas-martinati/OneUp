@@ -74,7 +74,17 @@ cssFiles.forEach(cssFile => {
     // just because `bubbleContainer` exists somewhere in the code.
     const escaped = cls.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const isUsed = new RegExp(`\\b${escaped}\\b`).test(codeContents);
-    if (!isUsed) {
+    
+    // Check for dynamic usage (e.g., `btn--${variant}` -> we look for "btn--")
+    let isDynamicallyUsed = false;
+    if (!isUsed && cls.includes('--')) {
+      const prefix = cls.split('--')[0] + '--'; // e.g., "btn--"
+      const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      // If the prefix exists in the code (like in `btn--${variant}` or 'btn--' +), consider it used
+      isDynamicallyUsed = new RegExp(`\\b${escapedPrefix}`).test(codeContents);
+    }
+
+    if (!isUsed && !isDynamicallyUsed) {
       fileUnused.push(cls);
     }
   });

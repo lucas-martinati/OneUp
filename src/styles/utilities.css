@@ -48,10 +48,8 @@
 .full-width { width: 100%; }
 .pos-relative { position: relative; }
 
-.overflow-hidden { overflow: hidden; }
 
 /* ── Typography & Spacing Utilities ── */
-.text-center { text-align: center; }
 
 .gap-responsive { gap: clamp(4px, 1vh, 10px); }
 .gap-4 { gap: var(--space-1); }
@@ -87,9 +85,6 @@
   gap: var(--space-6);
 }
 
-.section-stack--compact {
-  gap: var(--space-4);
-}
 
 /* ── Inline Style Replacements ── */
 .tab-view-content {
