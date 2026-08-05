@@ -22,6 +22,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
   const [name, setName] = useState('');
   const [color, setColor] = useState('#8b5cf6');
   const [error, setError] = useState('');
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   // Drag & Drop reorder state
   const [draggedIndex, setDraggedIndex] = useState(null);
@@ -155,6 +156,10 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
   }, [targetCategories, baseCountPerCategory, movesPerTarget]);
 
   useBackHandler(() => {
+    if (showConfirmDelete) {
+      setShowConfirmDelete(false);
+      return true;
+    }
     if (view === 'delete') {
       setView('list');
       setDeletingCat(null);
@@ -256,6 +261,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
 
     deleteCategory(deletingCat.id, exerciseMoves, exercisesToDelete);
     setDeletingCat(null);
+    setShowConfirmDelete(false);
     setView('list');
   };
 
@@ -278,6 +284,16 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
 
   const deletingExercises = deletingCat ? (exercisesByUserCategory?.[deletingCat.id] || []) : [];
   const selectedCount = Object.values(selectedExercises).filter(Boolean).length;
+
+  const repsToLose = useMemo(() => {
+    if (!deletingCat || !computedStats) return 0;
+    return deletingExercises.reduce((total, ex) => {
+      if (!selectedExercises[ex.id]) {
+        return total + (computedStats?.exerciseReps?.[ex.id] || 0);
+      }
+      return total;
+    }, 0);
+  }, [deletingExercises, selectedExercises, computedStats, deletingCat]);
 
   return (
     <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
@@ -679,28 +695,6 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                 }
               </div>
 
-              {(() => {
-                const repsToLose = deletingExercises.reduce((total, ex) => {
-                  if (!selectedExercises[ex.id]) {
-                    return total + (computedStats?.exerciseReps?.[ex.id] || 0);
-                  }
-                  return total;
-                }, 0);
-
-                if (repsToLose <= 0) return null;
-
-                return (
-                  <div style={{
-                    marginTop: '4px',
-                    padding: '12px 16px', borderRadius: 'var(--radius-md)',
-                    background: 'color-mix(in srgb, var(--error) 12%, transparent)', border: '1px solid color-mix(in srgb, var(--error) 30%, transparent)',
-                    fontSize: '0.8rem', color: 'var(--error)', fontWeight: '700', textAlign: 'center'
-                  }}>
-                    {t('customExercises.deleteWarning', { count: repsToLose.toLocaleString(i18n.language), unit: t('customExercises.repetitions') })}
-                  </div>
-                );
-              })()}
-
               {/* Actions */}
               <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
                 <Button
@@ -715,7 +709,7 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
                   variant="danger"
                   size="md"
                   fullWidth
-                  onClick={handleConfirmDelete}
+                  onClick={() => setShowConfirmDelete(true)}
                 >
                   {t('common.delete')}
                 </Button>
@@ -724,6 +718,63 @@ export function CategoryManagerModal({ onClose, customCategoriesHook, exercisesB
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showConfirmDelete && (
+        <div className="fade-in" style={{
+          position: 'fixed', inset: 0, background: 'var(--overlay-bg-heavy)',
+          zIndex: Z_INDEX.DELETE_MODAL, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)',
+          overflow: 'hidden', touchAction: 'none', overscrollBehavior: 'none'
+        }}
+          onTouchMove={(e) => e.preventDefault()}
+        >
+          <div style={{
+            background: 'var(--sheet-bg)', border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-lg)', padding: '24px', width: '100%', maxWidth: '340px',
+            textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px'
+          }}>
+            <div style={{
+              width: '64px', height: '64px', borderRadius: '50%', background: 'color-mix(in srgb, var(--error) 15%, transparent)',
+              color: 'var(--error)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto'
+            }}>
+              <Trash2 size={32} />
+            </div>
+            
+            <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '800' }}>
+              {t('customCategories.deleteTitle')}
+            </h3>
+            
+            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
+              {t('customCategories.deleteConfirm', { name: deletingCat?.name })}
+              {repsToLose > 0 && (
+                <span style={{ display: 'block', marginTop: '12px', color: 'var(--warning)', fontSize: '0.85rem', fontWeight: '700', padding: '8px', background: 'color-mix(in srgb, var(--warning) 15%, transparent)', borderRadius: '8px' }}>
+                  {t('customExercises.deleteWarning', { count: repsToLose.toLocaleString(i18n.language), unit: t('customExercises.repetitions') })}
+                </span>
+              )}
+            </p>
+            
+            <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+              <Button 
+                variant="secondary"
+                size="md"
+                fullWidth
+                onClick={() => setShowConfirmDelete(false)}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button 
+                variant="danger"
+                size="md"
+                fullWidth
+                onClick={handleConfirmDelete}
+              >
+                {t('common.delete')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
