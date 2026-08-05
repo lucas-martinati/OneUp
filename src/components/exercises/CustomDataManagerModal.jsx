@@ -27,7 +27,7 @@ export function CustomDataManagerModal({
         <ModalHeader title={t('common.customContent', 'Gestionnaire personnalisé')} onClose={onClose} />
         
         {/* Tabs */}
-        <div style={{ padding: '0 var(--space-4)', marginBottom: '16px' }}>
+        <div style={{ padding: '0 var(--space-4)', marginBottom: '16px', width: '100%', maxWidth: '440px', margin: '0 auto' }}>
           <SegmentedControl
             fullWidth
             options={[
