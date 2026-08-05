@@ -366,7 +366,10 @@
     "weeksAbbr": "주",
     "weights": "가중치",
     "you": "너",
-    "yourPseudo": "당신의 이름은..."
+    "yourPseudo": "당신의 이름은...",
+    "customContent": "사용자 지정 콘텐츠",
+    "categories": "카테고리",
+    "exercises": "운동"
   },
   "counter": {
     "completeAll": "모두 완료",

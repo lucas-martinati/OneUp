@@ -366,7 +366,10 @@
     "weeksAbbr": "sem",
     "weights": "Musculation",
     "you": "toi",
-    "yourPseudo": "Ton pseudo..."
+    "yourPseudo": "Ton pseudo...",
+    "customContent": "Contenu personnalisé",
+    "categories": "Catégories",
+    "exercises": "Exercices"
   },
   "counter": {
     "completeAll": "Tout compléter",

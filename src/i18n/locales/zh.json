@@ -366,7 +366,10 @@
     "weeksAbbr": "周",
     "weights": "负重",
     "you": "你",
-    "yourPseudo": "你的名字..."
+    "yourPseudo": "你的名字...",
+    "customContent": "自定义内容",
+    "categories": "类别",
+    "exercises": "练习"
   },
   "counter": {
     "completeAll": "全部完成",

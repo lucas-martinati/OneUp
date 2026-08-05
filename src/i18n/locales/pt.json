@@ -366,7 +366,10 @@
     "weeksAbbr": "sem",
     "weights": "Pesos",
     "you": "você",
-    "yourPseudo": "Seu nome..."
+    "yourPseudo": "Seu nome...",
+    "customContent": "Conteúdo Personalizado",
+    "categories": "Categorias",
+    "exercises": "Exercícios"
   },
   "counter": {
     "completeAll": "Concluir tudo",

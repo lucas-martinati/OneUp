@@ -366,7 +366,10 @@
     "weeksAbbr": "w",
     "weights": "重み",
     "you": "あなた",
-    "yourPseudo": "あなたの名前..."
+    "yourPseudo": "あなたの名前...",
+    "customContent": "カスタムコンテンツ",
+    "categories": "カテゴリー",
+    "exercises": "エクササイズ"
   },
   "counter": {
     "completeAll": "すべて完了",

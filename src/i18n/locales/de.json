@@ -366,7 +366,10 @@
     "weeksAbbr": "W",
     "weights": "Gewichte",
     "you": "Du",
-    "yourPseudo": "Ihr Name..."
+    "yourPseudo": "Ihr Name...",
+    "customContent": "Benutzerdefinierte Inhalte",
+    "categories": "Kategorien",
+    "exercises": "Übungen"
   },
   "counter": {
     "completeAll": "Schließe „Alle“ ab",

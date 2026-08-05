@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, Edit2, Check, ChevronRight, ChevronUp, ChevronDown, GripVertical, Settings2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS } from '@utils/icons';
-import { Button, Input, ModalHeader, DeleteConfirmOverlay, ColorPicker, Slider } from '@components/ui';
+import { Button, Input, ModalHeader, DeleteConfirmOverlay, ColorPicker, Slider, SegmentedControl } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { DynamicIcon } from '@utils/icons';
@@ -24,40 +24,18 @@ export function CustomDataManagerModal({
   return (
     <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
       <div className="modal-content" style={{ display: 'flex', flexDirection: 'column' }}>
-        <ModalHeader title={t('settings.customContent', 'Gestionnaire personnalisé')} onClose={onClose} />
+        <ModalHeader title={t('common.customContent', 'Gestionnaire personnalisé')} onClose={onClose} />
         
         {/* Tabs */}
-        <div style={{ display: 'flex', padding: '0 var(--space-4)', borderBottom: '1px solid var(--border-subtle)', marginBottom: '16px' }}>
-          <button 
-            onClick={() => setActiveTab('categories')}
-            style={{ 
-              flex: 1, 
-              padding: '12px', 
-              background: 'transparent',
-              border: 'none',
-              borderBottom: activeTab === 'categories' ? '2px solid var(--primary)' : '2px solid transparent',
-              color: activeTab === 'categories' ? 'var(--text-primary)' : 'var(--text-secondary)',
-              fontWeight: activeTab === 'categories' ? '700' : '500',
-              cursor: 'pointer'
-            }}
-          >
-            {t('common.categories')}
-          </button>
-          <button 
-            onClick={() => setActiveTab('exercises')}
-            style={{ 
-              flex: 1, 
-              padding: '12px', 
-              background: 'transparent',
-              border: 'none',
-              borderBottom: activeTab === 'exercises' ? '2px solid var(--primary)' : '2px solid transparent',
-              color: activeTab === 'exercises' ? 'var(--text-primary)' : 'var(--text-secondary)',
-              fontWeight: activeTab === 'exercises' ? '700' : '500',
-              cursor: 'pointer'
-            }}
-          >
-            {t('common.exercises')}
-          </button>
+        <div style={{ padding: '0 var(--space-4)', marginBottom: '16px' }}>
+          <SegmentedControl
+            options={[
+              { id: 'categories', label: t('common.categories') },
+              { id: 'exercises', label: t('common.exercises') }
+            ]}
+            value={activeTab}
+            onChange={setActiveTab}
+          />
         </div>
 
         {/* Tab Content */}

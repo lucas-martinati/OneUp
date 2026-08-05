@@ -366,7 +366,10 @@
     "weeksAbbr": "нед",
     "weights": "Отягощения",
     "you": "вы",
-    "yourPseudo": "Ваше имя..."
+    "yourPseudo": "Ваше имя...",
+    "customContent": "Пользовательский контент",
+    "categories": "Категории",
+    "exercises": "Упражнения"
   },
   "counter": {
     "completeAll": "Выполнить всё",
