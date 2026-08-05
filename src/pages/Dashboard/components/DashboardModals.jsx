@@ -12,18 +12,18 @@ import { useSubscription } from '@contexts/SubscriptionContext';
 import { useExercises } from '@contexts/ExercisesContext';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 
-const Calendar = lazy(() => import('@components/stats/Calendar').then(m => ({ default: m.Calendar })));
-const Stats = lazy(() => import('@components/stats/Stats').then(m => ({ default: m.Stats })));
-const Settings = lazy(() => import('@components/settings/Settings').then(m => ({ default: m.Settings })));
+const Calendar = lazy(() => import('@pages/Stats/components/Calendar').then(m => ({ default: m.Calendar })));
+const Stats = lazy(() => import('@pages/Stats/Stats').then(m => ({ default: m.Stats })));
+const Settings = lazy(() => import('@pages/Settings/Settings').then(m => ({ default: m.Settings })));
 const ExercisePanel = lazy(() => import('@components/exercises/ExercisePanel').then(m => ({ default: m.ExercisePanel })));
 const Leaderboard = lazy(() => import('@components/social/Leaderboard').then(m => ({ default: m.Leaderboard })));
 const Achievements = lazy(() => import('@components/feedback/Achievements').then(m => ({ default: m.Achievements })));
 const WorkoutSession = lazy(() => import('@components/exercises/WorkoutSession').then(m => ({ default: m.WorkoutSession })));
 const CustomDataManagerModal = lazy(() => import('@components/exercises/CustomDataManagerModal').then(m => ({ default: m.CustomDataManagerModal })));
 const AdminPanel = lazy(() => import('@components/admin/AdminPanel').then(m => ({ default: m.AdminPanel })));
-const ProUnlockedModal = lazy(() => import('@components/dashboard/ProUnlockedModal').then(m => ({ default: m.ProUnlockedModal })));
-const ProExpiredModal = lazy(() => import('@components/dashboard/ProExpiredModal').then(m => ({ default: m.ProExpiredModal })));
-const SupporterUnlockedModal = lazy(() => import('@components/dashboard/SupporterUnlockedModal').then(m => ({ default: m.SupporterUnlockedModal })));
+const ProUnlockedModal = lazy(() => import('./ProUnlockedModal').then(m => ({ default: m.ProUnlockedModal })));
+const ProExpiredModal = lazy(() => import('./ProExpiredModal').then(m => ({ default: m.ProExpiredModal })));
+const SupporterUnlockedModal = lazy(() => import('./SupporterUnlockedModal').then(m => ({ default: m.SupporterUnlockedModal })));
 
 export function DashboardModals({
     currentCatKey, effectiveSlide,

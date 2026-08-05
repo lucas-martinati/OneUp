@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Heart, RotateCcw, Sparkles } from '@utils/icons';
 import { Button, Card } from '@components/ui';
 import { getPurchaseHistory } from '@services/purchaseService';
-import { StoreCard } from '../store//StoreCard';
+import { StoreCard } from '@components/store/StoreCard';
 import { useAuth } from '@contexts/AuthContext';
 import { useSubscription } from '@contexts/SubscriptionContext';
 

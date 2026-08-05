@@ -2,6 +2,7 @@
   "compilerOptions": {
     "paths": {
       "@components/*": ["./src/components/*"],
+      "@pages/*": ["./src/pages/*"],
       "@config/*": ["./src/config/*"],
       "@contexts/*": ["./src/contexts/*"],
       "@hooks/*": ["./src/hooks/*"],

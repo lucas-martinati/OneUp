@@ -1,16 +1,16 @@
 import React, { useEffect, useLayoutEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CSSConfetti } from './feedback/CSSConfetti';
-import { OfflineBanner } from './feedback/OfflineBanner';
-import { MigrationBanner } from './feedback/MigrationBanner';
-import { GuestCloudBackupBanner } from './feedback/GuestCloudBackupBanner';
-import { NotificationManager } from './social/NotificationManager';
-import { ConflictOverlay } from './ui/ConflictOverlay';
-import { ConfirmDialog } from './ui/ConfirmDialog';
-import { DashboardHeader } from './dashboard/DashboardHeader';
-import { DashboardNavBar } from './dashboard/DashboardNavBar';
-import { SessionBubble } from './dashboard/SessionBubble';
-import { CategoryNav } from './dashboard/CategoryNav';
+import { CSSConfetti } from '@components/feedback/CSSConfetti';
+import { OfflineBanner } from '@components/feedback/OfflineBanner';
+import { MigrationBanner } from '@components/feedback/MigrationBanner';
+import { GuestCloudBackupBanner } from '@components/feedback/GuestCloudBackupBanner';
+import { NotificationManager } from '@components/social/NotificationManager';
+import { ConflictOverlay } from '@components/ui/ConflictOverlay';
+import { ConfirmDialog } from '@components/ui/ConfirmDialog';
+import { DashboardHeader } from './components/DashboardHeader';
+import { DashboardNavBar } from './components/DashboardNavBar';
+import { SessionBubble } from './components/SessionBubble';
+import { CategoryNav } from './components/CategoryNav';
 import { DashboardEvents, EventHud } from '@features/events';
 import { useAchievementToast } from '@hooks/useAchievementToast';
 import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
@@ -21,8 +21,8 @@ import { AnnouncementOverlay } from '@features/announcements/AnnouncementOverlay
 
 import { useDashboardState } from '@hooks/useDashboardState';
 import { useDashboardSelection } from '@hooks/useDashboardSelection';
-import { DashboardSlideRenderer } from './dashboard/DashboardSlideRenderer';
-import { DashboardModals } from './dashboard/DashboardModals';
+import { DashboardSlideRenderer } from './components/DashboardSlideRenderer';
+import { DashboardModals } from './components/DashboardModals';
 import { isPerfectDay } from '@utils/statUtils';
 import { EXERCISES as BODYWEIGHT_EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';

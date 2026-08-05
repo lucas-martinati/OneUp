@@ -19,20 +19,20 @@ import { useSubscription } from '@contexts/SubscriptionContext';
 import { useExercises } from '@contexts/ExercisesContext';
 import { useCardio } from '@features/cardio/useCardio';
 import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
-import { StatsFilters } from './StatsFilters';
-import { StatsOverviewCards } from './StatsOverviewCards';
-import { StatsHighlights } from './StatsHighlights';
-import { MonthlyActivityChart } from './MonthlyActivityChart';
-import { ExerciseBreakdown } from './ExerciseBreakdown';
-import { SessionHistoryList } from './SessionHistoryList';
-import { AchievementsShowcase } from './AchievementsShowcase';
+import { StatsFilters } from './components/StatsFilters';
+import { StatsOverviewCards } from './components/StatsOverviewCards';
+import { StatsHighlights } from './components/StatsHighlights';
+import { MonthlyActivityChart } from './components/MonthlyActivityChart';
+import { ExerciseBreakdown } from './components/ExerciseBreakdown';
+import { SessionHistoryList } from './components/SessionHistoryList';
+import { AchievementsShowcase } from './components/AchievementsShowcase';
 
 // Lazy load Recharts components
-const RadarChartPanel = lazy(() => import('./RadarChartPanel'));
-const ConsistencyPieChart = lazy(() => import('./ConsistencyPieChart'));
-const DailyRepsChart = lazy(() => import('./DailyRepsChart'));
-const WeightEvolutionChart = lazy(() => import('./WeightEvolutionChart'));
-const DifficultyEvolutionChart = lazy(() => import('./DifficultyEvolutionChart'));
+const RadarChartPanel = lazy(() => import('./components/RadarChartPanel'));
+const ConsistencyPieChart = lazy(() => import('./components/ConsistencyPieChart'));
+const DailyRepsChart = lazy(() => import('./components/DailyRepsChart'));
+const WeightEvolutionChart = lazy(() => import('./components/WeightEvolutionChart'));
+const DifficultyEvolutionChart = lazy(() => import('./components/DifficultyEvolutionChart'));
 const CardioStatsPanel = lazy(() => import('@features/cardio/CardioStatsPanel').then(m => ({ default: m.CardioStatsPanel })));
 const SessionDetailModal = lazy(() => import('@features/share/components/SessionDetailModal').then(m => ({ default: m.SessionDetailModal })));
 

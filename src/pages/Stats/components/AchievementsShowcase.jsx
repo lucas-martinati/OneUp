@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Award, Lock, ChevronRight } from '@utils/icons';
-import { buildBadges } from '../feedback/buildBadges';
+import { buildBadges } from '@components/feedback/buildBadges';
 
 const fmt = (n, lang) => typeof n === 'number' ? n.toLocaleString(lang) : n;
 
