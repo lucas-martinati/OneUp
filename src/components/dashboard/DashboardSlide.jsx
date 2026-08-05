@@ -275,26 +275,6 @@ export const DashboardSlide = React.memo(({
                     </div>
                     {(onManageCustom || onManageCategories) && (
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                            {onManageCustom && (
-                                <button
-                                    onClick={onManageCustom}
-                                    aria-label={t('customExercises.title')}
-                                    title={t('customExercises.title')}
-                                    className="hover-lift"
-                                    style={{
-                                        display: 'inline-flex', alignItems: 'center', gap: '5px',
-                                        padding: '3px 10px', borderRadius: '12px',
-                                        background: 'rgba(255, 255, 255, 0.08)',
-                                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                                        color: 'var(--text-primary)', fontSize: '0.72rem', fontWeight: '700',
-                                        cursor: 'pointer', transition: 'all 0.2s ease',
-                                        boxShadow: '0 2px 8px rgba(0,0,0,0.25)'
-                                    }}
-                                >
-                                    <Settings size={12} />
-                                    <span>{t('common.edit')}</span>
-                                </button>
-                            )}
                             {onManageCategories && (
                                 <button
                                     onClick={onManageCategories}
@@ -313,6 +293,26 @@ export const DashboardSlide = React.memo(({
                                 >
                                     <FolderPlus size={12} />
                                     <span>{t('customCategories.titleShort') || 'Catégories'}</span>
+                                </button>
+                            )}
+                            {onManageCustom && (
+                                <button
+                                    onClick={onManageCustom}
+                                    aria-label={t('customExercises.title')}
+                                    title={t('customExercises.title')}
+                                    className="hover-lift"
+                                    style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '5px',
+                                        padding: '3px 10px', borderRadius: '12px',
+                                        background: 'rgba(255, 255, 255, 0.08)',
+                                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                                        color: 'var(--text-primary)', fontSize: '0.72rem', fontWeight: '700',
+                                        cursor: 'pointer', transition: 'all 0.2s ease',
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.25)'
+                                    }}
+                                >
+                                    <Settings size={12} />
+                                    <span>{t('common.edit')}</span>
                                 </button>
                             )}
                         </div>
