@@ -85,12 +85,7 @@ export const DailySummaryHeader = React.memo(({
                     </div>
 
                     {/* Big animated day number inside hero pod */}
-                    <div className="flex-center pos-relative day-number-container" style={{
-                        minHeight: 'var(--day-num-height, clamp(2.2rem, 7vh, 4.8rem))',
-                        padding: '2px 12px 0px 12px',
-                        marginBottom: '0',
-                        overflow: 'visible'
-                    }}>
+                    <div className="flex-center pos-relative day-number-container">
                         {isCounterTransitioning && prevDayNumber && (
                             <div className={`day-number-anim ${isDayPerfect ? 'gold-text' : 'rainbow-gradient'}`} style={{
                                 position: 'absolute', fontSize: 'var(--day-num-font-size, clamp(2rem, 6.5vh, 4.5rem))', fontWeight: '800', lineHeight: 1.1,

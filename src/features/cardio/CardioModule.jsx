@@ -151,16 +151,9 @@ export function CardioModule() {
   return (
     <>
       <Stack 
-        className="cardio-module fade-in" 
+        className="cardio-module fade-in cardio-container" 
         {...swipeHandlers}
-        style={{
-        width: '100%', height: '100%',
-        padding: 'clamp(8px, 1.4vh, 18px)',
-        gap: 'clamp(6px, 1vh, 10px)',
-        position: 'relative',
-        overflow: 'hidden',
-        boxSizing: 'border-box',
-      }}>
+      >
         {/* Decorative glow */}
         <div style={{
           position: 'absolute', top: '-40px', right: '-40px',

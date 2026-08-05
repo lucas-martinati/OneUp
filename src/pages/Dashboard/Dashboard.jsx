@@ -269,9 +269,7 @@ export function Dashboard() {
                 completions={completions}
             />
 
-            <div className="flex-col full-height fade-in gap-responsive" style={{
-                paddingBottom: 'clamp(1px, 0.3vh, 6px)'
-            }}>
+            <div className="flex-col full-height fade-in gap-responsive dashboard-wrapper">
                 <MigrationBanner />
                 <OfflineBanner />
                 <GuestCloudBackupBanner displayStreak={computedStats.displayStreak} totalReps={totalReps} />

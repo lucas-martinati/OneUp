@@ -133,3 +133,31 @@
   max-width: 640px;
   padding: 2px;
 }
+
+.cardio-container {
+  width: 100%;
+  height: 100%;
+  padding: clamp(8px, 1.4vh, 18px);
+  gap: clamp(6px, 1vh, 10px);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.dashboard-wrapper {
+  padding-bottom: clamp(1px, 0.3vh, 6px);
+}
+
+.day-number-container {
+  min-height: var(--day-num-height, clamp(2.2rem, 7vh, 4.8rem));
+  padding: 2px 12px 0px;
+  margin-bottom: 0;
+  overflow: visible;
+}
+
+.onboarding-title {
+  font-size: clamp(2.4rem, 7vw, 3.5rem);
+  margin-bottom: var(--space-2);
+  font-weight: 800;
+  letter-spacing: -1px;
+}

@@ -81,15 +81,22 @@ for (const file of files) {
             // Supprimer uniquement les espaces pour la comparaison, mais garder les quotes pour tester si c'est statique
             styleRaw = rawContent.replace(/\s+/g, '');
             
+            const hasSpread = rawContent.includes('...');
+            // Vérifie les shorthands multiples (ex: "color, display: 'flex'") ou un mot seul (ex: "color")
+            const hasShorthand = /^[a-zA-Z_$][a-zA-Z0-9_$]*\s*,|,\s*[a-zA-Z_$][a-zA-Z0-9_$]*\s*,|,\s*[a-zA-Z_$][a-zA-Z0-9_$]*\s*$/.test(rawContent) || /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(rawContent);
+            const hasColon = rawContent.includes(':');
+            
             // Un style statique ne contient que des chaînes ("...", '...') ou des nombres après les ':'
-            // On exclut les variables, les backticks (template literals), les appels de fonctions, etc.
-            isStatic = !rawContent.includes('`') && !rawContent.match(/:\s*[a-zA-Z_$][a-zA-Z0-9_$]*(\.[a-zA-Z0-9_$]+)?/);
-            // Pour être plus précis, on autorise les mots-clés CSS sans quotes si on veut, mais en JSX les chaînes doivent avoir des quotes.
-            // Donc si une valeur n'a pas de quotes et n'est pas un nombre, c'est une variable.
-            // Le regex ci-dessus vérifie s'il y a des identifiants (variables) après les ':'
+            // On exclut les variables, les backticks, les appels de fonctions, les spread operators et les shorthands.
+            isStatic = hasColon 
+                       && !rawContent.includes('`') 
+                       && !rawContent.match(/:\s*[a-zA-Z_$][a-zA-Z0-9_$]*(\.[a-zA-Z0-9_$]+)?/)
+                       && !hasSpread
+                       && !hasShorthand;
           }
 
-          if (isStatic) {
+          // Ignore les fichiers de test
+          if (isStatic && !file.includes('.test.') && !file.includes('__tests__')) {
             elementsCandidates.push({
               file,
               line: lineIndex,

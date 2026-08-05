@@ -99,10 +99,7 @@ export function Onboarding({ onStart }) {
             {/* Title + sub-header — marginTop auto pairs with the footer's
                 marginBottom auto: centers the group when it fits, scrolls when not */}
             <div style={{ maxWidth: '380px', marginTop: 'auto', flexShrink: 0 }}>
-                <h1 className="rainbow-gradient" style={{
-                    fontSize: 'clamp(2.4rem, 7vw, 3.5rem)',
-                    marginBottom: 'var(--space-2)', fontWeight: '800', letterSpacing: '-1px'
-                }}>
+                <h1 className="rainbow-gradient onboarding-title">
                     OneUp
                 </h1>
                 <div style={{
