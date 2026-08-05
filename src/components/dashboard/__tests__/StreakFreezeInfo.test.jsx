@@ -112,7 +112,7 @@ describe('StreakFreezeInfo', () => {
         const onClose = vi.fn();
         const { getByRole } = render(<StreakFreezeInfo open={true} onClose={onClose} />);
         
-        fireEvent.click(getByRole('button', { name: 'common.close' }));
+        fireEvent.click(getByRole('button', { name: 'Close dialog' }));
         expect(onClose).toHaveBeenCalled();
     });
 

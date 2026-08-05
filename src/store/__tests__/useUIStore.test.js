@@ -131,25 +131,26 @@ describe('openAchievements / closeAchievements', () => {
 
 // ── Custom exercises modal ──────────────────────────────────────────────
 
-describe('openCustomExercises / closeCustomExercises', () => {
+describe('openCustomManager / closeCustomManager', () => {
   it('opens with a target category id', () => {
-    useUIStore.getState().openCustomExercises('cat_abc');
-    expect(useUIStore.getState().modals.customExercises).toBe(true);
-    expect(useUIStore.getState().customExModalCatId).toBe('cat_abc');
+    useUIStore.getState().openCustomManager('exercises', 'cat_abc');
+    expect(useUIStore.getState().modals.customManager).toBe(true);
+    expect(useUIStore.getState().customManagerCatId).toBe('cat_abc');
+    expect(useUIStore.getState().customManagerInitialTab).toBe('exercises');
   });
 
   it('defaults to null category (built-in custom category)', () => {
-    useUIStore.getState().openCustomExercises();
-    expect(useUIStore.getState().customExModalCatId).toBe(null);
+    useUIStore.getState().openCustomManager();
+    expect(useUIStore.getState().customManagerCatId).toBe(null);
   });
 
   it('close resets the target category and initial view', () => {
-    useUIStore.getState().openCustomExercises('cat_abc', 'create');
-    expect(useUIStore.getState().customExModalInitialView).toBe('create');
-    useUIStore.getState().closeCustomExercises();
-    expect(useUIStore.getState().modals.customExercises).toBe(false);
-    expect(useUIStore.getState().customExModalCatId).toBe(null);
-    expect(useUIStore.getState().customExModalInitialView).toBe('list');
+    useUIStore.getState().openCustomManager('exercises', 'cat_abc', 'create');
+    expect(useUIStore.getState().customManagerInitialView).toBe('create');
+    useUIStore.getState().closeCustomManager();
+    expect(useUIStore.getState().modals.customManager).toBe(false);
+    expect(useUIStore.getState().customManagerCatId).toBe(null);
+    expect(useUIStore.getState().customManagerInitialView).toBe('list');
   });
 });
 
