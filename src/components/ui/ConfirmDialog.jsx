@@ -2,11 +2,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from '@utils/icons';
 import { Button } from './Button';
-import { DialogShell } from './DialogShell';
+import { ModalShell } from './ModalShell';
 
 /**
  * Custom confirm dialog replacing window.confirm().
- * Renders on the shared DialogShell pattern so it follows the active theme.
+ * Renders on the shared ModalShell pattern so it follows the active theme.
  */
 export function ConfirmDialog({
     open,
@@ -43,7 +43,7 @@ export function ConfirmDialog({
     );
 
     return (
-        <DialogShell 
+        <ModalShell 
             open={open} 
             onClose={onCancel} 
             icon={Icon} 
@@ -73,6 +73,6 @@ export function ConfirmDialog({
                     <span>{warning}</span>
                 </div>
             )}
-        </DialogShell>
+        </ModalShell>
     );
 }

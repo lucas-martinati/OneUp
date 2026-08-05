@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, cleanup, fireEvent } from '@testing-library/react';
-import { SessionBubble } from '../SessionBubble';
+import { ActiveWorkoutIndicator } from '../ActiveWorkoutIndicator';
 
 vi.mock('@contexts/ExercisesContext', () => ({
   useExercises: () => ({
@@ -23,7 +23,7 @@ vi.mock('@utils/workoutSessionStorage', () => ({
   }),
 }));
 
-describe('SessionBubble', () => {
+describe('ActiveWorkoutIndicator', () => {
   beforeEach(() => {
     cleanup();
     vi.clearAllMocks();
@@ -36,7 +36,7 @@ describe('SessionBubble', () => {
     const onResume = vi.fn();
     const onDiscard = vi.fn();
     const { getByText } = render(
-      <SessionBubble onResume={onResume} onDiscard={onDiscard} />
+      <ActiveWorkoutIndicator onResume={onResume} onDiscard={onDiscard} />
     );
 
     expect(getByText('PlayIcon')).toBeTruthy();
@@ -46,7 +46,7 @@ describe('SessionBubble', () => {
     const onResume = vi.fn();
     const onDiscard = vi.fn();
     const { container } = render(
-      <SessionBubble onResume={onResume} onDiscard={onDiscard} />
+      <ActiveWorkoutIndicator onResume={onResume} onDiscard={onDiscard} />
     );
 
     const bubble = container.querySelector('[role="button"]');

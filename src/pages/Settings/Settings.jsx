@@ -5,7 +5,7 @@ import { ShoppingBag } from '@utils/icons';
 import { Button, ModalHeader, Card } from '@components/ui';
 import { CloudSyncPanel } from './components/CloudSyncPanel';
 import { StoreView } from './components/StoreView';
-import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection, DataSection } from './components/SettingsSections';
+import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection, DataSection } from './components/SettingsPanels';
 import { DifficultySettings } from './components/DifficultySettings';
 import { openLegalPage } from '@utils/navigation';
 import { useAuth } from '@contexts/AuthContext';

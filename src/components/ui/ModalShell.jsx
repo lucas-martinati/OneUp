@@ -12,7 +12,7 @@ import { X } from '@utils/icons';
  * card structure that was previously hand-rolled in each modal.
  *
  * **Not intended for "celebration" modals** (Pro unlocked,
- * Supporter unlocked) — those keep their bespoke StatusModalCard.
+ * Supporter unlocked) — those keep their bespoke GradientModal.
  *
  * @param {'sm'|'md'|'lg'} [size='sm'] — controls max-width
  * @param {'default'|'danger'} [variant='default']
@@ -21,7 +21,7 @@ import { X } from '@utils/icons';
  */
 const MAX_WIDTH = { sm: '340px', md: '440px', lg: '540px' };
 
-export function DialogShell({
+export function ModalShell({
   open,
   onClose,
   title,

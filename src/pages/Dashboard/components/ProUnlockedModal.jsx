@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Crown, Sparkles, Dumbbell, BarChart3, Palette, Snowflake, Plus, Check } from '@utils/icons';
 import { useHaptics } from '@hooks/useHaptics';
-import { StatusModalCard } from './StatusModalCard';
+import { GradientModal } from '@components/ui/GradientModal';
 
 export function ProUnlockedModal({ open, onClose, onConfirm }) {
   const { t } = useTranslation();
@@ -63,7 +63,7 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
   ];
 
   return (
-    <StatusModalCard
+    <GradientModal
       open={open}
       onClose={onClose}
       ariaLabel="Pro Unlocked"
@@ -241,6 +241,6 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
           {t('pro.unlockedModal.cta')}
         </button>
       </div>
-    </StatusModalCard>
+    </GradientModal>
   );
 }

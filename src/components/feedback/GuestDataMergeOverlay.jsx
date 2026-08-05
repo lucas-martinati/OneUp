@@ -10,7 +10,7 @@ import { Cloud, AlertCircle, Upload, AlertTriangle } from '@utils/icons';
  *
  * Regular reload conflicts (already signed in) are auto-merged silently.
  */
-export function ConflictOverlay({ conflictData, onResolveConflict }) {
+export function GuestDataMergeOverlay({ conflictData, onResolveConflict }) {
   const [resolving, setResolving] = useState(false);
   const { t } = useTranslation();
   const [confirmRestore, setConfirmRestore] = useState(false);

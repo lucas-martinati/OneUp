@@ -3,7 +3,7 @@
  *
  * All `sessionStarted` / `workout_session_*` localStorage keys live here so
  * the session lifecycle (start / resume / discard) stays consistent across
- * Dashboard, SessionBubble and useWorkoutSession.
+ * Dashboard, ActiveWorkoutIndicator and useWorkoutSession.
  */
 const KEYS = {
     started: 'sessionStarted',

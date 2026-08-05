@@ -6,7 +6,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 import { ConfirmDialog } from '../ConfirmDialog';
-import { ConflictOverlay } from '../ConflictOverlay';
+import { GuestDataMergeOverlay } from '../../feedback/GuestDataMergeOverlay';
 
 afterEach(cleanup);
 
@@ -68,16 +68,16 @@ describe('ConfirmDialog', () => {
   });
 });
 
-// ── ConflictOverlay ─────────────────────────────────────────────────────
+// ── GuestDataMergeOverlay ─────────────────────────────────────────────────────
 
-describe('ConflictOverlay', () => {
+describe('GuestDataMergeOverlay', () => {
   it('renders nothing without conflict data', () => {
-    render(<ConflictOverlay conflictData={null} onResolveConflict={() => {}} />);
+    render(<GuestDataMergeOverlay conflictData={null} onResolveConflict={() => {}} />);
     expect(screen.queryByText('cloud.anonymousMergeTitle')).toBe(null);
   });
 
   it('renders the merge prompt when conflict data is present', () => {
-    render(<ConflictOverlay conflictData={{ x: 1 }} onResolveConflict={() => {}} />);
+    render(<GuestDataMergeOverlay conflictData={{ x: 1 }} onResolveConflict={() => {}} />);
     expect(screen.getByText('cloud.anonymousMergeTitle')).toBeTruthy();
     expect(screen.getByText('cloud.merge')).toBeTruthy();
     expect(screen.getByText('cloud.restore')).toBeTruthy();
@@ -85,14 +85,14 @@ describe('ConflictOverlay', () => {
 
   it('resolves with "upload" when the merge button is clicked', () => {
     const onResolve = vi.fn().mockResolvedValue();
-    render(<ConflictOverlay conflictData={{ x: 1 }} onResolveConflict={onResolve} />);
+    render(<GuestDataMergeOverlay conflictData={{ x: 1 }} onResolveConflict={onResolve} />);
     fireEvent.click(screen.getByText('cloud.merge'));
     expect(onResolve).toHaveBeenCalledWith('upload');
   });
 
   it('requires a confirmation click before restoring', () => {
     const onResolve = vi.fn().mockResolvedValue();
-    render(<ConflictOverlay conflictData={{ x: 1 }} onResolveConflict={onResolve} />);
+    render(<GuestDataMergeOverlay conflictData={{ x: 1 }} onResolveConflict={onResolve} />);
 
     // First click: switches to the "are you sure" confirmation, no resolve yet.
     fireEvent.click(screen.getByText('cloud.restore'));

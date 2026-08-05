@@ -5,7 +5,7 @@ import { EXERCISES, EXERCISES_MAP } from '@config/exercises';
 import { WEIGHT_EXERCISES, WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { canAccessFeature, FEATURES } from '@utils/entitlements';
 
-import { DashboardSlide } from './DashboardSlide';
+import { CategoryProgressView } from './CategoryProgressView';
 import { ProPaywall } from './ProPaywall';
 
 import { useProgressStore } from '@store/useProgressStore';
@@ -20,7 +20,7 @@ import { FitToView } from '@components/ui';
 
 const CardioModule = lazy(() => import('@features/cardio/CardioModule').then(m => ({ default: m.CardioModule })));
 
-export function DashboardSlideRenderer({
+export function CategoryViewSwiper({
     fullCategoryOrder,
     renderedSlides,
     isFuture, effectiveStart, dayNumber, today,
@@ -66,7 +66,7 @@ export function DashboardSlideRenderer({
             return (
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                     <FitToView>
-                        <DashboardSlide
+                        <CategoryProgressView
                             isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
                             getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
                             isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
@@ -85,7 +85,7 @@ export function DashboardSlideRenderer({
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                     <FitToView>
                         {canAccessFeature(FEATURES.WEIGHTS, { isPro }) ? (
-                            <DashboardSlide
+                            <CategoryProgressView
                                 title={t('common.weights')}
                                 categoryColor={CATEGORY_COLORS[CATEGORIES.WEIGHTS]}
                                 isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
@@ -116,7 +116,7 @@ export function DashboardSlideRenderer({
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                     <FitToView>
                         {canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) ? (
-                            <DashboardSlide
+                            <CategoryProgressView
                                 title={title}
                                 categoryColor={color}
                                 isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
@@ -152,7 +152,7 @@ export function DashboardSlideRenderer({
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i} style={{ flex: '0 0 100%', scrollSnapAlign: 'start', height: '100%' }}>
                     <FitToView>
                         {canAccessFeature(FEATURES.CUSTOM_CATEGORIES, { isPro }) ? (
-                            <DashboardSlide
+                            <CategoryProgressView
                                 title={catDef.name}
                                 categoryColor={catDef.color}
                                 isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}

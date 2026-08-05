@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Star } from '@utils/icons';
 
-export const DayHeroHeader = React.memo(({
+export const DailySummaryHeader = React.memo(({
     dayNumber,
     prevDayNumber,
     isCounterTransitioning,

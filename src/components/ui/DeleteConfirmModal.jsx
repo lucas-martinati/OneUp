@@ -4,7 +4,7 @@ import { Trash2 } from '@utils/icons';
 import { Z_INDEX } from '@utils/zIndex';
 import { Button } from './Button';
 
-export function DeleteConfirmOverlay({
+export function DeleteConfirmModal({
   open,
   title,
   message,

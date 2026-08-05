@@ -22,7 +22,7 @@ if (import.meta.env.DEV) {
 }
 
 const Dashboard = lazy(() => import('@pages/Dashboard/Dashboard').then(module => ({ default: module.Dashboard })));
-const Onboarding = lazy(() => import('@pages/Settings/components/Onboarding').then(module => ({ default: module.Onboarding })));
+const Onboarding = lazy(() => import('@pages/Onboarding/Onboarding').then(module => ({ default: module.Onboarding })));
 
 /**
  * Inner app component — has access to all contexts.

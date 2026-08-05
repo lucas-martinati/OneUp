@@ -10,9 +10,9 @@ import { getExerciseLabel } from '@utils/exerciseLabel';
 
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { StreakFlame, WeightBadge, EmptyState, Card } from '@components/ui';
-import styles from '@styles/DashboardSlide.module.css';
+import styles from '@styles/CategoryProgressView.module.css';
 
-export const DashboardSlide = React.memo(({
+export const CategoryProgressView = React.memo(({
     isFuture, effectiveStart, dayNumber, today, getExerciseCount, completions, computedStats,
     pauseCloudSync, setShowCounter,
     activeExerciseId, onSelectExercise, exercisesList, exercisesMap, title, categoryColor, onManageCustom, onAddCustom, onManageCategories, getConfig

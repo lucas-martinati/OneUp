@@ -6,7 +6,7 @@ import { useUIStore } from '@store/useUIStore';
 import { useProgressStore } from '@store/useProgressStore';
 import { useAuth } from '@contexts/AuthContext';
 import { StreakFreezeInfo } from './StreakFreezeInfo';
-import { DayHeroHeader } from './DayHeroHeader';
+import { DailySummaryHeader } from './DailySummaryHeader';
 import { CATEGORIES } from '@config/categories';
 
 const filterOutIds = (idsToRemove) => (p) => p.filter(particle => !idsToRemove.has(particle.id));
@@ -309,7 +309,7 @@ export const DashboardHeader = React.memo(({
                     transition: 'transform 0.38s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out',
                     willChange: 'transform, opacity',
                 }}>
-                    <DayHeroHeader
+                    <DailySummaryHeader
                         dayNumber={dayNumber}
                         prevDayNumber={prevDayNumber}
                         isCounterTransitioning={isCounterTransitioning}

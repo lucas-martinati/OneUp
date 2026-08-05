@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Heart, Sparkles, Award } from '@utils/icons';
 import { useHaptics } from '@hooks/useHaptics';
-import { StatusModalCard } from './StatusModalCard';
+import { GradientModal } from '@components/ui/GradientModal';
 
 export function SupporterUnlockedModal({ open, onClose, onConfirm }) {
   const { t } = useTranslation();
@@ -20,7 +20,7 @@ export function SupporterUnlockedModal({ open, onClose, onConfirm }) {
   };
 
   return (
-    <StatusModalCard
+    <GradientModal
       open={open}
       onClose={onClose}
       ariaLabel="Supporter Unlocked"
@@ -178,6 +178,6 @@ export function SupporterUnlockedModal({ open, onClose, onConfirm }) {
           {t('supporter.unlockedModal.cta', 'C\'est un plaisir !')}
         </button>
       </div>
-    </StatusModalCard>
+    </GradientModal>
   );
 }

@@ -5,11 +5,11 @@ import { OfflineBanner } from '@components/feedback/OfflineBanner';
 import { MigrationBanner } from '@components/feedback/MigrationBanner';
 import { GuestCloudBackupBanner } from '@components/feedback/GuestCloudBackupBanner';
 import { NotificationManager } from '@components/social/NotificationManager';
-import { ConflictOverlay } from '@components/ui/ConflictOverlay';
+import { GuestDataMergeOverlay } from '@components/feedback/GuestDataMergeOverlay';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { DashboardHeader } from './components/DashboardHeader';
 import { DashboardNavBar } from './components/DashboardNavBar';
-import { SessionBubble } from './components/SessionBubble';
+import { ActiveWorkoutIndicator } from './components/ActiveWorkoutIndicator';
 import { CategoryNav } from './components/CategoryNav';
 import { DashboardEvents, EventHud } from '@features/events';
 import { useAchievementToast } from '@hooks/useAchievementToast';
@@ -21,7 +21,7 @@ import { AnnouncementOverlay } from '@features/announcements/AnnouncementOverlay
 
 import { useDashboardState } from '@hooks/useDashboardState';
 import { useDashboardSelection } from '@hooks/useDashboardSelection';
-import { DashboardSlideRenderer } from './components/DashboardSlideRenderer';
+import { CategoryViewSwiper } from './components/CategoryViewSwiper';
 import { DashboardModals } from './components/DashboardModals';
 import { isPerfectDay } from '@utils/statUtils';
 import { EXERCISES as BODYWEIGHT_EXERCISES } from '@config/exercises';
@@ -251,7 +251,7 @@ export function Dashboard() {
 
     return (
         <>
-            <ConflictOverlay conflictData={conflictData} onResolveConflict={onResolveConflict} />
+            <GuestDataMergeOverlay conflictData={conflictData} onResolveConflict={onResolveConflict} />
             {showAnnouncement && <AnnouncementOverlay announcement={announcement} onDismiss={dismissAnnouncement} onConfirm={confirmAnnouncement} />}
             <NotificationManager />
             <CSSConfetti
@@ -294,7 +294,7 @@ export function Dashboard() {
                 />
 
                 {sessionInProgress && !anyModalOpen && (
-                    <SessionBubble
+                    <ActiveWorkoutIndicator
                         onResume={() => openSession('running')}
                         onDiscard={handleDiscardSession}
                     />
@@ -316,7 +316,7 @@ export function Dashboard() {
                             maskImage: 'linear-gradient(to bottom, transparent 0px, black 12px, black calc(100% - 12px), transparent 100%)'
                         }}
                     >
-                        <DashboardSlideRenderer
+                        <CategoryViewSwiper
                             fullCategoryOrder={fullCategoryOrder}
                             renderedSlides={renderedSlides}
                             isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}

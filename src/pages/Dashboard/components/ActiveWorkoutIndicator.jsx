@@ -4,7 +4,7 @@ import { Play, DynamicIcon } from '@utils/icons';
 import { useExercises } from '@contexts/ExercisesContext';
 import { Z_INDEX } from '@utils/zIndex';
 import { loadWorkoutSession } from '@utils/workoutSessionStorage';
-import styles from '@styles/SessionBubble.module.css';
+import styles from '@styles/ActiveWorkoutIndicator.module.css';
 
 const MAX_TRAIL_SPHERES = 6;
 const LONG_PRESS_DURATION = 500;
@@ -38,7 +38,7 @@ const computeTrailSizes = (count) => {
  * Since session data only changes when WorkoutSession modal is open (which causes
  * this component to unmount), reading localStorage on mount always yields fresh data.
  */
-export const SessionBubble = React.memo(({ onResume, onDiscard }) => {
+export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard }) => {
     const { allExercisesMap } = useExercises();
 
     // ── Session data (fresh on every mount — see component docstring) ──
@@ -472,4 +472,4 @@ export const SessionBubble = React.memo(({ onResume, onDiscard }) => {
     return createPortal(portal, document.body);
 });
 
-SessionBubble.displayName = 'SessionBubble';
+ActiveWorkoutIndicator.displayName = 'ActiveWorkoutIndicator';

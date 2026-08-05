@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, Edit2, Check, ChevronRight, ChevronUp, ChevronDown, GripVertical, Settings2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS } from '@utils/icons';
-import { Button, Input, ModalHeader, DeleteConfirmOverlay, ColorPicker, Slider, SegmentedControl } from '@components/ui';
+import { Button, Input, ModalHeader, DeleteConfirmModal, ColorPicker, Slider, SegmentedControl } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { DynamicIcon } from '@utils/icons';
@@ -770,7 +770,7 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
         </div>
       </div>
 
-      <DeleteConfirmOverlay
+      <DeleteConfirmModal
         open={showConfirmDelete}
         title={t('customCategories.deleteTitle')}
         message={t('customCategories.deleteConfirm', { name: deletingCat?.name })}
@@ -1169,7 +1169,7 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
       </div>
 
       {/* Delete Confirmation Modal */}
-      <DeleteConfirmOverlay
+      <DeleteConfirmModal
         open={!!confirmDeleteEx}
         title={t('customExercises.deleteTitle')}
         message={t('customExercises.deleteConfirm', { name: confirmDeleteEx?.label })}

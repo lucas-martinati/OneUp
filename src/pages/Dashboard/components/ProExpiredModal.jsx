@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clock, BarChart3, CheckCircle2, RefreshCw } from '@utils/icons';
 import { useHaptics } from '@hooks/useHaptics';
-import { StatusModalCard } from './StatusModalCard';
+import { GradientModal } from '@components/ui/GradientModal';
 
 export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
   const { t } = useTranslation();
@@ -23,7 +23,7 @@ export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
   };
 
   return (
-    <StatusModalCard
+    <GradientModal
       open={open}
       onClose={onClose}
       ariaLabel="Pro Expired"
@@ -160,6 +160,6 @@ export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
           {t('pro.expiredModal.dismissCta', 'Continuer en version gratuite')}
         </button>
       </div>
-    </StatusModalCard>
+    </GradientModal>
   );
 }

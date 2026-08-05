@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Snowflake, Crown } from '@utils/icons';
 import { Button } from '@components/ui';
-import { DialogShell } from '@components/ui/DialogShell';
+import { ModalShell } from '@components/ui/ModalShell';
 import { GoogleSignInButton } from '@components/ui/GoogleSignInButton';
 import { useUIStore } from '@store/useUIStore';
 import { useProgressStore } from '@store/useProgressStore';
@@ -61,7 +61,7 @@ export function StreakFreezeInfo({ open, onClose }) {
     }
 
     return (
-        <DialogShell
+        <ModalShell
             open={open}
             onClose={onClose}
             size="md"
@@ -116,6 +116,6 @@ export function StreakFreezeInfo({ open, onClose }) {
                     </div>
                 )}
             </div>
-        </DialogShell>
+        </ModalShell>
     );
 }

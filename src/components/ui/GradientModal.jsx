@@ -3,7 +3,7 @@ import { ModalContainer } from '@components/ui/ModalContainer';
 import { X } from '@utils/icons';
 import { useHaptics } from '@hooks/useHaptics';
 
-export function StatusModalCard({ open, onClose, ariaLabel, maxWidth = '440px', borderGradient = 'rgba(139, 92, 246, 0.35)', shadowGlow = 'rgba(139, 92, 246, 0.25)', children }) {
+export function GradientModal({ open, onClose, ariaLabel, maxWidth = '440px', borderGradient = 'rgba(139, 92, 246, 0.35)', shadowGlow = 'rgba(139, 92, 246, 0.25)', children }) {
   const { light } = useHaptics();
 
   if (!open) return null;
