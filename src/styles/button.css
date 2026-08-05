@@ -79,7 +79,7 @@
 /* Primary CTA: Theme gradient + subtle top inner highlight + crisp border */
 .btn--primary {
   background: var(--gradient-primary);
-  color: var(--text-on-surface, #ffffff);
+  color: var(--text-on-surface, white);
   box-shadow:
     0 4px 14px color-mix(in srgb, var(--accent) 28%, transparent),
     inset 0 0 0 1px rgba(255, 255, 255, 0.2),
@@ -111,8 +111,8 @@
 
 /* Success CTA: Vibrant green gradient */
 .btn--success {
-  background: linear-gradient(135deg, var(--success), #059669);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--success), color-mix(in srgb, var(--success) 70%, black));
+  color: white;
   box-shadow:
     0 4px 14px color-mix(in srgb, var(--success) 28%, transparent),
     inset 0 0 0 1px rgba(255, 255, 255, 0.2),
@@ -129,8 +129,8 @@
 
 /* Danger CTA: Destructive red gradient */
 .btn--danger {
-  background: linear-gradient(135deg, var(--error), #dc2626);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--error), color-mix(in srgb, var(--error) 70%, black));
+  color: white;
   box-shadow:
     0 4px 14px color-mix(in srgb, var(--error) 28%, transparent),
     inset 0 0 0 1px rgba(255, 255, 255, 0.2),

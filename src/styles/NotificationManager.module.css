@@ -70,7 +70,7 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: #fff;
+  color: white;
   background: linear-gradient(135deg, var(--accent-glow), var(--accent));
   border: 2px solid var(--sheet-bg);
   animation: pokeBump 0.6s ease 0.15s 2;
@@ -95,7 +95,7 @@
   place-items: center;
   font-size: 0.7rem;
   font-weight: 900;
-  color: #fff;
+  color: white;
   background: linear-gradient(135deg, var(--accent-glow), var(--accent));
   border: 2px solid var(--sheet-bg);
   box-shadow: 0 2px 8px -1px color-mix(in srgb, var(--accent-glow) 70%, transparent);
@@ -116,7 +116,7 @@
 .name {
   font-size: 0.9rem;
   font-weight: 800;
-  color: var(--text-primary, #fff);
+  color: var(--text-primary, white);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -148,7 +148,7 @@
 
 .close:hover {
   background: color-mix(in srgb, var(--text-secondary) 24%, transparent);
-  color: var(--text-primary, #fff);
+  color: var(--text-primary, white);
 }
 
 /* Auto-dismiss countdown bar */

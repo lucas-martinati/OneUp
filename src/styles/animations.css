@@ -392,12 +392,12 @@
   );
   filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.3));
   -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
+    linear-gradient(white 0 0) content-box,
+    linear-gradient(white 0 0);
   -webkit-mask-composite: xor;
   mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
+    linear-gradient(white 0 0) content-box,
+    linear-gradient(white 0 0);
   mask-composite: exclude;
 }
 

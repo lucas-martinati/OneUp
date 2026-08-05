@@ -375,7 +375,7 @@ export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard }) => {
                     <div
                         className={styles.longPressRingBlob}
                         style={{
-                            background: `conic-gradient(from 0deg, #ef4444 0deg, #ef4444 ${longPressProgress * 360}deg, rgba(239,68,68,0.08) ${longPressProgress * 360}deg, rgba(239,68,68,0.08) 360deg)`
+                            background: `conic-gradient(from 0deg, var(--error) 0deg, var(--error) ${longPressProgress * 360}deg, color-mix(in srgb, var(--error) 8%, transparent) ${longPressProgress * 360}deg, color-mix(in srgb, var(--error) 8%, transparent) 360deg)`
                         }}
                     />
                 )}
@@ -393,14 +393,14 @@ export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard }) => {
                     <div
                         className={styles.progressRingBlob}
                         style={{
-                            background: `conic-gradient(from 0deg, #a78bfa 0deg, #a78bfa ${progress * 360}deg, rgba(255,255,255,0.06) ${progress * 360}deg, rgba(255,255,255,0.06) 360deg)`
+                            background: `conic-gradient(from 0deg, var(--accent-glow) 0deg, var(--accent-glow) ${progress * 360}deg, rgba(255,255,255,0.06) ${progress * 360}deg, rgba(255,255,255,0.06) 360deg)`
                         }}
                     />
 
                     <div className={styles.liveIndicator} />
 
                     <div className={styles.bubbleIcon}>
-                        <Play size={18} fill="#a78bfa" color="#a78bfa" style={{ marginLeft: '2px' }} />
+                        <Play size={18} fill="currentColor" color="currentColor" style={{ marginLeft: '2px' }} />
                     </div>
                 </div>
             </div>

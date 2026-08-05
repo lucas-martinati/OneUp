@@ -102,11 +102,10 @@
 }
 
 .oledSaverMode {
-  background: #000000 !important;
+  background: black !important;
 }
 
 .oledSaverMode .atmosphere,
 .oledSaverMode .vignette {
   opacity: 0.1 !important;
 }
-

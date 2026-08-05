@@ -131,7 +131,7 @@
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
-.statValueGold { color: #fcd34d; text-shadow: 0 0 12px rgba(255, 200, 0, 0.35); }
+.statValueGold { color: var(--color-amber); text-shadow: 0 0 12px rgba(255, 200, 0, 0.35); }
 .statValueAccent { color: var(--accent-glow); }
 .statValueSuccess { color: var(--success); }
 .statLabel {
@@ -248,7 +248,7 @@
      8px blur (vs original 15px) cuts compositing cost ~4× per cell. */
   box-shadow: 0 0 8px -2px rgba(255, 200, 0, 0.45);
 }
-.perfect .dayNum { color: #fcd34d; }
+.perfect .dayNum { color: var(--color-amber); }
 
 .missed {
   background: rgba(239, 68, 68, 0.07);
@@ -261,7 +261,7 @@
   background: rgba(56, 189, 248, 0.10);
   border-color: rgba(56, 189, 248, 0.40);
 }
-.frozen .dayNum { color: #7dd3fc; }
+.frozen .dayNum { color: color-mix(in srgb, var(--color-cyan) 60%, white); }
 
 .today {
   border-color: var(--accent-glow);
@@ -301,7 +301,7 @@
   flex-shrink: 0;
 }
 .swPerfect {
-  background: linear-gradient(135deg, #ffd700, #fdb931);
+  background: linear-gradient(135deg, var(--color-gold), var(--color-amber));
   box-shadow: 0 0 8px rgba(255, 215, 0, 0.55);
 }
 .swDone { background: var(--success); box-shadow: 0 0 7px color-mix(in srgb, var(--success) 60%, transparent); }
@@ -344,7 +344,7 @@
 }
 .pillPerfect {
   background: var(--gradient-gold-trans);
-  color: #fcd34d;
+  color: var(--color-amber);
   border: 1px solid rgba(255, 215, 0, 0.4);
 }
 .pillCaught {
@@ -509,7 +509,7 @@
   border-radius: var(--radius-full);
   border: none;
   background: var(--accent-glow);
-  color: #fff;
+  color: var(--text-on-surface);
   font-family: inherit;
   font-size: 0.82rem;
   font-weight: 700;

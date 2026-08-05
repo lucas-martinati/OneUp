@@ -149,9 +149,9 @@
 .ped3 { height: 46px; }
 
 /* Medal palettes */
-.gold   { --m1: #ffd700; --m2: #f59e0b; }
-.silver { --m1: #e2e8f0; --m2: #94a3b8; }
-.bronze { --m1: #e0a06a; --m2: #b45309; }
+.gold   { --m1: var(--color-gold); --m2: var(--color-amber); }
+.silver { --m1: var(--color-silver); --m2: var(--text-secondary); }
+.bronze { --m1: var(--color-bronze); --m2: var(--color-orange); }
 
 .gold .pReps { color: var(--m1); }
 .silver .pReps { color: var(--m1); }
@@ -208,7 +208,7 @@
   border-color: rgba(255, 215, 0, 0.38);
   box-shadow: inset 3px 0 0 rgba(255, 215, 0, 0.7), 0 0 14px -6px rgba(255, 215, 0, 0.5);
 }
-.namePerfect { color: #fcd34d; font-weight: 700; }
+.namePerfect { color: var(--color-amber); font-weight: 700; }
 .perfectStar { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7)); flex-shrink: 0; }
 
 /* Perfect-day glow ring + sparkles on the podium avatar */
@@ -276,7 +276,7 @@
   transition: transform 0.15s ease, background 0.2s ease;
 }
 .nudgeBtn:hover { transform: scale(1.08); }
-.nudgeBtnDone { background: var(--success); color: #fff; }
+.nudgeBtnDone { background: var(--success); color: var(--text-on-surface); }
 
 /* Compact nudge badge anchored to the bottom-right of a podium avatar */
 .pTierBadges {
@@ -324,8 +324,8 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: color-mix(in srgb, var(--accent) 92%, #000);
-  color: #fff;
+  background: color-mix(in srgb, var(--accent) 92%, black);
+  color: var(--text-on-surface);
   border: 2px solid var(--sheet-bg);
   cursor: pointer;
   flex-shrink: 0;
