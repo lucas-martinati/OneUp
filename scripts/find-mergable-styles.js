@@ -75,16 +75,28 @@ for (const file of files) {
           const styleRegex = /style=\{\{([\s\S]*?)\}\}/;
           const sMatch = styleRegex.exec(tagContent);
           let styleRaw = '';
+          let isStatic = false;
           if (sMatch) {
-            styleRaw = sMatch[1].replace(/[\s"']/g, ''); // strip spaces and quotes for easy comparison
+            const rawContent = sMatch[1].trim();
+            // Supprimer uniquement les espaces pour la comparaison, mais garder les quotes pour tester si c'est statique
+            styleRaw = rawContent.replace(/\s+/g, '');
+            
+            // Un style statique ne contient que des chaînes ("...", '...') ou des nombres après les ':'
+            // On exclut les variables, les backticks (template literals), les appels de fonctions, etc.
+            isStatic = !rawContent.includes('`') && !rawContent.match(/:\s*[a-zA-Z_$][a-zA-Z0-9_$]*(\.[a-zA-Z0-9_$]+)?/);
+            // Pour être plus précis, on autorise les mots-clés CSS sans quotes si on veut, mais en JSX les chaînes doivent avoir des quotes.
+            // Donc si une valeur n'a pas de quotes et n'est pas un nombre, c'est une variable.
+            // Le regex ci-dessus vérifie s'il y a des identifiants (variables) après les ':'
           }
 
-          elementsCandidates.push({
-            file,
-            line: lineIndex,
-            classes,
-            styleRaw
-          });
+          if (isStatic) {
+            elementsCandidates.push({
+              file,
+              line: lineIndex,
+              classes,
+              styleRaw
+            });
+          }
         }
       }
     }
