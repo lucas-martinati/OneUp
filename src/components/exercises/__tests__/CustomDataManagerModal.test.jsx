@@ -81,7 +81,7 @@ describe('CustomDataManagerModal — Layout & Tabs', () => {
   });
 
   it('switches between categories and exercises tabs', () => {
-    const { getByText, container } = renderModal({ initialTab: 'categories' });
+    const { getByText } = renderModal({ initialTab: 'categories' });
     
     // Tab "categories" should be active, meaning we see the Category create button
     expect(getByText('customCategories.create')).toBeTruthy();
@@ -113,7 +113,7 @@ describe('CustomDataManagerModal — Categories', () => {
 
   it('allows editing a category', () => {
     const hooks = makeHooks([], [{ id: 'c1', name: 'Yoga', color: '#ff0000', icon: 'Star' }]);
-    const { container, getByDisplayValue, getByText, getAllByLabelText, hooks: h } = renderModal({ hooks });
+    const { getByDisplayValue, getByText, getAllByLabelText, hooks: h } = renderModal({ hooks });
     
     // Click the edit button for Yoga
     fireEvent.click(getAllByLabelText('Modifier')[1]); 
@@ -150,7 +150,7 @@ describe('CustomDataManagerModal — Exercises', () => {
 
   it('edits an exercise', () => {
     const hooks = makeHooks(exercises);
-    const { container, getByDisplayValue, getByText, getByLabelText, hooks: h } = renderModal({ hooks, initialTab: 'exercises' });
+    const { getByDisplayValue, getByText, getByLabelText, hooks: h } = renderModal({ hooks, initialTab: 'exercises' });
     
     // Find the edit button for Plank
     fireEvent.click(getByLabelText('Modifier')); 
@@ -162,7 +162,7 @@ describe('CustomDataManagerModal — Exercises', () => {
 
   it('deletes an exercise after confirmation', () => {
     const hooks = makeHooks(exercises);
-    const { container, getByText, getByLabelText, hooks: h } = renderModal({ 
+    const { getByText, getByLabelText, hooks: h } = renderModal({ 
       hooks, 
       initialTab: 'exercises',
       computedStats: { exerciseReps: { e1: 120 } } 
