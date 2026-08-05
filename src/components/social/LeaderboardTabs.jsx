@@ -46,14 +46,16 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                                 id: 'bodyweight', 
                                 label: t('common.bodyweight'), 
                                 icon: <Trophy size={16} />,
-                                activeBg: 'rgba(251, 191, 36, 0.15)',
+                                activeBg: 'linear-gradient(135deg, rgba(251,191,36,0.22), rgba(245,158,11,0.08))',
+                                activeBorder: '1px solid rgba(251,191,36,0.45)',
                                 activeColor: '#fbbf24'
                             },
                             { 
                                 id: 'weights', 
                                 label: t('common.weights'), 
                                 icon: <Dumbbell size={16} />,
-                                activeBg: 'rgba(251, 146, 60, 0.15)',
+                                activeBg: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(234,88,12,0.08))',
+                                activeBorder: '1px solid rgba(249,115,22,0.45)',
                                 activeColor: '#fb923c'
                             }
                         ]}
