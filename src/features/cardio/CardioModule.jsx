@@ -11,7 +11,7 @@ import { Capacitor } from '@capacitor/core';
 import { healthConnectService } from '@services/healthConnectService';
 import { ChevronRight, CheckCircle2, Activity } from '@utils/icons';
 import { SegmentedControl } from'@components/ui/SegmentedControl';
-import { GoogleIcon } from'@components/ui/GoogleIcon';
+import { GoogleIcon, Stack } from'@components/ui';
 import { GoogleSignInButton } from'@components/ui/GoogleSignInButton';
 
 const MODES = [
@@ -42,13 +42,12 @@ const FAKE_GPS_TRACK = [
 const DEMO_START_TIME = Date.now() - 86400000 * 2;
 
 const RestrictionSection = ({ title, children }) => (
-  <div style={{
-    display: 'flex', flexDirection: 'column', gap: '8px',
-    padding: '12px',
+  <Stack gap="xs" style={{
+    padding: 'var(--space-3)',
     borderRadius: 'var(--radius-md)',
     background: 'rgba(255,255,255,0.03)',
     border: '1px dashed var(--border-default)',
-    marginTop: '8px'
+    marginTop: 'var(--space-2)'
   }}>
     <div style={{
       fontSize: '0.7rem', fontWeight: '800',
@@ -60,7 +59,7 @@ const RestrictionSection = ({ title, children }) => (
     <div style={{ display: 'flex', gap: '8px' }}>
       {children}
     </div>
-  </div>
+  </Stack>
 );
 
 export function CardioModule() {
@@ -151,12 +150,11 @@ export function CardioModule() {
 
   return (
     <>
-      <div 
+      <Stack 
         className="cardio-module fade-in" 
         {...swipeHandlers}
         style={{
         width: '100%', height: '100%',
-        display: 'flex', flexDirection: 'column',
         padding: 'clamp(8px, 1.4vh, 18px)',
         gap: 'clamp(6px, 1vh, 10px)',
         position: 'relative',
@@ -208,13 +206,11 @@ export function CardioModule() {
           </div>
           );
           return (
-          <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
-            <div style={{
+          <Stack style={{ position: 'relative', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+            <Stack justify="space-between" style={{
               flex: 1, minHeight: 0,
               overflow: 'hidden',
               overflowY: 'auto',
-              display: 'flex', flexDirection: 'column',
-              justifyContent: 'space-between',
               gap: 'clamp(4px, 0.8vh, 10px)',
               paddingBottom: '2px',
               pointerEvents: isDemo ? 'none' : 'auto',
@@ -357,8 +353,8 @@ export function CardioModule() {
                   {t('cardio.noSessions')}
                 </div>
               )}
-            </div>
-          </div>
+            </Stack>
+          </Stack>
           );
         })()}
 
@@ -440,7 +436,7 @@ export function CardioModule() {
                { label: t('cardio.healthConnect'), color: '#34A853', done: hasCardioSource, active: needsCardioSource }
              ];
              stepsUI = (
-               <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '210px', margin: '2px 0' }}>
+               <Stack style={{ width: '100%', maxWidth: '210px', margin: '2px 0' }}>
                  {steps.map((step, i) => {
                    const lit = step.active || step.done;
                    return (
@@ -471,12 +467,12 @@ export function CardioModule() {
                      </React.Fragment>
                    );
                  })}
-               </div>
+               </Stack>
              );
              actionButton = onGoogleStep ? (
                <GoogleSignInButton onClick={() => auth.signIn()} className="hover-lift" style={{ width: 'auto', marginTop: '6px' }} />
              ) : (
-               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', marginTop: '6px' }}>
+               <Stack align="center" gap="sm" style={{ marginTop: '6px' }}>
                  {healthAvailable && (
                    <button onClick={handleConnectHealth} className="hover-lift" style={{
                      padding: '12px 26px', borderRadius: '16px',
@@ -490,7 +486,7 @@ export function CardioModule() {
                      <Activity size={18} /> {t('cardio.healthConnect')}
                    </button>
                  )}
-               </div>
+               </Stack>
              );
           }
 
@@ -546,7 +542,7 @@ export function CardioModule() {
             </div>
           );
         })()}
-      </div>
+      </Stack>
 
       {/* History Modal */}
       {showHistory && (

@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, Volume2, Vibrate, Clock, Users, Lock, Gauge, Globe, Smartphone, Download, Upload, Calendar } from '@utils/icons';
-import { ToggleSwitch, SettingRow, ThemeSwatch, Card, Button, Input, SectionTitle } from '@components/ui';
+import { ToggleSwitch, SettingRow, ThemeSwatch, Card, Button, Input, SectionTitle, Stack } from '@components/ui';
 import { LANGUAGES } from '@config/languages';
 import { THEMES } from '@config/themes';
 import { isNativePlatform } from '@utils/platform';
@@ -16,7 +16,7 @@ export function PreferencesSection({ settings, onSave }) {
         <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.preferences')}</SectionTitle>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <Stack gap="xs">
                 <SettingRow
                     icon={Bell}
                     title={t('settings.notifications')}
@@ -33,10 +33,7 @@ export function PreferencesSection({ settings, onSave }) {
 
                 {/* Notification Time Picker */}
                 {settings?.notificationsEnabled && settings?.notificationTime && (
-                    <div className="scale-in" style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '10px',
+                    <Stack gap="sm" className="scale-in" style={{
                         padding: '12px',
                         borderRadius: 'var(--radius-md)',
                         background: 'var(--surface-muted)',
@@ -94,7 +91,7 @@ export function PreferencesSection({ settings, onSave }) {
                                 ))}
                             </select>
                         </div>
-                    </div>
+                    </Stack>
                 )}
 
                 <SettingRow
@@ -139,14 +136,7 @@ export function PreferencesSection({ settings, onSave }) {
                     />
                 </SettingRow>
 
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
-                    padding: '8px 0 4px 0',
-                    width: '100%',
-                    boxSizing: 'border-box'
-                }}>
+                <Stack gap="sm" style={{ padding: 'var(--space-2) 0 var(--space-1) 0', width: '100%', boxSizing: 'border-box' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', boxSizing: 'border-box' }}>
                         <div style={{
                             background: `linear-gradient(135deg, color-mix(in srgb, #06b6d4 13%, transparent), color-mix(in srgb, #06b6d4 3%, transparent))`,
@@ -221,8 +211,8 @@ export function PreferencesSection({ settings, onSave }) {
                             );
                         })}
                     </div>
-                </div>
-            </div>
+                </Stack>
+            </Stack>
         </Card>
     );
 }
@@ -350,7 +340,7 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
         <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.community')}</SectionTitle>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <Stack gap="xs">
                 <SettingRow
                     icon={Users}
                     title={t('leaderboard.title')}
@@ -378,7 +368,7 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
                         />
                     </div>
                 )}
-            </div>
+            </Stack>
         </Card>
     );
 }
@@ -471,7 +461,7 @@ export function DataSection() {
         <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.dataTitle')}</SectionTitle>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <Stack gap="xs">
                 <SettingRow
                     icon={Download}
                     title={t('settings.exportData')}
@@ -494,7 +484,7 @@ export function DataSection() {
                         {t('settings.importButton')}
                     </Button>
                 </SettingRow>
-            </div>
+            </Stack>
 
             <input
                 ref={fileInputRef}

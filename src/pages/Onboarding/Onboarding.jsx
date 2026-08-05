@@ -11,7 +11,7 @@ import { getLocalDateStr } from '@shared/dateUtils';
 import { EXERCISES } from '@config/exercises';
 import { LANGUAGES, resolveLanguageCode } from '@config/languages';
 import { useAuth } from '@contexts/AuthContext';
-import { Button, GoogleIcon } from '@components/ui';
+import { Button, GoogleIcon, Stack } from '@components/ui';
 
 const ACCENT = 'var(--gradient-accent)';
 
@@ -85,9 +85,8 @@ export function Onboarding({ onStart }) {
     }[step];
 
     return (
-        <div className="fade-in" style={{
+        <Stack align="center" className="fade-in" style={{
             position: 'relative',
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
             height: '100%', textAlign: 'center',
             gap: 'clamp(12px, 2.5vh, 32px)',
             // Top padding clears the fixed language switcher when content scrolls
@@ -117,13 +116,13 @@ export function Onboarding({ onStart }) {
             </div>
 
             {/* Content card */}
-            <div
+            <Stack
                 key={step}
                 className={step === 1 ? 'glass-premium scale-in' : 'glass-premium flip-enter'}
                 style={{
                     padding: 'clamp(14px, 3vw, 28px)', borderRadius: 'var(--radius-lg)',
                     width: '100%', maxWidth: '420px', flexShrink: 0,
-                    display: 'flex', flexDirection: 'column', gap: 'clamp(12px, 2vh, 24px)',
+                    gap: 'clamp(12px, 2vh, 24px)',
                     minHeight: 'clamp(220px, 36vh, 320px)', justifyContent: 'center',
                     boxShadow: 'var(--shadow-lg)'
                 }}
@@ -150,9 +149,8 @@ export function Onboarding({ onStart }) {
                                 { label: '…', h: '76%' },
                                 { label: '365', h: '100%' },
                             ].map((bar, i) => (
-                                <div key={i} style={{
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                                    gap: '6px', height: '100%', justifyContent: 'flex-end', flex: 1, maxWidth: '56px'
+                                <Stack align="center" justify="flex-end" key={i} style={{
+                                    height: '100%', flex: 1, maxWidth: '56px', gap: '6px'
                                 }}>
                                     <span style={{
                                         fontSize: 'clamp(0.65rem, 2vw, 0.8rem)', fontWeight: '800',
@@ -165,7 +163,7 @@ export function Onboarding({ onStart }) {
                                         background: ACCENT, opacity: 0.55 + i * 0.11,
                                         boxShadow: i === 4 ? 'var(--glow-accent)' : 'none'
                                     }} />
-                                </div>
+                                </Stack>
                             ))}
                         </div>
                         <p style={{
@@ -347,7 +345,7 @@ export function Onboarding({ onStart }) {
                 {/* ───────────────── STEP 3b — Import history (past) ───────────────── */}
                 {step === 3 && mode === 'past' && (
                     <>
-                        <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                        <Stack gap="sm" style={{ textAlign: 'left' }}>
                             {/* Start date */}
                             <div>
                                 <label style={{
@@ -450,7 +448,7 @@ export function Onboarding({ onStart }) {
                                     })}
                                 </div>
                             </div>
-                        </div>
+                        </Stack>
 
                         <NavRow onBack={() => setStep(2)} t={t}>
                             <button
@@ -471,7 +469,7 @@ export function Onboarding({ onStart }) {
                         </NavRow>
                     </>
                 )}
-            </div>
+            </Stack>
 
             {/* Progress indicator */}
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexShrink: 0 }}>
@@ -541,7 +539,7 @@ export function Onboarding({ onStart }) {
                     {t('settings.privacyPolicy')}
                 </button>
             </div>
-        </div>
+        </Stack>
     );
 }
 

@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, Edit2, Check, ChevronRight, ChevronUp, ChevronDown, GripVertical, Settings2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS } from '@utils/icons';
-import { Button, Input, ModalHeader, DeleteConfirmModal, ColorPicker, Slider, SegmentedControl } from '@components/ui';
+import { Button, Input, ModalHeader, DeleteConfirmModal, ColorPicker, Slider, SegmentedControl, Stack } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { DynamicIcon } from '@utils/icons';
@@ -26,7 +26,7 @@ export function CustomDataManagerModal({
       <div className="modal-content" style={{ display: 'flex', flexDirection: 'column' }}>
         <ModalHeader title={t('common.customContent', 'Gestionnaire personnalisé')} onClose={onClose} />
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', flex: 1, overflow: 'hidden' }}>
+        <Stack gap="sm" style={{ flex: 1, overflow: 'hidden' }}>
           {/* Tabs */}
           <div style={{ padding: '0 var(--space-4)', width: '100%', maxWidth: '440px', margin: '0 auto' }}>
             <SegmentedControl
@@ -59,7 +59,7 @@ export function CustomDataManagerModal({
               initialView={initialView}
             />
           )}
-        </div>
+        </Stack>
       </div>
     </div>
   );
@@ -363,9 +363,10 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
 
           {/* ═══════ LIST VIEW ═══════ */}
           {view === 'list' && (
-            <div
+            <Stack
               ref={listContainerRef}
-              style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}
+              gap="xs"
+              style={{ width: '100%', maxWidth: '440px' }}
             >
               {[
                 { id: 'custom', name: t('common.custom'), color: '#34d399', ...customCategories.find(c => c.id === 'custom') },
@@ -525,12 +526,12 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
                   {t('customCategories.limitReached', { count: maxCustomCategories })}
                 </p>
               )}
-            </div>
+            </Stack>
           )}
 
           {/* ═══════ CREATE / EDIT VIEW ═══════ */}
           {view === 'create' && (
-            <div className="fade-in" style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+            <Stack gap="md" className="fade-in" style={{ width: '100%', maxWidth: '440px' }}>
               {/* NAME */}
               <div>
                 <Input
@@ -607,12 +608,12 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
                   {t('common.save')}
                 </Button>
               </div>
-            </div>
+            </Stack>
           )}
 
           {/* ═══════ DELETE VIEW — Exercise Migration ═══════ */}
           {view === 'delete' && deletingCat && (
-            <div className="fade-in" style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+            <Stack gap="sm" className="fade-in" style={{ width: '100%', maxWidth: '440px' }}>
 
               {/* Header: category being deleted */}
               <div style={{
@@ -765,7 +766,7 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
                   {t('common.delete')}
                 </Button>
               </div>
-            </div>
+            </Stack>
           )}
         </div>
       </div>
@@ -915,7 +916,7 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
       <div style={{ flex: 1, overflow: confirmDeleteEx ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         
         {view === 'list' && (
-          <div style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <Stack gap="xs" style={{ width: '100%', maxWidth: '440px' }}>
             {customExercises.length === 0 ? (
               <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 20px' }}>
                 <Settings2 size={48} style={{ opacity: 0.5, marginBottom: '16px' }} />
@@ -980,11 +981,11 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
                 {t('customExercises.limitReached', { count: maxCustomExercises })}
               </p>
             )}
-          </div>
+          </Stack>
         )}
 
         {view === 'create' && (
-          <div className="fade-in" style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+          <Stack gap="md" className="fade-in" style={{ width: '100%', maxWidth: '440px' }}>
             {/* CATEGORY SELECTOR */}
             <div>
               <label className="input-label" style={{ marginBottom: 'var(--space-2)' }}>
@@ -1164,7 +1165,7 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
                 {t('common.save')}
               </Button>
             </div>
-          </div>
+          </Stack>
         )}
       </div>
 
