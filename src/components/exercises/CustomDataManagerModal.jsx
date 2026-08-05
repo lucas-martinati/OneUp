@@ -26,38 +26,40 @@ export function CustomDataManagerModal({
       <div className="modal-content" style={{ display: 'flex', flexDirection: 'column' }}>
         <ModalHeader title={t('common.customContent', 'Gestionnaire personnalisé')} onClose={onClose} />
         
-        {/* Tabs */}
-        <div style={{ padding: '0 var(--space-4)', marginBottom: '16px', width: '100%', maxWidth: '440px', margin: '0 auto' }}>
-          <SegmentedControl
-            fullWidth
-            options={[
-              { id: 'categories', label: t('common.categories') },
-              { id: 'exercises', label: t('common.exercises') }
-            ]}
-            value={activeTab}
-            onChange={setActiveTab}
-          />
-        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', flex: 1, overflow: 'hidden' }}>
+          {/* Tabs */}
+          <div style={{ padding: '0 var(--space-4)', width: '100%', maxWidth: '440px', margin: '0 auto' }}>
+            <SegmentedControl
+              fullWidth
+              options={[
+                { id: 'categories', label: t('common.categories') },
+                { id: 'exercises', label: t('common.exercises') }
+              ]}
+              value={activeTab}
+              onChange={setActiveTab}
+            />
+          </div>
 
-        {/* Tab Content */}
-        {activeTab === 'categories' ? (
-          <CategoryManagerView 
-            onClose={onClose}
-            customCategoriesHook={customCategoriesHook}
-            exercisesByUserCategory={exercisesByUserCategory}
-            defaultCustomExercises={defaultCustomExercises}
-            computedStats={computedStats}
-          />
-        ) : (
-          <ExercisesManagerView 
-            onClose={onClose}
-            customExercisesHook={customExercisesHook}
-            customCategoriesHook={customCategoriesHook}
-            computedStats={computedStats}
-            categoryId={categoryId}
-            initialView={initialView}
-          />
-        )}
+          {/* Tab Content */}
+          {activeTab === 'categories' ? (
+            <CategoryManagerView 
+              onClose={onClose}
+              customCategoriesHook={customCategoriesHook}
+              exercisesByUserCategory={exercisesByUserCategory}
+              defaultCustomExercises={defaultCustomExercises}
+              computedStats={computedStats}
+            />
+          ) : (
+            <ExercisesManagerView 
+              onClose={onClose}
+              customExercisesHook={customExercisesHook}
+              customCategoriesHook={customCategoriesHook}
+              computedStats={computedStats}
+              categoryId={categoryId}
+              initialView={initialView}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
