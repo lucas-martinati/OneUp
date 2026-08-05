@@ -7,6 +7,7 @@ export { ConflictOverlay } from './ConflictOverlay';
 export { DialogShell } from './DialogShell';
 export { DifficultyBadge } from './DifficultyBadge';
 export { FrozenFlame } from './FrozenFlame';
+export { FilterChip } from './FilterChip';
 export { GoogleIcon } from './GoogleIcon';
 export { GoogleSignInButton } from './GoogleSignInButton';
 export { InlineNameEditor } from './InlineNameEditor';
