@@ -84,6 +84,7 @@ export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard }) => {
     const [longPressProgress, setLongPressProgress] = useState(0);
     const longPressStartTime = useRef(null);
     const longPressRaf = useRef(null);
+    const longPressTimeout = useRef(null);
     const didLongPress = useRef(false);
     const didDrag = useRef(false);
     const startPointer = useRef(null);
@@ -255,6 +256,7 @@ export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard }) => {
     }, [onDiscard]);
 
     const cancelLongPress = useCallback(() => {
+        if (longPressTimeout.current) clearTimeout(longPressTimeout.current);
         longPressStartTime.current = null;
         cancelAnimationFrame(longPressRaf.current);
         setLongPressProgress(0);
@@ -269,7 +271,10 @@ export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard }) => {
         startPointer.current = { x: e.clientX, y: e.clientY };
         didLongPress.current = false;
         didDrag.current = false;
-        startLongPressAnimation();
+        
+        longPressTimeout.current = setTimeout(() => {
+            startLongPressAnimation();
+        }, 150); // 150ms delay to prevent red ring on quick tap
     }, [startLongPressAnimation]);
 
     const handlePointerMove = useCallback((e) => {
@@ -348,6 +353,7 @@ export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard }) => {
             cancelAnimationFrame(rafId.current);
             cancelAnimationFrame(longPressRaf.current);
             clearTimeout(trailTimer.current);
+            if (longPressTimeout.current) clearTimeout(longPressTimeout.current);
         };
     }, []);
 
