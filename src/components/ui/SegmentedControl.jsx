@@ -146,8 +146,8 @@ export function SegmentedControl({
           boxSizing: 'border-box',
           top: `${pad}px`,
           bottom: `${pad}px`,
-          left: `calc(${(activeIndex * 100) / count}% + ${pad}px)`,
-          right: `calc(${((count - 1 - activeIndex) * 100) / count}% + ${pad}px)`,
+          left: `calc(${pad}px + ${activeIndex} * (100% - ${pad * 2}px) / ${count})`,
+          right: `calc(${pad}px + ${count - 1 - activeIndex} * (100% - ${pad * 2}px) / ${count})`,
           transition: 'left 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.28s ease, bottom 0.28s ease',
           zIndex: 0,
           ...vStyles.indicator
