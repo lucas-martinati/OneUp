@@ -93,7 +93,7 @@ export function SegmentedControl({
           indicator: {
             background: activeOption.activeBg || 'var(--surface-elevated)',
             boxShadow: 'var(--shadow-sm)',
-            border: '1px solid var(--border-default)',
+            border: activeOption.activeBorder || '1px solid var(--border-default)',
             borderRadius: 'var(--radius-md)',
           },
           textInactive: 'var(--text-secondary)',
@@ -150,7 +150,10 @@ export function SegmentedControl({
           right: `calc(${pad}px + ${count - 1 - activeIndex} * (100% - ${pad * 2}px) / ${count})`,
           transition: 'left 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.28s ease, bottom 0.28s ease',
           zIndex: 0,
-          ...vStyles.indicator
+          ...vStyles.indicator,
+          backgroundSize: '100% 100%',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
         }}
       />
 
