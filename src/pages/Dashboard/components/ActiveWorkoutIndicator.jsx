@@ -34,15 +34,14 @@ const computeTrailSizes = (count) => {
  * - Trail spheres follow as a chained trail via rAF lerp
  * - Long-press fills a red SVG ring progressively
  *
- * Note: This component is only mounted when `!anyModalOpen` (see Dashboard.jsx).
- * Since session data only changes when WorkoutSession modal is open (which causes
- * this component to unmount), reading localStorage on mount always yields fresh data.
+ * Note: Stays mounted on the dashboard behind modals (z-index < modal).
+ * State is refreshed whenever anyModalOpen becomes false.
  */
-export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard }) => {
+export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard, anyModalOpen }) => {
     const { allExercisesMap } = useExercises();
 
-    // ── Session data (fresh on every mount — see component docstring) ──
-    const [{ queue: sessionQueue, currentIdx }] = useState(() => loadWorkoutSession());
+    // ── Session data ──
+    const [{ queue: sessionQueue, currentIdx }, setSessionData] = useState(() => loadWorkoutSession());
 
     const queueExercises = useMemo(() => {
         return sessionQueue
@@ -89,6 +88,31 @@ export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard }) => {
     const didDrag = useRef(false);
     const startPointer = useRef(null);
     const trailTimer = useRef(null);
+
+    const [prevAnyModalOpen, setPrevAnyModalOpen] = useState(anyModalOpen);
+
+    if (anyModalOpen !== prevAnyModalOpen) {
+        setPrevAnyModalOpen(anyModalOpen);
+        if (!anyModalOpen) {
+            setSessionData(loadWorkoutSession());
+        } else if (isDragging) {
+            setIsDragging(false);
+        }
+    }
+
+    // ── Suspend animations when a modal opens ──
+    useEffect(() => {
+        if (anyModalOpen) {
+            // Cancel all background animation loops when the indicator is hidden by a modal
+            cancelAnimationFrame(rafId.current);
+            cancelAnimationFrame(longPressRaf.current);
+            clearTimeout(trailTimer.current);
+            if (longPressTimeout.current) clearTimeout(longPressTimeout.current);
+            if (isDraggingRef.current) {
+                isDraggingRef.current = false;
+            }
+        }
+    }, [anyModalOpen]);
 
     // ── Derived data ──
     const visibleExercises = useMemo(
@@ -370,7 +394,10 @@ export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard }) => {
                     width: `${BUBBLE_SIZE}px`,
                     height: `${BUBBLE_SIZE}px`,
                     zIndex: Z_INDEX.FLOATING_BUBBLE,
-                    willChange: 'transform',
+                    willChange: 'transform, opacity',
+                    opacity: anyModalOpen ? 0 : 1,
+                    pointerEvents: anyModalOpen ? 'none' : 'auto',
+                    transition: 'opacity 0.25s ease-in-out',
                 }}
             >
                 {/* Pulse glow (idle only) */}
@@ -443,7 +470,7 @@ export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard }) => {
                             background: `linear-gradient(135deg, ${ex.color}25, ${ex.color}12)`,
                             borderColor: isCurrent ? `${ex.color}80` : `${ex.color}35`,
                             '--sphere-glow': `${ex.color}50`,
-                            opacity: visible ? baseOpacity : 0,
+                            opacity: (visible && !anyModalOpen) ? baseOpacity : 0,
                             transitionDelay: delayVal,
                         }}
                     >
@@ -463,8 +490,8 @@ export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard }) => {
                         position: 'fixed',
                         zIndex: Z_INDEX.FLOATING_BUBBLE - 1,
                         pointerEvents: 'none',
-                        opacity: (showTrail && !isRetracting) ? 1 : 0,
-                        transitionDelay: (showTrail && !isRetracting)
+                        opacity: (showTrail && !isRetracting && !anyModalOpen) ? 1 : 0,
+                        transitionDelay: (showTrail && !isRetracting && !anyModalOpen)
                             ? `${visibleExercises.length * 50}ms`
                             : '0ms',
                     }}

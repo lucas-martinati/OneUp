@@ -1,6 +1,6 @@
 export const Z_INDEX = {
   MODAL: 110,
-  FLOATING_BUBBLE: 999,
+  FLOATING_BUBBLE: 105,
   TOAST: 1000,
   TIMER_OVERLAY: 1001,
   // Achievements can be deep-linked from a toast tap while another

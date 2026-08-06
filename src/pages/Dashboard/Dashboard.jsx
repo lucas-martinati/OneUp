@@ -291,8 +291,9 @@ export function Dashboard() {
                     currentCatKey={currentCatKey}
                 />
 
-                {sessionInProgress && !anyModalOpen && (
+                {sessionInProgress && (
                     <ActiveWorkoutIndicator
+                        anyModalOpen={anyModalOpen}
                         onResume={() => openSession('running')}
                         onDiscard={handleDiscardSession}
                     />
