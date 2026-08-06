@@ -1,6 +1,7 @@
-import React, { useRef, useCallback } from 'react';
+import React from 'react';
 import { X, Shield, ArrowLeft, RefreshCw } from '@utils/icons';
 import { Z_INDEX } from '@utils/zIndex';
+import { useSwipeGesture } from '@hooks/useSwipeGesture';
 import { Spinner, Button, SegmentedControl } from '@components/ui';
 import { useAdminPanel } from './useAdminPanel';
 import { AdminUserList } from './AdminUserList';
@@ -23,34 +24,18 @@ export function AdminPanel({ onClose }) {
     handleResetProgress, handleDeleteUser,
   } = useAdminPanel();
 
-  const touchStartRef = useRef({ x: 0, y: 0, time: 0 });
-
-  const handleTouchStart = useCallback((e) => {
-    const touch = e.touches[0];
-    touchStartRef.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-      time: Date.now()
-    };
-  }, []);
-
-  const handleTouchEnd = useCallback((e) => {
-    const touch = e.changedTouches[0];
-    const start = touchStartRef.current;
-    const diffX = start.x - touch.clientX;
-    const diffY = start.y - touch.clientY;
-    const duration = Date.now() - start.time;
-
-    if (Math.abs(diffX) > 60 && Math.abs(diffY) < Math.abs(diffX) * 0.6 && duration < 300) {
+  const { handleTouchStart, handleTouchEnd } = useSwipeGesture({
+    onSwipeLeft: () => {
       const tabs = ['form', 'json'];
       const currentIndex = tabs.indexOf(editMode);
-      if (diffX > 0) {
-        if (currentIndex < tabs.length - 1) setEditMode(tabs[currentIndex + 1]);
-      } else {
-        if (currentIndex > 0) setEditMode(tabs[currentIndex - 1]);
-      }
+      if (currentIndex < tabs.length - 1) setEditMode(tabs[currentIndex + 1]);
+    },
+    onSwipeRight: () => {
+      const tabs = ['form', 'json'];
+      const currentIndex = tabs.indexOf(editMode);
+      if (currentIndex > 0) setEditMode(tabs[currentIndex - 1]);
     }
-  }, [editMode, setEditMode]);
+  });
 
 
   return (
