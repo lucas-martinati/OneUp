@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserPlus, Link, Check } from '@utils/icons';
-import { Card } from '@components/ui';
+import { Card, Button } from '@components/ui';
 import { useTranslation } from 'react-i18next';
 
 export function ClanInviteCard({ clanData }) {
@@ -29,15 +29,19 @@ export function ClanInviteCard({ clanData }) {
                         {clanData.code}
                     </div>
                 </div>
-                <button onClick={handleCopyCode} className="hover-lift" style={{
-                    padding: '10px 16px', borderRadius: 'var(--radius-md)',
-                    background: copied ? 'var(--success)' : 'rgba(255,255,255,0.1)',
-                    border: copied ? 'none' : '1px solid rgba(255,255,255,0.1)',
-                    color: 'white', fontSize: '0.85rem', fontWeight: '600',
-                    display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer'
-                }}>
-                    {copied ? <><Check size={16} /> {t('leaderboard.copied')}</> : <><Link size={16} /> {t('leaderboard.copy')}</>}
-                </button>
+                <Button 
+                    variant="ghost"
+                    onClick={handleCopyCode}
+                    icon={copied ? Check : Link}
+                    style={{
+                        padding: '10px 16px', borderRadius: 'var(--radius-md)',
+                        background: copied ? 'var(--success)' : 'rgba(255,255,255,0.1)',
+                        border: copied ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                        color: 'white', fontSize: '0.85rem', fontWeight: '600'
+                    }}
+                >
+                    {copied ? t('leaderboard.copied') : t('leaderboard.copy')}
+                </Button>
             </Card>
         </div>
     );

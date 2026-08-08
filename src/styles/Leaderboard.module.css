@@ -324,8 +324,8 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: color-mix(in srgb, var(--accent) 92%, black);
-  color: var(--text-on-surface);
+  background: var(--accent-glow);
+  color: var(--text-on-surface, white);
   border: 2px solid var(--sheet-bg);
   cursor: pointer;
   flex-shrink: 0;
@@ -333,6 +333,7 @@
   transition: transform 0.15s ease, background 0.2s ease;
 }
 .pNudgeBtn:hover { transform: scale(1.08); }
+.pNudgeBtn.nudgeBtnDone { background: var(--success); color: var(--text-on-surface); border-color: var(--success); }
 
 /* ── States ──────────────────────────────────────────────────────────── */
 .center {

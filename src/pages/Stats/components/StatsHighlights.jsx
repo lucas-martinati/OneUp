@@ -51,7 +51,7 @@ export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExR
                     gap: '10px'
                 }}>
                     {champion && champion.totalReps > 0 && (
-                        <Card variant="premium" padding="sm" className="scale-in" style={{ ...cardBase, animationDelay: '0.3s' }}>
+                        <Card variant="premium" padding="sm" interactive={true} className="scale-in" style={{ ...cardBase, animationDelay: '0.3s' }}>
                             <div aria-hidden="true" style={{
                                 position: 'absolute', top: '-28px', right: '-28px',
                                 width: '86px', height: '86px', borderRadius: '50%',
@@ -80,7 +80,7 @@ export function StatsHighlights({ champion, bestDayDate, bestDayReps, bestDayExR
                         </Card>
                     )}
                     {bestDayDate && (
-                        <Card variant="premium" padding="sm" className="scale-in" style={{ ...cardBase, animationDelay: '0.35s' }}>
+                        <Card variant="premium" padding="sm" interactive={true} className="scale-in" style={{ ...cardBase, animationDelay: '0.35s' }}>
                             <div aria-hidden="true" style={{
                                 position: 'absolute', top: '-28px', right: '-28px',
                                 width: '86px', height: '86px', borderRadius: '50%',

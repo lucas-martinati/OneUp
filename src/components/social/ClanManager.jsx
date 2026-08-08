@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Users, LogIn, Plus, Shield } from '@utils/icons';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import { GoogleSignInButton } from '@components/ui/GoogleSignInButton';
+import { Button, Card } from '@components/ui';
 import { useAuth } from '@contexts/AuthContext';
 import { useSettingsStore } from '@store/useSettingsStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
@@ -118,12 +119,12 @@ export function ClanManager({ onClanJoined }) {
                                             {t('clan.yourClans', { count: userClans.length })}
                                         </div>
                                         {userClans.map(clan => (
-                                            <button key={clan.id} onClick={() => { if(onClanJoined) onClanJoined(clan.id) }} className="hover-lift" style={{
+                                            <Card as="button" interactive={true} key={clan.id} onClick={() => { if(onClanJoined) onClanJoined(clan.id) }} style={{
                                                 width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
                                                 background: 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(217,119,6,0.15))',
                                                 border: '1px solid rgba(245,158,11,0.3)', color: 'white',
                                                 fontSize: '1.2rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                                boxShadow: '0 4px 12px rgba(245,158,11,0.1)', overflow: 'hidden'
+                                                boxShadow: '0 4px 12px rgba(245,158,11,0.1)', overflow: 'hidden', cursor: 'pointer', textAlign: 'left'
                                             }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', overflow: 'hidden' }}>
                                                     <div style={{ 
@@ -138,7 +139,7 @@ export function ClanManager({ onClanJoined }) {
                                                 <span style={{ flexShrink: 0, fontSize: '0.85rem', color: 'var(--color-amber)', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '700' }}>
                                                     <Users size={14} /> {clan.memberCount}
                                                 </span>
-                                            </button>
+                                            </Card>
                                         ))}
                                         <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '8px 0' }} />
                                     </div>
@@ -151,17 +152,17 @@ export function ClanManager({ onClanJoined }) {
                                 )}
 
                                 <div className="flex-col gap-12">
-                                    <button onClick={() => { setView('join'); setError(''); setInputValue(''); }} className="hover-lift" style={{
-                                        width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
-                                        background: 'linear-gradient(135deg, #818cf8, #6366f1)', border: 'none', color: 'white',
-                                        fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
-                                    }}><LogIn size={20} /> {t('clan.joinClan')}</button>
+                                    <Button fullWidth size="lg" variant="primary" icon={LogIn} onClick={() => { setView('join'); setError(''); setInputValue(''); }} style={{
+                                        background: 'linear-gradient(135deg, #818cf8, #6366f1)', border: 'none', color: 'white', borderRadius: 'var(--radius-lg)'
+                                    }}>
+                                        {t('clan.joinClan')}
+                                    </Button>
 
-                                    <button onClick={() => { setView('create'); setError(''); setInputValue(''); }} className="hover-lift" style={{
-                                        width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
-                                        background: 'rgba(255,255,255,0.05)', border: '2px solid rgba(255,255,255,0.1)', color: 'var(--text-primary)',
-                                        fontSize: '1rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
-                                    }}><Plus size={20} /> {t('clan.createClan')}</button>
+                                    <Button fullWidth size="lg" variant="ghost" icon={Plus} onClick={() => { setView('create'); setError(''); setInputValue(''); }} style={{
+                                        background: 'rgba(255,255,255,0.05)', border: '2px solid rgba(255,255,255,0.1)', color: 'var(--text-primary)', borderRadius: 'var(--radius-lg)'
+                                    }}>
+                                        {t('clan.createClan')}
+                                    </Button>
                                 </div>
                             </>
                         )}
@@ -220,20 +221,16 @@ export function ClanManager({ onClanJoined }) {
                                     submitLabel = t('clan.createButton');
                                 }
                                 return (
-                                    <button onClick={view === 'create' ? handleCreate : handleJoin} disabled={isLoading} className="hover-lift" style={{
-                                        width: '100%', padding: '14px', borderRadius: 'var(--radius-lg)',
-                                        background: 'linear-gradient(135deg, var(--color-amber), var(--warning))', border: 'none', color: 'black',
-                                        fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                                        opacity: isLoading ? 0.7 : 1
+                                    <Button fullWidth size="lg" variant="premium" disabled={isLoading} onClick={view === 'create' ? handleCreate : handleJoin} style={{
+                                        background: 'linear-gradient(135deg, var(--color-amber), var(--warning))', border: 'none', color: 'black', borderRadius: 'var(--radius-lg)'
                                     }}>
                                         {submitLabel}
-                                    </button>
+                                    </Button>
                                 );
                             })()}
-                            <button onClick={() => setView('menu')} style={{
-                                width: '100%', padding: '14px', background: 'transparent', border: 'none',
-                                color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: '600', cursor: 'pointer'
-                            }}>{t('common.cancel')}</button>
+                            <Button fullWidth size="md" variant="ghost" onClick={() => setView('menu')}>
+                                {t('common.cancel')}
+                            </Button>
                         </div>
                     </div>
                 )}

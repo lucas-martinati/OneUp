@@ -11,7 +11,7 @@ import { Card } from '@components/ui';
 function StatCard({ icon: Icon, value, format, label, color, dim = false, delay = 0, pending = false }) {
     const c = dim ? '#8a8a93' : color;
     return (
-        <Card variant="premium" padding="sm" className="hover-lift scale-in" style={{
+        <Card variant="premium" padding="sm" interactive={true} className="scale-in" style={{
             position: 'relative', overflow: 'hidden',
             display: 'flex', flexDirection: 'column', gap: '11px',
             animationDelay: `${delay}s`
@@ -70,7 +70,7 @@ export function StatsOverviewCards({
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             {/* ── Hero: Global Total Reps ─────────────────────────────── */}
-            <Card variant="premium" padding="lg" className="scale-in" style={{
+            <Card variant="premium" padding="lg" interactive={true} className="scale-in" style={{
                 position: 'relative', overflow: 'hidden',
                 textAlign: 'center'
             }}>
