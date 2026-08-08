@@ -3,18 +3,16 @@ import { useTranslation, Trans } from 'react-i18next';
 import { Cloud, CloudOff, AlertCircle, Trash2, Check, Smartphone, RefreshCw } from '@utils/icons';
 import { Avatar } from '@components/ui/Avatar';
 import { Button } from '@components/ui/Button';
-import { ConfirmDialog } from '@components/ui/ConfirmDialog';
+import { DeleteConfirmModal } from '@components/ui/DeleteConfirmModal';
 import { GoogleSignInButton } from '@components/ui/GoogleSignInButton';
 
 function DeleteConfirmationModal({ isOpen, onClose, onConfirm, isDeleting, title, description, t }) {
   return (
-    <ConfirmDialog
+    <DeleteConfirmModal
       open={isOpen}
-      destructive
-      icon={Trash2}
       title={title}
       message={description}
-      warning={t('cloud.deleteCannotUndo')}
+      warningMessage={t('cloud.deleteCannotUndo')}
       loading={isDeleting}
       confirmLabel={t('common.delete')}
       onCancel={onClose}
