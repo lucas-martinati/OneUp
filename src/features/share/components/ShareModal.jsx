@@ -127,19 +127,8 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
               {t('share.download')}
             </Button>
             <Button
-              variant="ghost"
               onClick={handleShare}
               disabled={isExporting}
-              className="hover-lift"
-              style={{
-                flex: 1, padding: '14px', borderRadius: '14px',
-                background: 'linear-gradient(135deg, #818cf8, #6366f1)',
-                border: 'none',
-                color: 'white', fontSize: '0.85rem', fontWeight: 700,
-                cursor: isExporting ? 'default' : 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                gap: '8px', opacity: isExporting ? 0.7 : 1,
-              }}
             >
               {isExporting ? <Loader2 size={18} className="spin" /> : <Share2 size={18} />}
               {canShareNatively()
