@@ -306,6 +306,7 @@ export function Dashboard() {
                 <main className="flex-1 flex-col pos-relative dashboard-main">
                     <div
                         ref={scrollContainerRef}
+                        className="no-scrollbar"
                         style={{
                             flex: 1, overflowY: anyModalOpen ? 'hidden' : 'auto', overflowX: 'hidden',
                             scrollSnapType: 'y mandatory',
