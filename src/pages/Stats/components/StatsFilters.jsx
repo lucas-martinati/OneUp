@@ -1,9 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Filter, ChevronDown } from '@utils/icons';
 import { CATEGORIES, buildCategoryChipItems } from '@config/categories';
-import { haptics } from '@utils/hapticsManager';
-import { CategoryChips } from '@components/ui';
-import styles from '@styles/StatsFilters.module.css';
+import { CategoryChips, FilterDropdown } from '@components/ui';
 
 /** Category filter toggle + chips panel of the Stats panel. */
 export function StatsFilters({
@@ -35,32 +32,19 @@ export function StatsFilters({
     }));
 
     return (
-        <div style={{ marginBottom: 'var(--space-6)' }}>
-            <button
-                onClick={() => {
-                    haptics.light();
-                    setShowFilters(!showFilters);
-                }}
-                className={showFilters ? `${styles.toggle} ${styles.toggleOpen}` : styles.toggle}
-                aria-expanded={showFilters}
-            >
-                <Filter size={16} />
-                {t('stats.filters')}
-                <span key={activeCategories.length} className={styles.count}>
-                    {activeCategories.length}
-                </span>
-                <ChevronDown size={16} className={styles.chevron} />
-            </button>
-            {showFilters && (
-                <div className={styles.panel}>
-                    <CategoryChips
-                        items={chipItems}
-                        selected={activeCategories}
-                        onToggle={handleToggleCategory}
-                        onLockedClick={onOpenStore}
-                    />
-                </div>
-            )}
-        </div>
+        <FilterDropdown
+            isOpen={showFilters}
+            onToggle={setShowFilters}
+            label={t('stats.filters')}
+            count={activeCategories.length}
+            style={{ marginBottom: 'var(--space-6)' }}
+        >
+            <CategoryChips
+                items={chipItems}
+                selected={activeCategories}
+                onToggle={handleToggleCategory}
+                onLockedClick={onOpenStore}
+            />
+        </FilterDropdown>
     );
 }

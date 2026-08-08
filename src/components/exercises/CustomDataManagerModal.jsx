@@ -76,8 +76,10 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
   const { t, i18n } = useTranslation();
   const { customCategories, addCategory, updateCategory, deleteCategory, moveCategory, reorderCategories, maxCustomCategories } = customCategoriesHook;
 
-  const [view, setView] = useState('list'); // 'list' | 'create' | 'delete'
-  const [editingId, setEditingId] = useState(null);
+  const [view, setView] = useState('list'); // list | create | category-create
+
+  // Active tab in list view
+  const [activeTab, setActiveTab] = useState('categories'); // categories | exercises
   const [name, setName] = useState('');
   const [color, setColor] = useState('#8b5cf6');
   const [error, setError] = useState('');

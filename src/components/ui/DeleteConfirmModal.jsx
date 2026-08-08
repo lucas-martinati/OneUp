@@ -28,17 +28,18 @@ export function DeleteConfirmModal({
     >
       <div style={{
         background: 'var(--sheet-bg)', border: '1px solid var(--border-default)',
-        borderRadius: 'var(--radius-lg)', padding: '24px', width: '100%', maxWidth: '340px',
-        textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px'
+        borderRadius: 'var(--radius-lg)', padding: '28px 24px', width: '100%', maxWidth: '340px',
+        textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '18px',
+        alignItems: 'center'
       }}>
         <div style={{
           width: '64px', height: '64px', borderRadius: '50%', background: 'color-mix(in srgb, var(--error) 15%, transparent)',
-          color: 'var(--error)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto'
+          color: 'var(--error)', display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
           <Trash2 size={32} />
         </div>
         
-        <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '800' }}>
+        <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.25rem', fontWeight: '800' }}>
           {title}
         </h3>
         
@@ -56,7 +57,7 @@ export function DeleteConfirmModal({
           )}
         </p>
 
-        <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+        <div style={{ display: 'flex', gap: '12px', marginTop: '12px', width: '100%' }}>
           <Button variant="secondary" onClick={onCancel} disabled={loading} style={{ flex: 1 }}>
             {t('common.cancel')}
           </Button>
