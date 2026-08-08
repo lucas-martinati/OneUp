@@ -2,7 +2,7 @@ import React from 'react';
 import { ModalContainer } from '@components/ui/ModalContainer';
 import { X } from '@utils/icons';
 import { useHaptics } from '@hooks/useHaptics';
-import { Button } from '@components/ui';
+import { Button } from './Button';
 
 export function GradientModal({ open, onClose, ariaLabel, maxWidth = '440px', borderGradient = 'rgba(139, 92, 246, 0.35)', shadowGlow = 'rgba(139, 92, 246, 0.25)', children }) {
   const { light } = useHaptics();

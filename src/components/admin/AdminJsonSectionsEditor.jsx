@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Save, Lock, Code, Copy, Check, RotateCcw } from '@utils/icons';
 import { JsonTreeEditor } from './JsonTreeEditor';
 import { LineNumberTextarea } from './LineNumberTextarea';
+import { Button } from '@components/ui';
 
 /** Short human summary of a JSON document, e.g. "12 clés" / "3 éléments". */
 function describeContent(text) {
@@ -29,22 +30,15 @@ function CopyButton({ text }) {
     }).catch(() => {});
   };
   return (
-    <button
+    <Button variant="secondary" size="sm"
       onClick={handleCopy}
       title="Copier le JSON"
-      style={{
-        padding: '6px 10px',
-        background: 'var(--surface-hover)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 'var(--radius-md)',
-        color: copied ? '#34d399' : 'var(--text-secondary)',
-        fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer',
-        display: 'flex', alignItems: 'center', gap: '4px'
-      }}
+      color={copied ? '#34d399' : undefined}
+      style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
     >
       {copied ? <Check size={12} /> : <Copy size={12} />}
       {copied ? 'Copié' : 'Copier'}
-    </button>
+    </Button>
   );
 }
 
@@ -214,72 +208,38 @@ export function AdminJsonSectionsEditor({
                     </div>
 
                     {keyEditorFormats[key] === 'raw' && (
-                      <button
+                      <Button variant="secondary" size="sm"
                         onClick={() => onFormatJson(key)}
-                        className="hover-lift"
-                        style={{
-                          padding: '6px 10px',
-                          background: 'var(--surface-hover)',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          borderRadius: 'var(--radius-md)',
-                          color: 'var(--text-primary)',
-                          fontSize: '0.72rem',
-                          fontWeight: '700',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px'
-                        }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                       >
                         <Code size={12} />
                         Formater
-                      </button>
+                      </Button>
                     )}
 
                     <CopyButton text={contentValue} />
 
                     {isDirty && onRevertJson && (
-                      <button
+                      <Button variant="danger-ghost" size="sm"
                         onClick={() => onRevertJson(key)}
                         title="Annuler les modifications non sauvegardées"
-                        style={{
-                          padding: '6px 10px',
-                          background: 'var(--surface-hover)',
-                          border: '1px solid rgba(245, 158, 11, 0.3)',
-                          borderRadius: 'var(--radius-md)',
-                          color: '#f59e0b',
-                          fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer',
-                          display: 'flex', alignItems: 'center', gap: '4px'
-                        }}
+                        color="#f59e0b"
+                        style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                       >
                         <RotateCcw size={12} />
                         Annuler
-                      </button>
+                      </Button>
                     )}
 
-                    <button
+                    <Button variant="success" size="sm"
                       disabled={!canSave}
                       onClick={() => onSaveJson(key)}
-                      className="hover-lift"
                       title={isDirty ? 'Sauvegarder (Ctrl+S)' : 'Aucune modification à sauvegarder'}
-                      style={{
-                        padding: '6px 12px',
-                        background: canSave ? 'linear-gradient(135deg, #10b981, #059669)' : 'var(--surface-muted)',
-                        border: 'none',
-                        borderRadius: 'var(--radius-md)',
-                        color: canSave ? 'white' : 'var(--text-secondary)',
-                        fontSize: '0.72rem',
-                        fontWeight: '800',
-                        cursor: canSave ? 'pointer' : 'not-allowed',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        opacity: canSave ? 1 : 0.6
-                      }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                     >
                       <Save size={12} />
                       Sauvegarder
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -324,20 +284,10 @@ export function AdminJsonSectionsEditor({
         );
       })}
 
-      {/* Cancel/Close Button */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--space-6)' }}>
-        <button
-          onClick={onBack}
-          style={{
-            padding: '12px 24px', borderRadius: 'var(--radius-lg)',
-            background: 'transparent',
-            border: '1px solid var(--border-default)',
-            color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.95rem',
-            cursor: 'pointer'
-          }}
-        >
+        <Button variant="secondary" size="md" onClick={onBack}>
           Retour aux utilisateurs
-        </button>
+        </Button>
       </div>
     </div>
   );

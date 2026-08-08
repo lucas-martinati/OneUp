@@ -152,9 +152,7 @@ export function ClanManager({ onClanJoined }) {
                                 )}
 
                                 <div className="flex-col gap-12">
-                                    <Button fullWidth size="lg" variant="primary" icon={LogIn} onClick={() => { setView('join'); setError(''); setInputValue(''); }} style={{
-                                        background: 'linear-gradient(135deg, #818cf8, #6366f1)', border: 'none', color: 'white', borderRadius: 'var(--radius-lg)'
-                                    }}>
+                                    <Button fullWidth size="lg" variant="primary" icon={LogIn} onClick={() => { setView('join'); setError(''); setInputValue(''); }}>
                                         {t('clan.joinClan')}
                                     </Button>
 
@@ -221,8 +219,9 @@ export function ClanManager({ onClanJoined }) {
                                     submitLabel = t('clan.createButton');
                                 }
                                 return (
-                                    <Button fullWidth size="lg" variant="premium" disabled={isLoading} onClick={view === 'create' ? handleCreate : handleJoin} style={{
-                                        background: 'linear-gradient(135deg, var(--color-amber), var(--warning))', border: 'none', color: 'black', borderRadius: 'var(--radius-lg)'
+                                    <Button fullWidth size="lg" variant={view === 'join' ? 'primary' : 'premium'} disabled={isLoading} onClick={view === 'create' ? handleCreate : handleJoin} style={{
+                                        border: 'none',
+                                        borderRadius: 'var(--radius-lg)'
                                     }}>
                                         {submitLabel}
                                     </Button>

@@ -9,6 +9,7 @@ import { WEIGHT_EXERCISES } from '@config/weights';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ORDER } from '@config/categories';
 import { SectionTitle } from '@components/ui';
+import { Button } from '@components/ui';
 
 function CategorySeparator({ label, color }) {
     return (
@@ -63,36 +64,27 @@ export function DifficultySettings() {
             </div>
 
             {!isMultiplierUnlocked ? (
-                <button
+                <Button variant="danger-ghost" size="lg"
                     onClick={() => setIsMultiplierUnlocked(true)}
-                    className="hover-lift"
                     style={{
-                        width: '100%', padding: '16px', borderRadius: 'var(--radius-lg)',
-                        background: 'rgba(239, 68, 68, 0.1)',
-                        border: '2px solid rgba(239, 68, 68, 0.4)',
-                        color: '#ef4444', fontWeight: '800', fontSize: '0.9rem',
+                        width: '100%',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        gap: '12px', cursor: 'pointer', letterSpacing: '1px',
-                        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.1)'
+                        gap: '12px', letterSpacing: '1px'
                     }}
                 >
                     {t('settings.unlockSettings')} <Lock size={18} />
-                </button>
+                </Button>
             ) : (
                 <div className="scale-in">
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
                         <div className="flex-align-center gap-8">
                             <span style={{ fontWeight: '700', color: 'white', fontSize: '0.9rem' }}>{t('settings.multiplier')}</span>
-                            <button
+                            <Button variant="secondary" size="sm"
                                 onClick={() => setIsMultiplierUnlocked(false)}
-                                style={{
-                                    background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '12px',
-                                    padding: '4px 10px', color: 'white', fontSize: '0.7rem', fontWeight: '700',
-                                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'
-                                }}
+                                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                             >
                                 {t('settings.lock')} <Unlock size={12} />
-                            </button>
+                            </Button>
                         </div>
                     </div>
 

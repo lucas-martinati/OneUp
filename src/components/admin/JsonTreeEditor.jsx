@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Edit2, Check, X, Trash2, ChevronRight, Plus } from '@utils/icons';
+import { Button } from '@components/ui';
 
 /** Children beyond this count start collapsed to keep big nodes (e.g. progress
  *  completions) readable and fast to render. */
@@ -8,18 +9,15 @@ const AUTO_COLLAPSE_THRESHOLD = 15;
 /** Bouton "supprimer" (icône poubelle, opacité au survol) réutilisé dans l'arbre. */
 function DeleteButton({ onClick, title }) {
   return (
-    <button
+    <Button variant="danger-ghost" size="sm"
       onClick={onClick}
       title={title}
-      style={{
-        background: 'transparent', border: 'none', color: 'var(--error)',
-        cursor: 'pointer', padding: '2px 6px', opacity: 0.4, display: 'flex', alignItems: 'center'
-      }}
+      style={{ padding: '2px 6px', display: 'flex', alignItems: 'center', opacity: 0.7 }}
       onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
-      onMouseLeave={(e) => e.currentTarget.style.opacity = 0.4}
+      onMouseLeave={(e) => e.currentTarget.style.opacity = 0.7}
     >
       <Trash2 size={12} />
-    </button>
+    </Button>
   );
 }
 
@@ -140,24 +138,18 @@ function JsonTreeNode({
             {name ? `"${name}": ` : ''} (JSON brut)
           </span>
           <div style={{ display: 'flex', gap: '6px' }}>
-            <button 
+            <Button variant="success" size="sm"
               onClick={handleRawSave} 
-              style={{
-                padding: '4px 8px', fontSize: '0.72rem', background: 'var(--success)', color: 'white',
-                border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px'
-              }}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               <Check size={12} /> OK
-            </button>
-            <button 
+            </Button>
+            <Button variant="secondary" size="sm"
               onClick={() => setIsEditingRaw(false)} 
-              style={{
-                padding: '4px 8px', fontSize: '0.72rem', background: 'rgba(255,255,255,0.1)', color: 'white',
-                border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'
-              }}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               <X size={12} /> Annuler
-            </button>
+            </Button>
           </div>
         </div>
         <textarea
@@ -285,31 +277,23 @@ function JsonTreeNode({
         )}
 
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
-          <button
+          <Button variant="secondary" size="sm"
             onClick={startAdd}
             title={isObject ? 'Ajouter une clé' : 'Ajouter un élément'}
-            style={{
-              background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)',
-              borderRadius: '4px', color: 'var(--color-emerald)', fontSize: '0.65rem',
-              padding: '2px 6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px'
-            }}
+            style={{ color: 'var(--color-emerald)', display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 6px' }}
           >
             <Plus size={10} />
             <span>Ajouter</span>
-          </button>
+          </Button>
 
-          <button
+          <Button variant="secondary" size="sm"
             onClick={startRawEdit}
             title="Modifier en JSON"
-            style={{
-              background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '4px', color: 'var(--text-secondary)', fontSize: '0.65rem',
-              padding: '2px 6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px'
-            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 6px' }}
           >
             <Edit2 size={10} />
             <span>Modifier</span>
-          </button>
+          </Button>
 
           {onDelete && (
             <DeleteButton onClick={() => onDelete(path)} title="Supprimer" />
@@ -353,25 +337,18 @@ function JsonTreeNode({
                 outline: 'none', flex: 1, minWidth: '160px', boxSizing: 'border-box'
               }}
             />
-            <button
+            <Button variant="success" size="sm"
               onClick={handleAddConfirm}
-              style={{
-                padding: '4px 8px', fontSize: '0.72rem', background: 'var(--success)', color: 'white',
-                border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '800',
-                display: 'flex', alignItems: 'center', gap: '4px'
-              }}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               <Check size={12} /> Ajouter
-            </button>
-            <button
+            </Button>
+            <Button variant="secondary" size="sm"
               onClick={() => setIsAdding(false)}
-              style={{
-                padding: '4px 8px', fontSize: '0.72rem', background: 'rgba(255,255,255,0.1)', color: 'white',
-                border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'
-              }}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               <X size={12} /> Annuler
-            </button>
+            </Button>
           </div>
           {addError && (
             <div style={{ color: 'var(--error)', fontSize: '0.72rem', fontFamily: 'monospace' }}>⚠️ {addError}</div>

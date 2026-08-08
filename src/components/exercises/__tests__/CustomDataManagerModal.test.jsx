@@ -116,7 +116,7 @@ describe('CustomDataManagerModal — Categories', () => {
     const { getByDisplayValue, getByText, getAllByLabelText, hooks: h } = renderModal({ hooks });
     
     // Click the edit button for Yoga
-    fireEvent.click(getAllByLabelText('Modifier')[1]); 
+    fireEvent.click(getAllByLabelText('common.edit')[1]); 
     
     expect(getByDisplayValue('Yoga')).toBeTruthy();
     fireEvent.change(getByDisplayValue('Yoga'), { target: { value: 'Advanced Yoga' } });
@@ -153,7 +153,7 @@ describe('CustomDataManagerModal — Exercises', () => {
     const { getByDisplayValue, getByText, getByLabelText, hooks: h } = renderModal({ hooks, initialTab: 'exercises' });
     
     // Find the edit button for Plank
-    fireEvent.click(getByLabelText('Modifier')); 
+    fireEvent.click(getByLabelText('common.edit')); 
 
     expect(getByDisplayValue('Plank')).toBeTruthy();
     fireEvent.click(getByText('common.save'));
@@ -169,7 +169,7 @@ describe('CustomDataManagerModal — Exercises', () => {
     });
     
     // Find delete button
-    fireEvent.click(getByLabelText('Supprimer'));
+    fireEvent.click(getByLabelText('common.delete'));
 
     expect(getByText('customExercises.deleteTitle')).toBeTruthy();
     fireEvent.click(getByText('common.delete'));

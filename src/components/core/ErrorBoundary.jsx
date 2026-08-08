@@ -1,5 +1,6 @@
 import React from 'react';
 import { RefreshCw, AlertTriangle } from '@utils/icons';
+import { Button } from '@components/ui';
 
 export class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -34,24 +35,13 @@ export class ErrorBoundary extends React.Component {
                     <p style={{ color: '#94a3b8', marginBottom: '20px', maxWidth: '400px' }}>
                         {this.state.error?.message || 'An unexpected error occurred.'}
                     </p>
-                    <button
+                    <Button variant="primary"
                         onClick={() => window.location.reload()}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '10px 20px',
-                            borderRadius: '8px',
-                            background: '#3b82f6',
-                            color: 'white',
-                            border: 'none',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                        }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                     >
                         <RefreshCw size={18} />
                         Reload App
-                    </button>
+                    </Button>
                 </div>
             );
         }

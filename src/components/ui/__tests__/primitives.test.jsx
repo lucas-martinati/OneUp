@@ -84,10 +84,10 @@ describe('Card', () => {
     expect(container.firstChild.className).toContain('glass');
   });
 
-  it('adds hover-lift when interactive and keeps custom className', () => {
+  it('adds micro-scale-hover when interactive and keeps custom className', () => {
     const { container } = render(<Card interactive className="mine">hi</Card>);
     const cls = container.firstChild.className;
-    expect(cls).toContain('hover-lift');
+    expect(cls).toContain('micro-scale-hover');
     expect(cls).toContain('mine');
   });
 

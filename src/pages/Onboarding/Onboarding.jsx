@@ -64,17 +64,7 @@ export function Onboarding({ onStart }) {
     const canStartPast = date < todayStr && selectedExercises.length > 0;
 
     // ── Shared styles ────────────────────────────────────────────────────
-    const primaryBtn = {
-        background: ACCENT,
-        color: 'white',
-        padding: 'clamp(12px, 1.8vh, 16px) var(--space-6)',
-        borderRadius: 'var(--radius-lg)',
-        fontWeight: '700',
-        fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-        boxShadow: 'var(--glow-accent)',
-        border: 'none', cursor: 'pointer', minHeight: 'var(--touch-min)',
-    };
+
 
     const headerFor = {
         1: { icon: <Target size={18} color="var(--accent-glow)" />, label: t('onboarding.concept') },
@@ -179,10 +169,10 @@ export function Onboarding({ onStart }) {
                             </Trans>
                         </p>
 
-                        <button onClick={() => setStep(2)} className="gradient-button hover-lift" style={primaryBtn}>
+                        <Button variant="primary" size="lg" fullWidth onClick={() => setStep(2)} style={{ background: 'var(--gradient-accent)' }}>
                             {t('onboarding.letsGo')}
                             <ArrowRight size={20} strokeWidth={3} />
-                        </button>
+                        </Button>
 
                         {!auth.isSignedIn && (
                             <>
@@ -297,10 +287,10 @@ export function Onboarding({ onStart }) {
                         </div>
 
                         <NavRow onBack={() => setStep(1)} t={t}>
-                            <button onClick={() => setStep(3)} className="gradient-button hover-lift" style={{ ...primaryBtn, flex: 2 }}>
+                            <Button variant="primary" size="lg" onClick={() => setStep(3)} style={{ flex: 2, background: 'var(--gradient-accent)' }}>
                                 {t('common.continue')}
                                 <ArrowRight size={20} strokeWidth={3} />
-                            </button>
+                            </Button>
                         </NavRow>
                     </>
                 )}
@@ -331,10 +321,10 @@ export function Onboarding({ onStart }) {
                         </p>
 
                         <NavRow onBack={() => setStep(2)} t={t}>
-                            <button onClick={handleStart} className="gradient-button hover-lift ripple" style={{ ...primaryBtn, flex: 2 }}>
+                            <Button variant="primary" size="lg" onClick={handleStart} style={{ flex: 2, background: 'var(--gradient-accent)' }}>
                                 {t('onboarding.startChallenge')}
                                 <ArrowRight size={20} strokeWidth={3} />
-                            </button>
+                            </Button>
                         </NavRow>
                     </>
                 )}
@@ -448,21 +438,14 @@ export function Onboarding({ onStart }) {
                         </Stack>
 
                         <NavRow onBack={() => setStep(2)} t={t}>
-                            <button
+                            <Button variant="primary" size="lg"
                                 onClick={handleStart}
-                                className="gradient-button hover-lift ripple"
                                 disabled={!canStartPast}
-                                style={{
-                                    ...primaryBtn, flex: 2,
-                                    background: canStartPast ? ACCENT : 'rgba(255,255,255,0.1)',
-                                    color: canStartPast ? 'white' : 'var(--text-secondary)',
-                                    boxShadow: canStartPast ? primaryBtn.boxShadow : 'none',
-                                    cursor: canStartPast ? 'pointer' : 'not-allowed'
-                                }}
+                                style={{ flex: 2, background: 'var(--gradient-accent)' }}
                             >
                                 {t('onboarding.startChallenge')}
                                 <ArrowRight size={20} strokeWidth={3} />
-                            </button>
+                            </Button>
                         </NavRow>
                     </>
                 )}

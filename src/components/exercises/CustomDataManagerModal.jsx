@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, Edit2, Check, ChevronRight, Settings2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS } from '@utils/icons';
+import { Plus, Trash2, Edit2, Check, ChevronRight, Settings2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, GripVertical } from '@utils/icons';
 import { Button, Input, ModalHeader, DeleteConfirmModal, ColorPicker, Slider, SegmentedControl, Stack, ListActionRow } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
@@ -74,7 +74,7 @@ const PRESET_COLORS = [
 
 function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCategory, defaultCustomExercises = [], computedStats }) {
   const { t, i18n } = useTranslation();
-  const { customCategories, addCategory, updateCategory, deleteCategory, moveCategory, reorderCategories, maxCustomCategories } = customCategoriesHook;
+  const { customCategories, addCategory, updateCategory, deleteCategory, reorderCategories, maxCustomCategories } = customCategoriesHook;
 
   const [view, setView] = useState('list'); // list | create | category-create
 
@@ -381,7 +381,7 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
                       onDragStart={(e) => handleDragStart(e, index)}
                       onDragOver={(e) => handleDragOver(e, index)}
                       onDragEnd={handleDragEnd}
-                      onTouchStart={(e) => handleTouchStart(e, index)}
+                      onTouchStart={() => handleTouchStart(index)}
                       onTouchMove={handleTouchMove}
                       onTouchEnd={handleTouchEnd}
                       renderActions={() => !isBuiltIn && (

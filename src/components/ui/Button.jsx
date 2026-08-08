@@ -1,6 +1,5 @@
 import { forwardRef, useCallback } from 'react';
 import { haptics } from '@utils/hapticsManager';
-
 /**
  * Canonical button primitive for the whole app.
  *
@@ -28,6 +27,7 @@ export const Button = forwardRef(function Button(
     size = 'md',
     fullWidth = false,
     iconOnly = false,
+    haptic = false,
     icon: Icon,
     iconRight: IconRight,
     loading = false,
@@ -45,23 +45,29 @@ export const Button = forwardRef(function Button(
   const isIconOnly = Boolean(iconOnly);
   const isDisabled = disabled || loading;
 
-  // Light physical tap on every press (no-op on web / when haptics are off).
   const handleClick = useCallback(
     (e) => {
-      haptics.light();
+      if (haptic) {
+        if (haptic === true || haptic === 'light') haptics.light();
+        else if (haptic === 'medium') haptics.medium();
+        else if (haptic === 'heavy') haptics.heavy();
+        else if (haptic === 'selection') haptics.selection();
+      }
       onClick?.(e);
     },
-    [onClick],
+    [onClick, haptic],
   );
 
-  const classes = [
-    'btn',
-    `btn--${size}`,
-    `btn--${variant}`,
-    fullWidth && 'btn--full',
-    isIconOnly && 'btn--icon-only',
-    className,
-  ].filter(Boolean).join(' ');
+  const classes = variant === 'unstyled'
+    ? className
+    : [
+        'btn',
+        `btn--${size}`,
+        `btn--${variant}`,
+        fullWidth && 'btn--full',
+        isIconOnly && 'btn--icon-only',
+        className,
+      ].filter(Boolean).join(' ');
 
   const iconPx = isIconOnly ? ICON_ONLY_SIZE[size] : ICON_SIZE[size];
   const combinedStyle = color ? { color, ...style } : style;
