@@ -26,7 +26,7 @@ export function CustomDataManagerModal({
       <div className="modal-content" style={{ display: 'flex', flexDirection: 'column' }}>
         <ModalHeader title={t('common.customContent', 'Gestionnaire personnalisé')} onClose={onClose} />
         
-        <Stack gap="sm" style={{ flex: 1, overflow: 'hidden' }}>
+        <Stack style={{ flex: 1, overflow: 'hidden' }}>
           {/* Tabs */}
           <div style={{ padding: '0 var(--space-4)', width: '100%', maxWidth: '440px', margin: '0 auto' }}>
             <SegmentedControl
@@ -359,7 +359,7 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
 
           {/* ═══════ LIST VIEW ═══════ */}
           {view === 'list' && (
-            <Stack gap="sm" style={{ width: '100%', maxWidth: '440px' }}>
+            <Stack style={{ width: '100%', maxWidth: '440px' }}>
               <Stack
                 ref={listContainerRef}
                 gap="xs"
@@ -461,7 +461,6 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
               <div>
                 <Input
                   label={t('customCategories.nameLabel')}
-                  type="text"
                   maxLength={20}
                   value={name}
                   onChange={e => setName(e.target.value)}
@@ -535,7 +534,7 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
 
           {/* ═══════ DELETE VIEW — Exercise Migration ═══════ */}
           {view === 'delete' && deletingCat && (
-            <Stack gap="sm" className="fade-in" style={{ width: '100%', maxWidth: '440px' }}>
+            <Stack className="fade-in" style={{ width: '100%', maxWidth: '440px' }}>
 
               {/* Header: category being deleted */}
               <div style={{
@@ -836,7 +835,7 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
       <div style={{ flex: 1, overflow: confirmDeleteEx ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         
         {view === 'list' && (
-          <Stack gap="sm" style={{ width: '100%', maxWidth: '440px' }}>
+          <Stack style={{ width: '100%', maxWidth: '440px' }}>
             <Stack gap="xs" style={{ width: '100%' }}>
               {customExercises.length === 0 ? (
                 <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 20px' }}>
@@ -962,7 +961,6 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
               <Input
                 ref={nameInputRef}
                 label={t('customExercises.nameLabel')}
-                type="text"
                 maxLength={20}
                 value={label}
                 onChange={e => setLabel(e.target.value)}
@@ -1059,7 +1057,6 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
                 <Slider
                   min={0.1}
                   max={5}
-                  step={0.1}
                   value={multiplier}
                   color={color}
                   onChange={setMultiplier}

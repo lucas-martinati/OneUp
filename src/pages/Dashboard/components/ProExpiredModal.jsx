@@ -66,8 +66,8 @@ export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
         </Stack>
       </Stack>
 
-      <Stack gap="sm" style={{ padding: '0 var(--space-6) var(--space-5)' }}>
-        <Card variant="glass" style={{ padding: 'var(--space-4)', display: 'flex', gap: 'var(--space-3)' }}>
+      <Stack style={{ padding: '0 var(--space-6) var(--space-5)' }}>
+        <Card style={{ padding: 'var(--space-4)', display: 'flex', gap: 'var(--space-3)' }}>
           <BarChart3 size={22} color="#60a5fa" style={{ flexShrink: 0, marginTop: '2px' }} />
           <div style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.85)', lineHeight: 1.4 }}>
             <strong>{t('pro.expiredModal.statsTitle', 'Accès à vos statistiques :')}</strong>{' '}
@@ -75,7 +75,7 @@ export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
           </div>
         </Card>
 
-        <Card variant="glass" style={{ padding: 'var(--space-4)', display: 'flex', gap: 'var(--space-3)' }}>
+        <Card style={{ padding: 'var(--space-4)', display: 'flex', gap: 'var(--space-3)' }}>
           <CheckCircle2 size={22} color="#a7f3d0" style={{ flexShrink: 0, marginTop: '2px' }} />
           <div style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.85)', lineHeight: 1.4 }}>
             <strong>{t('pro.expiredModal.repsTitle', 'Répétitions conservées :')}</strong>{' '}
@@ -85,7 +85,6 @@ export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
       </Stack>
 
       <Stack
-        gap="sm"
         style={{
           padding: 'var(--space-4) var(--space-6) var(--space-6)',
           borderTop: '1px solid var(--border-default)',

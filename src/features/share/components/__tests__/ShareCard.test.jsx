@@ -50,7 +50,6 @@ describe('ShareCard', () => {
         stats={stats}
         sessionHistory={[]}
         options={{ showDuration: true, showStreak: true, showVolume: true, showExercises: true, showWeights: true }}
-        mode="session"
       />
     );
     expect(container.textContent).toContain('Morning grind');
@@ -106,7 +105,7 @@ describe('ShareCard', () => {
 
   it('renders with minimal options without crashing', () => {
     const { container } = render(
-      <ShareCard sessionData={{ exercises: [] }} stats={stats} sessionHistory={[]} options={{}} mode="session" />
+      <ShareCard sessionData={{ exercises: [] }} stats={stats} sessionHistory={[]} options={{}} />
     );
     expect(container.firstChild).toBeTruthy();
   });

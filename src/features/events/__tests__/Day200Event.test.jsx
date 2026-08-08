@@ -17,7 +17,7 @@ const ctx = (perEx) => ({
 const Harness = (props) => (
   <>
     <Day200EventManager {...props} />
-    <EventHud placement="dashboard" />
+    <EventHud />
   </>
 );
 

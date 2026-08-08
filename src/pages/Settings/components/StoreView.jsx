@@ -95,7 +95,7 @@ export function StoreView() {
 
             {/* --- Historique des achats --- */}
             {displayHistory && displayHistory.length > 0 && (
-                <Card variant="glass" padding="md">
+                <Card>
                     <div style={{
                         fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)',
                         textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'

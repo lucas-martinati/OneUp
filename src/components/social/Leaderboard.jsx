@@ -237,7 +237,6 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 VISIBLE_TABS={VISIBLE_TABS}
-                showDomainFilter={true}
                 showExerciseTabs={false}
             />
 
@@ -250,7 +249,6 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                     setActiveTab={setActiveTab}
                     VISIBLE_TABS={VISIBLE_TABS}
                     showDomainFilter={false}
-                    showExerciseTabs={true}
                 />
                 {loading && (
                     <div className={styles.center}>

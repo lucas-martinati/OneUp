@@ -301,7 +301,7 @@ export function Dashboard() {
 
                 {/* HUD d'événement intégré (thermomètre / constellation), masqué en douceur
                     quand une modale est ouverte — l'ExercisePanel affiche le sien. */}
-                <EventHud placement="dashboard" hidden={anyModalOpen} />
+                <EventHud hidden={anyModalOpen} />
 
                 <main className="flex-1 flex-col pos-relative dashboard-main">
                     <div

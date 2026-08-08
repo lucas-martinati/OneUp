@@ -111,7 +111,7 @@ export function StatsOverviewCards({
                 gap: '10px'
             }}>
                 <StatCard icon={Flame} value={displayStreak} format={intFormat} label={t('stats.currentStreak')}
-                    color="#f97316" dim={!streakActive} delay={0} pending={pending} />
+                    color="#f97316" dim={!streakActive} pending={pending} />
                 <StatCard icon={Award} value={maxStreak} format={intFormat} label={t('common.bestStreak')}
                     color="#fbbf24" delay={0.05} pending={pending} />
                 <StatCard icon={Target} value={totalDays} format={intFormat} label={t('stats.completedDays')}

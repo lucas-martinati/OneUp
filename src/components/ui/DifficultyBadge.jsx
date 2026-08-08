@@ -19,7 +19,7 @@ export const DifficultyBadge = ({ difficulty, style = {} }) => {
     const color = `hsl(${hue}, 85%, 55%)`;
 
     return (
-        <MetricBadge color={color} size="md" style={{ marginLeft: '4px', ...style }}>
+        <MetricBadge color={color} style={{ marginLeft: '4px', ...style }}>
             x{difficulty.toFixed(1)}
         </MetricBadge>
     );

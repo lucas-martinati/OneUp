@@ -146,7 +146,6 @@ export const DashboardHeader = React.memo(({
             {/* Top Bar in glass Card */}
             <Card
                 as="div"
-                variant="glass"
                 padding="none"
                 className="dashboard-header-top-bar"
                 style={{
@@ -251,7 +250,7 @@ export const DashboardHeader = React.memo(({
                         }}
                     >
                         {isStreakFrozen
-                            ? <FrozenFlame size={16} color={streakBadge.fg} />
+                            ? <FrozenFlame color={streakBadge.fg} />
                             : <Flame size={16} color={streakBadge.fg} />}
                         <span style={{ color: streakBadge.fg }}>{displayStreak}</span>
                     </Button>

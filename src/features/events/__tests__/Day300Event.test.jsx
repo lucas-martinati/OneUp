@@ -49,7 +49,7 @@ function renderApp(eventProps) {
   return render(
     <>
       <Day300EventManager {...eventProps} />
-      <EventHud placement="dashboard" />
+      <EventHud />
     </>
   );
 }

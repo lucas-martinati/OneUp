@@ -467,7 +467,7 @@ export function CardioModule() {
              actionButton = onGoogleStep ? (
                <GoogleSignInButton onClick={() => auth.signIn()}  style={{ width: 'auto', marginTop: '6px' }} />
              ) : (
-               <Stack align="center" gap="sm" style={{ marginTop: '6px' }}>
+               <Stack align="center" style={{ marginTop: '6px' }}>
                  {healthAvailable && (
                    <Button variant="ghost" onClick={handleConnectHealth}  style={{
                      padding: '12px 26px', borderRadius: '16px',

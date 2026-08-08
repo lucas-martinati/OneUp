@@ -69,13 +69,10 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
       onClose={onClose}
       ariaLabel="Pro Unlocked"
       maxWidth="460px"
-      borderGradient="rgba(139, 92, 246, 0.35)"
-      shadowGlow="rgba(139, 92, 246, 0.25)"
     >
       {/* Header Hero */}
       <Stack
         align="center"
-        gap="sm"
         style={{
           padding: 'var(--space-8) var(--space-6) var(--space-5)',
           textAlign: 'center',
@@ -141,7 +138,6 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
 
       {/* Scrollable Feature List */}
       <Stack
-        gap="sm"
         style={{
           padding: '0 var(--space-6) var(--space-5)',
           overflowY: 'auto',
@@ -165,7 +161,6 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
           return (
             <Card
               key={item.key}
-              variant="glass"
               style={{
                 display: 'flex',
                 alignItems: 'flex-start',

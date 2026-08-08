@@ -81,7 +81,7 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
 
       {/* Read-only metadata overview */}
       {meta && (
-        <Card variant="glass" padding="md">
+        <Card>
           <h3 style={sectionTitleStyle}>Aperçu</h3>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
@@ -109,7 +109,7 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
       )}
 
       {/* Section Abonnements / Droits */}
-      <Card variant="glass" padding="md">
+      <Card>
         <h3 style={sectionTitleStyle}>Abonnements & Droits</h3>
 
         <SettingRow
@@ -156,13 +156,12 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
       </Card>
 
       {/* Section Configuration settings */}
-      <Card variant="glass" padding="md">
+      <Card>
         <h3 style={sectionTitleStyle}>Préférences App</h3>
 
         <div style={{ marginBottom: '12px' }}>
           <Input
             label="Pseudo pour le Classement (Leaderboard)"
-            type="text"
             value={formState.leaderboardPseudo}
             onChange={(e) => setFormState(prev => ({ ...prev, leaderboardPseudo: e.target.value.slice(0, 20) }))}
             placeholder="Pseudo du classement"
@@ -255,13 +254,12 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
       </Card>
 
       {/* Section Progrès */}
-      <Card variant="glass" padding="md">
+      <Card>
         <h3 style={sectionTitleStyle}>Progression</h3>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
           <Input
             label="Date de commencement du défi (Format YYYY-MM-DD)"
-            type="text"
             value={formState.startDate}
             onChange={(e) => setFormState(prev => ({ ...prev, startDate: e.target.value }))}
             placeholder="Ex: 2026-01-01"

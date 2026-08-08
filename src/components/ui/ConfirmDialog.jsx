@@ -47,10 +47,8 @@ export function ConfirmDialog({
             open={open} 
             onClose={onCancel} 
             variant={destructive ? 'danger' : 'default'} 
-            size="sm" 
             showCloseButton={false} 
             footer={buttonsJSX} 
-            footerLayout="row"
             closeOnEscape={!loading}
             closeOnBackdrop={!loading}
         >

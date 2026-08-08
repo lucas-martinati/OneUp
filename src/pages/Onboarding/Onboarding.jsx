@@ -332,7 +332,7 @@ export function Onboarding({ onStart }) {
                 {/* ───────────────── STEP 3b — Import history (past) ───────────────── */}
                 {step === 3 && mode === 'past' && (
                     <>
-                        <Stack gap="sm" style={{ textAlign: 'left' }}>
+                        <Stack style={{ textAlign: 'left' }}>
                             {/* Start date */}
                             <div>
                                 <label style={{

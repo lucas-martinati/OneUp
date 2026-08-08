@@ -378,7 +378,6 @@ function JsonTreeNode({
                 path={childPath}
                 onValueChange={onValueChange}
                 onDelete={onDelete}
-                depth={0}
               />
             );
           })}
@@ -428,7 +427,6 @@ export function JsonTreeEditor({ value, onChange }) {
         path=""
         onValueChange={handleValueChange}
         onDelete={null} // Cannot delete root
-        depth={0}
       />
     </div>
   );

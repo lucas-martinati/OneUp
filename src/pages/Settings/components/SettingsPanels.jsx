@@ -14,7 +14,7 @@ export function PreferencesSection({ settings, onSave }) {
     const { t } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Card style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.preferences')}</SectionTitle>
 
             <Stack gap="xs">
@@ -34,7 +34,7 @@ export function PreferencesSection({ settings, onSave }) {
 
                 {/* Notification Time Picker */}
                 {settings?.notificationsEnabled && settings?.notificationTime && (
-                    <Stack gap="sm" className="scale-in" style={{
+                    <Stack className="scale-in" style={{
                         padding: '12px',
                         borderRadius: 'var(--radius-md)',
                         background: 'var(--surface-muted)',
@@ -137,7 +137,7 @@ export function PreferencesSection({ settings, onSave }) {
                     />
                 </SettingRow>
 
-                <Stack gap="sm" style={{ padding: 'var(--space-2) 0 var(--space-1) 0', width: '100%', boxSizing: 'border-box' }}>
+                <Stack style={{ padding: 'var(--space-2) 0 var(--space-1) 0', width: '100%', boxSizing: 'border-box' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', boxSizing: 'border-box' }}>
                         <div style={{
                             background: `linear-gradient(135deg, color-mix(in srgb, #06b6d4 13%, transparent), color-mix(in srgb, #06b6d4 3%, transparent))`,
@@ -185,7 +185,7 @@ export function LanguageSection() {
     const { t, i18n } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Card style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.language')}</SectionTitle>
             <SettingRow
                 icon={Globe}
@@ -233,7 +233,7 @@ export function PerformanceSection({ settings, onSave }) {
     const { t } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Card style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.performance')}</SectionTitle>
 
             <SettingRow
@@ -269,7 +269,7 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
     const { t } = useTranslation();
 
     return (
-        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Card style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.community')}</SectionTitle>
 
             <Stack gap="xs">
@@ -291,7 +291,6 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
                     <div className="scale-in" style={{ paddingTop: '4px' }}>
                         <Input
                             label={t('settings.displayName')}
-                            type="text"
                             value={settings.leaderboardPseudo || ''}
                             onChange={(e) => onSave({ ...settings, leaderboardPseudo: e.target.value.slice(0, 20) })}
                             placeholder={cloudAuth?.user?.displayName || t('common.yourPseudo')}
@@ -312,7 +311,7 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
     const currentTheme = settings.appTheme || 'dark';
 
     return (
-        <Card variant="glass" padding="md" style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Card style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span>{t('settings.appTheme')}</span>
                 {!isPro && <Lock size={14} color="var(--accent)" style={{ opacity: 0.8 }} />}
@@ -390,7 +389,7 @@ export function DataSection() {
     };
 
     return (
-        <Card variant="glass" padding="md" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Card style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.dataTitle')}</SectionTitle>
 
             <Stack gap="xs">

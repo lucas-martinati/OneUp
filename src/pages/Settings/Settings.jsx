@@ -85,7 +85,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
 
                         {/* ── Données & Cloud ─────────────────────────────────────── */}
                         {cloudAuth && cloudSync && (
-                            <Card variant="glass" padding="md">
+                            <Card>
                                 <CloudSyncPanel
                                     authState={cloudAuth}
                                     onSignIn={() => cloudAuth.signIn()}

@@ -36,7 +36,7 @@ export function DifficultySettings() {
     const [isMultiplierUnlocked, setIsMultiplierUnlocked] = useState(false);
 
     return (
-        <Card variant="glass" padding="md" style={{
+        <Card style={{
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--space-6)',
@@ -121,7 +121,6 @@ export function DifficultySettings() {
                                                 <Slider
                                                     min={0.1}
                                                     max={1}
-                                                    step={0.1}
                                                     value={val}
                                                     color={exColor}
                                                     onChange={(newVal) => updateConfig(ex.id, { difficulty: newVal })}
