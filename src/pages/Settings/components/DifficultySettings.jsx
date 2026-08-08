@@ -69,7 +69,8 @@ export function DifficultySettings() {
                     style={{
                         width: '100%',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        gap: '12px', letterSpacing: '1px'
+                        gap: '12px', letterSpacing: '1px',
+                        whiteSpace: 'normal', height: 'auto', textAlign: 'center', padding: '12px'
                     }}
                 >
                     {t('settings.unlockSettings')} <Lock size={18} />

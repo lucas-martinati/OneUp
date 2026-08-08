@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, Edit2, Check, ChevronRight, Settings2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, GripVertical } from '@utils/icons';
-import { Button, Input, ModalHeader, DeleteConfirmModal, ColorPicker, Slider, SegmentedControl, Stack, ListActionRow } from '@components/ui';
+import { Button, Input, ModalHeader, ConfirmDialog, ColorPicker, Slider, SegmentedControl, Stack, ListActionRow } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { DynamicIcon } from '@utils/icons';
@@ -698,11 +698,11 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
         </div>
       </div>
 
-      <DeleteConfirmModal
+      <ConfirmDialog
         open={showConfirmDelete}
         title={t('customCategories.deleteTitle')}
         message={t('customCategories.deleteConfirm', { name: deletingCat?.name })}
-        warningMessage={repsToLose > 0 ? t('customExercises.deleteWarning', { count: repsToLose.toLocaleString(i18n.language), unit: t('customExercises.repetitions') }) : undefined}
+        warning={repsToLose > 0 ? t('customExercises.deleteWarning', { count: repsToLose.toLocaleString(i18n.language), unit: t('customExercises.repetitions') }) : undefined}
         loading={false}
         onConfirm={handleConfirmDelete}
         onCancel={() => {
@@ -857,8 +857,8 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
                       key={ex.id}
                       renderActions={() => (
                         <>
-                          <Button iconOnly icon={Edit2} onClick={(e) => { e.stopPropagation(); handleEdit(ex); }} variant="ghost" size="sm" aria-label="Modifier" />
-                          <Button iconOnly icon={Trash2} onClick={(e) => { e.stopPropagation(); handleDelete(ex); }} variant="danger-ghost" size="sm" aria-label="Supprimer" />
+                          <Button iconOnly icon={Edit2} onClick={(e) => { e.stopPropagation(); handleEdit(ex); }} variant="ghost" size="sm" aria-label={t('common.edit')} />
+                          <Button iconOnly icon={Trash2} onClick={(e) => { e.stopPropagation(); handleDelete(ex); }} variant="danger-ghost" size="sm" aria-label={t('common.delete')} />
                         </>
                       )}
                       style={{
@@ -1103,11 +1103,13 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
       </div>
 
       {/* Delete Confirmation Modal */}
-      <DeleteConfirmModal
+      <ConfirmDialog
+        destructive
         open={!!confirmDeleteEx}
+        confirmLabel={t('common.delete')}
         title={t('customExercises.deleteTitle')}
         message={t('customExercises.deleteConfirm', { name: confirmDeleteEx?.label })}
-        warningMessage={confirmDeleteEx && computedStats?.exerciseReps?.[confirmDeleteEx.id] > 0 ? t('customExercises.deleteWarning', { count: computedStats.exerciseReps[confirmDeleteEx.id].toLocaleString(i18n.language), unit: confirmDeleteEx.type === 'timer' ? t('customExercises.seconds') : t('customExercises.repetitions') }) : undefined}
+        warning={confirmDeleteEx && computedStats?.exerciseReps?.[confirmDeleteEx.id] > 0 ? t('customExercises.deleteWarning', { count: computedStats.exerciseReps[confirmDeleteEx.id].toLocaleString(i18n.language), unit: confirmDeleteEx.type === 'timer' ? t('customExercises.seconds') : t('customExercises.repetitions') }) : undefined}
         onConfirm={() => {
           deleteCustomExercise(confirmDeleteEx.id);
           setConfirmDeleteEx(null);

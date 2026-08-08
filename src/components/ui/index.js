@@ -27,7 +27,7 @@ export { EmptyState } from './EmptyState';
 export { ModalContainer } from './ModalContainer';
 export { MetricBadge } from './MetricBadge';
 export { FitToView } from './FitToView';
-export { DeleteConfirmModal } from './DeleteConfirmModal';
+
 export { ColorPicker } from './ColorPicker';
 export { ListActionButton } from './ListActionButton';
 export { ListActionRow } from './ListActionRow';

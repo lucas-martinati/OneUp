@@ -113,10 +113,10 @@ describe('CustomDataManagerModal — Categories', () => {
 
   it('allows editing a category', () => {
     const hooks = makeHooks([], [{ id: 'c1', name: 'Yoga', color: '#ff0000', icon: 'Star' }]);
-    const { getByDisplayValue, getByText, getAllByLabelText, hooks: h } = renderModal({ hooks });
+    const { getByDisplayValue, getByText, getByLabelText, hooks: h } = renderModal({ hooks });
     
     // Click the edit button for Yoga
-    fireEvent.click(getAllByLabelText('common.edit')[1]); 
+    fireEvent.click(getByLabelText('common.edit')); 
     
     expect(getByDisplayValue('Yoga')).toBeTruthy();
     fireEvent.change(getByDisplayValue('Yoga'), { target: { value: 'Advanced Yoga' } });

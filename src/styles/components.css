@@ -123,26 +123,6 @@ button:focus:not(:focus-visible) {
 }
 
 
-/* Error-tinted notice strip inside a dialog ("this cannot be undone"). */
-.dialog-warning {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  width: 100%;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--error) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--error) 20%, transparent);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.dialog-warning svg {
-  flex-shrink: 0;
-  color: var(--error);
-}
-
 /* ── Toggle Switch (ui/ToggleSwitch.jsx) ────────────────────────────────
    Organic take on the classic switch: the knob is a blob (same morph as the
    dashboard counter button) that jellies on toggle via dropletSquish.

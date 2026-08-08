@@ -52,14 +52,6 @@
   display: none !important;
 }
 
-[data-perf="low"] .gradient-button {
-  animation: none !important;
-}
-
-[data-perf="low"] .gradient-button::before {
-  display: none !important;
-}
-
 [data-perf="low"] .hover-lift,
 [data-perf="low"] .hover-lift:hover {
   transition: none !important;

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { X, Trophy, LogOut, Activity } from '@utils/icons';
 import { Button, Spinner, GoogleSignInButton } from '@components/ui';
-import { DeleteConfirmModal } from '@components/ui/DeleteConfirmModal';
+import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { getLocalDateStr } from '@shared/dateUtils';
@@ -330,7 +330,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
             )}
 
             {/* Leave Clan Confirmation */}
-            <DeleteConfirmModal
+            <ConfirmDialog destructive
                 open={showLeaveConfirm}
                 title={t('leaderboard.leaveClanConfirm')}
                 message={

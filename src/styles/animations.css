@@ -439,15 +439,6 @@
   }
 }
 
-/* Gradient button */
-.gradient-button {
-  background: var(--gradient-primary);
-  background-size: 200% 200%;
-  animation: gradientShift 3s ease infinite;
-  position: relative;
-  overflow: hidden;
-}
-
 @keyframes gradientShift {
 
   0%,
@@ -565,23 +556,6 @@
     transform: scale(1) rotate(0deg);
     opacity: 1;
   }
-}
-
-.gradient-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
-}
-
-.gradient-button:hover::before {
-  transform: translateX(100%);
 }
 
 @keyframes spin {

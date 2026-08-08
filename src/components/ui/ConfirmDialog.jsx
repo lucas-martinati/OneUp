@@ -46,8 +46,6 @@ export function ConfirmDialog({
         <ModalShell 
             open={open} 
             onClose={onCancel} 
-            icon={Icon} 
-            title={title} 
             variant={destructive ? 'danger' : 'default'} 
             size="sm" 
             showCloseButton={false} 
@@ -56,23 +54,50 @@ export function ConfirmDialog({
             closeOnEscape={!loading}
             closeOnBackdrop={!loading}
         >
-            <p style={{
-                margin: 0,
-                fontSize: '0.9rem',
-                fontWeight: '500',
-                color: 'var(--text-primary)',
-                textAlign: 'center',
-                lineHeight: '1.5',
+            <div style={{
+                textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px',
+                alignItems: 'center', paddingTop: '8px'
             }}>
-                {message}
-            </p>
+                {Icon && (
+                    <div style={{
+                        width: '56px', height: '56px', borderRadius: '50%', 
+                        background: destructive ? 'color-mix(in srgb, var(--error) 15%, transparent)' : 'color-mix(in srgb, var(--accent) 15%, transparent)',
+                        color: destructive ? 'var(--error)' : 'var(--accent)', 
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        <Icon size={28} />
+                    </div>
+                )}
+                
+                {title && (
+                    <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.25rem', fontWeight: '800' }}>
+                        {title}
+                    </h3>
+                )}
+                
+                <p style={{
+                    margin: 0,
+                    fontSize: '0.9rem',
+                    fontWeight: '500',
+                    color: 'var(--text-secondary)',
+                    textAlign: 'center',
+                    lineHeight: '1.5',
+                }}>
+                    {message}
+                </p>
 
-            {warning && (
-                <div className="dialog-warning">
-                    <AlertTriangle size={14} />
-                    <span>{warning}</span>
-                </div>
-            )}
+                {warning && (
+                    <div style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                        marginTop: '4px', color: 'var(--warning)', fontSize: '0.85rem', fontWeight: '700', 
+                        padding: '10px 14px', background: 'color-mix(in srgb, var(--warning) 15%, transparent)',
+                        borderRadius: '8px', width: '100%', textAlign: 'left'
+                    }}>
+                        <AlertTriangle size={18} style={{ flexShrink: 0 }} />
+                        <span>{warning}</span>
+                    </div>
+                )}
+            </div>
         </ModalShell>
     );
 }
