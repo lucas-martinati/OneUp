@@ -25,6 +25,7 @@ export const Button = forwardRef(function Button(
   {
     variant = 'primary',
     size = 'md',
+    lift = true,
     fullWidth = false,
     iconOnly = false,
     haptic = false,
@@ -62,6 +63,7 @@ export const Button = forwardRef(function Button(
     'btn',
     `btn--${size}`,
     `btn--${variant}`,
+    lift && 'hover-lift',
     fullWidth && 'btn--full',
     isIconOnly && 'btn--icon-only',
     className,
