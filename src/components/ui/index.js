@@ -30,4 +30,5 @@ export { FitToView } from './FitToView';
 export { DeleteConfirmModal } from './DeleteConfirmModal';
 export { ColorPicker } from './ColorPicker';
 export { ListActionButton } from './ListActionButton';
+export { ListActionRow } from './ListActionRow';
 export { FilterDropdown } from './FilterDropdown';

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Clock, Trash2, Dumbbell, Zap } from '@utils/icons';
 import { getIcon } from '@utils/icons';
-import { Button, ConfirmDialog, WeightBadge, InlineNameEditor } from '@components/ui';
+import { Button, DeleteConfirmModal, WeightBadge, InlineNameEditor } from '@components/ui';
 import { Z_INDEX } from '@utils/zIndex';
 import { updateSessionName } from '@features/share/services/sessionHistoryService';
 import { getExerciseLabel, getExerciseColor } from '@utils/exerciseLabel';
@@ -153,13 +153,11 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
         </div>
       </div>
 
-      <ConfirmDialog
+      <DeleteConfirmModal
         open={confirmDelete}
-        destructive
         title={t('share.deleteSession')}
         message={hasName ? name : formatDateTime(session.date, lang)}
-        warning={t('share.deleteSessionWarning')}
-        confirmLabel={t('common.delete')}
+        warningMessage={t('share.deleteSessionWarning')}
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
       />

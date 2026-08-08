@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { X, Trophy, LogOut, Activity } from '@utils/icons';
-import { Button, Spinner, GoogleSignInButton, ConfirmDialog } from '@components/ui';
+import { Button, Spinner, GoogleSignInButton } from '@components/ui';
+import { DeleteConfirmModal } from '@components/ui/DeleteConfirmModal';
 import { EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { getLocalDateStr } from '@shared/dateUtils';
@@ -329,7 +330,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
             )}
 
             {/* Leave Clan Confirmation */}
-            <ConfirmDialog
+            <DeleteConfirmModal
                 open={showLeaveConfirm}
                 title={t('leaderboard.leaveClanConfirm')}
                 message={
@@ -337,7 +338,6 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                         Es-tu sûr de vouloir quitter <strong>{{name: clanData?.name}}</strong> ? Tes statistiques personnelles sont protégées, mais tu n'apparaîtras plus dans leur classement.
                     </Trans>
                 }
-                destructive
                 confirmLabel={t('leaderboard.leaveClan')}
                 cancelLabel={t('common.cancel')}
                 onConfirm={async () => {

@@ -1,6 +1,6 @@
 import { useRef, useEffect, useMemo } from 'react';
-import { X, Play, Check, Save, Trash2, GripVertical, Pencil, Shuffle, ChevronUp, ChevronDown, DynamicIcon } from '@utils/icons';
-import { Button, ToggleSwitch, ListActionButton } from '@components/ui';
+import { X, Play, Check, Save, Trash2, Pencil, Shuffle, DynamicIcon } from '@utils/icons';
+import { Button, ToggleSwitch, ListActionRow } from '@components/ui';
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { Z_INDEX } from '@utils/zIndex';
 import { SessionSummary } from './SessionSummary';
@@ -187,7 +187,7 @@ export function WorkoutSession(props) {
         phase, queue, setQueue, showSaveRoutine, setShowSaveRoutine,
         routineName, setRoutineName,
         confirmDeleteId, setConfirmDeleteId,
-        dragIdx, dragOverIdx, queueListRef, itemRefs,
+        dragIdx, dragOverIdx, queueListRef,
         sessionDuration, savedSession, sessionName,
         hasAnimatedFirstPanel, showAll, setShowAll,
         t, computedStats, isPro, fullCategoryOrder, fullCategoryColors,
@@ -341,16 +341,34 @@ export function WorkoutSession(props) {
                                         }
 
                                         return (
-                                            <div
+                                            <ListActionRow
                                                 key={id}
-                                                ref={el => itemRefs.current[i] = el}
-                                                draggable
-                                                onDragStart={() => handleDragStart(i)}
-                                                onDragOver={(e) => { e.preventDefault(); handleDragOver(i); }}
-                                                onDragEnd={handleDragEnd}
-                                                onTouchStart={(e) => handleTouchStart(e, i)}
-                                                onTouchMove={handleTouchMove}
-                                                onTouchEnd={handleTouchEnd}
+                                                isDraggable={true}
+                                                dragProps={{
+                                                    onDragStart: () => handleDragStart(i),
+                                                    onDragOver: (e) => { e.preventDefault(); handleDragOver(i); },
+                                                    onDragEnd: handleDragEnd
+                                                }}
+                                                dragHandleProps={{
+                                                    onTouchStart: (e) => handleTouchStart(e, i),
+                                                    onTouchMove: handleTouchMove,
+                                                    onTouchEnd: handleTouchEnd
+                                                }}
+                                                showOrderControls={true}
+                                                isFirst={isFirst}
+                                                isLast={isLast}
+                                                onMoveUp={() => moveItem(i, i - 1)}
+                                                onMoveDown={() => moveItem(i, i + 1)}
+                                                renderActions={() => (
+                                                    <Button 
+                                                        iconOnly 
+                                                        icon={X} 
+                                                        onClick={(e) => { e.stopPropagation(); toggleExercise(id); }} 
+                                                        variant="danger-ghost" 
+                                                        size="sm" 
+                                                        aria-label="Remove" 
+                                                    />
+                                                )}
                                                 className={styles.queueItem}
                                                 style={{
                                                     background: itemBg,
@@ -361,8 +379,6 @@ export function WorkoutSession(props) {
                                                     transform: isDragging ? 'scale(0.97)' : undefined,
                                                 }}
                                             >
-                                                <GripVertical size={14} color="var(--text-secondary)" style={{ opacity: 0.3, flexShrink: 0 }} />
-
                                                 <div className={styles.numBadge} style={{ background: ex.color }}>
                                                     {i + 1}
                                                 </div>
@@ -383,31 +399,7 @@ export function WorkoutSession(props) {
                                                         {getConfig(id)?.weight || 0} {t('weight.kg')}
                                                     </span>
                                                 )}
-
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', flexShrink: 0 }}>
-                                                    <ListActionButton
-                                                        shape="up"
-                                                        onClick={(e) => { e.stopPropagation(); moveItem(i, i - 1); }}
-                                                        disabled={isFirst}
-                                                        aria-label="Move up"
-                                                        icon={ChevronUp}
-                                                    />
-                                                    <ListActionButton
-                                                        shape="down"
-                                                        onClick={(e) => { e.stopPropagation(); moveItem(i, i + 1); }}
-                                                        disabled={isLast}
-                                                        aria-label="Move down"
-                                                        icon={ChevronDown}
-                                                    />
-                                                </div>
-
-                                                <ListActionButton
-                                                    variant="danger"
-                                                    onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
-                                                    aria-label={t('common.delete')}
-                                                    icon={X}
-                                                />
-                                            </div>
+                                            </ListActionRow>
                                         );
                                     })}
                                 </div>

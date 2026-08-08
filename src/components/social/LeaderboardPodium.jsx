@@ -1,7 +1,6 @@
 import React from 'react';
 import { Crown, Star, HeartHandshake, Check, Shield, ShieldAlert } from '@utils/icons';
 import { Avatar } from '@components/ui/Avatar';
-import { Button } from '@components/ui';
 import { getTierBadgeConfigs } from '@utils/entitlements';
 import { PALETTE } from '@styles/palette';
 import styles from '@styles/Leaderboard.module.css';

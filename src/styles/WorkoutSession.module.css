@@ -379,60 +379,7 @@
   flex-shrink: 0;
 }
 
-.arrowCol {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  flex-shrink: 0;
-}
 
-.arrowBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 17px;
-  padding: 0;
-  background: var(--surface-dim);
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background var(--motion-fast) ease, color var(--motion-fast) ease;
-}
-
-.arrowBtn:first-child {
-  border-radius: 6px 6px 2px 2px;
-}
-
-.arrowBtn:last-child {
-  border-radius: 2px 2px 6px 6px;
-}
-
-.arrowBtn:disabled {
-  background: transparent;
-  color: var(--border-default);
-  cursor: default;
-}
-
-.removeBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-  padding: 0;
-  background: color-mix(in srgb, var(--error) 10%, transparent);
-  border: none;
-  border-radius: 50%;
-  color: color-mix(in srgb, var(--error) 70%, var(--text-primary));
-  cursor: pointer;
-  transition: background var(--motion-fast) ease;
-}
-
-.removeBtn:hover {
-  background: color-mix(in srgb, var(--error) 22%, transparent);
-}
 
 .reorderHint {
   text-align: center;

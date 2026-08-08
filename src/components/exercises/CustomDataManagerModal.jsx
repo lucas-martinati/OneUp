@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, Edit2, Check, ChevronRight, ChevronUp, ChevronDown, GripVertical, Settings2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS } from '@utils/icons';
-import { Button, Input, ModalHeader, DeleteConfirmModal, ColorPicker, Slider, SegmentedControl, Stack, ListActionButton } from '@components/ui';
+import { Plus, Trash2, Edit2, Check, ChevronRight, Settings2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS } from '@utils/icons';
+import { Button, Input, ModalHeader, DeleteConfirmModal, ColorPicker, Slider, SegmentedControl, Stack, ListActionRow } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { DynamicIcon } from '@utils/icons';
@@ -78,8 +78,7 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
 
   const [view, setView] = useState('list'); // list | create | category-create
 
-  // Active tab in list view
-  const [activeTab, setActiveTab] = useState('categories'); // categories | exercises
+  const [editingId, setEditingId] = useState(null);
   const [name, setName] = useState('');
   const [color, setColor] = useState('#8b5cf6');
   const [error, setError] = useState('');
@@ -258,15 +257,9 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
     setView('list');
   };
 
-  const handleEdit = (cat) => {
-    setEditingId(cat.id);
-    setName(cat.name);
-    setColor(cat.color);
-    setError('');
-    setView('create');
-  };
 
-  const handleStartDelete = (cat) => {
+
+  const initiateCategoryDelete = (cat) => {
     const exercises = exercisesByUserCategory?.[cat.id] || [];
     if (exercises.length === 0) {
       deleteCategory(cat.id, {}, []);
@@ -378,43 +371,52 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
                 const isBuiltIn = cat.id === 'custom';
                 const exerciseCount = isBuiltIn ? defaultCustomExercises.length : (exercisesByUserCategory?.[cat.id]?.length || 0);
                 const isDragging = draggedIndex === index;
+                const userCatsOnly = customCategories.filter(c => c.id !== 'custom');
+                const userIndex = userCatsOnly.findIndex(c => c.id === cat.id);
 
                 return (
-                  <div
+                  <ListActionRow
                     key={cat.id}
-                    data-cat-id={cat.id}
-                    draggable={!isBuiltIn}
-                    onDragStart={(e) => handleDragStart(e, index)}
-                    onDragOver={(e) => handleDragOver(e, index)}
-                    onDragEnd={handleDragEnd}
+                    isDraggable={!isBuiltIn}
+                    dragProps={{
+                        'data-cat-id': cat.id,
+                        onDragStart: (e) => handleDragStart(e, index),
+                        onDragOver: (e) => handleDragOver(e, index),
+                        onDragEnd: handleDragEnd
+                    }}
+                    dragHandleProps={{
+                        onTouchStart: () => handleTouchStart(index),
+                        onTouchMove: handleTouchMove,
+                        onTouchEnd: handleTouchEnd
+                    }}
+                    showOrderControls={!isBuiltIn}
+                    isFirst={userIndex === 0}
+                    isLast={userIndex === userCatsOnly.length - 1}
+                    onMoveUp={() => moveCategory(cat.id, 'up')}
+                    onMoveDown={() => moveCategory(cat.id, 'down')}
+                    renderActions={() => !isBuiltIn ? (
+                      <>
+                        <Button iconOnly icon={Edit2} onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingId(cat.id);
+                            setName(cat.name);
+                            setColor(cat.color || '#8b5cf6');
+                            setView('create');
+                        }} variant="ghost" size="sm" aria-label={t('common.edit')} />
+                        <Button iconOnly icon={Trash2} onClick={(e) => {
+                            e.stopPropagation();
+                            initiateCategoryDelete(cat);
+                        }} variant="danger-ghost" size="sm" aria-label={t('common.delete')} />
+                      </>
+                    ) : null}
                     style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                       padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-lg)',
                       background: isDragging ? 'rgba(139, 92, 246, 0.15)' : 'var(--surface-muted)',
                       border: `1px solid ${cat.color}${isDragging ? '80' : '30'}`,
                       opacity: isDragging ? 0.6 : 1,
-                      cursor: !isBuiltIn ? 'grab' : 'default',
-                      userSelect: 'none',
                       transition: 'transform 0.15s ease, background-color 0.15s ease, opacity 0.15s ease'
                     }}
                   >
-                    <div className="flex-align-center gap-12" style={{ alignItems: 'center' }}>
-                      {!isBuiltIn && (
-                        <div
-                          onTouchStart={() => handleTouchStart(index)}
-                          onTouchMove={handleTouchMove}
-                          onTouchEnd={handleTouchEnd}
-                          title="Glisser pour réordonner"
-                          aria-label="Glisser pour réordonner"
-                          style={{
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            color: 'rgba(255, 255, 255, 0.35)',
-                            cursor: 'grab', touchAction: 'none', paddingRight: '2px'
-                          }}
-                        >
-                          <GripVertical size={18} />
-                        </div>
-                      )}
                       <div style={{
                         width: '36px', height: '36px', borderRadius: 'var(--radius-md)',
                         background: `${cat.color}20`, border: `2px solid ${cat.color}50`,
@@ -432,50 +434,7 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
                           {t('common.exerciseCount', { count: exerciseCount })}
                         </div>
                       </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                      {!isBuiltIn && (
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '2px',
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          borderRadius: 'var(--radius-md)',
-                          padding: '2px',
-                          marginRight: '4px'
-                        }}>
-                          {(() => {
-                            const userCatsOnly = customCategories.filter(c => c.id !== 'custom');
-                            const userIndex = userCatsOnly.findIndex(c => c.id === cat.id);
-                            return (
-                              <>
-                                <ListActionButton
-                                  variant="ghost"
-                                  shape="up"
-                                  onClick={() => moveCategory(cat.id, 'up')}
-                                  disabled={userIndex === 0}
-                                  aria-label="Monter"
-                                  icon={ChevronUp}
-                                />
-                                <ListActionButton
-                                  variant="ghost"
-                                  shape="down"
-                                  onClick={() => moveCategory(cat.id, 'down')}
-                                  disabled={userIndex === userCatsOnly.length - 1}
-                                  aria-label="Descendre"
-                                  icon={ChevronDown}
-                                />
-                              </>
-                            );
-                          })()}
-                        </div>
-                      )}
-                      <Button iconOnly icon={Edit2} onClick={() => handleEdit(cat)} variant="ghost" size="sm" aria-label="Modifier" />
-                      {!isBuiltIn && (
-                        <Button iconOnly icon={Trash2} onClick={() => handleStartDelete(cat)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
-                      )}
-                    </div>
-                  </div>
+                  </ListActionRow>
                 );
               })}
 
@@ -756,7 +715,6 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
         onConfirm={handleConfirmDelete}
         onCancel={() => {
           setShowConfirmDelete(false);
-          setDeletingCat(null);
         }}
       />
     </>
@@ -902,31 +860,33 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
               customExercises.map(ex => {
                 const IconComponent = CUSTOM_EXERCISE_ICONS[ex.icon] || Star;
                 return (
-                  <div key={ex.id} style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)',
-                    background: 'var(--surface-muted)', border: '1px solid var(--border-default)'
-                  }}>
-                    <div className="flex-align-center gap-12" style={{ alignItems: 'center' }}>
-                      <div style={{
-                        width: '40px', height: '40px', borderRadius: '50%',
-                        background: `${ex.color}20`, color: ex.color,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                      }}>
-                        <IconComponent size={20} />
-                      </div>
-                      <div>
-                        <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{ex.label}</div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                          {ex.type === 'timer' ? t('customExercises.typeTimer') : t('customExercises.typeCounter')} • {t('customExercises.multiplierShort')}: x{ex.multiplier}
-                        </div>
+                  <ListActionRow
+                    key={ex.id}
+                    renderActions={() => (
+                      <>
+                        <Button iconOnly icon={Edit2} onClick={(e) => { e.stopPropagation(); handleEdit(ex); }} variant="ghost" size="sm" aria-label="Modifier" />
+                        <Button iconOnly icon={Trash2} onClick={(e) => { e.stopPropagation(); handleDelete(ex); }} variant="danger-ghost" size="sm" aria-label="Supprimer" />
+                      </>
+                    )}
+                    style={{
+                      padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-lg)',
+                      background: 'var(--surface-muted)', border: '1px solid var(--border-default)'
+                    }}
+                  >
+                    <div style={{
+                      width: '40px', height: '40px', borderRadius: '50%',
+                      background: `${ex.color}20`, color: ex.color,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                      <IconComponent size={20} />
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{ex.label}</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                        {ex.type === 'timer' ? t('customExercises.typeTimer') : t('customExercises.typeCounter')} • {t('customExercises.multiplierShort')}: x{ex.multiplier}
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '4px' }}>
-                      <Button iconOnly icon={Edit2} onClick={() => handleEdit(ex)} variant="ghost" size="sm" aria-label="Modifier" />
-                      <Button iconOnly icon={Trash2} onClick={() => handleDelete(ex)} variant="danger-ghost" size="sm" aria-label="Supprimer" />
-                    </div>
-                  </div>
+                  </ListActionRow>
                 );
               })
             )}

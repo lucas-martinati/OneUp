@@ -12,6 +12,8 @@ export function DeleteConfirmModal({
   onConfirm,
   onCancel,
   loading = false,
+  confirmLabel,
+  cancelLabel
 }) {
   const { t } = useTranslation();
 
@@ -59,10 +61,10 @@ export function DeleteConfirmModal({
 
         <div style={{ display: 'flex', gap: '12px', marginTop: '12px', width: '100%' }}>
           <Button variant="secondary" onClick={onCancel} disabled={loading} style={{ flex: 1 }}>
-            {t('common.cancel')}
+            {cancelLabel || t('common.cancel')}
           </Button>
           <Button variant="danger" onClick={onConfirm} loading={loading} style={{ flex: 1 }}>
-            {t('common.delete')}
+            {confirmLabel || t('common.delete')}
           </Button>
         </div>
       </div>

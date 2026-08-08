@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Star, X } from '@utils/icons';
+import { Trophy, Medal, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Star, X } from '@utils/icons';
 import { Avatar } from '@components/ui/Avatar';
 import { Card } from '@components/ui/Card';
 import { Button } from '@components/ui';
