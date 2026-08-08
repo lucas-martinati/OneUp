@@ -359,84 +359,76 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
 
           {/* ═══════ LIST VIEW ═══════ */}
           {view === 'list' && (
-            <Stack
-              ref={listContainerRef}
-              gap="xs"
-              style={{ width: '100%', maxWidth: '440px' }}
-            >
-              {[
-                { id: 'custom', name: t('common.custom'), color: '#34d399', ...customCategories.find(c => c.id === 'custom') },
-                ...customCategories.filter(c => c.id !== 'custom')
-              ].map((cat, index) => {
-                const isBuiltIn = cat.id === 'custom';
-                const exerciseCount = isBuiltIn ? defaultCustomExercises.length : (exercisesByUserCategory?.[cat.id]?.length || 0);
-                const isDragging = draggedIndex === index;
-                const userCatsOnly = customCategories.filter(c => c.id !== 'custom');
-                const userIndex = userCatsOnly.findIndex(c => c.id === cat.id);
+            <Stack gap="sm" style={{ width: '100%', maxWidth: '440px' }}>
+              <Stack
+                ref={listContainerRef}
+                gap="xs"
+                style={{ width: '100%' }}
+              >
+                {[
+                  { id: 'custom', name: t('common.custom'), color: '#34d399', ...customCategories.find(c => c.id === 'custom') },
+                  ...customCategories.filter(c => c.id !== 'custom')
+                ].map((cat, index) => {
+                  const isBuiltIn = cat.id === 'custom';
+                  const exerciseCount = isBuiltIn ? defaultCustomExercises.length : (exercisesByUserCategory?.[cat.id]?.length || 0);
+                  const isDragging = draggedIndex === index;
 
-                return (
-                  <ListActionRow
-                    key={cat.id}
-                    isDraggable={!isBuiltIn}
-                    dragProps={{
-                        'data-cat-id': cat.id,
-                        onDragStart: (e) => handleDragStart(e, index),
-                        onDragOver: (e) => handleDragOver(e, index),
-                        onDragEnd: handleDragEnd
-                    }}
-                    dragHandleProps={{
-                        onTouchStart: () => handleTouchStart(index),
-                        onTouchMove: handleTouchMove,
-                        onTouchEnd: handleTouchEnd
-                    }}
-                    showOrderControls={!isBuiltIn}
-                    isFirst={userIndex === 0}
-                    isLast={userIndex === userCatsOnly.length - 1}
-                    onMoveUp={() => moveCategory(cat.id, 'up')}
-                    onMoveDown={() => moveCategory(cat.id, 'down')}
-                    renderActions={() => !isBuiltIn ? (
-                      <>
-                        <Button iconOnly icon={Edit2} onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingId(cat.id);
-                            setName(cat.name);
-                            setColor(cat.color || '#8b5cf6');
-                            setView('create');
-                        }} variant="ghost" size="sm" aria-label={t('common.edit')} />
-                        <Button iconOnly icon={Trash2} onClick={(e) => {
-                            e.stopPropagation();
-                            initiateCategoryDelete(cat);
-                        }} variant="danger-ghost" size="sm" aria-label={t('common.delete')} />
-                      </>
-                    ) : null}
-                    style={{
-                      padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-lg)',
-                      background: isDragging ? 'rgba(139, 92, 246, 0.15)' : 'var(--surface-muted)',
-                      border: `1px solid ${cat.color}${isDragging ? '80' : '30'}`,
-                      opacity: isDragging ? 0.6 : 1,
-                      transition: 'transform 0.15s ease, background-color 0.15s ease, opacity 0.15s ease'
-                    }}
-                  >
-                      <div style={{
-                        width: '36px', height: '36px', borderRadius: 'var(--radius-md)',
-                        background: `${cat.color}20`, border: `2px solid ${cat.color}50`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                      }}>
-                        <div style={{
-                          width: '14px', height: '14px', borderRadius: '50%',
-                          background: cat.color,
-                          boxShadow: `0 0 8px ${cat.color}66`
-                        }} />
-                      </div>
-                      <div>
-                        <div style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '0.95rem' }}>{cat.name || (isBuiltIn ? t('common.custom') : '')}</div>
-                        <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                          {t('common.exerciseCount', { count: exerciseCount })}
+                  return (
+                    <ListActionRow
+                      key={cat.id}
+                      isDraggable={!isBuiltIn}
+                      isDragging={isDragging}
+                      onDragStart={(e) => handleDragStart(e, index)}
+                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDragEnd={handleDragEnd}
+                      onTouchStart={(e) => handleTouchStart(e, index)}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
+                      renderActions={() => !isBuiltIn && (
+                        <>
+                          <Button iconOnly icon={Edit2} onClick={(e) => { e.stopPropagation(); setEditingId(cat.id); setName(cat.name); setColor(cat.color || '#8b5cf6'); setError(''); setView('create'); }} variant="ghost" size="sm" aria-label={t('common.edit')} />
+                          <Button iconOnly icon={Trash2} onClick={(e) => { e.stopPropagation(); initiateCategoryDelete(cat); }} variant="danger-ghost" size="sm" aria-label={t('common.delete')} />
+                        </>
+                      )}
+                      renderLeftIcon={() => !isBuiltIn && (
+                        <div className="drag-handle" style={{
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: 'var(--text-tertiary)', padding: 'var(--space-2)',
+                          margin: '0 calc(-1 * var(--space-2))', cursor: 'grab',
+                          opacity: isDragging ? 0 : 1
+                        }}>
+                          <GripVertical size={16} />
                         </div>
-                      </div>
-                  </ListActionRow>
-                );
-              })}
+                      )}
+                      style={{
+                        padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-lg)',
+                        background: isDragging ? 'rgba(139, 92, 246, 0.15)' : 'var(--surface-muted)',
+                        border: `1px solid ${cat.color}${isDragging ? '80' : '30'}`,
+                        opacity: isDragging ? 0.6 : 1,
+                        transition: 'transform 0.15s ease, background-color 0.15s ease, opacity 0.15s ease'
+                      }}
+                    >
+                        <div style={{
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          width: '28px', height: '28px', borderRadius: '50%',
+                          background: `${cat.color}20`, flexShrink: 0
+                        }}>
+                          <div style={{
+                            width: '14px', height: '14px', borderRadius: '50%',
+                            background: cat.color,
+                            boxShadow: `0 0 8px ${cat.color}66`
+                          }} />
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '0.95rem' }}>{cat.name || (isBuiltIn ? t('common.custom') : '')}</div>
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                            {t('common.exerciseCount', { count: exerciseCount })}
+                          </div>
+                        </div>
+                    </ListActionRow>
+                  );
+                })}
+              </Stack>
 
               {customCategories.filter(c => c.id !== 'custom').length < maxCustomCategories && (
                 <Button
@@ -850,46 +842,48 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
       <div style={{ flex: 1, overflow: confirmDeleteEx ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         
         {view === 'list' && (
-          <Stack gap="xs" style={{ width: '100%', maxWidth: '440px' }}>
-            {customExercises.length === 0 ? (
-              <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 20px' }}>
-                <Settings2 size={48} style={{ opacity: 0.5, marginBottom: '16px' }} />
-                <p>{t('customExercises.empty')}</p>
-              </div>
-            ) : (
-              customExercises.map(ex => {
-                const IconComponent = CUSTOM_EXERCISE_ICONS[ex.icon] || Star;
-                return (
-                  <ListActionRow
-                    key={ex.id}
-                    renderActions={() => (
-                      <>
-                        <Button iconOnly icon={Edit2} onClick={(e) => { e.stopPropagation(); handleEdit(ex); }} variant="ghost" size="sm" aria-label="Modifier" />
-                        <Button iconOnly icon={Trash2} onClick={(e) => { e.stopPropagation(); handleDelete(ex); }} variant="danger-ghost" size="sm" aria-label="Supprimer" />
-                      </>
-                    )}
-                    style={{
-                      padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-lg)',
-                      background: 'var(--surface-muted)', border: '1px solid var(--border-default)'
-                    }}
-                  >
-                    <div style={{
-                      width: '40px', height: '40px', borderRadius: '50%',
-                      background: `${ex.color}20`, color: ex.color,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                      <IconComponent size={20} />
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{ex.label}</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                        {ex.type === 'timer' ? t('customExercises.typeTimer') : t('customExercises.typeCounter')} • {t('customExercises.multiplierShort')}: x{ex.multiplier}
+          <Stack gap="sm" style={{ width: '100%', maxWidth: '440px' }}>
+            <Stack gap="xs" style={{ width: '100%' }}>
+              {customExercises.length === 0 ? (
+                <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 20px' }}>
+                  <Settings2 size={48} style={{ opacity: 0.5, marginBottom: '16px' }} />
+                  <p>{t('customExercises.empty')}</p>
+                </div>
+              ) : (
+                customExercises.map(ex => {
+                  const IconComponent = CUSTOM_EXERCISE_ICONS[ex.icon] || Star;
+                  return (
+                    <ListActionRow
+                      key={ex.id}
+                      renderActions={() => (
+                        <>
+                          <Button iconOnly icon={Edit2} onClick={(e) => { e.stopPropagation(); handleEdit(ex); }} variant="ghost" size="sm" aria-label="Modifier" />
+                          <Button iconOnly icon={Trash2} onClick={(e) => { e.stopPropagation(); handleDelete(ex); }} variant="danger-ghost" size="sm" aria-label="Supprimer" />
+                        </>
+                      )}
+                      style={{
+                        padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-lg)',
+                        background: 'var(--surface-muted)', border: '1px solid var(--border-default)'
+                      }}
+                    >
+                      <div style={{
+                        width: '40px', height: '40px', borderRadius: '50%',
+                        background: `${ex.color}20`, color: ex.color,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                      }}>
+                        <IconComponent size={20} />
                       </div>
-                    </div>
-                  </ListActionRow>
-                );
-              })
-            )}
+                      <div>
+                        <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{ex.label}</div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                          {ex.type === 'timer' ? t('customExercises.typeTimer') : t('customExercises.typeCounter')} • {t('customExercises.multiplierShort')}: x{ex.multiplier}
+                        </div>
+                      </div>
+                    </ListActionRow>
+                  );
+                })
+              )}
+            </Stack>
 
             {customExercises.length < maxCustomExercises && (
               <Button
