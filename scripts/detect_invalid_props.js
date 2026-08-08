@@ -109,6 +109,7 @@ try {
     console.log('\x1b[32m✔ Aucune prop invalide ou redondante trouvée !\x1b[0m');
   } else {
     console.log(`\x1b[31mTotal: ${totalAnomalies} balise(s) avec des anomalies.\x1b[0m`);
+    process.exit(1);
   }
 
 } catch (err) {

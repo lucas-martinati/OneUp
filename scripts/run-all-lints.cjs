@@ -68,6 +68,18 @@ const tasks = [
     cmd: 'npm',
     args: ['run', 'lint:dup'],
     icon: '👥'
+  },
+  {
+    name: 'Classes CSS dupliquées',
+    cmd: 'node',
+    args: ['scripts/detect_duplicate_classes.js'],
+    icon: '✨'
+  },
+  {
+    name: 'Props invalides/redondantes',
+    cmd: 'node',
+    args: ['scripts/detect_invalid_props.js'],
+    icon: '🛡️'
   }
 ];
 
