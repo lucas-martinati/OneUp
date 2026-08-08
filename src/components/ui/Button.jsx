@@ -58,16 +58,14 @@ export const Button = forwardRef(function Button(
     [onClick, haptic],
   );
 
-  const classes = variant === 'unstyled'
-    ? className
-    : [
-        'btn',
-        `btn--${size}`,
-        `btn--${variant}`,
-        fullWidth && 'btn--full',
-        isIconOnly && 'btn--icon-only',
-        className,
-      ].filter(Boolean).join(' ');
+  const classes = [
+    'btn',
+    `btn--${size}`,
+    `btn--${variant}`,
+    fullWidth && 'btn--full',
+    isIconOnly && 'btn--icon-only',
+    className,
+  ].filter(Boolean).join(' ');
 
   const iconPx = isIconOnly ? ICON_ONLY_SIZE[size] : ICON_SIZE[size];
   const combinedStyle = color ? { color, ...style } : style;

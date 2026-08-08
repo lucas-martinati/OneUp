@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-l
 import { useBackHandler } from '@hooks/useBackHandler';
 import { CardioFullscreenMap } from './CardioFullscreenMap';
 import { MAP_TILES } from '@config/mapTiles';
+import { MapPin } from '@utils/icons';
 import 'leaflet/dist/leaflet.css';
 
 // Dark map tiles (CartoDB Dark Matter)
@@ -62,14 +63,26 @@ export const CardioMap = React.memo(({ gpsTrack, height = 'var(--cardio-map-heig
       <div style={{
         width: '100%', height, flex: '1 1 auto', minHeight: '50px',
         borderRadius: 'var(--radius-md)',
-        background: '#1a1a24',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        border: '1px solid var(--border-default)',
-        color: 'var(--text-secondary)', fontSize: 'clamp(0.62rem, 1.2cqh, 0.75rem)', opacity: 0.5,
+        background: 'linear-gradient(145deg, rgba(139, 92, 246, 0.08), rgba(139, 92, 246, 0.02))',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        border: '1px dashed rgba(139, 92, 246, 0.2)',
+        color: 'var(--text-secondary)',
+        gap: '8px',
         flexShrink: 1,
         ...styleProp
       }}>
-        {t('cardio.noGpsTrack')}
+        <div style={{
+          width: '36px', height: '36px', borderRadius: '50%',
+          background: 'rgba(139, 92, 246, 0.1)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: '#8b5cf6',
+          boxShadow: '0 0 15px rgba(139, 92, 246, 0.2)'
+        }}>
+          <MapPin size={18} />
+        </div>
+        <span style={{ fontSize: 'clamp(0.65rem, 1.2cqh, 0.8rem)', opacity: 0.8, fontWeight: '700', letterSpacing: '0.3px' }}>
+          {t('cardio.noGpsTrack')}
+        </span>
       </div>
     );
   }
