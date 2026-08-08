@@ -238,7 +238,7 @@ export function CardioModule() {
                 <Button
                   variant="ghost"
                   onClick={() => !isDemo && setShowHistory(true)}
-                  className="hover-lift"
+                  
                   style={{
                     padding: 'clamp(6px, 1.2vh, 12px) clamp(12px, 1.8vw, 18px)',
                     borderRadius: 'var(--radius-md)',
@@ -289,7 +289,7 @@ export function CardioModule() {
                       href="https://play.google.com/store/apps/details?id=com.lucasm548.oneup" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="hover-lift"
+                      
                       style={{
                         flex: 1,
                         display: 'flex',
@@ -368,7 +368,7 @@ export function CardioModule() {
               href="https://play.google.com/store/apps/details?id=com.lucasm548.oneup" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="hover-lift"
+              
               style={{
                 marginTop: isWebWall ? '16px' : '0',
                 display: 'inline-flex',
@@ -465,11 +465,11 @@ export function CardioModule() {
                </Stack>
              );
              actionButton = onGoogleStep ? (
-               <GoogleSignInButton onClick={() => auth.signIn()} className="hover-lift" style={{ width: 'auto', marginTop: '6px' }} />
+               <GoogleSignInButton onClick={() => auth.signIn()}  style={{ width: 'auto', marginTop: '6px' }} />
              ) : (
                <Stack align="center" gap="sm" style={{ marginTop: '6px' }}>
                  {healthAvailable && (
-                   <Button variant="ghost" onClick={handleConnectHealth} className="hover-lift" style={{
+                   <Button variant="ghost" onClick={handleConnectHealth}  style={{
                      padding: '12px 26px', borderRadius: '16px',
                      background: 'linear-gradient(145deg, #4285F4, #3367d6)', color: 'white',
                      fontWeight: '800', fontSize: 'clamp(0.8rem, 1.5vh, 0.9rem)',

@@ -200,7 +200,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                     icon={X}
                     variant="glass"
                     onClick={onClose}
-                    className="hover-lift"
+                    
                     aria-label="Close"
                     style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 10 }}
                 />

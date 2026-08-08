@@ -207,7 +207,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                     />
                 </div>
 
-                <Button iconOnly icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" style={{ flexShrink: 0 }} />
+                <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label="Close" style={{ flexShrink: 0 }} />
             </div>
 
             {/* Back button and Clan Name when viewing a specific clan */}

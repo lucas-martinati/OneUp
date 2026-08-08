@@ -42,7 +42,7 @@ export function ExercisePanelHeader({ activeColor, exerciseConfig, exerciseLabel
                     <Button
                         variant="ghost"
                         onClick={onNext}
-                        className="hover-lift"
+                        
                         style={{
                             padding: '8px 14px',
                             borderRadius: 'var(--radius-full)',
@@ -70,7 +70,7 @@ export function ExercisePanelHeader({ activeColor, exerciseConfig, exerciseLabel
                     variant="glass"
                     onClick={onClose}
                     aria-label={t('common.close')}
-                    className="hover-lift"
+                    
                 />
             </div>
         </div>

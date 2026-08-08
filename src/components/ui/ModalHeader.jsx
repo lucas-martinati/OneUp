@@ -25,7 +25,7 @@ export function ModalHeader({
             onClick={onBack}
             aria-label="Back"
             variant="glass"
-            className="hover-lift"
+            
           />
         )}
         {Icon && (
@@ -48,7 +48,7 @@ export function ModalHeader({
             onClick={onClose}
             aria-label="Close modal"
             variant="glass"
-            className="hover-lift"
+            
           />
         )}
       </div>

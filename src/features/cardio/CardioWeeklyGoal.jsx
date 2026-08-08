@@ -136,7 +136,7 @@ export const CardioWeeklyGoal = React.memo(({
             <Button
               variant="ghost"
               onClick={onInvalidate}
-              className="hover-lift"
+              
               style={{
                 padding: '4px 10px',
                 borderRadius: 'var(--radius-full)',

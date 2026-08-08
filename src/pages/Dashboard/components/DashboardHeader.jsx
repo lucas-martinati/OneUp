@@ -203,7 +203,7 @@ export const DashboardHeader = React.memo(({
                             type="button"
                             onClick={() => openModal('admin')}
                             aria-label="Admin Panel"
-                            className="hover-lift"
+                            
                             style={{
                                 ...BADGE_BASE,
                                 gap: 0,

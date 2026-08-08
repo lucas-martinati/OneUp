@@ -148,7 +148,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                     fontSize: 'inherit',
                                     fontFamily: 'inherit'
                                 }}
-                                className="hover-lift"
+                                
                             >
                                 {t('settings.privacyPolicy')}
                             </button>

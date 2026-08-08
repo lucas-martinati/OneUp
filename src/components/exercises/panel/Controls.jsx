@@ -19,7 +19,7 @@ export function TimerControls({
                 <Button
                     variant="ghost"
                     onClick={() => setIsRunning(!isRunning)}
-                    className="hover-lift ripple"
+                    className="ripple"
                     aria-label={isRunning ? t('timer.reset') : t('common.next')}
                     style={{
                         width: 'clamp(76px, 13vh, 96px)',
@@ -76,7 +76,7 @@ export function CounterControls({
                         variant="ghost"
                         key={`plus-${amount}`}
                         onClick={() => handleIncrement(amount)}
-                        className="hover-lift ripple"
+                        className="ripple"
                         disabled={isCompleted}
                         style={{
                             display: 'flex',
@@ -114,7 +114,7 @@ export function CounterControls({
                             variant="ghost"
                             key={`minus-${amount}`}
                             onClick={() => handleDecrement(amount)}
-                            className="hover-lift ripple"
+                            className="ripple"
                             disabled={!canDecrement}
                             style={{
                                 flex: 1,
@@ -162,7 +162,7 @@ function ResetButton({ onReset, disabled, label }) {
         <Button
             variant="ghost"
             onClick={onReset}
-            className="hover-lift"
+            
             disabled={disabled}
             style={{
                 flex: 1,

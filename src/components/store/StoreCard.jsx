@@ -174,7 +174,7 @@ export function StoreCard({
                     <Button
                         variant="ghost"
                         onClick={handlePurchase}
-                        className="hover-lift"
+                        
                         style={{
                             width: '100%', padding: '16px',
                             borderRadius: 'var(--radius-lg)',

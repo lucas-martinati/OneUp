@@ -229,7 +229,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                 {globalStats.badgeCount}/{BADGE_DEFINITIONS.length}
                             </span>
                         </button>
-                        <Button iconOnly icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
+                        <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label="Close" />
                     </div>
                 </div>
 

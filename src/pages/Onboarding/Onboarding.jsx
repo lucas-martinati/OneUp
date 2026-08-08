@@ -347,7 +347,7 @@ export function Onboarding({ onStart }) {
                                 }}>
                                     {t('onboarding.backfillExplain')}
                                 </p>
-                                <div className="hover-lift" style={{
+                                <div  style={{
                                     display: 'flex', alignItems: 'center',
                                     background: 'linear-gradient(135deg, rgba(109, 40, 217, 0.15), rgba(139, 92, 246, 0.15))',
                                     padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--radius-lg)',
@@ -407,7 +407,7 @@ export function Onboarding({ onStart }) {
                                             <button
                                                 key={ex.id}
                                                 onClick={() => toggleExercise(ex.id)}
-                                                className="hover-lift"
+                                                
                                                 style={{
                                                     display: 'flex', alignItems: 'center', gap: '10px',
                                                     padding: 'clamp(12px, 2.2vh, 16px)',
@@ -497,7 +497,7 @@ export function Onboarding({ onStart }) {
                         fontSize: 'inherit',
                         fontFamily: 'inherit'
                     }}
-                    className="hover-lift"
+                    
                 >
                     {t('settings.termsOfService')}
                 </button>
@@ -514,7 +514,7 @@ export function Onboarding({ onStart }) {
                         fontSize: 'inherit',
                         fontFamily: 'inherit'
                     }}
-                    className="hover-lift"
+                    
                 >
                     {t('settings.privacyPolicy')}
                 </button>
@@ -536,7 +536,7 @@ function LanguageSwitcher({ i18n }) {
 
     return (
         <label
-            className="hover-lift"
+            
             title={label}
             style={{
                 position: 'fixed',
@@ -576,7 +576,7 @@ function ModeCard({ active, onClick, icon, accent, title, desc, badge }) {
     return (
         <button
             onClick={onClick}
-            className="hover-lift"
+            
             style={{
                 position: 'relative', textAlign: 'left', display: 'flex', gap: '12px', alignItems: 'center',
                 padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--radius-lg)',
@@ -627,7 +627,7 @@ function ModeCard({ active, onClick, icon, accent, title, desc, badge }) {
 function NavRow({ onBack, t, children }) {
     return (
         <div style={{ display: 'flex', gap: '10px', marginTop: 'var(--space-2)' }}>
-            <Button variant="secondary" onClick={onBack} className="hover-lift" style={{ flex: 1, borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+            <Button variant="secondary" onClick={onBack}  style={{ flex: 1, borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                 <ArrowLeft size={18} />
                 {t('onboarding.back')}
             </Button>

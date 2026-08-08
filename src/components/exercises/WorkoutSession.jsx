@@ -218,7 +218,7 @@ export function WorkoutSession(props) {
                         <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
                             {isStarted ? t('common.edit') : t('dashboard.session')}
                         </h2>
-                        <Button iconOnly icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label={t('common.close')} />
+                        <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label={t('common.close')} />
                     </div>
 
                     <div className={styles.body}>

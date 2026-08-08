@@ -32,7 +32,7 @@ function StreakFreezeNotification({ count, onClose }) {
         <div style={getToastContainerStyle(1, isVisible, exit)}>
             <div
                 {...gestureHandlers}
-                className="hover-lift"
+                
                 style={getToastCardStyle(FREEZE_COLOR, gestureStyle)}
             >
                 <div style={{

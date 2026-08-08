@@ -273,7 +273,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                     <h2 className="panel-title" style={{ margin: 0 }}>
                         {t('common.achievements')}
                     </h2>
-                    <Button iconOnly icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
+                    <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label="Close" />
                 </div>
 
                 {/* ── Hero: progress ring + counters in one gold card ────── */}

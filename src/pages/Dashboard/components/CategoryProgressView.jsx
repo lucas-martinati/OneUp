@@ -280,7 +280,7 @@ export const CategoryProgressView = React.memo(({
                                     onClick={onManageCategories}
                                     aria-label={t('customCategories.title')}
                                     title={t('customCategories.title')}
-                                    className="hover-lift"
+                                    
                                     style={{
                                         display: 'inline-flex', alignItems: 'center', gap: '5px',
                                         padding: '3px 10px', borderRadius: '12px',
@@ -301,7 +301,7 @@ export const CategoryProgressView = React.memo(({
                                     onClick={onManageCustom}
                                     aria-label={t('customExercises.title')}
                                     title={t('customExercises.title')}
-                                    className="hover-lift"
+                                    
                                     style={{
                                         display: 'inline-flex', alignItems: 'center', gap: '5px',
                                         padding: '3px 10px', borderRadius: '12px',

@@ -35,7 +35,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
             onClick={() => setShowFilters(s => !s)}
             aria-label="Filtres"
             variant={showFilters || filterCount ? 'primary' : 'glass'}
-            className="hover-lift"
+            
           />
           {filterCount > 0 && (
             <span style={{
@@ -138,7 +138,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
             <div
               key={user.uid}
               onClick={() => onSelectUser(user)}
-              className="hover-lift glass"
+              className="glass"
               style={{
                 padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)',
                 background: 'var(--card-bg)',

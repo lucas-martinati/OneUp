@@ -29,7 +29,7 @@ export const ProPaywall = ({ title, onOpenStore }) => {
                 variant="premium"
                 icon={ShoppingBag}
                 onClick={onOpenStore}
-                className="hover-lift"
+                
             >
                 {t('paywall.viewStore')}
             </Button>

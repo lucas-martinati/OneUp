@@ -57,7 +57,7 @@ export function AdminPanel({ onClose }) {
                 onClick={() => setSelectedUid(null)}
                 aria-label="Retour"
                 variant="glass"
-                className="hover-lift"
+                
               />
             )}
             <h2 className="panel-title" style={{ margin: 0, fontSize: '1.4rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -84,7 +84,7 @@ export function AdminPanel({ onClose }) {
               onClick={onClose}
               aria-label="Fermer"
               variant="glass"
-              className="hover-lift"
+              
             />
           </div>
         </div>

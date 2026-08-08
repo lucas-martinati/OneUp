@@ -215,7 +215,7 @@ export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
           </div>
 
           {/* Close button (Right) */}
-          <Button iconOnly icon={X} variant="glass" onClick={onClose} className="hover-lift" aria-label="Close" />
+          <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label="Close" />
         </div>
 
         {/* Floating stats bar */}

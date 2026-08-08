@@ -125,7 +125,7 @@ export default function EvolutionChart({
                         <button
                             key={ex.id}
                             onClick={() => toggleExercise(ex.id)}
-                            className="hover-lift"
+                            
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '5px',
                                 padding: '6px 12px', borderRadius: 'var(--radius-full)',
