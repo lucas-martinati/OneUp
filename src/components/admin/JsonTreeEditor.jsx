@@ -280,7 +280,7 @@ function JsonTreeNode({
           <Button variant="secondary" size="sm"
             onClick={startAdd}
             title={isObject ? 'Ajouter une clé' : 'Ajouter un élément'}
-            style={{ color: 'var(--color-emerald)', display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 6px' }}
+            style={{ color: 'var(--color-emerald)', display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 10px', height: '32px', minHeight: '32px' }}
           >
             <Plus size={10} />
             <span>Ajouter</span>
@@ -289,7 +289,7 @@ function JsonTreeNode({
           <Button variant="secondary" size="sm"
             onClick={startRawEdit}
             title="Modifier en JSON"
-            style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 6px' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '2px 10px', height: '32px', minHeight: '32px' }}
           >
             <Edit2 size={10} />
             <span>Modifier</span>

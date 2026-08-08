@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Save, Lock, Code, Copy, Check, RotateCcw } from '@utils/icons';
 import { JsonTreeEditor } from './JsonTreeEditor';
 import { LineNumberTextarea } from './LineNumberTextarea';
-import { Button } from '@components/ui';
+import { Button, SegmentedControl } from '@components/ui';
 
 /** Short human summary of a JSON document, e.g. "12 clés" / "3 éléments". */
 function describeContent(text) {
@@ -20,7 +20,7 @@ function describeContent(text) {
 }
 
 /** Small copy-to-clipboard button with a transient "copied" confirmation. */
-function CopyButton({ text }) {
+function CopyButton({ text, style }) {
   const [copied, setCopied] = useState(false);
   const handleCopy = (e) => {
     e.stopPropagation();
@@ -34,7 +34,7 @@ function CopyButton({ text }) {
       onClick={handleCopy}
       title="Copier le JSON"
       color={copied ? '#34d399' : undefined}
-      style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+      style={{ display: 'flex', alignItems: 'center', gap: '4px', ...style }}
     >
       {copied ? <Check size={12} /> : <Copy size={12} />}
       {copied ? 'Copié' : 'Copier'}
@@ -166,65 +166,36 @@ export function AdminJsonSectionsEditor({
 
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                     {/* Editor Format Toggle Switcher */}
-                    <div style={{
-                      display: 'flex',
-                      background: 'rgba(255, 255, 255, 0.04)',
-                      padding: '2px',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)'
-                    }}>
-                      <button
-                        onClick={() => setKeyEditorFormats(prev => ({ ...prev, [key]: 'tree' }))}
-                        style={{
-                          padding: '4px 10px',
-                          background: keyEditorFormats[key] !== 'raw' ? 'rgba(255,255,255,0.08)' : 'transparent',
-                          border: 'none',
-                          borderRadius: 'calc(var(--radius-md) - 2px)',
-                          color: keyEditorFormats[key] !== 'raw' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                          fontSize: '0.72rem',
-                          fontWeight: '700',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease'
-                        }}
-                      >
-                        Arborescence
-                      </button>
-                      <button
-                        onClick={() => setKeyEditorFormats(prev => ({ ...prev, [key]: 'raw' }))}
-                        style={{
-                          padding: '4px 10px',
-                          background: keyEditorFormats[key] === 'raw' ? 'rgba(255,255,255,0.08)' : 'transparent',
-                          border: 'none',
-                          borderRadius: 'calc(var(--radius-md) - 2px)',
-                          color: keyEditorFormats[key] === 'raw' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                          fontSize: '0.72rem',
-                          fontWeight: '700',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease'
-                        }}
-                      >
-                        Code brut
-                      </button>
-                    </div>
+                    <SegmentedControl
+                      size="sm"
+                      variant="glass"
+                      options={[
+                        { id: 'tree', label: 'Arborescence', activeBg: 'rgba(255,255,255,0.08)', activeBorder: 'none', activeColor: 'var(--text-primary)' },
+                        { id: 'raw', label: 'Code brut', activeBg: 'rgba(255,255,255,0.08)', activeBorder: 'none', activeColor: 'var(--text-primary)' }
+                      ]}
+                      value={keyEditorFormats[key] || 'tree'}
+                      onChange={(val) => setKeyEditorFormats(prev => ({ ...prev, [key]: val }))}
+                      style={{ height: '32px' }}
+                    />
 
                     {keyEditorFormats[key] === 'raw' && (
                       <Button variant="secondary" size="sm"
                         onClick={() => onFormatJson(key)}
-                        style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '4px', height: '32px', minHeight: '32px' }}
                       >
                         <Code size={12} />
                         Formater
                       </Button>
                     )}
 
-                    <CopyButton text={contentValue} />
+                    <CopyButton text={contentValue} style={{ height: '32px', minHeight: '32px' }} />
 
                     {isDirty && onRevertJson && (
                       <Button variant="danger-ghost" size="sm"
                         onClick={() => onRevertJson(key)}
                         title="Annuler les modifications non sauvegardées"
                         color="#f59e0b"
-                        style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '4px', height: '32px', minHeight: '32px' }}
                       >
                         <RotateCcw size={12} />
                         Annuler
@@ -235,7 +206,7 @@ export function AdminJsonSectionsEditor({
                       disabled={!canSave}
                       onClick={() => onSaveJson(key)}
                       title={isDirty ? 'Sauvegarder (Ctrl+S)' : 'Aucune modification à sauvegarder'}
-                      style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '4px', height: '32px', minHeight: '32px' }}
                     >
                       <Save size={12} />
                       Sauvegarder
