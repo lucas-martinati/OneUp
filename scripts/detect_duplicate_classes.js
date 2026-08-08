@@ -3,11 +3,22 @@ import path from 'path';
 
 const srcDir = path.join(process.cwd(), 'src');
 
-// Classes appliquées par défaut par certains de tes composants
+// Liste exhaustive des classes par défaut appliquées par tes composants UI
 const COMPONENT_DEFAULTS = {
-  Button: ['btn', 'hover-lift'],
+  Button: ['btn', 'hover-lift', 'btn--primary', 'btn--secondary', 'btn--ghost', 'btn--danger', 'btn--md', 'btn--sm', 'btn--lg', 'btn--full', 'btn--icon-only'],
   Card: ['card'],
-  // Tu peux en ajouter d'autres ici !
+  Badge: ['badge', 'badge-icon'],
+  EmptyState: ['empty-state', 'empty-state-card'],
+  Input: ['input-group', 'input-label', 'input-wrapper', 'input-icon', 'input-field', 'input-error', 'input-helper'],
+  GoogleSignInButton: ['btn-cloud-signin', 'google-icon'],
+  Skeleton: ['skeleton'],
+  Spinner: ['spinner'],
+  SectionTitle: ['section-title'],
+  CategoryChips: ['chips', 'chipDot'],
+  ColorPicker: ['color-picker', 'color-swatch'],
+  Avatar: ['avatar', 'avatar-image', 'avatar-fallback'],
+  MetricBadge: ['metric-badge', 'metric-value', 'metric-label'],
+  ThemeSwatch: ['theme-swatch', 'theme-swatch-color'],
 };
 
 function walk(dir) {
@@ -19,7 +30,7 @@ function walk(dir) {
     if (stat && stat.isDirectory()) {
       results = results.concat(walk(fullPath));
     } else {
-      if (fullPath.endsWith('.jsx') || fullPath.endsWith('.js') || fullPath.endsWith('.tsx') || fullPath.endsWith('.ts')) {
+      if (fullPath.endsWith('.jsx') || fullPath.endsWith('.tsx')) {
         results.push(fullPath);
       }
     }
@@ -27,7 +38,7 @@ function walk(dir) {
   return results;
 }
 
-console.log('Scanning for duplicate CSS classes and component default classes...\n');
+console.log('Scanning for duplicate CSS classes (using manual dictionary)...\n');
 
 try {
   const files = walk(srcDir);
@@ -36,10 +47,6 @@ try {
   files.forEach(file => {
     const content = fs.readFileSync(file, 'utf8');
     const lines = content.split('\n');
-    
-    // Simplification pour trouver le tag:
-    // On va chercher "<NomComposant" sur la ligne courante ou les lignes précédentes
-    // quand on trouve un className.
     
     lines.forEach((line, i) => {
       const regexes = [
@@ -58,17 +65,15 @@ try {
             const cleanString = classString.replace(/\$\{[^}]+\}/g, ' ');
             const classes = cleanString.split(/\s+/).filter(c => c.trim().length > 0);
             
-            // 1. Chercher les répétitions dans la même string
+            // 1. Répétitions pures dans la même string
             const duplicates = classes.filter((item, index) => classes.indexOf(item) !== index);
             let uniqueDuplicates = [...new Set(duplicates)];
             let defaultDuplicates = [];
             
-            // 2. Chercher les répétitions par rapport aux classes par défaut du composant
-            // Remonter de quelques lignes pour trouver le tag le plus proche
+            // 2. Vérification par rapport au dictionnaire manuel
             let componentName = null;
             for (let j = i; j >= Math.max(0, i - 10); j--) {
-              // Regex pour trouver <MonComposant
-              const tagMatch = /<([A-Za-z0-9_]+)/.exec(lines[j]);
+              const tagMatch = /<([A-Z][A-Za-z0-9_]+)/.exec(lines[j]);
               if (tagMatch) {
                 componentName = tagMatch[1];
                 break;
@@ -93,7 +98,7 @@ try {
                 console.log(`  Classes répétées dans la string : \x1b[31m${uniqueDuplicates.join(', ')}\x1b[0m`);
               }
               if (defaultDuplicates.length > 0) {
-                console.log(`  Classes redondantes avec les valeurs par défaut de <${componentName}> : \x1b[35m${defaultDuplicates.join(', ')}\x1b[0m`);
+                console.log(`  Classes redondantes avec <${componentName}> : \x1b[35m${defaultDuplicates.join(', ')}\x1b[0m`);
               }
               console.log(`  Ligne : ${line.trim()}\n`);
             }
