@@ -22,14 +22,14 @@
   background: transparent;
 }
 *::-webkit-scrollbar-thumb {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
-*:hover::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-}
+
 *::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25); /* brighter when actively dragging */
+  background-color: rgba(255, 255, 255, 0.25);
 }
 
 /* Hide spin buttons for input[type=number] */

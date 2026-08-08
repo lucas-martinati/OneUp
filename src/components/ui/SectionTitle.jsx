@@ -9,6 +9,7 @@ import { forwardRef, useMemo } from 'react';
  *
  * @param {'h2'|'h3'|'h4'} [level='h3'] — semantic heading element
  * @param {'none'|'sm'|'md'} [spacing='none'] — margin-bottom
+ * @param {'default'|'primary'|'accent'} [variant='default'] — text color/gradient variant
  */
 const SPACING = {
   none: 0,
@@ -17,7 +18,7 @@ const SPACING = {
 };
 
 export const SectionTitle = forwardRef(function SectionTitle(
-  { level: Tag = 'h3', spacing = 'none', className = '', style, children, ...rest },
+  { level: Tag = 'h3', spacing = 'none', variant = 'default', className = '', style, children, ...rest },
   ref,
 ) {
   const composed = useMemo(
@@ -28,14 +29,20 @@ export const SectionTitle = forwardRef(function SectionTitle(
       fontWeight: 700,
       textTransform: 'uppercase',
       letterSpacing: '1px',
-      color: 'var(--text-secondary)',
+      color: variant === 'default' ? 'var(--text-secondary)' : undefined,
       ...style,
     }),
-    [spacing, style],
+    [spacing, variant, style],
   );
 
+  const finalClassName = [
+    variant === 'primary' && 'text-gradient-primary',
+    variant === 'accent' && 'text-gradient-accent',
+    className
+  ].filter(Boolean).join(' ');
+
   return (
-    <Tag ref={ref} className={className || undefined} style={composed} {...rest}>
+    <Tag ref={ref} className={finalClassName || undefined} style={composed} {...rest}>
       {children}
     </Tag>
   );

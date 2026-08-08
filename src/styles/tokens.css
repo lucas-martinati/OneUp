@@ -91,6 +91,21 @@
   --text-tertiary: rgba(255, 255, 255, 0.65);
   --text-disabled: rgba(255, 255, 255, 0.4);
 
+  /* Advanced Typography */
+  --tracking-tight: -0.02em;
+  --tracking-wide: 0.02em;
+  --line-height-tight: 1.25;
+  --line-height-relaxed: 1.6;
+
+  /* Z-Index Architecture */
+  --z-behind: -1;
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-dropdown: 50;
+  --z-sticky: 100;
+  --z-modal-overlay: 999;
+  --z-modal-content: 1000;
+  --z-toast: 9999;
 
   /* Theme-dependent surfaces */
   --overlay-bg: rgb(5, 5, 5);

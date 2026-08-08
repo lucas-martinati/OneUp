@@ -34,6 +34,34 @@
   animation: gradientShift 4s ease infinite;
 }
 
+.text-gradient-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-accent {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Surface Utilities ── */
+.surface-elevated {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-lg);
+}
+
+.surface-section {
+  background: var(--surface-section);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+}
+
 /* ── Layout Utilities ── */
 .flex-col { display: flex; flex-direction: column; }
 .flex-row { display: flex; flex-direction: row; }

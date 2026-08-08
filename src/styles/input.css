@@ -1,0 +1,132 @@
+/* ── Canonical input primitive ─────────────────────────────────────────
+   Class-based styles for components/ui/Input.jsx. */
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  position: relative;
+}
+
+.input-group--full {
+  width: 100%;
+}
+
+.input-label {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  transition: border-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease, background var(--motion-fast) ease;
+}
+
+.input-wrapper:focus-within {
+  background: var(--surface-dim);
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-glow) 20%, transparent);
+}
+
+.input-wrapper--error {
+  border-color: var(--error);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--error) 20%, transparent);
+}
+
+.input-wrapper--error:focus-within {
+  border-color: var(--error);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--error) 40%, transparent);
+}
+
+.input-wrapper--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input-field {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--text-md);
+  outline: none;
+}
+
+.input-field::placeholder {
+  color: var(--text-disabled);
+}
+
+.input-field:disabled {
+  cursor: not-allowed;
+}
+
+.input-wrapper--sm .input-field {
+  padding: 6px 12px;
+  min-height: 36px;
+  font-size: var(--text-sm);
+}
+
+.input-wrapper--md .input-field {
+  padding: 10px 14px;
+  min-height: var(--touch-min);
+}
+
+.input-wrapper--lg .input-field {
+  padding: 14px 18px;
+  min-height: 50px;
+  font-size: 1rem;
+}
+
+/* Icons support */
+.input-icon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.input-icon--left {
+  margin-left: 12px;
+}
+
+.input-icon--right {
+  margin-right: 12px;
+}
+
+/* Adjust input padding if there are icons */
+.input-icon--left ~ .input-field {
+  padding-left: 8px;
+}
+
+.input-field:has(~ .input-icon--right) {
+  padding-right: 8px;
+}
+
+/* Select specifics */
+.input-field--select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.input-field--select:disabled {
+  cursor: not-allowed;
+}
+
+/* Validation and Helpers */
+.input-error {
+  font-size: var(--text-xs);
+  color: var(--error);
+  font-weight: 600;
+}
+
+.input-helper {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}

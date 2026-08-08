@@ -80,7 +80,7 @@ export const Card = forwardRef(function Card(
     [variant, padding, tint, style],
   );
 
-  const classes = [VARIANT_CLASS[variant], interactive && 'hover-lift', className]
+  const classes = [VARIANT_CLASS[variant], interactive && 'micro-scale-hover', className]
     .filter(Boolean)
     .join(' ');
 

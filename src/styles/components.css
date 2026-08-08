@@ -1,7 +1,8 @@
 /* Focus visible for keyboard navigation */
 :focus-visible {
-  outline: 2px solid var(--accent-glow);
+  outline: 2px solid color-mix(in srgb, var(--accent-glow) 80%, transparent);
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-glow) 20%, transparent);
 }
 
 button:focus:not(:focus-visible) {
@@ -31,7 +32,7 @@ button:focus:not(:focus-visible) {
   position: fixed;
   inset: 0;
   background: var(--overlay-bg);
-  z-index: 100;
+  z-index: var(--z-modal-overlay);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -94,15 +95,10 @@ button:focus:not(:focus-visible) {
   -webkit-backdrop-filter: none;
 }
 
-/* ── Shared Centered Dialog ─────────────────────────────────────────────
-   Dim blurred backdrop + centered card: the canonical pattern for every
-   small confirmation/alert dialog (ConfirmDialog, ConflictOverlay,
-   announcements, StreakFreezeInfo…). Theme-aware via tokens — replaces the
-   hard-coded purple/blue copies that ignored the active theme. */
 .dialog-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 9999; /* matches Z_INDEX.DELETE_OVERLAY (utils/zIndex.js) */
+  z-index: var(--z-modal-overlay); /* matches Z_INDEX.DELETE_OVERLAY (utils/zIndex.js) */
   display: flex;
   align-items: center;
   justify-content: center;
