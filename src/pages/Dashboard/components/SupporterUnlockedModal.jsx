@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Heart, Sparkles, Award } from '@utils/icons';
 import { useHaptics } from '@hooks/useHaptics';
 import { GradientModal } from '@components/ui/GradientModal';
+import { Button } from '@components/ui';
 
 export function SupporterUnlockedModal({ open, onClose, onConfirm }) {
   const { t } = useTranslation();
@@ -155,7 +156,8 @@ export function SupporterUnlockedModal({ open, onClose, onConfirm }) {
           background: 'rgba(0, 0, 0, 0.2)',
         }}
       >
-        <button
+        <Button
+          variant="ghost"
           onClick={handleConfirm}
           style={{
             width: '100%',
@@ -176,7 +178,7 @@ export function SupporterUnlockedModal({ open, onClose, onConfirm }) {
         >
           <Sparkles size={18} />
           {t('supporter.unlockedModal.cta', 'C\'est un plaisir !')}
-        </button>
+        </Button>
       </div>
     </GradientModal>
   );

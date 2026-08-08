@@ -9,7 +9,7 @@ import { isPerfectDay } from '@utils/statUtils';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
-import { StreakFlame, WeightBadge, EmptyState, Card } from '@components/ui';
+import { StreakFlame, WeightBadge, EmptyState, Card, Button } from '@components/ui';
 import styles from '@styles/CategoryProgressView.module.css';
 
 export const CategoryProgressView = React.memo(({
@@ -80,7 +80,8 @@ export const CategoryProgressView = React.memo(({
                         />
                     ))}
                     {showAddBtn && (
-                        <button
+                        <Button
+                            variant="ghost"
                             onClick={onAddCustom || onManageCustom}
                             className="exercise-button hover-lift"
                             aria-label={t('customExercises.create')}
@@ -106,7 +107,7 @@ export const CategoryProgressView = React.memo(({
                             <span style={{ fontSize: 'var(--tile-label-size, clamp(0.55rem, 1.25vh, 0.78rem))', fontWeight: '700' }}>
                                 {t('common.add')}
                             </span>
-                        </button>
+                        </Button>
                     )}
                 </div>
 
@@ -125,7 +126,8 @@ export const CategoryProgressView = React.memo(({
                             animation: 'blobHaloPulse 4s ease-in-out infinite'
                         }} />
                         {/* Counter open button */}
-                        <button
+                        <Button
+                            variant="ghost"
                             aria-label={`${getExerciseLabel(safeSelectedExercise)} counter`}
                             onClick={() => { pauseCloudSync?.(); setShowCounter(true); }}
                             className="ripple counter-button"
@@ -187,7 +189,7 @@ export const CategoryProgressView = React.memo(({
                                     </span>
                                 </>
                             )}
-                        </button>
+                        </Button>
                     </div>
 
                     {/* Completion status */}
@@ -273,7 +275,8 @@ export const CategoryProgressView = React.memo(({
                     {(onManageCustom || onManageCategories) && (
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                             {onManageCategories && (
-                                <button
+                                <Button
+                                    variant="ghost"
                                     onClick={onManageCategories}
                                     aria-label={t('customCategories.title')}
                                     title={t('customCategories.title')}
@@ -290,10 +293,11 @@ export const CategoryProgressView = React.memo(({
                                 >
                                     <FolderPlus size={12} />
                                     <span>{t('customCategories.titleShort') || 'Catégories'}</span>
-                                </button>
+                                </Button>
                             )}
                             {onManageCustom && (
-                                <button
+                                <Button
+                                    variant="ghost"
                                     onClick={onManageCustom}
                                     aria-label={t('customExercises.title')}
                                     title={t('customExercises.title')}
@@ -310,7 +314,7 @@ export const CategoryProgressView = React.memo(({
                                 >
                                     <Settings size={12} />
                                     <span>{t('common.edit')}</span>
-                                </button>
+                                </Button>
                             )}
                         </div>
                     )}
@@ -398,7 +402,8 @@ const ExerciseButton = React.memo(({
     }
 
     return (
-        <button
+        <Button
+            variant="ghost"
             onClick={() => onSelect(ex.id)}
             className={`hover-lift exercise-button${exDone ? ' exercise-done' : ''}`}
             style={{
@@ -501,6 +506,6 @@ const ExerciseButton = React.memo(({
                     transition: 'width 0.4s ease'
                 }} />
             </div>
-        </button>
+        </Button>
     );
 });

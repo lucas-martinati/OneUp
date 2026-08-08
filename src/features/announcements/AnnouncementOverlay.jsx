@@ -11,6 +11,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBackHandler } from '@hooks/useBackHandler';
+import { Button } from '@components/ui';
 
 /**
  * Full-screen announcement overlay with smooth enter/exit animations.
@@ -121,7 +122,8 @@ export function AnnouncementOverlay({ announcement, onDismiss, onConfirm }) {
         )}
 
         {/* CTA Button */}
-        <button
+        <Button
+          variant="ghost"
           className="ann-cta"
           onClick={handleConfirm}
           onPointerDown={(e) => { e.currentTarget.style.transform = 'scale(0.97)'; }}
@@ -130,7 +132,7 @@ export function AnnouncementOverlay({ announcement, onDismiss, onConfirm }) {
         >
           <span className="ann-cta-shine" aria-hidden="true" />
           <span className="ann-cta-label">{cta}</span>
-        </button>
+        </Button>
       </div>
     </div>
   );

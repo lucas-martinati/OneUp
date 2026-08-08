@@ -164,7 +164,8 @@ const BadgeItem = React.memo(({ badge, highlighted }) => {
 
 /** Small colored pill that filters the grid to one badge category. */
 const CategoryChip = React.memo(({ label, color, count, active, onClick }) => (
-    <button
+    <Button
+        variant="ghost"
         type="button"
         onClick={onClick}
         style={{
@@ -190,7 +191,7 @@ const CategoryChip = React.memo(({ label, color, count, active, onClick }) => (
                 {count}
             </span>
         )}
-    </button>
+    </Button>
 ));
 
 /**

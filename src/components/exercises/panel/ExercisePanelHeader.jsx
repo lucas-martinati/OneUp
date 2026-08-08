@@ -1,4 +1,5 @@
 import { X, ChevronRight, DynamicIcon } from '@utils/icons';
+import { Button } from '@components/ui';
 
 export function ExercisePanelHeader({ activeColor, exerciseConfig, exerciseLabel, onClose, onNext, hideNextButton, t }) {
     const showNextButton = onNext && !hideNextButton;
@@ -38,7 +39,8 @@ export function ExercisePanelHeader({ activeColor, exerciseConfig, exerciseLabel
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
                 {showNextButton && (
-                    <button
+                    <Button
+                        variant="ghost"
                         onClick={onNext}
                         className="hover-lift"
                         style={{
@@ -60,28 +62,16 @@ export function ExercisePanelHeader({ activeColor, exerciseConfig, exerciseLabel
                     >
                         <span>{t('common.next')}</span>
                         <ChevronRight size={16} />
-                    </button>
+                    </Button>
                 )}
-                <button
+                <Button
+                    iconOnly
+                    icon={X}
+                    variant="glass"
                     onClick={onClose}
                     aria-label={t('common.close')}
                     className="hover-lift"
-                    style={{
-                        width: 'var(--touch-min)',
-                        height: 'var(--touch-min)',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'rgba(255,255,255,0.06)',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        color: 'var(--text-secondary)',
-                        cursor: 'pointer',
-                        flexShrink: 0
-                    }}
-                >
-                    <X size={20} />
-                </button>
+                />
             </div>
         </div>
     );

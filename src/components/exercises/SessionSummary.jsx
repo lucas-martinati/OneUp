@@ -8,7 +8,7 @@ import { updateSessionName } from '@features/share/services/sessionHistoryServic
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { SharePanel } from '@features/share/components/SharePanel';
-import { InlineNameEditor, Card } from '@components/ui';
+import { InlineNameEditor, Card, Button } from '@components/ui';
 import styles from '@styles/SessionSummary.module.css';
 
 function formatDuration(seconds) {
@@ -130,9 +130,9 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
 
                 {/* ── Footer (fixed) ── */}
                 <div className={styles.footer}>
-                    <button onClick={onClose} className={styles.closeBtn}>
+                    <Button variant="ghost" onClick={onClose} className={styles.closeBtn}>
                         {t('common.close')}
-                    </button>
+                    </Button>
                     <SharePanel
                         sessionData={shareSessionData}
                         stats={stats}

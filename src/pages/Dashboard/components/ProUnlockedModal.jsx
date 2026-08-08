@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Crown, Sparkles, Dumbbell, BarChart3, Palette, Snowflake, Plus, Check } from '@utils/icons';
 import { useHaptics } from '@hooks/useHaptics';
 import { GradientModal } from '@components/ui/GradientModal';
-import { Stack, Card } from '@components/ui';
+import { Stack, Card, Button } from '@components/ui';
 
 export function ProUnlockedModal({ open, onClose, onConfirm }) {
   const { t } = useTranslation();
@@ -210,7 +210,8 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
           background: 'rgba(0, 0, 0, 0.2)',
         }}
       >
-        <button
+        <Button
+          variant="ghost"
           onClick={handleConfirm}
           style={{
             width: '100%',
@@ -234,7 +235,7 @@ export function ProUnlockedModal({ open, onClose, onConfirm }) {
         >
           <Sparkles size={18} />
           {t('pro.unlockedModal.cta')}
-        </button>
+        </Button>
       </div>
     </GradientModal>
   );

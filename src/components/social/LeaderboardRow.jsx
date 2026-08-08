@@ -2,6 +2,7 @@ import React from 'react';
 import { ChevronRight, Shield, ShieldAlert, HeartHandshake, Check, Star } from '@utils/icons';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '@components/ui/Avatar';
+import { Button } from '@components/ui';
 import { getTierBadgeConfigs } from '@utils/entitlements';
 import styles from '@styles/Leaderboard.module.css';
 
@@ -83,14 +84,15 @@ export function LeaderboardRow({
             <ChevronRight size={16} color="var(--text-secondary)" className={styles.chevron} />
 
             {clanData && !isMe && (
-                <button
+                <Button
+                    variant="ghost"
                     onClick={(e) => onNudge(e, entry.uid)}
                     disabled={nudgedMember === entry.uid}
                     aria-label="nudge"
                     className={`${styles.nudgeBtn} ${nudgedMember === entry.uid ? styles.nudgeBtnDone : ''}`}
                 >
                     {nudgedMember === entry.uid ? <Check size={18} /> : <HeartHandshake size={18} />}
-                </button>
+                </Button>
             )}
         </div>
     );

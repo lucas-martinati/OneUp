@@ -1,8 +1,7 @@
 /* Focus visible for keyboard navigation */
 :focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent-glow) 80%, transparent);
+  outline: 2px solid var(--accent-glow);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-glow) 20%, transparent);
 }
 
 button:focus:not(:focus-visible) {

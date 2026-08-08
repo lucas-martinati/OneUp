@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { useTranslation } from 'react-i18next';
 import { X, Check } from '@utils/icons';
+import { Button } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 
@@ -99,7 +100,8 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         position: 'relative', zIndex: 2,
       }}>
-        <button
+        <Button
+          variant="ghost"
           onClick={onClose}
           style={{
             background: 'rgba(255,255,255,0.08)',
@@ -113,7 +115,7 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
           }}
         >
           <X size={20} />
-        </button>
+        </Button>
 
         <span style={{
           color: 'white', fontWeight: 700, fontSize: '0.95rem',
@@ -123,7 +125,8 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
           {t('share.cropImage')}
         </span>
 
-        <button
+        <Button
+          variant="ghost"
           onClick={handleSave}
           style={{
             background: 'linear-gradient(135deg, #818cf8, #6366f1)',
@@ -138,7 +141,7 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
           }}
         >
           <Check size={20} />
-        </button>
+        </Button>
       </div>
 
       {/* Crop area */}

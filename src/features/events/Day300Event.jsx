@@ -15,6 +15,7 @@
  * L'avancée est lue en temps réel depuis les compteurs de l'app.
  */
 import React, { useState, useEffect, memo } from 'react';
+import { Button } from '@components/ui';
 import { EXERCISES, getDailyGoal } from '@config/exercises';
 import { makeEventManager, seeded } from './eventEngine';
 
@@ -583,7 +584,8 @@ function Day300IntroModal({ onDismiss }) {
                     objectif du jour atteint rallume une étoile de la constellation. ✦
                 </div>
 
-                <button
+                <Button
+                    variant="ghost"
                     onClick={handleClose}
                     style={{
                         marginTop: '28px',
@@ -599,7 +601,7 @@ function Day300IntroModal({ onDismiss }) {
                     }}
                 >
                     🚀 Lancer l'ascension
-                </button>
+                </Button>
             </div>
         </div>
     );

@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, Edit2, Check, ChevronRight, ChevronUp, ChevronDown, GripVertical, Settings2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS } from '@utils/icons';
-import { Button, Input, ModalHeader, DeleteConfirmModal, ColorPicker, Slider, SegmentedControl, Stack } from '@components/ui';
+import { Button, Input, ModalHeader, DeleteConfirmModal, ColorPicker, Slider, SegmentedControl, Stack, ListActionButton } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { DynamicIcon } from '@utils/icons';
@@ -447,50 +447,22 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
                             const userIndex = userCatsOnly.findIndex(c => c.id === cat.id);
                             return (
                               <>
-                                <button
-                                  type="button"
+                                <ListActionButton
+                                  variant="ghost"
+                                  shape="up"
                                   onClick={() => moveCategory(cat.id, 'up')}
                                   disabled={userIndex === 0}
                                   aria-label="Monter"
-                                  style={{
-                                    width: '26px',
-                                    height: '26px',
-                                    borderRadius: 'var(--radius-sm)',
-                                    border: 'none',
-                                    background: 'transparent',
-                                    color: userIndex === 0 ? 'var(--text-disabled)' : 'var(--text-primary)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: userIndex === 0 ? 'default' : 'pointer',
-                                    opacity: userIndex === 0 ? 0.35 : 1,
-                                    transition: 'background-color 0.2s'
-                                  }}
-                                >
-                                  <ChevronUp size={15} />
-                                </button>
-                                <button
-                                  type="button"
+                                  icon={ChevronUp}
+                                />
+                                <ListActionButton
+                                  variant="ghost"
+                                  shape="down"
                                   onClick={() => moveCategory(cat.id, 'down')}
                                   disabled={userIndex === userCatsOnly.length - 1}
                                   aria-label="Descendre"
-                                  style={{
-                                    width: '26px',
-                                    height: '26px',
-                                    borderRadius: 'var(--radius-sm)',
-                                    border: 'none',
-                                    background: 'transparent',
-                                    color: userIndex === userCatsOnly.length - 1 ? 'var(--text-disabled)' : 'var(--text-primary)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: userIndex === userCatsOnly.length - 1 ? 'default' : 'pointer',
-                                    opacity: userIndex === userCatsOnly.length - 1 ? 0.35 : 1,
-                                    transition: 'background-color 0.2s'
-                                  }}
-                                >
-                                  <ChevronDown size={15} />
-                                </button>
+                                  icon={ChevronDown}
+                                />
                               </>
                             );
                           })()}
@@ -706,7 +678,8 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
                             const isDisabled = isFull && !isCurrentTarget;
 
                             return (
-                              <button
+                              <Button
+                                variant="ghost"
                                 key={tc.id}
                                 onClick={() => { if (!isDisabled) setExerciseTarget(ex.id, tc.id); }}
                                 disabled={isDisabled}
@@ -726,7 +699,7 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
                                 <span style={{ fontSize: '0.65rem', opacity: 0.7 }}>
                                   {isFull ? '🔒' : `(${slotsLeft})`}
                                 </span>
-                              </button>
+                              </Button>
                             );
                           })}
                         </div>
@@ -1012,7 +985,8 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
                   }
 
                   return (
-                    <button
+                    <Button
+                      variant="ghost"
                       key={cat.id}
                       disabled={isFull}
                       onClick={() => setSelectedCatId(cat.id)}
@@ -1029,7 +1003,7 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
                       <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: cat.color }} />
                       {cat.name}
                       {isSelected && <Check size={14} />}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -1071,7 +1045,7 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
                   const IconComp = CUSTOM_EXERCISE_ICONS[name];
                   const isSelected = iconName === name;
                   return (
-                    <button key={name} onClick={() => setIconName(name)} className={isSelected ? 'hover-lift' : ''} style={{
+                    <button type="button" key={name} onClick={() => setIconName(name)} className={isSelected ? 'hover-lift' : ''} style={{
                       aspectRatio: '1', borderRadius: 'var(--radius-md)',
                       background: isSelected ? `${color}20` : 'var(--surface-muted)',
                       border: isSelected ? `2px solid ${color}` : '1px solid var(--border-default)',
@@ -1092,7 +1066,8 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
                 {t('customExercises.typeLabel')}
               </label>
               <div style={{ display: 'flex', background: 'var(--surface-muted)', borderRadius: 'var(--radius-lg)', padding: '4px' }}>
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => setType('counter')}
                   style={{
                     flex: 1, padding: '12px', borderRadius: 'var(--radius-md)',
@@ -1102,8 +1077,9 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
                   }}
                 >
                   <Dumbbell size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} /> {t('customExercises.typeReps')}
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="ghost"
                   onClick={() => setType('timer')}
                   style={{
                     flex: 1, padding: '12px', borderRadius: 'var(--radius-md)',
@@ -1113,7 +1089,7 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
                   }}
                 >
                   <Activity size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} /> {t('customExercises.typeTime')}
-                </button>
+                </Button>
               </div>
             </div>
 

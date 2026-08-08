@@ -9,7 +9,8 @@ import styles from './ShareOptions.module.css';
 // color flows into the module via --c; --i staggers the entrance.
 function MetricTile({ icon: Icon, label, color, checked, onToggle, index }) {
   return (
-    <button
+    <Button
+      variant="ghost"
       aria-pressed={checked}
       onClick={() => {
         haptics.light();
@@ -23,14 +24,15 @@ function MetricTile({ icon: Icon, label, color, checked, onToggle, index }) {
       <span className={styles.metricCheck}>
         {checked && <Check size={12} strokeWidth={3} />}
       </span>
-    </button>
+    </Button>
   );
 }
 
 // Bouton d'upload (caméra / galerie) : même habillage, seuls l'action, l'icône et le label changent.
 function UploadButton({ onClick, label, children }) {
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={onClick}
       style={{
         flex: 1, padding: '12px', borderRadius: '12px',
@@ -47,7 +49,7 @@ function UploadButton({ onClick, label, children }) {
         {children}
       </div>
       {label}
-    </button>
+    </Button>
   );
 }
 
@@ -65,7 +67,7 @@ import { buildFullCategoryOrder, buildFullCategoryColors, buildCategoryChipItems
 import { useExercises } from '@contexts/ExercisesContext';
 import { THEMES as GLOBAL_THEMES } from '@config/themes';
 import { ThemeSwatch } from'@components/ui/ThemeSwatch';
-import { CategoryChips } from '@components/ui';
+import { CategoryChips, Button } from '@components/ui';
 
 export function ShareOptions({ options, toggleOption, setOption, toggleCategory, clearBackgroundImage, originalImage, openCropModal, mode = 'session', isPro = false, sessionData, onOpenStore }) {
   const { t } = useTranslation();
@@ -283,7 +285,8 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                     objectFit: 'cover', display: 'block',
                   }}
                 />
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => {
                     clearBackgroundImage();
                     setOption('bgSize', undefined);
@@ -302,7 +305,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                   }}
                 >
                   <X size={12} />
-                </button>
+                </Button>
               </div>
 
               {/* Actions column */}
@@ -320,7 +323,8 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                 </span>
 
                 {originalImage && (
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => openCropModal()}
                     style={{
                       padding: '8px 14px', borderRadius: '10px',
@@ -337,7 +341,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                   >
                     <Image size={14} />
                     {t('share.recropImage')}
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>

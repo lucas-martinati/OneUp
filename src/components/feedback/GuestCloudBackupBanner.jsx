@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Cloud, X } from '@utils/icons';
 import { useAuth } from '@contexts/AuthContext';
 import { GoogleIcon } from '@components/ui/GoogleIcon';
+import { Button } from '@components/ui';
 
 const DISMISS_KEY = 'oneup_guest_cloud_banner_dismissed';
 
@@ -78,7 +79,8 @@ export function GuestCloudBackupBanner({ displayStreak = 0, totalReps = 0 }) {
         </div>
       </div>
 
-      <button
+      <Button
+        variant="ghost"
         type="button"
         onClick={handleSignIn}
         onMouseEnter={() => setIsHovered(true)}
@@ -109,9 +111,10 @@ export function GuestCloudBackupBanner({ displayStreak = 0, totalReps = 0 }) {
         <span style={{ fontSize: '0.75rem', lineHeight: 1 }}>
           {t('cloud.backupButton', 'Sauvegarder')}
         </span>
-      </button>
+      </Button>
 
-      <button
+      <Button
+        variant="ghost"
         type="button"
         onClick={dismiss}
         aria-label={t('common.close', 'Fermer')}
@@ -128,7 +131,7 @@ export function GuestCloudBackupBanner({ displayStreak = 0, totalReps = 0 }) {
         }}
       >
         <X size={16} />
-      </button>
+      </Button>
     </div>
   );
 }

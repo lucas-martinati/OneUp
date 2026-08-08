@@ -4,6 +4,7 @@ import { HeartHandshake, X } from '@utils/icons';
 import { sounds } from '@utils/soundManager';
 import { cloudSync } from '@services/cloudSync';
 import { Avatar } from '@components/ui/Avatar';
+import { Button } from '@components/ui';
 import { useToastGestures } from '@hooks/useToastGestures';
 import { getToastRoot } from '../feedback/toastRoot';
 import styles from '@styles/NotificationManager.module.css';
@@ -42,14 +43,15 @@ function PokeToast({ toast, onDone }) {
                 <div className={styles.message}>{toast.message}</div>
             </div>
 
-            <button
+            <Button
+                variant="ghost"
                 className={styles.close}
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => { e.stopPropagation(); dismiss(); }}
                 aria-label="dismiss"
             >
                 <X size={16} />
-            </button>
+            </Button>
 
             {!exit && <span key={toast.count} className={styles.progress} />}
         </div>

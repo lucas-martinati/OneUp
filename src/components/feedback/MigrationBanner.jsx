@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Rocket, ArrowRight, X } from '@utils/icons';
 import { isNativePlatform } from '@utils/platform';
 import { APP_URL, APP_URL_DISPLAY } from '@config/app';
+import { Button } from '@components/ui';
 
 // Dismissal is kept per-session only: the user should keep being reminded on
 // later visits until they actually move to the new domain.
@@ -96,7 +97,8 @@ export function MigrationBanner() {
         {t('migration.button')}
         <ArrowRight size={14} />
       </a>
-      <button
+      <Button
+        variant="ghost"
         type="button"
         onClick={dismiss}
         aria-label={t('common.close')}
@@ -114,7 +116,7 @@ export function MigrationBanner() {
         }}
       >
         <X size={16} />
-      </button>
+      </Button>
     </div>
   );
 }

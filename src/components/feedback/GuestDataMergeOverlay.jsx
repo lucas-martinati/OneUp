@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Cloud, AlertCircle, Upload, AlertTriangle } from '@utils/icons';
+import { Button } from '@components/ui';
 
 /**
  * Full-screen overlay for anonymous (guest) data merge.
@@ -37,7 +38,8 @@ export function GuestDataMergeOverlay({ conflictData, onResolveConflict }) {
           {t('cloud.anonymousMergeDesc')}
         </p>
         <div className="conflict-actions">
-          <button
+          <Button
+            variant="ghost"
             className="btn-conflict btn-merge"
             onClick={() => handleResolve('upload')}
             disabled={resolving}
@@ -47,8 +49,9 @@ export function GuestDataMergeOverlay({ conflictData, onResolveConflict }) {
               <strong>{t('cloud.merge')}</strong>
               <span>{t('cloud.mergeDesc')}</span>
             </div>
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
             className={`btn-conflict btn-restore ${confirmRestore ? 'confirming' : ''}`}
             onClick={() => {
               if (!confirmRestore) {
@@ -65,7 +68,7 @@ export function GuestDataMergeOverlay({ conflictData, onResolveConflict }) {
               <strong>{confirmRestore ? t('cloud.areYouSure') : t('cloud.restore')}</strong>
               <span>{confirmRestore ? t('cloud.cannotBeUndone') : t('cloud.restoreDesc')}</span>
             </div>
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

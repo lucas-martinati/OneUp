@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Clock, BarChart3, CheckCircle2, RefreshCw } from '@utils/icons';
 import { useHaptics } from '@hooks/useHaptics';
 import { GradientModal } from '@components/ui/GradientModal';
-import { Stack, Card } from '@components/ui';
+import { Stack, Card, Button } from '@components/ui';
 
 export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
   const { t } = useTranslation();
@@ -93,7 +93,8 @@ export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
         }}
       >
         {onReSubscribe && (
-          <button
+          <Button
+            variant="ghost"
             onClick={() => handleConfirm('renew')}
             style={{
               width: '100%',
@@ -114,10 +115,11 @@ export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
           >
             <RefreshCw size={18} />
             {t('pro.expiredModal.renewCta', 'Renouveler mon abonnement Pro')}
-          </button>
+          </Button>
         )}
 
-        <button
+        <Button
+          variant="ghost"
           onClick={() => handleConfirm('dismiss')}
           style={{
             width: '100%',
@@ -132,7 +134,7 @@ export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
           }}
         >
           {t('pro.expiredModal.dismissCta', 'Continuer en version gratuite')}
-        </button>
+        </Button>
       </Stack>
     </GradientModal>
   );

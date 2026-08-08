@@ -16,6 +16,7 @@
  * atteint), l'orage éclate, la pluie tombe, la canicule est vaincue — event validé.
  */
 import React, { useState, useEffect, memo } from 'react';
+import { Button } from '@components/ui';
 import { EXERCISES } from '@config/exercises';
 import { makeEventManager, seeded } from './eventEngine';
 
@@ -657,7 +658,8 @@ function Day200IntroModal({ onDismiss }) {
                     le thermomètre dégringole, l'orage éclate, la canicule cède. 🌧️
                 </div>
 
-                <button
+                <Button
+                    variant="ghost"
                     onClick={handleClose}
                     style={{
                         width: '100%', marginTop: '22px',
@@ -673,7 +675,7 @@ function Day200IntroModal({ onDismiss }) {
                     }}
                 >
                     🥵 Suer pour faire tomber la pluie
-                </button>
+                </Button>
             </div>
         </div>
     );

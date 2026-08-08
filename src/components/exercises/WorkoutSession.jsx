@@ -1,6 +1,6 @@
 import { useRef, useEffect, useMemo } from 'react';
 import { X, Play, Check, Save, Trash2, GripVertical, Pencil, Shuffle, ChevronUp, ChevronDown, DynamicIcon } from '@utils/icons';
-import { Button, ToggleSwitch } from '@components/ui';
+import { Button, ToggleSwitch, ListActionButton } from '@components/ui';
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { Z_INDEX } from '@utils/zIndex';
 import { SessionSummary } from './SessionSummary';
@@ -86,20 +86,22 @@ function RoutineCard({ routine, index, allExercisesMap, confirming, onLoad, onEd
             <div className={styles.routineTop}>
                 <div className={styles.routineName}>{routine.name}</div>
                 <div className="flex-align-center gap-4">
-                    <button
+                    <Button
+                        variant="ghost"
                         className={styles.cardActionBtn}
                         onClick={(e) => { e.stopPropagation(); onEdit(routine); }}
                         aria-label={t('common.edit')}
                     >
                         <Pencil size={14} />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        variant="ghost"
                         className={`${styles.cardActionBtn} ${styles.cardActionBtnDanger}`}
                         onClick={(e) => { e.stopPropagation(); onAskDelete(routine.id); }}
                         aria-label={t('common.delete')}
                     >
                         <Trash2 size={14} />
-                    </button>
+                    </Button>
                 </div>
             </div>
             <div className={styles.routineMeta}>
@@ -155,7 +157,8 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
     }
 
     return (
-        <button
+        <Button
+            variant="ghost"
             onClick={() => !ex.done && onToggle(ex.id)}
             disabled={ex.done}
             className={ex.done ? `${styles.gridItem} ${styles.gridItemDone}` : styles.gridItem}
@@ -174,7 +177,7 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
             <DynamicIcon icon={ex.icon} size={24} />
             <span className={styles.gridItemName}>{getExerciseLabel(ex, t)}</span>
             <span className={styles.gridItemRemaining}>{remainingLabel}</span>
-        </button>
+        </Button>
     );
 }
 
@@ -381,32 +384,29 @@ export function WorkoutSession(props) {
                                                     </span>
                                                 )}
 
-                                                <div className={styles.arrowCol}>
-                                                    <button
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', flexShrink: 0 }}>
+                                                    <ListActionButton
+                                                        shape="up"
                                                         onClick={(e) => { e.stopPropagation(); moveItem(i, i - 1); }}
                                                         disabled={isFirst}
                                                         aria-label="Move up"
-                                                        className={styles.arrowBtn}
-                                                    >
-                                                        <ChevronUp size={12} />
-                                                    </button>
-                                                    <button
+                                                        icon={ChevronUp}
+                                                    />
+                                                    <ListActionButton
+                                                        shape="down"
                                                         onClick={(e) => { e.stopPropagation(); moveItem(i, i + 1); }}
                                                         disabled={isLast}
                                                         aria-label="Move down"
-                                                        className={styles.arrowBtn}
-                                                    >
-                                                        <ChevronDown size={12} />
-                                                    </button>
+                                                        icon={ChevronDown}
+                                                    />
                                                 </div>
 
-                                                <button
+                                                <ListActionButton
+                                                    variant="danger"
                                                     onClick={(e) => { e.stopPropagation(); toggleExercise(id); }}
-                                                    className={styles.removeBtn}
                                                     aria-label={t('common.delete')}
-                                                >
-                                                    <X size={10} />
-                                                </button>
+                                                    icon={X}
+                                                />
                                             </div>
                                         );
                                     })}

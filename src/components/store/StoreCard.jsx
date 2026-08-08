@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { SegmentedControl } from '@components/ui/SegmentedControl';
-import { SectionTitle } from '@components/ui';
+import { SectionTitle, Button } from '@components/ui';
 
 export function StoreCard({
     isActive,
@@ -171,7 +171,8 @@ export function StoreCard({
                         </div>
                     )}
 
-                    <button
+                    <Button
+                        variant="ghost"
                         onClick={handlePurchase}
                         className="hover-lift"
                         style={{
@@ -193,7 +194,7 @@ export function StoreCard({
                     >
                         <IconComponent size={20} fill={allowMultiplePurchases ? "white" : "none"} />
                         {currentBuyText}
-                    </button>
+                    </Button>
                 </div>
             )}
         </div>

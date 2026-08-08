@@ -11,7 +11,7 @@ import { Capacitor } from '@capacitor/core';
 import { healthConnectService } from '@services/healthConnectService';
 import { ChevronRight, CheckCircle2, Activity } from '@utils/icons';
 import { SegmentedControl } from'@components/ui/SegmentedControl';
-import { GoogleIcon, Stack } from'@components/ui';
+import { GoogleIcon, Stack, Button } from'@components/ui';
 import { GoogleSignInButton } from'@components/ui/GoogleSignInButton';
 
 const MODES = [
@@ -235,7 +235,8 @@ export function CardioModule() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <CardioStreak streak={displayStreak} />
                 </div>
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => !isDemo && setShowHistory(true)}
                   className="hover-lift"
                   style={{
@@ -256,13 +257,14 @@ export function CardioModule() {
                 >
                   {t('cardio.viewHistory')}
                   <ChevronRight size={14} color="var(--accent-glow)" />
-                </button>
+                </Button>
               </div>
 
               {/* Connection Section (only visible when connected) */}
               {!isDemo && healthAvailable && (
                 <RestrictionSection title={t('cardio.connectTitle')}>
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={handleConnectHealth}
                     style={{
                       flex: 1, padding: '6px', borderRadius: 'var(--radius-sm)',
@@ -276,7 +278,7 @@ export function CardioModule() {
                   >
                     {healthConnected ? <CheckCircle2 size={12} /> : <Activity size={12} />}
                     {t('cardio.healthConnect')}
-                  </button>
+                  </Button>
                 </RestrictionSection>
               )}
 
@@ -467,7 +469,7 @@ export function CardioModule() {
              ) : (
                <Stack align="center" gap="sm" style={{ marginTop: '6px' }}>
                  {healthAvailable && (
-                   <button onClick={handleConnectHealth} className="hover-lift" style={{
+                   <Button variant="ghost" onClick={handleConnectHealth} className="hover-lift" style={{
                      padding: '12px 26px', borderRadius: '16px',
                      background: 'linear-gradient(145deg, #4285F4, #3367d6)', color: 'white',
                      fontWeight: '800', fontSize: 'clamp(0.8rem, 1.5vh, 0.9rem)',
@@ -477,7 +479,7 @@ export function CardioModule() {
                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                    }}>
                      <Activity size={18} /> {t('cardio.healthConnect')}
-                   </button>
+                   </Button>
                  )}
                </Stack>
              );

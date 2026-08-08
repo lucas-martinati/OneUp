@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Calendar as CalendarIcon, Play, PieChart, Users, SettingsIcon } from '@utils/icons';
 import { useUIStore } from '@store/useUIStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { Button } from '@components/ui';
 
 import styles from '@styles/DashboardNavBar.module.css';
 
@@ -23,7 +24,8 @@ export const DashboardNavBar = React.memo(({
     const gradEnd = (selectedExercise.gradient && selectedExercise.gradient[1]) || accent;
 
     const navItem = (id, Icon, label) => (
-        <button
+        <Button
+            variant="ghost"
             key={id}
             onClick={() => openModal(id)}
             aria-label={label}
@@ -31,7 +33,7 @@ export const DashboardNavBar = React.memo(({
         >
             <Icon size={20} />
             <span className={styles.label}>{label}</span>
-        </button>
+        </Button>
     );
 
     return (
@@ -40,7 +42,8 @@ export const DashboardNavBar = React.memo(({
             {navItem('stats', PieChart, t('stats.title'))}
 
             {/* Central Séance button */}
-            <button
+            <Button
+                variant="ghost"
                 onClick={() => {
                     openSession('config');
                     pauseCloudSync?.();
@@ -59,7 +62,7 @@ export const DashboardNavBar = React.memo(({
                     {sessionInProgress && <span className={styles.sessionDot} />}
                 </span>
                 <span className={styles.label}>{t('dashboard.session')}</span>
-            </button>
+            </Button>
 
             {navItem('leaderboard', Users, t('leaderboard.title'))}
             {navItem('settings', SettingsIcon, t('settings.title'))}

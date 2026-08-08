@@ -8,6 +8,7 @@
  * sans dépendances dispersées dans le projet.
  */
 import React, { useState, useEffect, memo } from 'react';
+import { Button } from '@components/ui';
 import { makeEventManager, seeded } from './eventEngine';
 
 // ============================================================================
@@ -787,7 +788,8 @@ function Day100HackModal({ onDismiss }) {
                     )}
                 </div>
                 {showButton && (
-                    <button
+                    <Button
+                        variant="ghost"
                         onClick={handleClose}
                         style={{
                             width: '100%', marginTop: '20px',
@@ -798,17 +800,12 @@ function Day100HackModal({ onDismiss }) {
                             color: '#ef4444',
                             fontFamily: "'Courier New', monospace",
                             fontSize: '14px', fontWeight: '700',
-                            letterSpacing: '2px',
-                            textTransform: 'uppercase',
-                            cursor: 'pointer',
-                            animation: 'terminalBtnIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                            textShadow: '0 0 10px rgba(239, 68, 68, 0.5)',
                             position: 'relative', zIndex: 2,
                             transition: 'all 0.2s ease',
                         }}
                     >
                         &gt; CORRIGER LES FAILLES
-                    </button>
+                    </Button>
                 )}
             </div>
         </div>

@@ -1,7 +1,7 @@
 import React, { useRef, useState, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Shield, Flame, Trophy, Snowflake } from '@utils/icons';
-import { Card, FrozenFlame, Stack } from '@components/ui';
+import { Card, FrozenFlame, Stack, Button } from '@components/ui';
 import { useUIStore } from '@store/useUIStore';
 import { useProgressStore } from '@store/useProgressStore';
 import { useAuth } from '@contexts/AuthContext';
@@ -198,7 +198,8 @@ export const DashboardHeader = React.memo(({
                     }}
                 >
                     {isAdmin && (
-                        <button
+                        <Button
+                            variant="ghost"
                             type="button"
                             onClick={() => openModal('admin')}
                             aria-label="Admin Panel"
@@ -213,12 +214,13 @@ export const DashboardHeader = React.memo(({
                         >
                             <Shield size={16} color="#ef4444" />
                             <span aria-hidden="true">{'\u200b'}</span>
-                        </button>
+                        </Button>
                     )}
 
                     {/* Streak Freeze inventory */}
                     {showFreezeBadge && (
-                        <button
+                        <Button
+                            variant="ghost"
                             type="button"
                             onClick={() => setShowFreezeInfo(true)}
                             aria-label={t('streakFreeze.available', { count: displayFreezeCount })}
@@ -232,13 +234,14 @@ export const DashboardHeader = React.memo(({
                         >
                             <Snowflake size={16} color="#38bdf8" />
                             <span style={{ color: '#38bdf8' }}>{displayFreezeCount}</span>
-                        </button>
+                        </Button>
                     )}
 
                     {showFreezeInfo && <StreakFreezeInfo open={showFreezeInfo} onClose={() => setShowFreezeInfo(false)} />}
 
                     {/* Global streak badge */}
-                    <button
+                    <Button
+                        variant="ghost"
                         type="button"
                         onClick={handleStreakClick}
                         aria-label="Streak"
@@ -254,10 +257,11 @@ export const DashboardHeader = React.memo(({
                             ? <FrozenFlame size={16} color={streakBadge.fg} />
                             : <Flame size={16} color={streakBadge.fg} />}
                         <span style={{ color: streakBadge.fg }}>{displayStreak}</span>
-                    </button>
+                    </Button>
 
                     {/* Total reps badge */}
-                    <button
+                    <Button
+                        variant="ghost"
                         type="button"
                         tabIndex={-1}
                         className="shimmer"
@@ -272,7 +276,7 @@ export const DashboardHeader = React.memo(({
                     >
                         <Trophy size={16} color={selectedExercise.color} />
                         <span>{totalReps}</span>
-                    </button>
+                    </Button>
                 </Stack>
             </Card>
 

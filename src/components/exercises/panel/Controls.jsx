@@ -1,4 +1,5 @@
 import { CheckCheck, RotateCcw, Plus, Minus, Play, Pause } from '@utils/icons';
+import { Button } from '@components/ui';
 
 export function TimerControls({
     activeColor,
@@ -15,7 +16,8 @@ export function TimerControls({
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(12px, 2vh, 20px)', width: '100%', maxWidth: '360px' }}>
             {!isCompleted && (
-                <button
+                <Button
+                    variant="ghost"
                     onClick={() => setIsRunning(!isRunning)}
                     className="hover-lift ripple"
                     aria-label={isRunning ? t('timer.reset') : t('common.next')}
@@ -36,7 +38,7 @@ export function TimerControls({
                     }}
                 >
                     {isRunning ? <Pause size={34} fill="white" /> : <Play size={34} fill="white" style={{ marginLeft: '5px' }} />}
-                </button>
+                </Button>
             )}
             <ActionButtons
                 activeColor={activeColor}
@@ -70,7 +72,8 @@ export function CounterControls({
             {/* Primary interaction: increment quad */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'clamp(6px, 1vh, 8px)', width: '100%' }}>
                 {[1, 2, 5, 10].map(amount => (
-                    <button
+                    <Button
+                        variant="ghost"
                         key={`plus-${amount}`}
                         onClick={() => handleIncrement(amount)}
                         className="hover-lift ripple"
@@ -98,7 +101,7 @@ export function CounterControls({
                     >
                         <Plus size={14} style={{ opacity: 0.7 }} />
                         {amount}
-                    </button>
+                    </Button>
                 ))}
             </div>
 
@@ -107,7 +110,8 @@ export function CounterControls({
                 {[1, 5].map(amount => {
                     const canDecrement = displayCount > 0;
                     return (
-                        <button
+                        <Button
+                            variant="ghost"
                             key={`minus-${amount}`}
                             onClick={() => handleDecrement(amount)}
                             className="hover-lift ripple"
@@ -133,7 +137,7 @@ export function CounterControls({
                         >
                             <Minus size={14} style={{ opacity: 0.7 }} />
                             {amount}
-                        </button>
+                        </Button>
                     );
                 })}
                 <ResetButton onReset={handleReset} disabled={displayCount === 0} label={t('counter.reset')} />
@@ -155,7 +159,8 @@ export function CounterControls({
 /** Subtle, danger-tinted reset (utility). */
 function ResetButton({ onReset, disabled, label }) {
     return (
-        <button
+        <Button
+            variant="ghost"
             onClick={onReset}
             className="hover-lift"
             disabled={disabled}
@@ -179,14 +184,15 @@ function ResetButton({ onReset, disabled, label }) {
         >
             <RotateCcw size={16} />
             {label}
-        </button>
+        </Button>
     );
 }
 
 /** Filled primary call-to-action: complete the exercise. */
 function CompleteButton({ activeColor, gradEnd, completeFlash, isCompleted, onComplete, label }) {
     return (
-        <button
+        <Button
+            variant="ghost"
             onClick={onComplete}
             className={`hover-lift ripple${completeFlash ? ' complete-flash success-glow' : ''}`}
             disabled={isCompleted}
@@ -214,7 +220,7 @@ function CompleteButton({ activeColor, gradEnd, completeFlash, isCompleted, onCo
         >
             <CheckCheck size={20} />
             {label}
-        </button>
+        </Button>
     );
 }
 

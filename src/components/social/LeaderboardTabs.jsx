@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy, Dumbbell, Filter, ChevronUp } from '@utils/icons';
 import { SegmentedControl } from '@components/ui/SegmentedControl';
+import { Button } from '@components/ui';
 
 export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VISIBLE_TABS, showDomainFilter = true, showExerciseTabs = true }) {
     const { t } = useTranslation();
@@ -70,10 +71,10 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                         const isActive = tab.id === currentActiveId;
                         const Icon = tab.icon;
                         return (
-                            <button key={tab.id} onClick={() => { setActiveTab(tab.id); setShowAll(false); }} style={chipStyle(isActive, tab.color, tab.isSpecial)}>
+                            <Button variant="ghost" key={tab.id} onClick={() => { setActiveTab(tab.id); setShowAll(false); }} style={chipStyle(isActive, tab.color, tab.isSpecial)}>
                                 <Icon size={14} />
                                 {tab.customLabel ? tab.customLabel : t(tab.labelKey)}
-                            </button>
+                            </Button>
                         );
                     })}
 
@@ -81,17 +82,17 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
                         const isActive = tab.id === currentActiveId;
                         const Icon = tab.icon;
                         return (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={chipStyle(isActive, tab.color)}>
+                            <Button variant="ghost" key={tab.id} onClick={() => setActiveTab(tab.id)} style={chipStyle(isActive, tab.color)}>
                                 <Icon size={14} />
                                 {tab.customLabel ? tab.customLabel : t(tab.labelKey)}
-                            </button>
+                            </Button>
                         );
                     })}
 
-                    <button onClick={() => setShowAll(!showAll)} style={chipStyle(false, '#ffffff', false, !showAll)}>
+                    <Button variant="ghost" onClick={() => setShowAll(!showAll)} style={chipStyle(false, '#ffffff', false, !showAll)}>
                         {showAll ? <ChevronUp size={14} /> : <Filter size={14} />}
                         {showAll ? t('common.close') : t('share.exercises')}
-                    </button>
+                    </Button>
                 </div>
             )}
         </>

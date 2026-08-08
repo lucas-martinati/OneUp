@@ -108,7 +108,8 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
           </div>
 
           <div className={styles.actions}>
-            <button
+            <Button
+              variant="ghost"
               onClick={handleDownload}
               disabled={isExporting}
               className="hover-lift"
@@ -124,8 +125,9 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
             >
               {isExporting ? <Loader2 size={18} className="spin" /> : <Download size={18} />}
               {t('share.download')}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
               onClick={handleShare}
               disabled={isExporting}
               className="hover-lift"
@@ -143,7 +145,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
               {canShareNatively()
                 ? t('common.share')
                 : t('share.download')}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

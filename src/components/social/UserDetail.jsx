@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Star } from '@utils/icons';
+import { Trophy, Medal, ChevronLeft, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Star, X } from '@utils/icons';
 import { Avatar } from '@components/ui/Avatar';
 import { Card } from '@components/ui/Card';
+import { Button } from '@components/ui';
 import { Z_INDEX } from '@utils/zIndex';
 import { DifficultyBadge } from '@components/ui/DifficultyBadge';
 import { StreakFlame } from '@components/ui/StreakFlame';
@@ -194,19 +195,15 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                         ))}
                     </>
                 )}
-                <button
+                <Button
+                    iconOnly
+                    icon={X}
+                    variant="glass"
                     onClick={onClose}
                     className="hover-lift"
-                    style={{
-                        background: 'rgba(255,255,255,0.08)', border: 'none',
-                        borderRadius: '50%', width: 'var(--touch-min)', height: 'var(--touch-min)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'var(--text-secondary)', cursor: 'pointer', marginBottom: '12px',
-                        flexShrink: 0
-                    }}
-                >
-                    <ChevronLeft size={18} />
-                </button>
+                    aria-label="Close"
+                    style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 10 }}
+                />
 
                 <div style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'center',

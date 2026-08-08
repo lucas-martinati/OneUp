@@ -325,7 +325,7 @@
   display: grid;
   place-items: center;
   background: var(--accent-glow);
-  color: var(--text-on-surface, white);
+  color: white;
   border: 2px solid var(--sheet-bg);
   cursor: pointer;
   flex-shrink: 0;

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@components/ui';
 
 export const CardioWeeklyGoal = React.memo(({ 
   distance, goal, weekNumber, 
@@ -132,7 +133,8 @@ export const CardioWeeklyGoal = React.memo(({
               </div>
             </div>
 
-            <button
+            <Button
+              variant="ghost"
               onClick={onInvalidate}
               className="hover-lift"
               style={{
@@ -151,7 +153,7 @@ export const CardioWeeklyGoal = React.memo(({
               }}
             >
               {t('common.continue')}
-            </button>
+            </Button>
           </div>
         )}
 

@@ -1,4 +1,5 @@
 import { Check } from '@utils/icons';
+import { Button } from '@components/ui';
 
 export function WeightSelector({ activeColor, currentWeight, handleValidateWeight, localWeightStr, setLocalWeightStr, t }) {
     const parsedWeight = parseFloat(localWeightStr.replace(',', '.'));

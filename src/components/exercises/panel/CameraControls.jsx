@@ -1,4 +1,5 @@
 import { Camera, CameraOff, RefreshCw, ArrowDown, ArrowUp } from 'lucide-react';
+import { Button } from '@components/ui';
 
 /** Toggle buttons for the camera push-up counter, plus its description hint. */
 export function CameraModeBar({
@@ -8,7 +9,8 @@ export function CameraModeBar({
     return (
         <>
             <div className="camera-mode-bar">
-                <button
+                <Button
+                    variant="ghost"
                     onClick={isCameraActive ? stopCamera : startCamera}
                     className={`camera-mode-toggle hover-lift glass${isCameraActive ? ' is-active' : ''}`}
                     style={{ '--exercise-color': activeColor }}
@@ -17,17 +19,18 @@ export function CameraModeBar({
                         {isCameraActive ? <CameraOff size={16} /> : <Camera size={16} />}
                     </span>
                     {t('counter.cameraMode')}
-                </button>
+                </Button>
 
                 {isCameraActive && isCalibrated && (
-                    <button
+                    <Button
+                        variant="ghost"
                         onClick={recalibrate}
                         className="camera-recal-btn hover-lift glass"
                         aria-label={t('counter.cameraCalibrate')}
                     >
                         <RefreshCw size={14} />
                         {t('counter.cameraCalibrate')}
-                    </button>
+                    </Button>
                 )}
             </div>
 
