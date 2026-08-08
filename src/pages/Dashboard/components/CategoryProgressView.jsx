@@ -83,7 +83,7 @@ export const CategoryProgressView = React.memo(({
                         <Button
                             variant="ghost"
                             onClick={onAddCustom || onManageCustom}
-                            className="exercise-button hover-lift"
+                            className="exercise-button"
                             aria-label={t('customExercises.create')}
                             title={t('customExercises.create')}
                             style={{
@@ -405,7 +405,7 @@ const ExerciseButton = React.memo(({
         <Button
             variant="ghost"
             onClick={() => onSelect(ex.id)}
-            className={`hover-lift exercise-button${exDone ? ' exercise-done' : ''}`}
+            className={`exercise-button${exDone ? ' exercise-done' : ''}`}
             style={{
                 flex: tileSizing.flex,
                 minWidth: 'clamp(60px, 18vw, 100px)',

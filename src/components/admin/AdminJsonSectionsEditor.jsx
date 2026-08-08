@@ -256,7 +256,7 @@ export function AdminJsonSectionsEditor({
       })}
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--space-6)' }}>
-        <Button variant="secondary" size="md" onClick={onBack}>
+        <Button variant="secondary" onClick={onBack}>
           Retour aux utilisateurs
         </Button>
       </div>

@@ -99,7 +99,6 @@ export function MigrationBanner() {
       </a>
       <Button
         variant="ghost"
-        type="button"
         onClick={dismiss}
         aria-label={t('common.close')}
         style={{

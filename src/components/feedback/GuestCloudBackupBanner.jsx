@@ -81,7 +81,6 @@ export function GuestCloudBackupBanner({ displayStreak = 0, totalReps = 0 }) {
 
       <Button
         variant="ghost"
-        type="button"
         onClick={handleSignIn}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -115,7 +114,6 @@ export function GuestCloudBackupBanner({ displayStreak = 0, totalReps = 0 }) {
 
       <Button
         variant="ghost"
-        type="button"
         onClick={dismiss}
         aria-label={t('common.close', 'Fermer')}
         style={{

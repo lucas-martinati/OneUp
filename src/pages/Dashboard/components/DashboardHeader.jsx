@@ -200,7 +200,6 @@ export const DashboardHeader = React.memo(({
                     {isAdmin && (
                         <Button
                             variant="ghost"
-                            type="button"
                             onClick={() => openModal('admin')}
                             aria-label="Admin Panel"
                             
@@ -221,7 +220,6 @@ export const DashboardHeader = React.memo(({
                     {showFreezeBadge && (
                         <Button
                             variant="ghost"
-                            type="button"
                             onClick={() => setShowFreezeInfo(true)}
                             aria-label={t('streakFreeze.available', { count: displayFreezeCount })}
                             title={t('streakFreeze.available', { count: displayFreezeCount })}
@@ -242,7 +240,6 @@ export const DashboardHeader = React.memo(({
                     {/* Global streak badge */}
                     <Button
                         variant="ghost"
-                        type="button"
                         onClick={handleStreakClick}
                         aria-label="Streak"
                         style={{
@@ -262,7 +259,6 @@ export const DashboardHeader = React.memo(({
                     {/* Total reps badge */}
                     <Button
                         variant="ghost"
-                        type="button"
                         tabIndex={-1}
                         className="shimmer"
                         style={{

@@ -77,7 +77,7 @@ export function EmptyState({
 
       {actionLabel && onAction && (
         <div style={{ marginTop: 'var(--space-2)' }}>
-          <Button variant="primary" size="sm" onClick={onAction}>
+          <Button size="sm" onClick={onAction}>
             {actionLabel}
           </Button>
         </div>

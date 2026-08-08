@@ -75,7 +75,7 @@ export function AdminPanel({ onClose }) {
                 disabled={refreshing || loading}
                 aria-label="Actualiser"
                 variant="glass"
-                className={`hover-lift ${refreshing ? 'spin' : ''}`}
+                className={`${refreshing ? 'spin' : ''}`}
               />
             )}
             <Button

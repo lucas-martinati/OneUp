@@ -1,4 +1,5 @@
 import { Check } from '@utils/icons';
+import { Button } from '@components/ui';
 
 export function WeightSelector({ activeColor, currentWeight, handleValidateWeight, localWeightStr, setLocalWeightStr, t }) {
     const parsedWeight = parseFloat(localWeightStr.replace(',', '.'));
@@ -45,10 +46,10 @@ export function WeightSelector({ activeColor, currentWeight, handleValidateWeigh
                         textAlign: 'center'
                     }}
                 />
-                <button
+                <Button
                     onClick={handleValidateWeight}
-                    className="hover-lift"
                     disabled={isUnchanged}
+                    iconOnly
                     aria-label={t('weight.kg')}
                     style={{
                         width: '40px',
@@ -68,7 +69,7 @@ export function WeightSelector({ activeColor, currentWeight, handleValidateWeigh
                     }}
                 >
                     <Check size={20} />
-                </button>
+                </Button>
             </div>
         </div>
     );

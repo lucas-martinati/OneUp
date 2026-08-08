@@ -152,7 +152,7 @@ export function ClanManager({ onClanJoined }) {
                                 )}
 
                                 <div className="flex-col gap-12">
-                                    <Button fullWidth size="lg" variant="primary" icon={LogIn} onClick={() => { setView('join'); setError(''); setInputValue(''); }}>
+                                    <Button fullWidth size="lg" icon={LogIn} onClick={() => { setView('join'); setError(''); setInputValue(''); }}>
                                         {t('clan.joinClan')}
                                     </Button>
 
@@ -227,7 +227,7 @@ export function ClanManager({ onClanJoined }) {
                                     </Button>
                                 );
                             })()}
-                            <Button fullWidth size="md" variant="ghost" onClick={() => setView('menu')}>
+                            <Button fullWidth variant="ghost" onClick={() => setView('menu')}>
                                 {t('common.cancel')}
                             </Button>
                         </div>

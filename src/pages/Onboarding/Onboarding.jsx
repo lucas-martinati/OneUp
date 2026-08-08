@@ -169,7 +169,7 @@ export function Onboarding({ onStart }) {
                             </Trans>
                         </p>
 
-                        <Button variant="primary" size="lg" fullWidth onClick={() => setStep(2)} style={{ background: 'var(--gradient-accent)' }}>
+                        <Button size="lg" fullWidth onClick={() => setStep(2)} style={{ background: 'var(--gradient-accent)' }}>
                             {t('onboarding.letsGo')}
                             <ArrowRight size={20} strokeWidth={3} />
                         </Button>
@@ -287,7 +287,7 @@ export function Onboarding({ onStart }) {
                         </div>
 
                         <NavRow onBack={() => setStep(1)} t={t}>
-                            <Button variant="primary" size="lg" onClick={() => setStep(3)} style={{ flex: 2, background: 'var(--gradient-accent)' }}>
+                            <Button size="lg" onClick={() => setStep(3)} style={{ flex: 2, background: 'var(--gradient-accent)' }}>
                                 {t('common.continue')}
                                 <ArrowRight size={20} strokeWidth={3} />
                             </Button>
@@ -321,7 +321,7 @@ export function Onboarding({ onStart }) {
                         </p>
 
                         <NavRow onBack={() => setStep(2)} t={t}>
-                            <Button variant="primary" size="lg" onClick={handleStart} style={{ flex: 2, background: 'var(--gradient-accent)' }}>
+                            <Button size="lg" onClick={handleStart} style={{ flex: 2, background: 'var(--gradient-accent)' }}>
                                 {t('onboarding.startChallenge')}
                                 <ArrowRight size={20} strokeWidth={3} />
                             </Button>
@@ -438,7 +438,7 @@ export function Onboarding({ onStart }) {
                         </Stack>
 
                         <NavRow onBack={() => setStep(2)} t={t}>
-                            <Button variant="primary" size="lg"
+                            <Button size="lg"
                                 onClick={handleStart}
                                 disabled={!canStartPast}
                                 style={{ flex: 2, background: 'var(--gradient-accent)' }}

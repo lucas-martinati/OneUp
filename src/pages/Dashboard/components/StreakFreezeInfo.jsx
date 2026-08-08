@@ -54,7 +54,7 @@ export function StreakFreezeInfo({ open, onClose }) {
         );
     } else if (!isPro) {
         footerNode = (
-            <Button variant="primary" size="sm" fullWidth onClick={handleUpgrade}>
+            <Button size="sm" fullWidth onClick={handleUpgrade}>
                 {t('streakFreeze.proCta')}
             </Button>
         );

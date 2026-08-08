@@ -319,7 +319,6 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                 <div style={{ paddingTop: 'var(--space-4)' }}>
                     <Button
                         variant="danger-ghost"
-                        size="md"
                         fullWidth
                         icon={LogOut}
                         onClick={() => setShowLeaveConfirm(true)}

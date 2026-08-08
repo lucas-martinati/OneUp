@@ -166,7 +166,6 @@ const BadgeItem = React.memo(({ badge, highlighted }) => {
 const CategoryChip = React.memo(({ label, color, count, active, onClick }) => (
     <Button
         variant="ghost"
-        type="button"
         onClick={onClick}
         style={{
             display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0,

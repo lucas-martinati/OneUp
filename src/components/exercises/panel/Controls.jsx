@@ -194,7 +194,7 @@ function CompleteButton({ activeColor, gradEnd, completeFlash, isCompleted, onCo
         <Button
             variant="ghost"
             onClick={onComplete}
-            className={`hover-lift ripple${completeFlash ? ' complete-flash success-glow' : ''}`}
+            className={`ripple${completeFlash ? ' complete-flash success-glow' : ''}`}
             disabled={isCompleted}
             style={{
                 width: '100%',

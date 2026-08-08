@@ -432,7 +432,6 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
 
               {customCategories.filter(c => c.id !== 'custom').length < maxCustomCategories && (
                 <Button
-                  variant="primary"
                   size="lg"
                   fullWidth
                   icon={Plus}
@@ -515,7 +514,6 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
               <div style={{ display: 'flex', gap: '12px', marginTop: 'var(--space-3)' }}>
                 <Button
                   variant="secondary"
-                  size="md"
                   fullWidth
                   onClick={() => {
                     setEditingId(null);
@@ -526,8 +524,6 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
                 </Button>
 
                 <Button
-                  variant="primary"
-                  size="md"
                   fullWidth
                   onClick={handleSave}
                 >
@@ -678,7 +674,6 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
               <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
                 <Button
                   variant="secondary"
-                  size="md"
                   fullWidth
                   onClick={() => { setView('list'); setDeletingCat(null); }}
                 >
@@ -686,7 +681,6 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
                 </Button>
                 <Button
                   variant="danger"
-                  size="md"
                   fullWidth
                   onClick={() => setShowConfirmDelete(true)}
                 >
@@ -887,7 +881,6 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
 
             {customExercises.length < maxCustomExercises && (
               <Button
-                variant="primary"
                 size="lg"
                 fullWidth
                 icon={Plus}
@@ -1079,7 +1072,6 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
             <div style={{ display: 'flex', gap: '12px', marginTop: 'var(--space-3)' }}>
               <Button
                 variant="secondary"
-                size="md"
                 fullWidth
                 onClick={() => {
                   setEditingId(null);
@@ -1090,8 +1082,6 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
               </Button>
 
               <Button
-                variant="primary"
-                size="md"
                 fullWidth
                 onClick={handleSave}
               >

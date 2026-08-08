@@ -317,7 +317,6 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <Button
               variant="danger-ghost"
-              size="md"
               fullWidth
               icon={RotateCcw}
               onClick={() => setConfirm('reset')}
@@ -327,7 +326,6 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
             </Button>
             <Button
               variant="danger"
-              size="md"
               fullWidth
               icon={Trash2}
               onClick={() => setConfirm('delete')}
@@ -371,10 +369,10 @@ function ConfirmRow({ text, confirmLabel, loading, onConfirm, onCancel }) {
     <div className="scale-in flex-col gap-12">
       <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-primary)', lineHeight: 1.5 }}>{text}</p>
       <div style={{ display: 'flex', gap: '10px' }}>
-        <Button variant="secondary" size="md" fullWidth disabled={loading} onClick={onCancel}>
+        <Button variant="secondary" fullWidth disabled={loading} onClick={onCancel}>
           Annuler
         </Button>
-        <Button variant="danger" size="md" fullWidth loading={loading} onClick={onConfirm}>
+        <Button variant="danger" fullWidth loading={loading} onClick={onConfirm}>
           {confirmLabel}
         </Button>
       </div>

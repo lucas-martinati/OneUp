@@ -12,7 +12,7 @@ export function CameraModeBar({
                 <Button
                     variant="ghost"
                     onClick={isCameraActive ? stopCamera : startCamera}
-                    className={`camera-mode-toggle hover-lift glass${isCameraActive ? ' is-active' : ''}`}
+                    className={`camera-mode-toggle glass${isCameraActive ? ' is-active' : ''}`}
                     style={{ '--exercise-color': activeColor }}
                 >
                     <span className="camera-mode-toggle-icon">
@@ -25,7 +25,7 @@ export function CameraModeBar({
                     <Button
                         variant="ghost"
                         onClick={recalibrate}
-                        className="camera-recal-btn hover-lift glass"
+                        className="camera-recal-btn glass"
                         aria-label={t('counter.cameraCalibrate')}
                     >
                         <RefreshCw size={14} />
