@@ -10,7 +10,7 @@ import styles from './ShareOptions.module.css';
 function MetricTile({ icon: Icon, label, color, checked, onToggle, index }) {
   return (
     <Button
-      variant="ghost"
+      variant="unstyled"
       aria-pressed={checked}
       onClick={() => {
         haptics.light();
@@ -34,18 +34,9 @@ function UploadButton({ onClick, label, children }) {
     <Button
       variant="ghost"
       onClick={onClick}
-      style={{
-        flex: 1, padding: '12px', borderRadius: '12px',
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px dashed rgba(255,255,255,0.15)',
-        color: 'var(--text-secondary)',
-        fontSize: '0.7rem', fontWeight: 600,
-        cursor: 'pointer', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', gap: '6px',
-        transition: 'all 0.15s ease',
-      }}
+      className={styles.uploadBtn}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}>
+      <div className={styles.uploadIcon}>
         {children}
       </div>
       {label}
@@ -53,21 +44,30 @@ function UploadButton({ onClick, label, children }) {
   );
 }
 
-// En-tête de section (label majuscule, icône optionnelle).
-function SectionLabel({ icon: Icon, children }) {
-  return (
-    <div className={styles.sectionLabel}>
-      {Icon && <Icon size={12} />}
-      {children}
-    </div>
-  );
-}
+
 
 import { buildFullCategoryOrder, buildFullCategoryColors, buildCategoryChipItems } from '@config/categories';
 import { useExercises } from '@contexts/ExercisesContext';
 import { THEMES as GLOBAL_THEMES } from '@config/themes';
 import { ThemeSwatch } from'@components/ui/ThemeSwatch';
-import { CategoryChips, Button } from '@components/ui';
+import { CategoryChips, Button, Input } from '@components/ui';
+
+function SectionLabel({ icon: Icon, children, spacer = true }) {
+  return (
+    <>
+      {spacer && <div style={{ height: '4px' }} />}
+      <div style={{
+        fontSize: '0.65rem', fontWeight: 700,
+        color: 'var(--text-secondary)',
+        textTransform: 'uppercase', letterSpacing: '1px',
+        padding: '0 4px',
+      }}>
+        {Icon && <Icon size={11} style={{ marginRight: '4px', verticalAlign: 'middle' }} />}
+        {children}
+      </div>
+    </>
+  );
+}
 
 export function ShareOptions({ options, toggleOption, setOption, toggleCategory, clearBackgroundImage, originalImage, openCropModal, mode = 'session', isPro = false, sessionData, onOpenStore }) {
   const { t } = useTranslation();
@@ -125,8 +125,8 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       width: '100%',
     }}>
       {/* Theme selector — first: it changes the whole look of the card */}
-      <SectionLabel icon={Palette}>
-        {t('share.theme')} {!isPro && <Lock size={12} color="var(--accent)" style={{ opacity: 0.8 }} />}
+      <SectionLabel icon={Palette} spacer={false}>
+        {t('share.theme')} {!isPro && <Lock size={11} color="var(--accent)" style={{ opacity: 0.8 }} />}
       </SectionLabel>
       <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '12px' }}>
         <div style={{
@@ -229,7 +229,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
       </div>
 
       {isGlobal && options.showDailyExercises && (
-        <input
+        <Input
           type="date"
           className={styles.dateField}
           value={options.globalDate || new Date().toISOString().split('T')[0]}
@@ -285,8 +285,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                     objectFit: 'cover', display: 'block',
                   }}
                 />
-                <Button
-                  variant="ghost"
+                <button
                   onClick={() => {
                     clearBackgroundImage();
                     setOption('bgSize', undefined);
@@ -301,11 +300,11 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
                     border: '1px solid rgba(255,255,255,0.1)',
                     color: 'white', cursor: 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'all 0.15s ease',
+                    padding: 0
                   }}
                 >
                   <X size={12} />
-                </Button>
+                </button>
               </div>
 
               {/* Actions column */}

@@ -242,4 +242,27 @@
   min-height: 48px;
 }
 
+/* Link: Inline text link (no background, underline on hover) */
+.btn--link {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 4px 8px;
+  font-weight: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  min-height: auto;
+  white-space: normal;
+  display: inline;
+  gap: 0;
+}
 
+.btn--link:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+.btn--link:active:not(:disabled) {
+  transform: none;
+}

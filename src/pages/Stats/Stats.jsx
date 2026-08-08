@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useDeferredValue, Suspense, lazy } from 'react';
-import { X, Award } from '@utils/icons';
-import { Button } from '@components/ui';
+import { Award } from '@utils/icons';
+import { Button, ModalHeader } from '@components/ui';
 import { SegmentedControl } from '@components/ui/SegmentedControl';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '@hooks/useComputedStats';
@@ -202,6 +202,25 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         />
     );
 
+    const achievementsButton = (
+        <Button
+            variant="ghost"
+            onClick={onOpenAchievements}
+            style={{
+                background: 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.1))',
+                border: '1px solid rgba(251,191,36,0.3)', borderRadius: '12px',
+                padding: '8px 12px', display: 'flex', alignItems: 'center',
+                gap: '8px', color: '#fbbf24', cursor: 'pointer',
+                minHeight: 'var(--touch-min)'
+            }}
+        >
+            <Award size={18} />
+            <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>
+                {globalStats.badgeCount}/{BADGE_DEFINITIONS.length}
+            </span>
+        </Button>
+    );
+
     return (
         <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.MODAL }}>
             <div className="modal-content"
@@ -209,29 +228,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 onTouchEnd={handleTouchEnd}
             >
                 {/* ── Header ──────────────────────────────────────────────── */}
-                <div style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    marginBottom: 'var(--space-6)'
-                }}>
-                    <h2 className="panel-title" style={{ margin: 0 }}>
-                        {t('stats.title')}
-                    </h2>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        <button onClick={onOpenAchievements} className="hover-lift" style={{
-                            background: 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.1))',
-                            border: '1px solid rgba(251,191,36,0.3)', borderRadius: '12px',
-                            padding: '8px 12px', display: 'flex', alignItems: 'center',
-                            gap: '8px', color: '#fbbf24', cursor: 'pointer',
-                            minHeight: 'var(--touch-min)'
-                        }}>
-                            <Award size={18} />
-                            <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>
-                                {globalStats.badgeCount}/{BADGE_DEFINITIONS.length}
-                            </span>
-                        </button>
-                        <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label="Close" />
-                    </div>
-                </div>
+                <ModalHeader title={t('stats.title')} onClose={onClose} actions={achievementsButton} />
 
                 <StatsFilters
                     showFilters={showFilters} setShowFilters={setShowFilters}

@@ -687,7 +687,7 @@
     "basedOnManual_one": "{{count}} 手動日に基づく",
     "basedOnManual_other": "{{count}} 手動日数に基づく",
     "champion": "チャンピオン",
-    "completeForHabits": "毎日のエクササイズを完了して<br /> ここで自分の習慣を確認してください。",
+    "completeForHabits": "毎日のエクササイズを完了して  ここで自分の習慣を確認してください。",
     "completedDays": "完了した日数",
     "consistency": "⏰ 一貫性",
     "currentStreak": "現在の連続数",

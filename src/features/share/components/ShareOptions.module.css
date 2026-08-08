@@ -42,10 +42,8 @@
   font-family: inherit;
   text-align: left;
   cursor: pointer;
-  transition:
-    background var(--motion-fast) ease,
-    border-color var(--motion-fast) ease,
-    color var(--motion-fast) ease,
+  transition: background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease, color var(--motion-fast) ease,
     transform var(--motion-fast) ease;
   animation: tileIn 0.3s var(--ease-panel-in) backwards;
   animation-delay: calc(var(--i, 0) * 30ms);
@@ -71,9 +69,7 @@
   border-radius: var(--radius-full);
   background: var(--surface-muted);
   color: var(--text-secondary);
-  transition:
-    background var(--motion-fast) ease,
-    color var(--motion-fast) ease;
+  transition: background var(--motion-fast) ease, color var(--motion-fast) ease;
 }
 
 .metricOn .metricIcon {
@@ -101,8 +97,7 @@
   border: 2px solid var(--border-strong);
   border-radius: var(--radius-full);
   color: rgba(0, 0, 0, 0.75);
-  transition:
-    background var(--motion-fast) ease,
+  transition: background var(--motion-fast) ease,
     border-color var(--motion-fast) ease;
 }
 
@@ -145,9 +140,9 @@
 }
 
 /* ── Kill-switches ── */
-:global([data-perf='low']) .metric,
-:global([data-perf='low']) .dateField,
-:global([data-perf='low']) .metricOn .metricCheck {
+:global([data-perf="low"]) .metric,
+:global([data-perf="low"]) .dateField,
+:global([data-perf="low"]) .metricOn .metricCheck {
   animation: none;
 }
 
@@ -157,4 +152,23 @@
   .metricOn .metricCheck {
     animation: none;
   }
+}
+
+.uploadBtn {
+  flex: 1;
+  padding: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  flex-direction: column;
+  gap: 6px;
+  height: auto;
+}
+
+.uploadIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
 }

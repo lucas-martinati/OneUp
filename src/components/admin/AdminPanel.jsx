@@ -1,8 +1,8 @@
 import React from 'react';
-import { X, Shield, ArrowLeft, RefreshCw } from '@utils/icons';
+import { Shield, RefreshCw } from '@utils/icons';
 import { Z_INDEX } from '@utils/zIndex';
 import { useSwipeGesture } from '@hooks/useSwipeGesture';
-import { Spinner, Button, SegmentedControl } from '@components/ui';
+import { Spinner, Button, SegmentedControl, ModalHeader } from '@components/ui';
 import { useAdminPanel } from './useAdminPanel';
 import { AdminUserList } from './AdminUserList';
 import { AdminUserForm } from './AdminUserForm';
@@ -48,26 +48,13 @@ export function AdminPanel({ onClose }) {
       >
 
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexShrink: 0 }}>
-          <div className="flex-align-center gap-12" style={{ alignItems: 'center' }}>
-            {selectedUid && (
-              <Button
-                iconOnly
-                icon={ArrowLeft}
-                onClick={() => setSelectedUid(null)}
-                aria-label="Retour"
-                variant="glass"
-                
-              />
-            )}
-            <h2 className="panel-title" style={{ margin: 0, fontSize: '1.4rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Shield size={22} color="var(--error)" />
-              {selectedUid ? 'Modifier Utilisateur' : "Panel d'Administration"}
-            </h2>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {!selectedUid && (
+        <ModalHeader
+          title={selectedUid ? 'Modifier Utilisateur' : "Panel d'Administration"}
+          icon={Shield}
+          onBack={selectedUid ? () => setSelectedUid(null) : undefined}
+          onClose={onClose}
+          actions={
+            !selectedUid && (
               <Button
                 iconOnly
                 icon={RefreshCw}
@@ -77,17 +64,9 @@ export function AdminPanel({ onClose }) {
                 variant="glass"
                 className={`${refreshing ? 'spin' : ''}`}
               />
-            )}
-            <Button
-              iconOnly
-              icon={X}
-              onClick={onClose}
-              aria-label="Fermer"
-              variant="glass"
-              
-            />
-          </div>
-        </div>
+            )
+          }
+        />
 
         {/* Global Notifications Alert */}
         {message && (

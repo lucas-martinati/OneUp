@@ -10,6 +10,7 @@ import { forwardRef, useMemo } from 'react';
  * @param {'h2'|'h3'|'h4'} [level='h3'] — semantic heading element
  * @param {'none'|'sm'|'md'} [spacing='none'] — margin-bottom
  * @param {'default'|'primary'|'accent'} [variant='default'] — text color/gradient variant
+ * @param {React.ComponentType} [icon] — optional leading icon component
  */
 const SPACING = {
   none: 0,
@@ -18,7 +19,7 @@ const SPACING = {
 };
 
 export const SectionTitle = forwardRef(function SectionTitle(
-  { level: Tag = 'h3', spacing = 'none', variant = 'default', className = '', style, children, ...rest },
+  { level: Tag = 'h3', spacing = 'none', variant = 'default', icon: Icon, className = '', style, children, ...rest },
   ref,
 ) {
   const composed = useMemo(
@@ -30,9 +31,10 @@ export const SectionTitle = forwardRef(function SectionTitle(
       textTransform: 'uppercase',
       letterSpacing: '1px',
       color: variant === 'default' ? 'var(--text-secondary)' : undefined,
+      ...(Icon ? { display: 'flex', alignItems: 'center', gap: '6px' } : {}),
       ...style,
     }),
-    [spacing, variant, style],
+    [spacing, variant, Icon, style],
   );
 
   const finalClassName = [
@@ -43,6 +45,7 @@ export const SectionTitle = forwardRef(function SectionTitle(
 
   return (
     <Tag ref={ref} className={finalClassName || undefined} style={composed} {...rest}>
+      {Icon && <Icon size={12} />}
       {children}
     </Tag>
   );

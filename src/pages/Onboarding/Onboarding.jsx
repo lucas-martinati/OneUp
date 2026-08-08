@@ -176,73 +176,17 @@ export function Onboarding({ onStart }) {
 
                         {!auth.isSignedIn && (
                             <>
-                                <button
-                                    onClick={auth.signIn}
-                                    className="hover-lift"
-                                    disabled={auth.loading}
-                                    style={{
-                                        background: 'rgba(255, 255, 255, 0.05)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        color: 'var(--text-primary)',
-                                        padding: 'clamp(10px, 1.5vh, 14px) var(--space-6)',
-                                        borderRadius: 'var(--radius-lg)', fontWeight: '600',
-                                        fontSize: 'clamp(0.9rem, 2.3vw, 1rem)',
-                                        cursor: 'pointer', display: 'flex', alignItems: 'center',
-                                        justifyContent: 'center', gap: '10px',
-                                        minHeight: 'var(--touch-min)', width: '100%',
-                                        backdropFilter: 'blur(8px)'
-                                    }}
-                                >
-                                    {auth.loading ? (
-                                        <>
-                                            <span className="btn-spinner" />
-                                            <span>{t('common.loading')}</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <GoogleIcon className="google-icon" style={{ width: '18px', height: '18px', flexShrink: 0 }} />
-                                            <span>{t('onboarding.reconnectOption')}</span>
-                                        </>
-                                    )}
-                                </button>
+                                <Button variant="secondary" icon={GoogleIcon} loading={auth.loading} fullWidth onClick={auth.signIn}>{auth.loading ? t('common.loading') : t('onboarding.reconnectOption')}</Button>
                                 <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '4px', opacity: 0.85, lineHeight: '1.4' }}>
                                     <Trans i18nKey="onboarding.legalDisclaimer">
                                         En vous connectant, vous acceptez nos{' '}
-                                        <button
-                                            onClick={(e) => { e.preventDefault(); openLegalPage('terms'); }}
-                                            style={{
-                                                background: 'none',
-                                                border: 'none',
-                                                color: 'var(--text-primary)',
-                                                textDecoration: 'underline',
-                                                cursor: 'pointer',
-                                                padding: 0,
-                                                fontSize: 'inherit',
-                                                fontWeight: 'inherit',
-                                                fontFamily: 'inherit',
-                                                display: 'inline'
-                                            }}
-                                        >
+                                        <Button variant="link" onClick={(e) => { e.preventDefault(); openLegalPage('terms'); }}>
                                             Conditions d'Utilisation
-                                        </button>{' '}
+                                        </Button>{' '}
                                         et nos{' '}
-                                        <button
-                                            onClick={(e) => { e.preventDefault(); openLegalPage('privacy'); }}
-                                            style={{
-                                                background: 'none',
-                                                border: 'none',
-                                                color: 'var(--text-primary)',
-                                                textDecoration: 'underline',
-                                                cursor: 'pointer',
-                                                padding: 0,
-                                                fontSize: 'inherit',
-                                                fontWeight: 'inherit',
-                                                fontFamily: 'inherit',
-                                                display: 'inline'
-                                            }}
-                                        >
+                                        <Button variant="link" onClick={(e) => { e.preventDefault(); openLegalPage('privacy'); }}>
                                             Règles de Confidentialité
-                                        </button>.
+                                        </Button>.
                                     </Trans>
                                 </div>
                                 {auth.error && (
@@ -413,8 +357,9 @@ export function Onboarding({ onStart }) {
                                                     padding: 'clamp(12px, 2.2vh, 16px)',
                                                     background: isSelected ? `${ex.color}22` : 'rgba(255,255,255,0.05)',
                                                     border: `2px solid ${isSelected ? ex.color : 'rgba(255,255,255,0.1)'}`,
-                                                    borderRadius: 'var(--radius-md)', cursor: 'pointer',
-                                                    transition: 'all 0.2s ease', minHeight: 'clamp(54px, 8vh, 64px)'
+                                                    borderRadius: 'var(--radius-md)',
+                                                    transition: 'all 0.2s ease', minHeight: 'clamp(54px, 8vh, 64px)',
+                                                    cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left'
                                                 }}
                                             >
                                                 <div style={{
@@ -485,39 +430,13 @@ export function Onboarding({ onStart }) {
                 opacity: 0.6,
                 fontSize: '0.75rem'
             }}>
-                <button
-                    onClick={() => openLegalPage('terms')}
-                    style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--text-secondary)',
-                        textDecoration: 'underline',
-                        cursor: 'pointer',
-                        padding: '4px 8px',
-                        fontSize: 'inherit',
-                        fontFamily: 'inherit'
-                    }}
-                    
-                >
+                <Button variant="link" onClick={() => openLegalPage('terms')}>
                     {t('settings.termsOfService')}
-                </button>
+                </Button>
                 <span style={{ color: 'var(--text-secondary)', opacity: 0.5 }}>•</span>
-                <button
-                    onClick={() => openLegalPage('privacy')}
-                    style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--text-secondary)',
-                        textDecoration: 'underline',
-                        cursor: 'pointer',
-                        padding: '4px 8px',
-                        fontSize: 'inherit',
-                        fontFamily: 'inherit'
-                    }}
-                    
-                >
+                <Button variant="link" onClick={() => openLegalPage('privacy')}>
                     {t('settings.privacyPolicy')}
-                </button>
+                </Button>
             </div>
         </Stack>
     );
@@ -582,7 +501,8 @@ function ModeCard({ active, onClick, icon, accent, title, desc, badge }) {
                 padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--radius-lg)',
                 background: active ? `color-mix(in srgb, ${accent} 12%, transparent)` : 'rgba(255,255,255,0.04)',
                 border: `2px solid ${active ? accent : 'rgba(255,255,255,0.1)'}`,
-                cursor: 'pointer', transition: 'all 0.2s ease', minHeight: 'var(--touch-min)'
+                transition: 'all 0.2s ease', minHeight: 'var(--touch-min)',
+                cursor: 'pointer', fontFamily: 'inherit', width: '100%'
             }}
         >
             <div style={{

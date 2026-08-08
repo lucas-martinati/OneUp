@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { Share2, Download, X, Loader2 } from '@utils/icons';
-import { Button } from '@components/ui';
+import { Share2, Download, Loader2 } from '@utils/icons';
+import { Button, ModalHeader } from '@components/ui';
 import { Z_INDEX } from '@utils/zIndex';
 import { ShareCard } from './ShareCard';
 import { SharePreview } from './SharePreview';
@@ -53,20 +53,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
     <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
       <div className="modal-content">
       {/* Header */}
-      <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '8px 0 8px',
-      }}>
-        <h2 className="panel-title" style={{
-          margin: 0,
-          background: 'linear-gradient(135deg, #818cf8, #a78bfa)',
-          WebkitBackgroundClip: 'text', backgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-        }}>
-          {t('common.share')}
-        </h2>
-        <Button iconOnly icon={X} variant="glass" onClick={onClose} aria-label="Close" />
-      </div>
+      <ModalHeader title={t('common.share')} onClose={onClose} />
 
       <div className={styles.layout}>
         {/* Card preview — stays visible while options are tweaked */}
@@ -109,35 +96,20 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
 
           <div className={styles.actions}>
             <Button
-              variant="ghost"
+              variant="secondary"
+              icon={isExporting ? Loader2 : Download}
+              loading={isExporting}
+              fullWidth
               onClick={handleDownload}
-              disabled={isExporting}
-              
-              style={{
-                flex: 1, width: '50%', padding: '14px', borderRadius: '14px',
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                color: 'white', fontSize: '0.85rem', fontWeight: 700,
-                cursor: isExporting ? 'default' : 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                gap: '8px', opacity: isExporting ? 0.5 : 1,
-              }}
             >
-              {isExporting ? <Loader2 size={18} className="spin" /> : <Download size={18} />}
               {t('share.download')}
             </Button>
             <Button
+              icon={isExporting ? Loader2 : Share2}
+              loading={isExporting}
+              fullWidth
               onClick={handleShare}
-              disabled={isExporting}
-              style={{ 
-                flex: 1, width: '50%', padding: '14px', borderRadius: '14px',
-                fontSize: '0.85rem', fontWeight: 700,
-                cursor: isExporting ? 'default' : 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                gap: '8px', opacity: isExporting ? 0.5 : 1,
-              }}
             >
-              {isExporting ? <Loader2 size={18} className="spin" /> : <Share2 size={18} />}
               {canShareNatively()
                 ? t('common.share')
                 : t('share.download')}

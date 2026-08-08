@@ -37,13 +37,6 @@
   opacity: 0.7;
 }
 
-/* ── Top bar ─────────────────────────────────────────────────────────── */
-.topBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
 /* ── Month navigation (hero) ─────────────────────────────────────────── */
 .monthNav {
   display: flex;

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { Award, Lock, X } from '@utils/icons';
+import { Award, Lock } from '@utils/icons';
 import { useBackHandler } from '@hooks/useBackHandler';
-import { Button } from '@components/ui';
+import { Button, ModalHeader } from '@components/ui';
 import { SegmentedControl } from '@components/ui/SegmentedControl';
 import { Z_INDEX } from '@utils/zIndex';
 import { buildBadges } from './buildBadges';
@@ -266,14 +266,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
             <div ref={contentRef} className="modal-content" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
 
                 {/* ── Header ─────────────────────────────────────────────── */}
-                <div style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                }}>
-                    <h2 className="panel-title" style={{ margin: 0 }}>
-                        {t('common.achievements')}
-                    </h2>
-                    <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label="Close" />
-                </div>
+                <ModalHeader title={t('common.achievements')} onClose={onClose} />
 
                 {/* ── Hero: progress ring + counters in one gold card ────── */}
                 <div className="glass-premium slide-up" style={{

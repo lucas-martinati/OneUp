@@ -1,6 +1,6 @@
 import { useRef, useEffect, useMemo } from 'react';
 import { X, Play, Check, Save, Trash2, Pencil, Shuffle, DynamicIcon } from '@utils/icons';
-import { Button, ToggleSwitch, ListActionRow } from '@components/ui';
+import { Button, ToggleSwitch, ListActionRow, ModalHeader } from '@components/ui';
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { Z_INDEX } from '@utils/zIndex';
 import { SessionSummary } from './SessionSummary';
@@ -86,22 +86,20 @@ function RoutineCard({ routine, index, allExercisesMap, confirming, onLoad, onEd
             <div className={styles.routineTop}>
                 <div className={styles.routineName}>{routine.name}</div>
                 <div className="flex-align-center gap-4">
-                    <Button
-                        variant="ghost"
+                    <button
                         className={styles.cardActionBtn}
                         onClick={(e) => { e.stopPropagation(); onEdit(routine); }}
                         aria-label={t('common.edit')}
                     >
                         <Pencil size={14} />
-                    </Button>
-                    <Button
-                        variant="ghost"
+                    </button>
+                    <button
                         className={`${styles.cardActionBtn} ${styles.cardActionBtnDanger}`}
                         onClick={(e) => { e.stopPropagation(); onAskDelete(routine.id); }}
                         aria-label={t('common.delete')}
                     >
                         <Trash2 size={14} />
-                    </Button>
+                    </button>
                 </div>
             </div>
             <div className={styles.routineMeta}>
@@ -214,12 +212,10 @@ export function WorkoutSession(props) {
             <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
                 <div className={`modal-content ${styles.modalContent}`}>
                     {/* Header */}
-                    <div className={styles.header}>
-                        <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
-                            {isStarted ? t('common.edit') : t('dashboard.session')}
-                        </h2>
-                        <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label={t('common.close')} />
-                    </div>
+                    <ModalHeader 
+                        title={isStarted ? t('common.edit') : t('dashboard.session')} 
+                        onClose={onClose} 
+                    />
 
                     <div className={styles.body}>
                         {/* ── Routines: strip list ── */}

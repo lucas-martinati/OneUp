@@ -123,7 +123,7 @@ export function AnnouncementOverlay({ announcement, onDismiss, onConfirm }) {
 
         {/* CTA Button */}
         <Button
-          variant="ghost"
+          variant="unstyled"
           className="ann-cta"
           onClick={handleConfirm}
           onPointerDown={(e) => { e.currentTarget.style.transform = 'scale(0.97)'; }}

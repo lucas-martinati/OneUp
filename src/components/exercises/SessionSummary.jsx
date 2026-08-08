@@ -130,7 +130,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
 
                 {/* ── Footer (fixed) ── */}
                 <div className={styles.footer}>
-                    <Button variant="ghost" onClick={onClose} className={styles.closeBtn}>
+                    <Button variant="unstyled" onClick={onClose} className={styles.closeBtn}>
                         {t('common.close')}
                     </Button>
                     <SharePanel

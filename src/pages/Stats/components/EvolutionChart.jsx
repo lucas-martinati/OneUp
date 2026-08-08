@@ -3,6 +3,7 @@ import LineChart from './charts/LineChart';
 import { DynamicIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { useExercises } from '@contexts/ExercisesContext';
+import { Card, EmptyState } from '@components/ui';
 
 /**
  * Graphe d'évolution générique (une métrique par exercice dans le temps).
@@ -90,7 +91,7 @@ export default function EvolutionChart({
     else if (yAxisExtra?.unit) formatYTick = (v) => `${v}${yAxisExtra.unit}`;
 
     return (
-        <div className="glass-premium chart-card" style={{ background: gradient }}>
+        <Card variant="premium" className="chart-card" style={{ background: gradient }}>
             <h3 className="chart-title">
                 {title}
             </h3>
@@ -172,15 +173,11 @@ export default function EvolutionChart({
 
             {/* Chart or empty state */}
             {chartData.length < 2 ? (
-                <div className="chart-empty-state">
-                    <span className="chart-empty-icon">📊</span>
-                    <span className="chart-empty-title">
-                        {emptyTitle}
-                    </span>
-                    <span className="chart-empty-hint">
-                        {emptyHint}
-                    </span>
-                </div>
+                <EmptyState 
+                    icon="BarChart2"
+                    title={emptyTitle}
+                    description={emptyHint}
+                />
             ) : (
                 <LineChart
                     data={chartData}
@@ -193,6 +190,6 @@ export default function EvolutionChart({
                     step={carryForward}
                 />
             )}
-        </div>
+        </Card>
     );
 }

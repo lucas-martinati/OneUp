@@ -100,22 +100,7 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         position: 'relative', zIndex: 2,
       }}>
-        <Button
-          variant="ghost"
-          onClick={onClose}
-          style={{
-            background: 'rgba(255,255,255,0.08)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            color: 'rgba(255,255,255,0.7)',
-            cursor: 'pointer',
-            width: '38px', height: '38px',
-            borderRadius: '12px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          <X size={20} />
-        </Button>
+        <Button iconOnly icon={X} variant="glass" onClick={onClose} aria-label="Close" />
 
         <span style={{
           color: 'white', fontWeight: 700, fontSize: '0.95rem',
@@ -125,23 +110,7 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
           {t('share.cropImage')}
         </span>
 
-        <Button
-          variant="ghost"
-          onClick={handleSave}
-          style={{
-            background: 'linear-gradient(135deg, #818cf8, #6366f1)',
-            border: 'none',
-            color: 'white',
-            cursor: 'pointer',
-            width: '38px', height: '38px',
-            borderRadius: '12px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'all 0.2s ease',
-            boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
-          }}
-        >
-          <Check size={20} />
-        </Button>
+        <Button iconOnly icon={Check} onClick={handleSave} />
       </div>
 
       {/* Crop area */}

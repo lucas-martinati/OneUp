@@ -9,7 +9,7 @@ import { isPerfectDay } from '@utils/statUtils';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
-import { StreakFlame, WeightBadge, EmptyState, Card, Button } from '@components/ui';
+import { StreakFlame, WeightBadge, EmptyState, Card, Button, Stack } from '@components/ui';
 import styles from '@styles/CategoryProgressView.module.css';
 
 export const CategoryProgressView = React.memo(({
@@ -262,7 +262,7 @@ export const CategoryProgressView = React.memo(({
                 </>
             )}
             {title && (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
+                <Stack align="center" gap="xs" style={{ width: '100%' }}>
                     <div style={{
                         fontSize: 'var(--category-title-size, 0.82rem)', fontWeight: '800',
                         color: isDayPerfect ? '#ffdf00' : (categoryColor || 'var(--text-secondary)'),
@@ -273,7 +273,7 @@ export const CategoryProgressView = React.memo(({
                         {title}
                     </div>
                     {(onManageCustom || onManageCategories) && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                        <Stack direction="row" align="center" justify="center" gap={6}>
                             {onManageCategories && (
                                 <Button
                                     variant="ghost"
@@ -316,9 +316,9 @@ export const CategoryProgressView = React.memo(({
                                     <span>{t('common.edit')}</span>
                                 </Button>
                             )}
-                        </div>
+                        </Stack>
                     )}
-                </div>
+                </Stack>
             )}
             {renderContent()}
         </div>

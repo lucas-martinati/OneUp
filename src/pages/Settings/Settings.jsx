@@ -119,39 +119,29 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             opacity: 0.6,
                             fontSize: '0.78rem'
                         }}>
-                            <button
+                            <Button
+                                variant="link"
                                 onClick={() => openLegalPage('terms')}
                                 style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    color: 'var(--text-secondary)',
-                                    textDecoration: 'underline',
-                                    cursor: 'pointer',
                                     padding: '4px 8px',
                                     fontSize: 'inherit',
                                     fontFamily: 'inherit'
                                 }}
-                                className="hover-lift"
                             >
                                 {t('settings.termsOfService')}
-                            </button>
+                            </Button>
                             <span style={{ color: 'var(--text-secondary)', opacity: 0.5 }}>•</span>
-                            <button
+                            <Button
+                                variant="link"
                                 onClick={() => openLegalPage('privacy')}
                                 style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    color: 'var(--text-secondary)',
-                                    textDecoration: 'underline',
-                                    cursor: 'pointer',
                                     padding: '4px 8px',
                                     fontSize: 'inherit',
                                     fontFamily: 'inherit'
                                 }}
-                                
                             >
                                 {t('settings.privacyPolicy')}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 )}

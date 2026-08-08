@@ -60,7 +60,7 @@ describe('Achievements', () => {
 
   it('closes when the ✕ button is clicked', async () => {
     const { getByRole, onClose } = renderPanel();
-    fireEvent.click(getByRole('button', { name: 'Close' }));
+    fireEvent.click(getByRole('button', { name: 'Close modal' }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 

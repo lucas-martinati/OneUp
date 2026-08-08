@@ -21,7 +21,7 @@ const Medallion = React.memo(({ badge, onSelect, t }) => {
                 flex: '0 0 auto', width: '68px',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
                 background: 'none', border: 'none', padding: '4px 0', cursor: 'pointer',
-                outline: 'none',
+                outline: 'none', fontFamily: 'inherit',
             }}
         >
             <div style={{
@@ -112,6 +112,7 @@ export function AchievementsShowcase({ stats, onOpen }) {
                 style={{
                     width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer',
                     display: 'flex', alignItems: 'center', gap: '12px', textAlign: 'left',
+                    fontFamily: 'inherit',
                 }}
             >
                 <div style={{
@@ -172,6 +173,7 @@ export function AchievementsShowcase({ stats, onOpen }) {
                         display: 'flex', alignItems: 'center', gap: '12px',
                         background: 'var(--surface-muted)', border: '1px solid var(--border-default)',
                         borderRadius: 'var(--radius-lg)', cursor: 'pointer', textAlign: 'left',
+                        fontFamily: 'inherit',
                     }}
                 >
                     <div style={{

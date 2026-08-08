@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2, Check, ShieldAlert, Star, Snowflake, FileText } from '@utils/icons';
-import { Button } from '@components/ui';
+import { ModalHeader } from '@components/ui';
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr } from '@shared/dateUtils';
 import { useBackHandler } from '@hooks/useBackHandler';
@@ -231,12 +231,11 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
         >
             <div className={`modal-content ${styles.shell}`}>
                 {/* Top bar */}
-                <div className={`${styles.topBar} ${styles.rise} ${styles.rise1}`}>
-                    <h2 className="panel-title" style={{ margin: 0, textAlign: 'left' }}>
-                        {t('dashboard.calendar')}
-                    </h2>
-                    <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label="Close" style={{ flexShrink: 0 }} />
-                </div>
+                <ModalHeader 
+                    title={t('dashboard.calendar')} 
+                    onClose={onClose} 
+                    className={`${styles.rise} ${styles.rise1}`}
+                />
 
                 {/* Month navigation — the hero */}
                 <div className={`${styles.monthNav} ${styles.rise} ${styles.rise1}`}>

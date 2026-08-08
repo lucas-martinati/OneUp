@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Clock, Trash2, Dumbbell, Zap } from '@utils/icons';
+import { Clock, Trash2, Dumbbell, Zap } from '@utils/icons';
 import { getIcon } from '@utils/icons';
-import { Button, ConfirmDialog, WeightBadge, InlineNameEditor } from '@components/ui';
+import { Button, ConfirmDialog, WeightBadge, InlineNameEditor, ModalHeader } from '@components/ui';
+import { useBackHandler } from '@hooks/useBackHandler';
 import { Z_INDEX } from '@utils/zIndex';
 import { updateSessionName } from '@features/share/services/sessionHistoryService';
 import { getExerciseLabel, getExerciseColor } from '@utils/exerciseLabel';
@@ -38,21 +39,16 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   const [name, setName] = useState(session?.name || '');
   const hasName = name && name.trim().length > 0;
 
+  useBackHandler(() => {
+    if (confirmDelete) return false;
+    onClose();
+    return true;
+  });
+
   const exercises = session?.exercises || [];
   const totalReps = sumExerciseReps(exercises);
   const sessionWithName = useMemo(() => ({ ...session, name }), [session, name]);
 
-  // Escape backs out one level: name edit first, then the panel.
-  // The delete dialog handles its own Escape (and sits above us).
-  // The delete dialog handles its own Escape (and sits above us).
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key !== 'Escape' || confirmDelete) return;
-      onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [confirmDelete, onClose]);
 
   if (!session) return null;
 
@@ -77,12 +73,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   return (
     <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST + 1 }}>
       <div className="modal-content">
-        <div className={styles.header}>
-          <h2 className={`panel-title ${styles.title}`}>
-            {t('share.sessionDetail')}
-          </h2>
-          <Button iconOnly icon={X} variant="glass" onClick={onClose} aria-label={t('common.close')} />
-        </div>
+        <ModalHeader title={t('share.sessionDetail')} onClose={onClose} className={styles.header} />
 
         <div className={styles.body}>
           {/* Date & name */}

@@ -1,10 +1,11 @@
 import React from 'react';
 import DonutChart from './charts/DonutChart';
+import { Card, SectionTitle, EmptyState } from '@components/ui';
 
 export default function ConsistencyPieChart({ activeData, trackedCount, title, subTitle, emptyTitle, emptySub }) {
     return (
-        <div className="glass-premium chart-card" style={{ background: 'linear-gradient(135deg, rgba(109,40,217,0.1), rgba(139,92,246,0.1))' }}>
-            <h3 className="chart-title">{title}</h3>
+        <Card variant="premium" className="chart-card" style={{ background: 'linear-gradient(135deg, rgba(109,40,217,0.1), rgba(139,92,246,0.1))' }}>
+            <SectionTitle level="h3" className="chart-title">{title}</SectionTitle>
 
             {trackedCount > 0 ? (
                 <>
@@ -20,14 +21,13 @@ export default function ConsistencyPieChart({ activeData, trackedCount, title, s
                     </p>
                 </>
             ) : (
-                <div style={{
-                    textAlign: 'center', color: 'var(--text-secondary)',
-                    padding: 'var(--space-8)'
-                }}>
-                    <p style={{ fontSize: '0.9rem', marginBottom: '6px' }}>{emptyTitle}</p>
-                    <p style={{ fontSize: '0.78rem', opacity: 0.7, lineHeight: '1.5' }}>{emptySub}</p>
-                </div>
+                <EmptyState 
+                    icon="PieChart"
+                    title={emptyTitle}
+                    description={emptySub}
+                    style={{ padding: 'var(--space-8)' }}
+                />
             )}
-        </div>
+        </Card>
     );
 }

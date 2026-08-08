@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import LineChart from './charts/LineChart';
+import { Card } from '@components/ui';
 
 export default function DailyRepsChart({ dailyRepsData, title, t }) {
     const data = useMemo(() => (dailyRepsData || []).map(d => ({
@@ -12,7 +13,7 @@ export default function DailyRepsChart({ dailyRepsData, title, t }) {
     const maxReps = Math.max(...data.map(d => d.reps), 1);
 
     return (
-        <div className="glass-premium chart-card" style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.1), rgba(139,92,246,0.08))' }}>
+        <Card variant="premium" className="chart-card" style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.1), rgba(139,92,246,0.08))' }}>
             <h3 className="chart-title">{title}</h3>
             <LineChart
                 data={data}
@@ -22,6 +23,6 @@ export default function DailyRepsChart({ dailyRepsData, title, t }) {
                 formatValue={(v) => `${v}`}
                 dots={false}
             />
-        </div>
+        </Card>
     );
 }
