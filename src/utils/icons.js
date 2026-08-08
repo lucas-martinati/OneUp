@@ -22,7 +22,7 @@ import {
   Cloud, CloudOff, Upload, AlertCircle, AlertTriangle,
   // Misc
   Copy, RefreshCw, Heart, Sparkles, Link, Calendar, TrendingUp, BarChart3,
-  Gem, Ghost, Moon, Rocket, Sun,
+  Gem, Ghost, Moon, Rocket, Sun, Camera,
   // New Custom Icons
   Bike, Mountain, Droplets, Navigation, MapPin, Compass, 
   Anchor, Coffee, Music, Hexagon, Circle, Triangle,
@@ -34,7 +34,7 @@ import {
 export {
   Activity, AlertCircle, AlertTriangle, ArrowLeft, ArrowRight, Award,
   BarChart3, Bell, Bike,
-  Calendar, Check, CheckCheck, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, Cloud, CloudOff, Code, Copy, Crown,
+  Calendar, Camera, Check, CheckCheck, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, Cloud, CloudOff, Code, Copy, Crown,
   Download, Dumbbell,
   Edit2,
   Filter, Flame, FolderPlus, Footprints,

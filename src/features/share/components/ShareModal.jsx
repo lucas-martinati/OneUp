@@ -114,7 +114,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
               disabled={isExporting}
               
               style={{
-                flex: 1, padding: '14px', borderRadius: '14px',
+                flex: 1, width: '50%', padding: '14px', borderRadius: '14px',
                 background: 'rgba(255,255,255,0.08)',
                 border: '1px solid rgba(255,255,255,0.12)',
                 color: 'white', fontSize: '0.85rem', fontWeight: 700,
@@ -129,7 +129,13 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
             <Button
               onClick={handleShare}
               disabled={isExporting}
-              
+              style={{ 
+                flex: 1, width: '50%', padding: '14px', borderRadius: '14px',
+                fontSize: '0.85rem', fontWeight: 700,
+                cursor: isExporting ? 'default' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: '8px', opacity: isExporting ? 0.5 : 1,
+              }}
             >
               {isExporting ? <Loader2 size={18} className="spin" /> : <Share2 size={18} />}
               {canShareNatively()

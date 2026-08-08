@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isWeightExercise } from '@config/exercises';
-import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X, Lock, Check } from '@utils/icons';
+import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X, Lock, Check, Camera } from '@utils/icons';
 import { haptics } from '@utils/hapticsManager';
 import styles from './ShareOptions.module.css';
 
@@ -346,9 +346,9 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
               <UploadButton onClick={() => cameraInputRef.current?.click()} label={t('share.takePhoto')}>
-                <span style={{ fontSize: '14px' }}>📸</span>
+                <Camera size={14} style={{ opacity: 0.8 }} />
               </UploadButton>
               <UploadButton onClick={() => fileInputRef.current?.click()} label={t('share.uploadGallery')}>
                 <Image size={14} style={{ opacity: 0.8 }} />
