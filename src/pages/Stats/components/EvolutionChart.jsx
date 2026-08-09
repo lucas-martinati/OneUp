@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { BarChart2 } from 'lucide-react';
 import LineChart from './charts/LineChart';
 import { DynamicIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
@@ -172,9 +173,9 @@ export default function EvolutionChart({
             )}
 
             {/* Chart or empty state */}
-            {chartData.length < 2 ? (
+            {chartData.length < 1 ? (
                 <EmptyState 
-                    icon="BarChart2"
+                    icon={BarChart2}
                     title={emptyTitle}
                     description={emptyHint}
                 />

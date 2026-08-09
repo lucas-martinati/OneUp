@@ -1,4 +1,5 @@
 import React from 'react';
+import { PieChart } from 'lucide-react';
 import DonutChart from './charts/DonutChart';
 import { Card, SectionTitle, EmptyState } from '@components/ui';
 
@@ -22,7 +23,7 @@ export default function ConsistencyPieChart({ activeData, trackedCount, title, s
                 </>
             ) : (
                 <EmptyState 
-                    icon="PieChart"
+                    icon={PieChart}
                     title={emptyTitle}
                     description={emptySub}
                     style={{ padding: 'var(--space-8)' }}

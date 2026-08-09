@@ -34,6 +34,8 @@ export function GradientModal({ open, onClose, ariaLabel, maxWidth = '440px', bo
       >
         <Button
           variant="ghost"
+          iconOnly
+          icon={X}
           onClick={handleClose}
           aria-label="Fermer"
           style={{
@@ -42,19 +44,9 @@ export function GradientModal({ open, onClose, ariaLabel, maxWidth = '440px', bo
             right: '16px',
             zIndex: 10,
             background: 'rgba(255, 255, 255, 0.08)',
-            border: 'none',
-            borderRadius: '50%',
-            width: '36px',
-            height: '36px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
             color: 'rgba(255, 255, 255, 0.7)',
-            cursor: 'pointer',
           }}
-        >
-          <X size={18} />
-        </Button>
+        />
 
         {children}
       </div>

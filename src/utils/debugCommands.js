@@ -112,6 +112,20 @@ export function installDebugCommands() {
       console.log(`[OneUp Debug] Offline now, back online in ${ms}ms.`);
     },
 
+    // ── Modals ─────────────────────────────────────────────────────────
+    showProModal() {
+      window.dispatchEvent(new CustomEvent('debug:showModal', { detail: 'pro' }));
+      console.log(`[OneUp Debug] Showing Pro Unlocked modal.`);
+    },
+    showProExpiredModal() {
+      window.dispatchEvent(new CustomEvent('debug:showModal', { detail: 'proExpired' }));
+      console.log(`[OneUp Debug] Showing Pro Expired modal.`);
+    },
+    showSupporterModal() {
+      window.dispatchEvent(new CustomEvent('debug:showModal', { detail: 'supporter' }));
+      console.log(`[OneUp Debug] Showing Supporter Unlocked modal.`);
+    },
+
     // ── Resets ─────────────────────────────────────────────────────────
     async resetExercises() {
       const key = getActiveKey('pushup_challenge_data');
@@ -181,6 +195,9 @@ export function installDebugCommands() {
       ['offline()', 'Show the discreet offline banner'],
       ['online()', 'Restore connection (green flash, then hides)'],
       ['flapNetwork(3000)', 'Go offline then auto-reconnect after Nms'],
+      ['showProModal()', 'Show the Pro Unlocked modal'],
+      ['showProExpiredModal()', 'Show the Pro Expired / Non-Pro modal'],
+      ['showSupporterModal()', 'Show the Supporter Unlocked modal'],
       ['resetExercises()', "Reset today's exercises"],
       ['resetHistory()', 'Clear session history'],
       ['resetSettings()', 'Reset settings'],

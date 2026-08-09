@@ -343,6 +343,19 @@ export function SubscriptionProvider({ children }) {
     return result;
   }, [saveAndPublish, clearModalSeen]);
 
+  // Debug global listener
+  useEffect(() => {
+    const handleDebugModal = (e) => {
+      if (e.detail === 'pro') openProUnlockedModal();
+      if (e.detail === 'proExpired') openProExpiredModal();
+      if (e.detail === 'supporter') openSupporterUnlockedModal();
+    };
+    window.addEventListener('debug:showModal', handleDebugModal);
+    return () => {
+      window.removeEventListener('debug:showModal', handleDebugModal);
+    };
+  }, [openProUnlockedModal, openProExpiredModal, openSupporterUnlockedModal]);
+
   const value = useMemo(() => ({
     isSupporter: auth.isSignedIn ? isSupporter : false,
     isPro: auth.isSignedIn ? isPro : false,
