@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Cloud, AlertCircle, Upload, AlertTriangle } from '@utils/icons';
-import { Button } from '@components/ui';
+import { Button, ModalContainer } from '@components/ui';
 
 /**
  * Full-screen overlay for anonymous (guest) data merge.
@@ -27,8 +26,15 @@ export function GuestDataMergeOverlay({ conflictData, onResolveConflict }) {
     }
   };
 
-  return createPortal(
-    <div className="conflict-fullscreen-overlay dialog-backdrop dialog-backdrop--heavy">
+  return (
+    <ModalContainer
+      open={true}
+      position="center"
+      background="var(--overlay-bg-heavy)"
+      closeOnBackdrop={false}
+      closeOnEscape={false}
+      unstyled
+    >
       <div className="conflict-modal dialog-card">
         <div className="conflict-header">
           <AlertCircle className="conflict-icon" />
@@ -71,7 +77,6 @@ export function GuestDataMergeOverlay({ conflictData, onResolveConflict }) {
           </Button>
         </div>
       </div>
-    </div>,
-    document.body
+    </ModalContainer>
   );
 }

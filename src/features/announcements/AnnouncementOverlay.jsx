@@ -10,8 +10,7 @@
  */
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useBackHandler } from '@hooks/useBackHandler';
-import { Button } from '@components/ui';
+import { Button, ModalContainer } from '@components/ui';
 
 /**
  * Full-screen announcement overlay with smooth enter/exit animations.
@@ -37,12 +36,6 @@ export function AnnouncementOverlay({ announcement, onDismiss, onConfirm }) {
     setTimeout(() => (onConfirm ? onConfirm() : onDismiss()), 400);
   };
 
-  // Handle back button to dismiss announcement
-  useBackHandler(() => {
-    handleDismiss();
-    return true;
-  }, true);
-
   const title = t(announcement.titleKey, { defaultValue: announcement.titleKey });
   const body = t(announcement.bodyKey, { defaultValue: announcement.bodyKey });
   const cta = t(announcement.ctaKey, { defaultValue: announcement.ctaKey });
@@ -51,12 +44,16 @@ export function AnnouncementOverlay({ announcement, onDismiss, onConfirm }) {
   const basePath = import.meta.env.BASE_URL || '/';
 
   return (
-    <div
-      className="dialog-backdrop dialog-backdrop--heavy"
+    <ModalContainer
+      open={true}
+      onClose={handleDismiss}
+      position="center"
+      background="var(--overlay-bg-heavy)"
+      className={exiting ? 'no-fade-in' : ''}
       style={{
-        animation: exiting ? 'overlayFadeOut 0.4s ease forwards' : 'overlayFadeIn 0.4s ease',
+        animation: exiting ? 'overlayFadeOut 0.4s ease forwards' : undefined,
       }}
-      onClick={handleDismiss}
+      unstyled
     >
       <div
         className="ann-card no-scrollbar"
@@ -134,6 +131,6 @@ export function AnnouncementOverlay({ announcement, onDismiss, onConfirm }) {
           <span className="ann-cta-label">{cta}</span>
         </Button>
       </div>
-    </div>
+    </ModalContainer>
   );
 }
