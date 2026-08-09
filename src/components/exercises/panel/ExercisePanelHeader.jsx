@@ -5,7 +5,7 @@ export function ExercisePanelHeader({ activeColor, exerciseConfig, exerciseLabel
     const showNextButton = onNext && !hideNextButton;
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'clamp(8px, 1.5vh, 16px)', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
                 <div style={{
                     width: 'var(--touch-min)',

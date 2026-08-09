@@ -1,10 +1,12 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useHaptics } from '@hooks/useHaptics';
+import { useBackHandler } from '@hooks/useBackHandler';
 
 /**
- * Standardized Modal Container primitive for uniform popups, drawers, and dialogs.
- * Ensures backdrop blur, Escape key dismiss, focus trapping, scroll locking, and haptic feedback.
+ * Composant ModalContainer unifié.
+ * - Gère le backdrop (flou, clic pour fermer, escape).
+ * - Définit la carte de la modale avec background, limites de taille et espacement.
  */
 export function ModalContainer({
   open,
@@ -15,6 +17,16 @@ export function ModalContainer({
   closeOnBackdrop = true,
   closeOnEscape = true,
   ariaLabel = 'Modal',
+  // Nouveaux paramètres selon la demande :
+  showScrollbar = true,
+  maxWidth = 'var(--panel-max-width, 640px)',
+  // 'fullscreen' utilise modal-overlay (prend toute la page), 'center' utilise dialog-backdrop (centré)
+  position = 'fullscreen', 
+  background, // Optionnel, s'applique à l'overlay ou au backdrop
+  unstyled = false, // Permet de désactiver la carte pour les modales existantes complexes (ex: GradientModal)
+  contentClassName = '', // Custom class pour le div .modal-content interne
+  contentStyle = {}, // Custom style pour le div .modal-content interne
+  ...rest // Passed down to the inner content container if not unstyled
 }) {
   const backdropRef = useRef(null);
   const { light } = useHaptics();
@@ -28,6 +40,18 @@ export function ModalContainer({
     },
     [closeOnEscape, onClose, light],
   );
+
+  // Handle hardware back button on Android / PWA
+  const handleBack = useCallback(() => {
+    if (open && closeOnEscape && onClose) {
+      light();
+      onClose();
+      return true;
+    }
+    return false;
+  }, [open, closeOnEscape, onClose, light]);
+
+  useBackHandler(handleBack, open);
 
   useEffect(() => {
     if (open) {
@@ -50,31 +74,40 @@ export function ModalContainer({
 
   if (!open) return null;
 
+  const baseClass = position === 'center' ? 'dialog-backdrop' : 'modal-overlay';
+
   return createPortal(
     <div
       ref={backdropRef}
       onClick={handleBackdropClick}
-      className={`dialog-backdrop ${className}`}
+      className={`fade-in ${baseClass} ${className}`}
       role="dialog"
       aria-modal="true"
       aria-label={ariaLabel}
       style={{
-        position: 'fixed',
-        inset: 0,
         zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'var(--space-4)',
-        background: 'rgba(0, 0, 0, 0.65)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        animation: 'fadeIn 0.2s var(--ease-panel-in) both',
-        ...style,
+        ...(background ? { background } : {}),
+        ...style
       }}
     >
-      {children}
+      {unstyled ? (
+        children
+      ) : (
+        <div
+          className={`modal-content ${contentClassName}`.trim()}
+          style={{
+            maxWidth: maxWidth,
+            gap: 'var(--space-4)',
+            overflowY: showScrollbar ? 'visible' : 'hidden', // Let the overlay handle scrolling
+            ...contentStyle,
+          }}
+          onClick={(e) => e.stopPropagation()}
+          {...rest}
+        >
+          {children}
+        </div>
+      )}
     </div>,
-    document.body,
+    document.body
   );
 }

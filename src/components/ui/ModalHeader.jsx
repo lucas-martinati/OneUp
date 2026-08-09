@@ -14,18 +14,21 @@ export function ModalHeader({
   actions,
   className = '',
   style,
+  // Nouveaux paramètres selon la demande :
+  showClose = true,
+  showBack = false,
+  extraElements,
 }) {
   return (
     <div className={`modal-header ${className}`} style={style}>
       <div className="modal-header-title-group">
-        {onBack && (
+        {showBack && onBack && (
           <Button
             iconOnly
             icon={ArrowLeft}
             onClick={onBack}
-            aria-label="Back"
+            aria-label="Retour"
             variant="glass"
-            
           />
         )}
         {Icon && (
@@ -34,25 +37,28 @@ export function ModalHeader({
           </div>
         )}
         <div>
+          {/* Style du titre centralisé via CSS (modal-header-title et panel-title) */}
           {title && <h2 className="modal-header-title panel-title">{title}</h2>}
           {subtitle && <p className="modal-header-subtitle">{subtitle}</p>}
         </div>
       </div>
 
       <div className="modal-header-actions">
+        {/* Zone libre pour ajouter d'autres boutons ou éléments */}
+        {extraElements}
         {actions}
-        {onClose && (
+        
+        {/* Bouton de fermeture géré par le paramètre showClose */}
+        {showClose && onClose && (
           <Button
             iconOnly
             icon={X}
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label="Fermer"
             variant="glass"
-            
           />
         )}
       </div>
     </div>
   );
 }
-

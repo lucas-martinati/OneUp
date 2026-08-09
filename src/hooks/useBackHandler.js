@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { registerBackHandler } from '@utils/backHandler';
 
 /**
@@ -11,10 +11,24 @@ import { registerBackHandler } from '@utils/backHandler';
  * @param {Boolean} enabled - Whether the handler is currently active.
  */
 export function useBackHandler(onBack, enabled = true) {
+    const onBackRef = useRef(onBack);
+
+    // Keep the ref up to date with the latest callback
+    useEffect(() => {
+        onBackRef.current = onBack;
+    }, [onBack]);
+
     useEffect(() => {
         if (!enabled) return;
         
-        // registerBackHandler returns an unregister function
-        return registerBackHandler(onBack);
-    }, [onBack, enabled]);
+        // Register a stable wrapper function that calls the latest ref
+        const handler = () => {
+            if (onBackRef.current) {
+                return onBackRef.current();
+            }
+            return false;
+        };
+
+        return registerBackHandler(handler);
+    }, [enabled]); // Only re-register if 'enabled' state changes
 }

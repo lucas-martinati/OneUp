@@ -1,10 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { useTranslation } from 'react-i18next';
-import { X, Check } from '@utils/icons';
-import { Button } from '@components/ui';
-import { useBackHandler } from '@hooks/useBackHandler';
-import { Z_INDEX } from '@utils/zIndex';
+import { Check } from '@utils/icons';
+import { Button, ModalContainer, ModalHeader } from '@components/ui';
+import styles from './CropModal.module.css';
 
 const createImage = (url) =>
   new Promise((resolve, reject) => {
@@ -29,8 +28,6 @@ async function getCroppedImg(imageSrc, pixelCrop, rotation = 0) {
   const maxSize = Math.max(image.width, image.height);
   const safeArea = 2 * ((maxSize / 2) * Math.sqrt(2));
 
-  // set each dimensions to double largest dimension to allow for a safe area for the
-  // image to rotate in without being clipped by canvas context
   canvas.width = safeArea;
   canvas.height = safeArea;
 
@@ -55,7 +52,6 @@ async function getCroppedImg(imageSrc, pixelCrop, rotation = 0) {
     Math.round(0 - safeArea / 2 + image.height / 2 - pixelCrop.y)
   );
 
-  // Return base64 with moderate quality
   return canvas.toDataURL('image/jpeg', 0.85);
 }
 
@@ -64,12 +60,6 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
   const [crop, setCrop] = useState(initialCrop || { x: 0, y: 0 });
   const [zoom, setZoom] = useState(initialZoom || 1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-
-  // Handle back button to close crop modal
-  useBackHandler(() => {
-    onClose();
-    return true;
-  }, true);
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -87,46 +77,20 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
   };
 
   return (
-    <div className="fade-in modal-overlay" style={{ background: '#0a0a0f', zIndex: Z_INDEX.MODAL + 100 }}>
-      <div className="modal-content" style={{ padding: 0 }}>
-      {/* Header — frosted glass nav bar */}
-      <div style={{
-        padding: '14px 16px',
-        paddingTop: 'calc(14px + env(safe-area-inset-top))',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        background: 'rgba(15, 15, 25, 0.85)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        position: 'relative', zIndex: 2,
-      }}>
-        <Button iconOnly icon={X} variant="glass" onClick={onClose} aria-label="Close" />
+    <ModalContainer open={true} onClose={onClose} style={{ zIndex: 1010 }}>
+      {/* Header standardisé */}
+      <ModalHeader 
+        title={t('share.cropImage')} 
+        onClose={onClose} 
+      />
 
-        <span style={{
-          color: 'white', fontWeight: 700, fontSize: '0.95rem',
-          letterSpacing: '-0.01em',
-          position: 'absolute', left: '50%', transform: 'translateX(-50%)',
-        }}>
-          {t('share.cropImage')}
-        </span>
-
-        <Button iconOnly icon={Check} onClick={handleSave} />
-      </div>
-
-      {/* Crop area */}
-      <div style={{
-        position: 'relative', flex: 1, overflow: 'hidden',
-        margin: '12px',
-        marginBottom: 'calc(12px + env(safe-area-inset-bottom))',
-        borderRadius: '20px',
-        border: '1px solid rgba(255,255,255,0.06)',
-        boxShadow: 'inset 0 0 60px rgba(0,0,0,0.4)',
-      }}>
+      {/* Zone de recadrage */}
+      <div className={styles.cropArea}>
         <Cropper
           image={imageSrc}
           crop={crop}
           zoom={zoom}
-          // The share card is roughly 360 wide and potentially dynamic height. Let's use 3:4 for portrait layout
+          // Format portrait 3:4 pour les cartes de partage
           aspect={3 / 4}
           onCropChange={setCrop}
           onCropComplete={onCropComplete}
@@ -136,24 +100,23 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
           maxZoom={3}
           cropShape="rect"
           showGrid={false}
-          style={{
-            containerStyle: {
-              borderRadius: '20px',
-              background: '#0a0a0f',
-            },
-            cropAreaStyle: {
-              border: '2px solid rgba(129,140,248,0.5)',
-              borderRadius: '16px',
-              boxShadow: '0 0 0 9999px rgba(5,5,10,0.7), 0 0 30px rgba(129,140,248,0.15)',
-            },
-            mediaStyle: {
-              borderRadius: '0',
-            },
+          classes={{
+            containerClassName: styles.cropperContainer,
+            cropAreaClassName: styles.cropAreaOverlay,
+            mediaClassName: styles.mediaStyle,
           }}
         />
       </div>
 
+      {/* Footer avec bouton de validation */}
+      <div className={styles.footer}>
+        <Button variant="ghost" onClick={onClose}>
+          {t('common.cancel')}
+        </Button>
+        <Button variant="primary" icon={Check} onClick={handleSave}>
+          {t('common.save')}
+        </Button>
       </div>
-    </div>
+    </ModalContainer>
   );
 }

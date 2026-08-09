@@ -37,7 +37,6 @@ export function StatsFilters({
             onToggle={setShowFilters}
             label={t('stats.filters')}
             count={activeCategories.length}
-            style={{ marginBottom: 'var(--space-6)' }}
         >
             <CategoryChips
                 items={chipItems}

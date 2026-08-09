@@ -538,3 +538,29 @@
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: none; }
 }
+
+/* ── Day Preview Modal ──────────────────────────────────────────────── */
+.previewOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: calc(var(--space-6) + env(safe-area-inset-top));
+  padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  background: transparent;
+  z-index: 199;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.previewContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+  overflow-y: auto;
+  max-width: none;
+  gap: 20px;
+}

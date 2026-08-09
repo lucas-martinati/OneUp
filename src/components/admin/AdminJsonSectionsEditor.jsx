@@ -54,7 +54,7 @@ export function AdminJsonSectionsEditor({
   saveLoading, onBack
 }) {
   return (
-    <div className="flex-col gap-12">
+    <>
       {selectedUserKeys.map((key) => {
         const isExpanded = !!expandedKeys[key];
         const contentValue = keyJsonContents[key] || '';
@@ -260,6 +260,6 @@ export function AdminJsonSectionsEditor({
           Retour aux utilisateurs
         </Button>
       </div>
-    </div>
+    </>
   );
 }

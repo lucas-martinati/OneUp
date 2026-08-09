@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Share2, Download, Loader2 } from '@utils/icons';
-import { Button, ModalHeader } from '@components/ui';
-import { Z_INDEX } from '@utils/zIndex';
+import { Button, ModalHeader, ModalContainer } from '@components/ui';
 import { ShareCard } from './ShareCard';
 import { SharePreview } from './SharePreview';
 import { ShareOptions } from './ShareOptions';
@@ -49,9 +47,9 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
     settings, options, mode, isPro,
   };
 
-  return createPortal(
-    <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
-      <div className="modal-content">
+  return (
+    <>
+    <ModalContainer open={true} onClose={onClose}>
       {/* Header */}
       <ModalHeader title={t('common.share')} onClose={onClose} />
 
@@ -117,6 +115,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
           </div>
         </div>
       </div>
+      </ModalContainer>
 
       {/* Crop Modal */}
       {isCropModalOpen && originalImage && (
@@ -128,8 +127,6 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
           onClose={closeCropModal}
         />
       )}
-      </div>
-    </div>,
-    document.body
+    </>
   );
 }

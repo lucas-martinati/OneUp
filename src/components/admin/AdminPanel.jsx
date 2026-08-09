@@ -1,8 +1,7 @@
 import React from 'react';
 import { Shield, RefreshCw } from '@utils/icons';
-import { Z_INDEX } from '@utils/zIndex';
 import { useSwipeGesture } from '@hooks/useSwipeGesture';
-import { Spinner, Button, SegmentedControl, ModalHeader } from '@components/ui';
+import { Spinner, Button, SegmentedControl, ModalHeader, ModalContainer } from '@components/ui';
 import { useAdminPanel } from './useAdminPanel';
 import { AdminUserList } from './AdminUserList';
 import { AdminUserForm } from './AdminUserForm';
@@ -39,19 +38,13 @@ export function AdminPanel({ onClose }) {
 
 
   return (
-    <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.MODAL }}>
-      <div 
-        className="modal-content" 
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        style={{ maxWidth: '840px', display: 'flex', flexDirection: 'column', height: '90vh' }}
-      >
-
+    <ModalContainer open={true} onClose={onClose} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         {/* Header */}
         <ModalHeader
           title={selectedUid ? 'Modifier Utilisateur' : "Panel d'Administration"}
           icon={Shield}
           onBack={selectedUid ? () => setSelectedUid(null) : undefined}
+          showBack={!!selectedUid}
           onClose={onClose}
           actions={
             !selectedUid && (
@@ -78,7 +71,6 @@ export function AdminPanel({ onClose }) {
             color: message.type === 'success' ? 'var(--success)' : 'var(--error)',
             fontSize: '0.9rem',
             fontWeight: '600',
-            marginBottom: 'var(--space-4)',
             flexShrink: 0
           }}>
             {message.text}
@@ -106,9 +98,9 @@ export function AdminPanel({ onClose }) {
           />
         )}
         {!loading && selectedUid && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <>
             {/* Tabs Selector */}
-            <div style={{ marginBottom: 'var(--space-4)', flexShrink: 0 }}>
+            <div style={{ flexShrink: 0 }}>
               <SegmentedControl
                 variant="tabs"
                 fullWidth
@@ -121,8 +113,6 @@ export function AdminPanel({ onClose }) {
               />
             </div>
 
-            {/* Scrollable Workspace */}
-            <div style={{ flex: 1, overflowY: 'auto', marginBottom: 'var(--space-4)', paddingRight: '4px' }}>
               {editMode === 'form' ? (
                 <AdminUserForm
                   formState={formState}
@@ -152,13 +142,8 @@ export function AdminPanel({ onClose }) {
                   onBack={() => setSelectedUid(null)}
                 />
               )}
-            </div>
-
-          </div>
+          </>
         )}
-
-      </div>
-    </div>
+    </ModalContainer>
   );
 }
-

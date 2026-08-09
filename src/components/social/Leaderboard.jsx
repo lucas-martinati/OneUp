@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { X, Trophy, LogOut, Activity } from '@utils/icons';
-import { Button, Spinner, GoogleSignInButton } from '@components/ui';
+import { Button, Spinner, GoogleSignInButton, ModalContainer } from '@components/ui';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
@@ -11,7 +11,6 @@ import { LeaderboardTabs } from './LeaderboardTabs';
 import { LeaderboardRow } from './LeaderboardRow';
 import { LeaderboardPodium } from './LeaderboardPodium';
 import styles from '@styles/Leaderboard.module.css';
-import { Z_INDEX } from '@utils/zIndex';
 import { UserDetail } from './UserDetail';
 import { getIcon } from '@utils/icons';
 import { useAuth } from '@contexts/AuthContext';
@@ -89,8 +88,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
             setCommunityContext('global');
             return true;
         }
-        onClose();
-        return true;
+        return false;
     }, true);
     const [clanData, setClanData] = useState(initialClanData);
 
@@ -181,12 +179,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     const restEntries = sorted.slice(podiumCount);
 
     return (
-        <div
-            className="fade-in modal-overlay"
-            {...swipeHandlers}
-            style={{ zIndex: Z_INDEX.MODAL }}
-        >
-            <div className={`modal-content ${styles.shell}`}>
+        <ModalContainer open={true} onClose={onClose} contentClassName={styles.shell} {...swipeHandlers}>
                 {/* Header with Switch */}
             <div className={`${styles.header} ${styles.rise} ${styles.rise1}`}>
                 <div className={styles.headerLeft}>
@@ -361,7 +354,6 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                     onClose={() => setSelectedUser(null)}
                 />
             )}
-            </div>
-        </div>
+        </ModalContainer>
     );
 }

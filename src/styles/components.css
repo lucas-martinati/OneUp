@@ -60,6 +60,12 @@ button:focus:not(:focus-visible) {
   animation: overlayFadeIn var(--motion-fast) ease-out;
 }
 
+.modal-overlay.no-fade-in,
+.dialog-backdrop.no-fade-in,
+.no-fade-in {
+  animation: none !important;
+}
+
 .modal-overlay.fade-in > .modal-content {
   animation: panelEnter var(--motion-panel) var(--ease-panel-in);
   transform-origin: top center;
@@ -979,7 +985,6 @@ button:focus:not(:focus-visible) {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  margin-bottom: var(--space-3);
 }
 
 .modal-header-title-group {

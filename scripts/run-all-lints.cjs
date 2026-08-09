@@ -22,6 +22,12 @@ const tasks = [
     icon: '🔍'
   },
   {
+    name: 'check-default-translations',
+    cmd: 'node',
+    args: ['scripts/check-default-translations.cjs'],
+    icon: '🚫'
+  },
+  {
     name: 'Knip (Code mort/Fichiers inutilisés)',
     cmd: 'npx',
     args: ['knip', '--no-config-hints'],

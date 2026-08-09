@@ -15,7 +15,7 @@ export function GradientModal({ open, onClose, ariaLabel, maxWidth = '440px', bo
   };
 
   return (
-    <ModalContainer open={open} onClose={handleClose} ariaLabel={ariaLabel}>
+    <ModalContainer open={open} onClose={handleClose} ariaLabel={ariaLabel} position="center" unstyled>
       <div
         style={{
           width: '100%',

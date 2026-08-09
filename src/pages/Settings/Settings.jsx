@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Z_INDEX } from '@utils/zIndex';
 import { ShoppingBag } from '@utils/icons';
-import { Button, ModalHeader, Card } from '@components/ui';
+import { Button, ModalHeader, Card, ModalContainer } from '@components/ui';
 import { CloudSyncPanel } from './components/CloudSyncPanel';
 import { StoreView } from './components/StoreView';
 import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection, DataSection } from './components/SettingsPanels';
@@ -46,12 +45,12 @@ export function Settings({ defaultShowStore = false, onClose }) {
     }, showStore);
 
     return (
-        <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.MODAL }}>
-            <div className="modal-content">
+        <ModalContainer open={true} onClose={onClose}>
                 {/* ── Header ──────────────────────────────────────────────── */}
                 <ModalHeader
                     title={showStore ? t('store.title') : t('settings.title')}
                     onClose={onClose}
+                    showBack={showStore}
                     onBack={showStore ? () => setShowStore(false) : undefined}
                     actions={
                         !showStore && (
@@ -145,7 +144,6 @@ export function Settings({ defaultShowStore = false, onClose }) {
                         </div>
                     </div>
                 )}
-            </div>
-        </div>
+        </ModalContainer>
     );
 }

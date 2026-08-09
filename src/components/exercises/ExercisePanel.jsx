@@ -18,7 +18,7 @@ import { StatusLine } from './panel/StatusLine';
 import { TimerControls, CounterControls } from './panel/Controls';
 import { CameraModeBar, CameraLiveStats } from './panel/CameraControls';
 import { EventHud } from '@features/events';
-import { FitToView } from '@components/ui';
+import { FitToView, ModalContainer } from '@components/ui';
 import styles from './panel/ExercisePanel.module.css';
 
 export function ExercisePanel({
@@ -412,9 +412,16 @@ export function ExercisePanel({
                 onDone={() => setShowConfetti(false)}
             />
             {isSession ? content : (
-                <div className={`modal-overlay ${fadeIn ? 'fade-in' : ''}`} style={{ zIndex: Z_INDEX.TOAST }}>
+                <ModalContainer 
+                    open={true} 
+                    onClose={onClose} 
+                    unstyled 
+                    closeOnBackdrop={false}
+                    style={{ zIndex: Z_INDEX.TOAST }}
+                    className={fadeIn ? '' : 'no-fade-in'}
+                >
                     {content}
-                </div>
+                </ModalContainer>
             )}
         </>
     );

@@ -1,8 +1,7 @@
 import { useRef, useEffect, useMemo } from 'react';
 import { X, Play, Check, Save, Trash2, Pencil, Shuffle, DynamicIcon } from '@utils/icons';
-import { Button, ToggleSwitch, ListActionRow, ModalHeader } from '@components/ui';
+import { Button, ToggleSwitch, ListActionRow, ModalHeader, ModalContainer } from '@components/ui';
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
-import { Z_INDEX } from '@utils/zIndex';
 import { SessionSummary } from './SessionSummary';
 import { ExercisePanel } from './ExercisePanel';
 import { getSessionHistory } from '@features/share/services/sessionHistoryService';
@@ -209,17 +208,15 @@ export function WorkoutSession(props) {
 
     if (phase === 'config') {
         return (
-            <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
-                <div className={`modal-content ${styles.modalContent}`}>
-                    {/* Header */}
-                    <ModalHeader 
-                        title={isStarted ? t('common.edit') : t('dashboard.session')} 
-                        onClose={onClose} 
-                    />
+            <ModalContainer open={true} onClose={onClose} contentClassName={styles.modalContent}>
+                {/* Header */}
+                <ModalHeader 
+                    title={isStarted ? t('common.edit') : t('dashboard.session')} 
+                    onClose={onClose} 
+                />
 
-                    <div className={styles.body}>
-                        {/* ── Routines: strip list ── */}
-                        {routines.length > 0 && (
+                {/* ── Routines: strip list ── */}
+                {routines.length > 0 && (
                             <div className={styles.sectionCol}>
                                 <div className="section-label">
                                     {t('routines.title')}
@@ -405,8 +402,6 @@ export function WorkoutSession(props) {
                                 )}
                             </div>
                         )}
-                    </div>
-
                     {/* ── Save routine inline form ── */}
                     {showSaveRoutine && (
                         <div className={styles.saveForm}>
@@ -467,17 +462,14 @@ export function WorkoutSession(props) {
                             {t('workout.launch', { count: queue.length })}
                         </Button>
                     </div>
-
-
-                </div>
-            </div>
+            </ModalContainer>
         );
     }
 
     // ── RUNNING PHASE = render current exercise panel ─────────────────
     if (phase === 'running' && currentEx) {
         return (
-            <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
+            <ModalContainer open={true} onClose={onClose} unstyled>
                 <ExercisePanel
                     exerciseConfig={currentEx}
                     onClose={onClose}
@@ -494,7 +486,7 @@ export function WorkoutSession(props) {
                     isSession={true}
                     fadeIn={!hasAnimatedFirstPanel}
                 />
-            </div>
+            </ModalContainer>
         );
     }
 

@@ -12,6 +12,7 @@ import { EXERCISES } from '@config/exercises';
 import { LANGUAGES, resolveLanguageCode } from '@config/languages';
 import { useAuth } from '@contexts/AuthContext';
 import { Button, GoogleIcon, Stack } from '@components/ui';
+import { ModalContainer } from '@components/ui';
 
 const ACCENT = 'var(--gradient-accent)';
 
@@ -75,20 +76,27 @@ export function Onboarding({ onStart }) {
     }[step];
 
     return (
-        <Stack align="center" className="fade-in" style={{
-            position: 'relative',
-            height: '100%', textAlign: 'center',
-            gap: 'clamp(12px, 2.5vh, 32px)',
-            // Top padding clears the fixed language switcher when content scrolls
-            padding: '48px var(--space-6) var(--space-4)',
-            overflowY: 'auto', overflowX: 'hidden'
-        }}>
+        <ModalContainer 
+            open={true} 
+            className="hide-scrollbar" 
+            background="var(--bg-primary)"
+            maxWidth="440px"
+            contentClassName="fade-in" 
+            contentStyle={{
+                position: 'relative',
+                minHeight: '100%', 
+                textAlign: 'center',
+                alignItems: 'stretch',
+                gap: 'clamp(12px, 2.5vh, 32px)',
+                padding: '48px var(--space-6) var(--space-4)'
+            }}
+        >
             {/* Discreet language switcher */}
             <LanguageSwitcher i18n={i18n} />
 
             {/* Title + sub-header — marginTop auto pairs with the footer's
                 marginBottom auto: centers the group when it fits, scrolls when not */}
-            <div style={{ maxWidth: '380px', marginTop: 'auto', flexShrink: 0 }}>
+            <div style={{ marginTop: 'auto', flexShrink: 0, padding: '0 10%' }}>
                 <h1 className="rainbow-gradient onboarding-title">
                     OneUp
                 </h1>
@@ -108,7 +116,7 @@ export function Onboarding({ onStart }) {
                 className={step === 1 ? 'glass-premium scale-in' : 'glass-premium flip-enter'}
                 style={{
                     padding: 'clamp(14px, 3vw, 28px)', borderRadius: 'var(--radius-lg)',
-                    width: '100%', maxWidth: '420px', flexShrink: 0,
+                    width: '100%', flexShrink: 0,
                     gap: 'clamp(12px, 2vh, 24px)',
                     minHeight: 'clamp(220px, 36vh, 320px)', justifyContent: 'center',
                     boxShadow: 'var(--shadow-lg)'
@@ -137,7 +145,7 @@ export function Onboarding({ onStart }) {
                                 { label: '365', h: '100%' },
                             ].map((bar, i) => (
                                 <Stack align="center" justify="flex-end" key={i} style={{
-                                    height: '100%', flex: 1, maxWidth: '56px', gap: '6px'
+                                    height: '100%', flex: 1, gap: '6px'
                                 }}>
                                     <span style={{
                                         fontSize: 'clamp(0.65rem, 2vw, 0.8rem)', fontWeight: '800',
@@ -438,7 +446,7 @@ export function Onboarding({ onStart }) {
                     {t('settings.privacyPolicy')}
                 </Button>
             </div>
-        </Stack>
+        </ModalContainer>
     );
 }
 

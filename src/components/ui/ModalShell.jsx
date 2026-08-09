@@ -65,7 +65,7 @@ export function ModalShell({
   const accentTint = variant === 'danger' ? 'var(--error)' : 'var(--accent-glow)';
 
   return (
-    <ModalContainer open={open} onClose={onClose} ariaLabel={ariaLabel}>
+    <ModalContainer open={open} onClose={onClose} ariaLabel={ariaLabel} position="center" unstyled>
       <div className={className || undefined} style={cardStyle}>
         {/* ── Header ── */}
         {(title || Icon || showX) && (

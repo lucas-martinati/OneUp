@@ -19,7 +19,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
   return (
     <>
       {/* Search Bar + Filter toggle */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: 'var(--space-3)', flexShrink: 0, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: '8px', flexShrink: 0, alignItems: 'center' }}>
         <Input
           type="search"
           placeholder="Rechercher par pseudo, email ou UID..."
@@ -52,7 +52,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
       {/* Filter panel */}
       {showFilters && (
         <div className="scale-in" style={{
-          marginBottom: 'var(--space-3)', padding: 'var(--space-3)', borderRadius: 'var(--radius-lg)',
+          padding: 'var(--space-3)', borderRadius: 'var(--radius-lg)',
           background: 'var(--surface-muted)', border: '1px solid var(--border-default)', flexShrink: 0
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
@@ -97,7 +97,7 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
       )}
 
       {/* Sort selector */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-4)', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', flexShrink: 0 }}>
           Trier
         </span>

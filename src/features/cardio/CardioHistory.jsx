@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import 'leaflet/dist/leaflet.css';
 import { Clock, Target, TrendingUp, Gauge, ChevronDown, Activity } from '@utils/icons';
 import { updateCardioSessionName } from '@services/cardioService';
-import { Button, InlineNameEditor, ModalHeader } from '@components/ui';
-import { Z_INDEX } from '@utils/zIndex';
+import { Button, InlineNameEditor, ModalHeader, ModalContainer } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { CardioMap } from './CardioMap';
 import { CardioFullscreenMap } from './CardioFullscreenMap';
@@ -222,26 +221,18 @@ export function CardioHistory({ sessions, mode, onClose }) {
     return () => window.removeEventListener('show-cardio-fullscreen', handleFullscreen);
   }, []);
 
-  // Handle back button to close fullscreen map or the history panel itself
+  // Handle back button to close fullscreen map. History panel itself is handled by ModalContainer.
   useBackHandler(() => {
     if (fullscreenSession) {
       setFullscreenSession(null);
       return true;
     }
-    onClose();
-    return true;
+    return false;
   }, true);
 
   return createPortal(
     <>
-      <div
-        className="fade-in modal-overlay"
-        style={{ zIndex: Z_INDEX.TOAST }}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) onClose();
-        }}
-      >
-        <div className="modal-content">
+      <ModalContainer open={true} onClose={onClose}>
           <ModalHeader
             title={t('cardio.history')}
             onClose={onClose}
@@ -327,8 +318,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
             {t('common.close')}
           </Button>
         </div>
-      </div>
-    </div>
+      </ModalContainer>
 
       {/* Fullscreen map modal */}
       {fullscreenSession && (

@@ -2,9 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clock, Trash2, Dumbbell, Zap } from '@utils/icons';
 import { getIcon } from '@utils/icons';
-import { Button, ConfirmDialog, WeightBadge, InlineNameEditor, ModalHeader } from '@components/ui';
-import { useBackHandler } from '@hooks/useBackHandler';
-import { Z_INDEX } from '@utils/zIndex';
+import { Button, ConfirmDialog, WeightBadge, InlineNameEditor, ModalHeader, ModalContainer } from '@components/ui';
 import { updateSessionName } from '@features/share/services/sessionHistoryService';
 import { getExerciseLabel, getExerciseColor } from '@utils/exerciseLabel';
 import { sumExerciseReps } from '@utils/stats';
@@ -39,11 +37,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   const [name, setName] = useState(session?.name || '');
   const hasName = name && name.trim().length > 0;
 
-  useBackHandler(() => {
-    if (confirmDelete) return false;
-    onClose();
-    return true;
-  });
+
 
   const exercises = session?.exercises || [];
   const totalReps = sumExerciseReps(exercises);
@@ -71,9 +65,9 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   ];
 
   return (
-    <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST + 1 }}>
-      <div className="modal-content">
-        <ModalHeader title={t('share.sessionDetail')} onClose={onClose} className={styles.header} />
+    <>
+    <ModalContainer open={true} onClose={onClose}>
+        <ModalHeader title={t('share.sessionDetail')} onClose={onClose} />
 
         <div className={styles.body}>
           {/* Date & name */}
@@ -142,7 +136,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
             />
           </div>
         </div>
-      </div>
+      </ModalContainer>
 
       <ConfirmDialog
         destructive
@@ -153,6 +147,6 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
       />
-    </div>
+    </>
   );
 }

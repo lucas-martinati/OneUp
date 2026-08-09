@@ -77,7 +77,7 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+    <>
 
       {/* Read-only metadata overview */}
       {meta && (
@@ -356,8 +356,7 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
           />
         )}
       </div>
-
-    </div>
+    </>
   );
 }
 

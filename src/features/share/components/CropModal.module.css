@@ -1,0 +1,34 @@
+.cropArea {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  min-height: 400px;
+  max-height: 600px;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+  background: var(--surface-subtle);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.2);
+}
+
+.cropperContainer {
+  border-radius: var(--radius-lg);
+  background: transparent !important;
+}
+
+.cropAreaOverlay {
+  border: 2px solid var(--accent-glow) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6), 0 0 20px var(--accent-glow-subtle, rgba(255,255,255,0.1)) !important;
+}
+
+.mediaStyle {
+  border-radius: 0 !important;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: var(--space-4);
+}

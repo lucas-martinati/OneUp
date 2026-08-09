@@ -1,13 +1,12 @@
 import React, { useState, useCallback, useRef, useDeferredValue, Suspense, lazy } from 'react';
 import { Award } from '@utils/icons';
-import { Button, ModalHeader } from '@components/ui';
+import { Button, ModalHeader, ModalContainer } from '@components/ui';
 import { SegmentedControl } from '@components/ui/SegmentedControl';
 import { useTranslation } from 'react-i18next';
 import { computeAllStats } from '@hooks/useComputedStats';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { canAccessFeature, FEATURES } from '@utils/entitlements';
 import { BADGE_DEFINITIONS } from '@config/badgeDefinitions';
-import { Z_INDEX } from '@utils/zIndex';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { getSessionHistory, removeSession } from '@features/share/services/sessionHistoryService';
 import { getExerciseLabel } from '@utils/exerciseLabel';
@@ -222,11 +221,8 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
     );
 
     return (
-        <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.MODAL }}>
-            <div className="modal-content"
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-            >
+        <>
+        <ModalContainer open={true} onClose={onClose} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
                 {/* ── Header ──────────────────────────────────────────────── */}
                 <ModalHeader title={t('stats.title')} onClose={onClose} actions={achievementsButton} />
 
@@ -239,7 +235,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                 />
 
                 {/* ── Section tabs: keep each view short, no endless scroll ── */}
-                <div style={{ marginBottom: 'var(--space-6)' }}>
+                <div>
                     <SegmentedControl
                         options={[
                             { id: 'overview', label: t('common.overview') },
@@ -366,21 +362,21 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         {shareBlock}
                     </div>
                 )}
+        </ModalContainer>
 
-                {/* ── Session Detail Modal (lazy) ──────────────────────────── */}
-                <Suspense fallback={null}>
-                    {selectedSession && (
-                        <SessionDetailModal
-                            session={selectedSession}
-                            onClose={() => setSelectedSession(null)}
-                            onDelete={handleDeleteSession}
-                            onNameChange={handleSessionNameChange}
-                            stats={globalStats}
-                            isPro={hasProAccess}
-                        />
-                    )}
-                </Suspense>
-            </div>
-        </div>
+        {/* ── Session Detail Modal (lazy) ──────────────────────────── */}
+        <Suspense fallback={null}>
+            {selectedSession && (
+                <SessionDetailModal
+                    session={selectedSession}
+                    onClose={() => setSelectedSession(null)}
+                    onDelete={handleDeleteSession}
+                    onNameChange={handleSessionNameChange}
+                    stats={globalStats}
+                    isPro={hasProAccess}
+                />
+            )}
+        </Suspense>
+        </>
     );
 }

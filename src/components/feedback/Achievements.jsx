@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Award, Lock } from '@utils/icons';
-import { useBackHandler } from '@hooks/useBackHandler';
-import { Button, ModalHeader } from '@components/ui';
+import { Button, ModalHeader, ModalContainer } from '@components/ui';
 import { SegmentedControl } from '@components/ui/SegmentedControl';
-import { Z_INDEX } from '@utils/zIndex';
 import { buildBadges } from './buildBadges';
 
 const CATEGORY_COLORS = {
@@ -216,10 +213,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
         return () => clearTimeout(timer);
     }, [highlightedBadgeId]);
 
-    useBackHandler(() => {
-        onClose();
-        return true;
-    }, true);
+
 
     // Extract stats. Badge unlock/progress reads from `badgeStats` — the shared
     // snapshot (@shared/achievementStats.js) also used by the Cloud Function — so
@@ -261,12 +255,11 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
     const R = 40;
     const C = 2 * Math.PI * R;
 
-    return createPortal(
-        <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.ACHIEVEMENTS }}>
-            <div ref={contentRef} className="modal-content" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+    return (
+        <ModalContainer open={true} onClose={onClose}>
 
                 {/* ── Header ─────────────────────────────────────────────── */}
-                <ModalHeader title={t('common.achievements')} onClose={onClose} />
+                <ModalHeader title={t('common.achievements')} onClose={onClose} showBack onBack={onClose} />
 
                 {/* ── Hero: progress ring + counters in one gold card ────── */}
                 <div className="glass-premium slide-up" style={{
@@ -400,8 +393,6 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
                         );
                     })}
                 </div>
-            </div>
-        </div>,
-        document.body
+        </ModalContainer>
     );
 }

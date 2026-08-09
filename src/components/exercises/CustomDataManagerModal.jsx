@@ -1,9 +1,8 @@
 import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, Edit2, Check, ChevronRight, Settings2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, GripVertical } from '@utils/icons';
-import { Button, Input, ModalHeader, ConfirmDialog, ColorPicker, Slider, SegmentedControl, Stack, ListActionRow } from '@components/ui';
+import { Button, Input, ModalHeader, ConfirmDialog, ColorPicker, Slider, SegmentedControl, Stack, ListActionRow, ModalContainer } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
-import { Z_INDEX } from '@utils/zIndex';
 import { DynamicIcon } from '@utils/icons';
 import { MAX_EXERCISES_PER_CATEGORY } from '@store/useExercisesStore';
 
@@ -22,9 +21,8 @@ export function CustomDataManagerModal({
   const [activeTab, setActiveTab] = useState(initialTab);
 
   return (
-    <div className="fade-in modal-overlay" style={{ zIndex: Z_INDEX.TOAST }}>
-      <div className="modal-content" style={{ display: 'flex', flexDirection: 'column' }}>
-        <ModalHeader title={t('common.customContent', 'Gestionnaire personnalisé')} onClose={onClose} />
+    <ModalContainer open={true} onClose={onClose}>
+      <ModalHeader title={t('common.customContent')} onClose={onClose} />
         
         <Stack style={{ flex: 1, overflow: 'hidden' }}>
           {/* Tabs */}
@@ -61,8 +59,7 @@ export function CustomDataManagerModal({
             />
           )}
         </Stack>
-      </div>
-    </div>
+    </ModalContainer>
   );
 }
 
@@ -72,7 +69,7 @@ const PRESET_COLORS = [
   '#f43f5e', '#6366f1', '#14b8a6', '#64748b'
 ];
 
-function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCategory, defaultCustomExercises = [], computedStats }) {
+function CategoryManagerView({ customCategoriesHook, exercisesByUserCategory, defaultCustomExercises = [], computedStats }) {
   const { t, i18n } = useTranslation();
   const { customCategories, addCategory, updateCategory, deleteCategory, reorderCategories, maxCustomCategories } = customCategoriesHook;
 
@@ -230,8 +227,7 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
       setEditingId(null);
       return true;
     }
-    onClose();
-    return true;
+    return false;
   }, true);
 
   const handleSave = () => {
@@ -706,7 +702,7 @@ function CategoryManagerView({ onClose, customCategoriesHook, exercisesByUserCat
   );
 }
 
-function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHook, computedStats, categoryId, initialView = 'list' }) {
+function ExercisesManagerView({ customExercisesHook, customCategoriesHook, computedStats, categoryId, initialView = 'list' }) {
   const { t, i18n } = useTranslation();
   const { 
     customExercises: allCustomExercises, 
@@ -744,8 +740,7 @@ function ExercisesManagerView({ onClose, customExercisesHook, customCategoriesHo
       setSelectedCatId(effectiveCatId);
       return true;
     }
-    onClose();
-    return true;
+    return false;
   }, true);
 
   const handleSave = () => {

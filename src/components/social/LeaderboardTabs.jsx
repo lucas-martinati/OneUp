@@ -32,41 +32,39 @@ export function LeaderboardTabs({ domain, setDomain, activeTab, setActiveTab, VI
         <>
             {/* ── Domain Filter ── */}
             {showDomainFilter && (
-                <div style={{ padding: '0 0 8px' }}>
-                    <SegmentedControl
-                        fullWidth
-                        variant="pills"
-                        value={domain}
-                        onChange={(val) => {
-                            setDomain(val);
-                            setActiveTab(val);
-                            setShowAll(false);
-                        }}
-                        options={[
-                            { 
-                                id: 'bodyweight', 
-                                label: t('common.bodyweight'), 
-                                icon: <Trophy size={16} />,
-                                activeBg: 'linear-gradient(135deg, rgba(251,191,36,0.22), rgba(245,158,11,0.08))',
-                                activeBorder: '1px solid rgba(251,191,36,0.45)',
-                                activeColor: '#fbbf24'
-                            },
-                            { 
-                                id: 'weights', 
-                                label: t('common.weights'), 
-                                icon: <Dumbbell size={16} />,
-                                activeBg: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(234,88,12,0.08))',
-                                activeBorder: '1px solid rgba(249,115,22,0.45)',
-                                activeColor: '#fb923c'
-                            }
-                        ]}
-                    />
-                </div>
+                <SegmentedControl
+                    fullWidth
+                    variant="pills"
+                    value={domain}
+                    onChange={(val) => {
+                        setDomain(val);
+                        setActiveTab(val);
+                        setShowAll(false);
+                    }}
+                    options={[
+                        { 
+                            id: 'bodyweight', 
+                            label: t('common.bodyweight'), 
+                            icon: <Trophy size={16} />,
+                            activeBg: 'linear-gradient(135deg, rgba(251,191,36,0.22), rgba(245,158,11,0.08))',
+                            activeBorder: '1px solid rgba(251,191,36,0.45)',
+                            activeColor: '#fbbf24'
+                        },
+                        { 
+                            id: 'weights', 
+                            label: t('common.weights'), 
+                            icon: <Dumbbell size={16} />,
+                            activeBg: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(234,88,12,0.08))',
+                            activeBorder: '1px solid rgba(249,115,22,0.45)',
+                            activeColor: '#fb923c'
+                        }
+                    ]}
+                />
             )}
 
             {/* ── Tabs (wrapping) ── */}
             {showExerciseTabs && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: showDomainFilter ? '0' : '4px 0 var(--space-4)' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {globalTabs.map(tab => {
                         const isActive = tab.id === currentActiveId;
                         const Icon = tab.icon;

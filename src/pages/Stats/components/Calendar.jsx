@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2, Check, ShieldAlert, Star, Snowflake, FileText } from '@utils/icons';
-import { ModalHeader } from '@components/ui';
+import { ModalHeader, ModalContainer } from '@components/ui';
 import { useTranslation } from 'react-i18next';
 import { getLocalDateStr } from '@shared/dateUtils';
 import { useBackHandler } from '@hooks/useBackHandler';
@@ -222,14 +222,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
     const weekdayLabels = Array.isArray(rawWeekdayLabels) ? rawWeekdayLabels : t('calendar.weekdays', { returnObjects: true });
 
     return (
-        <div
-            className="fade-in modal-overlay"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            style={{ zIndex: 100, touchAction: 'pan-y', overflowX: 'hidden' }}
-        >
-            <div className={`modal-content ${styles.shell}`}>
+        <ModalContainer open={true} onClose={onClose} showScrollbar={false} contentClassName={styles.shell} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd} contentStyle={{ touchAction: 'pan-y', overflowX: 'hidden' }}>
                 {/* Top bar */}
                 <ModalHeader 
                     title={t('dashboard.calendar')} 
@@ -418,8 +411,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                         />
                     </>
                 )}
-            </div>
-        </div>
+        </ModalContainer>
     );
 }
 
@@ -536,10 +528,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
     }
 
     return (
-        <div className="modal-overlay" style={{
-            background: 'transparent', zIndex: 199,
-            overflow: 'hidden', pointerEvents: 'none'
-        }}>
+        <div className={styles.previewOverlay}>
         <div
             ref={sheetRef}
             onClick={(e) => e.stopPropagation()}
@@ -581,13 +570,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                 cursor: 'grab'
             }} />
 
-            <div className="modal-content" style={{
-                flex: 1, overflowY: 'auto',
-                paddingTop: 0,
-                paddingBottom: 0,
-                maxWidth: 'none',
-                display: 'flex', flexDirection: 'column', gap: '20px'
-            }}>
+            <div className={styles.previewContent}>
             <div className={styles.detailHead}>
                 <div style={{ minWidth: 0 }}>
                     <div className={styles.detailDate}>
@@ -708,7 +691,7 @@ function DayDetail({ dateString, completions, exercises, getDayNumber, onClose, 
                 </div>
             </div>
             </div>
-        </div>
+            </div>
         </div>
     );
 }

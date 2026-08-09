@@ -3,13 +3,7 @@
    border and accent derives from the design tokens so the panel follows the
    active theme instead of hard-coding indigo. */
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: var(--space-2);
-}
+
 
 .title {
   margin: 0;
