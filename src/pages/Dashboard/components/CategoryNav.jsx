@@ -240,7 +240,7 @@ export const CategoryNav = React.memo(({
             })}
             {showDiscoveryHint && (
                 <div className="category-nav-hint-tooltip" role="tooltip">
-                    {t('common.scrubberHint', 'Maintenez pour glisser')}
+                    {t('common.scrubberHint')}
                 </div>
             )}
         </div>

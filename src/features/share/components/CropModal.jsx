@@ -113,7 +113,7 @@ export function CropModal({ imageSrc, initialCrop, initialZoom, onSave, onClose 
         <Button variant="ghost" onClick={onClose}>
           {t('common.cancel')}
         </Button>
-        <Button variant="primary" icon={Check} onClick={handleSave}>
+        <Button icon={Check} onClick={handleSave}>
           {t('common.save')}
         </Button>
       </div>

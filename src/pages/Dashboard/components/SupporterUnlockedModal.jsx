@@ -78,7 +78,7 @@ export function SupporterUnlockedModal({ open, onClose, onConfirm }) {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            {t('supporter.unlockedModal.title', 'Un Grand Merci !')}
+            {t('supporter.unlockedModal.title')}
           </h2>
           <p
             style={{
@@ -88,7 +88,7 @@ export function SupporterUnlockedModal({ open, onClose, onConfirm }) {
               color: '#fca5a5',
             }}
           >
-            {t('supporter.unlockedModal.subtitle', 'Vous êtes désormais Membre Supporteur ❤️')}
+            {t('supporter.unlockedModal.subtitle')}
           </p>
         </div>
       </div>
@@ -96,7 +96,7 @@ export function SupporterUnlockedModal({ open, onClose, onConfirm }) {
       {/* Benefits Overview */}
       <div style={{ padding: '0 24px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <p style={{ margin: '0 0 4px', fontSize: '0.88rem', color: 'rgba(255, 255, 255, 0.8)', textAlign: 'center', lineHeight: 1.4 }}>
-          {t('supporter.unlockedModal.description', 'Votre soutien permet de faire vivre et évoluer OneUp de manière indépendante. Voici ce que vous avez débloqué :')}
+          {t('supporter.unlockedModal.description')}
         </p>
 
         <div
@@ -115,10 +115,10 @@ export function SupporterUnlockedModal({ open, onClose, onConfirm }) {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#ffffff' }}>
-              {t('supporter.unlockedModal.badgeTitle', 'Badge Supporteur Exclusif')}
+              {t('supporter.unlockedModal.badgeTitle')}
             </div>
             <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.65)' }}>
-              {t('supporter.unlockedModal.badgeDesc', 'Affiché fièrement sur votre profil et vos interactions.')}
+              {t('supporter.unlockedModal.badgeDesc')}
             </div>
           </div>
         </div>
@@ -139,10 +139,10 @@ export function SupporterUnlockedModal({ open, onClose, onConfirm }) {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#ffffff' }}>
-              {t('supporter.unlockedModal.indieTitle', 'Soutien au Développement Indépendant')}
+              {t('supporter.unlockedModal.indieTitle')}
             </div>
             <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.65)' }}>
-              {t('supporter.unlockedModal.indieDesc', 'Vous aidez directement à financer les serveurs et les futures fonctionnalités.')}
+              {t('supporter.unlockedModal.indieDesc')}
             </div>
           </div>
         </div>
@@ -177,7 +177,7 @@ export function SupporterUnlockedModal({ open, onClose, onConfirm }) {
           }}
         >
           <Sparkles size={18} />
-          {t('supporter.unlockedModal.cta', 'C\'est un plaisir !')}
+          {t('supporter.unlockedModal.cta')}
         </Button>
       </div>
     </GradientModal>

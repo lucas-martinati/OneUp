@@ -51,7 +51,7 @@ export function GuestCloudBackupBanner({ displayStreak = 0, totalReps = 0 }) {
   return (
     <div
       role="region"
-      aria-label={t('cloud.backupBannerTitle', 'Sauvegardez vos progrès')}
+      aria-label={t('cloud.backupBannerTitle')}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -72,10 +72,10 @@ export function GuestCloudBackupBanner({ displayStreak = 0, totalReps = 0 }) {
 
       <div style={{ flex: 1, minWidth: 0, lineHeight: 1.25 }}>
         <div style={{ fontWeight: 600, fontSize: '0.8rem', color: 'var(--text-primary)' }}>
-          {t('cloud.backupBannerTitle', 'Sauvegardez vos progrès')}
+          {t('cloud.backupBannerTitle')}
         </div>
         <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
-          {t('cloud.backupBannerSubtitle', 'Connectez-vous pour ne rien perdre')}
+          {t('cloud.backupBannerSubtitle')}
         </div>
       </div>
 
@@ -108,14 +108,14 @@ export function GuestCloudBackupBanner({ displayStreak = 0, totalReps = 0 }) {
       >
         <GoogleIcon size={14} />
         <span style={{ fontSize: '0.75rem', lineHeight: 1 }}>
-          {t('cloud.backupButton', 'Sauvegarder')}
+          {t('cloud.backupButton')}
         </span>
       </Button>
 
       <Button
         variant="ghost"
         onClick={dismiss}
-        aria-label={t('common.close', 'Fermer')}
+        aria-label={t('common.close')}
         style={{
           display: 'inline-flex',
           alignItems: 'center',

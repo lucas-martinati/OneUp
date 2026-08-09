@@ -58,10 +58,10 @@ export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
 
         <Stack gap="xs" align="center">
           <h2 className="panel-title" style={{ margin: 0, fontSize: '1.4rem' }}>
-            {t('pro.expiredModal.title', 'Votre accès Pro a expiré')}
+            {t('pro.expiredModal.title')}
           </h2>
           <p style={{ margin: 0, fontSize: '0.92rem', color: 'rgba(255, 255, 255, 0.7)' }}>
-            {t('pro.expiredModal.subtitle', 'Votre abonnement s\'est terminé, mais pas d\'inquiétude !')}
+            {t('pro.expiredModal.subtitle')}
           </p>
         </Stack>
       </Stack>
@@ -70,16 +70,16 @@ export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
         <Card style={{ padding: 'var(--space-4)', display: 'flex', gap: 'var(--space-3)' }}>
           <BarChart3 size={22} color="#60a5fa" style={{ flexShrink: 0, marginTop: '2px' }} />
           <div style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.85)', lineHeight: 1.4 }}>
-            <strong>{t('pro.expiredModal.statsTitle', 'Accès à vos statistiques :')}</strong>{' '}
-            {t('pro.expiredModal.statsDesc', 'Vous pouvez toujours consulter l\'ensemble de vos statistiques et progressions dans le panneau Stats.')}
+            <strong>{t('pro.expiredModal.statsTitle')}</strong>{' '}
+            {t('pro.expiredModal.statsDesc')}
           </div>
         </Card>
 
         <Card style={{ padding: 'var(--space-4)', display: 'flex', gap: 'var(--space-3)' }}>
           <CheckCircle2 size={22} color="#a7f3d0" style={{ flexShrink: 0, marginTop: '2px' }} />
           <div style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.85)', lineHeight: 1.4 }}>
-            <strong>{t('pro.expiredModal.repsTitle', 'Répétitions conservées :')}</strong>{' '}
-            {t('pro.expiredModal.repsDesc', 'Toutes vos répétitions et séances déjà effectuées restent comptabilisées dans votre historique.')}
+            <strong>{t('pro.expiredModal.repsTitle')}</strong>{' '}
+            {t('pro.expiredModal.repsDesc')}
           </div>
         </Card>
       </Stack>
@@ -113,7 +113,7 @@ export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
             }}
           >
             <RefreshCw size={18} />
-            {t('pro.expiredModal.renewCta', 'Renouveler mon abonnement Pro')}
+            {t('pro.expiredModal.renewCta')}
           </Button>
         )}
 
@@ -132,7 +132,7 @@ export function ProExpiredModal({ open, onClose, onConfirm, onReSubscribe }) {
             cursor: 'pointer',
           }}
         >
-          {t('pro.expiredModal.dismissCta', 'Continuer en version gratuite')}
+          {t('pro.expiredModal.dismissCta')}
         </Button>
       </Stack>
     </GradientModal>
