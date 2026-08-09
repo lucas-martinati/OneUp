@@ -12,14 +12,20 @@ describe('useBackHandler', () => {
     });
 
     it('registers the handler when enabled is true', () => {
-        const handler = vi.fn();
+        const handler = vi.fn().mockReturnValue(true);
         const unregisterMock = vi.fn();
         registerSpy.mockReturnValue(unregisterMock);
 
         renderHook(() => useBackHandler(handler, true));
 
-        expect(registerSpy).toHaveBeenCalledWith(handler);
+        expect(registerSpy).toHaveBeenCalledWith(expect.any(Function));
         expect(registerSpy).toHaveBeenCalledTimes(1);
+
+        // Verify the registered wrapper calls our handler
+        const registeredCallback = registerSpy.mock.calls[0][0];
+        const result = registeredCallback();
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(result).toBe(true);
     });
 
     it('registers the handler by default when enabled is not provided', () => {
@@ -29,7 +35,7 @@ describe('useBackHandler', () => {
 
         renderHook(() => useBackHandler(handler));
 
-        expect(registerSpy).toHaveBeenCalledWith(handler);
+        expect(registerSpy).toHaveBeenCalledWith(expect.any(Function));
     });
 
     it('does not register the handler when enabled is false', () => {

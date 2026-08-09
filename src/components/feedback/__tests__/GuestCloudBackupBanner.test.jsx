@@ -41,21 +41,21 @@ describe('GuestCloudBackupBanner', () => {
 
   it('renders the backup banner when guest has active streak or reps', () => {
     const { getByText } = render(<GuestCloudBackupBanner displayStreak={3} totalReps={50} />);
-    expect(getByText('Sauvegardez vos progrès')).toBeTruthy();
+    expect(getByText('cloud.backupBannerTitle')).toBeTruthy();
     expect(getByText('CloudIcon')).toBeTruthy();
-    expect(getByText('Sauvegarder')).toBeTruthy();
+    expect(getByText('cloud.backupButton')).toBeTruthy();
   });
 
   it('calls auth.signIn when action button is clicked', () => {
     const { getByText } = render(<GuestCloudBackupBanner displayStreak={3} totalReps={50} />);
-    const button = getByText('Sauvegarder').closest('button');
+    const button = getByText('cloud.backupButton').closest('button');
     fireEvent.click(button);
     expect(mockAuth.signIn).toHaveBeenCalledTimes(1);
   });
 
   it('dismisses the banner when close button is clicked', () => {
     const { getByText, queryByText } = render(<GuestCloudBackupBanner displayStreak={3} totalReps={50} />);
-    expect(getByText('Sauvegardez vos progrès')).toBeTruthy();
+    expect(getByText('cloud.backupBannerTitle')).toBeTruthy();
 
     const closeBtn = getByText('CloseIcon').closest('button');
     fireEvent.click(closeBtn);

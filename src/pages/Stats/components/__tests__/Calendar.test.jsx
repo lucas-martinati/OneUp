@@ -88,8 +88,8 @@ describe('Calendar and DayDetail date translation', () => {
 describe('Calendar swipe and touch events', () => {
   it('handles horizontal swipe to change month in Calendar', () => {
     vi.useFakeTimers();
-    const { container } = render(<Calendar {...defaultProps} />);
-    const overlay = container.querySelector('[class*="grid"]');
+    render(<Calendar {...defaultProps} />);
+    const overlay = document.querySelector('[class*="grid"]');
     
     // Swipe left (next month) diff > 0
     fireEvent.touchStart(overlay, { touches: [{ clientX: 300, clientY: 300 }] });
@@ -131,8 +131,7 @@ describe('Calendar swipe and touch events', () => {
     fireEvent.click(screen.getByRole('button', { name: '19 Junio' }));
 
     // DayDetail
-    const sheets = document.querySelectorAll('.modal-overlay');
-    const sheet = sheets[1].children[0];
+    const sheet = document.querySelector('[class*="previewOverlay"] > div');
     
     // Simulate transition end for entrance
     fireEvent.transitionEnd(sheet, { propertyName: 'transform' });
