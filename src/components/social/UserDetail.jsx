@@ -4,6 +4,7 @@ import { Trophy, Medal, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, 
 import { Avatar } from '@components/ui/Avatar';
 import { Card } from '@components/ui/Card';
 import { Button } from '@components/ui';
+import { ModalContainer } from '@components/ui/ModalContainer';
 import { Z_INDEX } from '@utils/zIndex';
 import { DifficultyBadge } from '@components/ui/DifficultyBadge';
 import { StreakFlame } from '@components/ui/StreakFlame';
@@ -21,11 +22,7 @@ import { PALETTE } from '@styles/palette';
 
 export function UserDetail({ entry, rank, isMe, onClose }) {
     const { t } = useTranslation();
-    // For the current user, trust the locally-computed badge count so the value
-    // matches the Stats page exactly (the server count can be stale/approximate).
     const myStats = useComputedStatsFromStore();
-    // Medal colors shared with LeaderboardPodium via the fixed palette
-    // (kept as hex strings because they get alpha-suffixed below).
     const rankColors = { 1: PALETTE.amber, 2: PALETTE.silver, 3: PALETTE.bronze };
     const todayStr = getLocalDateStr(new Date());
     const yesterdayDate = new Date();
@@ -36,18 +33,12 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
 
     const [details, setDetails] = useState(null);
     const [loadingDetails, setLoadingDetails] = useState(true);
-    // Which tier badge (supporter / pro) has its explanation bubble open.
     const [openBadge, setOpenBadge] = useState(null);
 
     const badgeInfo = {
         supporter: { title: t('tierBadge.supporterTitle'), desc: t('tierBadge.supporterDesc') },
         pro: { title: t('tierBadge.proTitle'), desc: t('tierBadge.proDesc') },
     };
-
-    useBackHandler(() => {
-        onClose();
-        return true;
-    }, true);
 
     useEffect(() => {
         let cancelled = false;
@@ -65,7 +56,6 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
         return () => { cancelled = true; };
     }, [entry.uid]);
 
-    // Server-computed derived stats from the user's public profile.
     const stats = details?.derivedStats || {};
 
     const maxReps = React.useMemo(() => {
@@ -79,151 +69,151 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
         return max;
     }, [entry.exerciseReps]);
 
-    const renderExerciseRow = (ex) => {
+    const renderExerciseRow = (ex, index) => {
         const ExIcon = getIcon(ex.icon);
         const reps = entry.exerciseReps?.[ex.id] || 0;
-        const barWidth = (reps / maxReps) * 100;
-        // Cardio is validated per WEEK, not per day (see useCardio.js): each
-        // "day" flagged isCompleted for running/cycling actually represents
-        // one validated week, so exerciseDays already counts weeks here — it
-        // just needs the right unit label.
+        const barWidth = Math.min((reps / maxReps) * 100, 100);
         const isCardioEx = isCardioExercise(ex.id);
         const exDays = loadingDetails ? null : (stats.exerciseDays?.[ex.id] || 0);
         const weight = details?.exerciseWeights?.[ex.id] || ex.defaultWeight;
         const isWeightEx = isWeightExercise(ex.id);
-        return (
-            <Card variant="tinted" tint={ex.color} padding="xs" key={ex.id} style={{
-                display: 'flex', alignItems: 'center', gap: '8px'
-            }}>
-                <ExIcon size={16} color={ex.color} style={{ flexShrink: 0 }} />
-                <div className="flex-1-min0">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                        <span style={{ fontSize: '0.75rem', fontWeight: '600', color: ex.color }}>{getExerciseLabel(ex, t)}</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            {!loadingDetails && (() => {
-                                // stats.exerciseDoneToday/exerciseStreaks are baked server-side
-                                // at the last write (anchored on that day's "today") and never
-                                // refreshed on day change. entry.lastActiveDay is derived straight
-                                // from completions so it can't go stale the same way — use it to
-                                // find out which real-world day that anchor actually was.
-                                const doneAtAnchor = !!stats.exerciseDoneToday?.[ex.id];
-                                const doneToday = doneAtAnchor && entry.lastActiveDay === todayStr;
-                                const doneYesterday = doneAtAnchor && entry.lastActiveDay === yesterdayStr;
-                                // Streak still alive (grey, pending today) only if it was done
-                                // yesterday; otherwise it's broken and the flame shouldn't show.
-                                const streakAlive = doneToday || doneYesterday;
-                                return (
-                                    <StreakFlame
-                                        streak={streakAlive ? (stats.exerciseStreaks?.[ex.id] || 0) : 0}
-                                        active={doneToday}
-                                    />
-                                );
-                            })()}
-                            {exDays !== null && (
-                                <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', opacity: 0.7 }}>{exDays}{t(isCardioEx ? 'common.weeksAbbr' : 'common.daysAbbr')}</span>
-                            )}
-                            {isWeightEx && <WeightBadge weight={weight} color={ex.color} />}
-                            {(() => {
-                                // Difficulty snapshot from the user's public profile.
-                                const difficulty = details?.exerciseDifficulties?.[ex.id] || 1.0;
 
-                                if (difficulty === 1.0) return null;
-                                return <DifficultyBadge difficulty={difficulty} style={{ marginLeft: 0, marginRight: '4px' }} />;
-                            })()}
-                            <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-primary)' }}>{reps.toLocaleString()}</span>
+        const doneAtAnchor = !!stats.exerciseDoneToday?.[ex.id];
+        const doneToday = doneAtAnchor && entry.lastActiveDay === todayStr;
+        const doneYesterday = doneAtAnchor && entry.lastActiveDay === yesterdayStr;
+        const streakAlive = doneToday || doneYesterday;
+
+        return (
+            <div 
+                key={ex.id} 
+                style={{
+                    display: 'flex', flexDirection: 'column', gap: '6px',
+                    padding: '10px 0',
+                    borderBottom: '1px solid rgba(255,255,255,0.03)',
+                    animation: 'fadeSlideUp 0.4s ease backwards',
+                    animationDelay: `${0.3 + (index * 0.05)}s`
+                }}
+            >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
+                        <div style={{ 
+                            width: '28px', height: '28px', borderRadius: '8px', 
+                            background: `${ex.color}1a`, border: `1px solid ${ex.color}33`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 
+                        }}>
+                            <ExIcon size={14} color={ex.color} />
                         </div>
+                        <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{getExerciseLabel(ex, t)}</span>
+                        
+                        {!loadingDetails && (
+                            <StreakFlame streak={streakAlive ? (stats.exerciseStreaks?.[ex.id] || 0) : 0} active={doneToday} />
+                        )}
+                        {exDays !== null && (
+                            <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', opacity: 0.7, background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '4px' }}>
+                                {exDays}{t(isCardioEx ? 'common.weeksAbbr' : 'common.daysAbbr')}
+                            </span>
+                        )}
                     </div>
-                    <div style={{ height: '3px', borderRadius: '2px', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', borderRadius: '2px', width: `${barWidth}%`, background: `linear-gradient(90deg, ${ex.color}, ${ex.color}88)`, transition: 'width 0.4s ease' }} />
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                        {isWeightEx && <WeightBadge weight={weight} color={ex.color} />}
+                        {(() => {
+                            const difficulty = details?.exerciseDifficulties?.[ex.id] || 1.0;
+                            if (difficulty === 1.0) return null;
+                            return <DifficultyBadge difficulty={difficulty} style={{ margin: 0 }} />;
+                        })()}
+                        <span style={{ fontSize: '0.9rem', fontWeight: '800', color: ex.color, width: '45px', textAlign: 'right' }}>
+                            {reps.toLocaleString()}
+                        </span>
                     </div>
                 </div>
-            </Card>
+                
+                {/* Clean progress bar */}
+                <div style={{ height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.04)', overflow: 'hidden', marginLeft: '36px' }}>
+                    <div style={{ 
+                        height: '100%', borderRadius: '2px', width: `${barWidth}%`, 
+                        background: `linear-gradient(90deg, ${ex.color}88, ${ex.color})`, 
+                        boxShadow: `0 0 10px ${ex.color}66`,
+                        transition: 'width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)' 
+                    }} />
+                </div>
+            </div>
         );
     };
 
     return (
-        <div
-            onClick={onClose}
-            className="fade-in"
-            style={{
-                position: 'fixed', inset: 0,
-                background: 'rgba(0,0,0,0.82)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: 'var(--space-6)', zIndex: Z_INDEX.MODAL + 10
-            }}
-        >
+        <ModalContainer open={true} onClose={onClose} ariaLabel="User details" position="center" unstyled>
             <Card
                 variant="premium"
-                padding="lg"
                 onClick={(e) => { e.stopPropagation(); setOpenBadge(null); }}
                 className="slide-up"
                 style={{
-                    width: '100%', maxWidth: '400px',
+                    width: '100%', maxWidth: '440px',
                     boxShadow: isPerfect 
-                        ? '0 0 30px rgba(255, 215, 0, 0.25), 0 20px 60px rgba(0,0,0,0.5)' 
-                        : '0 20px 60px rgba(0,0,0,0.5)',
+                        ? '0 0 40px rgba(255, 215, 0, 0.15), 0 24px 64px rgba(0,0,0,0.7)' 
+                        : '0 24px 64px rgba(0,0,0,0.7)',
                     maxHeight: '90vh', display: 'flex', flexDirection: 'column',
-                    background: rank <= 3
-                        ? `linear-gradient(160deg, ${rankColor}24, transparent 58%), var(--surface-section)`
-                        : 'var(--surface-section)',
-                    border: rank <= 3 ? `1px solid ${rankColor}40` : '1px solid var(--border-default)',
-                    position: 'relative', overflow: 'hidden'
+                    background: 'var(--surface-sheet, #151522)',
+                    border: rank <= 3 ? `1px solid ${rankColor}55` : '1px solid rgba(255,255,255,0.1)',
+                    position: 'relative', overflow: 'hidden', padding: 0
                 }}
             >
-                {isPerfect && (
-                    <>
-                        {[
-                            { top: '5%', left: '10%', size: 14, delay: '0s' },
-                            { top: '15%', right: '15%', size: 10, delay: '1s' },
-                            { bottom: '20%', left: '15%', size: 12, delay: '2s' },
-                            { bottom: '10%', right: '10%', size: 9, delay: '3s' },
-                            { top: '40%', left: '5%', size: 11, delay: '1.5s' },
-                            { top: '50%', right: '5%', size: 8, delay: '2.5s' },
-                            { top: '10%', left: '50%', size: 13, delay: '0.5s' },
-                            { bottom: '30%', right: '40%', size: 7, delay: '3.5s' },
-                        ].map((s, idx) => (
-                            <Star 
-                                key={idx}
-                                className="sparkle-icon" 
-                                size={s.size} 
-                                fill={PALETTE.gold} 
-                                style={{ 
-                                    top: s.top, left: s.left, right: s.right, bottom: s.bottom, 
-                                    animationDelay: s.delay 
-                                }} 
-                            />
-                        ))}
-                    </>
-                )}
-                <Button
-                    iconOnly
-                    icon={X}
-                    variant="glass"
-                    onClick={onClose}
-                    
-                    aria-label="Close"
-                    style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 10 }}
-                />
-
+                {/* Header Banner */}
                 <div style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    gap: '10px', marginBottom: 'var(--space-6)'
+                    height: '100px',
+                    flexShrink: 0,
+                    background: rank <= 3 
+                        ? `linear-gradient(145deg, ${rankColor}33, ${rankColor}0a)`
+                        : 'linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))',
+                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    position: 'relative'
                 }}>
+                    {isPerfect && (
+                        <>
+                            {[
+                                { top: '15%', left: '10%', size: 14, delay: '0s' },
+                                { top: '25%', right: '15%', size: 10, delay: '1s' },
+                                { top: '40%', left: '5%', size: 11, delay: '1.5s' },
+                                { top: '50%', right: '5%', size: 8, delay: '2.5s' },
+                                { top: '20%', left: '50%', size: 13, delay: '0.5s' },
+                            ].map((s, idx) => (
+                                <Star 
+                                    key={idx}
+                                    className="sparkle-icon" 
+                                    size={s.size} 
+                                    fill={PALETTE.gold} 
+                                    style={{ position: 'absolute', top: s.top, left: s.left, right: s.right, animationDelay: s.delay }} 
+                                />
+                            ))}
+                        </>
+                    )}
+                    <Button
+                        iconOnly
+                        icon={X}
+                        variant="glass"
+                        onClick={onClose}
+                        aria-label="Close"
+                        style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 10 }}
+                    />
+                </div>
+
+                {/* Avatar & Profile Info */}
+                <div style={{ padding: '0 var(--space-6)', marginTop: '-42px', position: 'relative', zIndex: 5, display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
                     <div style={{
                         position: 'relative', borderRadius: '50%',
+                        background: 'var(--surface-sheet, #151522)', padding: '4px',
                         boxShadow: isPerfect ? '0 0 28px -2px rgba(255,215,0,0.6)' : `0 0 24px -6px ${rankColor}`
                     }}>
                         {isPerfect && (
                             <>
-                                <Star className="sparkle-icon" size={14} fill={PALETTE.gold} style={{ top: '-4px', left: '-2px', animationDelay: '0s' }} />
-                                <Star className="sparkle-icon" size={10} fill={PALETTE.gold} style={{ bottom: '2px', right: '-4px', animationDelay: '1.6s' }} />
-                                <Star className="sparkle-icon" size={12} fill={PALETTE.gold} style={{ top: '46%', right: '-8px', animationDelay: '2.9s' }} />
+                                <Star className="sparkle-icon" size={14} fill={PALETTE.gold} style={{ position: 'absolute', top: '0', left: '0', animationDelay: '0s', zIndex: 2 }} />
+                                <Star className="sparkle-icon" size={12} fill={PALETTE.gold} style={{ position: 'absolute', bottom: '10%', right: '-4px', animationDelay: '1.6s', zIndex: 2 }} />
                             </>
                         )}
                         <Avatar photoURL={entry.photoURL} name={entry.pseudo} size={76} borderColor={isPerfect ? PALETTE.gold : rankColor} />
                     </div>
 
-                    <div style={{ textAlign: 'center' }}>
+                    <div style={{ textAlign: 'center', marginTop: '12px' }}>
                         <div style={{
                             fontSize: '1.45rem', fontWeight: '800', color: 'var(--text-primary)',
                             display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', justifyContent: 'center'
@@ -279,101 +269,134 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                         </div>
                         <div style={{
                             display: 'inline-flex', alignItems: 'center', gap: '5px',
-                            padding: '4px 12px', borderRadius: 'var(--radius-full)', marginTop: '6px',
-                            background: `${rankColor}1f`, border: `1px solid ${rankColor}3d`,
+                            padding: '4px 14px', borderRadius: 'var(--radius-full)', marginTop: '8px',
+                            background: rank <= 3 ? `linear-gradient(135deg, ${rankColor}1f, ${rankColor}0a)` : 'rgba(255,255,255,0.04)', 
+                            border: `1px solid ${rank <= 3 ? rankColor + '40' : 'rgba(255,255,255,0.08)'}`,
                             boxShadow: rank <= 3 ? `0 0 14px -4px ${rankColor}` : 'none'
                         }}>
-                            {rank <= 3 ? <Medal size={14} color={rankColor} /> : <span style={{ fontSize: '0.78rem', color: rankColor, fontWeight: '800' }}>#</span>}
-                            <span style={{ fontSize: '0.82rem', fontWeight: '800', color: rankColor }}>{rank}</span>
+                            {rank <= 3 ? <Medal size={14} color={rankColor} /> : <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: '800' }}>#</span>}
+                            <span style={{ fontSize: '0.82rem', fontWeight: '800', color: rank <= 3 ? rankColor : 'var(--text-primary)' }}>{rank}</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', paddingRight: '4px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: 'var(--space-6)', flexShrink: 0 }}>
+                {/* Scrollable Content Wrapper */}
+                <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, zIndex: 1 }}>
+                    {/* Top Fade Overlay */}
+                    <div style={{
+                        position: 'absolute', top: 0, left: 0, right: 0, height: '24px',
+                        background: 'linear-gradient(to bottom, var(--surface-sheet, #151522) 0%, transparent 100%)',
+                        zIndex: 10, pointerEvents: 'none'
+                    }} />
 
+                    <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', padding: 'var(--space-5) var(--space-6)' }}>
                         
-                        {canAccessFeature(FEATURES.WEIGHTS, entry) && entry.weightsTotalReps > 0 && (
-                            <StatCard 
-                                icon={<Activity size={16} color="#f43f5e" />} 
-                                label={t('common.global')} 
-                                value={(entry.totalReps + entry.weightsTotalReps).toLocaleString()} 
-                                color="#f43f5e" 
-                            />
-                        )}
-
-                        <StatCard 
-                            icon={<Trophy size={16} color={PALETTE.amber} />} 
-                            label={t('common.bodyweight')}
-                            value={entry.totalReps.toLocaleString()} 
-                            color={PALETTE.amber} 
-                        />
-                        
-                        {canAccessFeature(FEATURES.WEIGHTS, entry) && entry.weightsTotalReps > 0 && (
-                            <StatCard 
-                                icon={<Dumbbell size={16} color="#8b5cf6" />} 
-                                label={t('common.weights')} 
-                                value={entry.weightsTotalReps.toLocaleString()} 
-                                color="#8b5cf6" 
-                            />
-                        )}
-
-                        <StatCard icon={<Award size={16} color="#a855f7" />} label={t('common.achievements')} value={(isMe && myStats?.badgeCount != null ? myStats.badgeCount : details?.achievements) || 0} color="#a855f7" />
-                        <StatCard icon={<Flame size={16} color={PALETTE.orange} />} label={t('common.bestStreak')} value={loadingDetails ? '…' : (stats.maxStreak || 0)} color={PALETTE.orange} />
-                        <StatCard icon={<Calendar size={16} color="#22d3ee" />} label={t('leaderboard.activeDays')} value={loadingDetails ? '…' : (stats.totalDays || 0)} color="#22d3ee" />
-                        <StatCard icon={<TrendingUp size={16} color="#10b981" />} label={t('leaderboard.currentStreak')} value={loadingDetails ? '…' : (stats.currentStreak || 0)} color="#10b981" />
-                        <StatCard icon={<Activity size={16} color={PALETTE.pink} />} label={t('common.perfectDays')} value={loadingDetails ? '…' : (stats.perfectDays || 0)} color={PALETTE.pink} />
+                        {/* Primary Highlight Stat */}
+                    <div style={{ animation: 'fadeSlideUp 0.4s ease backwards', animationDelay: '0.05s', marginBottom: '12px' }}>
+                        <Card variant="glass" padding="md" interactive style={{
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px',
+                            background: 'linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01))',
+                            border: '1px solid rgba(255,255,255,0.05)',
+                        }}>
+                            {entry.weightsTotalReps > 0 ? (
+                                <>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                                        <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: '#f43f5e22', display: 'grid', placeItems: 'center' }}>
+                                            <Activity size={24} color="#f43f5e" />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                            <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', fontWeight: '700' }}>{t('common.global')}</span>
+                                            <span style={{ fontSize: '2rem', fontWeight: '800', color: 'var(--text-primary)', lineHeight: 1, marginTop: '2px' }}>
+                                                {((entry.totalReps || 0) + (entry.weightsTotalReps || 0)).toLocaleString()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style={{ display: 'flex', gap: '24px', width: '100%', justifyContent: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '14px' }}>
+                                        <div style={{ textAlign: 'center' }}>
+                                            <div style={{ fontSize: '0.6rem', textTransform: 'uppercase', color: 'var(--text-secondary)', fontWeight: '700' }}>{t('common.bodyweight')}</div>
+                                            <div style={{ fontSize: '1.1rem', fontWeight: '800', color: PALETTE.amber }}>{(entry.totalReps || 0).toLocaleString()}</div>
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                            <div style={{ fontSize: '0.6rem', textTransform: 'uppercase', color: 'var(--text-secondary)', fontWeight: '700' }}>{t('common.weights')}</div>
+                                            <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#8b5cf6' }}>{(entry.weightsTotalReps || 0).toLocaleString()}</div>
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                                    <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: `${PALETTE.amber}22`, display: 'grid', placeItems: 'center' }}>
+                                        <Trophy size={24} color={PALETTE.amber} />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', fontWeight: '700' }}>{t('common.bodyweight')}</span>
+                                        <span style={{ fontSize: '2rem', fontWeight: '800', color: 'var(--text-primary)', lineHeight: 1, marginTop: '2px' }}>
+                                            {(entry.totalReps || 0).toLocaleString()}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+                        </Card>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0, paddingBottom: '16px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: 'var(--space-6)' }}>
+                        <StatCard icon={<Award size={16} color="#a855f7" />} label={t('common.achievements')} value={(isMe && myStats?.badgeCount != null ? myStats.badgeCount : details?.achievements) || 0} color="#a855f7" delay="0.1s" />
+                        <StatCard icon={<Flame size={16} color={PALETTE.orange} />} label={t('common.bestStreak')} value={loadingDetails ? '…' : (stats.maxStreak || 0)} color={PALETTE.orange} delay="0.15s" />
+                        <StatCard icon={<Calendar size={16} color="#22d3ee" />} label={t('leaderboard.activeDays')} value={loadingDetails ? '…' : (stats.totalDays || 0)} color="#22d3ee" delay="0.2s" />
+                        <StatCard icon={<Activity size={16} color={PALETTE.pink} />} label={t('common.perfectDays')} value={loadingDetails ? '…' : (stats.perfectDays || 0)} color={PALETTE.pink} delay="0.25s" />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0', paddingBottom: '16px' }}>
                         {CARDIO_EXERCISES && CARDIO_EXERCISES.length > 0 && (
                             <>
-                                <div style={{ ...sectionLabelStyle, marginTop: '4px' }}>
-                                    {t('common.cardio')}
-                                </div>
-                                {CARDIO_EXERCISES.map(renderExerciseRow)}
+                                <div style={{ ...sectionLabelStyle, animationDelay: '0.3s' }}>{t('common.cardio')}</div>
+                                {CARDIO_EXERCISES.map((ex, i) => renderExerciseRow(ex, i))}
                             </>
                         )}
 
-                        <div style={sectionLabelStyle}>
-                            {t('common.bodyweight')}
-                        </div>
-                        {EXERCISES.map(renderExerciseRow)}
+                        <div style={{ ...sectionLabelStyle, animationDelay: '0.4s' }}>{t('common.bodyweight')}</div>
+                        {EXERCISES.map((ex, i) => renderExerciseRow(ex, i + (CARDIO_EXERCISES?.length || 0)))}
                         
-                        {canAccessFeature(FEATURES.WEIGHTS, entry) && (
+                        {entry.weightsTotalReps > 0 && (
                             <>
-                                <div style={sectionLabelStyle}>
-                                    {t('common.weights')}
-                                </div>
-                                {WEIGHT_EXERCISES.map(renderExerciseRow)}
+                                <div style={{ ...sectionLabelStyle, animationDelay: '0.5s' }}>{t('common.weights')}</div>
+                                {WEIGHT_EXERCISES.map((ex, i) => renderExerciseRow(ex, i + EXERCISES.length + (CARDIO_EXERCISES?.length || 0)))}
                             </>
                         )}
                     </div>
                 </div>
+                </div>
             </Card>
-        </div>
+        </ModalContainer>
     );
 }
 
 const sectionLabelStyle = {
-    fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)',
-    textTransform: 'uppercase', marginBottom: '4px', marginTop: '16px', letterSpacing: '1px'
+    fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-secondary)',
+    textTransform: 'uppercase', marginBottom: '4px', marginTop: '16px', letterSpacing: '1.5px',
+    animation: 'fadeSlideUp 0.4s ease backwards'
 };
 
-function StatCard({ icon, label, value, color }) {
+function StatCard({ icon, label, value, color, delay }) {
     return (
-        <Card variant="tinted" tint={color} padding="sm" style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '7px'
+        <Card variant="glass" padding="sm" interactive style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.03)',
+            animation: 'fadeSlideUp 0.4s ease backwards',
+            animationDelay: delay,
+            textAlign: 'center'
         }}>
             <div style={{
-                width: '32px', height: '32px', borderRadius: '50%',
-                background: `${color}1f`, border: `1px solid ${color}33`,
-                display: 'grid', placeItems: 'center'
+                width: '28px', height: '28px', borderRadius: '8px',
+                background: `${color}1a`, border: `1px solid ${color}33`,
+                display: 'grid', placeItems: 'center',
+                marginBottom: '2px'
             }}>
                 {icon}
             </div>
             <div style={{ fontSize: '1.4rem', fontWeight: '800', color, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{value}</div>
-            <div style={{ fontSize: '0.56rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-secondary)', textAlign: 'center' }}>{label}</div>
+            <div style={{ fontSize: '0.6rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)', lineHeight: 1.2 }}>{label}</div>
         </Card>
     );
 }
