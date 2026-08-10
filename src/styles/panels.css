@@ -176,16 +176,17 @@ body.exercise-panel-active::before {
   cursor: pointer;
   transition: transform var(--motion-fast) ease, box-shadow var(--motion-fast) ease, border-color var(--motion-fast) ease, background var(--motion-fast) ease;
   text-align: left;
+  white-space: normal;
 }
 
 .btn-conflict svg { width: 24px; height: 24px; flex-shrink: 0; }
-.btn-conflict div { display: flex; flex-direction: column; gap: 4px; }
+.btn-conflict div { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
 .btn-conflict strong { font-size: 15px; font-weight: 600; }
 .btn-conflict span { font-size: 13px; opacity: 0.8; }
 
 .btn-merge {
-  background: linear-gradient(135deg, var(--success), color-mix(in srgb, var(--success) 80%, black));
-  color: white;
+  background: linear-gradient(135deg, var(--success), color-mix(in srgb, var(--success) 80%, black)) !important;
+  color: white !important;
 }
 
 .btn-merge:hover:not(:disabled) {
@@ -325,65 +326,65 @@ body.exercise-panel-active::before {
    Backdrop + card come from the shared .dialog-backdrop / .dialog-card
    pattern (components.css); only the conflict-specific overrides live here. */
 
-.conflict-fullscreen-overlay .conflict-modal {
+.conflict-modal {
   max-width: 500px;
   padding: 40px;
   border: 2px solid color-mix(in srgb, var(--warning) 30%, transparent);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
-.conflict-fullscreen-overlay .conflict-header {
+.conflict-modal .conflict-header {
   gap: 16px;
   margin-bottom: 20px;
 }
 
-.conflict-fullscreen-overlay .conflict-icon {
+.conflict-modal .conflict-icon {
   width: 32px;
   height: 32px;
 }
 
-.conflict-fullscreen-overlay .conflict-header h2 {
+.conflict-modal .conflict-header h2 {
   margin: 0;
   font-size: 24px;
   font-weight: 700;
   color: white;
 }
 
-.conflict-fullscreen-overlay .conflict-message {
+.conflict-modal .conflict-message {
   margin: 0 0 32px;
   font-size: 16px;
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
 }
 
-.conflict-fullscreen-overlay .conflict-actions {
+.conflict-modal .conflict-actions {
   gap: 16px;
 }
 
-.conflict-fullscreen-overlay .btn-conflict {
+.conflict-modal .btn-conflict {
   gap: 20px;
   padding: 20px;
   border-radius: 16px;
 }
 
-.conflict-fullscreen-overlay .btn-conflict svg { width: 28px; height: 28px; }
-.conflict-fullscreen-overlay .btn-conflict div { gap: 6px; }
-.conflict-fullscreen-overlay .btn-conflict strong { font-size: 18px; font-weight: 700; }
-.conflict-fullscreen-overlay .btn-conflict span { font-size: 14px; }
+.conflict-modal .btn-conflict svg { width: 28px; height: 28px; }
+.conflict-modal .btn-conflict div { gap: 6px; }
+.conflict-modal .btn-conflict strong { font-size: 18px; font-weight: 700; }
+.conflict-modal .btn-conflict span { font-size: 14px; }
 
-.conflict-fullscreen-overlay .btn-merge {
+.conflict-modal .btn-merge {
   border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.conflict-fullscreen-overlay .btn-merge:hover:not(:disabled) {
+.conflict-modal .btn-merge:hover:not(:disabled) {
   transform: translateY(-3px);
   box-shadow: 0 12px 32px rgba(16, 185, 129, 0.4);
   border-color: rgba(255, 255, 255, 0.3);
 }
 
 .btn-restore {
-  background: linear-gradient(135deg, var(--color-blue), color-mix(in srgb, var(--color-blue) 80%, black));
-  color: white;
+  background: linear-gradient(135deg, var(--color-blue), color-mix(in srgb, var(--color-blue) 80%, black)) !important;
+  color: white !important;
 }
 
 .btn-restore.confirming {

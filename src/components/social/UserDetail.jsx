@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Medal, Award, Flame, Calendar, TrendingUp, Activity, Dumbbell, Star, X } from '@utils/icons';
+import { Trophy, Medal, Award, Flame, Calendar, Activity, Star, X } from '@utils/icons';
 import { Avatar } from '@components/ui/Avatar';
 import { Card } from '@components/ui/Card';
 import { Button } from '@components/ui';
 import { ModalContainer } from '@components/ui/ModalContainer';
-import { Z_INDEX } from '@utils/zIndex';
 import { DifficultyBadge } from '@components/ui/DifficultyBadge';
 import { StreakFlame } from '@components/ui/StreakFlame';
 import { WeightBadge } from '@components/ui/WeightBadge';
 import { EXERCISES, CARDIO_EXERCISES, isBodyweightExercise, isCardioExercise, isWeightExercise } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { getLocalDateStr } from '@shared/dateUtils';
-import { getTierBadgeConfigs, canAccessFeature, FEATURES } from '@utils/entitlements';
-import { useBackHandler } from '@hooks/useBackHandler';
 import { getIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { cloudSync } from '@services/cloudSync';
 import { useComputedStatsFromStore } from '@hooks/useComputedStatsFromStore';
+import { getTierBadgeConfigs } from '@utils/entitlements';
 import { PALETTE } from '@styles/palette';
 
 export function UserDetail({ entry, rank, isMe, onClose }) {
@@ -87,9 +85,10 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
             <div 
                 key={ex.id} 
                 style={{
+                    padding: '8px 12px', borderRadius: 'var(--radius-md)',
+                    background: `${ex.color}10`, border: `1px solid ${ex.color}20`,
                     display: 'flex', flexDirection: 'column', gap: '6px',
-                    padding: '10px 0',
-                    borderBottom: '1px solid rgba(255,255,255,0.03)',
+                    marginBottom: '6px',
                     animation: 'fadeSlideUp 0.4s ease backwards',
                     animationDelay: `${0.3 + (index * 0.05)}s`
                 }}
@@ -129,7 +128,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                 </div>
                 
                 {/* Clean progress bar */}
-                <div style={{ height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.04)', overflow: 'hidden', marginLeft: '36px' }}>
+                <div style={{ height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.04)', overflow: 'hidden' }}>
                     <div style={{ 
                         height: '100%', borderRadius: '2px', width: `${barWidth}%`, 
                         background: `linear-gradient(90deg, ${ex.color}88, ${ex.color})`, 
@@ -267,15 +266,25 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                                 );
                             })}
                         </div>
-                        <div style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '5px',
-                            padding: '4px 14px', borderRadius: 'var(--radius-full)', marginTop: '8px',
-                            background: rank <= 3 ? `linear-gradient(135deg, ${rankColor}1f, ${rankColor}0a)` : 'rgba(255,255,255,0.04)', 
-                            border: `1px solid ${rank <= 3 ? rankColor + '40' : 'rgba(255,255,255,0.08)'}`,
-                            boxShadow: rank <= 3 ? `0 0 14px -4px ${rankColor}` : 'none'
-                        }}>
-                            {rank <= 3 ? <Medal size={14} color={rankColor} /> : <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: '800' }}>#</span>}
-                            <span style={{ fontSize: '0.82rem', fontWeight: '800', color: rank <= 3 ? rankColor : 'var(--text-primary)' }}>{rank}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '8px' }}>
+                            <div style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '5px',
+                                padding: '4px 14px', borderRadius: 'var(--radius-full)',
+                                background: rank <= 3 ? `linear-gradient(135deg, ${rankColor}1f, ${rankColor}0a)` : 'rgba(255,255,255,0.04)', 
+                                border: `1px solid ${rank <= 3 ? rankColor + '40' : 'rgba(255,255,255,0.08)'}`,
+                                boxShadow: rank <= 3 ? `0 0 14px -4px ${rankColor}` : 'none'
+                            }}>
+                                {rank <= 3 ? <Medal size={14} color={rankColor} /> : <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: '800' }}>#</span>}
+                                <span style={{ fontSize: '0.82rem', fontWeight: '800', color: rank <= 3 ? rankColor : 'var(--text-primary)' }}>{rank}</span>
+                            </div>
+                            
+                            {(stats.currentStreak > 0 || stats.displayStreak > 0) && (
+                                <StreakFlame 
+                                    streak={stats.displayStreak || stats.currentStreak || 0} 
+                                    active={isPerfect} 
+                                    style={{ transform: 'scale(1.15)', transformOrigin: 'left center', margin: '0 4px' }}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -293,7 +302,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                         
                         {/* Primary Highlight Stat */}
                     <div style={{ animation: 'fadeSlideUp 0.4s ease backwards', animationDelay: '0.05s', marginBottom: '12px' }}>
-                        <Card variant="glass" padding="md" interactive style={{
+                        <Card interactive style={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px',
                             background: 'linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01))',
                             border: '1px solid rgba(255,255,255,0.05)',
@@ -379,7 +388,7 @@ const sectionLabelStyle = {
 
 function StatCard({ icon, label, value, color, delay }) {
     return (
-        <Card variant="glass" padding="sm" interactive style={{
+        <Card padding="sm" interactive style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
             background: 'rgba(255,255,255,0.03)',
             border: '1px solid rgba(255,255,255,0.03)',

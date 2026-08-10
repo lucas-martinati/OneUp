@@ -55,91 +55,68 @@ export function ExerciseBreakdown({
                             {catStats.map(ex => {
                                 return (
                                     <div key={ex.id} style={{
-                                        padding: '10px 12px', borderRadius: 'var(--radius-md)',
-                                        background: `${ex.color}10`,
-                                        border: `1px solid ${ex.color}25`
+                                        padding: '8px 12px', borderRadius: 'var(--radius-md)',
+                                        background: `${ex.color}10`, border: `1px solid ${ex.color}20`,
+                                        display: 'flex', flexDirection: 'column', gap: '6px',
+                                        marginBottom: '6px'
                                     }}>
-                                        {/* Top row: icon, label, badges */}
-                                        <div style={{
-                                            display: 'flex', alignItems: 'center',
-                                            gap: '10px', marginBottom: '6px'
-                                        }}>
-                                            <div style={{
-                                                width: '32px', height: '32px', borderRadius: '50%',
-                                                background: `${ex.color}20`, display: 'flex',
-                                                alignItems: 'center', justifyContent: 'center', flexShrink: 0
-                                            }}>
-                                                <DynamicIcon icon={ex.icon} size={16} color={ex.color} />
-                                            </div>
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{
-                                                    display: 'flex', alignItems: 'center',
-                                                    justifyContent: 'space-between'
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
+                                                <div style={{ 
+                                                    width: '28px', height: '28px', borderRadius: '8px', 
+                                                    background: `${ex.color}1a`, border: `1px solid ${ex.color}33`,
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 
                                                 }}>
-                                                    <span style={{
-                                                        fontSize: '0.85rem', fontWeight: '700',
-                                                        color: ex.color
-                                                    }}>{getExerciseLabel(ex, t)}</span>
-                                                    <div style={{
-                                                        display: 'flex', alignItems: 'center', gap: '6px'
-                                                    }}>
-                                                        {ex.maxStreak > 0 && (
-                                                            <span style={{
-                                                                fontSize: '0.6rem', color: '#fbbf24',
-                                                                background: 'rgba(251,191,36,0.1)',
-                                                                padding: '2px 6px', borderRadius: '8px',
-                                                                fontWeight: '600'
-                                                            }}>
-                                                                {t('stats.maxDays', { count: ex.maxStreak })}
-                                                            </span>
-                                                        )}
-                                                        <StreakFlame streak={ex.streak} active={ex.streakActive} />
-                                                    </div>
+                                                    <DynamicIcon icon={ex.icon} size={14} color={ex.color} />
                                                 </div>
-                                                {/* Sub-stats row */}
-                                                <div style={{
-                                                    display: 'flex', alignItems: 'center',
-                                                    gap: '8px', marginTop: '2px'
-                                                }}>
-                                                    {hasCardio && (ex.id === 'running' || ex.id === 'cycling') ? (
-                                                        <>
-                                                            <span className="hint-text">
-                                                                {((cardioSessions.filter(s => s.type === ex.id).reduce((sum, s) => sum + (s.distance || 0), 0)) / 1000).toFixed(1)} {t('cardio.units.km')}
-                                                            </span>
-                                                            <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
-                                                            <span className="hint-text">
-                                                                {t('cardio.sessionsCount', { count: cardioSessions.filter(s => s.type === ex.id).length })}
-                                                            </span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <span className="hint-text">
-                                                                {ex.totalReps.toLocaleString()} {t('common.reps')}
-                                                            </span>
-                                                            <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
-                                                            <span className="hint-text">
-                                                                {ex.daysCompleted}{t('common.daysAbbr')}
-                                                            </span>
-                                                            <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', opacity: 0.5 }}>·</span>
-                                                            <span className="hint-text">
-                                                                {ex.completionRate}%
-                                                            </span>
-                                                        </>
-                                                    )}
+                                                <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                    {getExerciseLabel(ex, t)}
+                                                </span>
+                                                <StreakFlame streak={ex.streak} active={ex.streakActive} />
+                                            </div>
+                                            
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                                                {ex.maxStreak > 0 && (
+                                                    <span style={{
+                                                        fontSize: '0.6rem', color: '#fbbf24',
+                                                        background: 'rgba(251,191,36,0.1)',
+                                                        padding: '2px 6px', borderRadius: '8px',
+                                                        fontWeight: '700'
+                                                    }}>
+                                                        {t('stats.maxDays', { count: ex.maxStreak })}
+                                                    </span>
+                                                )}
+                                                <div style={{ fontSize: '0.95rem', fontWeight: '800', color: ex.color, fontVariantNumeric: 'tabular-nums' }}>
+                                                    {hasCardio && (ex.id === 'running' || ex.id === 'cycling') ? 
+                                                        `${((cardioSessions.filter(s => s.type === ex.id).reduce((sum, s) => sum + (s.distance || 0), 0)) / 1000).toFixed(1)} ${t('cardio.units.km')}`
+                                                        : ex.totalReps.toLocaleString()}
                                                 </div>
                                             </div>
                                         </div>
-                                        {/* Mini progress bar */}
-                                        <div style={{
-                                            height: '3px', borderRadius: '2px',
-                                            background: 'var(--progress-track-thin)', overflow: 'hidden'
-                                        }}>
-                                            <div style={{
-                                                height: '100%', borderRadius: '2px',
-                                                width: `${ex.completionRate}%`,
-                                                background: `linear-gradient(90deg, ${ex.color}, ${ex.color}88)`,
-                                                transition: 'width 0.6s ease'
-                                            }} />
+                                        
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <div style={{ flex: 1, height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
+                                                <div style={{ 
+                                                    height: '100%', borderRadius: '2px', width: `${ex.completionRate}%`, 
+                                                    background: ex.color,
+                                                    boxShadow: `0 0 10px ${ex.color}80`,
+                                                    transition: 'width 0.6s ease'
+                                                }} />
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                {hasCardio && (ex.id === 'running' || ex.id === 'cycling') ? (
+                                                    <span style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-secondary)' }}>
+                                                        {t('cardio.sessionsCount', { count: cardioSessions.filter(s => s.type === ex.id).length })}
+                                                    </span>
+                                                ) : (
+                                                    <span style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-secondary)' }}>
+                                                        {ex.daysCompleted}{t('common.daysAbbr')}
+                                                    </span>
+                                                )}
+                                                <div style={{ fontSize: '0.65rem', fontWeight: '700', color: ex.color, minWidth: '35px', textAlign: 'right' }}>
+                                                    {(ex.completionRate || 0).toFixed(1)}%
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 );

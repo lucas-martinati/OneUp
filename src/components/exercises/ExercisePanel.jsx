@@ -10,6 +10,7 @@ import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { useWakeLock } from '@hooks/useWakeLock';
 import { Z_INDEX } from '@utils/zIndex';
 import { useSettingsStore } from '@store/useSettingsStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
 import { useCameraPushUpCounter } from '@hooks/useCameraPushUpCounter';
 import { ExercisePanelHeader } from './panel/ExercisePanelHeader';
 import { WeightSelector } from './panel/WeightSelector';
@@ -38,6 +39,9 @@ export function ExercisePanel({
     const keepScreenOn = settings?.keepScreenOn ?? true;
     useWakeLock(keepScreenOn);
 
+    const pauseCloudSync = useCloudSyncStore(s => s.pauseCloudSync);
+    const resumeCloudSync = useCloudSyncStore(s => s.resumeCloudSync);
+
     const { t } = useTranslation();
     const { getConfig, updateConfig } = useExerciseConfig();
     const isTimer = exerciseConfig?.type === 'timer';
@@ -54,10 +58,15 @@ export function ExercisePanel({
     const [localWeightStr, setLocalWeightStr] = useState('');
 
     // Pause background animations to save battery when screen is kept on
+    // And pause cloud sync to prevent reps from resetting when ExercisePanel is open
     useEffect(() => {
         document.body.classList.add('exercise-panel-active');
-        return () => document.body.classList.remove('exercise-panel-active');
-    }, []);
+        pauseCloudSync();
+        return () => {
+            document.body.classList.remove('exercise-panel-active');
+            resumeCloudSync();
+        };
+    }, [pauseCloudSync, resumeCloudSync]);
 
     useEffect(() => {
         if (currentWeight !== null) {

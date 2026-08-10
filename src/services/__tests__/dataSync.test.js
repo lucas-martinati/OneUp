@@ -334,7 +334,7 @@ describe('sanitizeForCloud', () => {
     expect(sanitizeForCloud(null)).toBeNull();
   });
 
-  it('strips count from completions, keeps isCompleted/timestamp', () => {
+  it('strips count from completions ONLY when isCompleted is true', () => {
     const data = {
       startDate: '2025-01-01',
       completions: {
@@ -349,7 +349,8 @@ describe('sanitizeForCloud', () => {
       isCompleted: true, timestamp: '2025-01-01T10:00:00Z'
     });
     expect(sanitized.completions['2025-01-01'].pushups.count).toBeUndefined();
-    expect(sanitized.completions['2025-01-01'].squats.count).toBeUndefined();
+    // when isCompleted is false, count should be kept
+    expect(sanitized.completions['2025-01-01'].squats.count).toBe(10);
   });
 
   it('skips null exercise entries', () => {

@@ -25,7 +25,8 @@ export function sanitizeForCloud(data) {
         // rather than an unrecoverable UTC approximation — see @shared/achievementStats.
         ...(Number.isInteger(ex.localHour) ? { localHour: ex.localHour } : {}),
         ...(ex.weight !== undefined ? { weight: ex.weight } : {}),
-        ...(ex.difficulty !== undefined ? { difficulty: ex.difficulty } : {})
+        ...(ex.difficulty !== undefined ? { difficulty: ex.difficulty } : {}),
+        ...(!ex.isCompleted && ex.count !== undefined ? { count: ex.count } : {})
       };
     });
     sanitizedCompletions[dateStr] = sanitizedDay;
@@ -141,8 +142,6 @@ export function mergeData(localData, cloudData) {
           const cloudEx = cloudDay[exId];
           const localEx = merged[exId];
           
-          // Use cloud version if it has a strictly newer timestamp,
-          // or if local has a placeholder and cloud has a real timestamp.
           const localIsPlaceholder = localEx?.timestamp && typeof localEx.timestamp === 'object' && localEx.timestamp['.sv'];
           const cloudIsPlaceholder = cloudEx?.timestamp && typeof cloudEx.timestamp === 'object' && cloudEx.timestamp['.sv'];
           
@@ -154,7 +153,6 @@ export function mergeData(localData, cloudData) {
           const valuesMatch = localEx?.isCompleted === cloudEx?.isCompleted &&
             (localEx?.count === undefined || cloudEx?.count === undefined || localEx?.count === cloudEx?.count);
           const cloudReplacesPlaceholder = localIsPlaceholder && !cloudIsPlaceholder && cloudEx?.timestamp && valuesMatch;
-
           if (!localEx || cloudIsNewer || localHasNoTimestamp || cloudReplacesPlaceholder) {
             merged[exId] = { ...localEx, ...cloudEx };
           }

@@ -25,20 +25,44 @@ async function loadFromStorage(userId) {
   try {
     const key = getStorageKey(userId);
     const { value: saved } = await Preferences.get({ key });
+    const localSaved = localStorage.getItem(key);
     
-    if (!saved) {
-      // 🔄 Seamless migration: if not in Preferences but in localStorage, migrate!
-      const legacySaved = localStorage.getItem(key);
-      if (legacySaved) {
-        logger.info(`Migrating storage to Preferences for ${key}`);
-        await Preferences.set({ key, value: legacySaved });
-        const parsed = JSON.parse(legacySaved);
-        return parseProgressData(parsed) ?? getDefaultState();
+    let prefParsed = null;
+    let localParsed = null;
+
+    if (saved) {
+      try { prefParsed = JSON.parse(saved); } catch { /* ignore */ }
+    }
+    if (localSaved) {
+      try { localParsed = JSON.parse(localSaved); } catch { /* ignore */ }
+    }
+    
+    let bestParsed = null;
+
+    if (prefParsed && localParsed) {
+      const prefTs = prefParsed._localUpdatedTs || 0;
+      const localTs = localParsed._localUpdatedTs || 0;
+      
+      bestParsed = localTs > prefTs ? localParsed : prefParsed;
+      
+      // If local is fresher, sync it back to Preferences
+      if (localTs > prefTs) {
+         Preferences.set({ key, value: localSaved }).catch(() => {});
       }
+    } else {
+      bestParsed = prefParsed || localParsed;
+      if (localParsed && !prefParsed) {
+        logger.info(`Migrating/recovering storage to Preferences for ${key}`);
+        Preferences.set({ key, value: localSaved }).catch(() => {});
+      }
+    }
+
+    if (!bestParsed) {
       return getDefaultState();
     }
-    const parsed = JSON.parse(saved);
-    return parseProgressData(parsed) ?? getDefaultState();
+
+    const validated = parseProgressData(bestParsed);
+    return validated ?? getDefaultState();
   } catch (err) {
     logger.error('Failed to load progress from Preferences:', err);
     return getDefaultState();
@@ -48,7 +72,17 @@ async function loadFromStorage(userId) {
 async function saveToStorage(userId, state) {
   try {
     const key = getStorageKey(userId);
-    await Preferences.set({ key, value: JSON.stringify(state) });
+    // Add a local timestamp to determine which storage is fresher on reload
+    // This is crucial for surviving sudden app kills where async Preferences.set might not finish
+    const stateToSave = { ...state, _localUpdatedTs: Date.now() };
+    const serialized = JSON.stringify(stateToSave);
+    
+    // High-speed synchronous fallback buffer
+    try {
+      localStorage.setItem(key, serialized);
+    } catch { /* ignore */ }
+
+    await Preferences.set({ key, value: serialized });
   } catch (e) {
     logger.error('Failed to persist progress:', e);
     throw e;
@@ -375,6 +409,7 @@ export const useProgressStore = create((set, get) => ({
       const weightChanged = weight !== null && weight !== (current.weight ?? null);
       const difficultyChanged = difficulty !== null && difficulty !== (current.difficulty ?? null);
       const needsCloudSync = completionChanged || countChanged || weightChanged || difficultyChanged;
+      
       return {
         completions: newCompletions,
         ...(needsCloudSync ? { lastCompletionChange: serverTimestamp() } : {}),

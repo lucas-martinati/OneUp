@@ -19,11 +19,12 @@ export function useProgressAutoSave(auth) {
   const conflictData = useCloudSyncStore(s => s.conflictData);
   const conflictCheckDone = useCloudSyncStore(s => s.conflictCheckDone);
   const isInitialSyncDone = useCloudSyncStore(s => s.isInitialSyncDone);
+  const isSyncPaused = useCloudSyncStore(s => s.isSyncPaused);
   const setSyncError = useCloudSyncStore(s => s.setSyncError);
 
   // ── Auto-save to cloud on completion change (debounced) ───────────────
   useEffect(() => {
-    if (auth.isSignedIn && !auth.loading && !conflictData && conflictCheckDone && isInitialSyncDone) {
+    if (auth.isSignedIn && !auth.loading && !conflictData && conflictCheckDone && isInitialSyncDone && !isSyncPaused) {
       const doSave = async () => {
         try {
           await saveToCloud();
@@ -36,12 +37,12 @@ export function useProgressAutoSave(auth) {
       const timer = setTimeout(doSave, 400);
       return () => clearTimeout(timer);
     }
-  }, [lastCompletionChange, auth.isSignedIn, auth.loading, conflictData, conflictCheckDone, isInitialSyncDone, saveToCloud, setSyncError]);
+  }, [lastCompletionChange, auth.isSignedIn, auth.loading, conflictData, conflictCheckDone, isInitialSyncDone, isSyncPaused, saveToCloud, setSyncError]);
 
   // ── Force save on visibility change ────────────────────────────────────
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden' && auth.isSignedIn && isInitialSyncDone) {
+      if (document.visibilityState === 'hidden' && auth.isSignedIn && isInitialSyncDone && !useCloudSyncStore.getState().isSyncPaused) {
         logger.info('App hidden, forcing immediate cloud save...');
         saveToCloud().catch(err => logger.error('Force save failed:', err));
       }

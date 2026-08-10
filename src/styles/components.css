@@ -112,11 +112,6 @@ button:focus:not(:focus-visible) {
   animation: overlayFadeIn 0.2s ease-out;
 }
 
-/* Darker variant for destructive or blocking flows. */
-.dialog-backdrop--heavy {
-  background: var(--overlay-bg-heavy);
-}
-
 .dialog-card {
   width: 100%;
   max-width: 340px;

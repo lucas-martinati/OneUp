@@ -8,9 +8,11 @@ vi.mock('@store/useProgressStore', () => ({
   useProgressStore: vi.fn(),
 }));
 
-vi.mock('@store/useCloudSyncStore', () => ({
-  useCloudSyncStore: vi.fn(),
-}));
+vi.mock('@store/useCloudSyncStore', () => {
+  const mockStore = vi.fn();
+  mockStore.getState = vi.fn(() => ({ isSyncPaused: false }));
+  return { useCloudSyncStore: mockStore };
+});
 
 describe('useProgressAutoSave', () => {
   let saveToCloudMock;
@@ -37,6 +39,7 @@ describe('useProgressAutoSave', () => {
       if (str.includes('conflictCheckDone')) return true;
       if (str.includes('isInitialSyncDone')) return true;
       if (str.includes('setSyncError')) return setSyncErrorMock;
+      if (str.includes('isSyncPaused')) return false;
       return null;
     });
   });
@@ -102,5 +105,22 @@ describe('useProgressAutoSave', () => {
     await vi.runAllTimersAsync();
 
     expect(syncWithCloudMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not save to cloud when sync is paused', async () => {
+    const auth = { isSignedIn: true, loading: false };
+    useCloudSyncStore.mockImplementation((selector) => {
+      const str = selector.toString();
+      if (str.includes('isSyncPaused')) return true;
+      if (str.includes('conflictCheckDone')) return true;
+      if (str.includes('isInitialSyncDone')) return true;
+      return null;
+    });
+    
+    renderHook(() => useProgressAutoSave(auth));
+    vi.advanceTimersByTime(400);
+    await vi.runAllTimersAsync();
+
+    expect(saveToCloudMock).not.toHaveBeenCalled();
   });
 });

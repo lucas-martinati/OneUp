@@ -2,6 +2,7 @@ import { Preferences } from '@capacitor/preferences';
 import { cloudSync } from '@services/cloudSync';
 import { BADGE_DEFINITIONS, getBadgeById } from '@config/badgeDefinitions';
 import { useUIStore } from '@store/useUIStore';
+import { useCloudSyncStore } from '@store/useCloudSyncStore';
 import i18n from '../i18n';
 
 /**
@@ -174,6 +175,23 @@ export function installDebugCommands() {
       localStorage.removeItem(getActiveKey('oneup_settings'));
       console.log('[OneUp Debug] Progress, history and settings cleared. Reload to apply.');
     },
+    
+    /** Show the data merge conflict overlay for styling/debugging */
+    showConflictModal() {
+      useCloudSyncStore.getState().setConflictData({
+        isAnonymousMerge: true,
+        completions: {
+          '2026-08-10': {
+            pushups: { count: 100, isCompleted: true, timestamp: Date.now() },
+            squats: { count: 150, isCompleted: true, timestamp: Date.now() }
+          }
+        },
+        achievements: { first_blood: Date.now() },
+        stats: { pushups: 1000 },
+        startDate: '2026-08-01'
+      });
+      console.log('[OneUp Debug] Conflict modal displayed.');
+    },
 
     /** Reprint the command list with descriptions. */
     help() {
@@ -202,6 +220,7 @@ export function installDebugCommands() {
       ['resetHistory()', 'Clear session history'],
       ['resetSettings()', 'Reset settings'],
       ['resetAll()', 'Clear progress + history + settings'],
+      ['showConflictModal()', 'Show the Guest Data Merge / Conflict modal'],
       ['help()', 'Show this list again'],
     ];
     const pad = Math.max(...lines.map(([c]) => c.length));

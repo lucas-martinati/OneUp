@@ -297,7 +297,7 @@
     "backupBannerSubtitle": "Anmelden, um nichts zu verlieren",
     "backupBannerTitle": "Fortschritt sichern",
     "backupButton": "Sichern",
-    "cannotBeUndone": "Ihre lokalen und Cloud-Daten werden zusammengeführt.",
+    "cannotBeUndone": "Diese Aktion kann nicht rückgängig gemacht werden. Lokale Daten werden überschrieben.",
     "cloudBackup": "Cloud-Backup",
     "connectedGooglePlay": "Verbunden mit Google Play",
     "dataConflict": "Datenkonflikt",
@@ -447,8 +447,7 @@
   "leaderboard": {
     "activeDays": "Aktive Tage",
     "copied": "Kopiert",
-    "copy": "Kopie",
-    "currentStreak": "Aktueller Streak",
+    "copy": "Kopieren",
     "empty": "Noch niemand hier",
     "enableToAppear": "Aktivieren Sie die Anzeige der Bestenliste in den Einstellungen!",
     "inviteCode": "Einladungscode",
