@@ -460,34 +460,29 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   });
 
   // ── Write public profile (detail view payload) ──────────────────────────
-  // Only published for users who are visible on the leaderboard. The derived
-  // stats let UserDetail.jsx render streaks/days WITHOUT reading anyone's
-  // private completions calendar.
-  if (isPublic) {
-    const derived = computeExerciseDerived(completions, userLocalDate, frozenDays, startDate);
-    await db.ref(paths.publicProfile(uid)).set({
-      // Detail-view-only payload. exerciseReps lives in the leaderboard entry
-      // (needed for the list's per-exercise ranking); everything below is only
-      // read when opening a user's detail card.
-      exerciseWeights,
-      exerciseDifficulties: exerciseDifficulties || {},
-      achievements: badgeCount,
-      derivedStats: {
-        currentStreak: derived.currentStreak,
-        maxStreak: badgeStats.maxStreak,
-        totalDays: badgeStats.totalDays,
-        perfectDays: badgeStats.perfectDays,
-        exerciseDays: derived.exerciseDays,
-        exerciseStreaks: derived.exerciseStreaks,
-        exerciseDoneToday: derived.exerciseDoneToday,
-        lastActiveDay,
-      },
-      lastUpdated: admin.database.ServerValue.TIMESTAMP,
-    });
-  } else {
-    // User went private — drop any stale public profile.
-    await db.ref(paths.publicProfile(uid)).remove();
-  }
+  // The derived stats let UserDetail.jsx render streaks/days WITHOUT reading anyone's
+  // private completions calendar. Always published so clan members can view details
+  // even if the user is hidden from the global leaderboard.
+  const derived = computeExerciseDerived(completions, userLocalDate, frozenDays, startDate);
+  await db.ref(paths.publicProfile(uid)).set({
+    // Detail-view-only payload. exerciseReps lives in the leaderboard entry
+    // (needed for the list's per-exercise ranking); everything below is only
+    // read when opening a user's detail card.
+    exerciseWeights,
+    exerciseDifficulties: exerciseDifficulties || {},
+    achievements: badgeCount,
+    derivedStats: {
+      currentStreak: derived.currentStreak,
+      maxStreak: badgeStats.maxStreak,
+      totalDays: badgeStats.totalDays,
+      perfectDays: badgeStats.perfectDays,
+      exerciseDays: derived.exerciseDays,
+      exerciseStreaks: derived.exerciseStreaks,
+      exerciseDoneToday: derived.exerciseDoneToday,
+      lastActiveDay,
+    },
+    lastUpdated: admin.database.ServerValue.TIMESTAMP,
+  });
 
   console.log(`[Leaderboard] Recomputed for ${uid}: ${totalClassicReps + cardioTotalReps} reps, last=${lastActiveDay}, perfect=${isPerfectToday}`);
 }
@@ -962,104 +957,7 @@ const OAUTH_PROXY_CORS = [
 
 
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Google Health API OAuth Token Proxy (web cardio source)
-// ══════════════════════════════════════════════════════════════════════════════
-//
-// The web app reads recorded exercises from the Google Health API. Auth is
-// standard Google OAuth 2.0: the browser gets an authorization code, and these
-// functions exchange/refresh it against Google's token endpoint with the client
-// secret (kept in Cloud Secret Manager via
-// `firebase functions:secrets:set GOOGLE_HEALTH_CLIENT_SECRET`).
-// ══════════════════════════════════════════════════════════════════════════════
 
-const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
-
-const GOOGLE_HEALTH_SECRETS_CONFIG = {
-  secrets: ["GOOGLE_HEALTH_CLIENT_ID", "GOOGLE_HEALTH_CLIENT_SECRET"],
-  cors: OAUTH_PROXY_CORS,
-};
-
-/** POST a form-encoded body to Google's token endpoint and relay the result. */
-async function googleTokenRequest(res, extraParams, context) {
-  try {
-    const body = new URLSearchParams({
-      client_id: process.env.GOOGLE_HEALTH_CLIENT_ID,
-      client_secret: process.env.GOOGLE_HEALTH_CLIENT_SECRET,
-      ...extraParams,
-    });
-
-    const response = await fetch(GOOGLE_TOKEN_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: body.toString(),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error(`[GoogleHealth] ${context} failed:`, data);
-      res.status(response.status).json(data);
-      return;
-    }
-
-    res.status(200).json(data);
-  } catch (error) {
-    console.error(`[GoogleHealth] ${context} error:`, error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-}
-
-/**
- * googleHealthExchangeToken
- * Exchanges an OAuth authorization code for tokens.
- * Client sends: { code: string, redirect_uri: string }
- */
-export const googleHealthExchangeToken = onRequest(GOOGLE_HEALTH_SECRETS_CONFIG, async (req, res) => {
-  if (req.method !== "POST") {
-    res.status(405).send("Method Not Allowed");
-    return;
-  }
-
-  const { code, redirect_uri: redirectUri } = req.body || {};
-  if (!code || typeof code !== "string") {
-    res.status(400).json({ error: "Missing or invalid 'code' parameter" });
-    return;
-  }
-  if (!redirectUri || typeof redirectUri !== "string") {
-    res.status(400).json({ error: "Missing or invalid 'redirect_uri' parameter" });
-    return;
-  }
-
-  await googleTokenRequest(res, {
-    grant_type: "authorization_code",
-    code,
-    redirect_uri: redirectUri,
-  }, "Token exchange");
-});
-
-/**
- * googleHealthRefreshToken
- * Refreshes an expired access token.
- * Client sends: { refresh_token: string }
- */
-export const googleHealthRefreshToken = onRequest(GOOGLE_HEALTH_SECRETS_CONFIG, async (req, res) => {
-  if (req.method !== "POST") {
-    res.status(405).send("Method Not Allowed");
-    return;
-  }
-
-  const { refresh_token: refreshToken } = req.body || {};
-  if (!refreshToken || typeof refreshToken !== "string") {
-    res.status(400).json({ error: "Missing or invalid 'refresh_token' parameter" });
-    return;
-  }
-
-  await googleTokenRequest(res, {
-    grant_type: "refresh_token",
-    refresh_token: refreshToken,
-  }, "Token refresh");
-});
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Scheduled Jobs

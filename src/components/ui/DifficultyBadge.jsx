@@ -1,5 +1,4 @@
 import React from 'react';
-import { MetricBadge } from './MetricBadge';
 
 /**
  * Reusable difficulty badge (red module) to indicate multipliers > 1.0.
@@ -17,10 +16,26 @@ export const DifficultyBadge = ({ difficulty, style = {} }) => {
     const clampedDiff = Math.max(0.1, Math.min(1.0, difficulty));
     const hue = Math.round(((clampedDiff - 0.1) / 0.9) * 55);
     const color = `hsl(${hue}, 85%, 55%)`;
+    const bgColor = `hsla(${hue}, 85%, 55%, 0.12)`;
+    const borderColor = `hsla(${hue}, 85%, 55%, 0.2)`;
 
     return (
-        <MetricBadge color={color} style={{ marginLeft: '4px', ...style }}>
+        <span style={{ 
+            fontSize: 'clamp(0.52rem, 1.2vh, 0.7rem)', 
+            padding: '1px 6px', 
+            borderRadius: 'var(--radius-full)',
+            background: bgColor,
+            border: `1px solid ${borderColor}`,
+            color: color,
+            display: 'inline-flex',
+            alignItems: 'center',
+            verticalAlign: 'middle',
+            whiteSpace: 'nowrap',
+            fontWeight: 700,
+            marginLeft: '4px',
+            ...style 
+        }}>
             x{difficulty.toFixed(1)}
-        </MetricBadge>
+        </span>
     );
 };

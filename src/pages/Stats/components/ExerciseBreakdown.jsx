@@ -3,14 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { DynamicIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { CATEGORIES, isUserCategory } from '@config/categories';
-import { StreakFlame } from '@components/ui';
+import { StreakFlame, WeightBadge, DifficultyBadge } from '@components/ui';
 import { useExercises } from '@contexts/ExercisesContext';
 
 /** Per-exercise breakdown list, grouped by category. */
 export function ExerciseBreakdown({
     enrichedExerciseStats,
     fullCategoryOrder, fullCategoryColors,
-    hasCardio, cardioSessions
+    hasCardio, cardioSessions,
+    settings
 }) {
     const { t } = useTranslation();
     const { customCategoriesMap } = useExercises();
@@ -76,6 +77,14 @@ export function ExerciseBreakdown({
                                             </div>
                                             
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                                                {(() => {
+                                                    const difficulty = settings?.exerciseDifficulties?.[ex.id] || 1.0;
+                                                    if (difficulty === 1.0) return null;
+                                                    return <DifficultyBadge difficulty={difficulty} style={{ margin: 0 }} />;
+                                                })()}
+                                                {ex.categoryId === CATEGORIES.WEIGHTS && (
+                                                    <WeightBadge weight={settings?.exerciseWeights?.[ex.id] || ex.defaultWeight} color={ex.color} />
+                                                )}
                                                 {ex.maxStreak > 0 && (
                                                     <span style={{
                                                         fontSize: '0.6rem', color: '#fbbf24',

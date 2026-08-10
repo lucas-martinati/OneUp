@@ -351,6 +351,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                             fullCategoryOrder={fullCategoryOrder} fullCategoryColors={fullCategoryColors}
                             customCategories={customCategories}
                             hasCardio={hasCardio} cardioSessions={cardioData.allSessions}
+                            settings={settings}
                         />
 
                         {/* ── Session History ──────────────────────────── */}

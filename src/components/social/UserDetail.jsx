@@ -115,12 +115,12 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                        {isWeightEx && <WeightBadge weight={weight} color={ex.color} />}
                         {(() => {
                             const difficulty = details?.exerciseDifficulties?.[ex.id] || 1.0;
                             if (difficulty === 1.0) return null;
                             return <DifficultyBadge difficulty={difficulty} style={{ margin: 0 }} />;
                         })()}
+                        {isWeightEx && <WeightBadge weight={weight} color={ex.color} />}
                         <span style={{ fontSize: '0.9rem', fontWeight: '800', color: ex.color, width: '45px', textAlign: 'right' }}>
                             {reps.toLocaleString()}
                         </span>

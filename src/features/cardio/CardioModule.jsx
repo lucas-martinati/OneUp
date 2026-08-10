@@ -277,7 +277,7 @@ export function CardioModule() {
                     }}
                   >
                     {healthConnected ? <CheckCircle2 size={12} /> : <Activity size={12} />}
-                    {t('cardio.healthConnect')}
+                    Health Connect
                   </Button>
                 </RestrictionSection>
               )}
@@ -423,12 +423,12 @@ export function CardioModule() {
              actionButton = googlePlayButton;
              stepsUI = null;
           } else {
-             title = onGoogleStep ? t('cardio.googleWallTitle') : t('cardio.healthConnect');
+             title = onGoogleStep ? t('cardio.googleWallTitle') : 'Health Connect';
              desc = onGoogleStep ? t('cardio.googleWallDesc') : t('cardio.stravaWallDesc');
              icon = onGoogleStep ? <GoogleIcon size={28} /> : <Activity size={28} color="#34A853" />;
              const steps = [
                { label: t('cardio.googleWallStep1'), color: '#4285F4', done: auth.isSignedIn, active: needsGoogleLogin },
-               { label: t('cardio.healthConnect'), color: '#34A853', done: hasCardioSource, active: needsCardioSource }
+               { label: 'Health Connect', color: '#34A853', done: hasCardioSource, active: needsCardioSource }
              ];
              stepsUI = (
                <Stack style={{ width: '100%', maxWidth: '210px', margin: '2px 0' }}>
@@ -478,7 +478,7 @@ export function CardioModule() {
                      display: 'flex', gap: '8px', alignItems: 'center', letterSpacing: '0.3px',
                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                    }}>
-                     <Activity size={18} /> {t('cardio.healthConnect')}
+                     <Activity size={18} /> Health Connect
                    </Button>
                  )}
                </Stack>

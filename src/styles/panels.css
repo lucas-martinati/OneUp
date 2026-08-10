@@ -124,46 +124,6 @@ body.exercise-panel-active::before {
   white-space: nowrap;
 }
 
-.conflict-dialog {
-  padding: 20px;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 146, 60, 0.1));
-  border-radius: 16px;
-  border: 2px solid rgba(245, 158, 11, 0.3);
-  animation: slideIn 0.3s ease;
-}
-
-.conflict-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.conflict-icon {
-  width: 24px;
-  height: 24px;
-  color: var(--warning);
-}
-
-.conflict-header h4 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.conflict-message {
-  margin: 0 0 20px;
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-.conflict-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
 
 .btn-conflict {
   display: flex;
@@ -187,11 +147,13 @@ body.exercise-panel-active::before {
 .btn-merge {
   background: linear-gradient(135deg, var(--success), color-mix(in srgb, var(--success) 80%, black)) !important;
   color: white !important;
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-merge:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(16, 185, 129, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 
@@ -322,65 +284,7 @@ body.exercise-panel-active::before {
 
 .sync-message svg { width: 18px; height: 18px; }
 
-/* ── ConflictOverlay ──────────────────────────────────────────────────────
-   Backdrop + card come from the shared .dialog-backdrop / .dialog-card
-   pattern (components.css); only the conflict-specific overrides live here. */
 
-.conflict-modal {
-  max-width: 500px;
-  padding: 40px;
-  border: 2px solid color-mix(in srgb, var(--warning) 30%, transparent);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-}
-
-.conflict-modal .conflict-header {
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.conflict-modal .conflict-icon {
-  width: 32px;
-  height: 32px;
-}
-
-.conflict-modal .conflict-header h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-  color: white;
-}
-
-.conflict-modal .conflict-message {
-  margin: 0 0 32px;
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.6;
-}
-
-.conflict-modal .conflict-actions {
-  gap: 16px;
-}
-
-.conflict-modal .btn-conflict {
-  gap: 20px;
-  padding: 20px;
-  border-radius: 16px;
-}
-
-.conflict-modal .btn-conflict svg { width: 28px; height: 28px; }
-.conflict-modal .btn-conflict div { gap: 6px; }
-.conflict-modal .btn-conflict strong { font-size: 18px; font-weight: 700; }
-.conflict-modal .btn-conflict span { font-size: 14px; }
-
-.conflict-modal .btn-merge {
-  border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.conflict-modal .btn-merge:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(16, 185, 129, 0.4);
-  border-color: rgba(255, 255, 255, 0.3);
-}
 
 .btn-restore {
   background: linear-gradient(135deg, var(--color-blue), color-mix(in srgb, var(--color-blue) 80%, black)) !important;

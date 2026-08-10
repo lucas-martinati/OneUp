@@ -61,8 +61,9 @@ function getWeekBoundsStr(dateStr, weekStartDay = 'monday') {
 /**
  * Returns true if ANY exercise is marked done for the given date.
  * Handles single day exercises and weekly cardio window.
+ * @public
  */
-function isDayDone(completions, dateStr, weekStartDay = 'monday') {
+export function isDayDone(completions, dateStr, weekStartDay = 'monday') {
   const dayData = completions?.[dateStr];
   if (dayData && typeof dayData === 'object' && Object.values(dayData).some(e => e?.isCompleted)) {
     return true;

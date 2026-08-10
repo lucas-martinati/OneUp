@@ -226,7 +226,6 @@
   "cardio": {
     "avgSpeed": "Durchschnittliche Geschwindigkeit",
     "connectTitle": "Vernetzte Dienste",
-    "healthConnect": "Google Health",
     "difficultyMismatchDesc": "Der Schwierigkeitsgrad hat sich geändert ({{saved}}x → {{current}}x). Möchten Sie mit dieser neuen Einstellung fortfahren?",
     "difficultyModified": "Schwierigkeitsgrad geändert",
     "distance": "Distanz",

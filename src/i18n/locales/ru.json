@@ -226,7 +226,6 @@
   "cardio": {
     "avgSpeed": "Ср. скорость",
     "connectTitle": "Подключенные сервисы",
-    "healthConnect": "Google Health",
     "difficultyMismatchDesc": "Сложность изменилась ({{saved}}x → {{current}}x). Хотите продолжить с новыми настройками?",
     "difficultyModified": "Сложность изменена",
     "distance": "Расстояние",

@@ -226,7 +226,6 @@
   "cardio": {
     "avgSpeed": "평균 속도",
     "connectTitle": "연결된 서비스",
-    "healthConnect": "Google Health",
     "difficultyMismatchDesc": "난이도가 변경되었습니다({{saved}}x → {{current}}x). 이 새로운 설정을 계속하시겠습니까?",
     "difficultyModified": "난이도가 수정되었습니다.",
     "distance": "거리",
