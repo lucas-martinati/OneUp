@@ -73,7 +73,7 @@ export function ModalShell({
             style={{
               padding: `var(--space-6) var(--space-6) 0`,
               display: 'flex',
-              alignItems: 'flex-start',
+              alignItems: 'center',
               gap: 'var(--space-3)',
               justifyContent: (!title && !subtitle && !showX) ? 'center' : 'flex-start',
             }}

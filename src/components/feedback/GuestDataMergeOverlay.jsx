@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Cloud, AlertCircle, Upload, AlertTriangle } from '@utils/icons';
-import { Button, ModalContainer } from '@components/ui';
+import { Button, ModalShell } from '@components/ui';
 
 /**
  * Full-screen overlay for anonymous (guest) data merge.
@@ -27,23 +27,15 @@ export function GuestDataMergeOverlay({ conflictData, onResolveConflict }) {
   };
 
   return (
-    <ModalContainer
+    <ModalShell
       open={true}
-      position="center"
-      background="var(--overlay-bg-heavy)"
-      closeOnBackdrop={false}
-      closeOnEscape={false}
-      unstyled
-    >
-      <div className="conflict-modal dialog-card">
-        <div className="conflict-header">
-          <AlertCircle className="conflict-icon" />
-          <h2 className="panel-title">{t('cloud.anonymousMergeTitle')}</h2>
-        </div>
-        <p className="conflict-message">
-          {t('cloud.anonymousMergeDesc')}
-        </p>
-        <div className="conflict-actions">
+      title={t('cloud.anonymousMergeTitle')}
+      icon={AlertCircle}
+      showCloseButton={false}
+      size="md"
+      footerLayout="column"
+      footer={
+        <>
           <Button
             variant="ghost"
             className="btn-conflict btn-merge"
@@ -75,8 +67,12 @@ export function GuestDataMergeOverlay({ conflictData, onResolveConflict }) {
               <span>{confirmRestore ? t('cloud.cannotBeUndone') : t('cloud.restoreDesc')}</span>
             </div>
           </Button>
-        </div>
-      </div>
-    </ModalContainer>
+        </>
+      }
+    >
+      <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+        {t('cloud.anonymousMergeDesc')}
+      </p>
+    </ModalShell>
   );
 }
