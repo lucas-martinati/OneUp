@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, Edit2, Check, ChevronRight, Settings2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS, GripVertical } from '@utils/icons';
+import { Plus, Trash2, Edit2, Check, ChevronRight, Settings2, Star, Dumbbell, Activity, CUSTOM_EXERCISE_ICONS } from '@utils/icons';
 import { Button, Input, ModalHeader, ConfirmDialog, ColorPicker, Slider, SegmentedControl, Stack, ListActionRow, ModalContainer } from '@components/ui';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { DynamicIcon } from '@utils/icons';
@@ -373,28 +373,21 @@ function CategoryManagerView({ customCategoriesHook, exercisesByUserCategory, de
                     <ListActionRow
                       key={cat.id}
                       isDraggable={!isBuiltIn}
-                      isDragging={isDragging}
-                      onDragStart={(e) => handleDragStart(e, index)}
-                      onDragOver={(e) => handleDragOver(e, index)}
-                      onDragEnd={handleDragEnd}
-                      onTouchStart={() => handleTouchStart(index)}
-                      onTouchMove={handleTouchMove}
-                      onTouchEnd={handleTouchEnd}
+                      dragProps={{
+                        onDragStart: (e) => handleDragStart(e, index),
+                        onDragOver: (e) => handleDragOver(e, index),
+                        onDragEnd: handleDragEnd
+                      }}
+                      dragHandleProps={{
+                        onTouchStart: () => handleTouchStart(index),
+                        onTouchMove: handleTouchMove,
+                        onTouchEnd: handleTouchEnd
+                      }}
                       renderActions={() => !isBuiltIn && (
                         <>
                           <Button iconOnly icon={Edit2} onClick={(e) => { e.stopPropagation(); setEditingId(cat.id); setName(cat.name); setColor(cat.color || '#8b5cf6'); setError(''); setView('create'); }} variant="ghost" size="sm" aria-label={t('common.edit')} />
                           <Button iconOnly icon={Trash2} onClick={(e) => { e.stopPropagation(); initiateCategoryDelete(cat); }} variant="danger-ghost" size="sm" aria-label={t('common.delete')} />
                         </>
-                      )}
-                      renderLeftIcon={() => !isBuiltIn && (
-                        <div className="drag-handle" style={{
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: 'var(--text-tertiary)', padding: 'var(--space-2)',
-                          margin: '0 calc(-1 * var(--space-2))', cursor: 'grab',
-                          opacity: isDragging ? 0 : 1
-                        }}>
-                          <GripVertical size={16} />
-                        </div>
                       )}
                       style={{
                         padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-lg)',
