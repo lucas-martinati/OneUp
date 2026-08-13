@@ -37,7 +37,8 @@ export function SharePanel({
 }) {
   const [showShare, setShowShare] = useState(false);
   const { t } = useTranslation();
-  const { isPro } = useSubscription();
+  const { isPro, hadPro } = useSubscription();
+  const hasProAccess = isPro || hadPro;
   const completions = useProgressStore(s => s.completions);
   const getDayNumber = useProgressStore(s => s.getDayNumber);
   const settings = useSettingsStore(s => s.settings);
@@ -61,7 +62,7 @@ export function SharePanel({
       sessionHistory: getSessionHistory(),
       mode,
       initialCategories: mappedCategories,
-      isPro,
+      isPro: hasProAccess,
   });
 
   const { setOption } = shareHook;
@@ -111,7 +112,7 @@ export function SharePanel({
           <ShareModal
             shareHook={shareHook}
             onClose={() => setShowShare(false)}
-            isPro={isPro}
+            isPro={hasProAccess}
             mode={mode}
             completions={completions}
             getDayNumber={getDayNumber}
