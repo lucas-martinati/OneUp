@@ -232,13 +232,20 @@ describe('syncUtils', () => {
         expect(result.streakFreezes.lastRefill).toBe('2026-02');
       });
 
-      it('picks lower count if refill date is the same', () => {
-        const local = { completions: {}, streakFreezes: { count: 2, lastRefill: '2026-01' } };
-        const cloud = { completions: {}, streakFreezes: { count: 1, lastRefill: '2026-01' } };
+      it('picks the cloud inventory when refill date is the same (server-authoritative)', () => {
+        const local = { completions: {}, streakFreezes: { count: 1, lastRefill: '2026-01' } };
+        const cloud = { completions: {}, streakFreezes: { count: 2, lastRefill: '2026-01' } };
         const result = mergeData(local, cloud);
-        expect(result.streakFreezes.count).toBe(1);
+        expect(result.streakFreezes.count).toBe(2);
       });
-      
+
+      it('keeps the local inventory when its refill is strictly newer', () => {
+        const local = { completions: {}, streakFreezes: { count: 1, lastRefill: '2026-02' } };
+        const cloud = { completions: {}, streakFreezes: { count: 5, lastRefill: '2026-01' } };
+        const result = mergeData(local, cloud);
+        expect(result.streakFreezes).toEqual({ count: 1, lastRefill: '2026-02' });
+      });
+
       it('handles undefined counts gracefully when tied on refill', () => {
         const local = { completions: {}, streakFreezes: { count: undefined, lastRefill: '2026-01' } };
         const cloud = { completions: {}, streakFreezes: { count: undefined, lastRefill: '2026-01' } };

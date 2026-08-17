@@ -574,11 +574,22 @@ export const useProgressStore = create((set, get) => ({
     set((state) => {
       const cloudJSON = JSON.stringify(validated.completions);
       const localJSON = JSON.stringify(state.completions);
-      
+
       const nextSessions = { ...(state.cardio?.sessions || {}), ...(validated.cardio?.sessions || {}) };
       const cardioChanged = JSON.stringify(state.cardio?.sessions) !== JSON.stringify(nextSessions);
-      
-      if (cloudJSON === localJSON && !cardioChanged) return state;
+
+      // The freeze inventory / frozen days / notes are owned server-side (the
+      // client never writes them), so a cloud change on those fields must be
+      // applied even when the completions are untouched.
+      const serverFieldsChanged =
+        JSON.stringify(validated.streakFreezes ?? null) !== JSON.stringify(state.streakFreezes ?? null) ||
+        JSON.stringify(validated.frozenDays ?? null) !== JSON.stringify(state.frozenDays ?? null) ||
+        JSON.stringify(validated.notes ?? null) !== JSON.stringify(state.notes ?? null) ||
+        validated.startDate !== state.startDate ||
+        validated.userStartDate !== state.userStartDate ||
+        validated.isSetup !== state.isSetup;
+
+      if (cloudJSON === localJSON && !cardioChanged && !serverFieldsChanged) return state;
 
       logger.info('[Real-time sync] Incoming cloud update applied');
       const merged = cloudSync.mergeData(state, validated);

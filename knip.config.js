@@ -5,6 +5,7 @@ const config = {
     "firebase/functions/shared/badgeRules.js",
     "firebase/functions/shared/exerciseRules.js",
     "firebase/functions/shared/dbSchema.js",
+    "firebase/functions/grant-admin-role.mjs", // one-off admin bootstrap script (invoked manually)
     "src/components/index.js",
     "src/components/*/index.js",
     "src/services/*Service.js",

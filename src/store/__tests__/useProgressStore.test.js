@@ -555,6 +555,36 @@ describe('applyRealtimeUpdate', () => {
     expect(useProgressStore.getState().completions).toBe(before);
   });
 
+  it('applies server-owned field changes even when completions are identical', () => {
+    const completions = { '2026-01-01': {} };
+    useProgressStore.setState({
+      completions,
+      startDate: '2026-01-01',
+      userStartDate: '2026-01-01',
+      isSetup: true,
+      frozenDays: {},
+      streakFreezes: { count: 0, lastRefill: null },
+      notes: {},
+      cardio: { sessions: {} },
+    });
+    useProgressStore.getState().applyRealtimeUpdate({
+      completions,
+      startDate: '2026-01-01',
+      userStartDate: '2026-01-01',
+      isSetup: true,
+      // Server-side only changes (admin edit / hourly reconcile): must not be dropped
+      frozenDays: { '2026-01-02': true },
+      streakFreezes: { count: 3, lastRefill: '2026-08' },
+      notes: { '2026-01-01': 'bonjour' },
+      cardio: { sessions: {} },
+    });
+    const s = useProgressStore.getState();
+    expect(s.streakFreezes).toEqual({ count: 3, lastRefill: '2026-08' });
+    expect(s.frozenDays['2026-01-02']).toBe(true);
+    expect(s.notes['2026-01-01']).toBe('bonjour');
+    expect(cloudSync.mergeData).toHaveBeenCalled();
+  });
+
   it('merges genuinely new cloud data', () => {
     useProgressStore.setState({
       completions: { '2026-01-01': {} },

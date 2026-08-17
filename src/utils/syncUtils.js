@@ -74,27 +74,30 @@ function reattachLocalCounts(cloudCompletions, localCompletions) {
 
 /**
  * Merge two streak-freeze states. Frozen days are UNIONed (a freeze-protected
- * day must never be lost on either side); the inventory keeps the side with the
- * most recent monthly refill, and the lower count when refills tie (conservative
- * against double-spending across devices).
+ * day must never be lost on either side).
+ *
+ * The inventory is SERVER-AUTHORITATIVE: clients cannot write streakFreezes /
+ * frozenDays (database rules block them; sanitizeForCloud strips them), the
+ * hourly autoReconcileStreakFreezes function is their only writer. So the cloud
+ * value wins except when the LOCAL refill is strictly newer (the server hasn't
+ * reconciled that month yet). This also lets admin edits made directly in the
+ * database propagate to every open page.
  */
 function mergeStreakFreeze(localData, cloudData) {
   const frozenDays = { ...(cloudData.frozenDays || {}), ...(localData.frozenDays || {}) };
   const localInv = localData.streakFreezes;
   const cloudInv = cloudData.streakFreezes;
+  const normalize = inv => ({
+    lastRefill: inv?.lastRefill || null,
+    count: Number.isFinite(inv?.count) ? inv.count : 0,
+  });
+
   let streakFreezes;
-  if (!localInv) streakFreezes = cloudInv;
-  else if (!cloudInv) streakFreezes = localInv;
-  else if ((localInv.lastRefill || '') === (cloudInv.lastRefill || '')) {
-    // Same refill month → take the lower count. Trade-off: if a user spends
-    // freezes on two devices in one month (e.g. 2 on mobile, 1 on web), the
-    // merge keeps min(0,1)=0 — slightly over-conservative (it can "lose" a
-    // freeze) but it can never DOUBLE-SPEND, which matters more than recovering
-    // the odd freeze in a rare offline-on-two-devices race.
-    streakFreezes = { lastRefill: localInv.lastRefill, count: Math.min(localInv.count ?? 0, cloudInv.count ?? 0) };
-  } else {
-    streakFreezes = (localInv.lastRefill || '') > (cloudInv.lastRefill || '') ? localInv : cloudInv;
-  }
+  if (!cloudInv) streakFreezes = normalize(localInv);
+  else if (!localInv) streakFreezes = normalize(cloudInv);
+  else streakFreezes = (localInv.lastRefill || '') > (cloudInv.lastRefill || '')
+    ? normalize(localInv)
+    : normalize(cloudInv);
   return { frozenDays, streakFreezes };
 }
 
