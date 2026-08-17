@@ -201,17 +201,24 @@ export const DashboardHeader = React.memo(({
                             variant="ghost"
                             onClick={() => openModal('admin')}
                             aria-label="Admin Panel"
-                            
+                            title={t('admin.title', { defaultValue: 'Admin Panel' })}
                             style={{
                                 ...BADGE_BASE,
-                                gap: 0,
+                                width: 'auto',
+                                aspectRatio: '1 / 1',
+                                padding: 0,
+                                alignSelf: 'stretch',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: '10px',
+                                flexShrink: 0,
                                 background: 'linear-gradient(135deg, rgba(239,68,68,0.22), rgba(220,38,38,0.22))',
                                 border: '1px solid rgba(239,68,68,0.3)',
                                 boxShadow: '0 2px 8px rgba(239,68,68,0.15)'
                             }}
                         >
                             <Shield size={16} color="#ef4444" />
-                            <span aria-hidden="true">{'\u200b'}</span>
                         </Button>
                     )}
 
