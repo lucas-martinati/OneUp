@@ -201,7 +201,7 @@ export const DashboardHeader = React.memo(({
                             variant="ghost"
                             onClick={() => openModal('admin')}
                             aria-label="Admin Panel"
-                            title={t('admin.title', { defaultValue: 'Admin Panel' })}
+                            title="Admin Panel"
                             style={{
                                 ...BADGE_BASE,
                                 width: 'auto',
