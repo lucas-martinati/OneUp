@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { cloudSync } from '@services/cloudSync';
 import { createLogger } from '@utils/logger';
@@ -9,6 +9,9 @@ const logger = createLogger('GoogleAuth');
 
 // Client ID for Google OAuth (from environment variable)
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+// Stable no-op: auth state is managed by the onAuthStateChanged listener.
+const noopRefresh = () => {};
 
 export function useGoogleAuth() {
   const [authState, setAuthState] = useState({
@@ -177,7 +180,7 @@ export function useGoogleAuth() {
   }, []);
 
   // Native sign-in using Capacitor
-  const signInNative = async () => {
+  const signInNative = useCallback(async () => {
     try {
       setAuthState(prev => ({ ...prev, loading: true, error: null }));
 
@@ -198,10 +201,10 @@ export function useGoogleAuth() {
       }));
       throw error;
     }
-  };
+  }, []);
 
   // Unified sign-in function
-  const signIn = async () => {
+  const signIn = useCallback(async () => {
     setAuthState(prev => ({ ...prev, loading: true, error: null }));
 
     // Boot Firebase before authenticating (no-op if already initialized).
@@ -223,9 +226,9 @@ export function useGoogleAuth() {
         }));
       }
     }
-  };
+  }, [isNative, signInNative, webSignInHandler]);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       setAuthState(prev => ({ ...prev, loading: true, error: null }));
 
@@ -256,17 +259,19 @@ export function useGoogleAuth() {
       }));
       throw error;
     }
-  };
+  }, [isNative]);
 
-  const updateSyncStatus = (status) => {
+  const updateSyncStatus = useCallback((status) => {
     setAuthState(prev => ({ ...prev, syncStatus: status }));
-  };
+  }, []);
 
-  return {
+  // Stable return: only recomputed when the auth state actually changes, so
+  // AuthContext consumers don't re-render on unrelated re-renders.
+  return useMemo(() => ({
     ...authState,
     signIn,
     signOut,
-    refresh: () => {}, // Auth state is now managed by onAuthStateChanged listener
+    refresh: noopRefresh,
     updateSyncStatus
-  };
+  }), [authState, signIn, signOut, updateSyncStatus]);
 }

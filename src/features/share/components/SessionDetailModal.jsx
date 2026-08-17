@@ -49,9 +49,11 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   const handleNameSave = async (newName) => {
     const previousName = name;
     setName(newName);
-    onNameChange?.(session.id, newName);
     try {
       await updateSessionName(session.id, newName);
+      // Propagate to the parent only after the cloud write succeeded, so the
+      // parent's list stays consistent with the rollback on failure.
+      onNameChange?.(session.id, newName);
     } catch (err) {
       console.error('Failed to save session name', err);
       // Revert the optimistic UI update on failure

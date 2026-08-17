@@ -68,6 +68,10 @@ describe('ComputedStatsSynchronizer', () => {
 describe('ErrorBoundary', () => {
   const Boom = () => { throw new Error('kaboom'); };
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('renders children when there is no error', () => {
     const { getByText } = render(<ErrorBoundary><span>ok</span></ErrorBoundary>);
     expect(getByText('ok')).toBeTruthy();
@@ -84,7 +88,6 @@ describe('ErrorBoundary', () => {
       expect.any(Error),
       expect.anything()
     );
-    console.error.mockRestore();
   });
 
   it('recovers via the Try Again button', () => {
@@ -100,7 +103,6 @@ describe('ErrorBoundary', () => {
     fireEvent.click(getByText('Try Again'));
     rerender(<ErrorBoundary><Flaky /></ErrorBoundary>);
     expect(getByText('recovered')).toBeTruthy();
-    console.error.mockRestore();
   });
 });
 

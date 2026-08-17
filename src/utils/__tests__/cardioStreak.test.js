@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { evaluateCardioWeek } from '../cardioStreak';
+import { evaluateCardioWeek, computeCardioCurrentStreak, computeCardioMaxStreak } from '../cardioStreak';
 import { getWeekBounds, getLocalDateStr } from '@shared/dateUtils';
 
 // Bornes de la semaine courante (weekOffset = 0) — calculées dynamiquement
@@ -10,6 +10,11 @@ const inWeek = start + DAY_MS; // mardi 00:00, toujours dans [start, end]
 
 // challengeStartDate = aujourd'hui ⇒ getCurrentWeekNumber renvoie 1.
 const today = getLocalDateStr(new Date());
+
+// Challenges lancés dans le passé (pour évaluer plusieurs semaines ≥ 1) :
+// 14 jours ⇒ semaine courante 3 ; 28 jours ⇒ semaine courante 5.
+const start2W = getLocalDateStr(new Date(Date.now() - 14 * DAY_MS));
+const start4W = getLocalDateStr(new Date(Date.now() - 28 * DAY_MS));
 
 // Objectif running semaine 1 = 450 m (WEEKLY_INCREMENT.running) × difficulté 1
 // ⇒ 0.45 km. Marge d'arrondi : 0.01 km (10 m).
@@ -100,5 +105,63 @@ describe('evaluateCardioWeek', () => {
     // 'swimming' absent de WEEKLY_INCREMENT ⇒ objectif 0 ⇒ atteint sans distance.
     const { achieved } = evaluateCardioWeek([], 'swimming', 0, today, 1);
     expect(achieved).toBe(true);
+  });
+});
+
+describe('computeCardioCurrentStreak', () => {
+  it('renvoie 0 sans sessions', () => {
+    expect(computeCardioCurrentStreak([], 'running', today, 1)).toBe(0);
+  });
+
+  it('compte les semaines consécutives atteintes', () => {
+    // Semaine courante + précédente atteintes.
+    const sessions = [runSession(5000, inWeek), runSession(5000, inWeek - 7 * DAY_MS)];
+    expect(computeCardioCurrentStreak(sessions, 'running', start2W, 1)).toBe(2);
+  });
+
+  it('ne casse pas la série sur la semaine courante incomplète', () => {
+    // Semaine courante non atteinte (aucune session), mais la précédente l’est.
+    const sessions = [runSession(5000, inWeek - 7 * DAY_MS)];
+    expect(computeCardioCurrentStreak(sessions, 'running', start2W, 1)).toBe(1);
+  });
+
+  it('rompt la série sur une semaine manquée antérieure', () => {
+    // Semaine -2 atteinte, semaine -1 manquée → la série s’arrête.
+    const sessions = [runSession(5000, inWeek - 14 * DAY_MS)];
+    expect(computeCardioCurrentStreak(sessions, 'running', start2W, 1)).toBe(0);
+  });
+
+  it('ignore les semaines antérieures au début du défi (weekNum < 1)', () => {
+    // Avec un challenge lancé il y a 14 jours (semaine courante = 3), une
+    // session datant de 3 semaines (weekNum = 0) ne doit pas prolonger la série.
+    const sessions = [runSession(5000, inWeek - 21 * DAY_MS)];
+    expect(computeCardioCurrentStreak(sessions, 'running', start2W, 1)).toBe(0);
+  });
+
+  it('ignore les sessions d’un autre mode', () => {
+    const sessions = [{ type: 'cycling', distance: 5000, startTime: inWeek }];
+    expect(computeCardioCurrentStreak(sessions, 'running', start2W, 1)).toBe(0);
+  });
+});
+
+describe('computeCardioMaxStreak', () => {
+  it('renvoie 0 sans sessions', () => {
+    expect(computeCardioMaxStreak([], 'running', today, 1)).toBe(0);
+  });
+
+  it('trouve la plus longue série au-delà d’une semaine manquée', () => {
+    // Semaines 0 et 1 atteintes (série de 2), semaine 2 manquée (reset),
+    // semaine 3 atteinte seule → max = 2.
+    const sessions = [
+      runSession(5000, inWeek),
+      runSession(5000, inWeek - 7 * DAY_MS),
+      runSession(5000, inWeek - 21 * DAY_MS),
+    ];
+    expect(computeCardioMaxStreak(sessions, 'running', start4W, 1)).toBe(2);
+  });
+
+  it('ignore les semaines antérieures au début du défi', () => {
+    const sessions = [runSession(5000, inWeek - 21 * DAY_MS)];
+    expect(computeCardioMaxStreak(sessions, 'running', start2W, 1)).toBe(0);
   });
 });

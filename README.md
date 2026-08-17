@@ -137,6 +137,8 @@ firebase/
 - **backfillUserProfiles** — Admin utility for profile data recovery
 - **grantAdminRole** — Bootstraps the `{ admin: true }` custom claim for the account whose UID matches the `ADMIN_UID` secret (the admin UID never appears in the database rules or client code; rules gate admin access on `auth.token.admin === true`)
 
+> **Bootstrap admin (ordre impératif) :** 1) `npm run secrets:set` (configure `ADMIN_UID`), 2) `npm run deploy:functions`, 3) sign in with the admin account and call `grantAdminRole` once (e.g. `httpsCallable` from the browser console — only the account matching `ADMIN_UID` is allowed), 4) **refresh the ID token** with `getIdToken(true)` (custom claims only appear on fresh tokens; otherwise ~1h wait), 5) `npm run deploy:database` to publish the new rules. Do NOT deploy the rules before the claim is granted — the hardcoded UID is removed from the rules, so admin writes would be denied.
+
 ### 🗄️ Database Schema
 Firebase RTDB structure is defined and documented in `firebase/functions/shared/dbSchema.js` with a dedicated path builder (`paths`) used by both client and server — no hardcoded path strings.
 

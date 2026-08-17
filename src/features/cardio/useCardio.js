@@ -8,33 +8,7 @@ import { useSettingsStore } from '@store/useSettingsStore';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '@shared/dateUtils';
 import { getWeeklyGoalKm, CARDIO_REPS_PER_KM } from '@config/exercises';
-import { evaluateCardioWeek } from '@utils/cardioStreak';
-
-/**
- * Compute the cardio streak: number of consecutive weeks (ending at current)
- * where the weekly goal was met. The day that "counts" for the streak is the
- * day the user reached or exceeded the weekly goal.
- */
-function computeStreak(sessions, mode, challengeStartDate, currentDifficulty, completions = {}, weekStartDay = 'monday') {
-  if (!sessions.length) return 0;
-
-  let streak = 0;
-
-  // Walk backwards week by week
-  for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
-    const { weekNum, achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions, weekStartDay);
-    if (weekNum < 1) break;
-
-    if (achieved) {
-      streak++;
-    } else if (weekOffset > 0) {
-      // Current week can be incomplete, skip it for break detection
-      break;
-    }
-  }
-
-  return streak;
-}
+import { computeCardioCurrentStreak } from '@utils/cardioStreak';
 
 /**
  * Hook providing cardio data and computations.
@@ -305,7 +279,7 @@ export function useCardio() {
 
   // Streak
   const streak = useMemo(
-    () => computeStreak(sessions, activeMode, startDate, activeMode === 'running' ? runningMultiplier : cyclingMultiplier, completions, weekStartDay),
+    () => computeCardioCurrentStreak(sessions, activeMode, startDate, activeMode === 'running' ? runningMultiplier : cyclingMultiplier, completions, weekStartDay),
     [sessions, activeMode, startDate, runningMultiplier, cyclingMultiplier, completions, weekStartDay]
   );
 

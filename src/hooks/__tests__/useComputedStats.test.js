@@ -32,7 +32,9 @@ vi.mock('@utils/cardioStreak', () => ({
     // Return true for week 0 and 2, false for others to break the streak and hit the else branches
     if (weekOffset === 0 || weekOffset === 2) return { achieved: true };
     return { achieved: false };
-  })
+  }),
+  computeCardioCurrentStreak: vi.fn(() => 3),
+  computeCardioMaxStreak: vi.fn(() => 5)
 }));
 
 vi.mock('@config/weights', () => ({

@@ -7,7 +7,7 @@ import { useCloudSyncStore } from '@store/useCloudSyncStore';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { loadCardioSessions, saveCardioSession } from '@services/cardioService';
 import { getAllActivities } from '@services/cardioProviders';
-import { evaluateCardioWeek } from '@utils/cardioStreak';
+import { evaluateCardioWeek, computeCardioCurrentStreak } from '@utils/cardioStreak';
 import { getWeekBounds } from '@shared/dateUtils';
 
 vi.mock('@contexts/AuthContext');
@@ -20,7 +20,8 @@ vi.mock('@services/cardioService', () => ({
     getSortedCardioSessions: vi.fn((s) => s || [])
 }));
 vi.mock('@utils/cardioStreak', () => ({
-    evaluateCardioWeek: vi.fn(() => ({ weekNum: 1, achieved: true }))
+    evaluateCardioWeek: vi.fn(() => ({ weekNum: 1, achieved: true })),
+    computeCardioCurrentStreak: vi.fn(() => 3)
 }));
 vi.mock('@services/cardioProviders', () => ({
     getAllActivities: vi.fn()
@@ -259,16 +260,12 @@ describe('useCardio', () => {
     });
 
     it('breaks streak computation properly', () => {
-        // Provide at least one session so it doesn't return 0 early
+        // Provide at least one session so the hook's memo doesn't short-circuit
         mockProgress.cardio = { sessions: [{ id: '1' }] };
-        
-        // weekOffset 0: achieved false (does not break)
-        // weekOffset 1: achieved false (BREAKS)
-        evaluateCardioWeek.mockImplementation((sessions, mode, weekOffset) => {
-            if (weekOffset === 0) return { weekNum: 1, achieved: false };
-            if (weekOffset === 1) return { weekNum: 1, achieved: false };
-            return { weekNum: 0, achieved: false };
-        });
+
+        // The streak walk is delegated to the shared computeCardioCurrentStreak
+        // (unit-tested in cardioStreak.test.js): a missed week yields 0.
+        computeCardioCurrentStreak.mockReturnValue(0);
 
         const { result } = renderHook(() => useCardio());
         expect(result.current.streak).toBe(0);

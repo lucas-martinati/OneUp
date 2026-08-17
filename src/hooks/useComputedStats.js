@@ -1,6 +1,6 @@
 import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions, walkStreak, parseLocalDate } from '@shared/dateUtils';
 import { EXERCISES, getDailyGoal, getWeeklyGoalKm, CARDIO_REPS_PER_KM } from '@config/exercises';
-import { evaluateCardioWeek } from '@utils/cardioStreak';
+import { computeCardioCurrentStreak, computeCardioMaxStreak } from '@utils/cardioStreak';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '@config/badgeDefinitions';
 import { computeAchievementStats } from '@shared/achievementStats.js';
@@ -284,49 +284,16 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         return false;
     }
 
-    // Streaks cardio : on casse la boucle dès que weekNum < 1 (semaines
-    // antérieures au début du challenge), cohérent avec useCardio.js.
-    function computeCardioMaxStreak(sessions, mode, challengeStartDate, currentDifficulty, completions) {
-        if (!sessions.length) return 0;
-        let maxStreak = 0;
-        let streak = 0;
-        for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
-            const { weekNum, achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions, weekStartDay);
-            if (weekNum < 1) break;
-            if (achieved) {
-                streak++;
-                if (streak > maxStreak) maxStreak = streak;
-            } else if (weekOffset > 0) {
-                // Semaine manquée : on remet à zéro mais on continue pour trouver d'anciens streaks.
-                streak = 0;
-            }
-        }
-        return maxStreak;
-    }
-
-    function computeCardioCurrentStreak(sessions, mode, challengeStartDate, currentDifficulty, completions) {
-        if (!sessions.length) return 0;
-        let streak = 0;
-        for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
-            const { weekNum, achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions, weekStartDay);
-            if (weekNum < 1) break;
-            if (achieved) {
-                streak++;
-            } else if (weekOffset > 0) {
-                break;
-            }
-        }
-        return streak;
-    }
-
+    // Streaks cardio : calculs mutualisés avec useCardio (les semaines
+    // antérieures au début du challenge sont ignorées, weekNum < 1).
     for (const ex of allExercises) {
         if (ex.id === 'running' || ex.id === 'cycling') {
             const cardioSessions = cardioReps?.allSessions || [];
             const userStartDate = userStartDateStr || firstActiveDate || sortedDates[0] || todayStr;
             const currentDifficulty = settings?.exerciseDifficulties?.[ex.id] ?? 1.0;
             
-            exerciseCurrentStreaks[ex.id] = computeCardioCurrentStreak(cardioSessions, ex.id, userStartDate, currentDifficulty, completions);
-            exerciseMaxStreaks[ex.id] = computeCardioMaxStreak(cardioSessions, ex.id, userStartDate, currentDifficulty, completions);
+            exerciseCurrentStreaks[ex.id] = computeCardioCurrentStreak(cardioSessions, ex.id, userStartDate, currentDifficulty, completions, weekStartDay);
+            exerciseMaxStreaks[ex.id] = computeCardioMaxStreak(cardioSessions, ex.id, userStartDate, currentDifficulty, completions, weekStartDay);
             exerciseDoneToday[ex.id] = isDayDoneFromCompletions(completions, todayStr) && !!getWeeklyCompletion(completions, ex.id, today);
         } else {
             exerciseCurrentStreaks[ex.id] = calculateExerciseStreak(completions, todayStr, ex.id);

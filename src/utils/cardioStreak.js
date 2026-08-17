@@ -40,3 +40,51 @@ export function evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDat
 
   return { weekNum, achieved: weekDistanceKm >= goalKm - 0.01 }; // petite marge d'arrondi
 }
+
+/**
+ * Streak cardio actuel : nombre de semaines consécutives (en terminant par la
+ * semaine en cours) où l'objectif hebdomadaire a été atteint. La semaine en
+ * cours peut être incomplète : elle ne casse pas la série si non atteinte.
+ * Mutualisé entre useCardio et useComputedStats pour rester strictement
+ * cohérent (et notamment ignorer les semaines antérieures au début du défi).
+ */
+export function computeCardioCurrentStreak(sessions, mode, challengeStartDate, currentDifficulty, completions = {}, weekStartDay = 'monday') {
+  if (!sessions.length) return 0;
+
+  let streak = 0;
+  for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
+    const { weekNum, achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions, weekStartDay);
+    if (weekNum < 1) break;
+    if (achieved) {
+      streak++;
+    } else if (weekOffset > 0) {
+      // Semaine manquée : la série s'arrête.
+      break;
+    }
+  }
+  return streak;
+}
+
+/**
+ * Streak cardio maximal : plus longue série de semaines consécutives atteintes
+ * (en remettant à zéro à chaque semaine manquée, tout en continuant à
+ * parcourir l'historique complet).
+ */
+export function computeCardioMaxStreak(sessions, mode, challengeStartDate, currentDifficulty, completions = {}, weekStartDay = 'monday') {
+  if (!sessions.length) return 0;
+
+  let maxStreak = 0;
+  let streak = 0;
+  for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
+    const { weekNum, achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions, weekStartDay);
+    if (weekNum < 1) break;
+    if (achieved) {
+      streak++;
+      if (streak > maxStreak) maxStreak = streak;
+    } else if (weekOffset > 0) {
+      // Semaine manquée : on remet à zéro mais on continue pour trouver d'anciens streaks.
+      streak = 0;
+    }
+  }
+  return maxStreak;
+}
