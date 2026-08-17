@@ -222,6 +222,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
             open={true}
             onClose={onClose}
             maxWidth="680px"
+            ambientGlow
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}

@@ -3,6 +3,21 @@ import { createPortal } from 'react-dom';
 import { useHaptics } from '@hooks/useHaptics';
 import { useBackHandler } from '@hooks/useBackHandler';
 
+function getAmbientGlowColor(ambientGlow) {
+  if (!ambientGlow) return undefined;
+  if (typeof ambientGlow !== 'string') {
+    return 'color-mix(in srgb, var(--accent-glow) 16%, transparent)';
+  }
+  if (
+    ambientGlow.startsWith('color-mix') ||
+    ambientGlow.startsWith('rgba') ||
+    ambientGlow.startsWith('hsla')
+  ) {
+    return ambientGlow;
+  }
+  return `color-mix(in srgb, ${ambientGlow} 18%, transparent)`;
+}
+
 /**
  * Composant ModalContainer unifié.
  * - Gère le backdrop (flou, clic pour fermer, escape).
@@ -23,6 +38,7 @@ export function ModalContainer({
   // 'fullscreen' utilise modal-overlay (prend toute la page), 'center' utilise dialog-backdrop (centré)
   position = 'fullscreen', 
   background, // Optionnel, s'applique à l'overlay ou au backdrop
+  ambientGlow, // Optionnel: true | 'accent' | 'gold' | 'amber' | 'cyan' | 'blue' | 'success' | 'danger' | string couleur
   unstyled = false, // Permet de désactiver la carte pour les modales existantes complexes (ex: GradientModal)
   contentClassName = '', // Custom class pour le div .modal-content interne
   contentStyle = {}, // Custom style pour le div .modal-content interne
@@ -75,6 +91,8 @@ export function ModalContainer({
   if (!open) return null;
 
   const baseClass = position === 'center' ? 'dialog-backdrop' : 'modal-overlay';
+  const glowColor = getAmbientGlowColor(ambientGlow);
+  const glowStyle = glowColor ? { '--modal-glow-color': glowColor } : undefined;
 
   return createPortal(
     <div
@@ -90,6 +108,13 @@ export function ModalContainer({
         ...style
       }}
     >
+      {ambientGlow && (
+        <div
+          className="modal-ambient-glow"
+          style={glowStyle}
+          aria-hidden="true"
+        />
+      )}
       {unstyled ? (
         children
       ) : (

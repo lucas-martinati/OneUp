@@ -6,6 +6,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 import { ConfirmDialog } from '../ConfirmDialog';
+import { ModalContainer } from '../ModalContainer';
 import { GuestDataMergeOverlay } from '../../feedback/GuestDataMergeOverlay';
 
 afterEach(cleanup);
@@ -104,3 +105,51 @@ describe('GuestDataMergeOverlay', () => {
     expect(onResolve).toHaveBeenCalledWith('restore');
   });
 });
+
+// ── ModalContainer ────────────────────────────────────────────────────────────
+
+describe('ModalContainer ambientGlow', () => {
+  it('renders no glow by default', () => {
+    render(<ModalContainer open={true}><div>Content</div></ModalContainer>);
+    expect(document.body.querySelector('.modal-ambient-glow')).toBe(null);
+  });
+
+  it('renders accent glow when ambientGlow={true}', () => {
+    render(<ModalContainer open={true} ambientGlow><div>Content</div></ModalContainer>);
+    const glow = document.body.querySelector('.modal-ambient-glow');
+    expect(glow).not.toBe(null);
+    expect(glow.style.getPropertyValue('--modal-glow-color')).toBe('color-mix(in srgb, var(--accent-glow) 16%, transparent)');
+  });
+
+  it('renders dynamic red glow when ambientGlow="var(--error)"', () => {
+    render(<ModalContainer open={true} ambientGlow="var(--error)"><div>Content</div></ModalContainer>);
+    const glow = document.body.querySelector('.modal-ambient-glow');
+    expect(glow).not.toBe(null);
+    expect(glow.style.getPropertyValue('--modal-glow-color')).toBe('color-mix(in srgb, var(--error) 18%, transparent)');
+  });
+
+  it('renders dynamic amber glow when ambientGlow="var(--color-amber)"', () => {
+    render(<ModalContainer open={true} ambientGlow="var(--color-amber)"><div>Content</div></ModalContainer>);
+    const glow = document.body.querySelector('.modal-ambient-glow');
+    expect(glow).not.toBe(null);
+    expect(glow.style.getPropertyValue('--modal-glow-color')).toBe('color-mix(in srgb, var(--color-amber) 18%, transparent)');
+  });
+
+  it('renders raw color string when already using rgba or color-mix', () => {
+    render(<ModalContainer open={true} ambientGlow="rgba(255, 0, 0, 0.2)"><div>Content</div></ModalContainer>);
+    const glow = document.body.querySelector('.modal-ambient-glow');
+    expect(glow).not.toBe(null);
+    expect(glow.style.getPropertyValue('--modal-glow-color')).toBe('rgba(255, 0, 0, 0.2)');
+  });
+
+  it('updates --modal-glow-color style seamlessly when ambientGlow color changes', () => {
+    const { rerender } = render(<ModalContainer open={true} ambientGlow="var(--color-amber)"><div>Content</div></ModalContainer>);
+    const glow = document.body.querySelector('.modal-ambient-glow');
+    expect(glow).not.toBe(null);
+    expect(glow.style.getPropertyValue('--modal-glow-color')).toBe('color-mix(in srgb, var(--color-amber) 18%, transparent)');
+
+    rerender(<ModalContainer open={true} ambientGlow="var(--color-violet)"><div>Content</div></ModalContainer>);
+    expect(glow.style.getPropertyValue('--modal-glow-color')).toBe('color-mix(in srgb, var(--color-violet) 18%, transparent)');
+  });
+});
+

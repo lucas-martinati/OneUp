@@ -44,6 +44,8 @@ button:focus:not(:focus-visible) {
 }
 
 .modal-overlay .modal-content {
+  position: relative;
+  z-index: 1;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -54,6 +56,26 @@ button:focus:not(:focus-visible) {
   max-width: var(--panel-max-width, 640px);
   margin: 0 auto;
   padding: 0 var(--space-4);
+}
+
+/* ── Modal Ambient Glow (Top Halo) ──────────────────────────────────── */
+@property --modal-glow-color {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+.modal-ambient-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 50% at 50% -8%,
+    var(--modal-glow-color, color-mix(in srgb, var(--accent-glow) 16%, transparent)) 0%, transparent 60%);
+  opacity: 0.85;
+  transition:
+    --modal-glow-color var(--motion-panel, 400ms) cubic-bezier(0.16, 1, 0.3, 1),
+    opacity var(--motion-fast, 200ms) ease;
 }
 
 .modal-overlay.fade-in {

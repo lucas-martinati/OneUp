@@ -45,7 +45,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
     }, showStore);
 
     return (
-        <ModalContainer open={true} onClose={onClose}>
+        <ModalContainer open={true} onClose={onClose} ambientGlow>
                 {/* ── Header ──────────────────────────────────────────────── */}
                 <ModalHeader
                     title={showStore ? t('store.title') : t('settings.title')}

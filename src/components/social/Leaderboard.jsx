@@ -185,7 +185,12 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     const restEntries = sorted.slice(podiumCount);
 
     return (
-        <ModalContainer open={true} onClose={onClose} contentClassName={styles.shell} {...swipeHandlers}>
+        <ModalContainer
+            open={true}
+            onClose={onClose}
+            ambientGlow={communityContext === 'global' ? (activeTabConfig?.color || 'var(--color-amber)') : 'var(--color-violet)'}
+            {...swipeHandlers}
+        >
                 {/* Header with Switch */}
             <div className={`${styles.header} ${styles.rise} ${styles.rise1}`}>
                 <div className={styles.headerLeft}>

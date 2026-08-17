@@ -213,7 +213,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
 
   return createPortal(
     <>
-      <ModalContainer open={true} onClose={onClose}>
+      <ModalContainer open={true} onClose={onClose} ambientGlow="var(--color-cyan)">
           <ModalHeader
             title={t('cardio.history')}
             onClose={onClose}

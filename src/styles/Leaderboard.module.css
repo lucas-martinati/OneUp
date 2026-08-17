@@ -4,25 +4,6 @@
    then clean, harmonious rows. Medal colours are universal; the rest follows
    the app accent tokens so it adapts to every theme. Entrance-only motion.
    ─────────────────────────────────────────────────────────────────────── */
-
-.shell {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-  position: relative;
-  isolation: isolate;
-}
-.shell::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: radial-gradient(120% 45% at 50% -6%,
-    rgba(251, 191, 36, 0.10) 0%, transparent 60%);
-  opacity: 0.8;
-}
-
 /* ── Header ──────────────────────────────────────────────────────────── */
 .header {
   display: flex;

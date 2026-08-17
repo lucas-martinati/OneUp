@@ -256,7 +256,7 @@ export function Achievements({ /* completions, exercises, settings, getDayNumber
     const C = 2 * Math.PI * R;
 
     return (
-        <ModalContainer open={true} onClose={onClose}>
+        <ModalContainer open={true} onClose={onClose} ambientGlow="var(--color-amber)">
 
                 {/* ── Header ─────────────────────────────────────────────── */}
                 <ModalHeader title={t('common.achievements')} onClose={onClose} showBack onBack={onClose} />

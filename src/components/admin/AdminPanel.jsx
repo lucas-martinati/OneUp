@@ -38,7 +38,7 @@ export function AdminPanel({ onClose }) {
 
 
   return (
-    <ModalContainer open={true} onClose={onClose} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+    <ModalContainer open={true} onClose={onClose} ambientGlow="var(--error)" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         {/* Header */}
         <ModalHeader
           title={selectedUid ? 'Modifier Utilisateur' : "Panel d'Administration"}

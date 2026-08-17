@@ -222,7 +222,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
 
     return (
         <>
-        <ModalContainer open={true} onClose={onClose} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <ModalContainer open={true} onClose={onClose} ambientGlow onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
                 {/* ── Header ──────────────────────────────────────────────── */}
                 <ModalHeader title={t('stats.title')} onClose={onClose} actions={achievementsButton} />
 
