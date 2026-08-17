@@ -20,7 +20,7 @@ export function useSwipe({
   durationLimit = 300,
 }) {
   const effectiveMinDistance = threshold !== undefined ? threshold : minDistance;
-  const touchStartRef = useRef({ x: 0, y: 0, time: 0 });
+  const touchStartRef = useRef(null);
   const touchEndRef = useRef(null);
 
   const onTouchStart = useCallback((e) => {
@@ -51,6 +51,10 @@ export function useSwipe({
     const endTouch = e?.changedTouches?.[0];
     const endX = endTouch?.clientX ?? touchEndRef.current?.x;
     const endY = endTouch?.clientY ?? touchEndRef.current?.y;
+
+    // Reset touch state for next gesture
+    touchStartRef.current = null;
+    touchEndRef.current = null;
 
     if (endX === undefined || endX === null) return;
 
