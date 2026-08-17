@@ -272,7 +272,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                     ))}
 
                     {days.map((date, i) => {
-                        if (!date) return <div key={`pad-${i}`} className={styles.pad} />;
+                        if (!date) return <div key={`pad-${i}-${year}-${month}`} className={styles.pad} />;
 
                         const dateString = getLocalDateStr(date);
                         const isFuture = dateString > todayStr;
@@ -339,9 +339,10 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
 
                         return (
                             <button
-                                key={i}
+                                key={dateString}
                                 type="button"
                                 className={cls.join(' ')}
+                                style={{ animationDelay: `${i * 10}ms` }}
                                 disabled={isMuted}
                                 aria-pressed={isSelected}
                                 aria-label={`${date.getDate()} ${monthNames[month]}`}
@@ -363,10 +364,10 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                                             ) : null
                                         ))}
                                         {isMissed && (
-                                            <X size={dotPx + 6} color="#ef4444" strokeWidth={3} style={{ filter: 'drop-shadow(0 0 3px rgba(239,68,68,0.5))' }} />
+                                            <X className={styles.missedIcon} size={dotPx + 6} color="#ef4444" strokeWidth={3} />
                                         )}
                                         {isFrozen && (
-                                            <Snowflake size={dotPx + 6} color="#38bdf8" strokeWidth={2.5} style={{ filter: 'drop-shadow(0 0 3px rgba(56,189,248,0.55))' }} />
+                                            <Snowflake className={styles.frozenIcon} size={dotPx + 6} color="#38bdf8" strokeWidth={2.5} />
                                         )}
                                     </span>
                                 )}
