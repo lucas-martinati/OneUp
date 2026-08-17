@@ -5,38 +5,6 @@
    driven by the app accent tokens so it follows every theme. Decorative
    layers are entrance-only (no continuous animation) to stay light.
    ─────────────────────────────────────────────────────────────────────── */
-
-.shell {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  min-height: 100%;
-}
-
-/* Desktop: the shared panel column widens (components.css), but a month
-   grid with ~120px day cells looks bloated — keep the calendar itself at
-   a readable width. */
-@media (min-width: 768px) {
-  .shell {
-    --panel-max-width: 680px;
-  }
-}
-
-/* Soft accent pool behind the whole panel for depth. */
-.shell::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(120% 50% at 50% -8%,
-      color-mix(in srgb, var(--accent-glow) 16%, transparent) 0%, transparent 60%);
-  opacity: 0.7;
-}
-
 /* ── Month navigation (hero) ─────────────────────────────────────────── */
 .monthNav {
   display: flex;

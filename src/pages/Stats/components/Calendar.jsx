@@ -218,12 +218,17 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
     const weekdayLabels = Array.isArray(rawWeekdayLabels) ? rawWeekdayLabels : t('calendar.weekdays', { returnObjects: true });
 
     return (
-        <ModalContainer open={true} onClose={onClose} showScrollbar={false} contentClassName={styles.shell} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd} contentStyle={{ touchAction: 'pan-y', overflowX: 'hidden' }}>
+        <ModalContainer
+            open={true}
+            onClose={onClose}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+        >
                 {/* Top bar */}
                 <ModalHeader 
                     title={t('dashboard.calendar')} 
                     onClose={onClose} 
-                    className={`${styles.rise} ${styles.rise1}`}
                 />
 
                 {/* Month navigation — the hero */}
