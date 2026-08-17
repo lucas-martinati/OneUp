@@ -200,6 +200,7 @@ export const useSettingsStore = create((set) => ({
     const key = getStorageKey(userId);
     Preferences.get({ key })
       .then(({ value: prefSaved }) => {
+        if (useSettingsStore.getState()._userId !== userId) return;
         if (prefSaved) {
           try {
             const prefParsed = cleanSettings(JSON.parse(prefSaved));
