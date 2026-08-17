@@ -221,6 +221,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
         <ModalContainer
             open={true}
             onClose={onClose}
+            maxWidth="680px"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
