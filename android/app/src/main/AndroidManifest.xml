@@ -93,6 +93,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <!-- Health Connect (Google Health) — cardio sync without OAuth.
          OneUp only reads completed workouts (exercise sessions), their distance
