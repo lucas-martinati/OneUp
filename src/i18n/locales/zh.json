@@ -679,7 +679,8 @@
     "theme.ocean": "海洋",
     "theme.purple": "紫色",
     "theme.sunset": "日落",
-    "uploadGallery": "相册"
+    "uploadGallery": "相册",
+    "error": "分享失败，请重试。"
   },
   "stats": {
     "basedOnManual_one": "基于{{count}}个手动记录的天数",

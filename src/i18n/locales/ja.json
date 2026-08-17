@@ -679,7 +679,8 @@
     "theme.ocean": "海",
     "theme.purple": "紫",
     "theme.sunset": "日没",
-    "uploadGallery": "ギャラリー"
+    "uploadGallery": "ギャラリー",
+    "error": "共有に失敗しました。もう一度お試しください。"
   },
   "stats": {
     "basedOnManual_one": "{{count}} 手動日に基づく",

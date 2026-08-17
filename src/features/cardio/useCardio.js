@@ -133,8 +133,9 @@ export function useCardio() {
       all.sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
       setSessions(all);
     } catch (err) {
+      // Keep the previously loaded sessions on a transient error instead of
+      // wiping the whole list (and the store) to empty.
       console.error('Failed to load cardio sessions', err);
-      setSessions([]);
     } finally {
       setLoading(false);
     }
@@ -198,7 +199,7 @@ export function useCardio() {
   // an infinite loop (this effect calls updateExerciseCount which modifies completions).
   // We read completions via completionsRef instead.
   useEffect(() => {
-    if (!isReady || !sessions.length || !updateExerciseCount) return;
+    if (!isReady || !updateExerciseCount) return;
 
     // Group sessions by week to validate the goal only once per week
     const sessionsByWeek = {};
@@ -208,6 +209,8 @@ export function useCardio() {
       if (!sessionsByWeek[start]) sessionsByWeek[start] = [];
       sessionsByWeek[start].push(s);
     });
+
+    const coveredWeekStarts = new Set(Object.keys(sessionsByWeek));
 
     Object.keys(sessionsByWeek).forEach(weekStart => {
       const weekSessions = sessionsByWeek[weekStart];
@@ -236,6 +239,21 @@ export function useCardio() {
         // Unmark if distance dropped below goal (session deleted or difficulty increased)
         updateExerciseCount(existingComp.dateStr, activeMode, 0, 1, null, goalDifficulty);
       }
+    });
+
+    // Unmark stale completions: weeks that no longer have any qualifying
+    // session in the current list (e.g. after deleting the last session of a
+    // week, the completion would otherwise stay "done" forever). Read the
+    // live completions via the ref (the effect intentionally doesn't depend
+    // on `completions`).
+    Object.entries(completionsRef.current).forEach(([dateStr, day]) => {
+      const comp = day?.[activeMode];
+      if (!comp?.isCompleted) return;
+      const { start } = getWeekBounds(new Date(dateStr), weekStartDay);
+      if (coveredWeekStarts.has(String(start))) return;
+      // Never touch pre-challenge weeks
+      if (getCurrentWeekNumber(startDate, dateStr) < 1) return;
+      updateExerciseCount(dateStr, activeMode, 0, 1, null, comp.difficulty || 1);
     });
   }, [sessions, updateExerciseCount, activeMode, startDate, runningMultiplier, cyclingMultiplier, getWeeklyCompletion, isReady, weekStartDay]);
 

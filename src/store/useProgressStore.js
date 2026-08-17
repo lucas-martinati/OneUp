@@ -7,6 +7,7 @@ import { getLocalDateStr, parseLocalDate, isDayDoneFromCompletions } from '@shar
 import { STORAGE_KEY_BASE, getDefaultState, parseProgressData, validateProgressData } from '@hooks/useProgressStorage';
 import { cloudSync } from '@services/cloudSync';
 import { reconcileStreakFreezeState } from '@shared/streakFreeze';
+import { mergeData } from '@utils/syncUtils';
 
 const logger = createLogger('ProgressStore');
 
@@ -140,6 +141,7 @@ export const useProgressStore = create((set, get) => ({
   _userId: null,
   _achievementsLoaded: false,
   _isSaving: false,
+  _saveChain: Promise.resolve(),
   _initRequestId: null,
 
   // ── Initialisation ───────────────────────────────────────────────────
@@ -189,7 +191,9 @@ export const useProgressStore = create((set, get) => ({
       cloudSync.loadAchievementsFromCloud(userId).then(cloudAch => {
         if (get()._initRequestId !== requestId) return;
 
-        const finalAch = { ...(cloudAch || {}) };
+        // Union merge: local keys win over the cloud snapshot so offline
+        // unlocks are never wiped by a stale cloud read.
+        const finalAch = { ...(cloudAch || {}), ...(get().achievements || {}) };
         let changed = false;
 
         if (finalAch.first_share === undefined) { finalAch.first_share = false; changed = true; }
@@ -705,28 +709,35 @@ export const useProgressStore = create((set, get) => ({
   // ── Cloud save/load/sync (delegates to cloudSync service) ───────────
 
   saveToCloud: async () => {
-    const state = get();
-    if (state._isSaving) return { success: false, error: 'Save in progress' };
-    set({ _isSaving: true });
-    try {
-      await cloudSync.saveToCloud({
-        startDate: state.startDate,
-        userStartDate: state.userStartDate,
-        completions: state.completions,
-        isSetup: state.isSetup,
-        lastCompletionChange: state.lastCompletionChange,
-        cardio: state.cardio,
-        frozenDays: state.frozenDays,
-        streakFreezes: state.streakFreezes,
-        notes: state.notes,
-      });
-      return { success: true };
-    } catch (error) {
-      logger.error('Failed to save to cloud:', error);
-      return { success: false, error: error.message };
-    } finally {
-      set({ _isSaving: false });
-    }
+    const run = async () => {
+      set({ _isSaving: true });
+      try {
+        const state = get();
+        await cloudSync.saveToCloud({
+          startDate: state.startDate,
+          userStartDate: state.userStartDate,
+          completions: state.completions,
+          isSetup: state.isSetup,
+          lastCompletionChange: state.lastCompletionChange,
+          cardio: state.cardio,
+          frozenDays: state.frozenDays,
+          streakFreezes: state.streakFreezes,
+          notes: state.notes,
+        });
+        return { success: true };
+      } catch (error) {
+        logger.error('Failed to save to cloud:', error);
+        return { success: false, error: error.message };
+      } finally {
+        set({ _isSaving: false });
+      }
+    };
+    // Serialize saves on a chain so a concurrent saveToCloud never drops an
+    // update (the old _isSaving skip lost writes) and snapshots stay current.
+    const prev = get()._saveChain || Promise.resolve();
+    const next = prev.then(run, run);
+    set({ _saveChain: next });
+    return next;
   },
 
   loadFromCloud: async () => {
@@ -745,8 +756,10 @@ export const useProgressStore = create((set, get) => ({
 
   syncWithCloud: async () => {
     try {
+      if (get()._saveChain) await get()._saveChain;
+      const cloudData = await cloudSync.loadFromCloud();
       const state = get();
-      const mergedData = await cloudSync.syncData({
+      const mergedData = mergeData({
         startDate: state.startDate,
         userStartDate: state.userStartDate,
         completions: state.completions,
@@ -756,9 +769,12 @@ export const useProgressStore = create((set, get) => ({
         frozenDays: state.frozenDays,
         streakFreezes: state.streakFreezes,
         notes: state.notes,
-      });
+      }, cloudData);
       if (mergedData) {
+        // Apply first so saveToCloud persists the merged result through the
+        // serialized save chain (it snapshots state at execution time).
         get().applySyncedData(mergedData);
+        await get().saveToCloud();
       }
       return { success: true, data: mergedData };
     } catch (error) {

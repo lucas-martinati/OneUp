@@ -77,4 +77,19 @@ describe('useCloudAutoSave', () => {
         vi.advanceTimersByTime(1);
         expect(saveFn).toHaveBeenCalledTimes(1);
     });
+
+    it('swallows a rejected save so the timer callback never rejects', async () => {
+        const rejectionHandler = vi.fn();
+        window.addEventListener('unhandledrejection', rejectionHandler);
+        const saveFn = vi.fn(() => Promise.reject(new Error('boom')));
+
+        renderHook(() => useCloudAutoSave(true, { foo: 'bar' }, saveFn));
+
+        vi.advanceTimersByTime(1000);
+        await Promise.resolve(); // let the rejection propagate to the handler
+
+        expect(saveFn).toHaveBeenCalledTimes(1);
+        expect(rejectionHandler).not.toHaveBeenCalled();
+        window.removeEventListener('unhandledrejection', rejectionHandler);
+    });
 });

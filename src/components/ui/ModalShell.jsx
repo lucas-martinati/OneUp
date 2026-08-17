@@ -18,6 +18,8 @@ import { X } from '@utils/icons';
  * @param {'default'|'danger'} [variant='default']
  * @param {'row'|'column'} [footerLayout='row']
  * @param {boolean} [showCloseButton] — defaults to true when onClose is provided
+ * @param {boolean} [closeOnBackdrop=true] — forwarded to ModalContainer
+ * @param {boolean} [closeOnEscape=true] — forwarded to ModalContainer
  */
 const MAX_WIDTH = { sm: '340px', md: '440px', lg: '540px' };
 
@@ -33,6 +35,8 @@ export function ModalShell({
   footer,
   footerLayout = 'row',
   ariaLabel = 'Dialog',
+  closeOnBackdrop = true,
+  closeOnEscape = true,
   children,
   className = '',
   style,
@@ -65,7 +69,7 @@ export function ModalShell({
   const accentTint = variant === 'danger' ? 'var(--error)' : 'var(--accent-glow)';
 
   return (
-    <ModalContainer open={open} onClose={onClose} ariaLabel={ariaLabel} position="center" unstyled>
+    <ModalContainer open={open} onClose={onClose} ariaLabel={ariaLabel} position="center" unstyled closeOnBackdrop={closeOnBackdrop} closeOnEscape={closeOnEscape}>
       <div className={className || undefined} style={cardStyle}>
         {/* ── Header ── */}
         {(title || Icon || showX) && (

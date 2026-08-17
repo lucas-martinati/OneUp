@@ -102,9 +102,14 @@ export function useStreakFreeze() {
 
     // Streak freezes are exclusive to signed-in users: guests never earn or hold
     // them. Once the store is loaded, wipe any local inventory while signed out
-    // (e.g. left over after a sign-out) so the badge disappears for guests.
+    // (e.g. left over after a sign-out) so the badge disappears for guests. The
+    // baseline is reset too, so a sign-out followed by a different sign-in does
+    // not fire a spurious toast for the previous user's frozen days.
     useEffect(() => {
-        if (isStoreInitialized && !auth.isSignedIn) clearStreakFreezes();
+        if (isStoreInitialized && !auth.isSignedIn) {
+            clearStreakFreezes();
+            prevFrozenDaysRef.current = null;
+        }
     }, [isStoreInitialized, auth.isSignedIn, clearStreakFreezes]);
 
     // Gate: signed in, store loaded, challenge set up, subscription resolved, and
@@ -116,22 +121,19 @@ export function useStreakFreeze() {
     useEffect(() => {
         if (!ready) return;
 
-        if (reconcileStreakFreezes) {
-            reconcileStreakFreezes(isPro);
-        }
+        // Reconcile first and read the frozen dates it actually produced: the
+        // first run only captures the baseline (no toast — e.g. after a fresh
+        // sign-in), while later runs toast whatever the reconciliation froze.
+        const froze = reconcileStreakFreezes ? (reconcileStreakFreezes(isPro) || []) : [];
 
         if (prevFrozenDaysRef.current === null) {
-            prevFrozenDaysRef.current = frozenDays;
+            prevFrozenDaysRef.current = { ...frozenDays };
             return;
         }
 
-        const newKeys = Object.keys(frozenDays || {});
-        const oldKeys = Object.keys(prevFrozenDaysRef.current || {});
-        const addedCount = newKeys.filter(k => !oldKeys.includes(k)).length;
-
-        if (addedCount > 0) {
+        if (froze.length > 0) {
             setTimeout(() => {
-                setToast({ count: addedCount, seq: Date.now() });
+                setToast({ count: froze.length, seq: Date.now() });
             }, 0);
         }
 

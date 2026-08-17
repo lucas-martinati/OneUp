@@ -56,4 +56,36 @@ describe('useDashboardSelection', () => {
     act(() => result.current.handleSelectExercise(EXERCISES[1].id));
     expect(result.current.classicSelected).toBe(EXERCISES[1].id);
   });
+
+  it('moves off the placeholder once custom exercises load asynchronously', () => {
+    let currentExercises = [];
+    let currentMap = {};
+    const { result, rerender } = renderHook(() =>
+      useDashboardSelection('custom', currentExercises, currentMap, exercisesByUserCategory)
+    );
+
+    // While loading, the placeholder is selected.
+    expect(result.current.customSelected).toBe('custom_placeholder');
+
+    // Exercises arrive → the effect re-points the selection at the first one.
+    act(() => {
+      currentExercises = customExercises;
+      currentMap = customExercisesMap;
+      rerender();
+    });
+    expect(result.current.customSelected).toBe('cust1');
+    expect(result.current.selectedExercise.id).toBe('cust1');
+  });
+
+  it('keeps a valid user-chosen custom selection when exercises reload', () => {
+    const { result, rerender } = renderHook(() =>
+      useDashboardSelection('custom', customExercises, customExercisesMap, exercisesByUserCategory)
+    );
+    act(() => result.current.handleSelectExercise('cust1'));
+
+    act(() => {
+      rerender();
+    });
+    expect(result.current.customSelected).toBe('cust1');
+  });
 });

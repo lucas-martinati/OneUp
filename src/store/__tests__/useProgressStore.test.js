@@ -441,11 +441,20 @@ describe('saveToCloud', () => {
     expect(useProgressStore.getState()._isSaving).toBe(false);
   });
 
-  it('refuses concurrent saves', async () => {
-    useProgressStore.setState({ _isSaving: true });
-    const result = await useProgressStore.getState().saveToCloud();
-    expect(result.success).toBe(false);
-    expect(cloudSync.saveToCloud).not.toHaveBeenCalled();
+  it('serializes concurrent saves: both complete, second runs after the first', async () => {
+    let resolveFirst;
+    cloudSync.saveToCloud.mockImplementationOnce(() => new Promise((resolve) => { resolveFirst = resolve; }));
+    const p1 = useProgressStore.getState().saveToCloud();
+    const p2 = useProgressStore.getState().saveToCloud();
+    await flush();
+    // Only the first save has started; the second is queued behind it
+    expect(cloudSync.saveToCloud).toHaveBeenCalledTimes(1);
+    resolveFirst();
+    const [r1, r2] = await Promise.all([p1, p2]);
+    expect(r1.success).toBe(true);
+    expect(r2.success).toBe(true);
+    expect(cloudSync.saveToCloud).toHaveBeenCalledTimes(2);
+    expect(useProgressStore.getState()._isSaving).toBe(false);
   });
 });
 
@@ -482,32 +491,56 @@ describe('loadFromCloud', () => {
 describe('syncWithCloud', () => {
   it('applies the merged result and preserves local achievements', async () => {
     useProgressStore.setState({ achievements: { local_badge: true } });
-    cloudSync.syncData.mockResolvedValueOnce({
+    cloudSync.loadFromCloud.mockResolvedValueOnce({
       startDate: fixedStart,
       isSetup: true,
       completions: { [`${currentYear}-03-02`]: { squats: { isCompleted: true } } },
-      achievements: { cloud_badge: true },
     });
     const result = await useProgressStore.getState().syncWithCloud();
     expect(result.success).toBe(true);
     const s = useProgressStore.getState();
     expect(s.completions[`${currentYear}-03-02`].squats.isCompleted).toBe(true);
     expect(s.achievements).toEqual({ local_badge: true });
+    expect(cloudSync.saveToCloud).toHaveBeenCalled();
   });
 
-  it('skips applySyncedData if mergedData is null', async () => {
-    const applySpy = vi.spyOn(useProgressStore.getState(), 'applySyncedData');
-    cloudSync.syncData.mockResolvedValueOnce(null);
+  it('falls back to local data when the cloud has nothing and persists it', async () => {
+    useProgressStore.setState({ isSetup: true, startDate: fixedStart });
+    cloudSync.loadFromCloud.mockResolvedValueOnce(null);
     const result = await useProgressStore.getState().syncWithCloud();
     expect(result.success).toBe(true);
-    expect(applySpy).not.toHaveBeenCalled();
-    applySpy.mockRestore();
+    const s = useProgressStore.getState();
+    expect(s.isSetup).toBe(true);
+    // The local fallback was saved back through the save chain
+    expect(cloudSync.saveToCloud).toHaveBeenCalledWith(expect.objectContaining({
+      isSetup: true,
+    }));
   });
 
   it('reports failure when the service throws', async () => {
-    cloudSync.syncData.mockRejectedValueOnce(new Error('network'));
+    cloudSync.loadFromCloud.mockRejectedValueOnce(new Error('network'));
     const result = await useProgressStore.getState().syncWithCloud();
     expect(result.success).toBe(false);
+  });
+
+  it('snapshots state AFTER the cloud load (edits during load are not lost)', async () => {
+    let resolveLoad;
+    cloudSync.loadFromCloud.mockReturnValueOnce(new Promise((resolve) => { resolveLoad = resolve; }));
+    const p = useProgressStore.getState().syncWithCloud();
+    // Edit the store while the cloud load is in flight
+    useProgressStore.setState({
+      isSetup: true,
+      completions: { [`${currentYear}-05-01`]: { pushups: { isCompleted: true } } },
+    });
+    resolveLoad({ startDate: fixedStart, completions: {} });
+    const result = await p;
+    expect(result.success).toBe(true);
+    // The edit made during the load survives the sync
+    expect(useProgressStore.getState().completions[`${currentYear}-05-01`].pushups.isCompleted).toBe(true);
+    // ...and is what got persisted to the cloud
+    expect(cloudSync.saveToCloud).toHaveBeenCalledWith(expect.objectContaining({
+      completions: expect.objectContaining({ [`${currentYear}-05-01`]: expect.any(Object) }),
+    }));
   });
 });
 

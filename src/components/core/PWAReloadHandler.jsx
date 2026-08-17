@@ -15,12 +15,13 @@ export function PWAReloadHandler() {
     }
 
     const intervalMS = 60 * 60 * 1000; // 1 hour
+    let updateInterval = null;
 
     registerSW({
       onRegisteredSW(swUrl, r) {
         if (r) {
           // Periodically check for updates
-          setInterval(() => {
+          updateInterval = setInterval(() => {
             if (r.installing || !navigator.onLine) return;
             r.update();
           }, intervalMS);
@@ -48,6 +49,7 @@ export function PWAReloadHandler() {
 
     return () => {
       navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+      if (updateInterval) clearInterval(updateInterval);
     };
   }, []);
 

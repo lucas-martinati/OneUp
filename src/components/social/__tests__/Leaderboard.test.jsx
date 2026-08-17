@@ -97,6 +97,20 @@ describe('Leaderboard', () => {
     await waitFor(() => expect(cloudSync.sendPoke).toHaveBeenCalledWith('u4', 'nudge', expect.any(String)));
   });
 
+  it('clears the nudged flag when the poke fails, so the member can be nudged again', async () => {
+    cloudSync.loadLeaderboard.mockResolvedValue(ENTRIES);
+    cloudSync.sendPoke.mockRejectedValueOnce(new Error('network'));
+    const { getByTestId } = render(<Leaderboard onClose={vi.fn()} />);
+    await waitFor(() => getByTestId('nudge-u4'));
+
+    fireEvent.click(getByTestId('nudge-u4'));
+    await waitFor(() => expect(cloudSync.sendPoke).toHaveBeenCalledTimes(1));
+
+    // A stuck nudgedMember would swallow this second click.
+    fireEvent.click(getByTestId('nudge-u4'));
+    await waitFor(() => expect(cloudSync.sendPoke).toHaveBeenCalledTimes(2));
+  });
+
   it('switches to the clans context and renders the manager', async () => {
     const { getByText, getByTestId } = render(<Leaderboard onClose={vi.fn()} />);
     // SegmentedControl toggle (2 options) → click switches to clans/manage

@@ -84,6 +84,16 @@ export function useToastGestures({ onClose, onTap, duration = 5000 }) {
         }
     };
 
+    const onPointerCancel = () => {
+        // System pointer cancel (notification shade, gesture navigation): the
+        // drag is aborted — spring back without treating it as a tap or fling.
+        if (!dragging.current) return;
+        dragging.current = false;
+        setAnimate(true);
+        dragXRef.current = 0;
+        setDragX(0);
+    };
+
     const onTransitionEnd = (e) => {
         if (exit && e.propertyName === 'transform' && !done.current) {
             done.current = true;
@@ -108,7 +118,7 @@ export function useToastGestures({ onClose, onTap, duration = 5000 }) {
             onPointerDown,
             onPointerMove,
             onPointerUp,
-            onPointerCancel: onPointerUp,
+            onPointerCancel,
             onTransitionEnd,
             style: {
                 transform,

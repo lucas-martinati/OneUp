@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 import { useGoogleAuth } from '@hooks/useGoogleAuth';
 
 const AuthContext = createContext(null);
@@ -12,8 +12,12 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const auth = useGoogleAuth();
 
+  // Keep the context value reference stable across renders so consumers don't
+  // re-render when unrelated state changes.
+  const value = useMemo(() => auth, [auth]);
+
   return (
-    <AuthContext.Provider value={auth}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

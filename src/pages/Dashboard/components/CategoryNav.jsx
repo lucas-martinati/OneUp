@@ -220,9 +220,12 @@ export const CategoryNav = React.memo(({
                 }
 
                 return (
-                    <div 
-                        key={i} 
+                    <button
+                        type="button"
+                        key={i}
                         className={`category-nav-dot ${isActive ? 'active' : ''} ${isDragOver ? 'drag-over' : ''}`}
+                        aria-label={getCategoryName(catId)}
+                        aria-current={isActive ? 'true' : undefined}
                         onClick={(e) => {
                             e.stopPropagation();
                             const el = scrollContainerRef.current;
@@ -230,12 +233,12 @@ export const CategoryNav = React.memo(({
                                 scrollToCategoryIndex(el, i, 'smooth');
                             }
                         }}
-                        style={{ background: dotColor }}
+                        style={{ background: dotColor, border: 'none', padding: 0, cursor: 'pointer' }}
                     >
                         <span className="category-nav-label">
                             {getCategoryName(catId)}
                         </span>
-                    </div>
+                    </button>
                 );
             })}
             {showDiscoveryHint && (

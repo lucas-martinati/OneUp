@@ -16,6 +16,10 @@ export class ErrorBoundary extends React.Component {
         console.error('Uncaught error:', error, errorInfo);
     }
 
+    reset = () => {
+        this.setState({ hasError: false, error: null });
+    };
+
     render() {
         if (this.state.hasError) {
             return (
@@ -33,15 +37,23 @@ export class ErrorBoundary extends React.Component {
                     <AlertTriangle size={48} color="var(--error)" style={{ marginBottom: '20px' }} />
                     <h1 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Something went wrong</h1>
                     <p style={{ color: '#94a3b8', marginBottom: '20px', maxWidth: '400px' }}>
-                        {this.state.error?.message || 'An unexpected error occurred.'}
+                        An unexpected error occurred while rendering this view. It has been logged; try again or reload the app.
                     </p>
-                    <Button
-                        onClick={() => window.location.reload()}
-                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-                    >
-                        <RefreshCw size={18} />
-                        Reload App
-                    </Button>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        <Button
+                            onClick={this.reset}
+                            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                        >
+                            Try Again
+                        </Button>
+                        <Button
+                            onClick={() => window.location.reload()}
+                            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                        >
+                            <RefreshCw size={18} />
+                            Reload App
+                        </Button>
+                    </div>
                 </div>
             );
         }

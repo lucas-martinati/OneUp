@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CATEGORIES, isUserCategory } from '@config/categories';
 import { EXERCISES, EXERCISES_MAP } from '@config/exercises';
@@ -11,6 +11,13 @@ export function useDashboardSelection(currentCatKey, customExercises, customExer
     const [weightsSelected, setWeightsSelected] = useState(WEIGHT_EXERCISES[0]?.id);
     const [customSelected, setCustomSelected] = useState(customExercises[0]?.id || 'custom_placeholder');
     const [userCatSelected, setUserCatSelected] = useState({});
+
+    useEffect(() => {
+        if (!customSelected || !customExercisesMap[customSelected]) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect -- deliberate state-sync effect over async-loaded props; no event handler exists to attach to.
+            setCustomSelected(customExercises[0]?.id || 'custom_placeholder');
+        }
+    }, [customExercises, customExercisesMap, customSelected]);
 
     const handleSelectExercise = (id) => {
         if (currentCatKey === CATEGORIES.BODYWEIGHT) setClassicSelected(id);

@@ -51,7 +51,8 @@ describe('PWAReloadHandler', () => {
     expect(registerSW).toHaveBeenCalled();
     // exercise the registerSW callbacks
     const opts = registerSW.mock.calls[0][0];
-    opts.onRegisteredSW('sw.js', { update: vi.fn(), installing: false });
+    const update = vi.fn();
+    opts.onRegisteredSW('sw.js', { update, installing: false });
     opts.onNeedRefresh();
     opts.onOfflineReady();
 
@@ -61,5 +62,42 @@ describe('PWAReloadHandler', () => {
     expect(reloadSpy).toHaveBeenCalledTimes(1);
 
     Object.defineProperty(window, 'location', { configurable: true, value: originalLocation });
+  });
+
+  it('clears the periodic update interval on unmount', () => {
+    vi.stubEnv('DEV', false);
+    installServiceWorker();
+    vi.useFakeTimers();
+
+    const { unmount } = render(<PWAReloadHandler />);
+    const opts = registerSW.mock.calls[0][0];
+    const update = vi.fn();
+    opts.onRegisteredSW('sw.js', { update, installing: false });
+
+    vi.advanceTimersByTime(2 * 60 * 60 * 1000);
+    expect(update).toHaveBeenCalledTimes(2);
+
+    unmount();
+    vi.advanceTimersByTime(60 * 60 * 1000);
+    // no further calls after unmount — the interval was cleared
+    expect(update).toHaveBeenCalledTimes(2);
+
+    vi.useRealTimers();
+  });
+
+  it('skips the update while the service worker is installing', () => {
+    vi.stubEnv('DEV', false);
+    installServiceWorker();
+    vi.useFakeTimers();
+
+    render(<PWAReloadHandler />);
+    const opts = registerSW.mock.calls[0][0];
+    const update = vi.fn();
+    opts.onRegisteredSW('sw.js', { update, installing: true });
+
+    vi.advanceTimersByTime(60 * 60 * 1000);
+    expect(update).not.toHaveBeenCalled();
+
+    vi.useRealTimers();
   });
 });

@@ -1,44 +1,52 @@
 {
   "rules": {
-    ".read": "auth != null && auth.uid === 'bAI8hvjR5TdIu0hDEDh4uP2MyCh1'",
-    ".write": "auth != null && auth.uid === 'bAI8hvjR5TdIu0hDEDh4uP2MyCh1'",
+    ".read": "auth != null && auth.token.admin === true",
+    ".write": "auth != null && auth.token.admin === true",
     "users": {
       ".indexOn": ["settings/timezone"],
       "$uid": {
-        ".read": "$uid === auth.uid",
+        // Lecture admin (panneau d'administration) ou propriétaire du compte.
+        ".read": "$uid === auth.uid || auth.token.admin === true",
         "progress": {
           // PRIVÉ : seul le propriétaire lit son progress. Les fonctionnalités
           // sociales lisent les stats publiques dérivées dans `publicProfiles`
           // (sans le calendrier ni les traces GPS). Auparavant ce nœud était
           // lisible par tout utilisateur authentifié — ce qui exposait les
           // traces GPS cardio ; c'est désormais fermé.
-          ".read": "$uid === auth.uid",
-          ".write": "$uid === auth.uid",
+          ".read": "$uid === auth.uid || auth.token.admin === true",
+          ".write": "$uid === auth.uid || auth.token.admin === true",
           "streakFreezes": {
-            ".write": false,
+            // Écriture réservée à l'admin (et à la Cloud Function via le SDK
+            // Admin, non soumise à ces règles).
+            ".write": "auth.token.admin === true",
             // Gel de série : count borné à [0, 6] (max Pro) et lastRefill au
             // format 'YYYY-MM' (7 caractères). Empêche un utilisateur de
             // s'attribuer un nombre arbitraire de gels via l'API.
-            ".validate": "newData.hasChildren(['count', 'lastRefill']) && newData.child('count').isNumber() && newData.child('count').val() >= 0 && newData.child('count').val() <= 6 && newData.child('lastRefill').isString() && newData.child('lastRefill').val().length === 7"
+            ".validate": "newData.val() === null || (newData.hasChildren(['count', 'lastRefill']) && newData.child('count').isNumber() && newData.child('count').val() >= 0 && newData.child('count').val() <= 6 && newData.child('lastRefill').isString() && newData.child('lastRefill').val().length === 7)"
           },
           "frozenDays": {
-            ".write": false,
+            // Écriture réservée à l'admin (la Cloud Function écrit les jours
+            // gelés via le SDK Admin) ; suppression (null) autorisée aussi.
+            ".write": "auth.token.admin === true",
             // Jours gelés : chaque clé doit être une date YYYY-MM-DD (10 chars)
             // et chaque valeur doit être le booléen true.
             "$date": {
-              ".validate": "newData.val() === true && $date.length === 10"
+              ".validate": "newData.val() === null || (newData.val() === true && $date.length === 10)"
             }
           }
         },
         "$topic": {
-          ".write": "$uid === auth.uid && $topic !== 'purchase'"
+          // Le propriétaire écrit tout sauf `purchase` (pas d'auto-Pro) ;
+          // l'admin (panneau d'administration) écrit n'importe quel topic.
+          ".write": "($uid === auth.uid && $topic !== 'purchase') || auth.token.admin === true"
         }
       }
     },
     "leaderboard": {
       ".read": "auth != null",
       "$uid": {
-        ".write": false
+        // Réinitialisation des totaux par l'admin (panneau d'administration).
+        ".write": "auth.token.admin === true"
       }
     },
     "publicProfiles": {

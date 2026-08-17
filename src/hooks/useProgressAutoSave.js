@@ -27,11 +27,12 @@ export function useProgressAutoSave(auth) {
     if (auth.isSignedIn && !auth.loading && !conflictData && conflictCheckDone && isInitialSyncDone && !isSyncPaused) {
       const doSave = async () => {
         try {
-          await saveToCloud();
-          setSyncError(null);
+          const result = await saveToCloud();
+          if (result?.success) setSyncError(null);
+          else setSyncError(result?.error || 'Save failed');
         } catch (error) {
           logger.error('Auto-save failed:', error);
-          setSyncError(error.message);
+          setSyncError(error?.message || 'Save failed');
         }
       };
       const timer = setTimeout(doSave, 400);

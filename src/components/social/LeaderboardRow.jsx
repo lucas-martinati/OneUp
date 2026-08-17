@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar } from '@components/ui/Avatar';
 import { Button } from '@components/ui';
 import { getTierBadgeConfigs } from '@utils/entitlements';
+import { getShieldFlags } from '@utils/leaderboard';
 import styles from '@styles/Leaderboard.module.css';
 
 export function LeaderboardRow({
@@ -22,10 +23,7 @@ export function LeaderboardRow({
 
     const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
 
-    // Shield logic: server-computed (immune to client clock manipulation).
-    const shieldFresh = entry.shieldDate === todayStr;
-    const showVerifiedShield = !!entry.shieldGreen && shieldFresh;
-    const showSuspiciousShield = !!entry.shieldOrange && shieldFresh;
+    const { showVerifiedShield, showSuspiciousShield } = getShieldFlags(entry, todayStr);
 
     const rowCls = [styles.row];
     if (isPerfect) rowCls.push(styles.rowPerfect, 'perfect-day-row');

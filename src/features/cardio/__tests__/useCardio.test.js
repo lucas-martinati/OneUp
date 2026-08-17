@@ -8,6 +8,7 @@ import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { loadCardioSessions, saveCardioSession } from '@services/cardioService';
 import { getAllActivities } from '@services/cardioProviders';
 import { evaluateCardioWeek } from '@utils/cardioStreak';
+import { getWeekBounds } from '@shared/dateUtils';
 
 vi.mock('@contexts/AuthContext');
 vi.mock('@store/useProgressStore');
@@ -183,6 +184,57 @@ describe('useCardio', () => {
             expect(result.current.loading).toBe(false);
         }, { timeout: 3000 });
         expect(result.current.allSessions).toEqual([]);
+    });
+
+    it('keeps previously loaded sessions when a later fetch fails', async () => {
+        loadCardioSessions.mockResolvedValueOnce([{ id: 'fb1', startTime: 1000, type: 'running', distance: 5000 }]);
+        const { result } = renderHook(() => useCardio());
+
+        await vi.waitFor(() => {
+            expect(result.current.allSessions).toHaveLength(1);
+        }, { timeout: 3000 });
+
+        loadCardioSessions.mockRejectedValueOnce(new Error('offline'));
+        act(() => { result.current.refresh(); });
+
+        await vi.waitFor(() => {
+            expect(result.current.loading).toBe(false);
+        }, { timeout: 3000 });
+        // A transient fetch error must NOT wipe the previously loaded sessions
+        expect(result.current.allSessions).toHaveLength(1);
+    });
+
+    it('unmarks stale completion when the last session of a week is deleted', async () => {
+        // Each date maps to its own week start so weeks are distinguishable
+        getWeekBounds.mockImplementation((date) => {
+            const d = new Date(date);
+            return { start: d.getTime(), end: d.getTime() + 6 * 24 * 3600 * 1000 };
+        });
+
+        // Week of Jan 8 previously completed, but its only session was deleted;
+        // the current sessions only cover the week of Jan 15.
+        mockProgress.completions = {
+            '2024-01-08': { running: { isCompleted: true, difficulty: 1 } },
+        };
+        getAllActivities.mockResolvedValue([{ id: 's1', type: 'running', distance: 6000, startTime: Date.parse('2024-01-15T08:00:00') }]);
+
+        renderHook(() => useCardio());
+
+        await vi.waitFor(() => {
+            expect(mockUpdateExerciseCount).toHaveBeenCalledWith('2024-01-08', 'running', 0, 1, null, 1);
+        }, { timeout: 3000 });
+    });
+
+    it('unmarks all cardio completions when every session is deleted', async () => {
+        mockProgress.completions = {
+            '2024-01-08': { running: { isCompleted: true, difficulty: 1 } },
+        };
+        // No sessions at all — the ghost completion must be cleaned up
+        renderHook(() => useCardio());
+
+        await vi.waitFor(() => {
+            expect(mockUpdateExerciseCount).toHaveBeenCalledWith('2024-01-08', 'running', 0, 1, null, 1);
+        }, { timeout: 3000 });
     });
 
     it('switches active mode', () => {

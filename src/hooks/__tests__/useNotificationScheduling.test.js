@@ -94,4 +94,20 @@ describe('useNotificationScheduling', () => {
     // scheduleNotification should NOT have been called again (still 1 call)
     expect(mockScheduleNotification).toHaveBeenCalledTimes(1);
   });
+
+  it('does not tear down and re-schedule when completions change', () => {
+    const { rerender } = renderHook(() => useNotificationScheduling());
+
+    expect(mockScheduleNotification).toHaveBeenCalledTimes(1); // mount
+
+    // Completions change every exercise completion; the effect must not re-run
+    // (the day-done skip happens inside scheduleNotification via the store).
+    mockProgressStore.completions = {
+      '2026-06-21': { pushups: { isCompleted: true } }
+    };
+    rerender();
+
+    expect(mockScheduleNotification).toHaveBeenCalledTimes(1);
+    expect(mockRequestNotificationPermission).toHaveBeenCalledTimes(1);
+  });
 });

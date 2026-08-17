@@ -1,40 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clock, Target, TrendingUp } from '@utils/icons';
-
-/**
- * Format seconds to "Xh Ym" or "Ym Zs"
- */
-function formatDuration(seconds) {
-  if (!seconds || seconds <= 0) return '—';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  if (h > 0) return `${h}h ${m.toString().padStart(2, '0')}m`;
-  return `${m}m ${s.toString().padStart(2, '0')}s`;
-}
-
-/**
- * Format meters to km with 1 decimal
- */
-function formatDistance(meters, t) {
-  if (!meters || meters <= 0) return '—';
-  return `${(meters / 1000).toFixed(1)} ${t('cardio.units.km')}`;
-}
-
-/**
- * Format m/s to either Pace (min/km) for running or Speed (km/h) for others
- */
-function formatSpeed(speedMs, type, t) {
-  if (!speedMs || speedMs <= 0) return '—';
-  if (type === 'running') {
-    const secondsPerKm = 1000 / speedMs;
-    const mins = Math.floor(secondsPerKm / 60);
-    const secs = Math.floor(secondsPerKm % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')} ${t('cardio.units.minKm')}`;
-  }
-  return `${(speedMs * 3.6).toFixed(1)} ${t('cardio.units.kmh')}`;
-}
+import { formatDuration, formatDistance, formatSpeed } from '@utils/cardioFormatters';
 
 const StatCard = ({ icon: Icon, label, value, color }) => (
   <div style={{
@@ -75,6 +42,12 @@ export const CardioLastSession = React.memo(({ session }) => {
   const speed = session.avgSpeed || session.averageSpeed || 0;
   const elevation = session.elevationGain || session.elevation || 0;
 
+  const distance = formatDistance(session.distance);
+  const distanceText = distance === '—' ? distance : `${distance} ${t('cardio.units.km')}`;
+  const speedUnit = session.type === 'running' ? t('cardio.units.minKm') : t('cardio.units.kmh');
+  const speedText = formatSpeed(speed, session.type);
+  const speedLabel = speedText === '—' ? speedText : `${speedText} ${speedUnit}`;
+
   return (
     <div style={{ width: '100%', flexShrink: 0 }}>
       <div style={{
@@ -99,7 +72,7 @@ export const CardioLastSession = React.memo(({ session }) => {
         <StatCard
           icon={Target}
           label={t('cardio.distance')}
-          value={formatDistance(session.distance, t)}
+          value={distanceText}
           color="#8b5cf6"
         />
         <StatCard
@@ -111,7 +84,7 @@ export const CardioLastSession = React.memo(({ session }) => {
         <StatCard
           icon={TrendingUp}
           label={session.type === 'running' ? t('cardio.pace') : t('cardio.avgSpeed')}
-          value={formatSpeed(speed, session.type, t)}
+          value={speedLabel}
           color="#c084fc"
         />
       </div>

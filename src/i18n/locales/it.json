@@ -679,7 +679,8 @@
     "theme.ocean": "Oceano",
     "theme.purple": "Viola",
     "theme.sunset": "Tramonto",
-    "uploadGallery": "Galleria"
+    "uploadGallery": "Galleria",
+    "error": "Condivisione non riuscita. Riprova."
   },
   "stats": {
     "basedOnManual_one": "Basato su {{count}} giorno manuale",

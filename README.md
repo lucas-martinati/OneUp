@@ -135,6 +135,7 @@ firebase/
 - **onAccountDeleted** — Cleans up all user data on account deletion
 - **auditStaleData / pruneStaleData** — Schema-driven stale data management
 - **backfillUserProfiles** — Admin utility for profile data recovery
+- **grantAdminRole** — Bootstraps the `{ admin: true }` custom claim for the account whose UID matches the `ADMIN_UID` secret (the admin UID never appears in the database rules or client code; rules gate admin access on `auth.token.admin === true`)
 
 ### 🗄️ Database Schema
 Firebase RTDB structure is defined and documented in `firebase/functions/shared/dbSchema.js` with a dedicated path builder (`paths`) used by both client and server — no hardcoded path strings.

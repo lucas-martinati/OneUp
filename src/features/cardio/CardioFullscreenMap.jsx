@@ -7,6 +7,7 @@ import { useBackHandler } from '@hooks/useBackHandler';
 import { X, Clock, Target, TrendingUp, Footprints } from '@utils/icons';
 import { Button } from '@components/ui';
 import { MAP_TILES } from '@config/mapTiles';
+import { formatDuration, formatDistance, formatSpeed } from '@utils/cardioFormatters';
 
 const TILE_URL = MAP_TILES.dark;
 
@@ -27,30 +28,6 @@ function FullscreenFitBounds({ gpsTrack }) {
   return null;
 }
 
-function formatDuration(seconds) {
-  if (!seconds || seconds <= 0) return '—';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) return `${h}h${m.toString().padStart(2, '0')}`;
-  return `${m}min`;
-}
-
-function formatDistance(meters) {
-  if (!meters || meters <= 0) return '—';
-  return `${(meters / 1000).toFixed(2)}`;
-}
-
-function formatSpeed(speedMs, type, t) {
-  if (!speedMs || speedMs <= 0) return { value: '—', label: t('cardio.units.kmh') };
-  if (type === 'running') {
-    const secondsPerKm = 1000 / speedMs;
-    const mins = Math.floor(secondsPerKm / 60);
-    const secs = Math.floor(secondsPerKm % 60);
-    return { value: `${mins}:${secs.toString().padStart(2, '0')}`, label: t('cardio.units.minKm') };
-  }
-  return { value: `${(speedMs * 3.6).toFixed(1)}`, label: t('cardio.units.kmh') };
-}
-
 export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
   const { t } = useTranslation();
   
@@ -64,10 +41,13 @@ export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
     if (!session) return null;
     const speed = session.avgSpeed || session.averageSpeed || 0;
     const elevation = session.elevationGain || session.elevation || 0;
-    const speedInfo = formatSpeed(speed, session.type, t);
+    const speedInfo = {
+      value: formatSpeed(speed, session.type),
+      label: session.type === 'running' ? t('cardio.units.minKm') : t('cardio.units.kmh'),
+    };
     
     return [
-      { icon: Target, label: t('cardio.units.km'), value: formatDistance(session.distance), color: '#8b5cf6' },
+      { icon: Target, label: t('cardio.units.km'), value: formatDistance(session.distance, 2), color: '#8b5cf6' },
       { icon: Clock, label: '', value: formatDuration(session.duration), color: '#a78bfa' },
       ...(speed > 0 ? [{ icon: TrendingUp, label: speedInfo.label, value: speedInfo.value, color: '#c084fc' }] : []),
       ...(elevation > 0 ? [{ icon: TrendingUp, label: t('cardio.units.m'), value: `+${elevation}`, color: '#6d28d9' }] : []),
@@ -215,7 +195,7 @@ export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
           </div>
 
           {/* Close button (Right) */}
-          <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label="Close" />
+          <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label={t('common.close')} />
         </div>
 
         {/* Floating stats bar */}

@@ -1,4 +1,4 @@
-import { onRequest } from "firebase-functions/v2/https";
+import { onRequest, onCall, HttpsError } from "firebase-functions/v2/https";
 import { onValueWritten } from "firebase-functions/v2/database";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import functionsV1 from "firebase-functions/v1";
@@ -789,6 +789,41 @@ export const pruneStaleData = onRequest({ secrets: ["ADMIN_API_KEY"] }, async (r
     console.error("Prune failed:", error);
     res.status(500).send("Erreur lors de la purge : " + error.message);
   }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Admin role bootstrap — custom claim
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * grantAdminRole
+ * Grants the `{ admin: true }` custom claim to the caller if their UID matches
+ * the ADMIN_UID secret. The Realtime Database rules gate admin access on
+ * `auth.token.admin === true`, so the admin UID never appears in the rules or
+ * in client code.
+ *
+ * Bootstrap: sign in as the admin account, then call this function once
+ * (e.g. from the admin panel or a script) with a valid auth token.
+ */
+export const grantAdminRole = onCall({ secrets: ["ADMIN_UID"] }, async (request) => {
+  const adminUid = process.env.ADMIN_UID;
+  if (!adminUid) {
+    throw new HttpsError("failed-precondition", "ADMIN_UID secret is not configured");
+  }
+  const callerUid = request.auth?.uid;
+  if (!callerUid) {
+    throw new HttpsError("unauthenticated", "Authentication required");
+  }
+  if (callerUid !== adminUid) {
+    throw new HttpsError("permission-denied", "Not authorized to grant the admin role");
+  }
+  try {
+    await admin.auth().setCustomUserClaims(callerUid, { admin: true });
+  } catch (error) {
+    console.error("grantAdminRole: failed to set custom claims:", error);
+    throw new HttpsError("internal", "Failed to grant the admin role");
+  }
+  return { success: true };
 });
 
 // ══════════════════════════════════════════════════════════════════════════════

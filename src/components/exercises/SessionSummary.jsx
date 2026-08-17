@@ -55,9 +55,15 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
     const totalReps = recapExercises.reduce((sum, ex) => sum + (ex.type !== 'timer' ? (ex.reps || ex.goal || 0) : 0), 0);
 
     const handleNameSave = async (newName) => {
+        const previousName = sessionName;
         setSessionName(newName);
         if (sessionData?.id) {
-            await updateSessionName(sessionData.id, newName);
+            try {
+                await updateSessionName(sessionData.id, newName);
+            } catch (error) {
+                console.error('Failed to update session name:', error);
+                setSessionName(previousName);
+            }
         }
     };
 

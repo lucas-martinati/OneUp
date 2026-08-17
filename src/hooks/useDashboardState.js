@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getLocalDateStr } from '@shared/dateUtils';
 import { useProgressStore } from '@store/useProgressStore';
 import { useSettingsStore } from '@store/useSettingsStore';
@@ -15,6 +15,11 @@ export function useDashboardState() {
     const [prevDayNumber, setPrevDayNumber] = useState(null);
     const [showDayConfetti, setShowDayConfetti] = useState(false);
 
+    // The 800ms transition timer must survive the effect re-run triggered by
+    // `today` changing (the transition is exactly what changes it), so it lives
+    // in a ref and is only superseded by the next day change — never by cleanup.
+    const transitionTimerRef = useRef(null);
+
     useEffect(() => {
         const handleDayChange = () => {
             const currentDateStr = getLocalDateStr(new Date());
@@ -25,7 +30,8 @@ export function useDashboardState() {
                     setPrevDayNumber(previousDayNumber);
                     setIsCounterTransitioning(true);
                     setShowDayConfetti(true);
-                    setTimeout(() => { setIsCounterTransitioning(false); setPrevDayNumber(null); }, 800);
+                    clearTimeout(transitionTimerRef.current);
+                    transitionTimerRef.current = setTimeout(() => { setIsCounterTransitioning(false); setPrevDayNumber(null); }, 800);
                 }
                 setToday(currentDateStr);
                 if (scheduleNotification) scheduleNotification(settings);
@@ -33,7 +39,9 @@ export function useDashboardState() {
         };
         handleDayChange();
         const interval = setInterval(handleDayChange, 10000);
-        return () => clearInterval(interval);
+        return () => {
+            clearInterval(interval);
+        };
     }, [today, getDayNumber, settings, scheduleNotification]);
 
     return {

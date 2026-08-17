@@ -679,7 +679,8 @@
     "theme.ocean": "Океан",
     "theme.purple": "Фиолетовый",
     "theme.sunset": "Закат",
-    "uploadGallery": "Галерея"
+    "uploadGallery": "Галерея",
+    "error": "Не удалось поделиться. Попробуйте ещё раз."
   },
   "stats": {
     "basedOnManual_one": "На основе {{count}} ручного дня",

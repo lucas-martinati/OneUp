@@ -109,7 +109,13 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
         e.stopPropagation();
         if (nudgedMember === uid) return;
         setNudgedMember(uid);
-        await cloudSync.sendPoke(uid, 'nudge', t('common.poke'));
+        try {
+            await cloudSync.sendPoke(uid, 'nudge', t('common.poke'));
+        } catch (err) {
+            console.error('Failed to send poke:', err);
+            setNudgedMember(null);
+            return;
+        }
         setTimeout(() => setNudgedMember(null), 2000);
     };
 

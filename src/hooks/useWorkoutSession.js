@@ -127,13 +127,22 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     const canMixDashboards = canAccessFeature(FEATURES.INTER_DASHBOARD, { isPro });
     const availableExercises = canMixDashboards && showAll ? allExercises : localExercises;
 
+    // ── "Is this exercise done today?" — single source of truth ──
+    const isDoneToday = useCallback((id) => {
+        const ex = allExercisesMap[id];
+        if (!ex) return false;
+        const count = getExerciseCount(today, id);
+        const goal = getDailyGoal(ex, dayNumber, getConfig(ex.id, today).difficulty);
+        return completions[today]?.[id]?.isCompleted || count >= goal;
+    }, [today, dayNumber, completions, getExerciseCount, getConfig, allExercisesMap]);
+
     // ── Exercise info with current state ──
     const exerciseInfo = useMemo(() => {
         return availableExercises.map(ex => {
             const currentDiff = getConfig(ex.id, today).difficulty;
             const goal = getDailyGoal(ex, dayNumber, currentDiff);
             const count = getExerciseCount(today, ex.id);
-            const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
+            const done = isDoneToday(ex.id);
 
             let category = 'custom';
             if (isBodyweightExercise(ex.id)) category = 'bodyweight';
@@ -149,7 +158,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
 
             return { ...ex, goal, count, done, category };
         });
-    }, [availableExercises, dayNumber, today, completions, getExerciseCount, getConfig, exercisesByUserCategory]);
+    }, [availableExercises, dayNumber, today, getExerciseCount, getConfig, exercisesByUserCategory, isDoneToday]);
 
     // ── Toggle exercise in queue ──
     const toggleExercise = (id) => {
@@ -181,11 +190,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         const filteredQueue = queue.filter(id => {
             const ex = allExercisesMap[id];
             if (!ex) return false;
-            const currentDiff = getConfig(ex.id, today).difficulty;
-            const goal = getDailyGoal(ex, dayNumber, currentDiff);
-            const count = getExerciseCount(today, id);
-            const done = completions[today]?.[id]?.isCompleted || count >= goal;
-            return !done;
+            return !isDoneToday(id);
         });
         if (filteredQueue.length < 1) return;
         setQueue(filteredQueue);
@@ -209,11 +214,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
             });
 
         const validExercises = routineExercises.filter(ex => {
-            const currentDiff = getConfig(ex.id, today).difficulty;
-            const goal = getDailyGoal(ex, dayNumber, currentDiff);
-            const count = getExerciseCount(today, ex.id);
-            const done = completions[today]?.[ex.id]?.isCompleted || count >= goal;
-            return !done;
+            return !isDoneToday(ex.id);
         });
 
         const validIds = validExercises.map(ex => ex.id);
@@ -267,11 +268,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         const validIds = routine.exerciseIds.filter(id => {
             const ex = allExercisesMap[id];
             if (!ex) return false;
-            const currentDiff = getConfig(ex.id, today).difficulty;
-            const goal = getDailyGoal(ex, dayNumber, currentDiff);
-            const count = getExerciseCount(today, ex.id);
-            const done = completions[today]?.[id]?.isCompleted || count >= goal;
-            return !done;
+            return !isDoneToday(id);
         });
         setQueue(validIds);
         setRoutineName(routine.name);
@@ -347,19 +344,16 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     const currentDifficulty = getConfig(currentEx?.id, today).difficulty;
     const currentGoal = currentEx ? getDailyGoal(currentEx, dayNumber, currentDifficulty) : 0;
     const currentCount = currentEx ? getExerciseCount(today, currentExId) : 0;
-    const currentDone = currentEx ? (completions[today]?.[currentExId]?.isCompleted || currentCount >= currentGoal) : false;
+    const currentDone = currentEx ? isDoneToday(currentExId) : false;
 
     const hasNextAvailableExercise = useMemo(() => {
         return queue.some((id, idx) => {
             if (idx === currentIdx) return false;
             const ex = allExercisesMap[id];
             if (!ex) return false;
-            const difficulty = getConfig(ex.id, today).difficulty;
-            const goal = getDailyGoal(ex, dayNumber, difficulty);
-            const count = getExerciseCount(today, id);
-            return !(completions[today]?.[id]?.isCompleted || count >= goal);
+            return !isDoneToday(id);
         });
-    }, [allExercisesMap, completions, currentIdx, dayNumber, getConfig, getExerciseCount, queue, today]);
+    }, [isDoneToday, currentIdx, queue, allExercisesMap]);
 
     useEffect(() => {
         if (phase !== 'running' || !currentEx || hasAnimatedFirstPanel) return undefined;

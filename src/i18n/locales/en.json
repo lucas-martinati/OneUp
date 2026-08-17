@@ -694,7 +694,8 @@
     "theme.ocean": "Ocean",
     "theme.purple": "Purple",
     "theme.sunset": "Sunset",
-    "uploadGallery": "Gallery"
+    "uploadGallery": "Gallery",
+    "error": "Sharing failed. Please try again."
   },
   "stats": {
     "basedOnManual_one": "Based on {{count}} manual day",

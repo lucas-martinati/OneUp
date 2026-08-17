@@ -111,17 +111,24 @@ describe('parseProgressData', () => {
     expect(Object.keys(out.completions)).toHaveLength(1);
   });
 
-  it('resets progress from a previous year but keeps achievements', () => {
+  it('preserves data from a previous year instead of wiping it', () => {
     const out = parseProgressData({
       startDate: `${currentYear - 1}-01-01`,
       isSetup: true,
       completions: { [`${currentYear - 1}-05-01`]: { pushups: { isCompleted: true } } },
+      cardio: { sessions: { a: { type: 'running' } } },
+      frozenDays: { [`${currentYear - 1}-05-02`]: true },
+      streakFreezes: { count: 2, lastRefill: `${currentYear - 1}-01-01` },
       achievements: { veteran: true },
       lastCompletionChange: 'lcc',
     });
-    expect(out.startDate).toBe(fixedStart);
-    expect(out.isSetup).toBe(false);
-    expect(out.completions).toEqual({});
+    // The stored start date and all user data survive the year rollover.
+    expect(out.startDate).toBe(`${currentYear - 1}-01-01`);
+    expect(Object.keys(out.completions)).toHaveLength(1);
+    expect(out.completions[`${currentYear - 1}-05-01`].pushups.isCompleted).toBe(true);
+    expect(out.cardio.sessions.a.type).toBe('running');
+    expect(out.frozenDays[`${currentYear - 1}-05-02`]).toBe(true);
+    expect(out.streakFreezes).toMatchObject({ count: 2 });
     expect(out.achievements).toMatchObject({ veteran: true });
     expect(out.lastCompletionChange).toBe('lcc');
   });

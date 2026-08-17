@@ -44,6 +44,12 @@ describe('soundManager', () => {
     expect(playSpy).toHaveBeenCalled();
   });
 
+  it('plays the click sound via the success sample', async () => {
+    const { sounds } = await load();
+    sounds.click();
+    expect(playSpy).toHaveBeenCalled();
+  });
+
   it('does nothing when sounds are disabled by the settings getter', async () => {
     const { sounds, setSoundSettingsGetter } = await load();
     setSoundSettingsGetter(() => ({ soundsEnabled: false }));

@@ -42,13 +42,19 @@ export function ClanManager({ onClanJoined }) {
             updateSettings({ ...settings, leaderboardPseudo: pseudoInput.trim() });
         }
 
-        const res = await cloudSync.createClan(inputValue.trim());
-        if (res.success) {
-            setShowConfetti(true);
-            await refreshUserClans();
-            if (onClanJoined) onClanJoined(res.clanId);
-        } else {
-            setError(res.error || t('clan.createError'));
+        try {
+            const res = await cloudSync.createClan(inputValue.trim());
+            if (res.success) {
+                setShowConfetti(true);
+                await refreshUserClans();
+                if (onClanJoined) onClanJoined(res.clanId);
+            } else {
+                setError(res.error || t('clan.createError'));
+            }
+        } catch (err) {
+            console.error('Failed to create clan:', err);
+            setError(t('clan.createError'));
+        } finally {
             setIsLoading(false);
         }
     };
@@ -64,13 +70,19 @@ export function ClanManager({ onClanJoined }) {
             updateSettings({ ...settings, leaderboardPseudo: pseudoInput.trim() });
         }
 
-        const res = await cloudSync.joinClan(inputValue.trim());
-        if (res.success) {
-            setShowConfetti(true);
-            await refreshUserClans();
-            if (onClanJoined) onClanJoined(res.clanId);
-        } else {
-            setError(res.error || t('clan.invalidCode'));
+        try {
+            const res = await cloudSync.joinClan(inputValue.trim());
+            if (res.success) {
+                setShowConfetti(true);
+                await refreshUserClans();
+                if (onClanJoined) onClanJoined(res.clanId);
+            } else {
+                setError(res.error || t('clan.invalidCode'));
+            }
+        } catch (err) {
+            console.error('Failed to join clan:', err);
+            setError(t('clan.invalidCode'));
+        } finally {
             setIsLoading(false);
         }
     };

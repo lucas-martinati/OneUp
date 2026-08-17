@@ -1,4 +1,4 @@
-import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions, walkStreak } from '@shared/dateUtils';
+import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions, walkStreak, parseLocalDate } from '@shared/dateUtils';
 import { EXERCISES, getDailyGoal, getWeeklyGoalKm, CARDIO_REPS_PER_KM } from '@config/exercises';
 import { evaluateCardioWeek } from '@utils/cardioStreak';
 import { WEIGHT_EXERCISES } from '@config/weights';
@@ -15,7 +15,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         allExercisesMap = Object.fromEntries(allExercises.map(e => [e.id, e]));
     }
     const todayStr = getLocalDateStr(new Date());
-    const today = new Date(todayStr);
+    const today = parseLocalDate(todayStr);
     const weekStartDay = settings?.weekStartDay || 'monday';
 
     const isDayDoneLocal = (dateStr) => {
@@ -31,7 +31,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     const isFrozenDay = (dateStr) => !!frozenDays[dateStr];
 
     const calculateLocalStreak = (dateStr) => {
-        const checkDate = new Date(dateStr);
+        const checkDate = parseLocalDate(dateStr);
         const dateAt = (offset) => {
             const d = new Date(checkDate);
             d.setDate(d.getDate() - offset);
@@ -114,7 +114,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         }
 
         // Day of week
-        const dateObj = new Date(dateStr);
+        const dateObj = parseLocalDate(dateStr);
         const dayOfWeek = dateObj.getDay();
         if (dayOfWeek >= 1 && dayOfWeek <= 5) weekdayWorkouts++;
         if (dayOfWeek === 0 || dayOfWeek === 6) weekendWorkouts++;
@@ -229,7 +229,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     // ─── Streak calculations (require backward day iteration) ────────────
     let maxStreak = 0, tempStreak = 0;
     for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
-        const d = new Date(today);
+        const d = parseLocalDate(today);
         d.setDate(d.getDate() - i);
         const dStr = getLocalDateStr(d);
         if (isDayDoneLocal(dStr)) {
@@ -243,7 +243,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     }
 
     const currentStreak = calculateLocalStreak(todayStr);
-    const yesterdayDate = new Date(today);
+    const yesterdayDate = parseLocalDate(today);
     yesterdayDate.setDate(yesterdayDate.getDate() - 1);
     const yesterdayStreak = calculateLocalStreak(getLocalDateStr(yesterdayDate));
 
@@ -251,7 +251,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     let perfectStreak = 0, maxPerfectStreak = 0;
 
     for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
-        const d = new Date(today);
+        const d = parseLocalDate(today);
         d.setDate(d.getDate() - i);
         const dateStr = getLocalDateStr(d);
         const dayCompletions = completions[dateStr];
@@ -284,14 +284,15 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         return false;
     }
 
-    // Streaks cardio : on ne casse PAS la boucle sur weekNum < 1, car des sessions
-    // Strava peuvent exister avant la date de début du challenge.
+    // Streaks cardio : on casse la boucle dès que weekNum < 1 (semaines
+    // antérieures au début du challenge), cohérent avec useCardio.js.
     function computeCardioMaxStreak(sessions, mode, challengeStartDate, currentDifficulty, completions) {
         if (!sessions.length) return 0;
         let maxStreak = 0;
         let streak = 0;
         for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
-            const { achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions, weekStartDay);
+            const { weekNum, achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions, weekStartDay);
+            if (weekNum < 1) break;
             if (achieved) {
                 streak++;
                 if (streak > maxStreak) maxStreak = streak;
@@ -307,7 +308,8 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         if (!sessions.length) return 0;
         let streak = 0;
         for (let weekOffset = 0; weekOffset < 52; weekOffset++) {
-            const { achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions, weekStartDay);
+            const { weekNum, achieved } = evaluateCardioWeek(sessions, mode, weekOffset, challengeStartDate, currentDifficulty, completions, weekStartDay);
+            if (weekNum < 1) break;
             if (achieved) {
                 streak++;
             } else if (weekOffset > 0) {
@@ -334,7 +336,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
             // Max streak
             let maxExStreak = 0, tempExStreak = 0;
             for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
-                const d = new Date(today);
+                const d = parseLocalDate(today);
                 d.setDate(d.getDate() - i);
                 if (completions[getLocalDateStr(d)]?.[ex.id]?.isCompleted) {
                     tempExStreak++;
@@ -349,7 +351,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
 
     // ─── Derived values ──────────────────────────────────────────────────
     const globalTotalReps = Object.values(exerciseReps).reduce((sum, r) => sum + r, 0) ;
-    const successRate = totalDays > 0 ? Math.round((totalDays / MAX_STREAK_WINDOW) * 100) : 0;
+    const successRate = totalDays > 0 ? Math.min(100, Math.round((totalDays / MAX_STREAK_WINDOW) * 100)) : 0;
     const hasCompletedAllExercisesOnce = EXERCISES.every(ex => completedExIds.has(ex.id));
     const todayDone = isDayDoneLocal(todayStr);
     

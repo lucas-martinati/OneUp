@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { isWeightExercise } from '@config/exercises';
 import { Clock, Zap, Dumbbell, Flame, History, Award, Target, Weight, Filter, Palette, Image, X, Lock, Check, Camera } from '@utils/icons';
 import { haptics } from '@utils/hapticsManager';
+import { getLocalDateStr } from '@shared/dateUtils';
 import styles from './ShareOptions.module.css';
 
 // Multi-select tile: icon pastille + label + checkbox badge. The accent
@@ -232,7 +233,7 @@ export function ShareOptions({ options, toggleOption, setOption, toggleCategory,
         <Input
           type="date"
           className={styles.dateField}
-          value={options.globalDate || new Date().toISOString().split('T')[0]}
+          value={options.globalDate || getLocalDateStr(new Date())}
           onChange={(e) => setOption('globalDate', e.target.value)}
         />
       )}

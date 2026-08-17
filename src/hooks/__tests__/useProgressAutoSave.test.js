@@ -21,7 +21,7 @@ describe('useProgressAutoSave', () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
-    saveToCloudMock = vi.fn().mockResolvedValue();
+    saveToCloudMock = vi.fn().mockResolvedValue({ success: true });
     syncWithCloudMock = vi.fn().mockResolvedValue();
     setSyncErrorMock = vi.fn();
 
@@ -69,6 +69,17 @@ describe('useProgressAutoSave', () => {
     await vi.runAllTimersAsync();
 
     expect(setSyncErrorMock).toHaveBeenCalledWith('Save Error');
+  });
+
+  it('sets syncError when saveToCloud reports a failed result', async () => {
+    saveToCloudMock.mockResolvedValueOnce({ success: false, error: 'offline' });
+    const auth = { isSignedIn: true, loading: false };
+    renderHook(() => useProgressAutoSave(auth));
+
+    vi.advanceTimersByTime(400);
+    await vi.runAllTimersAsync();
+
+    expect(setSyncErrorMock).toHaveBeenCalledWith('offline');
   });
 
   it('forces saveToCloud when visibility changes to hidden', async () => {

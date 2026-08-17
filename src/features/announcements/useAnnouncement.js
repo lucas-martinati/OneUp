@@ -48,7 +48,9 @@ export function useAnnouncement() {
   };
 
   const dismiss = () => {
-    setShow(false);
+    // Dismissing has the same effect as confirming: hide AND persist so it
+    // never shows again.
+    confirm();
   };
 
   return {

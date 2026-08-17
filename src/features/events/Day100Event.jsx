@@ -563,6 +563,12 @@ const Day100Styles = memo(() => (
           50%  { opacity: 1; transform: scale(1); }
           100% { opacity: 1; }
         }
+
+        /* ── Reward confetti (uses --dx/--dy/--grav set inline per particle) ── */
+        @keyframes confettiBurst3D {
+          0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+          100% { transform: translate(calc(var(--dx) * 1px), calc(var(--dy) * 1px + var(--grav) * 1px)) rotate(420deg); opacity: 0; }
+        }
     `}} />
 ));
 

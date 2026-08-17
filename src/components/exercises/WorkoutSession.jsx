@@ -6,7 +6,7 @@ import { SessionSummary } from './SessionSummary';
 import { ExercisePanel } from './ExercisePanel';
 import { getSessionHistory } from '@features/share/services/sessionHistoryService';
 import { getExerciseLabel } from '@utils/exerciseLabel';
-import { CATEGORIES, CATEGORY_ORDER, isUserCategory } from '@config/categories';
+import { CATEGORIES, isUserCategory } from '@config/categories';
 import { useWorkoutSession } from '@hooks/useWorkoutSession';
 import { getLocalDateStr } from '@shared/dateUtils';
 import styles from '@styles/WorkoutSession.module.css';
@@ -500,12 +500,17 @@ export function WorkoutSession(props) {
             return ex ? { id: ex.id, label: getExerciseLabel(ex, t), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff } : null;
         }).filter(Boolean);
 
-        const currentCategory = CATEGORY_ORDER[activeSlide];
+        // activeSlide indexes into fullCategoryOrder (built-ins + user-created
+        // categories), so lookup must use it — CATEGORY_ORDER would return
+        // undefined for user-category slides and silently fall back to 'bodyweight'.
+        const currentCategory = fullCategoryOrder[activeSlide];
         let sessionType = 'bodyweight';
         if (currentCategory === CATEGORIES.WEIGHTS) {
             sessionType = 'weights';
         } else if (currentCategory === CATEGORIES.CUSTOM) {
             sessionType = 'custom';
+        } else if (isUserCategory(currentCategory)) {
+            sessionType = currentCategory;
         } else if (currentCategory === CATEGORIES.CARDIO) {
             sessionType = 'cardio';
         }

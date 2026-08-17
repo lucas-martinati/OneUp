@@ -10,7 +10,6 @@ import { useNotificationManager } from './useNotificationManager';
  */
 export function useNotificationScheduling() {
   const isSetup = useProgressStore(s => s.isSetup);
-  const completions = useProgressStore(s => s.completions);
   const isDayDone = useProgressStore(s => s.isDayDone);
   const getDayNumber = useProgressStore(s => s.getDayNumber);
   const settings = useSettingsStore(s => s.settings);
@@ -24,7 +23,7 @@ export function useNotificationScheduling() {
     getDayNumber,
   });
 
-  // ── Permission & scheduling on settings / completion changes, plus midnight reschedule ──
+  // ── Permission & scheduling on settings changes, plus midnight reschedule ──
   useEffect(() => {
     if (isSetup && notificationsEnabled) {
       requestNotificationPermission();
@@ -48,21 +47,20 @@ export function useNotificationScheduling() {
       // foreground. This is what reliably clears a reminder that got stuck in the
       // tray after a reboot (the plugin's restore receiver re-fires past-due
       // notifications, and on aggressive OEMs like MIUI it can do so repeatedly).
-      let removeResumeListener = () => {};
-      import('@capacitor/app')
+      // The listener handle is reached through the import promise so the cleanup
+      // always removes it — even when the import resolves after unmount.
+      const resumePromise = import('@capacitor/app')
         .then(({ App }) => App.addListener('resume', () => {
           scheduleNotification(lightweightSettings);
         }))
-        .then((handle) => {
-          removeResumeListener = () => handle.remove();
-        })
         .catch((error) => {
           console.debug('App resume listener registration failed:', error);
+          return null;
         });
 
       return () => {
         clearTimeout(midnightTimer);
-        removeResumeListener();
+        resumePromise.then((handle) => { if (handle?.remove) handle.remove(); });
       };
     }
   }, [
@@ -70,7 +68,9 @@ export function useNotificationScheduling() {
     notificationsEnabled,
     notificationHour,
     notificationMinute,
-    completions,
+    // scheduleNotification reads the day-done state from the store at call time
+    // (via refs in useNotificationManager), so a completion change must NOT
+    // tear down and re-run this effect.
     requestNotificationPermission,
     scheduleNotification
   ]);

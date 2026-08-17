@@ -264,11 +264,16 @@ describe('authService', () => {
       expect(result).toBe(true); // wait, it returns true? Yes, it returns true and catches the error.
     });
 
-    it('throws other auth errors', async () => {
+    it('throws other auth errors without signing the user out locally', async () => {
       deleteUser.mockRejectedValueOnce({ code: 'auth/unknown' });
+      const listeners = [vi.fn()];
       const getUserClansFn = vi.fn(() => Promise.resolve([]));
-      
-      await expect(authService.deleteAccount([], vi.fn(), getUserClansFn)).rejects.toEqual({ code: 'auth/unknown' });
+
+      await expect(authService.deleteAccount(listeners, vi.fn(), getUserClansFn)).rejects.toEqual({ code: 'auth/unknown' });
+      // Account survives → the user must NOT be signed out locally
+      expect(Preferences.remove).not.toHaveBeenCalled();
+      expect(listeners[0]).not.toHaveBeenCalled();
+      expect(firebaseSignOut).not.toHaveBeenCalled();
     });
 
     it('throws if no current user', async () => {

@@ -4,6 +4,7 @@ import { CARD_WIDTH } from '@features/share/services/cardModel';
 import { CATEGORIES } from '@config/categories';
 import { useTranslation } from 'react-i18next';
 import { generateShareTextFromSession } from '@utils/sessionNameGenerator';
+import { getLocalDateStr } from '@shared/dateUtils';
 
 const DEFAULT_OPTIONS = {
   showDuration: true,
@@ -53,7 +54,7 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
   // Apply initial categories only once on mount (when modal opens)
   const getInitialOptions = () => {
     const saved = loadSavedOptions();
-    saved.globalDate = new Date().toISOString().split('T')[0]; // Always reset date to today
+    saved.globalDate = getLocalDateStr(new Date()); // Always reset date to today
     if (!isPro) {
       saved.theme = 'dark';
       saved.backgroundImage = null;
@@ -193,9 +194,10 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
 
   const exportCard = useCallback(async () => {
     const dataUrl = await captureCard();
-    await downloadImage(dataUrl, `oneup-session-${Date.now()}.png`);
+    const ext = options.format === 'jpeg' ? 'jpg' : 'png';
+    await downloadImage(dataUrl, `oneup-session-${Date.now()}.${ext}`);
     return { success: true };
-  }, [captureCard]);
+  }, [captureCard, options.format]);
 
   const shareCard = useCallback(async () => {
     const dataUrl = await captureCard();
@@ -204,11 +206,12 @@ export function useShareCard({ sessionData, stats = {}, sessionHistory = [], mod
     const result = await shareImage(dataUrl, { title: 'OneUp', text: shareText });
 
     if (!result.success && !result.canceled) {
-      await downloadImage(dataUrl, `oneup-session-${Date.now()}.png`);
+      const ext = options.format === 'jpeg' ? 'jpg' : 'png';
+      await downloadImage(dataUrl, `oneup-session-${Date.now()}.${ext}`);
       return { success: true, method: 'download-fallback' };
     }
     return result;
-  }, [captureCard, mode, sessionData, stats?.isPerfectToday, t]);
+  }, [captureCard, mode, sessionData, stats?.isPerfectToday, t, options.format]);
 
   return {
     cardRef,

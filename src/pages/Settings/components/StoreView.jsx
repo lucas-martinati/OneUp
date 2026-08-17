@@ -26,7 +26,7 @@ export function StoreView() {
     useEffect(() => {
         getPurchaseHistory().then(hist => {
             setRevenueCatHistory(hist);
-        });
+        }).catch(() => setRevenueCatHistory([]));
     }, []);
 
     return (

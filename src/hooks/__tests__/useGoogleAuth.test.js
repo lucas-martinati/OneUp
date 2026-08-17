@@ -64,6 +64,29 @@ describe('mount / auth bootstrap', () => {
     unmount();
   });
 
+  it('falls through to the signed-out branch when the sign-in preference read fails', async () => {
+    const { Preferences } = await import('@utils/preferences');
+    Preferences.get.mockRejectedValueOnce(new Error('storage down'));
+    const { result } = renderHook(() => useGoogleAuth());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.isSignedIn).toBe(false);
+    expect(result.current.authConfirmed).toBe(true);
+    expect(cloudSync.ensureInitialized).not.toHaveBeenCalled();
+  });
+
+  it('skips the optimistic boot when the cached user id read fails', async () => {
+    const { Preferences } = await import('@utils/preferences');
+    ho.prefStore = { user_signed_in: 'true', user_id: 'u1' };
+    Preferences.get
+      .mockImplementationOnce(() => Promise.resolve({ value: 'true' }))
+      .mockImplementationOnce(() => Promise.reject(new Error('storage down')));
+    const { result } = renderHook(() => useGoogleAuth());
+    await waitFor(() => expect(cloudSync.ensureInitialized).toHaveBeenCalled());
+    // No optimistic boot: loading stays until Firebase confirms the session
+    expect(result.current.isSignedIn).toBe(false);
+    expect(result.current.loading).toBe(true);
+  });
+
   it('optimistically boots a previously signed-in user from cache', async () => {
     ho.prefStore = { user_signed_in: 'true', user_id: 'u1', user_profile: JSON.stringify({ displayName: 'Alice' }) };
     const { result } = renderHook(() => useGoogleAuth());

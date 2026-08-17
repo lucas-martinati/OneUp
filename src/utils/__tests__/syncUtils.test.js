@@ -136,7 +136,9 @@ describe('syncUtils', () => {
       };
 
       const result = mergeData(local, cloud);
-      expect(result.lastCompletionChange).toBe(1500); // cloud real timestamp replaces placeholder
+      // Local placeholder write is kept: the pending server timestamp must win
+      // over the stale cloud LCC, otherwise the next save regresses it.
+      expect(result.lastCompletionChange).toEqual(localPlaceholder);
       
       expect(result.completions['2026-01-01'].squats.timestamp).toBe(2000); // cloud newer
       expect(result.completions['2026-01-01'].squats.weight).toBe(10); 
@@ -146,6 +148,30 @@ describe('syncUtils', () => {
       expect(result.completions['2026-01-02'].bench.timestamp).toBe(2000); // replaced placeholder
 
       expect(result.completions['2026-01-03'].deadlift.isCompleted).toBe(true);
+    });
+
+    it('keeps the local placeholder LCC when cloud has a real timestamp (no regression)', () => {
+      const localPlaceholder = { '.sv': 'timestamp' };
+      const local = {
+        lastCompletionChange: localPlaceholder,
+        completions: {
+          '2026-01-01': { squats: { isCompleted: true, timestamp: 1000 } }
+        }
+      };
+      const cloud = {
+        lastCompletionChange: 900, // older real timestamp
+        completions: {
+          '2026-01-01': { pushups: { isCompleted: true, timestamp: 1000 } }
+        }
+      };
+
+      const result = mergeData(local, cloud);
+      // The pending local write is kept so the next save writes a fresh server
+      // timestamp instead of regressing to the stale cloud LCC.
+      expect(result.lastCompletionChange).toEqual(localPlaceholder);
+      // Cloud-newer overwrite branch NOT taken: the local-only exercise survives.
+      expect(result.completions['2026-01-01'].squats.isCompleted).toBe(true);
+      expect(result.completions['2026-01-01'].pushups.isCompleted).toBe(true);
     });
 
     it('retains local properties if cloud is older', () => {

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Button } from './Button';
 import { X, ArrowLeft } from '@utils/icons';
 
@@ -19,6 +20,8 @@ export function ModalHeader({
   showBack = false,
   extraElements,
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className={`modal-header ${className}`} style={style}>
       <div className="modal-header-title-group">
@@ -27,7 +30,7 @@ export function ModalHeader({
             iconOnly
             icon={ArrowLeft}
             onClick={onBack}
-            aria-label="Retour"
+            aria-label={t('onboarding.back')}
             variant="glass"
           />
         )}
@@ -54,7 +57,7 @@ export function ModalHeader({
             iconOnly
             icon={X}
             onClick={onClose}
-            aria-label="Fermer"
+            aria-label={t('common.close')}
             variant="glass"
           />
         )}

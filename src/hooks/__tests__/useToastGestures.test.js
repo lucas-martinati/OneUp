@@ -134,4 +134,31 @@ describe('useToastGestures', () => {
         // It's still 'up', not changed to dragging state
         expect(result.current.exit).toBe('up');
     });
+
+    it('pointer cancel springs back without tapping or flinging', () => {
+        const onClose = vi.fn();
+        const onTap = vi.fn();
+        const { result } = renderHook(() => useToastGestures({ onClose, onTap }));
+
+        act(() => {
+            result.current.cardProps.onPointerDown({ clientX: 100, currentTarget: {} });
+            result.current.cardProps.onPointerMove({ clientX: 40 });
+        });
+        expect(result.current.cardProps.style.transform).toBe('translateX(-60px)');
+
+        act(() => {
+            result.current.cardProps.onPointerCancel();
+        });
+
+        // No tap, no exit — the toast springs back to rest.
+        expect(onTap).not.toHaveBeenCalled();
+        expect(result.current.exit).toBeNull();
+        expect(result.current.cardProps.style.transform).toBe('translateX(0px)');
+
+        // A cancel outside a drag is a no-op.
+        act(() => {
+            result.current.cardProps.onPointerCancel();
+        });
+        expect(result.current.exit).toBeNull();
+    });
 });

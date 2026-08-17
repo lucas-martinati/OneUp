@@ -679,7 +679,8 @@
     "theme.ocean": "Ozean",
     "theme.purple": "Lila",
     "theme.sunset": "Sonnenuntergang",
-    "uploadGallery": "Galerie"
+    "uploadGallery": "Galerie",
+    "error": "Teilen fehlgeschlagen. Bitte erneut versuchen."
   },
   "stats": {
     "basedOnManual_one": "Basierend auf {{count}} manuellen Tag",

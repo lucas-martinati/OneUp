@@ -6,6 +6,38 @@ import { Button } from '@components/ui';
  *  completions) readable and fast to render. */
 const AUTO_COLLAPSE_THRESHOLD = 15;
 
+/** Number input that commits on blur/Enter instead of on every keystroke, so
+ *  transient states ('-', 'e', empty) never write NaN/null over real values. */
+function InputNumber({ defaultValue, onCommit }) {
+  const [text, setText] = useState(String(defaultValue));
+  // Adjust state during render when the committed value changes externally
+  const [prevDefault, setPrevDefault] = useState(defaultValue);
+  if (prevDefault !== defaultValue) {
+    setPrevDefault(defaultValue);
+    setText(String(defaultValue));
+  }
+  const commit = () => {
+    const n = Number(text);
+    // Empty text parses as 0 — treat it like an invalid partial input too
+    if (text.trim() !== '' && Number.isFinite(n)) onCommit(n);
+    else setText(String(defaultValue));
+  };
+  return (
+    <input
+      type="number"
+      value={text}
+      onChange={(e) => setText(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => { if (e.key === 'Enter') commit(); }}
+      style={{
+        background: '#07070a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '4px',
+        color: '#60a5fa', fontFamily: 'monospace', width: '80px', outline: 'none', fontSize: '0.8rem',
+        padding: '2px 6px', boxSizing: 'border-box'
+      }}
+    />
+  );
+}
+
 /** Bouton "supprimer" (icône poubelle, opacité au survol) réutilisé dans l'arbre. */
 function DeleteButton({ onClick, title }) {
   return (
@@ -186,16 +218,7 @@ function JsonTreeNode({
       );
     } else if (typeof value === 'number') {
       valueElement = (
-        <input 
-          type="number" 
-          value={value} 
-          onChange={(e) => handlePrimitiveChange(Number(e.target.value))}
-          style={{
-            background: '#07070a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '4px',
-            color: '#60a5fa', fontFamily: 'monospace', width: '80px', outline: 'none', fontSize: '0.8rem',
-            padding: '2px 6px', boxSizing: 'border-box'
-          }}
-        />
+        <InputNumber defaultValue={value} onCommit={handlePrimitiveChange} />
       );
     } else if (value === null) {
       valueElement = <span style={{ color: '#9ca3af', fontFamily: 'monospace', fontSize: '0.8rem', fontWeight: 'bold' }}>null</span>;

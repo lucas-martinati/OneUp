@@ -679,7 +679,8 @@
     "theme.ocean": "Océano",
     "theme.purple": "Púrpura",
     "theme.sunset": "Atardecer",
-    "uploadGallery": "Galería"
+    "uploadGallery": "Galería",
+    "error": "Error al compartir. Inténtalo de nuevo."
   },
   "stats": {
     "basedOnManual_one": "Basado en {{count}} día manual",

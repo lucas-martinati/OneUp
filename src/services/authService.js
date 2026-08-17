@@ -160,11 +160,6 @@ export async function deleteAccount(listeners, leaveClanFn, getUserClansFn) {
     logger.warn('Client-side leaderboard removal denied, deferring to server cleanup:', err);
   }
 
-  await Preferences.remove({ key: 'user_signed_in' });
-  await Preferences.remove({ key: 'user_id' });
-  await Preferences.remove({ key: 'user_profile' });
-  notifyListeners(listeners, { isSignedIn: false, user: null });
-
   try {
     await deleteUser(auth.currentUser);
     logger.success('Account deleted successfully');
@@ -176,6 +171,11 @@ export async function deleteAccount(listeners, leaveClanFn, getUserClansFn) {
       throw authError;
     }
   }
+
+  await Preferences.remove({ key: 'user_signed_in' });
+  await Preferences.remove({ key: 'user_id' });
+  await Preferences.remove({ key: 'user_profile' });
+  notifyListeners(listeners, { isSignedIn: false, user: null });
   return true;
 }
 

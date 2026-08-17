@@ -103,7 +103,15 @@ export function useGoogleAuth() {
     // This tells us if the user was previously signed in, so we can
     // keep showing the loading screen instead of flashing the Onboarding.
     const initAuth = async () => {
-      const { value: wasPreviouslySignedIn } = await Preferences.get({ key: 'user_signed_in' });
+      // A native storage failure must not leave the app spinning on the
+      // loading screen: fall through to the signed-out branch below.
+      let wasPreviouslySignedIn = null;
+      try {
+        const { value } = await Preferences.get({ key: 'user_signed_in' });
+        wasPreviouslySignedIn = value;
+      } catch (error) {
+        logger.error('Failed to read sign-in preference:', error);
+      }
 
       if (wasPreviouslySignedIn === 'true') {
         // User was signed in before → boot Firebase so onAuthStateChanged can
@@ -118,7 +126,7 @@ export function useGoogleAuth() {
         // (it refreshes the ID token first) — without this the whole app sits
         // on "Initialisation...". Cloud access stays gated on `authConfirmed`,
         // so nothing hits the network until Firebase is genuinely ready.
-        const { value: cachedUid } = await Preferences.get({ key: 'user_id' });
+        const { value: cachedUid } = await Preferences.get({ key: 'user_id' }).catch(() => ({ value: null }));
         if (cachedUid && isMounted) {
           let cachedUser = { uid: cachedUid };
           try {

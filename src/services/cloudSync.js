@@ -1,5 +1,8 @@
 import { initializeFirebase, getAuthInstance } from './firebase';
 import { mergeData } from '@utils/syncUtils';
+import { createLogger } from '@utils/logger';
+
+const logger = createLogger('CloudSync');
 
 const USER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -179,7 +182,7 @@ class CloudSyncService {
     this.ensureInitialized().then(() => {
       if (unsubscribed) return;
       actualUnsubscribe = this._dataSyncService.listenToCloudChanges(callback);
-    });
+    }).catch(err => logger.error('Failed to initialize cloud listener:', err));
 
     return () => {
       unsubscribed = true;
@@ -208,7 +211,7 @@ class CloudSyncService {
     this.ensureInitialized().then(() => {
       if (unsubscribed) return;
       actualUnsubscribe = this._userDataService.listenToSettingsFromCloud(callback);
-    });
+    }).catch(err => logger.error('Failed to initialize cloud listener:', err));
     return () => {
       unsubscribed = true;
       if (actualUnsubscribe) actualUnsubscribe();
@@ -226,7 +229,7 @@ class CloudSyncService {
     this.ensureInitialized().then(() => {
       if (unsubscribed) return;
       actualUnsubscribe = this._userDataService.listenToRoutinesFromCloud(callback);
-    });
+    }).catch(err => logger.error('Failed to initialize cloud listener:', err));
     return () => {
       unsubscribed = true;
       if (actualUnsubscribe) actualUnsubscribe();
@@ -244,7 +247,7 @@ class CloudSyncService {
     this.ensureInitialized().then(() => {
       if (unsubscribed) return;
       actualUnsubscribe = this._userDataService.listenToCustomExercisesFromCloud(callback);
-    });
+    }).catch(err => logger.error('Failed to initialize cloud listener:', err));
     return () => {
       unsubscribed = true;
       if (actualUnsubscribe) actualUnsubscribe();
@@ -262,7 +265,7 @@ class CloudSyncService {
     this.ensureInitialized().then(() => {
       if (unsubscribed) return;
       actualUnsubscribe = this._userDataService.listenToCustomCategoriesFromCloud(callback);
-    });
+    }).catch(err => logger.error('Failed to initialize cloud listener:', err));
     return () => {
       unsubscribed = true;
       if (actualUnsubscribe) actualUnsubscribe();
@@ -280,7 +283,7 @@ class CloudSyncService {
     this.ensureInitialized().then(() => {
       if (unsubscribed) return;
       actualUnsubscribe = this._userDataService.listenToPurchaseFromCloud(callback);
-    });
+    }).catch(err => logger.error('Failed to initialize cloud listener:', err));
     return () => {
       unsubscribed = true;
       if (actualUnsubscribe) actualUnsubscribe();
@@ -309,7 +312,7 @@ class CloudSyncService {
     this.ensureInitialized().then(() => {
       if (unsubscribed) return;
       actualUnsubscribe = this._weightHistoryService.listenToWeightHistoryFromCloud(callback);
-    });
+    }).catch(err => logger.error('Failed to initialize cloud listener:', err));
     return () => {
       unsubscribed = true;
       if (actualUnsubscribe) actualUnsubscribe();
@@ -327,7 +330,7 @@ class CloudSyncService {
     this.ensureInitialized().then(() => {
       if (unsubscribed) return;
       actualUnsubscribe = this._cardioService.listenToCardioSessionsFromCloud(callback);
-    });
+    }).catch(err => logger.error('Failed to initialize cloud listener:', err));
     return () => {
       unsubscribed = true;
       if (actualUnsubscribe) actualUnsubscribe();
@@ -370,7 +373,7 @@ class CloudSyncService {
     this.ensureInitialized().then(() => {
       if (unsubscribed) return;
       actualUnsubscribe = this._clanService.listenToNotifications(callback);
-    });
+    }).catch(err => logger.error('Failed to initialize cloud listener:', err));
     return () => {
       unsubscribed = true;
       if (actualUnsubscribe) actualUnsubscribe();

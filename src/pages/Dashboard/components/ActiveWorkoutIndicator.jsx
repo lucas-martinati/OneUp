@@ -93,12 +93,20 @@ export const ActiveWorkoutIndicator = React.memo(({ onResume, onDiscard, anyModa
 
     if (anyModalOpen !== prevAnyModalOpen) {
         setPrevAnyModalOpen(anyModalOpen);
-        if (!anyModalOpen) {
-            setSessionData(loadWorkoutSession());
-        } else if (isDragging) {
+        if (anyModalOpen && isDragging) {
             setIsDragging(false);
         }
     }
+
+    // Reload the persisted session once a modal finishes closing (the read is
+    // localStorage I/O, so it runs in an effect — not during render).
+    useEffect(() => {
+        if (prevAnyModalOpen && !anyModalOpen) {
+            const reloadTimer = setTimeout(() => setSessionData(loadWorkoutSession()), 0);
+            return () => clearTimeout(reloadTimer);
+        }
+        return undefined;
+    }, [anyModalOpen, prevAnyModalOpen]);
 
     // ── Suspend animations when a modal opens ──
     useEffect(() => {

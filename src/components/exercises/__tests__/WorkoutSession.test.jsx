@@ -17,9 +17,15 @@ vi.mock('@hooks/useWorkoutSession', () => ({
   useWorkoutSession: vi.fn(),
 }));
 
-describe('WorkoutSession config phase titles', () => {
-  const defaultWsMock = {
-    phase: 'config',
+// Capture the sessionType the done phase derives for the summary
+vi.mock('../SessionSummary', () => ({
+  SessionSummary: ({ sessionData }) => (
+    <div data-testid="session-summary" data-type={sessionData?.type} />
+  ),
+}));
+
+const defaultWsMock = {
+  phase: 'config',
     queue: [],
     setQueue: vi.fn(),
     showSaveRoutine: false,
@@ -82,6 +88,7 @@ describe('WorkoutSession config phase titles', () => {
     isStarted: false,
   };
 
+describe('WorkoutSession config phase titles', () => {
   beforeEach(() => {
     cleanup();
     vi.clearAllMocks();
@@ -115,5 +122,36 @@ describe('WorkoutSession config phase titles', () => {
     // Ensure hardcoded gradient styles are removed so it uses canonical panel-title class styles
     expect(titleElement.style.background).toBeFalsy();
     expect(titleElement.style.WebkitBackgroundClip).toBeFalsy();
+  });
+});
+
+describe('WorkoutSession done phase session type', () => {
+  const FULL_ORDER = ['cardio', 'bodyweight', 'weights', 'custom', 'cat_my'];
+  const doneMock = (overrides = {}) => ({
+    ...defaultWsMock,
+    phase: 'done',
+    queue: ['pushups'],
+    exerciseInfo: [{ id: 'pushups', goal: 10, color: '#fff', icon: 'X', type: 'reps' }],
+    sessionName: 'Session',
+    fullCategoryOrder: FULL_ORDER,
+    ...overrides,
+  });
+
+  beforeEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('derives the session type from the user category slide (not the built-in order)', () => {
+    vi.mocked(useWorkoutSession).mockReturnValue(doneMock({ activeSlide: 4 }));
+    const { getByTestId } = render(<WorkoutSession onClose={vi.fn()} />);
+    // CATEGORY_ORDER[4] is undefined → old code fell back to 'bodyweight'
+    expect(getByTestId('session-summary').dataset.type).toBe('cat_my');
+  });
+
+  it('derives cardio for the cardio slide', () => {
+    vi.mocked(useWorkoutSession).mockReturnValue(doneMock({ activeSlide: 0 }));
+    const { getByTestId } = render(<WorkoutSession onClose={vi.fn()} />);
+    expect(getByTestId('session-summary').dataset.type).toBe('cardio');
   });
 });

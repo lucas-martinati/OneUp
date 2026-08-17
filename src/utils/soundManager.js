@@ -84,7 +84,8 @@ function playSound(soundName) {
       const selectedSound = getSuccessSound();
       playAudioFile(selectedSound);
     } else if (soundName === 'click') {
-      playAudioFile('click');
+      // No dedicated click sample exists; reuse the common success sample
+      playAudioFile('success');
     } else if (soundName === 'poke') {
       playAudioFile('poke');
     }

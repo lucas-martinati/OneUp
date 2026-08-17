@@ -17,7 +17,6 @@ import {
   saveWeightEntry,
   loadWeightHistory,
   loadAllWeightHistories,
-  loadLatestWeights,
 } from '../weightHistoryService';
 
 const snapshot = (val) => ({ exists: () => val != null, val: () => val });
@@ -71,21 +70,5 @@ describe('loadAllWeightHistories', () => {
   it('returns null when signed out', async () => {
     getAuthInstance.mockReturnValue({ currentUser: null });
     expect(await loadAllWeightHistories()).toBeNull();
-  });
-});
-
-describe('loadLatestWeights', () => {
-  it('returns the snapshot of current weights', async () => {
-    get.mockResolvedValue(snapshot({ bench: 60 }));
-    expect(await loadLatestWeights('u2')).toEqual({ bench: 60 });
-  });
-
-  it('returns null without a uid', async () => {
-    expect(await loadLatestWeights('')).toBeNull();
-  });
-
-  it('returns null when nothing stored', async () => {
-    get.mockResolvedValue(snapshot(null));
-    expect(await loadLatestWeights('u2')).toBeNull();
   });
 });

@@ -130,10 +130,18 @@ export function parseProgressData(parsed) {
   const lastChange = parsed?.lastCompletionChange || null;
 
   if (validated.startDate !== fixedStartDate) {
+    // Challenge carried over from a previous year: reset the "new year" fields
+    // but keep the user's data. Dropping completions here wipes a year of
+    // progress at every year rollover.
     return {
       ...getDefaultState(),
+      startDate: validated.startDate,
+      completions: validated.completions,
+      cardio: validated.cardio,
+      frozenDays: validated.frozenDays,
+      streakFreezes: validated.streakFreezes,
       achievements: validated.achievements ?? {},
-      lastCompletionChange: lastChange
+      lastCompletionChange: lastChange,
     };
   }
 

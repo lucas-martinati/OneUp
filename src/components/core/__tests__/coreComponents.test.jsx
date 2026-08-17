@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, cleanup } from '@testing-library/react';
+import { render, fireEvent, cleanup } from '@testing-library/react';
 
 // ── ComputedStatsSynchronizer ──────────────────────────────────────────
 const progressState = {
@@ -73,11 +73,33 @@ describe('ErrorBoundary', () => {
     expect(getByText('ok')).toBeTruthy();
   });
 
-  it('renders the fallback and the error message when a child throws', () => {
+  it('renders the fallback with generic copy and logs the error when a child throws', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { getByText } = render(<ErrorBoundary><Boom /></ErrorBoundary>);
+    const { getByText, queryByText } = render(<ErrorBoundary><Boom /></ErrorBoundary>);
     expect(getByText('Something went wrong')).toBeTruthy();
-    expect(getByText('kaboom')).toBeTruthy();
+    // The raw error message must not leak into the UI — only the log gets it.
+    expect(queryByText('kaboom')).toBeNull();
+    expect(console.error).toHaveBeenCalledWith(
+      expect.stringContaining('Uncaught error:'),
+      expect.any(Error),
+      expect.anything()
+    );
+    console.error.mockRestore();
+  });
+
+  it('recovers via the Try Again button', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    let shouldThrow = true;
+    const Flaky = () => {
+      if (shouldThrow) throw new Error('boom');
+      return <span>recovered</span>;
+    };
+    const { getByText, rerender } = render(<ErrorBoundary><Flaky /></ErrorBoundary>);
+    expect(getByText('Something went wrong')).toBeTruthy();
+    shouldThrow = false;
+    fireEvent.click(getByText('Try Again'));
+    rerender(<ErrorBoundary><Flaky /></ErrorBoundary>);
+    expect(getByText('recovered')).toBeTruthy();
     console.error.mockRestore();
   });
 });

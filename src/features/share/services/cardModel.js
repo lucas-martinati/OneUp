@@ -79,7 +79,7 @@ export function buildCardModel({
   let dailyWeightsDone = false;
 
   if (isGlobal && options.showDailyExercises && completions) {
-    const targetDate = options.globalDate || new Date().toISOString().split('T')[0];
+    const targetDate = options.globalDate || getLocalDateStr(new Date());
     const dayNum = getDayNumber ? getDayNumber(targetDate) : 1;
     const dayData = completions[targetDate];
     if (dayData) {

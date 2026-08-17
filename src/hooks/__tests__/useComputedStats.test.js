@@ -5,6 +5,7 @@ import { isGlobalPerfectDay } from '@utils/statUtils';
 // We need to mock dependencies
 vi.mock('@shared/dateUtils', () => ({
   getLocalDateStr: vi.fn((d) => d.toISOString().split('T')[0]),
+  parseLocalDate: vi.fn((d) => new Date(d)),
   calculateExerciseStreak: vi.fn(() => 5),
   MAX_STREAK_WINDOW: 7,
   parseTimestamp: vi.fn((ts) => new Date(ts)),

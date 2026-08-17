@@ -16,6 +16,7 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
   const hasShared = useProgressStore(s => s.hasShared);
   const setHasShared = useProgressStore(s => s.setHasShared);
   const [cardFormat, setCardFormat] = useState(null);
+  const [shareError, setShareError] = useState(null);
   const {
     cardRef, options, toggleOption, setOption, toggleCategory,
     setBackgroundImage, clearBackgroundImage,
@@ -33,12 +34,24 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
   };
 
   const handleShare = async () => {
-    await shareCard();
-    handleShareSuccess();
+    setShareError(null);
+    try {
+      await shareCard();
+      handleShareSuccess();
+    } catch (err) {
+      console.error('Share failed', err);
+      setShareError(t('share.error'));
+    }
   };
   const handleDownload = async () => {
-    await exportCard();
-    handleShareSuccess();
+    setShareError(null);
+    try {
+      await exportCard();
+      handleShareSuccess();
+    } catch (err) {
+      console.error('Download failed', err);
+      setShareError(t('share.error'));
+    }
   };
 
   // Shared by the ref-holding preview card and its enlarged zoom copy
@@ -91,6 +104,16 @@ export function ShareModal({ shareHook, onClose, isPro = false, completions = {}
               }}
             />
           </div>
+
+          {shareError && (
+            <div style={{
+              color: 'var(--error)', fontSize: '0.8rem', marginTop: '4px',
+              padding: '6px 10px', borderRadius: 'var(--radius-md)',
+              background: 'rgba(239, 68, 68, 0.08)', marginBottom: '8px'
+            }}>
+              {shareError}
+            </div>
+          )}
 
           <div className={styles.actions}>
             <Button

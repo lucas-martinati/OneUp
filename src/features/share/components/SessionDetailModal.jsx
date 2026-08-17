@@ -47,9 +47,16 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
   if (!session) return null;
 
   const handleNameSave = async (newName) => {
+    const previousName = name;
     setName(newName);
-    updateSessionName(session.id, newName);
     onNameChange?.(session.id, newName);
+    try {
+      await updateSessionName(session.id, newName);
+    } catch (err) {
+      console.error('Failed to save session name', err);
+      // Revert the optimistic UI update on failure
+      setName(previousName);
+    }
   };
 
   const handleDelete = () => {

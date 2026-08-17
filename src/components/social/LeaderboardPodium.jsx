@@ -2,6 +2,7 @@ import React from 'react';
 import { Crown, Star, HeartHandshake, Check, Shield, ShieldAlert } from '@utils/icons';
 import { Avatar } from '@components/ui/Avatar';
 import { getTierBadgeConfigs } from '@utils/entitlements';
+import { getShieldFlags } from '@utils/leaderboard';
 import { PALETTE } from '@styles/palette';
 import styles from '@styles/Leaderboard.module.css';
 
@@ -26,10 +27,7 @@ export function LeaderboardPodium({ items, currentUid, todayStr, onSelect, clanD
                 const isPerfect = entry.isPerfectToday && entry.lastActiveDay === todayStr;
                 const avatarSize = slot === 0 ? 66 : 52;
 
-                // Shield logic: server-computed (immune to client clock manipulation).
-                const shieldFresh = entry.shieldDate === todayStr;
-                const showVerifiedShield = !!entry.shieldGreen && shieldFresh;
-                const showSuspiciousShield = !!entry.shieldOrange && shieldFresh;
+                const { showVerifiedShield, showSuspiciousShield } = getShieldFlags(entry, todayStr);
 
                 let pItemCls = styles.pItem3;
                 if (slot === 0) {

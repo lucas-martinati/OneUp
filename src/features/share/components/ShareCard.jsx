@@ -6,7 +6,7 @@ import {
 } from '@utils/icons';
 import { getExerciseLabel, getExerciseColor } from '@utils/exerciseLabel';
 import { APP_URL_DISPLAY } from '@config/app';
-import { parseLocalDate } from '@shared/dateUtils';
+import { parseLocalDate, getLocalDateStr } from '@shared/dateUtils';
 import { formatDuration } from '@utils/formatters';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { DifficultyBadge } from '@components/ui/DifficultyBadge';
@@ -346,7 +346,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
 
   const dateStr = sessionData?.date
     ? formatDate(sessionData.date, lang)
-    : formatDate(new Date().toISOString(), lang);
+    : formatDate(getLocalDateStr(new Date()), lang);
 
   const heroVisible = !!options.showVolume;
   const tiles = isGlobal
@@ -596,7 +596,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
             transition: `all 0.4s ${SPRING}`,
           }}>
             <SectionLabel color={currentTheme.accent}>
-              {formatDate(options.globalDate || new Date().toISOString().split('T')[0], lang)}
+              {formatDate(options.globalDate || getLocalDateStr(new Date()), lang)}
             </SectionLabel>
             {showDailySections ? (
               dailyCategories.map(cat => (

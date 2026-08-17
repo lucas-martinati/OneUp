@@ -9,31 +9,12 @@ import { useBackHandler } from '@hooks/useBackHandler';
 import { CardioMap } from './CardioMap';
 import { CardioFullscreenMap } from './CardioFullscreenMap';
 import { parseTimestamp } from '@shared/dateUtils';
-
-function formatDuration(seconds) {
-  if (!seconds || seconds <= 0) return '—';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) return `${h}h${m.toString().padStart(2, '0')}`;
-  return `${m}min`;
-}
+import { formatDuration, formatDistance, formatSpeed } from '@utils/cardioFormatters';
 
 function formatDate(timestamp, lang) {
   if (!timestamp) return '—';
   const d = parseTimestamp(timestamp);
   return d.toLocaleDateString(lang || undefined, { day: 'numeric', month: 'short', year: 'numeric' });
-}
-
-/** Pace (min/km) for running, speed (km/h) otherwise. averageSpeed is in m/s. */
-function formatSpeed(speedMs, type) {
-  if (!speedMs || speedMs <= 0) return '—';
-  if (type === 'running') {
-    const secondsPerKm = 1000 / speedMs;
-    const mins = Math.floor(secondsPerKm / 60);
-    const secs = Math.floor(secondsPerKm % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  }
-  return (speedMs * 3.6).toFixed(1);
 }
 
 function getSpeed(session) {
@@ -134,7 +115,7 @@ function SessionCard({ session, mode, t, lang }) {
         <StatChip
           icon={Target}
           label={t('cardio.distance')}
-          value={session.distance ? (session.distance / 1000).toFixed(1) : '—'}
+          value={formatDistance(session.distance)}
           unit={t('cardio.units.km')}
         />
         <StatChip

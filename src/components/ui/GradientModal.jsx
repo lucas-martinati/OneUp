@@ -1,10 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ModalContainer } from '@components/ui/ModalContainer';
 import { X } from '@utils/icons';
 import { useHaptics } from '@hooks/useHaptics';
 import { Button } from './Button';
 
 export function GradientModal({ open, onClose, ariaLabel, maxWidth = '440px', borderGradient = 'rgba(139, 92, 246, 0.35)', shadowGlow = 'rgba(139, 92, 246, 0.25)', children }) {
+  const { t } = useTranslation();
   const { light } = useHaptics();
 
   if (!open) return null;
@@ -37,7 +39,7 @@ export function GradientModal({ open, onClose, ariaLabel, maxWidth = '440px', bo
           iconOnly
           icon={X}
           onClick={handleClose}
-          aria-label="Fermer"
+          aria-label={t('common.close')}
           style={{
             position: 'absolute',
             top: '16px',

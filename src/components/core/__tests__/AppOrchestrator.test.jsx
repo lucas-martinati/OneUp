@@ -174,21 +174,21 @@ describe('AppOrchestrator — signed-in user with local data', () => {
   });
 
   it('runs a full sync and starts the realtime listener', async () => {
-    cloudSync.syncData.mockResolvedValue(cloudData);
+    cloudSync.loadFromCloud.mockResolvedValue(cloudData);
 
     renderOrchestrator();
 
     await waitFor(() => {
       expect(useCloudSyncStore.getState().isInitialSyncDone).toBe(true);
     });
-    expect(cloudSync.syncData).toHaveBeenCalled();
+    expect(cloudSync.loadFromCloud).toHaveBeenCalled();
     await waitFor(() => {
       expect(cloudSync.listenToCloudChanges).toHaveBeenCalled();
     });
   });
 
   it('still starts when the initial sync fails (data stays local)', async () => {
-    cloudSync.syncData.mockRejectedValue(new Error('offline'));
+    cloudSync.loadFromCloud.mockRejectedValue(new Error('offline'));
 
     renderOrchestrator();
 
@@ -234,11 +234,6 @@ describe('AppOrchestrator — guest data conflict on sign-in', () => {
 
   it('after resolving the conflict, sync resumes', async () => {
     cloudSync.loadFromCloud.mockResolvedValue(cloudData);
-    // Realistic sync: the service merges local data with the cloud
-    cloudSync.syncData.mockImplementation(async (local) => ({
-      ...local,
-      completions: { ...local.completions, ...cloudData.completions },
-    }));
 
     renderOrchestrator();
     await waitFor(() => {

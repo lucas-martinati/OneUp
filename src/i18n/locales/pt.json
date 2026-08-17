@@ -679,7 +679,8 @@
     "theme.ocean": "Oceano",
     "theme.purple": "Roxo",
     "theme.sunset": "Pôr do sol",
-    "uploadGallery": "Galeria"
+    "uploadGallery": "Galeria",
+    "error": "Falha ao partilhar. Tenta novamente."
   },
   "stats": {
     "basedOnManual_one": "Baseado em {{count}} dia manual",

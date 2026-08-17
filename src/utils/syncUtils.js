@@ -163,9 +163,7 @@ export function mergeData(localData, cloudData) {
     });
   }
 
-  const finalLCC = (cloudLCCTs > localLCCTs || (localLCCIsPlaceholder && !cloudLCCIsPlaceholder)) 
-    ? cloudLCC 
-    : localLCC;
+  const finalLCC = (cloudLCCTs > localLCCTs && !localLCCIsPlaceholder) ? cloudLCC : localLCC;
 
   const mergedSessions = { 
     ...(localData.cardio?.sessions || {}), 

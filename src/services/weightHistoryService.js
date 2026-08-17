@@ -55,18 +55,3 @@ export async function loadAllWeightHistories() {
   }
   return null;
 }
-
-/**
- * Load the latest weight per exercise for a given user (public reader).
- * Used in UserDetail to display another user's last weights.
- * Returns { [exerciseId]: weight } or null.
- */
-export async function loadLatestWeights(uid) {
-  const database = getDatabaseInstance();
-  if (!database || !uid) return null;
-
-  // Read the user's current exerciseWeights (quick snapshot)
-  const snapshot = await get(ref(database, paths.userExerciseWeights(uid)));
-  if (snapshot.exists()) return snapshot.val();
-  return null;
-}
