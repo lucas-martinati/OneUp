@@ -1,6 +1,6 @@
 import React from 'react';
 import { Shield, RefreshCw } from '@utils/icons';
-import { useSwipeGesture } from '@hooks/useSwipeGesture';
+import { useSwipe } from '@hooks/useSwipe';
 import { Spinner, Button, SegmentedControl, ModalHeader, ModalContainer } from '@components/ui';
 import { useAdminPanel } from './useAdminPanel';
 import { AdminUserList } from './AdminUserList';
@@ -23,7 +23,7 @@ export function AdminPanel({ onClose }) {
     handleResetProgress, handleDeleteUser,
   } = useAdminPanel();
 
-  const { handleTouchStart, handleTouchEnd } = useSwipeGesture({
+  const { handleTouchStart, handleTouchEnd } = useSwipe({
     onSwipeLeft: () => {
       const tabs = ['form', 'json'];
       const currentIndex = tabs.indexOf(editMode);

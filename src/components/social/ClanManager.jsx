@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Users, LogIn, Plus, Shield } from '@utils/icons';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import { GoogleSignInButton } from '@components/ui/GoogleSignInButton';
-import { Button, Card } from '@components/ui';
+import { Button, Card, Input } from '@components/ui';
 import { useAuth } from '@contexts/AuthContext';
 import { useSettingsStore } from '@store/useSettingsStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
@@ -186,17 +186,12 @@ export function ClanManager({ onClanJoined }) {
                                 <p style={{ margin: 0, color: 'var(--text-secondary)', textAlign: 'center', fontSize: '0.85rem' }}>
                                     {t('clan.choosePseudo')}
                                 </p>
-                                <input
-                                    type="text"
+                                <Input
                                     value={pseudoInput}
                                     onChange={(e) => setPseudoInput(e.target.value)}
                                     placeholder={t('common.yourPseudo')}
                                     maxLength={20}
-                                    style={{
-                                        width: '100%', padding: '14px', borderRadius: 'var(--radius-md)',
-                                        background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)',
-                                        color: 'white', fontSize: '1.1rem', textAlign: 'center', fontWeight: 'bold'
-                                    }}
+                                    style={{ textAlign: 'center', fontWeight: 'bold' }}
                                 />
                             </div>
                         )}
@@ -205,17 +200,12 @@ export function ClanManager({ onClanJoined }) {
                             <p style={{ margin: 0, color: 'var(--text-secondary)', textAlign: 'center', fontSize: '0.85rem' }}>
                                 {view === 'create' ? t('clan.clanNamePrompt') : t('clan.enterCode')}
                             </p>
-                            <input
-                                type="text"
+                            <Input
                                 value={inputValue}
                                 onChange={(e) => setInputValue(view === 'join' ? e.target.value.toUpperCase() : e.target.value)}
                                 placeholder={view === 'create' ? t('clan.clanNamePlaceholder') : "EX: ABC123"}
                                 maxLength={view === 'join' ? 6 : 20}
-                                style={{
-                                    width: '100%', padding: '14px', borderRadius: 'var(--radius-md)',
-                                    background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)',
-                                    color: 'white', fontSize: '1.2rem', textAlign: 'center', fontWeight: '800'
-                                }}
+                                style={{ textAlign: 'center', fontWeight: '800' }}
                             />
                         </div>
                         

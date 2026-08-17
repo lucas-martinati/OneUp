@@ -282,7 +282,7 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
       </Card>
 
       {/* Form Save Button */}
-      <div style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
+      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', width: '100%', flexShrink: 0 }}>
         <Button
           variant="danger"
           size="lg"
@@ -290,13 +290,15 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
           loading={saveLoading}
           icon={Save}
           onClick={onSave}
+          style={{ flex: '1 1 200px' }}
         >
-          Enregistrer Profil & Droits
+          Enregistrer le profil
         </Button>
         <Button
           variant="secondary"
           size="lg"
           onClick={onBack}
+          style={{ flex: '1 1 100px' }}
         >
           Retour
         </Button>

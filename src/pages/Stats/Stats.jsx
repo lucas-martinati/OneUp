@@ -15,7 +15,7 @@ import { useProgressStore } from '@store/useProgressStore';
 import { useSettingsStore } from '@store/useSettingsStore';
 import { useComputedStatsFromStore } from '@hooks/useComputedStatsFromStore';
 import { useSubscription } from '@contexts/SubscriptionContext';
-import { useSwipeGesture } from '@hooks/useSwipeGesture';
+import { useSwipe } from '@hooks/useSwipe';
 import { useExercises } from '@contexts/ExercisesContext';
 import { useCardio } from '@features/cardio/useCardio';
 import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
@@ -82,7 +82,7 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
     }, [onClose]);
 
     // Touch gesture handlers for mobile swipe category switching
-    const { handleTouchStart, handleTouchEnd } = useSwipeGesture({
+    const { handleTouchStart, handleTouchEnd } = useSwipe({
         onSwipeLeft: () => {
             const tabs = ['overview', 'charts', 'details'];
             const currentIndex = tabs.indexOf(activeTab);

@@ -5,7 +5,7 @@ import { getIcon } from '@utils/icons';
 import { Button, ConfirmDialog, WeightBadge, InlineNameEditor, ModalHeader, ModalContainer } from '@components/ui';
 import { updateSessionName } from '@features/share/services/sessionHistoryService';
 import { getExerciseLabel, getExerciseColor } from '@utils/exerciseLabel';
-import { sumExerciseReps } from '@utils/stats';
+import { sumExerciseReps } from '@utils/statUtils';
 import { SharePanel } from './SharePanel';
 import styles from './SessionDetailModal.module.css';
 

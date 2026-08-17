@@ -3,6 +3,7 @@ import { cloudSync } from '@services/cloudSync';
 import { BADGE_DEFINITIONS, getBadgeById } from '@config/badgeDefinitions';
 import { useUIStore } from '@store/useUIStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
+import { getLocalDateStr } from '@shared/dateUtils';
 import i18n from '../i18n';
 
 /**
@@ -137,7 +138,7 @@ export function installDebugCommands() {
       }
       try {
         const data = JSON.parse(raw);
-        const todayStr = new Date().toLocaleDateString('sv-SE');
+        const todayStr = getLocalDateStr(new Date());
         const day = data.completions?.[todayStr];
         if (day && typeof day === 'object') {
           for (const exId of Object.keys(day)) {

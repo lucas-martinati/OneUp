@@ -181,14 +181,16 @@ export default defineConfig({
         'src/components/admin/JsonTreeEditor.jsx',
         'src/components/admin/LineNumberTextarea.jsx',
         'src/pages/Dashboard/components/DashboardHeader.jsx',
+        'src/pages/Dashboard/components/DailySummaryHeader.jsx',
+        'src/pages/Dashboard/components/StreakFreezeInfo.jsx',
         'src/pages/Dashboard/components/DashboardModals.jsx',
         'src/pages/Dashboard/components/CategoryProgressView.jsx',
         'src/pages/Dashboard/components/CategoryViewSwiper.jsx',
         'src/pages/Dashboard/components/ProPaywall.jsx',
         'src/pages/Dashboard/components/ActiveWorkoutIndicator.jsx',
         'src/components/exercises/ExercisePanel.jsx',
-        'src/components/exercises/CategoryManagerModal.jsx',
-        'src/components/exercises/CustomExercisesModal.jsx',
+        'src/components/exercises/CustomDataManagerModal.jsx',
+        'src/components/exercises/custom/**',
         'src/components/exercises/SessionSummary.jsx',
         'src/components/exercises/WorkoutSession.jsx',
         'src/components/exercises/panel/**',
@@ -204,8 +206,8 @@ export default defineConfig({
         'src/components/social/NotificationManager.jsx',
         'src/components/social/UserDetail.jsx',
         // Stats views are charts/calendars/cards — presentational viz. The
-        // underlying stats computation lives in src/utils/stats.js & statUtils.js
-        // (both fully covered).
+        // underlying stats computation lives in src/utils/statUtils.js
+        // (fully covered).
         'src/pages/Stats/**',
         'src/pages/Dashboard/components/ProExpiredModal.jsx',
         'src/pages/Dashboard/components/ProUnlockedModal.jsx',
@@ -216,6 +218,8 @@ export default defineConfig({
         'src/components/store/StoreCard.jsx',
         'src/components/ui/AnimatedNumber.jsx',
         'src/features/announcements/AnnouncementOverlay.jsx',
+        'src/features/events/Day*Event.jsx',
+        'src/features/events/index.jsx',
         'src/features/cardio/Cardio*.jsx',
         'src/features/share/components/**',
       ],

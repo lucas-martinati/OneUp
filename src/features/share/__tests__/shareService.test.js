@@ -28,6 +28,7 @@ import {
   downloadImage,
   shareImage,
   canShareNatively,
+  _resetFontEmbedCache,
 } from '@features/share/services/shareService';
 import { toPng, toJpeg } from 'html-to-image';
 import { Share } from '@capacitor/share';
@@ -36,6 +37,7 @@ import { Filesystem } from '@capacitor/filesystem';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  _resetFontEmbedCache();
   vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
   vi.mocked(toPng).mockResolvedValue('data:image/png;base64,fake');
   vi.mocked(toJpeg).mockResolvedValue('data:image/jpeg;base64,fake');
@@ -80,6 +82,31 @@ describe('captureElement', () => {
     const mockEl = document.createElement('div');
     await captureElement(mockEl, { pixelRatio: 3 });
     expect(toPng).toHaveBeenCalledWith(mockEl, expect.objectContaining({ pixelRatio: 3 }));
+  });
+
+  it('embeds google web fonts when present in document', async () => {
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Outfit';
+    document.head.appendChild(link);
+
+    const mockCss = '@font-face { font-family: "Outfit"; src: url(https://fonts.gstatic.com/font.woff2); unicode-range: U+0000-00FF; }';
+    const mockBlob = new Blob(['font-bytes'], { type: 'font/woff2' });
+
+    vi.stubGlobal('fetch', vi.fn((url) => {
+      if (url.includes('googleapis')) {
+        return Promise.resolve({ text: () => Promise.resolve(mockCss) });
+      }
+      return Promise.resolve({ blob: () => Promise.resolve(mockBlob) });
+    }));
+
+    const mockEl = document.createElement('div');
+    await captureElement(mockEl);
+
+    expect(toPng).toHaveBeenCalledWith(mockEl, expect.objectContaining({
+      fontEmbedCSS: expect.stringContaining('@font-face')
+    }));
+
+    document.head.removeChild(link);
   });
 });
 

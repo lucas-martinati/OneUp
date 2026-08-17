@@ -5,223 +5,155 @@ import { paths } from '@shared/dbSchema.js';
 
 const logger = createLogger('UserData');
 
-// ── Settings ────────────────────────────────────────────────────────────
+// ── Generic Firebase RTDB Helpers ────────────────────────────────────────
 
-export async function saveSettingsToCloud(settings) {
+function getContext(explicitUid = null) {
   const auth = getAuthInstance();
   const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return false;
+  const uid = explicitUid || auth?.currentUser?.uid;
+  if (!uid || !database) return null;
+  return { uid, database };
+}
 
-  await set(ref(database, paths.userSettings(auth.currentUser.uid)), settings);
-  logger.success('Settings synced to cloud');
+async function saveCloudData(path, data, entityName = null, explicitUid = null) {
+  const ctx = getContext(explicitUid);
+  if (!ctx) return false;
+  await set(ref(ctx.database, path), data);
+  if (entityName) logger.success(`${entityName} synced to cloud`);
   return true;
 }
 
-export async function loadSettingsFromCloud() {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return null;
-
-  const snapshot = await get(ref(database, paths.userSettings(auth.currentUser.uid)));
-  if (snapshot.exists()) { logger.success('Settings loaded from cloud'); return snapshot.val(); }
+async function loadCloudData(path, entityName = null, explicitUid = null) {
+  const ctx = getContext(explicitUid);
+  if (!ctx) return null;
+  const snapshot = await get(ref(ctx.database, path));
+  if (snapshot.exists()) {
+    if (entityName) logger.success(`${entityName} loaded from cloud`);
+    return snapshot.val();
+  }
   return null;
 }
 
-/**
- * Subscribe to live settings changes (e.g. edited from the admin panel or
- * another device). Fires once immediately with the current value (or null when
- * none exist). Returns an unsubscribe function.
- */
-export function listenToSettingsFromCloud(callback) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return () => {};
-
-  return onValue(ref(database, paths.userSettings(auth.currentUser.uid)), (snapshot) => {
-    callback(snapshot.exists() ? snapshot.val() : null);
+function listenCloudData(path, callback, emptyFallback = null, explicitUid = null) {
+  const ctx = getContext(explicitUid);
+  if (!ctx) return () => {};
+  return onValue(ref(ctx.database, path), (snapshot) => {
+    callback(snapshot.exists() ? snapshot.val() : emptyFallback);
   });
 }
+
+// ── Settings ────────────────────────────────────────────────────────────
+
+export const saveSettingsToCloud = (settings) => {
+  const ctx = getContext();
+  return ctx ? saveCloudData(paths.userSettings(ctx.uid), settings, 'Settings') : Promise.resolve(false);
+};
+
+export const loadSettingsFromCloud = () => {
+  const ctx = getContext();
+  return ctx ? loadCloudData(paths.userSettings(ctx.uid), 'Settings') : Promise.resolve(null);
+};
+
+export const listenToSettingsFromCloud = (callback) => {
+  const ctx = getContext();
+  return ctx ? listenCloudData(paths.userSettings(ctx.uid), callback, null) : () => {};
+};
 
 // ── Purchase ────────────────────────────────────────────────────────────
 
-export async function loadPurchase() {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return null;
+export const loadPurchase = () => {
+  const ctx = getContext();
+  return ctx ? loadCloudData(paths.userPurchase(ctx.uid)) : Promise.resolve(null);
+};
 
-  const snapshot = await get(ref(database, paths.userPurchase(auth.currentUser.uid)));
-  if (snapshot.exists()) return snapshot.val();
-  return null;
-}
-
-export function listenToPurchaseFromCloud(callback) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return () => {};
-
-  return onValue(ref(database, paths.userPurchase(auth.currentUser.uid)), (snapshot) => {
-    callback(snapshot.exists() ? snapshot.val() : null);
-  });
-}
-
+export const listenToPurchaseFromCloud = (callback) => {
+  const ctx = getContext();
+  return ctx ? listenCloudData(paths.userPurchase(ctx.uid), callback, null) : () => {};
+};
 
 // ── Routines ────────────────────────────────────────────────────────────
 
-export async function saveRoutinesToCloud(routines) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return false;
+export const saveRoutinesToCloud = (routines) => {
+  const ctx = getContext();
+  return ctx ? saveCloudData(paths.userRoutines(ctx.uid), routines || [], 'Routines') : Promise.resolve(false);
+};
 
-  await set(ref(database, paths.userRoutines(auth.currentUser.uid)), routines || []);
-  logger.success('Routines synced to cloud');
-  return true;
-}
+export const loadRoutinesFromCloud = () => {
+  const ctx = getContext();
+  return ctx ? loadCloudData(paths.userRoutines(ctx.uid), 'Routines') : Promise.resolve(null);
+};
 
-export async function loadRoutinesFromCloud() {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return null;
-
-  const snapshot = await get(ref(database, paths.userRoutines(auth.currentUser.uid)));
-  if (snapshot.exists()) { logger.success('Routines loaded from cloud'); return snapshot.val(); }
-  return null;
-}
-
-export function listenToRoutinesFromCloud(callback) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return () => {};
-
-  return onValue(ref(database, paths.userRoutines(auth.currentUser.uid)), (snapshot) => {
-    callback(snapshot.exists() ? snapshot.val() : []);
-  });
-}
+export const listenToRoutinesFromCloud = (callback) => {
+  const ctx = getContext();
+  return ctx ? listenCloudData(paths.userRoutines(ctx.uid), callback, []) : () => {};
+};
 
 // ── Custom exercises ────────────────────────────────────────────────────
 
-export async function saveCustomExercisesToCloud(exercises) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return false;
+export const saveCustomExercisesToCloud = (exercises) => {
+  const ctx = getContext();
+  return ctx ? saveCloudData(paths.userCustomExercises(ctx.uid), exercises || [], 'Custom exercises') : Promise.resolve(false);
+};
 
-  await set(ref(database, paths.userCustomExercises(auth.currentUser.uid)), exercises || []);
-  logger.success('Custom exercises synced to cloud');
-  return true;
-}
+export const loadCustomExercisesFromCloud = () => {
+  const ctx = getContext();
+  return ctx ? loadCloudData(paths.userCustomExercises(ctx.uid), 'Custom exercises') : Promise.resolve(null);
+};
 
-export async function loadCustomExercisesFromCloud() {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return null;
-
-  const snapshot = await get(ref(database, paths.userCustomExercises(auth.currentUser.uid)));
-  if (snapshot.exists()) { logger.success('Custom exercises loaded from cloud'); return snapshot.val(); }
-  return null;
-}
-
-export function listenToCustomExercisesFromCloud(callback) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return () => {};
-
-  return onValue(ref(database, paths.userCustomExercises(auth.currentUser.uid)), (snapshot) => {
-    callback(snapshot.exists() ? snapshot.val() : []);
-  });
-}
+export const listenToCustomExercisesFromCloud = (callback) => {
+  const ctx = getContext();
+  return ctx ? listenCloudData(paths.userCustomExercises(ctx.uid), callback, []) : () => {};
+};
 
 // ── Program completions ─────────────────────────────────────────────────
 
-export async function saveProgramCompletionsToCloud(programId, completions) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return false;
+export const saveProgramCompletionsToCloud = (programId, completions) => {
+  const ctx = getContext();
+  return ctx ? saveCloudData(paths.userProgramCompletion(ctx.uid, programId), completions || {}) : Promise.resolve(false);
+};
 
-  await set(ref(database, paths.userProgramCompletion(auth.currentUser.uid, programId)), completions || {});
-  return true;
-}
-
-export async function loadProgramCompletionsFromCloud(programId) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return null;
-
-  const snapshot = await get(ref(database, paths.userProgramCompletion(auth.currentUser.uid, programId)));
-  if (snapshot.exists()) return snapshot.val();
-  return null;
-}
+export const loadProgramCompletionsFromCloud = (programId) => {
+  const ctx = getContext();
+  return ctx ? loadCloudData(paths.userProgramCompletion(ctx.uid, programId)) : Promise.resolve(null);
+};
 
 // ── Achievements (manual & social) ───────────────────────────────────────
 
-export async function saveAchievementsToCloud(achievements, userId = null) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  const uid = userId || auth?.currentUser?.uid;
-  if (!uid || !database) return false;
+export const saveAchievementsToCloud = (achievements, userId = null) => {
+  const ctx = getContext(userId);
+  return ctx ? saveCloudData(paths.userAchievements(ctx.uid), achievements || {}, 'Achievements', ctx.uid) : Promise.resolve(false);
+};
 
-  await set(ref(database, paths.userAchievements(uid)), achievements || {});
-  logger.success('Achievements synced to cloud');
-  return true;
-}
-
-export async function loadAchievementsFromCloud(userId = null) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  const uid = userId || auth?.currentUser?.uid;
-  if (!uid || !database) return null;
-
-  const snapshot = await get(ref(database, paths.userAchievements(uid)));
-  if (snapshot.exists()) { logger.success('Achievements loaded from cloud'); return snapshot.val(); }
-  return null;
-}
+export const loadAchievementsFromCloud = (userId = null) => {
+  const ctx = getContext(userId);
+  return ctx ? loadCloudData(paths.userAchievements(ctx.uid), 'Achievements', ctx.uid) : Promise.resolve(null);
+};
 
 // ── Exercise weights (current weight per exercise) ──────────────────────
 
-export async function saveExerciseWeightsToCloud(weights) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return false;
+export const saveExerciseWeightsToCloud = (weights) => {
+  const ctx = getContext();
+  return ctx ? saveCloudData(paths.userExerciseWeights(ctx.uid), weights || {}, 'Exercise weights') : Promise.resolve(false);
+};
 
-  await set(ref(database, paths.userExerciseWeights(auth.currentUser.uid)), weights || {});
-  logger.success('Exercise weights synced to cloud');
-  return true;
-}
+export const loadExerciseWeightsFromCloud = () => {
+  const ctx = getContext();
+  return ctx ? loadCloudData(paths.userExerciseWeights(ctx.uid), 'Exercise weights') : Promise.resolve(null);
+};
 
-export async function loadExerciseWeightsFromCloud() {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return null;
-
-  const snapshot = await get(ref(database, paths.userExerciseWeights(auth.currentUser.uid)));
-  if (snapshot.exists()) { logger.success('Exercise weights loaded from cloud'); return snapshot.val(); }
-  return null;
-}
 // ── Custom categories ───────────────────────────────────────────────────
-export async function saveCustomCategoriesToCloud(categories) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return false;
 
-  await set(ref(database, paths.userCustomCategories(auth.currentUser.uid)), categories || []);
-  logger.success('Custom categories synced to cloud');
-  return true;
-}
+export const saveCustomCategoriesToCloud = (categories) => {
+  const ctx = getContext();
+  return ctx ? saveCloudData(paths.userCustomCategories(ctx.uid), categories || [], 'Custom categories') : Promise.resolve(false);
+};
 
-export async function loadCustomCategoriesFromCloud() {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return null;
+export const loadCustomCategoriesFromCloud = () => {
+  const ctx = getContext();
+  return ctx ? loadCloudData(paths.userCustomCategories(ctx.uid), 'Custom categories') : Promise.resolve(null);
+};
 
-  const snapshot = await get(ref(database, paths.userCustomCategories(auth.currentUser.uid)));
-  if (snapshot.exists()) { logger.success('Custom categories loaded from cloud'); return snapshot.val(); }
-  return null;
-}
-
-export function listenToCustomCategoriesFromCloud(callback) {
-  const auth = getAuthInstance();
-  const database = getDatabaseInstance();
-  if (!auth?.currentUser || !database) return () => {};
-
-  return onValue(ref(database, paths.userCustomCategories(auth.currentUser.uid)), (snapshot) => {
-    callback(snapshot.exists() ? snapshot.val() : []);
-  });
-}
+export const listenToCustomCategoriesFromCloud = (callback) => {
+  const ctx = getContext();
+  return ctx ? listenCloudData(paths.userCustomCategories(ctx.uid), callback, []) : () => {};
+};

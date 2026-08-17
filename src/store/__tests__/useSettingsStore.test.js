@@ -2,6 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useSettingsStore, getAutoDetectedWeekStartDay } from '../useSettingsStore';
 
 // Mock dependencies
+vi.mock('@capacitor/preferences', () => ({
+  Preferences: {
+    get: vi.fn(() => Promise.resolve({ value: null })),
+    set: vi.fn(() => Promise.resolve()),
+    remove: vi.fn(() => Promise.resolve()),
+  },
+}));
+
 vi.mock('@utils/logger', () => ({
   createLogger: () => ({
     error: vi.fn(),

@@ -2,7 +2,7 @@ import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCate
 import { EXERCISES, CARDIO_EXERCISES, getDailyGoal, isCardioExercise, isWeightExercise } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { isCustomExercise } from '@utils/exerciseLabel';
-import { sumExerciseReps } from '@utils/stats';
+import { sumExerciseReps } from '@utils/statUtils';
 import { getLocalDateStr, getCurrentWeekNumber, parseLocalDate } from '@shared/dateUtils';
 
 /**

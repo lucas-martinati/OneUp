@@ -1,4 +1,4 @@
-import { sumExerciseReps } from './stats';
+import { sumExerciseReps } from './statUtils';
 
 function ensureIsoString(date) {
   if (!date) return new Date().toISOString();

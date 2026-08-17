@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateRepsForDay, isPerfectDay, isGlobalPerfectDay, isCaughtUpDay } from '../statUtils';
+import { calculateRepsForDay, isPerfectDay, isGlobalPerfectDay, isCaughtUpDay, sumExerciseReps } from '../statUtils';
 import { EXERCISES } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 
@@ -189,3 +189,27 @@ describe('isCaughtUpDay', () => {
     expect(isCaughtUpDay(day, 'date-invalide')).toBe(false);
   });
 });
+
+// ── sumExerciseReps ───────────────────────────────────────────────────
+
+describe('sumExerciseReps', () => {
+  it('returns 0 for invalid inputs', () => {
+    expect(sumExerciseReps(null)).toBe(0);
+    expect(sumExerciseReps(undefined)).toBe(0);
+    expect(sumExerciseReps({})).toBe(0);
+    expect(sumExerciseReps('string')).toBe(0);
+  });
+
+  it('returns 0 for empty array', () => {
+    expect(sumExerciseReps([])).toBe(0);
+  });
+
+  it('correctly sums reps across exercises', () => {
+    expect(sumExerciseReps([{ reps: 10 }, { reps: 25 }, { reps: 5 }])).toBe(40);
+  });
+
+  it('handles missing or undefined reps in elements', () => {
+    expect(sumExerciseReps([{ reps: 10 }, {}, { reps: 5 }])).toBe(15);
+  });
+});
+

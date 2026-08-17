@@ -67,18 +67,6 @@ class CloudSyncService {
       this._clanService = clan;
       this._authService = auth;
 
-      // Delegate methods dynamically for any runtime methods not explicitly declared below
-      const delegatedServices = [dataSync, leaderboard, userData, weightHistory, cardio, clan];
-      for (const service of delegatedServices) {
-        for (const [key, method] of Object.entries(service)) {
-          if (typeof method === 'function') {
-            if (!(key in this)) {
-              this[key] = method.bind(service);
-            }
-          }
-        }
-      }
-
       // Setup the auth listener
       this._authService.setupAuthListener(this.listeners);
 

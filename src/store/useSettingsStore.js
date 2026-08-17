@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { Preferences } from '@capacitor/preferences';
 import { createLogger } from '@utils/logger';
 
 const logger = createLogger('SettingsStore');
@@ -152,12 +153,20 @@ function loadFromStorage(userId) {
 }
 
 /**
- * Persist settings to localStorage for the given user.
+ * Persist settings to localStorage and Preferences for the given user.
  */
 function saveToStorage(userId, settings) {
   try {
     const key = getStorageKey(userId);
-    localStorage.setItem(key, JSON.stringify(settings));
+    const serialized = JSON.stringify(settings);
+    try {
+      localStorage.setItem(key, serialized);
+    } catch {
+      // Ignore localStorage errors (e.g. quota or private mode)
+    }
+    Preferences.set({ key, value: serialized }).catch((e) => {
+      logger.error('Failed to persist settings in Preferences:', e);
+    });
   } catch (e) {
     logger.error('Failed to persist settings:', e);
   }
@@ -167,7 +176,7 @@ function saveToStorage(userId, settings) {
  * Zustand store for user settings.
  *
  * Replaces the old useSettings hook + the settings slice of ProgressContext.
- * Supports UID-scoped localStorage persistence and cloud sync.
+ * Supports UID-scoped localStorage and Preferences persistence and cloud sync.
  */
 export const useSettingsStore = create((set) => ({
   // ── State ────────────────────────────────────────────────────────────
@@ -180,11 +189,30 @@ export const useSettingsStore = create((set) => ({
 
   /**
    * Initialise the store for a given user.
-   * Loads from localStorage and resets the sync flag.
+   * Loads synchronously from localStorage, syncs asynchronously from Preferences,
+   * and resets the sync flag.
    */
   initForUser: (userId) => {
     const loaded = loadFromStorage(userId);
     set({ settings: loaded, _userId: userId, settingsInitialSyncDone: false });
+
+    // Sync from Preferences in case localStorage was cleared
+    const key = getStorageKey(userId);
+    Preferences.get({ key })
+      .then(({ value: prefSaved }) => {
+        if (prefSaved) {
+          try {
+            const prefParsed = cleanSettings(JSON.parse(prefSaved));
+            if (!localStorage.getItem(key)) {
+              set((state) => ({ settings: { ...state.settings, ...prefParsed } }));
+              try {
+                localStorage.setItem(key, JSON.stringify(prefParsed));
+              } catch { /* ignore */ }
+            }
+          } catch { /* ignore parse error */ }
+        }
+      })
+      .catch(() => {});
   },
 
   /**
