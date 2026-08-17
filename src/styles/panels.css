@@ -304,3 +304,206 @@ body.exercise-panel-active::before {
   transform: translateY(0);
 }
 
+/* ── Admin Panel User List ────────────────────────────────────────── */
+.admin-user-card {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  border: 1px solid var(--border-default);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+  transition: transform var(--motion-fast) ease, border-color var(--motion-fast) ease, background var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
+  user-select: none;
+}
+
+.admin-user-card:hover {
+  background: var(--surface-hover);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border-default));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.admin-user-card:active {
+  transform: scale(0.99);
+}
+
+.admin-user-card:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 2px;
+}
+
+.admin-user-card-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-user-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.admin-user-pro-crown {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--color-amber), var(--color-orange));
+  color: var(--bg-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.4);
+}
+
+.admin-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-user-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.admin-user-name {
+  font-weight: 800;
+  font-size: 1.02rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.admin-user-email {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-user-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.admin-user-uid-pill {
+  font-size: 0.65rem;
+  font-family: var(--font-mono, monospace);
+  color: var(--text-tertiary);
+  background: var(--surface-muted);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+  letter-spacing: 0.2px;
+}
+
+.admin-user-card-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.admin-user-stats-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.admin-user-badges-top {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-stat-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: var(--surface-muted);
+  border: 1px solid var(--border-default);
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.admin-stat-pill strong {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.admin-last-seen {
+  font-size: 0.68rem;
+  color: var(--text-tertiary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-user-chevron {
+  color: var(--text-tertiary);
+  transition: transform var(--motion-fast) ease, color var(--motion-fast) ease;
+}
+
+.admin-user-card:hover .admin-user-chevron {
+  color: var(--accent-glow);
+  transform: translateX(3px);
+}
+
+@media (max-width: 520px) {
+  .admin-user-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .admin-user-card-right {
+    justify-content: space-between;
+    width: 100%;
+    border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+    padding-top: 8px;
+  }
+
+  .admin-user-stats-col {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
-import { Clock, Filter, X, ChevronDown, ChevronUp } from '@utils/icons';
+import { Clock, Filter, X, Check, ChevronDown, ChevronUp, ChevronRight, Crown, Dumbbell, Calendar, Heart } from '@utils/icons';
 import { Avatar, Input, Badge, Button } from '@components/ui';
 import { FILTER_OPTIONS } from './useAdminPanel';
 
@@ -35,7 +35,6 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
             onClick={() => setShowFilters(s => !s)}
             aria-label="Filtres"
             variant={showFilters || filterCount ? 'primary' : 'glass'}
-            
           />
           {filterCount > 0 && (
             <span style={{
@@ -138,59 +137,87 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
             <div
               key={user.uid}
               onClick={() => onSelectUser(user)}
-              className="glass"
-              style={{
-                padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)',
-                background: 'var(--card-bg)',
-                border: '1px solid var(--border-default)',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                cursor: 'pointer', transition: 'background-color 0.2s ease, border-color 0.2s ease'
+              className="admin-user-card glass"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectUser(user);
+                }
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
-                <Avatar photoURL={user.photoURL} name={user.displayName} size={44} />
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontWeight: '800', fontSize: '1.05rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {user.displayName}
-                  </div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {user.email || "Email non renseigné"}
-                  </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px' }}>
-                    <Badge variant={user.isSetup ? 'success' : 'default'} size="sm">
-                      {user.isSetup ? '✓ Configuré' : '✗ Non configuré'}
-                    </Badge>
-                    {user.startDate && (
-                      <Badge variant="info" size="sm">Début {user.startDate}</Badge>
+              <div className="admin-user-card-left">
+                <div className="admin-user-avatar-wrap">
+                  <Avatar photoURL={user.photoURL} name={user.displayName} size={46} />
+                  {user.isPro && (
+                    <div className="admin-user-pro-crown" title="Utilisateur PRO">
+                      <Crown size={11} />
+                    </div>
+                  )}
+                </div>
+
+                <div className="admin-user-info">
+                  <div className="admin-user-name-row">
+                    <span className="admin-user-name">{user.displayName}</span>
+                    {user.isPro && !user.photoURL && (
+                      <Badge variant="pro" size="sm">PRO</Badge>
                     )}
                   </div>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontFamily: 'monospace', marginTop: '4px' }}>
-                    UID: {user.uid}
+
+                  <div className="admin-user-email">
+                    {user.email || 'Email non renseigné'}
+                  </div>
+
+                  <div className="admin-user-meta-row">
+                    <Badge variant={user.isSetup ? 'success' : 'default'} size="sm" icon={user.isSetup ? Check : X}>
+                      {user.isSetup ? 'Configuré' : 'Non configuré'}
+                    </Badge>
+                    {user.startDate && (
+                      <Badge variant="info" size="sm" icon={Calendar}>
+                        {user.startDate}
+                      </Badge>
+                    )}
+                    <span className="admin-user-uid-pill" title={`UID: ${user.uid}`}>
+                      {user.uid.length > 12 ? `${user.uid.slice(0, 8)}…` : user.uid}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', flexShrink: 0 }}>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  {user.isPro && (
-                    <Badge variant="pro" size="sm">PRO</Badge>
+              <div className="admin-user-card-right">
+                <div className="admin-user-stats-col">
+                  {(user.isPro || user.isSupporter) && (
+                    <div className="admin-user-badges-top">
+                      {user.isPro && (
+                        <Badge variant="pro" size="sm" icon={Crown}>PRO</Badge>
+                      )}
+                      {user.isSupporter && (
+                        <Badge variant="warning" size="sm" icon={Heart}>SUPPORT</Badge>
+                      )}
+                    </div>
                   )}
-                  {user.isSupporter && (
-                    <Badge variant="warning" size="sm">SUPPORT</Badge>
-                  )}
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                  Jours: <strong style={{ color: 'var(--text-primary)' }}>{user.completionsCount}</strong>
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                  Reps: <strong style={{ color: 'var(--text-primary)' }}>{(user.totalReps || 0).toLocaleString()}</strong>
-                </div>
-                {user.lastSeen && (
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                    <Clock size={10} />
-                    {new Date(user.lastSeen).toLocaleDateString()}
+
+                  <div className="admin-stat-pills">
+                    <div className="admin-stat-pill" title="Jours d'entraînement complétés">
+                      <Calendar size={12} color="var(--warning)" />
+                      <span><strong>{user.completionsCount}</strong> j</span>
+                    </div>
+                    <div className="admin-stat-pill" title="Répétitions totales">
+                      <Dumbbell size={12} color="var(--accent-glow)" />
+                      <span><strong>{(user.totalReps || 0).toLocaleString()}</strong> reps</span>
+                    </div>
                   </div>
-                )}
+
+                  {user.lastSeen && (
+                    <div className="admin-last-seen" title={`Dernière activité : ${new Date(user.lastSeen).toLocaleString()}`}>
+                      <Clock size={10} />
+                      <span>{new Date(user.lastSeen).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
+
+                <ChevronRight size={18} className="admin-user-chevron" />
               </div>
             </div>
           ))
@@ -199,4 +226,5 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
     </>
   );
 }
+
 
