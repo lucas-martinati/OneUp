@@ -11,12 +11,17 @@ import { STREAK_FREEZE_LIMITS, getFreezeLimits } from '@shared/streakFreeze';
 
 const FREEZE_COLOR = '#38bdf8';
 
+/** Keeps the snowflake in the freeze blue regardless of the active theme accent. */
+function FreezeIcon({ size = 22 }) {
+    return <Snowflake size={size} color={FREEZE_COLOR} />;
+}
+
 /** A single stat column (value over label) in the allotment row. */
 function FreezeStat({ value, label }) {
     return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-            <span style={{ fontSize: '1.5rem', fontWeight: 900, color: FREEZE_COLOR }}>{value}</span>
-            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-secondary)', textAlign: 'center' }}>{label}</span>
+            <span style={{ fontSize: '1.35rem', fontWeight: 900, color: FREEZE_COLOR }}>{value}</span>
+            <span style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-secondary)', textAlign: 'center' }}>{label}</span>
         </div>
     );
 }
@@ -35,6 +40,7 @@ export function StreakFreezeInfo({ open, onClose }) {
 
     const limits = getFreezeLimits(isPro);
     const proMultiplier = Math.round(STREAK_FREEZE_LIMITS.pro.perMonth / STREAK_FREEZE_LIMITS.free.perMonth);
+    const reservePct = limits.maxStock > 0 ? Math.min(100, Math.round((freezeCount / limits.maxStock) * 100)) : 0;
 
     if (!open) return null;
 
@@ -54,8 +60,19 @@ export function StreakFreezeInfo({ open, onClose }) {
         );
     } else if (!isPro) {
         footerNode = (
-            <Button size="sm" fullWidth onClick={handleUpgrade}>
-                {t('streakFreeze.proCta')}
+            <>
+                <Button variant="ghost" size="sm" onClick={onClose}>
+                    {t('streakFreeze.gotIt')}
+                </Button>
+                <Button size="sm" onClick={handleUpgrade}>
+                    {t('streakFreeze.proCta')}
+                </Button>
+            </>
+        );
+    } else {
+        footerNode = (
+            <Button size="sm" fullWidth onClick={onClose}>
+                {t('streakFreeze.gotIt')}
             </Button>
         );
     }
@@ -65,37 +82,56 @@ export function StreakFreezeInfo({ open, onClose }) {
             open={open}
             onClose={onClose}
             size="md"
+            accent={FREEZE_COLOR}
+            icon={FreezeIcon}
+            title={t('streakFreeze.title')}
+            subtitle={t('streakFreeze.subtitle')}
             footer={footerNode}
         >
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-                <div style={{
-                    width: '52px', height: '52px', borderRadius: '50%', flexShrink: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: `radial-gradient(circle at 32% 26%, ${FREEZE_COLOR}, ${FREEZE_COLOR}cc)`,
-                    border: `2px solid ${FREEZE_COLOR}`, boxShadow: `0 4px 16px ${FREEZE_COLOR}66`,
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+                <p style={{
+                    margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)',
+                    textAlign: 'center', lineHeight: 1.5,
                 }}>
-                    <Snowflake size={26} color="#fff" />
-                </div>
-
-                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                    {t('streakFreeze.title')}
-                </h3>
-
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center', lineHeight: 1.5 }}>
                     {auth.isSignedIn ? t('streakFreeze.intro') : t('streakFreeze.guestDesc')}
                 </p>
 
                 {/* Current allotment for the user's tier (signed-in only) */}
                 {auth.isSignedIn && (
                     <div style={{
-                        display: 'flex', width: '100%', gap: '10px', padding: '14px',
-                        borderRadius: '14px', background: `${FREEZE_COLOR}12`, border: `1px solid ${FREEZE_COLOR}22`,
+                        width: '100%', display: 'flex', flexDirection: 'column', gap: '10px',
+                        padding: '14px', borderRadius: '14px',
+                        background: 'linear-gradient(160deg, rgba(56,189,248,0.10), rgba(14,165,233,0.05))',
+                        border: '1px solid rgba(56,189,248,0.22)',
                     }}>
-                        <FreezeStat value={freezeCount} label={t('streakFreeze.statAvailable')} />
-                        <div style={{ width: '1px', background: 'var(--border-default)' }} />
-                        <FreezeStat value={`+${limits.perMonth}`} label={t('streakFreeze.statPerMonth')} />
-                        <div style={{ width: '1px', background: 'var(--border-default)' }} />
-                        <FreezeStat value={limits.maxStock} label={t('common.max')} />
+                        <div style={{ display: 'flex', width: '100%', gap: '10px' }}>
+                            <FreezeStat value={freezeCount} label={t('streakFreeze.statAvailable')} />
+                            <div style={{ width: '1px', background: 'var(--border-default)' }} />
+                            <FreezeStat value={`+${limits.perMonth}`} label={t('streakFreeze.statPerMonth')} />
+                            <div style={{ width: '1px', background: 'var(--border-default)' }} />
+                            <FreezeStat value={limits.maxStock} label={t('common.max')} />
+                        </div>
+
+                        {/* Reserve fill against the tier cap */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <div style={{
+                                display: 'flex', justifyContent: 'space-between',
+                                fontSize: '0.66rem', fontWeight: 700, color: 'var(--text-secondary)',
+                            }}>
+                                <span>{t('streakFreeze.statReserve')}</span>
+                                <span style={{ color: FREEZE_COLOR }}>{freezeCount}/{limits.maxStock}</span>
+                            </div>
+                            <div style={{
+                                width: '100%', height: '6px', borderRadius: '999px',
+                                background: 'rgba(56,189,248,0.12)', overflow: 'hidden',
+                            }}>
+                                <div style={{
+                                    width: `${reservePct}%`, height: '100%', borderRadius: '999px',
+                                    background: `linear-gradient(90deg, ${FREEZE_COLOR}88, ${FREEZE_COLOR})`,
+                                    transition: 'width 0.4s ease',
+                                }} />
+                            </div>
+                        </div>
                     </div>
                 )}
 
@@ -104,11 +140,11 @@ export function StreakFreezeInfo({ open, onClose }) {
                     <div style={{
                         width: '100%', display: 'flex', flexDirection: 'column', gap: '12px',
                         padding: '14px', borderRadius: '14px',
-                        background: 'linear-gradient(135deg, rgba(139,92,246,0.14), rgba(129,140,248,0.10))',
-                        border: '1px solid rgba(139,92,246,0.3)',
+                        background: 'linear-gradient(135deg, rgba(56,189,248,0.14), rgba(14,165,233,0.10))',
+                        border: '1px solid rgba(56,189,248,0.3)',
                     }}>
                         <div className="flex-align-center gap-8">
-                            <Crown size={18} color="#a78bfa" />
+                            <Crown size={18} color="#38bdf8" />
                             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.4 }}>
                                 {t('streakFreeze.proPitch', { multiplier: proMultiplier, count: STREAK_FREEZE_LIMITS.pro.perMonth })}
                             </span>

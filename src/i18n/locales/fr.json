@@ -983,7 +983,10 @@
     "statAvailable": "En réserve",
     "statPerMonth": "Par mois",
     "proPitch": "Les membres Pro en gagnent {{multiplier}}× plus — {{count}} gels chaque mois.",
-    "proCta": "Passer Pro"
+    "proCta": "Passer Pro",
+    "subtitle": "Protège ta série quand tu rates un jour",
+    "gotIt": "Compris",
+    "statReserve": "Réserve"
   },
   "migration": {
     "title": "OneUp a déménagé sur {{host}}",

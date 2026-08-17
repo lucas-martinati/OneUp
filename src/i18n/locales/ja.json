@@ -983,7 +983,10 @@
     "statAvailable": "残り",
     "statPerMonth": "毎月",
     "proPitch": "Proなら{{multiplier}}倍——毎月{{count}}回の凍結を獲得できます。",
-    "proCta": "Proを解除"
+    "proCta": "Proを解除",
+    "subtitle": "休んだ日も連続記録を守ろう",
+    "gotIt": "了解",
+    "statReserve": "ストック"
   },
   "migration": {
     "title": "OneUp は {{host}} に移転しました",

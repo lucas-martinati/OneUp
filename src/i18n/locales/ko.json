@@ -983,7 +983,10 @@
     "statAvailable": "보유",
     "statPerMonth": "매달",
     "proPitch": "Pro는 {{multiplier}}배 더 많이 — 매달 얼리기 {{count}}개를 받습니다.",
-    "proCta": "Pro 잠금 해제"
+    "proCta": "Pro 잠금 해제",
+    "subtitle": "하루를 빠뜨려도 연속 기록을 지켜주세요",
+    "gotIt": "알겠어요",
+    "statReserve": "보유량"
   },
   "migration": {
     "title": "OneUp이 {{host}}(으)로 이전했습니다",

@@ -983,7 +983,10 @@
     "statAvailable": "剩余",
     "statPerMonth": "每月",
     "proPitch": "Pro 会员获得 {{multiplier}}× 更多——每月 {{count}} 次冻结。",
-    "proCta": "解锁 Pro"
+    "proCta": "解锁 Pro",
+    "subtitle": "错过一天也能保住连续记录",
+    "gotIt": "知道了",
+    "statReserve": "库存"
   },
   "migration": {
     "title": "OneUp 已迁移至 {{host}}",

@@ -16,6 +16,8 @@ import { X } from '@utils/icons';
  *
  * @param {'sm'|'md'|'lg'} [size='sm'] — controls max-width
  * @param {'default'|'danger'} [variant='default']
+ * @param {string} [accent] — CSS color overriding the theme accent for the card
+ * border and header icon tint (e.g. a dialog that must stay in its brand color)
  * @param {'row'|'column'} [footerLayout='row']
  * @param {boolean} [showCloseButton] — defaults to true when onClose is provided
  * @param {boolean} [closeOnBackdrop=true] — forwarded to ModalContainer
@@ -32,6 +34,7 @@ export function ModalShell({
   showCloseButton,
   size = 'sm',
   variant = 'default',
+  accent,
   footer,
   footerLayout = 'row',
   ariaLabel = 'Dialog',
@@ -42,6 +45,9 @@ export function ModalShell({
   style,
 }) {
   const showX = showCloseButton ?? !!onClose;
+  // `accent` overrides the theme accent (e.g. a dialog that must stay in the
+  // brand blue regardless of the active theme); defaults to error for danger.
+  const accentTint = accent || (variant === 'danger' ? 'var(--error)' : 'var(--accent-glow)');
 
   const cardStyle = useMemo(
     () => ({
@@ -50,9 +56,7 @@ export function ModalShell({
       maxWidth: MAX_WIDTH[size],
       borderRadius: 'var(--radius-lg)',
       background: 'var(--sheet-bg)',
-      border: `1px solid color-mix(in srgb, ${
-        variant === 'danger' ? 'var(--error)' : 'var(--accent-glow)'
-      } 20%, transparent)`,
+      border: `1px solid color-mix(in srgb, ${accentTint} 20%, transparent)`,
       boxShadow:
         variant === 'danger'
           ? '0 24px 64px rgba(0, 0, 0, 0.5), 0 0 40px color-mix(in srgb, var(--error) 10%, transparent)'
@@ -61,12 +65,10 @@ export function ModalShell({
       overflow: 'hidden',
       ...style,
     }),
-    [size, variant, style],
+    [size, variant, accentTint, style],
   );
 
   if (!open) return null;
-
-  const accentTint = variant === 'danger' ? 'var(--error)' : 'var(--accent-glow)';
 
   return (
     <ModalContainer open={open} onClose={onClose} ariaLabel={ariaLabel} position="center" unstyled closeOnBackdrop={closeOnBackdrop} closeOnEscape={closeOnEscape}>

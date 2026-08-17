@@ -983,7 +983,10 @@
     "statAvailable": "In reserve",
     "statPerMonth": "Per month",
     "proPitch": "Pro members earn {{multiplier}}× more — {{count}} freezes every month.",
-    "proCta": "Unlock Pro"
+    "proCta": "Unlock Pro",
+    "subtitle": "Protect your streak when you miss a day",
+    "gotIt": "Got it",
+    "statReserve": "Reserve"
   },
   "migration": {
     "title": "OneUp has moved to {{host}}",

@@ -983,7 +983,10 @@
     "statAvailable": "В запасе",
     "statPerMonth": "В месяц",
     "proPitch": "Подписчики Pro получают в {{multiplier}}× больше — {{count}} заморозки каждый месяц.",
-    "proCta": "Открыть Pro"
+    "proCta": "Открыть Pro",
+    "subtitle": "Защити свою серию, если пропустил день",
+    "gotIt": "Понятно",
+    "statReserve": "Запас"
   },
   "migration": {
     "title": "OneUp переехал на {{host}}",

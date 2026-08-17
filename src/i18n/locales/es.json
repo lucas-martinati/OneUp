@@ -983,7 +983,10 @@
     "statAvailable": "En reserva",
     "statPerMonth": "Al mes",
     "proPitch": "Los miembros Pro ganan {{multiplier}}× más: {{count}} congelaciones al mes.",
-    "proCta": "Desbloquear Pro"
+    "proCta": "Desbloquear Pro",
+    "subtitle": "Protege tu racha cuando faltas un día",
+    "gotIt": "Entendido",
+    "statReserve": "Reserva"
   },
   "migration": {
     "title": "OneUp se ha mudado a {{host}}",

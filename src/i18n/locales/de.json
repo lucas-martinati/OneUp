@@ -983,7 +983,10 @@
     "statAvailable": "Im Vorrat",
     "statPerMonth": "Pro Monat",
     "proPitch": "Pro-Mitglieder erhalten {{multiplier}}× mehr — {{count}} Einfrierungen pro Monat.",
-    "proCta": "Pro freischalten"
+    "proCta": "Pro freischalten",
+    "subtitle": "Schütze deine Serie, wenn du einen Tag verpasst",
+    "gotIt": "Verstanden",
+    "statReserve": "Reserve"
   },
   "migration": {
     "title": "OneUp ist auf {{host}} umgezogen",
