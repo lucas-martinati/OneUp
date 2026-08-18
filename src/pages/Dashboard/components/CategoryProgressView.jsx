@@ -236,7 +236,7 @@ export const CategoryProgressView = React.memo(({
             className={`flex-col flex-justify-evenly flex-align-center full-width full-height pos-relative hide-scrollbar gap-responsive dashboard-slide-bg ${isDayPerfect ? styles.goldBg : ''}`}
             style={{
                 paddingTop: title ? 'calc(var(--day-pod-space) + 8px)' : 'var(--day-pod-space)',
-                transition: 'all 0.6s ease-in-out',
+                transition: 'background 0.6s ease-in-out, opacity 0.6s ease-in-out',
                 overflow: 'hidden'
             }}
         >
