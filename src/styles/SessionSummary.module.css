@@ -13,7 +13,7 @@
   align-items: center;
   justify-content: center;
   background: var(--overlay-bg);
-  padding: calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 14px);
+  padding: calc(env(safe-area-inset-top) + var(--page-padding)) var(--page-padding) calc(env(safe-area-inset-bottom) + var(--page-padding));
 }
 
 .card {

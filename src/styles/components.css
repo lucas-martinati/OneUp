@@ -39,8 +39,8 @@ button:focus:not(:focus-visible) {
   overscroll-behavior: none;
   touch-action: auto;
   padding: 0;
-  padding-top: calc(var(--space-6) + env(safe-area-inset-top));
-  padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .modal-overlay .modal-content {
@@ -55,7 +55,7 @@ button:focus:not(:focus-visible) {
      declares its own --panel-max-width in its module. */
   max-width: var(--panel-max-width, 640px);
   margin: 0 auto;
-  padding: 0 var(--space-4);
+  padding: var(--page-padding);
 }
 
 /* ── Modal Ambient Glow (Top Halo) ──────────────────────────────────── */

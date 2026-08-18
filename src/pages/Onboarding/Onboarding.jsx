@@ -87,8 +87,7 @@ export function Onboarding({ onStart }) {
                 minHeight: '100%', 
                 textAlign: 'center',
                 alignItems: 'stretch',
-                gap: 'clamp(12px, 2.5vh, 32px)',
-                padding: '48px var(--space-6) var(--space-4)'
+                gap: 'clamp(12px, 2.5vh, 32px)'
             }}
         >
             {/* Discreet language switcher */}

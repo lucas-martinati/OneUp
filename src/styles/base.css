@@ -108,7 +108,7 @@ body::before {
 #root {
   width: 100%;
   height: 100%;
-  padding: 8px;
+  padding: var(--page-padding);
   display: flex;
   flex-direction: column;
   position: relative;

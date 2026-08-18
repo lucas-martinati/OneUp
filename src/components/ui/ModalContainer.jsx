@@ -42,6 +42,7 @@ export function ModalContainer({
   unstyled = false, // Permet de désactiver la carte pour les modales existantes complexes (ex: GradientModal)
   contentClassName = '', // Custom class pour le div .modal-content interne
   contentStyle = {}, // Custom style pour le div .modal-content interne
+  padding = 'var(--page-padding)', // Uniform padding of the page container (.modal-content)
   ...rest // Passed down to the inner content container if not unstyled
 }) {
   const backdropRef = useRef(null);
@@ -122,6 +123,7 @@ export function ModalContainer({
           className={`modal-content ${contentClassName}`.trim()}
           style={{
             maxWidth: maxWidth,
+            padding: padding,
             gap: 'var(--space-4)',
             overflowY: showScrollbar ? 'visible' : 'hidden', // Let the overlay handle scrolling
             ...contentStyle,

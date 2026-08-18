@@ -167,9 +167,13 @@
   box-sizing: border-box;
 }
 
-.dashboard-wrapper {
-  padding-bottom: clamp(1px, 0.3vh, 6px);
+/* The dashboard uses a tighter page inset than the default --page-padding
+   (16px) used by modal pages, so it overrides the token on its container. */
+#root:has(.dashboard-wrapper) {
+  --page-padding: var(--space-2);
+}
 
+.dashboard-wrapper {
   /* Vertical extent the day-pod (T-stem) hangs below the top bar. Shared by the
      header pod container and the slides' top padding so the pod NEVER overlaps
      interactive content — the reserved space always matches the pod's real size
