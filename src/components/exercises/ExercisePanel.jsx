@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ArrowDown, ArrowUp, Camera, CameraOff, RefreshCw } from 'lucide-react';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import { sounds } from '@utils/soundManager';
 import { haptics } from '@utils/hapticsManager';
@@ -12,15 +13,737 @@ import { Z_INDEX } from '@utils/zIndex';
 import { useSettingsStore } from '@store/useSettingsStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
 import { useCameraPushUpCounter } from '@hooks/useCameraPushUpCounter';
-import { ExercisePanelHeader } from './panel/ExercisePanelHeader';
-import { WeightSelector } from './panel/WeightSelector';
-import { ProgressRing } from './panel/ProgressRing';
-import { StatusLine } from './panel/StatusLine';
-import { TimerControls, CounterControls } from './panel/Controls';
-import { CameraModeBar, CameraLiveStats } from './panel/CameraControls';
 import { EventHud } from '@features/events';
-import { FitToView, ModalContainer } from '@components/ui';
-import styles from './panel/ExercisePanel.module.css';
+import { Button, FitToView, ModalContainer, ModalHeader } from '@components/ui';
+import { Check, CheckCheck, ChevronRight, DynamicIcon, Minus, Pause, Play, Plus, RotateCcw } from '@utils/icons';
+import styles from './ExercisePanel.module.css';
+
+/* ── Private sub-components (single-use, kept local to this panel) ───── */
+
+function PanelHeader({ activeColor, exerciseConfig, exerciseLabel, onClose, onNext, hideNextButton, t }) {
+    const showNextButton = onNext && !hideNextButton;
+
+    return (
+        <ModalHeader
+            title={exerciseLabel}
+            icon={(props) => <DynamicIcon icon={exerciseConfig?.icon} {...props} color={activeColor} />}
+            onClose={onClose}
+            style={{ '--accent': activeColor, '--accent-glow': activeColor }}
+            extraElements={showNextButton && (
+                <Button
+                    variant="ghost"
+                    onClick={onNext}
+                    style={{
+                        padding: '8px 14px',
+                        borderRadius: 'var(--radius-full)',
+                        background: `${activeColor}1f`,
+                        border: `1px solid ${activeColor}44`,
+                        color: activeColor,
+                        fontSize: '0.82rem',
+                        fontWeight: '700',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '3px',
+                        cursor: 'pointer',
+                        minHeight: 'var(--touch-min)',
+                        whiteSpace: 'nowrap',
+                        transition: 'background 0.45s ease, border-color 0.45s ease, color 0.45s ease'
+                    }}
+                >
+                    <span>{t('common.next')}</span>
+                    <ChevronRight size={16} />
+                </Button>
+            )}
+        />
+    );
+}
+
+function WeightSelector({ activeColor, currentWeight, handleValidateWeight, localWeightStr, setLocalWeightStr, t }) {
+    const parsedWeight = parseFloat(localWeightStr.replace(',', '.'));
+    const isUnchanged = parsedWeight === currentWeight;
+
+    return (
+        <div className="scale-in" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px',
+            marginBottom: 'var(--space-2)'
+        }}>
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '8px 8px 8px 18px',
+                borderRadius: 'var(--radius-full)',
+                background: `linear-gradient(135deg, ${activeColor}16, ${activeColor}08)`,
+                border: `1px solid ${activeColor}33`
+            }}>
+                <span style={{
+                    fontSize: '0.62rem', fontWeight: '700', letterSpacing: '0.14em',
+                    textTransform: 'uppercase', color: 'var(--text-secondary)', opacity: 0.8
+                }}>
+                    {t('weight.kg')}
+                </span>
+                <input
+                    type="number"
+                    inputMode="decimal"
+                    value={localWeightStr}
+                    onChange={(e) => setLocalWeightStr(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleValidateWeight()}
+                    onBlur={handleValidateWeight}
+                    style={{
+                        width: Math.max(38, localWeightStr.length * 15 + 8) + 'px',
+                        background: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        fontSize: '1.5rem',
+                        fontWeight: '800',
+                        color: activeColor,
+                        textAlign: 'center'
+                    }}
+                />
+                <Button
+                    onClick={handleValidateWeight}
+                    disabled={isUnchanged}
+                    iconOnly
+                    aria-label={t('weight.kg')}
+                    style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        background: isUnchanged ? 'rgba(255,255,255,0.05)' : `linear-gradient(135deg, ${activeColor}, ${activeColor}cc)`,
+                        border: isUnchanged ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                        cursor: isUnchanged ? 'default' : 'pointer',
+                        color: isUnchanged ? 'var(--text-secondary)' : 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        boxShadow: isUnchanged ? 'none' : `0 4px 14px ${activeColor}55`,
+                        transition: 'all 0.2s',
+                        opacity: isUnchanged ? 0.5 : 1
+                    }}
+                >
+                    <Check size={20} />
+                </Button>
+            </div>
+        </div>
+    );
+}
+
+function ProgressRing({
+    activeColor,
+    dailyGoal,
+    displayCount,
+    displayTime,
+    goalTime,
+    gradEnd,
+    gradStart,
+    gradientId,
+    isAnimating,
+    isCompleted,
+    isRunning,
+    isTimer,
+    progress,
+    ringCircumference,
+    ringRadius,
+
+    timeFontSize,
+    countFontSize = 'clamp(4rem, 12vw, 6rem)',
+    // Camera props
+    isCameraActive = false,
+    videoRef = null,
+    cameraError = null,
+    isCalibrated = false,
+    calibrateCountdown = 0,
+    pushupState = 'up',
+    t
+}) {
+    const label = isTimer ? t('cardio.duration') : t('common.reps');
+
+    let filterVal = `drop-shadow(0 0 5px ${activeColor}55)`;
+    if (isCompleted) {
+        filterVal = `drop-shadow(0 0 12px ${activeColor}aa)`;
+    } else if (isTimer && isRunning) {
+        filterVal = 'none';
+    }
+
+    return (
+        <div
+            style={{
+                position: 'absolute',
+                inset: 0,
+                margin: 'auto',
+                maxHeight: '100%',
+                maxWidth: '100%',
+                aspectRatio: '1 / 1',
+                // Expose the accent colour to the halo / container-query units.
+                containerType: 'inline-size',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                '--ex': activeColor,
+                '--exercise-color': activeColor,
+                '--exercise-color-dim': activeColor + '15'
+            }}
+        >
+            {/* Hero halo — soft pool of colour behind the ring, brighter when done */}
+            {!isCameraActive && (
+                <div
+                    className={styles.ringHalo}
+                    style={{
+                        background: `radial-gradient(circle, ${activeColor}${isCompleted ? '2e' : '16'} 0%, transparent 62%)`,
+                        opacity: isCompleted ? 0.9 : 0.7,
+                        transform: isCompleted ? 'scale(1.04)' : 'scale(1)'
+                    }}
+                />
+            )}
+
+            <svg
+                viewBox="0 0 220 220"
+                overflow="visible"
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    pointerEvents: 'none'
+                }}
+            >
+                <circle cx="110" cy="110" r={ringRadius} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="7" />
+                <circle
+                    cx="110"
+                    cy="110"
+                    r={ringRadius}
+                    fill="none"
+                    stroke={isCompleted ? activeColor : `url(#${gradientId})`}
+                    strokeWidth="9"
+                    strokeDasharray={ringCircumference}
+                    strokeDashoffset={ringCircumference * (1 - progress / 100)}
+                    strokeLinecap="round"
+                    transform="rotate(-90 110 110)"
+                    style={{
+                        transition: `${isTimer && isRunning ? 'stroke-dashoffset 1s linear' : 'stroke-dashoffset 0.45s ease'}, stroke 0.45s ease, filter 0.45s ease`,
+                        // Glow is a paint-time filter. While a timer is actively
+                        // running the ring repaints every frame, so we drop the
+                        // filter then to avoid per-frame repaints (battery/heat).
+                        filter: filterVal
+                    }}
+                />
+                <defs>
+                    <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor={gradStart} style={{ transition: 'stop-color 0.45s ease' }} />
+                        <stop offset="100%" stopColor={gradEnd} style={{ transition: 'stop-color 0.45s ease' }} />
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            {isCameraActive && (
+                <div
+                    className={`camera-video-wrapper${isCalibrated && pushupState === 'down' ? ' is-down' : ''}`}
+                    style={{ width: `calc(100% - 24px)`, height: `calc(100% - 24px)`, '--exercise-color': activeColor }}
+                >
+                    <video
+                        ref={videoRef}
+                        className="camera-video-feed"
+                        playsInline
+                        muted
+                        autoPlay
+                    />
+
+                    {/* Accent rim that reacts to the rep state (cheap: toggles on state, not per-frame) */}
+                    <div className="camera-video-rim" />
+
+                    {/* Scanning sweep only while calibrating — keeps the active phase cool */}
+                    {!cameraError && !isCalibrated && (
+                        <div className="camera-scanning-line" />
+                    )}
+
+                    {cameraError === 'permission_denied' && (
+                        <div className="camera-calibration-overlay">
+                            <span className="camera-overlay-error">
+                                {t('counter.cameraNoPermission')}
+                            </span>
+                        </div>
+                    )}
+
+                    {!cameraError && !isCalibrated && calibrateCountdown > 0 && (
+                        <div className="camera-calibration-overlay">
+                            <div className="camera-countdown-num">{calibrateCountdown}</div>
+                            <span className="camera-overlay-hint">{t('counter.cameraHoldStill')}</span>
+                        </div>
+                    )}
+
+                    {!cameraError && !isCalibrated && calibrateCountdown === 0 && (
+                        <div className="camera-calibration-overlay">
+                            <span className="camera-spinner" />
+                            <span className="camera-overlay-hint">{t('counter.cameraLoading')}</span>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Reps / Timer readout — absolutely centred so it stays dead-centre
+                regardless of the SVG and font metrics. */}
+            {!isCameraActive && (
+                <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    zIndex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    pointerEvents: 'none'
+                }}>
+                    <span style={{
+                        fontSize: 'clamp(0.6rem, 1.6vh, 0.72rem)',
+                        fontWeight: '700',
+                        letterSpacing: '0.18em',
+                        textTransform: 'uppercase',
+                        color: 'var(--text-secondary)',
+                        opacity: 0.7,
+                        marginBottom: '2px'
+                    }}>
+                        {label}
+                    </span>
+                    <div
+                        className={!isTimer && isAnimating ? 'scale-in' : ''}
+                        style={{
+                            fontSize: isTimer ? timeFontSize : countFontSize,
+                            fontWeight: '800',
+                            color: isCompleted ? activeColor : 'var(--text-primary)',
+                            lineHeight: 1,
+                            transition: 'color 0.45s ease, font-size 0.45s ease',
+                            fontVariantNumeric: 'tabular-nums',
+                            maxWidth: '90%',
+                            textAlign: 'center',
+                            whiteSpace: 'nowrap',
+                            textShadow: isCompleted ? `0 0 22px ${activeColor}55` : 'none'
+                        }}
+                    >
+                        {isTimer ? displayTime : displayCount}
+                    </div>
+                    <div style={{
+                        fontSize: 'clamp(0.95rem, 2.8vw, 1.25rem)',
+                        fontWeight: '600',
+                        color: 'var(--text-secondary)',
+                        marginTop: '6px',
+                        maxWidth: '90%',
+                        textAlign: 'center',
+                        whiteSpace: 'nowrap'
+                    }}>
+                        / {isTimer ? goalTime : dailyGoal}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function StatusLine({ activeColor, exerciseLabel, gradEnd, gradStart, isCompleted, isTimer, remaining, t }) {
+    if (!isCompleted) {
+        return (
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                borderRadius: 'var(--radius-full)',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                color: 'var(--text-secondary)',
+                fontSize: 'clamp(0.85rem, 2.4vw, 1rem)',
+                fontWeight: '500',
+                minHeight: '48px',
+                boxSizing: 'border-box'
+            }}>
+                <span style={{
+                    width: '7px', height: '7px', borderRadius: '50%',
+                    background: activeColor, flexShrink: 0,
+                    boxShadow: `0 0 8px ${activeColor}`
+                }} />
+                {isTimer ? t('timer.remaining', { time: formatTime(remaining) }) : t('common.remaining', { count: remaining })}
+            </div>
+        );
+    }
+
+    return (
+        <div className="scale-in" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px',
+            padding: '10px 24px',
+            borderRadius: 'var(--radius-full)',
+            background: `linear-gradient(135deg, ${activeColor}22, ${gradEnd}1a)`,
+            border: `1px solid ${activeColor}55`,
+            boxShadow: `0 0 22px ${activeColor}33`,
+            minHeight: '48px',
+            boxSizing: 'border-box'
+        }}>
+            <Check size={22} color={activeColor} strokeWidth={3} />
+            <span style={{
+                fontWeight: '700',
+                fontSize: 'clamp(0.95rem, 2.6vw, 1.1rem)',
+                background: `linear-gradient(135deg, ${gradStart}, ${gradEnd})`,
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+            }}>
+                {isTimer ? t('timer.validated') : t('counter.validated', { exercise: exerciseLabel })}
+            </span>
+        </div>
+    );
+}
+
+function TimerControls({
+    activeColor,
+    completeFlash,
+    displayCount,
+    gradEnd,
+    handleCompleteAll,
+    handleReset,
+    isCompleted,
+    isRunning,
+    setIsRunning,
+    t
+}) {
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(12px, 2vh, 20px)', width: '100%', maxWidth: '360px' }}>
+            {!isCompleted && (
+                <Button
+                    variant="ghost"
+                    onClick={() => setIsRunning(!isRunning)}
+                    className="ripple"
+                    aria-label={isRunning ? t('timer.reset') : t('common.next')}
+                    style={{
+                        width: 'clamp(76px, 13vh, 96px)',
+                        height: 'clamp(76px, 13vh, 96px)',
+                        borderRadius: '50%',
+                        background: isRunning
+                            ? `linear-gradient(135deg, ${activeColor}, ${gradEnd})`
+                            : `radial-gradient(circle at 50% 35%, ${activeColor}cc, ${gradEnd})`,
+                        border: 'none',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: `0 10px 30px ${activeColor}66, 0 0 0 6px ${activeColor}1f, inset 0 2px 0 rgba(255,255,255,0.3)`,
+                        transition: 'background 0.35s ease, box-shadow 0.35s ease, transform 0.2s ease'
+                    }}
+                >
+                    {isRunning ? <Pause size={34} fill="white" /> : <Play size={34} fill="white" style={{ marginLeft: '5px' }} />}
+                </Button>
+            )}
+            <ActionButtons
+                activeColor={activeColor}
+                completeFlash={completeFlash}
+                completeLabel={t('timer.skip')}
+                displayCount={displayCount}
+                gradEnd={gradEnd}
+                isCompleted={isCompleted}
+                onComplete={handleCompleteAll}
+                onReset={handleReset}
+                resetLabel={t('timer.reset')}
+            />
+        </div>
+    );
+}
+
+function CounterControls({
+    activeColor,
+    completeFlash,
+    displayCount,
+    gradEnd,
+    handleCompleteAll,
+    handleDecrement,
+    handleIncrement,
+    handleReset,
+    isCompleted,
+    t
+}) {
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(8px, 1.4vh, 12px)', width: '100%', maxWidth: '360px' }}>
+            {/* Primary interaction: increment quad */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'clamp(6px, 1vh, 8px)', width: '100%' }}>
+                {[1, 2, 5, 10].map(amount => (
+                    <Button
+                        variant="ghost"
+                        key={`plus-${amount}`}
+                        onClick={() => handleIncrement(amount)}
+                        className="ripple"
+                        disabled={isCompleted}
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '1px',
+                            padding: 'clamp(12px, 2.2vh, 18px) 4px',
+                            borderRadius: 'var(--radius-md)',
+                            background: `linear-gradient(160deg, ${activeColor}33, ${gradEnd}1a)`,
+                            border: `1px solid ${activeColor}55`,
+                            color: isCompleted ? 'var(--text-secondary)' : 'var(--text-primary)',
+                            fontSize: 'clamp(1.1rem, 3.2vw, 1.45rem)',
+                            fontWeight: '800',
+                            fontVariantNumeric: 'tabular-nums',
+                            minHeight: 'var(--touch-min)',
+                            cursor: isCompleted ? 'not-allowed' : 'pointer',
+                            opacity: isCompleted ? 0.35 : 1,
+                            boxShadow: isCompleted ? 'none' : `0 3px 12px ${activeColor}26`,
+                            transition: 'background 0.45s ease, border-color 0.45s ease, opacity 0.2s ease, transform 0.12s ease'
+                        }}
+                    >
+                        <Plus size={14} style={{ opacity: 0.7 }} />
+                        {amount}
+                    </Button>
+                ))}
+            </div>
+
+            {/* Utility row: decrements + reset */}
+            <div style={{ display: 'flex', gap: 'clamp(6px, 1vh, 8px)', width: '100%' }}>
+                {[1, 5].map(amount => {
+                    const canDecrement = displayCount > 0;
+                    return (
+                        <Button
+                            variant="ghost"
+                            key={`minus-${amount}`}
+                            onClick={() => handleDecrement(amount)}
+                            className="ripple"
+                            disabled={!canDecrement}
+                            style={{
+                                flex: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '4px',
+                                padding: 'clamp(9px, 1.6vh, 13px) 4px',
+                                borderRadius: 'var(--radius-md)',
+                                background: 'rgba(255, 255, 255, 0.04)',
+                                border: '1px solid rgba(255, 255, 255, 0.09)',
+                                color: !canDecrement ? 'var(--text-secondary)' : 'var(--text-primary)',
+                                fontSize: 'clamp(0.85rem, 2.4vw, 1rem)',
+                                fontWeight: '600',
+                                fontVariantNumeric: 'tabular-nums',
+                                minHeight: 'var(--touch-min)',
+                                cursor: !canDecrement ? 'not-allowed' : 'pointer',
+                                opacity: !canDecrement ? 0.4 : 1
+                            }}
+                        >
+                            <Minus size={14} style={{ opacity: 0.7 }} />
+                            {amount}
+                        </Button>
+                    );
+                })}
+                <ResetButton onReset={handleReset} disabled={displayCount === 0} label={t('counter.reset')} />
+            </div>
+
+            {/* Primary CTA */}
+            <CompleteButton
+                activeColor={activeColor}
+                gradEnd={gradEnd}
+                completeFlash={completeFlash}
+                isCompleted={isCompleted}
+                onComplete={handleCompleteAll}
+                label={t('counter.completeAll')}
+            />
+        </div>
+    );
+}
+
+/** Subtle, danger-tinted reset (utility). */
+function ResetButton({ onReset, disabled, label }) {
+    return (
+        <Button
+            variant="ghost"
+            onClick={onReset}
+
+            disabled={disabled}
+            style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: 'clamp(9px, 1.6vh, 13px) 4px',
+                borderRadius: 'var(--radius-md)',
+                background: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.22)',
+                color: disabled ? 'var(--text-secondary)' : 'var(--error)',
+                fontSize: 'clamp(0.85rem, 2.4vw, 1rem)',
+                fontWeight: '600',
+                minHeight: 'var(--touch-min)',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                opacity: disabled ? 0.4 : 1
+            }}
+        >
+            <RotateCcw size={16} />
+            {label}
+        </Button>
+    );
+}
+
+/** Filled primary call-to-action: complete the exercise. */
+function CompleteButton({ activeColor, gradEnd, completeFlash, isCompleted, onComplete, label }) {
+    return (
+        <Button
+            variant="ghost"
+            onClick={onComplete}
+            className={`ripple${completeFlash ? ' complete-flash success-glow' : ''}`}
+            disabled={isCompleted}
+            style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: 'clamp(13px, 2vh, 17px)',
+                borderRadius: 'var(--radius-lg)',
+                background: isCompleted
+                    ? `linear-gradient(135deg, ${activeColor}26, ${gradEnd}1a)`
+                    : `linear-gradient(135deg, ${activeColor}, ${gradEnd})`,
+                border: isCompleted ? `1px solid ${activeColor}55` : 'none',
+                color: isCompleted ? activeColor : 'white',
+                fontSize: 'clamp(0.95rem, 2.6vw, 1.1rem)',
+                fontWeight: '800',
+                cursor: isCompleted ? 'not-allowed' : 'pointer',
+                opacity: isCompleted ? 0.65 : 1,
+                boxShadow: isCompleted ? 'none' : `0 8px 24px ${activeColor}55, inset 0 2px 0 rgba(255,255,255,0.25)`,
+                transition: 'background 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease',
+                minHeight: 'var(--touch-min)'
+            }}
+        >
+            <CheckCheck size={20} />
+            {label}
+        </Button>
+    );
+}
+
+/** Reset + Complete pair, used by the timer (skip = complete). */
+function ActionButtons({
+    activeColor,
+    completeFlash,
+    completeLabel,
+    displayCount,
+    gradEnd,
+    isCompleted,
+    onComplete,
+    onReset,
+    resetLabel
+}) {
+    return (
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'stretch', width: '100%' }}>
+            <ResetButton onReset={onReset} disabled={displayCount === 0} label={resetLabel} />
+            <div style={{ flex: 1.6, display: 'flex' }}>
+                <CompleteButton
+                    activeColor={activeColor}
+                    gradEnd={gradEnd}
+                    completeFlash={completeFlash}
+                    isCompleted={isCompleted}
+                    onComplete={onComplete}
+                    label={completeLabel}
+                />
+            </div>
+        </div>
+    );
+}
+
+/** Toggle buttons for the camera push-up counter, plus its description hint. */
+function CameraModeBar({
+    activeColor, isCameraActive, isCalibrated,
+    startCamera, stopCamera, recalibrate, t
+}) {
+    return (
+        <>
+            <div className="camera-mode-bar">
+                <Button
+                    variant="ghost"
+                    onClick={isCameraActive ? stopCamera : startCamera}
+                    className={`camera-mode-toggle glass${isCameraActive ? ' is-active' : ''}`}
+                    style={{ '--exercise-color': activeColor }}
+                >
+                    <span className="camera-mode-toggle-icon">
+                        {isCameraActive ? <CameraOff size={16} /> : <Camera size={16} />}
+                    </span>
+                    {t('counter.cameraMode')}
+                </Button>
+
+                {isCameraActive && isCalibrated && (
+                    <Button
+                        variant="ghost"
+                        onClick={recalibrate}
+                        className="camera-recal-btn glass"
+                        aria-label={t('counter.cameraCalibrate')}
+                    >
+                        <RefreshCw size={14} />
+                        {t('counter.cameraCalibrate')}
+                    </Button>
+                )}
+            </div>
+
+            {!isCameraActive && (
+                <p className="camera-mode-hint">
+                    {t('counter.cameraModeDesc')}
+                </p>
+            )}
+        </>
+    );
+}
+
+/** Live reps counter + depth gauge shown below the ring while the camera is active. */
+function CameraLiveStats({
+    activeColor, displayCount, dailyGoal,
+    proximity, isCalibrated, calibrateCountdown, pushupState, t
+}) {
+    const isDown = pushupState === 'down';
+    const depth = Math.max(0, Math.min(100, proximity)) / 100;
+
+    return (
+        <div className="camera-live-card glass" style={{ '--exercise-color': activeColor }}>
+            {isCalibrated ? (
+                <>
+                    <div className="camera-live-top">
+                        <span className={`camera-state-pill${isDown ? ' is-down' : ''}`}>
+                            {isDown ? <ArrowDown size={14} /> : <ArrowUp size={14} />}
+                            {isDown ? t('counter.cameraStateDown') : t('counter.cameraStateUp')}
+                        </span>
+
+                        <span className="camera-live-reps">
+                            <span className="camera-live-reps-num">{displayCount}</span>
+                            <span className="camera-live-reps-goal">/ {dailyGoal}</span>
+                        </span>
+                    </div>
+
+                    <div className="camera-depth">
+                        <span className="camera-depth-label">{t('counter.cameraDepth')}</span>
+                        <div className="camera-depth-track">
+                            <div
+                                className="camera-depth-fill"
+                                style={{ transform: `scaleX(${depth})` }}
+                            />
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <div className="camera-live-status">
+                    <span className="camera-spinner" />
+                    <span>
+                        {calibrateCountdown > 0
+                            ? t('counter.cameraCalibrating', { count: calibrateCountdown })
+                            : t('counter.cameraLoading')}
+                    </span>
+                </div>
+            )}
+        </div>
+    );
+}
+
+/* ── Main panel ─────────────────────────────────────────────────────── */
 
 export function ExercisePanel({
     onClose,
@@ -259,9 +982,9 @@ export function ExercisePanel({
             <div className={`${styles.atmosphere} ${isCompleted ? styles.atmosphereDone : ''}`} />
             <div className={styles.vignette} />
 
-            <FitToView style={{ flex: 1, minHeight: 0, height: '100%' }} contentStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'space-between', gap: 'clamp(6px, 1.2vh, 16px)' }}>
+            <FitToView style={{ flex: 1, minHeight: 0, height: '100%' }} contentStyle={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', gap: 'clamp(6px, 1.2vh, 16px)', height: '100%' }}>
                 <div className={`${styles.rise} ${styles.rise1}`} style={{ width: '100%' }}>
-                    <ExercisePanelHeader
+                    <PanelHeader
                         activeColor={activeColor}
                         exerciseConfig={exerciseConfig}
                         exerciseLabel={exerciseLabel}

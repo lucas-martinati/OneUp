@@ -193,7 +193,6 @@ export default defineConfig({
         'src/components/exercises/custom/**',
         'src/components/exercises/SessionSummary.jsx',
         'src/components/exercises/WorkoutSession.jsx',
-        'src/components/exercises/panel/**',
         'src/components/feedback/CSSConfetti.jsx',
         'src/pages/Settings/**',
         'src/pages/Onboarding/**',
