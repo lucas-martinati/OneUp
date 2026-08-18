@@ -165,6 +165,18 @@
 
 .dashboard-wrapper {
   padding-bottom: clamp(1px, 0.3vh, 6px);
+
+  /* Vertical extent the day-pod (T-stem) hangs below the top bar. Shared by the
+     header pod container and the slides' top padding so the pod NEVER overlaps
+     interactive content — the reserved space always matches the pod's real size
+     at every resolution (pure vh, no cqh, since the header is outside the slides'
+     size containers). Mirrors the header's day-label / day-number / pod-padding /
+     stem values so it tracks the pod exactly. */
+  --day-pod-space: calc(
+    clamp(0.7rem, 1.5vh, 0.85rem) * 1.2  /* day label (line-height 1.2) */
+    + clamp(2rem, 6.5vh, 4.5rem) * 1.1   /* day number (line-height 1.1) */
+    + 26px                                /* pod paddings + label margin + 14px stem */
+  );
 }
 
 .day-number-container {

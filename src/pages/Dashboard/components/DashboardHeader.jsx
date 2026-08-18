@@ -139,6 +139,7 @@ export const DashboardHeader = React.memo(({
                 width: '100%',
                 position: 'relative',
                 zIndex: 10,
+                isolation: 'isolate',
                 boxSizing: 'border-box',
                 ...(isDayPerfect ? { '--glow-c1': 'rgba(253, 185, 49, 0.2)', '--glow-c2': 'rgba(255, 215, 0, 0.15)' } : {})
             }}
@@ -282,14 +283,22 @@ export const DashboardHeader = React.memo(({
                 </Stack>
             </Card>
 
-            {/* Vertical Stem of the T — Centered Glass Pod wrapping Day Hero (separate cube/card) */}
+            {/* Vertical Stem of the T — Centered Glass Pod wrapping Day Hero (separate cube/card).
+                The pod is a pure transform/opacity overlay: its container reserves a FIXED height
+                (var(--day-pod-space), shared with the slides' top padding) so hiding/showing it on
+                category change never mutates the scroll flow (no height/top animation → no jank,
+                no layout shift). pointerEvents is always 'none' so the pod never blocks the
+                scrollable band beneath it. */}
             <div style={{
                 display: 'flex', justifyContent: 'center', width: '100%',
                 position: 'absolute', top: 'calc(100% - 1px)', left: 0, right: 0,
                 zIndex: 5,
-                paddingBottom: '24px',
+                height: 'var(--day-pod-space)',
+                paddingBottom: '4px',
+                boxSizing: 'border-box',
                 overflow: 'hidden',
-                pointerEvents: isCardio ? 'none' : 'auto',
+                contain: 'layout paint',
+                pointerEvents: 'none',
             }}>
                 <div className="glass dashboard-header-day-pod" style={{
                     display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
