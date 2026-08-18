@@ -42,9 +42,30 @@ export function FitToView({
     const observer = new ResizeObserver(updateScale);
     observer.observe(container);
     observer.observe(content);
+
+    // Re-measure whenever the content's DOM changes (lazy/Suspense children,
+    // done-state flips, fonts…). ResizeObserver only fires on box-size changes,
+    // and a height:100% wrapper won't report growth in its scrollHeight — which
+    // is exactly when content overflows and the bottom (counter button) would
+    // get clipped instead of scaled down.
+    let raf = 0;
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        updateScale();
+      });
+    };
+    const mutObserver = new MutationObserver(schedule);
+    mutObserver.observe(content, { childList: true, subtree: true, characterData: true });
+
     updateScale();
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      mutObserver.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [minScale, maxScale, disabled]);
 
   const isScaled = scale < 1 && !disabled;

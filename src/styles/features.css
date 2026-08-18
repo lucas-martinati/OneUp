@@ -813,7 +813,7 @@
 
 @supports (height: 1cqh) {
   .dashboard-slide-container {
-    /* Slides with up to 3 tile rows */
+    /* Slides with up to 4 tile rows (12 exercises) */
     --dashboard-slide-padding-top: clamp(4px, 1.2cqh, 12px);
     --day-label-size: clamp(0.7rem, 2.1cqh, 1rem);
     --day-num-height: clamp(2rem, 9.6cqh, 6.5rem);
