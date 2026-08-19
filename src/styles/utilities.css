@@ -132,6 +132,9 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  /* Keeps the bottom-most content clear of the scroll container's bottom
+     mask fade (12px) plus a little breathing room. */
+  padding-bottom: 16px;
 }
 
 /* Reserves the day-pod (T-stem) height at the top of every slide so the pod

@@ -112,7 +112,10 @@ export const CategoryProgressView = React.memo(({
                 </div>
 
                 {/* ── Progress ring + Counter button + Completion status (grouped) ── */}
-                <div className="flex-col flex-align-center gap-responsive">
+                <div className="flex-col flex-align-center gap-responsive" style={{
+                    marginTop: 'auto',
+                    marginBottom: 'auto'
+                }}>
                     <div className="flex-center pos-relative" style={{
                         width: 'var(--bottom-btn-size, clamp(96px, 16vh, 140px))',
                         height: 'var(--bottom-btn-size, clamp(96px, 16vh, 140px))'
@@ -233,7 +236,7 @@ export const CategoryProgressView = React.memo(({
 
     return (
         <div
-            className={`flex-col flex-justify-center flex-align-center full-width pos-relative hide-scrollbar gap-responsive dashboard-slide-bg ${isDayPerfect ? styles.goldBg : ''}`}
+            className={`flex-col flex-align-center full-width pos-relative hide-scrollbar gap-responsive dashboard-slide-bg ${isDayPerfect ? styles.goldBg : ''}`}
             style={{
                 minHeight: '100%',
                 paddingTop: title ? '8px' : 0,
@@ -263,7 +266,7 @@ export const CategoryProgressView = React.memo(({
                 </>
             )}
             {title && (
-                <Stack align="center" gap="xs" style={{ width: '100%' }}>
+                <Stack align="center" gap="xs" style={{ width: '100%', marginTop: 'auto', marginBottom: 'auto' }}>
                     <div style={{
                         fontSize: 'var(--category-title-size, 0.82rem)', fontWeight: '800',
                         color: isDayPerfect ? '#ffdf00' : (categoryColor || 'var(--text-secondary)'),
