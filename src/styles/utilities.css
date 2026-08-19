@@ -69,7 +69,6 @@
 .flex-align-center { display: flex; align-items: center; }
 .flex-justify-center { display: flex; justify-content: center; }
 
-.flex-justify-evenly { display: flex; justify-content: space-evenly; }
 .flex-1 { flex: 1; }
 .flex-wrap { flex-wrap: wrap; }
 .full-height { height: 100%; }
@@ -193,7 +192,7 @@
   --day-pod-space: calc(
     clamp(0.7rem, 1.5vh, 0.85rem) * 1.2  /* day label (line-height 1.2) */
     + clamp(2rem, 6.5vh, 4.5rem) * 1.1   /* day number (line-height 1.1) */
-    + 22px                                /* pod paddings + label margin + stem */
+    + 20px                                /* pod paddings + label margin + stem */
   );
 }
 
