@@ -20,6 +20,21 @@ import { FitToView } from '@components/ui';
 
 const CardioModule = lazy(() => import('@features/cardio/CardioModule').then(m => ({ default: m.CardioModule })));
 
+/**
+ * Slide body for categories that sit under the day-pod: a fixed, non-scaled
+ * spacer reserves the pod's height (var(--day-pod-space)) so the pod never
+ * overlaps the content, then FitToView auto-scales only the content below it
+ * when the available height is tight (small screens).
+ */
+const SlideBody = React.memo(({ children }) => (
+    <>
+        <div className="dashboard-slide-pod-spacer" aria-hidden="true" />
+        <FitToView style={{ flex: 1, minHeight: 0, height: 'auto' }}>
+            {children}
+        </FitToView>
+    </>
+));
+
 export function CategoryViewSwiper({
     fullCategoryOrder,
     renderedSlides,
@@ -65,7 +80,7 @@ export function CategoryViewSwiper({
         if (catKey === CATEGORIES.BODYWEIGHT) {
             return (
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i}>
-                    <FitToView>
+                    <SlideBody>
                         <CategoryProgressView
                             isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
                             getExerciseCount={getExerciseCount} completions={completions} computedStats={computedStats}
@@ -75,7 +90,7 @@ export function CategoryViewSwiper({
                             exercisesList={EXERCISES} exercisesMap={EXERCISES_MAP}
                             getConfig={getConfig}
                         />
-                    </FitToView>
+                    </SlideBody>
                 </div>
             );
         }
@@ -83,7 +98,7 @@ export function CategoryViewSwiper({
         if (catKey === CATEGORIES.WEIGHTS) {
             return (
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i}>
-                    <FitToView>
+                    <SlideBody>
                         {canAccessFeature(FEATURES.WEIGHTS, { isPro }) ? (
                             <CategoryProgressView
                                 title={t('common.weights')}
@@ -102,7 +117,7 @@ export function CategoryViewSwiper({
                                 onOpenStore={openStore}
                             />
                         )}
-                    </FitToView>
+                    </SlideBody>
                 </div>
             );
         }
@@ -114,7 +129,7 @@ export function CategoryViewSwiper({
 
             return (
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i}>
-                    <FitToView>
+                    <SlideBody>
                         {canAccessFeature(FEATURES.CUSTOM_EXERCISES, { isPro }) ? (
                             <CategoryProgressView
                                 title={title}
@@ -136,7 +151,7 @@ export function CategoryViewSwiper({
                                 onOpenStore={openStore}
                             />
                         )}
-                    </FitToView>
+                    </SlideBody>
                 </div>
             );
         }
@@ -150,7 +165,7 @@ export function CategoryViewSwiper({
             const selId = userCatSelected[catKey] || catExercises[0]?.id || null;
             return (
                 <div key={catKey} className="dashboard-slide-container" data-slide-index={i}>
-                    <FitToView>
+                    <SlideBody>
                         {canAccessFeature(FEATURES.CUSTOM_CATEGORIES, { isPro }) ? (
                             <CategoryProgressView
                                 title={catDef.name}
@@ -172,7 +187,7 @@ export function CategoryViewSwiper({
                                 onOpenStore={openStore}
                             />
                         )}
-                    </FitToView>
+                    </SlideBody>
                 </div>
             );
         }

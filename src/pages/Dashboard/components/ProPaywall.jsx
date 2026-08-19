@@ -7,7 +7,7 @@ export const ProPaywall = ({ title, onOpenStore }) => {
     const { t } = useTranslation();
 
     return (
-        <Stack align="center" justify="center" style={{ height: '100%', paddingTop: 'var(--day-pod-space)', paddingBottom: 'var(--space-5)', paddingInline: 'var(--space-5)', textAlign: 'center' }}>
+        <Stack align="center" justify="center" style={{ height: '100%', textAlign: 'center' }}>
             <div style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8 }}>
                 {title}
             </div>
