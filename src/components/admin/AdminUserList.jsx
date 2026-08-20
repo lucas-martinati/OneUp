@@ -127,7 +127,15 @@ export function AdminUserList({ searchQuery, setSearchQuery, sortBy, sortReverse
       </div>
 
       {/* List */}
-      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', paddingRight: '4px' }}>
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--space-3)',
+        paddingRight: '4px',
+        overflow: 'visible'
+        }}>
         {filteredUsers.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)', fontWeight: '600' }}>
             Aucun utilisateur trouvé
