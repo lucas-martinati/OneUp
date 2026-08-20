@@ -21,7 +21,7 @@ const elementsCandidates = [];
 // 1. Compter toutes les classes
 for (const file of files) {
   const code = fs.readFileSync(file, 'utf-8');
-  
+
   // Cherche className="xyz" ou className={styles.xyz}
   const classRegex = /className\s*=\s*(?:(["'])(.*?)\1|\{([^}]+)\})/g;
   let match;

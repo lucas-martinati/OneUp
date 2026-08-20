@@ -3,22 +3,48 @@ import path from 'path';
 
 const srcDir = path.join(process.cwd(), 'src');
 
-// Liste exhaustive des classes par défaut appliquées par tes composants UI
+// Liste exhaustive des classes par défaut appliquées par tes composants UI.
+// Seuls les composants qui acceptent une prop `className` fusionnée sur un
+// élément portant déjà des classes globales littérales sont référencés
+// (les composants 100% inline-styles ou CSS Modules sont exclus : Avatar,
+// MetricBadge, ThemeSwatch, Spinner, CategoryChips, ColorPicker, …).
 const COMPONENT_DEFAULTS = {
-  Button: ['btn', 'hover-lift', 'btn--primary', 'btn--secondary', 'btn--ghost', 'btn--danger', 'btn--md', 'btn--sm', 'btn--lg', 'btn--full', 'btn--icon-only'],
-  Card: ['card'],
-  Badge: ['badge', 'badge-icon'],
-  EmptyState: ['empty-state', 'empty-state-card'],
-  Input: ['input-group', 'input-label', 'input-wrapper', 'input-icon', 'input-field', 'input-error', 'input-helper'],
+  Button: [
+    'btn',
+    'hover-lift',
+    'btn--primary', 'btn--secondary', 'btn--success', 'btn--danger', 'btn--ghost', 'btn--danger-ghost', 'btn--premium', 'btn--glass', 'btn--link', 'btn--surface',
+    'btn--sm', 'btn--md', 'btn--lg',
+    'btn--full', 'btn--icon-only',
+  ],
+  Card: ['glass', 'glass-premium', 'micro-scale-hover'],
+  Badge: [
+    'badge',
+    'badge--sm', 'badge--md',
+    'badge--default', 'badge--primary', 'badge--success', 'badge--warning', 'badge--error', 'badge--info', 'badge--gold', 'badge--pro',
+    'badge-icon',
+  ],
+  EmptyState: ['empty-state-card'],
+  Input: [
+    'input-group', 'input-group--full',
+    'input-label',
+    'input-wrapper', 'input-wrapper--sm', 'input-wrapper--md', 'input-wrapper--lg', 'input-wrapper--error', 'input-wrapper--disabled',
+    'input-icon', 'input-icon--left', 'input-icon--right',
+    'input-field', 'input-field--select',
+    'input-error', 'input-helper',
+  ],
   GoogleSignInButton: ['btn-cloud-signin', 'google-icon'],
-  Skeleton: ['skeleton'],
-  Spinner: ['spinner'],
-  SectionTitle: ['section-title'],
-  CategoryChips: ['chips', 'chipDot'],
-  ColorPicker: ['color-picker', 'color-swatch'],
-  Avatar: ['avatar', 'avatar-image', 'avatar-fallback'],
-  MetricBadge: ['metric-badge', 'metric-value', 'metric-label'],
-  ThemeSwatch: ['theme-swatch', 'theme-swatch-color'],
+  Skeleton: ['skeleton-loader'],
+  SectionTitle: ['text-gradient-primary', 'text-gradient-accent'],
+  Slider: ['premium-slider'],
+  SegmentedControl: ['bump'],
+  ModalContainer: ['fade-in', 'modal-overlay', 'dialog-backdrop', 'modal-ambient-glow', 'modal-content'],
+  ModalHeader: [
+    'modal-header',
+    'modal-header-title-group', 'modal-header-icon', 'modal-header-text',
+    'modal-header-title', 'modal-header-title--multiline', 'panel-title',
+    'modal-header-subtitle', 'modal-header-actions',
+  ],
+  FitToView: ['fit-to-view-container', 'fit-to-view-content'],
 };
 
 function walk(dir) {
