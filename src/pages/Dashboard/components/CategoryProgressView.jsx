@@ -265,8 +265,12 @@ export const CategoryProgressView = React.memo(({
                     ))}
                 </>
             )}
-            {title && (
-                <Stack align="center" gap="xs" style={{ width: '100%', marginTop: 'auto', marginBottom: 'auto' }}>
+            <Stack align="center" gap="xs" style={{
+                width: '100%',
+                marginTop: 'auto',
+                marginBottom: 'auto',
+                visibility: title ? 'visible' : 'hidden'
+            }}>
                     <div style={{
                         fontSize: 'var(--category-title-size, 0.82rem)', fontWeight: '800',
                         color: isDayPerfect ? '#ffdf00' : (categoryColor || 'var(--text-secondary)'),
@@ -274,7 +278,7 @@ export const CategoryProgressView = React.memo(({
                         textShadow: isDayPerfect ? '0 0 10px rgba(255,223,0,0.5)' : 'none',
                         textAlign: 'center'
                     }}>
-                        {title}
+                        {title || '\u00A0'}
                     </div>
                     {(onManageCustom || onManageCategories) && (
                         <Stack direction="row" align="center" justify="center" gap={6}>
@@ -284,7 +288,7 @@ export const CategoryProgressView = React.memo(({
                                     onClick={onManageCategories}
                                     aria-label={t('customCategories.title')}
                                     title={t('customCategories.title')}
-                                    
+
                                     style={{
                                         display: 'inline-flex', alignItems: 'center', gap: '5px',
                                         padding: '3px 10px', borderRadius: '12px',
@@ -305,7 +309,7 @@ export const CategoryProgressView = React.memo(({
                                     onClick={onManageCustom}
                                     aria-label={t('customExercises.title')}
                                     title={t('customExercises.title')}
-                                    
+
                                     style={{
                                         display: 'inline-flex', alignItems: 'center', gap: '5px',
                                         padding: '3px 10px', borderRadius: '12px',
@@ -323,7 +327,6 @@ export const CategoryProgressView = React.memo(({
                         </Stack>
                     )}
                 </Stack>
-            )}
             {renderContent()}
         </div>
     );
