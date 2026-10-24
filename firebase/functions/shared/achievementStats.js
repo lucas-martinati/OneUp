@@ -1,3 +1,4 @@
+import { isFullCompletion, getEntryLevel, computeLevelStreaks } from './exerciseLevels.js';
 /**
  * SINGLE SOURCE OF TRUTH for the achievement STATS SNAPSHOT (the numbers the
  * badge rules test against: totalDays, streaks, perfect days, weekday/weekend
@@ -31,7 +32,7 @@ import {
   ALL_EXERCISE_IDS,
 } from './exerciseRules.js';
 
-import { MAX_STREAK_WINDOW } from "./dateUtils.js";
+import { MAX_STREAK_WINDOW, getWeekBounds, getLocalDateStr } from "./dateUtils.js";
 
 // Deterministic "local hour" shared by client and server: hours elapsed between
 // the local day's UTC-midnight and the recorded UTC timestamp, wrapped to 0-23.
@@ -52,19 +53,32 @@ function badgeLocalHour(dateStr, ts) {
  * @param {Object} frozenDays   Map of `dateStr` → true for streak-frozen days.
  * @returns {Object} snapshot consumed by BADGE_RULES.
  */
-export function computeAchievementStats(completions, totalRepsAll, frozenDays = {}) {
+export function computeAchievementStats(completions, totalRepsAll, frozenDays = {}, weekStartDay = 'monday') {
   const pad = n => String(n).padStart(2, '0');
   const toStr = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
   const dayIsDone = day => !!day && typeof day === 'object' &&
     Object.entries(day).some(([id, e]) => e?.isCompleted && ALL_EXERCISE_IDS.has(id));
-  const isStandardPerfect = day => EXERCISES.every(ex => day[ex.id]?.isCompleted);
-  const isWeightsPerfect = day => WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => day[ex.id]?.isCompleted);
+  const isStandardPerfect = day => EXERCISES.every(ex => isFullCompletion(day[ex.id]));
+  const isWeightsPerfect = day => WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => isFullCompletion(day[ex.id]));
 
   let totalDays = 0, perfectDays = 0, weekdayWorkouts = 0, weekendWorkouts = 0;
   let morningWorkouts = 0, afternoonWorkouts = 0, eveningWorkouts = 0, ghostWorkout = false;
   const completedStandard = new Set();
+  const today = new Date().toISOString().slice(0, 10);
+  const levelCredits = new Map();
+  let highestLevel = 0;
 
   for (const [dateStr, day] of Object.entries(completions)) {
+    if (dateStr > today) continue;
+    for (const [id, entry] of Object.entries(day || {})) {
+      if (!ALL_EXERCISE_IDS.has(id)) continue;
+      const level = getEntryLevel(entry);
+      highestLevel = Math.max(highestLevel, level);
+      let period = dateStr;
+      if (id === 'running' || id === 'cycling') period = getLocalDateStr(new Date(getWeekBounds(dateStr, weekStartDay).start));
+      const key = `${period}/${id}`;
+      levelCredits.set(key, Math.max(levelCredits.get(key) || 0, level));
+    }
     if (!dayIsDone(day)) continue;
     totalDays++;
     if (isStandardPerfect(day) || isWeightsPerfect(day)) perfectDays++;
@@ -82,7 +96,7 @@ export function computeAchievementStats(completions, totalRepsAll, frozenDays = 
       // UTC-derived approximation only for legacy entries that predate the field.
       const h = Number.isInteger(exData.localHour)
         ? exData.localHour
-        : (exData.timestamp ? badgeLocalHour(dateStr, exData.timestamp) : null);
+        : (exData.timestamp && !exData.timestampEstimated ? badgeLocalHour(dateStr, exData.timestamp) : null);
       if (h !== null) {
         if (h < 12) hasMorning = true;
         else if (h < 18) hasAfternoon = true;
@@ -115,6 +129,9 @@ export function computeAchievementStats(completions, totalRepsAll, frozenDays = 
   }
 
   return {
+    totalLevels: [...levelCredits.values()].reduce((sum, level) => sum + level, 0),
+    highestLevel,
+    levelFiveStreak: computeLevelStreaks(completions, today, { frozenDays, weekStartDay, exerciseIds: [...ALL_EXERCISE_IDS] }).levels[4].max,
     totalDays, perfectDays, weekdayWorkouts, weekendWorkouts,
     morningWorkouts, afternoonWorkouts, eveningWorkouts, ghostWorkout,
     hasCompletedAllExercisesOnce, maxStreak, perfectStreak,

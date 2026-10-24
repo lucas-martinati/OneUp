@@ -36,22 +36,29 @@
  *   bodyKey  — i18n key for the body text
  *   ctaKey   — i18n key for the dismiss button label
  *   highlights — optional array of { emoji, key } feature rows (i18n keys)
- *   images   — optional array of image paths (relative to public/) to display
+ *   images   — optional array of { src, captionKey } (paths relative to public/)
  */
 const CURRENT_ANNOUNCEMENT = {
-  id: 'ui-refresh-v1',
+  id: 'levels-v1',
   enabled: true,
   emoji: '✨',
+  heroLevel: 10,
   titleKey: 'announcement.title',
   bodyKey: 'announcement.body',
   ctaKey: 'announcement.cta',
   highlights: [
-    { emoji: '🎨', key: 'announcement.highlights.design' },
-    { emoji: '⚡', key: 'announcement.highlights.motion' },
-    { emoji: '🧩', key: 'announcement.highlights.components' },
-    { emoji: '🚀', key: 'announcement.highlights.onboarding' },
+    { emoji: '🎯', key: 'announcement.highlights.progress' },
+    { emoji: '🔥', key: 'announcement.highlights.streaks' },
+    { emoji: '⚡', key: 'announcement.highlights.global' },
+    { emoji: '🏃', key: 'announcement.highlights.cardio' },
+    { emoji: '🕰️', key: 'announcement.highlights.history' },
+    { emoji: '🏆', key: 'announcement.highlights.rewards' },
   ],
-  images: [],
+  images: [
+    { src: 'announcements/levels/exercise.png', captionKey: 'announcement.screens.exercise' },
+    { src: 'announcements/levels/calendar.png', captionKey: 'announcement.screens.calendar' },
+    { src: 'announcements/levels/share.png', captionKey: 'announcement.screens.share' },
+  ],
 };
 
 export default CURRENT_ANNOUNCEMENT;

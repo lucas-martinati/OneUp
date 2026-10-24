@@ -146,7 +146,25 @@
       "streak_desc": "连续{{count}}天",
       "perfect_days_desc": "{{count}}个完美天",
       "total_reps_desc": "共{{count}}次",
-      "workout_count_desc": "{{period}}{{count}}次锻炼"
+      "workout_count_desc": "{{period}}{{count}}次锻炼",
+      "level_ten": {
+        "title": "登顶",
+        "desc": "在一个训练项目中达到第10级。"
+      },
+      "level_100": {
+        "title": "100个等级"
+      },
+      "level_500": {
+        "title": "500个等级"
+      },
+      "level_1000": {
+        "title": "1000个等级"
+      },
+      "level_points_desc": "累计获得{{count}}个等级。",
+      "level_five_week": {
+        "title": "扎实的一周",
+        "desc": "连续7个训练日保持总连续记录第5级或以上。"
+      }
     },
     "badgesUnlocked": "已解锁徽章",
     "nextBadge": "下一个成就",
@@ -165,14 +183,23 @@
   },
   "announcement": {
     "badge": "新功能",
-    "title": "全新的界面 ✨",
-    "body": "OneUp 焕然一新！整个应用都经过重新设计，带来更流畅、更统一、更舒适的日常体验。",
-    "cta": "去看看",
+    "title": "每一份努力都让你升级",
+    "body": "每项运动有10个等级，连续记录随你成长，进度处处可见。每天由你决定前进多少。",
+    "cta": "开始吧！",
     "highlights": {
-      "design": "从里到外焕新的设计，重新打造的头像与渐变",
-      "motion": "各处更流畅的动画与加载效果",
-      "components": "统一的组件，让各页面之间保持完美一致",
-      "onboarding": "重新设计的引导流程，并支持语言切换"
+      "progress": "无需选择难度，直接挑战10个等级。达到1级即完成该运动，10级代表完成全部目标。未达1级的次数也会保存。动态圆环会显示距离下一级还差多少。",
+      "streaks": "每项运动保留独立的连续记录。连续200天达到10级后，第二天只达到5级，就会变成5级的201天连续记录。更高等级的最佳纪录仍会保留。",
+      "global": "总连续记录采用当天最高等级。今天俯卧撑10级、明天深蹲10级，即使更换运动，10级的连续记录也会继续。",
+      "cardio": "有氧运动也有等级：距离进度分为10个阶段，逐步完成每周目标。已达到的有氧等级在该周结束前持续有效。",
+      "history": "历史记录会自动转换。过去已完成的运动记为10级。未完成但已保存的次数会与原日期的目标比较，计算对应等级。无需重新输入。",
+      "rewards": "日历、统计、个人资料和分享图片都会显示等级。新增5项成就，奖励等级提升与坚持；已有成就仍会保留。"
+    },
+    "gallery": "看看新版OneUp",
+    "galleryHint": "滑动浏览使用演示数据的截图。部分截图为英文。",
+    "screens": {
+      "exercise": "圆环逐级填满，并显示下一个目标。",
+      "calendar": "日历显示每天达到的等级。",
+      "share": "分享的训练图片中也会显示等级。"
     }
   },
   "app": {
@@ -226,13 +253,10 @@
   "cardio": {
     "avgSpeed": "平均速度",
     "connectTitle": "已连接服务",
-    "difficultyMismatchDesc": "难度已更改 ({{saved}}x → {{current}}x)。您想继续使用此新设置吗？",
-    "difficultyModified": "难度已修改",
     "distance": "距离",
     "duration": "用时",
     "elevation": "爬升+",
     "finish": "终点",
-    "goalReached": "目标达成！",
     "googleWallDesc": "使用您的 Google 账户登录以访问有氧模块并同步数据。",
     "googleWallStep1": "Google 登录",
     "googleWallTitle": "需要账户",
@@ -614,25 +638,20 @@
     "language": "语言",
     "languageDesc": "更改应用语言",
     "leaderboardDesc": "在公开排行榜中显示",
-    "lock": "锁定",
     "maxChars": "最多20个字符 · 将使用你的Google头像",
     "monday": "周一",
-    "multiplier": "倍率（最高1.0）",
     "notifications": "通知",
     "performance": "性能",
     "preferences": "偏好",
     "reducedEffects": "减少视觉效果",
     "reminder": "锻炼提醒",
     "reminderTime": "提醒时间",
-    "sensitiveParam": "敏感设置",
-    "sensitiveWarning": "更改此设置将修改你的每日目标。设为0.5会将目标减半。",
     "soundEffects": "音效",
     "soundsDescription": "操作音效",
     "hapticFeedback": "触觉反馈",
     "hapticsDescription": "操作时震动",
     "sunday": "周日",
     "title": "设置",
-    "unlockSettings": "解锁设置",
     "privacyPolicy": "隐私政策",
     "termsOfService": "服务条款",
     "dataTitle": "数据",
@@ -691,9 +710,9 @@
     "consistency": "⏰ 坚持度",
     "currentStreak": "当前连续",
     "dailyReps": "📈 每日次数趋势",
-    "difficultyEvolution": "⚙️ 难度变化",
-    "difficultyNoData": "暂无难度数据",
-    "difficultyNoDataHint": "更改练习的难度即可在此处查看其变化",
+    "levelEvolution": "等级变化",
+    "levelNoData": "暂无等级记录",
+    "levelNoDataHint": "达到第一个等级即可查看进度。",
     "exercisesDone": "已完成运动",
     "filters": "筛选",
     "loadingCharts": "加载图表中...",
@@ -806,7 +825,10 @@
     "selectExercises": "选择运动",
     "sessionDone": "训练完成！",
     "shuffle": "随机排序",
-    "yourOrder": "你的顺序"
+    "yourOrder": "你的顺序",
+    "finish": "结束训练",
+    "incompleteMessage": "部分运动尚未完成。只会保存已完成的次数和已达到的等级，不会清除已有进度。",
+    "progressSaved": "进度已保存"
   },
   "customCategories": {
     "colorLabel": "类别颜色",
@@ -998,5 +1020,24 @@
     "afternoon": "下午",
     "evening": "晚上",
     "total": "共"
+  },
+  "levels": {
+    "short": "Lvl {{level}}",
+    "reached": "Lvl {{level}} / 10",
+    "progress": "等级",
+    "streaks": "各等级连续记录",
+    "current": "当前连续记录",
+    "record": "最佳记录",
+    "nextReps": "距离第{{level}}级还差{{count}}次",
+    "nextTime": "距离第{{level}}级还差{{time}}",
+    "complete": "已达到最高等级！",
+    "step1": "训练已完成",
+    "step5": "完成一半",
+    "step10": "目标达成",
+    "example": "进度示例",
+    "globalRule": "当天等级最高的项目推进总连续记录。连续记录的等级是每天都保持的等级。",
+    "cardioRule": "有氧运动的十个等级按一周内完成的距离累积。",
+    "profileTitle": "等级历程",
+    "profilePending": "此用户资料更新后将显示等级，已有连续记录仍会保留显示。"
   }
 }

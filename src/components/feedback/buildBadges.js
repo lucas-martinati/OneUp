@@ -3,6 +3,9 @@ import { BADGE_DEFINITIONS, getBadgeIconFromDef, isBadgeUnlocked } from '@config
 // Visual-only progress metadata: [stat key, goal]. Lets locked numeric badges
 // show how close they are. Unlock logic stays in badgeDefinitions (test()).
 const PROGRESS_META = {
+    level_ten: ['highestLevel', 10], level_100: ['totalLevels', 100],
+    level_500: ['totalLevels', 500], level_1000: ['totalLevels', 1000],
+    level_five_week: ['levelFiveStreak', 7],
     first_blood: ['totalDays', 1],
     consistent: ['maxStreak', 3], week_warrior: ['maxStreak', 7], two_weeks: ['maxStreak', 14],
     month_warrior: ['maxStreak', 30], two_months: ['maxStreak', 60], quarter_year: ['maxStreak', 90],
@@ -28,10 +31,11 @@ const PROGRESS_META = {
  */
 export function buildBadges(stats) {
     const achievements = stats?.achievements;
+    const snapshot = stats?.badgeStats || stats;
     return BADGE_DEFINITIONS.map(def => {
-        const unlocked = isBadgeUnlocked(def.id, stats, achievements);
+        const unlocked = isBadgeUnlocked(def.id, snapshot, achievements);
         const meta = PROGRESS_META[def.id];
-        const current = meta ? (stats?.[meta[0]] || 0) : null;
+        const current = meta ? (snapshot?.[meta[0]] || 0) : null;
         const goal = meta ? meta[1] : null;
         return {
             id: def.id,

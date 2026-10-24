@@ -108,7 +108,7 @@ describe('buildCardModel — session mode', () => {
     expect(yoga.exercises[0].id).toBe('custom_x');
   });
 
-  it('defaults difficulty from getConfig when missing', () => {
+  it('keeps old completed sessions at level ten regardless of current difficulty', () => {
     const model = buildCardModel({
       mode: 'session',
       sessionData: { ...sessionData, exercises: [{ id: bw.id, reps: 10 }] },
@@ -116,7 +116,7 @@ describe('buildCardModel — session mode', () => {
       getConfig: () => ({ difficulty: 0.8 }),
       t,
     });
-    expect(model.allExercises[0].difficulty).toBeCloseTo(0.8);
+    expect(model.allExercises[0].level).toBe(10);
   });
 
   it('never uses a pro theme without isPro', () => {

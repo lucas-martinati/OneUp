@@ -13,6 +13,12 @@
  */
 
 export const BADGE_RULES = [
+  // Level progress is independent of exercise rep multipliers and timer units.
+  { id: 'level_ten', test: s => s.highestLevel >= 10 },
+  { id: 'level_100', test: s => s.totalLevels >= 100 },
+  { id: 'level_500', test: s => s.totalLevels >= 500 },
+  { id: 'level_1000', test: s => s.totalLevels >= 1000 },
+  { id: 'level_five_week', test: s => s.levelFiveStreak >= 7 },
   // ── Streak ─────────────────────────────────────────────────────────
   { id: 'first_blood',          test: s => s.totalDays >= 1 },
   { id: 'consistent',           test: s => s.maxStreak >= 3 },

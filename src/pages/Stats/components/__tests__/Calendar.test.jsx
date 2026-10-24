@@ -66,7 +66,7 @@ describe('Calendar and DayDetail date translation', () => {
 
     // Find the button for June 19th
     // In Spanish, monthNames[5] is "Junio"
-    const dayButton = screen.getByRole('button', { name: '19 Junio' });
+    const dayButton = screen.getByRole('button', { name: /^19 Junio/ });
     expect(dayButton).toBeTruthy();
 
     // Click to open DayDetail
@@ -128,7 +128,7 @@ describe('Calendar swipe and touch events', () => {
     vi.setSystemTime(new Date('2026-06-20'));
     render(<Calendar {...defaultProps} />);
     // Click on a day to open DayDetail
-    fireEvent.click(screen.getByRole('button', { name: '19 Junio' }));
+    fireEvent.click(screen.getByRole('button', { name: /^19 Junio/ }));
 
     // DayDetail
     const sheet = document.querySelector('[class*="previewOverlay"] > div');

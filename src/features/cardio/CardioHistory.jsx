@@ -243,11 +243,7 @@ export function CardioHistory({ sessions, mode, onClose }) {
             </div>
           )}
 
-          <div className="custom-scrollbar" style={{
-            flex: 1, overflowY: 'auto',
-            display: 'flex', flexDirection: 'column', gap: '10px',
-            margin: '0 -10px', padding: '0 10px'
-          }}>
+          <div className="cardio-hist-list custom-scrollbar">
           {sessions.length === 0 ? (
             <div style={{
               flex: 1,

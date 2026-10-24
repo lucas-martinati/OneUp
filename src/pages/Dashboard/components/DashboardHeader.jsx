@@ -1,3 +1,7 @@
+import { LevelSeparator } from '@components/ui/LevelSeparator';
+import { ModalShell } from '@components/ui/ModalShell';
+import { LevelStreakDetails } from '@components/ui/LevelStreakDetails';
+import { LevelEmblem } from '@components/ui/LevelEmblem';
 import React, { useRef, useState, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Shield, Flame, Trophy, Snowflake } from '@utils/icons';
@@ -25,7 +29,7 @@ const BADGE_BASE = {
 
 export const DashboardHeader = React.memo(({
     isAdmin,
-    streakActive, streakFrozen, displayStreak, selectedExercise, totalReps,
+    streakActive, streakFrozen, displayStreak, streakLevel, levelStreaks, selectedExercise, totalReps,
     dayNumber, prevDayNumber, isCounterTransitioning, isDayPerfect, isFuture, effectiveStart,
     currentCatKey
 }) => {
@@ -33,6 +37,7 @@ export const DashboardHeader = React.memo(({
     const { t } = useTranslation();
     const auth = useAuth();
     const freezeCount = useProgressStore(s => s.streakFreezes?.count || 0);
+    const [showLevelInfo, setShowLevelInfo] = useState(false);
     const [showFreezeInfo, setShowFreezeInfo] = useState(false);
     // Guests see a "0" badge that invites them to sign in; signed-in users see
     // their count and the badge hides at zero.
@@ -51,6 +56,7 @@ export const DashboardHeader = React.memo(({
     const [particles, setParticles] = useState([]);
 
     const handleStreakClick = (e) => {
+        setShowLevelInfo(true);
         if (!streakActive || displayStreak == 0 || displayStreak == '0') return;
         const rect = e.currentTarget.getBoundingClientRect();
         const headerRect = headerRef.current ? headerRef.current.getBoundingClientRect() : { left: 0, top: 0 };
@@ -242,6 +248,9 @@ export const DashboardHeader = React.memo(({
                         </Button>
                     )}
 
+                    {showLevelInfo && <ModalShell open={showLevelInfo} onClose={() => setShowLevelInfo(false)} title={t('levels.streaks')} icon={Flame} accent="#f97316">
+                        <LevelStreakDetails levels={levelStreaks} expanded />
+                    </ModalShell>}
                     {showFreezeInfo && <StreakFreezeInfo open={showFreezeInfo} onClose={() => setShowFreezeInfo(false)} />}
 
                     {/* Global streak badge */}
@@ -249,6 +258,7 @@ export const DashboardHeader = React.memo(({
                         variant="ghost"
                         onClick={handleStreakClick}
                         aria-label="Streak"
+                        aria-description={streakLevel > 0 ? t('levels.short', { level: streakLevel }) : undefined}
                         style={{
                             ...BADGE_BASE,
                             background: streakBadge.bg,
@@ -261,6 +271,10 @@ export const DashboardHeader = React.memo(({
                             ? <FrozenFlame color={streakBadge.fg} />
                             : <Flame size={16} color={streakBadge.fg} />}
                         <span style={{ color: streakBadge.fg }}>{displayStreak}</span>
+                        {streakLevel > 0 && <>
+                            <LevelSeparator color={`color-mix(in srgb, ${streakBadge.fg} 40%, transparent)`} />
+                            <LevelEmblem level={streakLevel} />
+                        </>}
                     </Button>
 
                     {/* Total reps badge */}

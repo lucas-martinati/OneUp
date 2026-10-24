@@ -27,6 +27,8 @@ export async function loadLeaderboard() {
       weightsTotalReps: entry.weightsTotalReps || 0,
       exerciseReps: entry.exerciseReps || {},
       lastActiveDay: entry.lastActiveDay || null,
+      currentStreak: entry.currentStreak || 0,
+      streakLevel: entry.streakLevel || 0,
       lastUpdated: entry.lastUpdated || null,
       isSupporter: !!entry.isSupporter,
       isPro: !!entry.isPro,

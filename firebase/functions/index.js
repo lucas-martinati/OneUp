@@ -1,3 +1,7 @@
+import { rebuildMissingPublicLevels } from './publicLevelBackfill.js';
+import { computeExerciseDerived } from './shared/publicLevelStats.js';
+import { getCardioReps } from './shared/cardioLevels.js';
+import { migrateLevelProgress, getRecordedReps, isFullCompletion } from './shared/exerciseLevels.js';
 import { onRequest, onCall, HttpsError } from "firebase-functions/v2/https";
 import { onValueWritten } from "firebase-functions/v2/database";
 import { onSchedule } from "firebase-functions/v2/scheduler";
@@ -7,7 +11,7 @@ import crypto from "crypto";
 import { BADGE_RULES, isBadgeUnlocked } from "./shared/badgeRules.js";
 import { DB_SCHEMA, LEAF, paths } from "./shared/dbSchema.js";
 import { normalizeFrozenDays, reconcileStreakFreezeState } from "./shared/streakFreeze.js";
-import { walkStreak, isDayDone, MAX_STREAK_WINDOW } from "./shared/dateUtils.js";
+import { isDayDone, MAX_STREAK_WINDOW } from "./shared/dateUtils.js";
 import { computeAchievementStats } from "./shared/achievementStats.js";
 
 // Initialize Firebase Admin SDK using Default Compute Service Account
@@ -22,13 +26,9 @@ const db = admin.database();
 import {
   EXERCISES,
   WEIGHT_EXERCISES,
-  CARDIO_EXERCISES,
   ALL_STANDARD_IDS,
   ALL_WEIGHT_IDS,
   ALL_EXERCISE_IDS,
-  getDailyGoal,
-  getWeeklyGoalKm,
-  CARDIO_REPS_PER_KM,
 } from "./shared/exerciseRules.js";
 
 
@@ -115,58 +115,6 @@ function getUserLocalDate(completions, serverNow) {
 // ══════════════════════════════════════════════════════════════════════════════
 
 
-// All known exercise ids (standard + weights + cardio), as a flat list.
-const ALL_EX_OBJECTS = [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES];
-
-function computeExerciseDerived(completions, anchorDateStr, frozenDays = {}, startDate = null) {
-  const pad = n => String(n).padStart(2, '0');
-  const dayStr = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
-  const dayIsDone = day => !!day && typeof day === 'object' &&
-    Object.entries(day).some(([id, e]) => e?.isCompleted && ALL_EXERCISE_IDS.has(id));
-
-  // Per-exercise total days completed. Dates before the challenge start are
-  // excluded — e.g. cardio weeks retroactively marked "completed" from
-  // historical Health Connect/Strava imports that predate the user's own
-  // challenge (see the reps loop in recomputeLeaderboardEntry for the same rule).
-  const exerciseDays = {};
-  for (const ex of ALL_EX_OBJECTS) exerciseDays[ex.id] = 0;
-  for (const [dateStr, day] of Object.entries(completions)) {
-    if (!day || typeof day !== 'object') continue;
-    if (startDate && dateStr < startDate) continue;
-    for (const ex of ALL_EX_OBJECTS) {
-      if (day[ex.id]?.isCompleted) exerciseDays[ex.id]++;
-    }
-  }
-
-  // Streaks counting backwards from the user's local "today".
-  const [ay, am, ad] = anchorDateStr.split('-').map(Number);
-  const anchorMs = Date.UTC(ay, am - 1, ad);
-
-  // Frozen days are transparent in the global streak walk (see @shared/streakFreeze).
-  const currentStreak = walkStreak(
-    (offset) => dayStr(new Date(anchorMs - offset * 86400000)),
-    (ds) => (!startDate || ds >= startDate) && dayIsDone(completions[ds]),
-    (ds) => !!frozenDays[ds],
-    MAX_STREAK_WINDOW
-  );
-
-  const exerciseStreaks = {};
-  const exerciseDoneToday = {};
-  for (const ex of ALL_EX_OBJECTS) {
-    let streak = 0;
-    for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
-      const ds = dayStr(new Date(anchorMs - i * 86400000));
-      if (startDate && ds < startDate) break;
-      if (completions[ds]?.[ex.id]?.isCompleted) streak++;
-      else break;
-    }
-    exerciseStreaks[ex.id] = streak;
-    exerciseDoneToday[ex.id] = !!completions[anchorDateStr]?.[ex.id]?.isCompleted;
-  }
-
-  return { currentStreak, exerciseDays, exerciseStreaks, exerciseDoneToday };
-}
-
 // ══════════════════════════════════════════════════════════════════════════════
 // Core: recompute leaderboard entry from source of truth
 // ══════════════════════════════════════════════════════════════════════════════
@@ -201,7 +149,9 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   }
 
   // ── Extract data ───────────────────────────────────────────────────────
-  const completions = progress.completions || {};
+  // Normalize legacy effort for public stats even before the owner reopens the app.
+  // This is a read-only projection: never rewrite the private history here.
+  const completions = migrateLevelProgress(progress).completions || {};
   const rawFrozenDays = normalizeFrozenDays(progress.frozenDays);
 
   // ── Server-side frozenDays validation ──────────────────────────────────
@@ -252,21 +202,14 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     let anyDone = false;
 
     for (const [exId, exData] of Object.entries(day)) {
-      if (!exData?.isCompleted) continue;
+      if (!exData?.isCompleted && !(exData?.count > 0)) continue;
       if (!ALL_EXERCISE_IDS.has(exId)) continue; // Skip unknown exercises (custom exercises use their own IDs)
 
-      anyDone = true;
+      anyDone ||= !!exData.isCompleted;
 
       if (exId === 'running' || exId === 'cycling') {
-        // Cardio is validated per WEEK (not per day — see useCardio.js), and
-        // only the week's goal distance counts, never the actual distance
-        // logged: same "goal, not overage" rule as getDailyGoal for every
-        // other exercise. A validated week where the user ran 40km still only
-        // counts that week's (small, linearly-growing) goal in km.
         const weekNum = Math.floor((dayNum - 1) / 7) + 1;
-        const difficulty = exData.difficulty ?? 1;
-        const goalKm = getWeeklyGoalKm(exId, weekNum) * difficulty;
-        const reps = Math.floor(goalKm * CARDIO_REPS_PER_KM[exId]);
+        const reps = getCardioReps(exData, exId, weekNum);
         exerciseReps[exId] = (exerciseReps[exId] || 0) + reps;
         if (exId === 'running') runningReps += reps; else cyclingReps += reps;
         continue;
@@ -275,8 +218,8 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
       const exercise = EXERCISES.find(e => e.id === exId) || WEIGHT_EXERCISES.find(e => e.id === exId);
       if (!exercise) continue;
 
-      const diff = exerciseDifficulties[exId] ?? 1.0;
-      const reps = getDailyGoal(exercise, dayNum, diff);
+      const diff = exData.difficulty ?? exerciseDifficulties[exId] ?? 1.0;
+      const reps = getRecordedReps(exData, exercise, dayNum, diff);
 
       exerciseReps[exId] = (exerciseReps[exId] || 0) + reps;
 
@@ -311,16 +254,16 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   if (lastActiveDay && completions[lastActiveDay]) {
     const dayData = completions[lastActiveDay];
     const isStandardPerfect = EXERCISES.length > 0 &&
-      EXERCISES.every(ex => dayData[ex.id]?.isCompleted);
+      EXERCISES.every(ex => isFullCompletion(dayData[ex.id]));
     const isWeightsPerfect = WEIGHT_EXERCISES.length > 0 &&
-      WEIGHT_EXERCISES.every(ex => dayData[ex.id]?.isCompleted);
+      WEIGHT_EXERCISES.every(ex => isFullCompletion(dayData[ex.id]));
     isPerfectToday = isStandardPerfect || isWeightsPerfect;
   }
 
   // ── Badge count — computed from stats (derived badges) + the manual flags
   //    stored in the achievements node (first_share / white_hat) ────────────
   const totalRepsAll = totalClassicReps + weightsTotalReps + cardioTotalReps;
-  const badgeStats = computeAchievementStats(completions, totalRepsAll, frozenDays);
+  const badgeStats = computeAchievementStats(completions, totalRepsAll, frozenDays, settings.weekStartDay || 'monday');
   const badgeCount = BADGE_RULES.filter(b => isBadgeUnlocked(b.id, badgeStats, achievements)).length;
 
   // ── Determine pseudo and visibility ────────────────────────────────────
@@ -441,6 +384,7 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   const userLocalDate = getUserLocalDate(completions, serverNow);
   const shieldDate = shieldOrange ? serverTodayUTC : userLocalDate;
 
+  const derived = computeExerciseDerived(completions, userLocalDate, frozenDays, startDate, settings.weekStartDay || 'monday');
   // ── Write to leaderboard ───────────────────────────────────────────────
   await db.ref(paths.leaderboardEntry(uid)).update({
     pseudo,
@@ -448,6 +392,8 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     totalReps: totalClassicReps + cardioTotalReps,
     weightsTotalReps,
     exerciseReps,
+    streakLevel: derived.globalLevels.level,
+    currentStreak: derived.globalLevels.streak,
     lastActiveDay,
     isPublic,
     isPerfectToday,
@@ -463,7 +409,6 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
   // The derived stats let UserDetail.jsx render streaks/days WITHOUT reading anyone's
   // private completions calendar. Always published so clan members can view details
   // even if the user is hidden from the global leaderboard.
-  const derived = computeExerciseDerived(completions, userLocalDate, frozenDays, startDate);
   await db.ref(paths.publicProfile(uid)).set({
     // Detail-view-only payload. exerciseReps lives in the leaderboard entry
     // (needed for the list's per-exercise ranking); everything below is only
@@ -472,8 +417,11 @@ async function recomputeLeaderboardEntry(uid, progress, beforeProgress = null) {
     exerciseDifficulties: exerciseDifficulties || {},
     achievements: badgeCount,
     derivedStats: {
-      currentStreak: derived.currentStreak,
-      maxStreak: badgeStats.maxStreak,
+      currentStreak: derived.globalLevels.streak,
+      streakLevel: derived.globalLevels.level,
+      levelStreaks: derived.globalLevels.levels,
+      exerciseLevels: derived.exerciseLevels,
+      maxStreak: derived.globalLevels.levels[0].max,
       totalDays: badgeStats.totalDays,
       perfectDays: badgeStats.perfectDays,
       exerciseDays: derived.exerciseDays,
@@ -645,6 +593,28 @@ export const backfillUserProfiles = onRequest({ secrets: ["ADMIN_API_KEY"] }, as
   } catch (error) {
     console.error("Backfill failed:", error);
     res.status(500).send("Erreur lors du backfill : " + error.message);
+  }
+});
+
+/** Rebuild only public level projections missing from the release before levels.
+ * Preview is the default; the authenticated administrator must POST { apply: true }.
+ * Private progress is read but never rewritten. Re-running skips completed profiles.
+ */
+export const backfillPublicLevels = onRequest({ secrets: ["ADMIN_API_KEY"], timeoutSeconds: 540 }, async (req, res) => {
+  if (!checkAdminAuth(req, res, process.env.ADMIN_API_KEY)) return;
+  if (req.method !== 'POST') { res.status(405).send('POST required'); return; }
+  try {
+    const profiles = (await db.ref(paths.publicProfiles()).once('value')).val() || {};
+    const result = await rebuildMissingPublicLevels({
+      profiles,
+      apply: req.body?.apply === true,
+      readProgress: async uid => (await db.ref(paths.userProgress(uid)).once('value')).val(),
+      recompute: recomputeLeaderboardEntry,
+    });
+    res.json(result);
+  } catch (error) {
+    console.error('[backfillPublicLevels] Failed:', error);
+    res.status(500).send('Public profile rebuild failed; completed profiles will be skipped on retry.');
   }
 });
 

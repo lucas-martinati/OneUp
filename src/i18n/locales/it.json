@@ -146,7 +146,25 @@
       "streak_desc": "{{count}} giorni di fila",
       "perfect_days_desc": "{{count}} giorni perfetti",
       "total_reps_desc": "{{count}} ripetizioni totali",
-      "workout_count_desc": "{{count}} allenamenti {{period}}"
+      "workout_count_desc": "{{count}} allenamenti {{period}}",
+      "level_ten": {
+        "title": "In vetta",
+        "desc": "Raggiungi il livello 10 in un esercizio."
+      },
+      "level_100": {
+        "title": "100 livelli"
+      },
+      "level_500": {
+        "title": "500 livelli"
+      },
+      "level_1000": {
+        "title": "1000 livelli"
+      },
+      "level_points_desc": "Accumula {{count}} livelli.",
+      "level_five_week": {
+        "title": "Una settimana solida",
+        "desc": "Mantieni una serie globale al livello 5 o superiore per 7 giorni di allenamento."
+      }
     },
     "badgesUnlocked": "Badge sbloccati",
     "nextBadge": "Prossimo risultato",
@@ -164,15 +182,24 @@
     "filterLocked": "Bloccati"
   },
   "announcement": {
-    "badge": "Nuovo",
-    "title": "Un'interfaccia tutta nuova ✨",
-    "body": "OneUp si rifà il look! L'intera app è stata riprogettata per un'esperienza più fluida, coerente e piacevole ogni giorno.",
-    "cta": "Scopri",
+    "badge": "Novità",
+    "title": "Ogni sforzo ti fa salire di livello",
+    "body": "10 livelli per esercizio, serie che crescono con te e progressi visibili ovunque. Scegli ogni giorno fin dove arrivare.",
+    "cta": "Si parte!",
     "highlights": {
-      "design": "Un design rinnovato da cima a fondo, con avatar e sfumature ridisegnati",
-      "motion": "Animazioni e caricamenti più fluidi ovunque",
-      "components": "Componenti unificati per una coerenza perfetta tra le schermate",
-      "onboarding": "Un onboarding ridisegnato, con selettore della lingua"
+      "progress": "10 livelli senza scegliere la difficoltà. Il livello 1 convalida l’esercizio; il livello 10 completa l’obiettivo. Le ripetizioni sotto il livello 1 restano salvate. Il cerchio animato indica quanto manca al prossimo livello.",
+      "streaks": "Ogni esercizio conserva la sua serie. Dopo 200 giorni al livello 10, un giorno al livello 5 porta la serie a 201 giorni al livello 5. I record dei livelli superiori restano.",
+      "global": "La serie globale considera il livello più alto del giorno. Piegamenti al livello 10 oggi e squat al livello 10 domani mantengono la serie al livello 10, anche cambiando esercizio.",
+      "cardio": "Anche il cardio ha i livelli: la distanza riempie 10 tappe verso l’obiettivo settimanale. Un livello cardio raggiunto resta valido fino alla fine della settimana.",
+      "history": "La cronologia viene recuperata automaticamente. Gli esercizi già completati diventano livello 10. Le ripetizioni salvate senza completamento vengono confrontate con l’obiettivo della loro data originale. Non devi reinserire nulla.",
+      "rewards": "Calendario, statistiche, profili e condivisioni mostrano i livelli. 5 nuovi traguardi premiano livelli e costanza; i traguardi precedenti restano."
+    },
+    "gallery": "Il nuovo OneUp in immagini",
+    "galleryHint": "Scorri le schermate con dati dimostrativi. Alcune sono in inglese.",
+    "screens": {
+      "exercise": "Il cerchio si riempie livello dopo livello e mostra il prossimo obiettivo.",
+      "calendar": "Il calendario mostra il livello raggiunto ogni giorno.",
+      "share": "I livelli appaiono anche nelle immagini degli allenamenti condivisi."
     }
   },
   "app": {
@@ -226,13 +253,10 @@
   "cardio": {
     "avgSpeed": "Velocità media",
     "connectTitle": "Servizi connessi",
-    "difficultyMismatchDesc": "La difficoltà è cambiata ({{saved}}x → {{current}}x). Vuoi continuare con questa nuova impostazione?",
-    "difficultyModified": "Difficoltà modificata",
     "distance": "Distanza",
     "duration": "Tempo",
     "elevation": "Elevazione+",
     "finish": "Fine",
-    "goalReached": "Obiettivo raggiunto!",
     "googleWallDesc": "Accedi con il tuo account Google per accedere al modulo Cardio e sincronizzare i tuoi dati.",
     "googleWallStep1": "Accesso a Google",
     "googleWallTitle": "Conto richiesto",
@@ -614,25 +638,20 @@
     "language": "Lingua",
     "languageDesc": "Cambia la lingua dell'applicazione",
     "leaderboardDesc": "Appare nella classifica pubblica",
-    "lock": "Serratura",
     "maxChars": "Massimo 20 caratteri · Verrà utilizzata la tua foto Google",
     "monday": "Lunedì",
-    "multiplier": "Moltiplicatore (massimo 1,0)",
     "notifications": "Notifiche",
     "performance": "Prestazione",
     "preferences": "Preferenze",
     "reducedEffects": "Effetti visivi ridotti",
     "reminder": "Promemoria allenamento",
     "reminderTime": "TEMPO DI PROMEMORIA",
-    "sensitiveParam": "IMPOSTAZIONE SENSIBILE",
-    "sensitiveWarning": "La modifica di questo modificherà i tuoi obiettivi di ripetizione giornalieri. Un'impostazione di 0,5 dimezza i tuoi obiettivi.",
     "soundEffects": "Effetti sonori",
     "soundsDescription": "Suoni sulle azioni",
     "hapticFeedback": "Feedback aptico",
     "hapticsDescription": "Vibrazioni sulle azioni",
     "sunday": "Domenica",
     "title": "Impostazioni",
-    "unlockSettings": "SBLOCCA IMPOSTAZIONI",
     "privacyPolicy": "Informativa sulla privacy",
     "termsOfService": "Termini di servizio",
     "dataTitle": "Dati",
@@ -691,9 +710,9 @@
     "consistency": "⏰ Coerenza",
     "currentStreak": "Serie attuale",
     "dailyReps": "📈Evoluzione delle ripetizioni",
-    "difficultyEvolution": "⚙️ Evoluzione della difficoltà",
-    "difficultyNoData": "Nessun dato sulla difficoltà ancora",
-    "difficultyNoDataHint": "Cambia la difficoltà di un esercizio per vederne l'evoluzione qui",
+    "levelEvolution": "Andamento dei livelli",
+    "levelNoData": "Nessun livello",
+    "levelNoDataHint": "Raggiungi il primo livello per vedere i tuoi progressi.",
     "exercisesDone": "Esercizi fatti",
     "filters": "Filtri",
     "loadingCharts": "Caricamento grafici...",
@@ -806,7 +825,10 @@
     "selectExercises": "Seleziona esercizi",
     "sessionDone": "Sessione completata!",
     "shuffle": "Mescola",
-    "yourOrder": "Il tuo ordine"
+    "yourOrder": "Il tuo ordine",
+    "finish": "Termina sessione",
+    "incompleteMessage": "Alcuni esercizi sono incompleti. Verranno salvati solo ripetizioni e livelli raggiunti, senza cancellare i progressi.",
+    "progressSaved": "Progressi salvati"
   },
   "customCategories": {
     "colorLabel": "Colore categoria",
@@ -998,5 +1020,24 @@
     "afternoon": "pomeridiani",
     "evening": "serali",
     "total": "totali"
+  },
+  "levels": {
+    "short": "Lvl {{level}}",
+    "reached": "Lvl {{level}} / 10",
+    "progress": "Livelli",
+    "streaks": "Serie per livello",
+    "current": "Serie attuale",
+    "record": "Record",
+    "nextReps": "{{count}} ripetizioni al livello {{level}}",
+    "nextTime": "{{time}} al livello {{level}}",
+    "complete": "Livello massimo raggiunto!",
+    "step1": "Esercizio convalidato",
+    "step5": "A metà strada",
+    "step10": "Obiettivo completo",
+    "example": "Esempio di progresso",
+    "globalRule": "Il tuo miglior esercizio del giorno fa avanzare la serie globale. Il suo livello è quello mantenuto ogni giorno.",
+    "cardioRule": "Nel cardio, i dieci livelli si completano con la distanza percorsa durante la settimana.",
+    "profileTitle": "Percorso dei livelli",
+    "profilePending": "I livelli di questo profilo appariranno dopo il suo aggiornamento. Le serie note restano visibili."
   }
 }

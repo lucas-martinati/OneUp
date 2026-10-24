@@ -96,15 +96,15 @@ class CloudSyncService {
 
   // ── Proxy functions that ensure initialization ─────────────────────
 
-  async loadUserDetailsWithCache(uid) {
+  async loadUserDetailsWithCache(uid, lastUpdated = null) {
     const cached = this._userDetailsCache.get(uid);
     const now = Date.now();
-    if (cached && (now - cached.timestamp) < USER_CACHE_TTL) {
+    if (cached && cached.lastUpdated === lastUpdated && (now - cached.timestamp) < USER_CACHE_TTL) {
       return cached.data;
     }
     await this.ensureInitialized();
     const data = await this._leaderboardService.loadUserDetails(uid);
-    this._userDetailsCache.set(uid, { data, timestamp: now });
+    this._userDetailsCache.set(uid, { data, timestamp: now, lastUpdated });
     return data;
   }
 

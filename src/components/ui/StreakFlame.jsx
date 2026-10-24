@@ -1,5 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { LevelSeparator } from './LevelSeparator';
+import { LevelEmblem } from './LevelEmblem';
 
 /**
  * Streak indicator: a flame + day count. The flame is colored when the
@@ -19,11 +21,12 @@ import { useTranslation } from 'react-i18next';
  * @param {Object} [props.style] - Optional additional container styles.
  * @returns {JSX.Element|null}
  */
-export const StreakFlame = React.memo(({ streak, active, variant = 'pill', style = {} }) => {
+export const StreakFlame = React.memo(({ streak, active, level = 0, weekly = false, variant = 'pill', separatorColor, style = {} }) => {
     const { t } = useTranslation();
     if (!streak || streak <= 0) return null;
 
     const isBadge = variant === 'badge';
+    const unit = t(weekly ? 'common.weeksAbbr' : 'common.daysAbbr');
 
     const containerStyle = isBadge
         ? {
@@ -54,8 +57,9 @@ export const StreakFlame = React.memo(({ streak, active, variant = 'pill', style
                 fontSize: '0.75rem', fontWeight: '700',
                 color: active ? '#f97316' : '#888'
             }}>
-                {streak}{isBadge ? '' : t('common.daysAbbr')}
+                {streak}{isBadge ? '' : unit}
             </span>
+            {level > 0 && <><LevelSeparator color={separatorColor} /><LevelEmblem level={level} size={isBadge ? 18 : 22} /></>}
         </div>
     );
 });

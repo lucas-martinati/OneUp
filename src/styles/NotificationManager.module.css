@@ -133,6 +133,10 @@
 }
 
 .close {
+  padding: 0;
+  min-width: 30px;
+  min-height: 30px;
+  aspect-ratio: 1;
   flex-shrink: 0;
   display: grid;
   place-items: center;

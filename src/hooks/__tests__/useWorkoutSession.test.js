@@ -171,6 +171,27 @@ describe('start session', () => {
   });
 });
 
+describe('finishSession', () => {
+  it('saves partial levels once without validating untouched exercises or changing daily progress', () => {
+    progressState.completions = { '2024-01-01': { [bwId]: { count: 30, goal: 100, level: 3, isCompleted: true } } };
+    progressState.getExerciseCount.mockImplementation((date, id) => id === bwId ? 30 : 0);
+    const before = JSON.stringify(progressState.completions);
+    const { result } = setup({ dayNumber: 100 });
+    act(() => { result.current.setQueue([bwId, bwId2]); });
+    act(() => result.current.startSession());
+    act(() => result.current.finishSession());
+    expect(result.current.phase).toBe('done');
+    expect(addSession).toHaveBeenCalledWith(expect.objectContaining({ exercises: expect.arrayContaining([
+      expect.objectContaining({ id: bwId, reps: 30, level: 3 }),
+      expect.objectContaining({ id: bwId2, reps: 0, level: 0 }),
+    ]) }));
+    act(() => result.current.finishSession());
+    expect(addSession).toHaveBeenCalledTimes(1);
+    expect(progressState.updateExerciseCount).not.toHaveBeenCalled();
+    expect(JSON.stringify(progressState.completions)).toBe(before);
+  });
+});
+
 describe('advanceToNext', () => {
   it('advances to the next not-done exercise', () => {
     const { result } = setup();

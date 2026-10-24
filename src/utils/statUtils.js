@@ -1,4 +1,6 @@
-import { getDailyGoal, isBodyweightExercise, isWeightExercise } from '@config/exercises';
+import { getCardioReps } from '@shared/cardioLevels.js';
+import { getRecordedReps, isFullCompletion } from '@shared/exerciseLevels.js';
+import { isBodyweightExercise, isWeightExercise } from '@config/exercises';
 
 import { getCurrentWeekNumber } from '@shared/dateUtils';
 
@@ -16,13 +18,14 @@ export function calculateRepsForDay(dayCompletions, dayNumber, exercises, getCon
     if (!dayCompletions || !exercises) return 0;
     return exercises.reduce((sum, ex) => {
         const exData = dayCompletions[ex.id];
-        if (!exData?.isCompleted) return sum;
+        if (!exData) return sum;
         const exDiff = getConfig(ex.id, dateStr).difficulty;
         
         const isCardio = ex.id === 'running' || ex.id === 'cycling';
         const num = isCardio ? getCurrentWeekNumber(startDate || dateStr, new Date(dateStr)) : dayNumber;
         
-        return sum + getDailyGoal(ex, num, exDiff, isCardio);
+        if (isCardio) return sum + getCardioReps(exData, ex.id, num);
+        return sum + getRecordedReps(exData, ex, num, exDiff);
     }, 0);
 }
 
@@ -42,7 +45,7 @@ export function isPerfectDay(dayCompletions, exercises = []) {
     }
     if (completedCount < exercises.length) return false;
 
-    return exercises.every(ex => dayCompletions[ex.id]?.isCompleted);
+    return exercises.every(ex => isFullCompletion(dayCompletions[ex.id]));
 }
 
 /**
@@ -94,10 +97,10 @@ export function isGlobalPerfectDay(dayCompletions, allExercises = []) {
         const exId = allExercises[i].id;
         if (isBodyweightExercise(exId)) {
             standardTotal++;
-            if (dayCompletions[exId]?.isCompleted) standardCompleted++;
+            if (isFullCompletion(dayCompletions[exId])) standardCompleted++;
         } else if (isWeightExercise(exId)) {
             weightsTotal++;
-            if (dayCompletions[exId]?.isCompleted) weightsCompleted++;
+            if (isFullCompletion(dayCompletions[exId])) weightsCompleted++;
         }
     }
     

@@ -1,3 +1,5 @@
+import { LevelEmblem } from '@components/ui/LevelEmblem';
+import { getEntryLevel } from '@shared/exerciseLevels.js';
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clock, Trash2, Dumbbell, Zap } from '@utils/icons';
@@ -41,7 +43,9 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
 
   const exercises = session?.exercises || [];
   const totalReps = sumExerciseReps(exercises);
-  const sessionWithName = useMemo(() => ({ ...session, name }), [session, name]);
+  const sessionWithName = useMemo(() => ({ ...session, name, exercises: (session?.exercises || []).map(ex => ({
+    ...ex, level: getEntryLevel({ level: ex.level, isCompleted: true }),
+  })) }), [session, name]);
 
 
   if (!session) return null;
@@ -105,7 +109,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
           {/* Exercise list */}
           {exercises.length > 0 && (
             <div className={styles.section}>
-              <div className={styles.sectionLabel}>{t('share.exercisesCompleted')}</div>
+              <div className={styles.sectionLabel}>{t('share.exercises')}</div>
               {exercises.map((ex, i) => {
                 const Icon = getIcon(ex.icon);
                 const color = getExerciseColor(ex);
@@ -122,6 +126,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
                         {ex.type === 'timer' ? 's' : t('common.reps')}
                       </span>
                     </div>
+                    <LevelEmblem level={getEntryLevel({ level: ex.level, isCompleted: true })} size={26} showZero />
                   </div>
                 );
               })}

@@ -1,9 +1,12 @@
+import { LevelStreakDetails } from '@components/ui/LevelStreakDetails';
+import { LevelEmblem } from '@components/ui/LevelEmblem';
+import { getStreakRecordLevel } from '@shared/exerciseLevels.js';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DynamicIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { CATEGORIES, isUserCategory } from '@config/categories';
-import { StreakFlame, WeightBadge, DifficultyBadge } from '@components/ui';
+import { StreakFlame, WeightBadge } from '@components/ui';
 import { useExercises } from '@contexts/ExercisesContext';
 
 /** Per-exercise breakdown list, grouped by category. */
@@ -61,52 +64,49 @@ export function ExerciseBreakdown({
                                         display: 'flex', flexDirection: 'column', gap: '6px',
                                         marginBottom: '6px'
                                     }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
-                                                <div style={{ 
-                                                    width: '28px', height: '28px', borderRadius: '8px', 
+                                                <div style={{
+                                                    width: '28px', height: '28px', borderRadius: '8px',
                                                     background: `${ex.color}1a`, border: `1px solid ${ex.color}33`,
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
                                                 }}>
                                                     <DynamicIcon icon={ex.icon} size={14} color={ex.color} />
                                                 </div>
                                                 <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                                     {getExerciseLabel(ex, t)}
                                                 </span>
-                                                <StreakFlame streak={ex.streak} active={ex.streakActive} />
                                             </div>
-                                            
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                                                {(() => {
-                                                    const difficulty = settings?.exerciseDifficulties?.[ex.id] || 1.0;
-                                                    if (difficulty === 1.0) return null;
-                                                    return <DifficultyBadge difficulty={difficulty} style={{ margin: 0 }} />;
-                                                })()}
+
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, flexWrap: 'wrap' }}>
+                                                <StreakFlame streak={ex.streak} level={ex.streakLevel} active={ex.streakActive} weekly={ex.id === 'running' || ex.id === 'cycling'} />
+
                                                 {ex.categoryId === CATEGORIES.WEIGHTS && (
                                                     <WeightBadge weight={settings?.exerciseWeights?.[ex.id] || ex.defaultWeight} color={ex.color} />
                                                 )}
                                                 {ex.maxStreak > 0 && (
                                                     <span style={{
-                                                        fontSize: '0.6rem', color: '#fbbf24',
+                                                        display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.6rem', color: '#fbbf24',
                                                         background: 'rgba(251,191,36,0.1)',
                                                         padding: '2px 6px', borderRadius: '8px',
                                                         fontWeight: '700'
                                                     }}>
-                                                        {t('stats.maxDays', { count: ex.maxStreak })}
+                                                        {ex.id === 'running' || ex.id === 'cycling' ? `${t('levels.record')} · ${ex.maxStreak} ${t('common.weeksAbbr')}` : t('stats.maxDays', { count: ex.maxStreak })}
+                                                        <LevelEmblem level={getStreakRecordLevel(ex.levelStreaks, ex.maxStreak)} size={20} />
                                                     </span>
                                                 )}
                                                 <div style={{ fontSize: '0.95rem', fontWeight: '800', color: ex.color, fontVariantNumeric: 'tabular-nums' }}>
-                                                    {hasCardio && (ex.id === 'running' || ex.id === 'cycling') ? 
+                                                    {hasCardio && (ex.id === 'running' || ex.id === 'cycling') ?
                                                         `${((cardioSessions.filter(s => s.type === ex.id).reduce((sum, s) => sum + (s.distance || 0), 0)) / 1000).toFixed(1)} ${t('cardio.units.km')}`
                                                         : ex.totalReps.toLocaleString()}
                                                 </div>
                                             </div>
                                         </div>
-                                        
+                                        <LevelStreakDetails levels={ex.levelStreaks} weekly={ex.id === 'running' || ex.id === 'cycling'} />
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                             <div style={{ flex: 1, height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-                                                <div style={{ 
-                                                    height: '100%', borderRadius: '2px', width: `${ex.completionRate}%`, 
+                                                <div style={{
+                                                    height: '100%', borderRadius: '2px', width: `${ex.completionRate}%`,
                                                     background: ex.color,
                                                     boxShadow: `0 0 10px ${ex.color}80`,
                                                     transition: 'width 0.6s ease'

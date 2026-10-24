@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flame } from '@utils/icons';
 
-export const CardioStreak = React.memo(({ streak }) => {
+export const CardioStreak = React.memo(({ streak, level }) => {
   const { t } = useTranslation();
   const isActive = streak > 0;
 
@@ -53,7 +53,7 @@ export const CardioStreak = React.memo(({ streak }) => {
           {streak} <span style={{
             fontSize: 'clamp(0.7rem, 1.3vh, 0.82rem)',
             fontWeight: '600', opacity: 0.75
-          }}>{t('common.weeksAbbr')}</span>
+          }}>{t('common.weeksAbbr')}</span> {level > 0 && <span style={{ fontSize: '0.75rem' }}>· {t('levels.short', { level })}</span>}
         </div>
       </div>
     </div>

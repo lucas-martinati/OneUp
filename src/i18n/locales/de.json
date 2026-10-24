@@ -146,7 +146,25 @@
       "streak_desc": "{{count}} Tage hintereinander",
       "perfect_days_desc": "{{count}} perfekte Tage",
       "total_reps_desc": "Insgesamt {{count}} Wiederholungen",
-      "workout_count_desc": "{{count}} {{period}}"
+      "workout_count_desc": "{{count}} {{period}}",
+      "level_ten": {
+        "title": "Am Gipfel",
+        "desc": "Erreiche Level 10 bei einer Übung."
+      },
+      "level_100": {
+        "title": "100 Level"
+      },
+      "level_500": {
+        "title": "500 Level"
+      },
+      "level_1000": {
+        "title": "1000 Level"
+      },
+      "level_points_desc": "Sammle {{count}} Level.",
+      "level_five_week": {
+        "title": "Eine starke Woche",
+        "desc": "Halte eine Gesamtserie auf Level 5 oder höher für 7 Trainingstage."
+      }
     },
     "badgesUnlocked": "Abzeichen freigeschaltet",
     "nextBadge": "Nächster Erfolg",
@@ -165,14 +183,23 @@
   },
   "announcement": {
     "badge": "Neu",
-    "title": "Ein ganz neues Design ✨",
-    "body": "OneUp im neuen Look! Die gesamte App wurde überarbeitet – für ein flüssigeres, einheitlicheres und angenehmeres Erlebnis im Alltag.",
-    "cta": "Entdecken",
+    "title": "Jede Anstrengung bringt dich weiter",
+    "body": "10 Level pro Übung, Serien, die mit dir wachsen, und überall sichtbarer Fortschritt. Entscheide jeden Tag, wie weit du gehst.",
+    "cta": "Los geht’s!",
     "highlights": {
-      "design": "Ein rundum aufgefrischtes Design mit überarbeiteten Avataren und Farbverläufen",
-      "motion": "Überall flüssigere Animationen und Ladezustände",
-      "components": "Einheitliche Komponenten für perfekte Konsistenz auf allen Bildschirmen",
-      "onboarding": "Ein neu gestaltetes Onboarding mit Sprachauswahl"
+      "progress": "10 Level ohne Schwierigkeitsauswahl. Level 1 bestätigt die Übung, Level 10 erfüllt das ganze Ziel. Wiederholungen unter Level 1 bleiben gespeichert. Der animierte Ring zeigt den Weg zum nächsten Level.",
+      "streaks": "Jede Übung hat ihre eigene Serie. Nach 200 Tagen auf Level 10 ergibt ein Tag auf Level 5 eine Serie von 201 Tagen auf Level 5. Rekorde höherer Level bleiben erhalten.",
+      "global": "Für die Gesamtserie zählt das höchste Level des Tages. Heute Liegestütze auf Level 10, morgen Kniebeugen auf Level 10: Die Serie bleibt auf Level 10, auch beim Übungswechsel.",
+      "cardio": "Auch Cardio hat Level: Deine Distanz füllt 10 Stufen bis zum Wochenziel. Ein erreichtes Cardio-Level gilt bis zum Ende dieser Woche.",
+      "history": "Dein Verlauf wird automatisch übernommen. Früher abgeschlossene Übungen werden Level 10. Gespeicherte Wiederholungen ohne Abschluss werden mit dem Ziel ihres ursprünglichen Datums verglichen. Du musst nichts neu eingeben.",
+      "rewards": "Kalender, Statistiken, Profile und geteilte Bilder zeigen deine Level. 5 neue Erfolge belohnen Level und Regelmäßigkeit. Bestehende Erfolge bleiben erhalten."
+    },
+    "gallery": "Das neue OneUp in Bildern",
+    "galleryHint": "Scrolle durch die Screenshots mit Beispieldaten. Einige Aufnahmen sind auf Englisch.",
+    "screens": {
+      "exercise": "Der Ring füllt sich Level für Level und zeigt das nächste Ziel.",
+      "calendar": "Der Kalender zeigt das täglich erreichte Level.",
+      "share": "Auch geteilte Trainingsbilder enthalten deine Level."
     }
   },
   "app": {
@@ -226,13 +253,10 @@
   "cardio": {
     "avgSpeed": "Durchschnittliche Geschwindigkeit",
     "connectTitle": "Vernetzte Dienste",
-    "difficultyMismatchDesc": "Der Schwierigkeitsgrad hat sich geändert ({{saved}}x → {{current}}x). Möchten Sie mit dieser neuen Einstellung fortfahren?",
-    "difficultyModified": "Schwierigkeitsgrad geändert",
     "distance": "Distanz",
     "duration": "Zeit",
     "elevation": "Höhe+",
     "finish": "Beenden",
-    "goalReached": "Ziel erreicht!",
     "googleWallDesc": "Melden Sie sich mit Ihrem Google-Konto an, um auf das Cardio-Modul zuzugreifen und Ihre Daten zu synchronisieren.",
     "googleWallStep1": "Google-Anmeldung",
     "googleWallTitle": "Konto erforderlich",
@@ -614,25 +638,20 @@
     "language": "Sprache",
     "languageDesc": "Ändern Sie die Anwendungssprache",
     "leaderboardDesc": "Erscheinen Sie in der öffentlichen Bestenliste",
-    "lock": "Sperren",
     "maxChars": "Maximal 20 Zeichen · Ihr Google-Foto wird verwendet",
     "monday": "Montag",
-    "multiplier": "Multiplikator (max. 1,0)",
     "notifications": "Benachrichtigungen",
     "performance": "Leistung",
     "preferences": "Präferenzen",
     "reducedEffects": "Reduzierte visuelle Effekte",
     "reminder": "Trainingserinnerung",
     "reminderTime": "ERINNERUNGSZEIT",
-    "sensitiveParam": "EMPFINDLICHE EINSTELLUNG",
-    "sensitiveWarning": "Wenn Sie dies ändern, ändern sich Ihre täglichen Wiederholungsziele. Eine Einstellung von 0,5 halbiert Ihre Ziele.",
     "soundEffects": "Soundeffekte",
     "soundsDescription": "Geräusche bei Aktionen",
     "hapticFeedback": "Haptisches Feedback",
     "hapticsDescription": "Vibrationen bei Aktionen",
     "sunday": "Sonntag",
     "title": "Einstellungen",
-    "unlockSettings": "EINSTELLUNGEN ENTSPERREN",
     "privacyPolicy": "Datenschutzerklärung",
     "termsOfService": "Nutzungsbedingungen",
     "dataTitle": "Daten",
@@ -691,9 +710,9 @@
     "consistency": "⏰ Konsistenz",
     "currentStreak": "Aktueller Streak",
     "dailyReps": "📈 Reps-Entwicklung",
-    "difficultyEvolution": "⚙️ Schwierigkeitsentwicklung",
-    "difficultyNoData": "Noch keine Schwierigkeitsdaten",
-    "difficultyNoDataHint": "Ändern Sie hier den Schwierigkeitsgrad einer Übung, um deren Entwicklung zu sehen",
+    "levelEvolution": "Level-Verlauf",
+    "levelNoData": "Noch keine Level",
+    "levelNoDataHint": "Erreiche dein erstes Level, um deinen Fortschritt zu sehen.",
     "exercisesDone": "Übungen erledigt",
     "filters": "Filter",
     "loadingCharts": "Diagramme werden geladen...",
@@ -806,7 +825,10 @@
     "selectExercises": "Übungen auswählen",
     "sessionDone": "Sitzung abgeschlossen!",
     "shuffle": "Shuffle",
-    "yourOrder": "Deine Reihenfolge"
+    "yourOrder": "Deine Reihenfolge",
+    "finish": "Training beenden",
+    "incompleteMessage": "Einige Übungen sind unvollständig. Gespeichert werden nur die erreichten Wiederholungen und Level. Dein Fortschritt bleibt erhalten.",
+    "progressSaved": "Dein Fortschritt ist gespeichert"
   },
   "customCategories": {
     "colorLabel": "Kategoriefarbe",
@@ -998,5 +1020,24 @@
     "afternoon": "Nachmittagstrainingseinheiten",
     "evening": "Abendtrainingseinheiten",
     "total": "Trainingseinheiten insgesamt"
+  },
+  "levels": {
+    "short": "Lvl {{level}}",
+    "reached": "Lvl {{level}} / 10",
+    "progress": "Level",
+    "streaks": "Serien nach Level",
+    "current": "Aktuelle Serie",
+    "record": "Rekord",
+    "nextReps": "{{count}} Wiederholungen bis Level {{level}}",
+    "nextTime": "{{time}} bis Level {{level}}",
+    "complete": "Höchstes Level erreicht!",
+    "step1": "Übung bestätigt",
+    "step5": "Halbzeit",
+    "step10": "Ziel erreicht",
+    "example": "Fortschrittsbeispiel",
+    "globalRule": "Deine beste Übung des Tages zählt für die Gesamtserie. Ihr Level entspricht dem täglich gehaltenen Level.",
+    "cardioRule": "Beim Cardio füllen sich die zehn Level mit der in der Woche zurückgelegten Strecke.",
+    "profileTitle": "Level-Fortschritt",
+    "profilePending": "Die Level dieses Profils erscheinen nach seiner Aktualisierung. Bekannte Serien bleiben sichtbar."
   }
 }

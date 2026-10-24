@@ -26,6 +26,8 @@ export default function EvolutionChart({
     yAxisExtra,      // props additionnelles passées au YAxis (tickFormatter / unit)
     formatBadge,     // (ex) => texte du badge "valeur actuelle"
     formatTooltip,   // (value) => texte de la valeur dans le tooltip
+    dots = 'changes',
+    includeIncomplete = false,
     carryForward = false, // tracé en escalier : maintient la dernière valeur jusqu'à la saisie suivante au lieu d'interpoler
 }) {
     const defaultId = exercises[0]?.id;
@@ -50,7 +52,7 @@ export default function EvolutionChart({
 
         Object.entries(completions).forEach(([date, dayData]) => {
             if (!dayData || typeof dayData !== 'object') return;
-            const hasDataForSelected = selectedExIds.some(id => dayData[id] && dayData[id][valueKey] != null && dayData[id].isCompleted);
+            const hasDataForSelected = selectedExIds.some(id => dayData[id] && dayData[id][valueKey] != null && (includeIncomplete || dayData[id].isCompleted));
             if (hasDataForSelected) allDates.add(date);
         });
 
@@ -60,13 +62,13 @@ export default function EvolutionChart({
             const point = { date, label: date.slice(5).replace('-', '/') };
             const dayData = completions[date] || {};
             selectedExIds.forEach(id => {
-                if (dayData[id] && dayData[id][valueKey] != null && dayData[id].isCompleted) {
-                    point[id] = Number(dayData[id][valueKey]) || defaultValue;
+                if (dayData[id] && dayData[id][valueKey] != null && (includeIncomplete || dayData[id].isCompleted)) {
+                    point[id] = Number.isFinite(Number(dayData[id][valueKey])) ? Number(dayData[id][valueKey]) : defaultValue;
                 }
             });
             return point;
         });
-    }, [completions, selectedExIds, valueKey, defaultValue]);
+    }, [completions, selectedExIds, valueKey, defaultValue, includeIncomplete]);
 
     const maxValue = useMemo(() => {
         let max = initialMax;
@@ -159,13 +161,15 @@ export default function EvolutionChart({
                     {selectedExIds.map(id => {
                         const ex = allExercisesMap[id];
                         if (!ex) return null;
+                        const badge = formatBadge(ex);
+                        if (badge == null) return null;
                         return (
                             <span key={id} style={{
                                 fontSize: '0.75rem', fontWeight: '800', color: ex.color,
                                 background: `${ex.color}15`, padding: '2px 8px', borderRadius: '8px',
                                 border: `1px solid ${ex.color}30`
                             }}>
-                                {formatBadge(ex)}
+                                {badge}
                             </span>
                         );
                     })}
@@ -187,7 +191,7 @@ export default function EvolutionChart({
                     yMax={yRange[1]}
                     formatValue={formatTooltip}
                     formatYTick={formatYTick}
-                    dots={true}
+                    dots={dots}
                     step={carryForward}
                 />
             )}

@@ -7,6 +7,7 @@ const progressState = {
     '2026-01-01': { pushup: { isCompleted: true, difficulty: 1.5 } },
     '2026-01-02': { pushup: { isCompleted: true } }, // completed, no saved difficulty
   },
+  migrateLevels: vi.fn(),
   getDayNumber: vi.fn(() => 1),
   hasShared: false,
   achievements: {},
@@ -39,15 +40,11 @@ afterEach(() => cleanup());
 describe('ComputedStatsSynchronizer', () => {
   beforeEach(() => recompute.mockClear());
 
-  it('recomputes stats with derived cardio data on mount', () => {
+  it('recomputes stats with the calendar week preference on mount', () => {
     const { container } = render(<ComputedStatsSynchronizer />);
     expect(container.firstChild).toBeNull(); // invisible
     expect(recompute).toHaveBeenCalled();
-    // Reps are now computed inside computeAllStats from completions (goal-based,
-    // capped per validated week) — cardioData only needs to carry the raw
-    // session list through for the weekly streak calculation.
-    const cardioData = recompute.mock.calls[0][7];
-    expect(cardioData.allSessions).toHaveLength(2);
+    expect(recompute.mock.calls[0][1].weekStartDay).toBe('monday');
   });
 
   it('builds a getConfig resolving difficulty across all branches', () => {

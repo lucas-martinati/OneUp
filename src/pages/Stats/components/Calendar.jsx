@@ -1,3 +1,5 @@
+import { getDayLevel } from '@shared/exerciseLevels.js';
+import { LevelEmblem } from '@components/ui/LevelEmblem';
 import { useState, useRef, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, Snowflake } from '@utils/icons';
 import { ModalHeader, ModalContainer } from '@components/ui';
@@ -319,6 +321,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                             }
                         }
                         const completedCount = exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length;
+                        const level = getDayLevel(completions, dateString, exercises.map(ex => ex.id), weekStartDay);
                         const isSelected = selectedDay === dateString;
 
                         // Exercise dots scale down as the day gets busier so they stay inside the cell.
@@ -352,10 +355,11 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                                 style={{ animationDelay: `${i * 10}ms` }}
                                 disabled={isMuted}
                                 aria-pressed={isSelected}
-                                aria-label={`${date.getDate()} ${monthNames[month]}`}
+                                aria-label={`${date.getDate()} ${monthNames[month]}${level ? ' · ' + t('levels.short', { level }) : ''}`}
                                 onClick={() => setSelectedDay(isSelected ? null : dateString)}
                             >
                                 <span className={styles.dayNum}>{date.getDate()}</span>
+                                {level > 0 && !isMuted && <LevelEmblem level={level} size={20} />}
                                 {!isMuted && (
                                     <span className={styles.dots}>
                                         {exercises && exercises.map(ex => (

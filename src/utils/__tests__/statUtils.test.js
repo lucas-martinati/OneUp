@@ -95,14 +95,14 @@ describe('calculateRepsForDay', () => {
     // indépendamment du dayNumber (99) passé.
     const day = { running: { isCompleted: true } };
     const reps = calculateRepsForDay(day, 99, [{ id: 'running' }], getConfig, '2026-06-01', '2026-06-01');
-    expect(reps).toBe(7);
+    expect(reps).toBe(49);
   });
 
   it('falls back to dateStr as start date for cardio when startDate is null', () => {
     const day = { cycling: { isCompleted: true } };
     // startDate non fourni ⇒ utilise dateStr ⇒ semaine 1 ⇒ 7.
     const reps = calculateRepsForDay(day, 5, [{ id: 'cycling' }], getConfig, '2026-06-01');
-    expect(reps).toBe(7);
+    expect(reps).toBe(48);
   });
 });
 

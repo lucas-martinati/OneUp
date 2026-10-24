@@ -146,7 +146,25 @@
       "streak_desc": "{{count}}日連続",
       "perfect_days_desc": "完璧な{{count}}日間",
       "total_reps_desc": "合計 {{count}} 回の繰り返し",
-      "workout_count_desc": "{{period}}{{count}}回のトレーニング"
+      "workout_count_desc": "{{period}}{{count}}回のトレーニング",
+      "level_ten": {
+        "title": "頂点へ",
+        "desc": "1つの種目でレベル10を達成する。"
+      },
+      "level_100": {
+        "title": "100レベル"
+      },
+      "level_500": {
+        "title": "500レベル"
+      },
+      "level_1000": {
+        "title": "1000レベル"
+      },
+      "level_points_desc": "合計{{count}}レベルを獲得。",
+      "level_five_week": {
+        "title": "充実した1週間",
+        "desc": "全体の連続記録をレベル5以上で7日間のトレーニングにわたって維持する。"
+      }
     },
     "badgesUnlocked": "バッジのロックが解除されました",
     "nextBadge": "次の実績",
@@ -164,15 +182,24 @@
     "filterLocked": "未解除"
   },
   "announcement": {
-    "badge": "新しい",
-    "title": "まったく新しいインターフェース ✨",
-    "body": "OneUp が生まれ変わりました！アプリ全体を見直し、より滑らかで一貫性のある、毎日が心地よい体験に仕上げました。",
-    "cta": "見てみる",
+    "badge": "新機能",
+    "title": "努力の分だけレベルアップ",
+    "body": "各種目に10段階のレベル。成長する連続記録と、どこでも見える進捗。その日の目標は自分で決められます。",
+    "cta": "始めよう！",
     "highlights": {
-      "design": "アバターやグラデーションを刷新し、隅々までデザインを一新",
-      "motion": "あらゆる画面でアニメーションと読み込みがより滑らかに",
-      "components": "統一されたコンポーネントで画面間の一貫性が完璧に",
-      "onboarding": "言語切り替えを備えた、新しいオンボーディング"
+      "progress": "難易度を選ばず10段階で進行。レベル1で種目達成、レベル10で目標を完全達成します。レベル1未満の回数も保存されます。動くリングで次のレベルまでの残りがわかります。",
+      "streaks": "種目ごとに連続記録を保持。レベル10で200日続けた後、翌日がレベル5なら、レベル5の201日連続記録になります。上位レベルの最高記録は残ります。",
+      "global": "全体の連続記録はその日の最高レベルで判定。今日は腕立て伏せ、明日はスクワットでレベル10なら、種目が違ってもレベル10の連続記録が続きます。",
+      "cardio": "有酸素運動もレベル制に。距離に応じて週間目標まで10段階で進みます。達成した有酸素運動のレベルはその週の終わりまで有効です。",
+      "history": "履歴は自動で引き継がれます。以前達成した種目はレベル10に。未達成でも保存済みの回数を当時の日付の目標と比較してレベルを算出します。再入力は不要です。",
+      "rewards": "カレンダー、統計、プロフィール、共有画像にレベルを表示。レベルと継続に応じた5つの新しい実績を追加。これまでの実績も保持されます。"
+    },
+    "gallery": "新しいOneUpをチェック",
+    "galleryHint": "デモデータの画面をスクロールしてご覧ください。一部は英語表示です。",
+    "screens": {
+      "exercise": "リングがレベルごとに埋まり、次の目標を表示します。",
+      "calendar": "カレンダーで毎日の達成レベルを確認できます。",
+      "share": "共有するトレーニング画像にもレベルが表示されます。"
     }
   },
   "app": {
@@ -226,13 +253,10 @@
   "cardio": {
     "avgSpeed": "平均速度",
     "connectTitle": "接続されたサービス",
-    "difficultyMismatchDesc": "難易度が変更されました ({{saved}}x → {{current}}x)。この新しい設定を続行しますか?",
-    "difficultyModified": "難易度変更",
     "distance": "距離",
     "duration": "時間",
     "elevation": "標高+",
     "finish": "仕上げる",
-    "goalReached": "目標達成！",
     "googleWallDesc": "Google アカウントでサインインして、Cardio モジュールにアクセスし、データを同期します。",
     "googleWallStep1": "Googleサインイン",
     "googleWallTitle": "アカウントが必要です",
@@ -614,25 +638,20 @@
     "language": "言語",
     "languageDesc": "アプリケーション言語を変更する",
     "leaderboardDesc": "公開リーダーボードに表示される",
-    "lock": "ロック",
     "maxChars": "最大 20 文字 · Google フォトが使用されます",
     "monday": "月曜日",
-    "multiplier": "乗数(最大1.0)",
     "notifications": "通知",
     "performance": "パフォーマンス",
     "preferences": "設定",
     "reducedEffects": "視覚効果の低減",
     "reminder": "ワークアウトリマインダー",
     "reminderTime": "リマインダー時間",
-    "sensitiveParam": "敏感な設定",
-    "sensitiveWarning": "これを変更すると、毎日の担当者目標が変更されます。 0.5 に設定すると、ターゲットが半分になります。",
     "soundEffects": "効果音",
     "soundsDescription": "アクション時のサウンド",
     "hapticFeedback": "触覚フィードバック",
     "hapticsDescription": "アクション時のバイブレーション",
     "sunday": "日曜日",
     "title": "設定",
-    "unlockSettings": "設定のロックを解除する",
     "privacyPolicy": "プライバシーポリシー",
     "termsOfService": "利用規約",
     "dataTitle": "データ",
@@ -691,9 +710,9 @@
     "consistency": "⏰ 一貫性",
     "currentStreak": "現在の連続数",
     "dailyReps": "📈 レップの進化",
-    "difficultyEvolution": "⚙️ 難易度の進化",
-    "difficultyNoData": "難易度データはまだありません",
-    "difficultyNoDataHint": "ここで演習の難易度を変更してその進化を確認します",
+    "levelEvolution": "レベルの推移",
+    "levelNoData": "レベルの記録はありません",
+    "levelNoDataHint": "最初のレベルを達成すると進捗が表示されます。",
     "exercisesDone": "演習は完了しました",
     "filters": "フィルター",
     "loadingCharts": "チャートを読み込んでいます...",
@@ -806,7 +825,10 @@
     "selectExercises": "エクササイズを選択",
     "sessionDone": "セッション完了！",
     "shuffle": "シャッフル",
-    "yourOrder": "順序"
+    "yourOrder": "順序",
+    "finish": "セッションを終了",
+    "incompleteMessage": "未完了の種目があります。達成済みの回数とレベルだけを保存し、進捗は消去しません。",
+    "progressSaved": "進捗を保存しました"
   },
   "customCategories": {
     "colorLabel": "カテゴリーの色",
@@ -998,5 +1020,24 @@
     "afternoon": "午後の",
     "evening": "夜の",
     "total": "合計"
+  },
+  "levels": {
+    "short": "Lvl {{level}}",
+    "reached": "Lvl {{level}} / 10",
+    "progress": "レベル",
+    "streaks": "レベル別の連続記録",
+    "current": "現在の記録",
+    "record": "最高記録",
+    "nextReps": "レベル{{level}}まであと{{count}}回",
+    "nextTime": "レベル{{level}}まであと{{time}}",
+    "complete": "最高レベル達成！",
+    "step1": "種目達成",
+    "step5": "折り返し",
+    "step10": "目標達成",
+    "example": "進捗の例",
+    "globalRule": "その日の最高レベルの種目が全体の連続記録に反映されます。レベルは毎日維持したレベルです。",
+    "cardioRule": "有酸素運動では、1週間の距離で10段階のレベルを積み上げます。",
+    "profileTitle": "レベルの歩み",
+    "profilePending": "プロフィールの更新後にレベルが表示されます。既存の連続記録は引き続き表示されます。"
   }
 }

@@ -1,9 +1,9 @@
 import { forwardRef, useMemo } from 'react';
 
 /**
- * Tiny tinted pill for inline metric display (weight, difficulty, etc.).
+ * Tiny tinted pill for inline metric display (weight, level, etc.).
  *
- * Provides the unified visual foundation for DifficultyBadge and
+ * Provides the unified visual foundation for LevelBadge and
  * WeightBadge, which remain thin wrappers handling formatting logic.
  *
  * @param {string} color — tint color for background, border, and text

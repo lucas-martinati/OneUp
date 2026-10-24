@@ -5,10 +5,8 @@ import { useAuth } from '@contexts/AuthContext';
 import { useProgressStore } from '@store/useProgressStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
 import { useSettingsStore } from '@store/useSettingsStore';
-import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { getLocalDateStr, getWeekBounds, getCurrentWeekNumber } from '@shared/dateUtils';
-import { getWeeklyGoalKm, CARDIO_REPS_PER_KM } from '@config/exercises';
-import { computeCardioCurrentStreak } from '@utils/cardioStreak';
+import { getCardioGoal, getCardioReps, getCardioWeekEntry, getCardioLevelUpdates, computeCardioLevelStreaks } from '@shared/cardioLevels.js';
 
 /**
  * Hook providing cardio data and computations.
@@ -31,13 +29,13 @@ export function useCardio() {
       : isStoreInitialized
   );
 
-  const { getConfig } = useExerciseConfig();
   const weekStartDay = useSettingsStore(s => s.settings.weekStartDay) || 'monday';
   const [sessions, setSessions] = useState(() => {
     // Initialize from context if available to avoid flicker/wiping during initial load
     return getSortedCardioSessions(cardio?.sessions);
   });
   const [loading, setLoading] = useState(true);
+  const [sessionsLoaded, setSessionsLoaded] = useState(false);
   const [activeMode, setActiveMode] = useState('running');
 
   // Sync sessions state with store's sessions once the store & sync are fully initialized
@@ -51,20 +49,17 @@ export function useCardio() {
     }
   }, [isReady, cardio?.sessions]);
 
-  // Get difficulty multipliers for cardio exercises
-  const runningMultiplier = getConfig('running')?.difficulty || 1;
-  const cyclingMultiplier = getConfig('cycling')?.difficulty || 1;
-
   // Fetch sessions from Firebase and Strava, save new Strava sessions to Firebase
   const fetchSessions = useCallback(async () => {
     if (!isReady) return; // Wait for initialization to prevent session wiping or premature writes
     if (!auth.isSignedIn) {
-      setSessions([]);
+      setSessionsLoaded(true);
       setLoading(false);
       return;
     }
     try {
       setLoading(true);
+      setSessionsLoaded(false);
       
       // Load existing sessions from Firebase
       const firebaseSessions = await loadCardioSessions();
@@ -85,7 +80,7 @@ export function useCardio() {
       const all = [...rawFirebase];
       const existingIds = new Set(rawFirebase.map(s => s.id));
 
-      // Save new provider activities to Firebase (with difficulty at time of save)
+      // Save new provider activities; levels come from the weekly distance snapshot.
       const newSessions = [];
       providerActivities.forEach(act => {
         if (!existingIds.has(act.id)) {
@@ -93,7 +88,6 @@ export function useCardio() {
           existingIds.add(act.id);
           newSessions.push({
             ...act,
-            difficulty: act.type === 'running' ? runningMultiplier : cyclingMultiplier,
           });
         }
       });
@@ -106,6 +100,7 @@ export function useCardio() {
       // Sort by time descending
       all.sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
       setSessions(all);
+      setSessionsLoaded(true);
     } catch (err) {
       // Keep the previously loaded sessions on a transient error instead of
       // wiping the whole list (and the store) to empty.
@@ -113,7 +108,7 @@ export function useCardio() {
     } finally {
       setLoading(false);
     }
-  }, [auth.isSignedIn, isReady, runningMultiplier, cyclingMultiplier]);
+  }, [auth.isSignedIn, isReady]);
 
   useEffect(() => {
     if (isReady) {
@@ -121,11 +116,7 @@ export function useCardio() {
     }
   }, [fetchSessions, isReady]);
 
-  // Compute total cardio reps: goal-based per validated week, capped at that
-  // week's goal (no bonus for logging more distance than the goal — same
-  // rule as every other exercise). Mirrors the Cloud Function's leaderboard
-  // computation (firebase/functions/index.js) so personal stats and the
-  // public profile never drift apart.
+  // The shared conversion keeps profile, ranking and local partial volume identical.
   const cardioReps = useMemo(() => {
     let running = 0;
     let cycling = 0;
@@ -133,10 +124,8 @@ export function useCardio() {
       if (!day || typeof day !== 'object') continue;
       for (const mode of ['running', 'cycling']) {
         const comp = day[mode];
-        if (!comp?.isCompleted) continue;
         const weekNum = getCurrentWeekNumber(startDate, dateStr);
-        const difficulty = comp.difficulty ?? 1;
-        const reps = Math.floor(getWeeklyGoalKm(mode, weekNum) * difficulty * CARDIO_REPS_PER_KM[mode]);
+        const reps = getCardioReps(comp, mode, weekNum);
         if (mode === 'running') running += reps; else cycling += reps;
       }
     }
@@ -145,110 +134,27 @@ export function useCardio() {
 
   // Sync to global progress state for cloud persistence
   useEffect(() => {
-    if (updateCardioSessions && !loading && isReady) {
+    if (updateCardioSessions && !loading && isReady && sessionsLoaded) {
       updateCardioSessions(sessions);
     }
-  }, [sessions, updateCardioSessions, loading, isReady]);
+  }, [sessions, updateCardioSessions, loading, isReady, sessionsLoaded]);
 
   // Helper to find if a week has a completion and return its data.
   // Uses a ref to avoid the sync effect below re-triggering on every completions change.
   const completionsRef = useRef(completions);
   useEffect(() => { completionsRef.current = completions; }, [completions]);
 
-  const getWeeklyCompletion = useCallback((mode, refDate = new Date()) => {
-    const currentCompletions = completionsRef.current;
-    const { start, end } = getWeekBounds(refDate, weekStartDay);
-    const loop = new Date(start);
-    while (loop <= end) {
-      const dateStr = getLocalDateStr(loop);
-      const comp = currentCompletions[dateStr]?.[mode];
-      if (comp?.isCompleted) return { dateStr, ...comp };
-      loop.setDate(loop.getDate() + 1);
-    }
-    return null;
-  }, [weekStartDay]);
-
-  // Sync cardio sessions to global completions to update the global streak & firebase.
-  // IMPORTANT: `completions` is intentionally NOT in the dependency array to prevent
-  // an infinite loop (this effect calls updateExerciseCount which modifies completions).
-  // We read completions via completionsRef instead.
+  // Persist both sports together, after the authoritative session load completes.
   useEffect(() => {
-    if (!isReady || !updateExerciseCount) return;
+    if (!isReady || loading || !sessionsLoaded || !updateExerciseCount) return;
+    const updates = getCardioLevelUpdates(sessions, completionsRef.current, startDate, weekStartDay);
+    updates.forEach(({ date, mode, count, goal }) => updateExerciseCount(date, mode, count, goal));
+  }, [sessions, loading, sessionsLoaded, updateExerciseCount, startDate, isReady, weekStartDay]);
 
-    // Group sessions by week to validate the goal only once per week
-    const sessionsByWeek = {};
-    sessions.forEach(s => {
-      if (!s.startTime) return;
-      const { start } = getWeekBounds(new Date(s.startTime), weekStartDay);
-      if (!sessionsByWeek[start]) sessionsByWeek[start] = [];
-      sessionsByWeek[start].push(s);
-    });
-
-    const coveredWeekStarts = new Set(Object.keys(sessionsByWeek));
-
-    Object.keys(sessionsByWeek).forEach(weekStart => {
-      const weekSessions = sessionsByWeek[weekStart];
-      const weekStartNum = parseInt(weekStart);
-      const modeSessions = weekSessions.filter(s => s.type === activeMode);
-      if (modeSessions.length === 0) return;
-
-      const totalDistanceKm = modeSessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000;
-      const weekNum = getCurrentWeekNumber(startDate, new Date(weekStartNum));
-      
-      const existingComp = getWeeklyCompletion(activeMode, new Date(weekStartNum));
-      let goalDifficulty = activeMode === 'running' ? runningMultiplier : cyclingMultiplier;
-      if (existingComp) {
-        goalDifficulty = existingComp.difficulty || 1;
-      }
-      const goalKm = getWeeklyGoalKm(activeMode, weekNum) * goalDifficulty;
-
-      const isGoalReached = totalDistanceKm >= goalKm;
-
-      if (isGoalReached && !existingComp) {
-        // Mark the LAST session's date as completed
-        const lastSession = modeSessions.sort((a, b) => b.startTime - a.startTime)[0];
-        const dateStr = getLocalDateStr(new Date(lastSession.startTime));
-        updateExerciseCount(dateStr, activeMode, 1, 1, null, goalDifficulty);
-      } else if (!isGoalReached && existingComp) {
-        // Unmark if distance dropped below goal (session deleted or difficulty increased)
-        updateExerciseCount(existingComp.dateStr, activeMode, 0, 1, null, goalDifficulty);
-      }
-    });
-
-    // Unmark stale completions: weeks that no longer have any qualifying
-    // session in the current list (e.g. after deleting the last session of a
-    // week, the completion would otherwise stay "done" forever). Read the
-    // live completions via the ref (the effect intentionally doesn't depend
-    // on `completions`).
-    Object.entries(completionsRef.current).forEach(([dateStr, day]) => {
-      const comp = day?.[activeMode];
-      if (!comp?.isCompleted) return;
-      const { start } = getWeekBounds(new Date(dateStr), weekStartDay);
-      if (coveredWeekStarts.has(String(start))) return;
-      // Never touch pre-challenge weeks
-      if (getCurrentWeekNumber(startDate, dateStr) < 1) return;
-      updateExerciseCount(dateStr, activeMode, 0, 1, null, comp.difficulty || 1);
-    });
-  }, [sessions, updateExerciseCount, activeMode, startDate, runningMultiplier, cyclingMultiplier, getWeeklyCompletion, isReady, weekStartDay]);
-
-  // Current week number
-  const weekNumber = useMemo(
-    () => getCurrentWeekNumber(startDate),
-    [startDate]
-  );
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- completions included for UI reactivity
-  const existingWeeklyComp = useMemo(() => getWeeklyCompletion(activeMode), [getWeeklyCompletion, activeMode, completions]);
-
-  // Weekly goal for current week (in km) - apply difficulty multiplier
-  const weeklyGoal = useMemo(() => {
-    let multiplier = activeMode === 'running' ? runningMultiplier : cyclingMultiplier;
-    if (existingWeeklyComp) {
-      multiplier = existingWeeklyComp.difficulty || 1;
-    }
-    const baseGoal = getWeeklyGoalKm(activeMode, weekNumber);
-    return baseGoal * multiplier;
-  }, [activeMode, weekNumber, runningMultiplier, cyclingMultiplier, existingWeeklyComp]);
+  const weekNumber = getCurrentWeekNumber(startDate);
+  const today = getLocalDateStr(new Date());
+  const existingWeeklyComp = getCardioWeekEntry(completions, activeMode, today, weekStartDay);
+  const weeklyGoal = getCardioGoal(activeMode, startDate, today, existingWeeklyComp, weekStartDay) / 1000;
 
   // Filter sessions by current mode
   const modeSessions = useMemo(
@@ -256,7 +162,7 @@ export function useCardio() {
     [sessions, activeMode]
   );
 
-  // Weekly computations (show actual distance, goal is adjusted by difficulty)
+  // Show actual distance even when it exceeds the level-ten target.
   const weeklyData = useMemo(() => {
     const { start, end } = getWeekBounds(undefined, weekStartDay);
     const weekSessions = modeSessions.filter(
@@ -277,33 +183,26 @@ export function useCardio() {
     [modeSessions]
   );
 
-  // Streak
-  const streak = useMemo(
-    () => computeCardioCurrentStreak(sessions, activeMode, startDate, activeMode === 'running' ? runningMultiplier : cyclingMultiplier, completions, weekStartDay),
-    [sessions, activeMode, startDate, runningMultiplier, cyclingMultiplier, completions, weekStartDay]
+  const levelStats = useMemo(
+    () => computeCardioLevelStreaks(completions, activeMode, startDate, today, weekStartDay),
+    [completions, activeMode, startDate, today, weekStartDay]
   );
 
   return {
     activeMode,
     setActiveMode,
     weekNumber,
-    weeklyDistance: weeklyData.distance,
+    weeklyDistance: Math.max(weeklyData.distance, existingWeeklyComp?.legacyCardio ? existingWeeklyComp.count / 1000 : 0),
     weeklyGoal,
     weeklySessionCount: weeklyData.sessionCount,
     lastSession,
-    streak,
+    streak: levelStats.streak,
+    streakLevel: levelStats.level,
+    levelStreaks: levelStats.levels,
     sessions: modeSessions,
     allSessions: sessions,
     totalReps: cardioReps.total,
     loading,
     refresh: fetchSessions,
-    isDifficultyMismatch: !!existingWeeklyComp && existingWeeklyComp.difficulty !== undefined && existingWeeklyComp.difficulty !== (activeMode === 'running' ? runningMultiplier : cyclingMultiplier),
-    savedDifficulty: existingWeeklyComp?.difficulty || 1,
-    currentDifficulty: activeMode === 'running' ? runningMultiplier : cyclingMultiplier,
-    invalidateCurrentWeek: () => {
-      if (existingWeeklyComp) {
-        updateExerciseCount(existingWeeklyComp.dateStr, activeMode, 0, 1, null, activeMode === 'running' ? runningMultiplier : cyclingMultiplier);
-      }
-    }
   };
 }

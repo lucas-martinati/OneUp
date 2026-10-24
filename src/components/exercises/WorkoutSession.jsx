@@ -1,6 +1,7 @@
-import { useRef, useEffect, useMemo } from 'react';
+import { getLevelForCount } from '@shared/exerciseLevels.js';
+import { useRef, useEffect, useMemo, useState } from 'react';
 import { X, Play, Check, Save, Trash2, Pencil, Shuffle, DynamicIcon } from '@utils/icons';
-import { Button, ToggleSwitch, ListActionRow, ModalHeader, ModalContainer } from '@components/ui';
+import { Button, ToggleSwitch, ListActionRow, ModalHeader, ModalContainer, ConfirmDialog } from '@components/ui';
 import { WEIGHT_EXERCISES_MAP } from '@config/weights';
 import { SessionSummary } from './SessionSummary';
 import { ExercisePanel } from './ExercisePanel';
@@ -180,6 +181,7 @@ function ExerciseGridItem({ ex, selected, orderNum, onToggle, t }) {
 
 export function WorkoutSession(props) {
     const ws = useWorkoutSession(props);
+    const [confirmFinish, setConfirmFinish] = useState(false);
     const {
         phase, queue, setQueue, showSaveRoutine, setShowSaveRoutine,
         routineName, setRoutineName,
@@ -194,7 +196,7 @@ export function WorkoutSession(props) {
         currentDifficulty, hasNextAvailableExercise,
         updateExerciseCount, getConfig,
         toggleExercise, shuffleQueue, startSession, loadRoutine,
-        handleSaveRoutine, editRoutine, advanceToNext,
+        handleSaveRoutine, editRoutine, advanceToNext, finishSession,
         moveItem, clearQueue,
         handleDragStart, handleDragOver, handleDragEnd,
         handleTouchStart, handleTouchMove, handleTouchEnd,
@@ -469,6 +471,7 @@ export function WorkoutSession(props) {
     // ── RUNNING PHASE = render current exercise panel ─────────────────
     if (phase === 'running' && currentEx) {
         return (
+            <>
             <ModalContainer open={true} onClose={onClose} unstyled>
                 <ExercisePanel
                     exerciseConfig={currentEx}
@@ -482,11 +485,19 @@ export function WorkoutSession(props) {
                     isCompleted={currentDone}
                     dayNumber={dayNumber}
                     onNext={advanceToNext}
+                    onFinish={() => {
+                        if (queue.some(id => !exerciseInfo.find(ex => ex.id === id)?.done)) setConfirmFinish(true);
+                        else finishSession();
+                    }}
                     hideNextButton={!hasNextAvailableExercise}
                     isSession={true}
                     fadeIn={!hasAnimatedFirstPanel}
                 />
             </ModalContainer>
+            <ConfirmDialog open={confirmFinish} title={t('workout.finish')} message={t('workout.incompleteMessage')}
+                confirmLabel={t('workout.finish')} onCancel={() => setConfirmFinish(false)}
+                onConfirm={() => { setConfirmFinish(false); finishSession(); }} />
+            </>
         );
     }
 
@@ -497,7 +508,7 @@ export function WorkoutSession(props) {
             const conf = getConfig(id, getLocalDateStr(new Date()));
             const w = conf ? conf.weight : null;
             const diff = conf ? conf.difficulty : 1.0;
-            return ex ? { id: ex.id, label: getExerciseLabel(ex, t), reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff } : null;
+            return ex ? { id: ex.id, label: getExerciseLabel(ex, t), reps: ex.count, color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff, level: getLevelForCount(ex.count, ex.goal) } : null;
         }).filter(Boolean);
 
         // activeSlide indexes into fullCategoryOrder (built-ins + user-created

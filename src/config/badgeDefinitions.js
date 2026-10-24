@@ -3,7 +3,7 @@ import {
   Star, Award, Crown, Activity, Sun, Moon, Users, Ghost, Share2
 } from '@utils/icons';
 
-// Single source of truth for all 40 achievement badges.
+// Presentation metadata for achievement badges; unlock rules are shared with the server.
 // test(stats) → boolean determines unlock condition.
 // i18n keys are derived as `achievements.badges.${def.id}.title` / `.desc`
 import { BADGE_RULES } from '@shared/badgeRules.js';
@@ -14,6 +14,11 @@ export const BADGE_ICONS = {
 };
 
 const METADATA = [
+  { id: 'level_ten', icon: 'Crown', color: '#fbbf24', category: 'levels' },
+  { id: 'level_100', icon: 'Target', color: '#67e8f9', category: 'levels', descKey: 'level_points_desc' },
+  { id: 'level_500', icon: 'Gem', color: '#a78bfa', category: 'levels', descKey: 'level_points_desc' },
+  { id: 'level_1000', icon: 'Trophy', color: '#fbbf24', category: 'levels', descKey: 'level_points_desc' },
+  { id: 'level_five_week', icon: 'Flame', color: '#f97316', category: 'levels' },
   // ── Streak ─────────────────────────────────────────────────────────
   { id: 'first_blood',        icon: 'Target',   color: '#3b82f6', category: 'streak' },
   { id: 'consistent',         icon: 'Flame',    color: '#f97316', category: 'streak' },

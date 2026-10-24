@@ -140,7 +140,7 @@ export async function updateWidgetData(computedStats, completions, frozenDays = 
       updatedAt: Date.now(),
       streakFrozen: !!computedStats.streakFrozen,
       // Translations
-      streakLabel: i18n.t('widgets.streak'),
+      streakLabel: [i18n.t('widgets.streak'), computedStats.streakLevel ? i18n.t('levels.short', { level: computedStats.streakLevel }) : ''].filter(Boolean).join(' · '),
       daysLabel: i18n.t('widgets.days'),
       weekdayLabels: (() => {
         const labels = i18n.t('widgets.weekdays', { returnObjects: true });

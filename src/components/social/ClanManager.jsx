@@ -77,11 +77,11 @@ export function ClanManager({ onClanJoined }) {
                 await refreshUserClans();
                 if (onClanJoined) onClanJoined(res.clanId);
             } else {
-                setError(res.error || t('clan.invalidCode'));
+                setError(res.error || t('clan.joinError'));
             }
         } catch (err) {
             console.error('Failed to join clan:', err);
-            setError(t('clan.invalidCode'));
+            setError(t('clan.joinError'));
         } finally {
             setIsLoading(false);
         }

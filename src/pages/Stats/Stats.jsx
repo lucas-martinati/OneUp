@@ -32,7 +32,7 @@ const RadarChartPanel = lazy(() => import('./components/RadarChartPanel'));
 const ConsistencyPieChart = lazy(() => import('./components/ConsistencyPieChart'));
 const DailyRepsChart = lazy(() => import('./components/DailyRepsChart'));
 const WeightEvolutionChart = lazy(() => import('./components/WeightEvolutionChart'));
-const DifficultyEvolutionChart = lazy(() => import('./components/DifficultyEvolutionChart'));
+const LevelEvolutionChart = lazy(() => import('./components/LevelEvolutionChart'));
 const CardioStatsPanel = lazy(() => import('@features/cardio/CardioStatsPanel').then(m => ({ default: m.CardioStatsPanel })));
 const SessionDetailModal = lazy(() => import('@features/share/components/SessionDetailModal').then(m => ({ default: m.SessionDetailModal })));
 
@@ -128,20 +128,13 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
         return list;
     }, [deferredCategories, exercisesList, customCategories, exercisesByUserCategory]);
 
-    // Cardio reps are now computed inside computeAllStats directly from
-    // completions (goal-based, capped per validated week) — this only needs
-    // to carry the raw session list through for the weekly streak calculation.
-    const localCardioData = React.useMemo(() => ({
-        allSessions: cardioData?.allSessions || [],
-    }), [cardioData.allSessions]);
-
     const userStartDate = useProgressStore(s => s.userStartDate);
     const frozenDays = useProgressStore(s => s.frozenDays);
 
     const computedStats = React.useMemo(() => {
         if (canAccessFeature(FEATURES.MERGED_STATS, { isPro: hasProAccess }) && deferredCategories.length === 4) return globalStats;
-        return computeAllStats(completions, settings, getDayNumber, exercises, false, {}, getConfig, localCardioData, userStartDate, frozenDays);
-    }, [deferredCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess, getConfig, localCardioData, userStartDate, frozenDays]);
+        return computeAllStats(completions, settings, getDayNumber, exercises, false, {}, getConfig, userStartDate, frozenDays);
+    }, [deferredCategories, completions, settings, getDayNumber, exercises, globalStats, hasProAccess, getConfig, userStartDate, frozenDays]);
 
     // All values come from computedStats
     const {
@@ -255,6 +248,8 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                         <AchievementsShowcase stats={globalStats} onOpen={onOpenAchievements} />
 
                         <StatsOverviewCards
+                            streakLevel={computedStats.streakLevel}
+                            levelStreaks={computedStats.levelStreaks}
                             onlyCardio={onlyCardio} cardioKm={cardioKm} cardioSessionsCount={cardioData.allSessions.length}
                             globalTotalReps={globalTotalReps} exercisesCount={exercises?.length || 0} totalDays={totalDays}
                             displayStreak={displayStreak} streakActive={streakActive} maxStreak={maxStreak} successRate={successRate}
@@ -317,10 +312,10 @@ export function Stats({ initialCategory, onClose, onOpenAchievements, onOpenStor
                                     completions={completions}
                                 />
                             )}
-                            <DifficultyEvolutionChart
-                                title={t('stats.difficultyEvolution')}
+                            <LevelEvolutionChart
+                                weekStartDay={settings.weekStartDay || 'monday'}
+                                title={t('stats.levelEvolution')}
                                 t={t}
-                                getConfig={getConfig}
                                 completions={completions}
                                 exercises={exercises}
                             />

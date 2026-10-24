@@ -1,9 +1,11 @@
+import { getCardioWeekEntry, getCardioReps } from '@shared/cardioLevels.js';
+import { isFullCompletion, getEntryLevel } from '@shared/exerciseLevels.js';
 import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
 import { EXERCISES, CARDIO_EXERCISES, getDailyGoal, isCardioExercise, isWeightExercise } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { isCustomExercise } from '@utils/exerciseLabel';
 import { sumExerciseReps } from '@utils/statUtils';
-import { getLocalDateStr, getCurrentWeekNumber, parseLocalDate } from '@shared/dateUtils';
+import { getLocalDateStr, getCurrentWeekNumber } from '@shared/dateUtils';
 
 /**
  * Card geometry — the card renders at a fixed logical width and snaps its
@@ -69,7 +71,7 @@ export function buildCardModel({
 
   const allExercises = (sessionData?.exercises || []).map(ex => ({
     ...ex,
-    difficulty: ex.difficulty || (getConfig ? getConfig(ex.id, sessionData?.date).difficulty : 1.0)
+    level: ex.level ?? getEntryLevel(completions?.[sessionData?.date]?.[ex.id] || { isCompleted: true })
   }));
   const sessionType = sessionData?.type || CATEGORIES.BODYWEIGHT;
 
@@ -88,7 +90,7 @@ export function buildCardModel({
         allKnownExercisesMap[e.id] = e;
       });
       for (const [exId, exStats] of Object.entries(dayData)) {
-        if (exStats?.isCompleted) {
+        if (exStats?.isCompleted || exStats?.count > 0) {
           const knownEx = allKnownExercisesMap[exId];
           if (knownEx && !isCardioExercise(exId)) {
             const conf = getConfig(exId, targetDate);
@@ -96,7 +98,7 @@ export function buildCardModel({
               ...knownEx,
               reps: exStats.count || getDailyGoal(knownEx, dayNum, conf.difficulty) || knownEx.reps || 0,
               weight: exStats.weight,
-              difficulty: conf.difficulty
+              level: getEntryLevel(exStats)
             });
           }
         }
@@ -104,38 +106,15 @@ export function buildCardModel({
 
       // Special handling for Cardio: if done anytime in the week, show it as done
       for (const cardio of CARDIO_EXERCISES) {
-        let isDoneInWeek = false;
-        let weekDate = null;
-
-        // Look back until previous Monday to find if done in CURRENT week
-        const targetD = parseLocalDate(targetDate);
-        const dayOfWeek = targetD.getDay(); // 0 is Sunday
-        const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-
-        for (let i = 0; i <= daysSinceMonday; i++) {
-          const checkDate = parseLocalDate(targetDate);
-          checkDate.setDate(checkDate.getDate() - i);
-          const dateStr = getLocalDateStr(checkDate);
-          if (completions[dateStr]?.[cardio.id]?.isCompleted) {
-            isDoneInWeek = true;
-            weekDate = dateStr;
-            break;
-          }
-        }
-
-        if (isDoneInWeek) {
-          const conf = getConfig(cardio.id, weekDate);
-          const weekNum = getCurrentWeekNumber(settings?.startDate || stats?.firstActiveDate, parseLocalDate(targetDate));
-          dailyExercises.push({
-            ...cardio,
-            reps: getDailyGoal(cardio, weekNum, conf.difficulty, true),
-            difficulty: conf.difficulty
-          });
+        const entry = getCardioWeekEntry(completions, cardio.id, targetDate, settings?.weekStartDay || 'monday');
+        if (entry && entry.dateStr <= targetDate && (entry.isCompleted || entry.count > 0)) {
+          const weekNum = getCurrentWeekNumber(settings?.startDate || stats?.firstActiveDate, entry.dateStr);
+          dailyExercises.push({ ...cardio, reps: getCardioReps(entry, cardio.id, weekNum), level: getEntryLevel(entry) });
         }
       }
 
-      dailyStandardDone = EXERCISES.every(ex => dayData[ex.id]?.isCompleted);
-      dailyWeightsDone = WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => dayData[ex.id]?.isCompleted);
+      dailyStandardDone = EXERCISES.every(ex => isFullCompletion(dayData[ex.id]));
+      dailyWeightsDone = WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => isFullCompletion(dayData[ex.id]));
 
       if (dailyStandardDone || dailyWeightsDone) {
         activeThemeKey = 'gold';
@@ -302,6 +281,7 @@ export function buildCardModel({
     totalReps: isGlobal ? (filteredStats?.totalReps || 0) : sumExerciseReps(allExercises),
     duration: sessionData?.duration || 0,
     streak: stats?.displayStreak || 0,
+    streakLevel: stats?.streakLevel || 0,
     streakActive: stats?.streakActive || false,
     exerciseCount: isGlobal ? (filteredStats?.exerciseCount || 0) : allExercises.length,
     totalDays: isGlobal ? (stats?.totalDays || 0) : 0,

@@ -146,7 +146,25 @@
       "streak_desc": "{{count}} days in a row",
       "perfect_days_desc": "{{count}} perfect days",
       "total_reps_desc": "{{count}} total reps",
-      "workout_count_desc": "{{count}} {{period}} workouts"
+      "workout_count_desc": "{{count}} {{period}} workouts",
+      "level_ten": {
+        "title": "At the summit",
+        "desc": "Reach level 10 on one exercise."
+      },
+      "level_100": {
+        "title": "100 levels"
+      },
+      "level_500": {
+        "title": "500 levels"
+      },
+      "level_1000": {
+        "title": "1000 levels"
+      },
+      "level_points_desc": "Accumulate {{count}} levels.",
+      "level_five_week": {
+        "title": "A solid week",
+        "desc": "Maintain a global streak at level 5 or above for 7 training days."
+      }
     },
     "badgesUnlocked": "Badges Unlocked",
     "nextBadge": "Next achievement",
@@ -165,14 +183,23 @@
   },
   "announcement": {
     "badge": "New",
-    "title": "A brand-new look ✨",
-    "body": "OneUp got a fresh coat of paint! The entire app has been redesigned for a smoother, more consistent and more delightful everyday experience.",
-    "cta": "Explore",
+    "title": "Every effort takes you up a level",
+    "body": "10 levels per exercise, streaks that grow with you and progress you can see everywhere. Choose how far to go each day.",
+    "cta": "Let’s go!",
     "highlights": {
-      "design": "A refreshed design throughout, with reworked avatars and gradients",
-      "motion": "Smoother animations and loading states everywhere",
-      "components": "Unified components for perfect consistency across screens",
-      "onboarding": "A redesigned onboarding, with a language switcher"
+      "progress": "10 levels, with no difficulty to select. Level 1 validates an exercise; level 10 completes its full goal. Reps below level 1 are still saved. The animated ring shows what remains before the next level.",
+      "streaks": "Each exercise keeps its own streak. After 200 days at level 10, a day at level 5 makes it 201 days at level 5. Higher-level records are preserved.",
+      "global": "Your global streak uses the highest level of the day. Level 10 push-ups today and level 10 squats tomorrow keep a level 10 streak, even when you switch exercises.",
+      "cardio": "Cardio has levels too: distance fills 10 stages towards your weekly goal. A cardio level remains valid until the end of that week.",
+      "history": "Your history is restored automatically. Previously completed exercises become level 10. Saved reps from incomplete exercises are compared with the goal for their original date to recover their level. No need to enter anything again.",
+      "rewards": "Calendar, statistics, profiles and shares now show your levels. 5 new achievements reward levels and consistency; existing achievements are preserved."
+    },
+    "gallery": "See the new OneUp",
+    "galleryHint": "Scroll through the screenshots. Examples use demonstration data; some screenshots are in English.",
+    "screens": {
+      "exercise": "The ring fills level by level and shows the next target.",
+      "calendar": "The calendar shows the level reached each day.",
+      "share": "Levels also appear in your shared workout images."
     }
   },
   "app": {
@@ -226,13 +253,10 @@
   "cardio": {
     "avgSpeed": "Avg speed",
     "connectTitle": "Connected Services",
-    "difficultyMismatchDesc": "Difficulty has changed ({{saved}}x → {{current}}x). Do you want to continue with this new setting?",
-    "difficultyModified": "Difficulty Modified",
     "distance": "Distance",
     "duration": "Time",
     "elevation": "Elevation+",
     "finish": "Finish",
-    "goalReached": "Goal reached!",
     "googleWallDesc": "Sign in with your Google account to access the Cardio module and sync your data.",
     "googleWallStep1": "Google Sign-in",
     "googleWallTitle": "Account Required",
@@ -629,25 +653,20 @@
     "language": "Language",
     "languageDesc": "Change the application language",
     "leaderboardDesc": "Appear in the public leaderboard",
-    "lock": "Lock",
     "maxChars": "Max 20 characters · Your Google photo will be used",
     "monday": "Monday",
-    "multiplier": "Multiplier (Max 1.0)",
     "notifications": "Notifications",
     "performance": "Performance",
     "preferences": "Preferences",
     "reducedEffects": "Reduced visual effects",
     "reminder": "Workout reminder",
     "reminderTime": "REMINDER TIME",
-    "sensitiveParam": "SENSITIVE SETTING",
-    "sensitiveWarning": "Changing this will modify your daily rep targets. A setting of 0.5 halves your targets.",
     "soundEffects": "Sound Effects",
     "soundsDescription": "Sounds on actions",
     "hapticFeedback": "Haptic feedback",
     "hapticsDescription": "Vibrations on actions",
     "sunday": "Sunday",
     "title": "Settings",
-    "unlockSettings": "UNLOCK SETTINGS",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
     "dataTitle": "Data",
@@ -706,9 +725,9 @@
     "consistency": "⏰ Consistency",
     "currentStreak": "Current Streak",
     "dailyReps": "📈 Reps Evolution",
-    "difficultyEvolution": "⚙️ Difficulty Evolution",
-    "difficultyNoData": "No difficulty data yet",
-    "difficultyNoDataHint": "Change the difficulty of an exercise to see its evolution here",
+    "levelEvolution": "Level history",
+    "levelNoData": "No levels yet",
+    "levelNoDataHint": "Reach your first level to see your progress.",
     "exercisesDone": "Exercises Done",
     "filters": "Filters",
     "loadingCharts": "Loading charts...",
@@ -821,7 +840,10 @@
     "selectExercises": "Select exercises",
     "sessionDone": "Session Complete!",
     "shuffle": "Shuffle",
-    "yourOrder": "Your order"
+    "yourOrder": "Your order",
+    "finish": "Finish session",
+    "incompleteMessage": "Some exercises are incomplete. Finishing saves only the reps and levels already reached, without erasing your progress.",
+    "progressSaved": "Your progress is saved"
   },
   "sessionNames": {
     "light": {
@@ -998,5 +1020,24 @@
     "afternoon": "afternoon",
     "evening": "evening",
     "total": "total"
+  },
+  "levels": {
+    "short": "Lvl {{level}}",
+    "reached": "Lvl {{level}} / 10",
+    "progress": "Levels",
+    "streaks": "Streaks by level",
+    "current": "Current streak",
+    "record": "Best",
+    "nextReps": "{{count}} reps to level {{level}}",
+    "nextTime": "{{time}} to level {{level}}",
+    "complete": "Maximum level reached!",
+    "step1": "Exercise validated",
+    "step5": "Halfway there",
+    "step10": "Full goal",
+    "example": "Progress example",
+    "globalRule": "Your best exercise each day advances the global streak. Its level is the one maintained every day.",
+    "cardioRule": "For cardio, all ten levels fill with the distance covered during the week.",
+    "profileTitle": "Level journey",
+    "profilePending": "This profile’s levels will appear after it updates. Previously known streaks remain visible."
   }
 }

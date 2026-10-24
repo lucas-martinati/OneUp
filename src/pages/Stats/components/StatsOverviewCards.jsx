@@ -1,3 +1,6 @@
+import { LevelStreakDetails } from '@components/ui/LevelStreakDetails';
+import { LevelEmblem } from '@components/ui/LevelEmblem';
+import { getStreakRecordLevel } from '@shared/exerciseLevels.js';
 import { useTranslation } from 'react-i18next';
 import { TrendingUp, Award, Flame, Target, Hash, Star } from '@utils/icons';
 import { AnimatedNumber } from '@components/ui/AnimatedNumber';
@@ -8,7 +11,7 @@ import { Card } from '@components/ui';
  * over a neutral glass surface with a soft colored corner glow. Replaces the
  * old fully-colored blocks for a calmer, more premium look.
  */
-function StatCard({ icon: Icon, value, format, label, color, dim = false, delay = 0, pending = false }) {
+function StatCard({ icon: Icon, value, format, label, color, level = 0, dim = false, delay = 0, pending = false }) {
     const c = dim ? '#8a8a93' : color;
     return (
         <Card variant="premium" padding="sm" interactive={true} className="scale-in" style={{
@@ -36,9 +39,10 @@ function StatCard({ icon: Icon, value, format, label, color, dim = false, delay 
             <div style={{ position: 'relative', zIndex: 1 }}>
                 <div style={{
                     fontSize: 'clamp(1.5rem, 6vw, 1.8rem)', fontWeight: '800', lineHeight: 1,
-                    color: 'var(--text-primary)'
+                    color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px'
                 }}>
                     <AnimatedNumber value={value} format={format} pending={pending} />
+                    {!pending && <LevelEmblem level={level} size={32} />}
                 </div>
                 <div style={{
                     fontSize: 'clamp(0.6rem, 1.5vw, 0.68rem)', color: 'var(--text-secondary)',
@@ -57,7 +61,7 @@ const pctFormat = (v) => `${v}%`;
 export function StatsOverviewCards({
     onlyCardio, cardioKm, cardioSessionsCount,
     globalTotalReps, exercisesCount, totalDays,
-    displayStreak, streakActive, maxStreak, successRate,
+    displayStreak, streakActive, maxStreak, successRate, streakLevel = 0, levelStreaks = [],
     totalExerciseCompletions, perfectDays, pending = false
 }) {
     const { t } = useTranslation();
@@ -110,9 +114,9 @@ export function StatsOverviewCards({
                 display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
                 gap: '10px'
             }}>
-                <StatCard icon={Flame} value={displayStreak} format={intFormat} label={t('stats.currentStreak')}
+                <StatCard icon={Flame} value={displayStreak} format={intFormat} label={t('stats.currentStreak')} level={streakLevel}
                     color="#f97316" dim={!streakActive} pending={pending} />
-                <StatCard icon={Award} value={maxStreak} format={intFormat} label={t('common.bestStreak')}
+                <StatCard icon={Award} value={maxStreak} format={intFormat} label={t('common.bestStreak')} level={getStreakRecordLevel(levelStreaks, maxStreak)}
                     color="#fbbf24" delay={0.05} pending={pending} />
                 <StatCard icon={Target} value={totalDays} format={intFormat} label={t('stats.completedDays')}
                     color="#10b981" delay={0.1} pending={pending} />
@@ -123,6 +127,7 @@ export function StatsOverviewCards({
                 <StatCard icon={Star} value={perfectDays} format={intFormat} label={t('common.perfectDays')}
                     color="#ec4899" delay={0.25} pending={pending} />
             </div>
+            <LevelStreakDetails levels={levelStreaks} weekly={onlyCardio} />
         </div>
     );
 }

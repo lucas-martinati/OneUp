@@ -1,3 +1,4 @@
+import i18n from '../../../../i18n';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import { Settings } from '../../Settings';
@@ -50,7 +51,8 @@ vi.mock('@hooks/useExerciseConfig', () => ({
 }));
 
 describe('Settings component', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
+        await i18n.changeLanguage('en');
         cleanup();
         vi.clearAllMocks();
     });
@@ -61,6 +63,6 @@ describe('Settings component', () => {
         expect(getByText('Preferences')).toBeTruthy();
         expect(getByText('Graphics Mode')).toBeTruthy();
         expect(getByText('Leaderboard')).toBeTruthy();
-        expect(getByText('Difficulty')).toBeTruthy();
+        expect(getByText('Levels')).toBeTruthy();
     });
 });

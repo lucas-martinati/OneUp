@@ -3,7 +3,8 @@ import { computeAllStats } from '../useComputedStats';
 import { isGlobalPerfectDay } from '@utils/statUtils';
 
 // We need to mock dependencies
-vi.mock('@shared/dateUtils', () => ({
+vi.mock('@shared/dateUtils', async (importOriginal) => ({
+    ...await importOriginal(),
   getLocalDateStr: vi.fn((d) => d.toISOString().split('T')[0]),
   parseLocalDate: vi.fn((d) => new Date(d)),
   calculateExerciseStreak: vi.fn(() => 5),
@@ -25,16 +26,6 @@ vi.mock('@config/exercises', () => ({
   getDailyGoal: vi.fn(() => 10),
   getWeeklyGoalKm: vi.fn(() => 5),
   CARDIO_REPS_PER_KM: { running: 100, cycling: 40 }
-}));
-
-vi.mock('@utils/cardioStreak', () => ({
-  evaluateCardioWeek: vi.fn((sessions, mode, weekOffset) => {
-    // Return true for week 0 and 2, false for others to break the streak and hit the else branches
-    if (weekOffset === 0 || weekOffset === 2) return { achieved: true };
-    return { achieved: false };
-  }),
-  computeCardioCurrentStreak: vi.fn(() => 3),
-  computeCardioMaxStreak: vi.fn(() => 5)
 }));
 
 vi.mock('@config/weights', () => ({
@@ -84,7 +75,6 @@ describe('computeAllStats', () => {
       }
     };
 
-    const cardioReps = { allSessions: [{ id: 's1' }] };
     
     // We mock Date to be exactly 2026-07-12
     const originalDate = globalThis.Date;
@@ -96,7 +86,7 @@ describe('computeAllStats', () => {
       }
     };
 
-    const result = computeAllStats(completions, {}, getDayNumber, allExercises, false, {}, getConfig, cardioReps);
+    const result = computeAllStats(completions, {}, getDayNumber, allExercises, false, {}, getConfig);
 
     expect(result.totalDays).toBe(2);
     expect(result.firstActiveDate).toBe('2026-07-10');
@@ -111,8 +101,8 @@ describe('computeAllStats', () => {
     expect(result.pieData[0].value).toBe(1); // morning (pushups)
     expect(result.pieData[2].value).toBe(1); // evening (squats)
 
-    expect(result.exerciseReps.pushups).toBe(10); // getDailyGoal mock returns 10
-    expect(result.exerciseReps.running).toBe(500); // getWeeklyGoalKm(5) * CARDIO_REPS_PER_KM(100) * diff(1.0) = 500
+    expect(result.exerciseReps.pushups).toBe(1); // legacy goal: day 1 at multiplier 1
+    expect(result.exerciseReps.running).toBe(49); // Shared legacy volume: floor(0.45 km × 109 reps/km)
     
     // restore date
     globalThis.Date = originalDate;
@@ -136,9 +126,8 @@ describe('computeAllStats', () => {
       }
     };
     
-    const cardioReps = { allSessions: [{ id: '1' }] };
     // the evaluateCardioWeek mock returns achieved: true 
-    const result = computeAllStats(completions, {}, getDayNumber, onlyCardio, false, {}, getConfig, cardioReps);
+    const result = computeAllStats(completions, {}, getDayNumber, onlyCardio, false, {}, getConfig);
     
     // If only cardio, streak is calculated from the weekly cardio streaks (which evaluates to 52 for current because our mock always returns achieved)
     // Wait, the mock evaluateCardioWeek always returns true so streak goes up to 52.
@@ -195,9 +184,11 @@ describe('computeAllStats', () => {
         }
       };
 
-      const result = computeAllStats(completions, {}, getDayNumber, allExercises, false, {}, getConfig, null, null, frozenDays);
-      // It should call walkStreak, which we mocked to 3
-      expect(result.currentStreak).toBe(3);
+      const result = computeAllStats(completions, {}, getDayNumber, allExercises, false, {}, getConfig, null, frozenDays);
+      // Today is pending; the two trained days remain connected through the freeze.
+      expect(result.currentStreak).toBe(0);
+      expect(result.displayStreak).toBe(2);
+      expect(result.streakLevel).toBe(10);
       
       globalThis.Date = originalDate;
   });

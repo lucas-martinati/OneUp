@@ -10,6 +10,7 @@
  */
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LevelEmblem } from '@components/ui/LevelEmblem';
 import { Button, ModalContainer } from '@components/ui';
 
 /**
@@ -71,7 +72,7 @@ export function AnnouncementOverlay({ announcement, onDismiss, onConfirm }) {
         <div className="ann-hero">
           <span className="ann-ring ann-ring-1" aria-hidden="true" />
           <span className="ann-ring ann-ring-2" aria-hidden="true" />
-          <div className="ann-emoji">{announcement.emoji}</div>
+          <div className="ann-emoji">{announcement.heroLevel ? <LevelEmblem level={announcement.heroLevel} size={64} /> : announcement.emoji}</div>
         </div>
 
         {/* Badge */}
@@ -84,6 +85,27 @@ export function AnnouncementOverlay({ announcement, onDismiss, onConfirm }) {
 
         {/* Body */}
         <p className="ann-body">{body}</p>
+
+        {/* Native scroll-snap gallery keeps screenshots readable on mobile. */}
+        {images.length > 0 && (
+          <section className="ann-gallery">
+            <h3>{t('announcement.gallery')}</h3>
+            <p className="ann-gallery-hint">{t('announcement.galleryHint')}</p>
+            <div className="ann-images" tabIndex={0} role="region" aria-label={t('announcement.gallery')}>
+              {images.map((image, i) => {
+                const src = typeof image === 'string' ? image : image.src;
+                const caption = image.captionKey ? t(image.captionKey) : '';
+                return (
+                  <figure key={src} className="ann-image-frame">
+                    <img src={`${basePath}${src.replace(/^\//, '')}`} alt={caption}
+                      className="ann-image" loading="lazy" width={390} height={844} />
+                    <figcaption><span>{i + 1} / {images.length}</span>{caption}</figcaption>
+                  </figure>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Highlights list */}
         {highlights.length > 0 && (
@@ -101,21 +123,6 @@ export function AnnouncementOverlay({ announcement, onDismiss, onConfirm }) {
               </li>
             ))}
           </ul>
-        )}
-
-        {/* Optional images showcase */}
-        {images.length > 0 && (
-          <div className="ann-images">
-            {images.map((src, i) => (
-              <div key={i} className="ann-image-frame">
-                <img
-                  src={`${basePath}${src.replace(/^\//, '')}`}
-                  alt=""
-                  className="ann-image"
-                />
-              </div>
-            ))}
-          </div>
         )}
 
         {/* CTA Button */}

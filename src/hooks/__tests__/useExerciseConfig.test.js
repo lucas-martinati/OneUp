@@ -30,10 +30,10 @@ describe('useExerciseConfig', () => {
     expect(result.current.getConfig(null)).toEqual({ difficulty: 1.0, weight: null });
   });
 
-  it('reads live difficulty from settings and weight from context', () => {
+  it('uses the full daily goal scale and reads weight from context', () => {
     storeState.settings = { exerciseDifficulties: { bench: 1.5 } };
     const { result } = renderHook(() => useExerciseConfig());
-    expect(result.current.getConfig('bench')).toEqual({ difficulty: 1.5, weight: 50 });
+    expect(result.current.getConfig('bench')).toEqual({ difficulty: 1, weight: 50 });
   });
 
   it('prioritizes saved historical config for a completed past day', () => {

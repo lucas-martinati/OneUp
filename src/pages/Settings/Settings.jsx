@@ -5,7 +5,7 @@ import { Button, ModalHeader, Card, ModalContainer } from '@components/ui';
 import { CloudSyncPanel } from './components/CloudSyncPanel';
 import { StoreView } from './components/StoreView';
 import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection, DataSection } from './components/SettingsPanels';
-import { DifficultySettings } from './components/DifficultySettings';
+import { LevelSettings } from './components/LevelSettings';
 import { openLegalPage } from '@utils/navigation';
 import { useAuth } from '@contexts/AuthContext';
 import { useSettingsStore } from '@store/useSettingsStore';
@@ -106,7 +106,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
 
                         <DataSection />
 
-                        <DifficultySettings />
+                        <LevelSettings />
 
                         {/* Legal footer */}
                         <div style={{

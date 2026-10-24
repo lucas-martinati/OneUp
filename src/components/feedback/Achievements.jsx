@@ -6,6 +6,7 @@ import { SegmentedControl } from '@components/ui/SegmentedControl';
 import { buildBadges } from './buildBadges';
 
 const CATEGORY_COLORS = {
+    levels: '#a78bfa',
     streak: '#f97316',
     quantite: '#22c55e',
     volume: '#ef4444',
@@ -16,6 +17,7 @@ const CATEGORY_COLORS = {
 };
 
 const CATEGORY_TITLES = {
+    levels: 'levels.progress',
     streak: 'achievements.categories.streak',
     quantite: 'achievements.categories.quantity',
     volume: 'achievements.categories.volume',

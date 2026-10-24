@@ -1,3 +1,5 @@
+import { shiftDateStr } from '@shared/dateUtils';
+import { StreakFlame } from '@components/ui/StreakFlame';
 import React from 'react';
 import { ChevronRight, Shield, ShieldAlert, HeartHandshake, Check, Star } from '@utils/icons';
 import { useTranslation } from 'react-i18next';
@@ -73,6 +75,7 @@ export function LeaderboardRow({
                     {showVerifiedShield && <Shield size={12} color="#10b981" />}
                     {showSuspiciousShield && <ShieldAlert size={12} color="#f59e0b" />}
                 </div>
+                {entry.lastActiveDay >= shiftDateStr(todayStr, -1) && <StreakFlame streak={entry.currentStreak} level={entry.streakLevel} active={entry.lastActiveDay === todayStr} variant="badge" style={{ width: 'fit-content', marginTop: '3px' }} />}
             </div>
 
             <span className={styles.reps} style={{ color: activeTabConfig?.color || '#fbbf24' }}>

@@ -24,8 +24,10 @@ Available as a **PWA** 🌐 and **Android app** 📱 (Capacitor).
 - **2 cardio activities** — Running & Cycling with Strava integration
 - **Custom exercises & categories** — Create your own exercises and organize them
 - **Camera-based push-up counter** — AI-powered rep counting via your camera
-- **Progressive difficulty** — Each exercise has its own multiplier; daily goal = `ceil(day × multiplier × user_difficulty)`
-- **Difficulty adjustment** — Per-exercise multiplier override (0.1× to 3×)
+- **Progressive goals** — Each exercise has its own multiplier; full daily goal = `ceil(day × multiplier)`
+- **10 automatic levels** — Every rep counts; level 1 validates the exercise, level 10 completes the full goal
+- **Streaks by level** — Per-exercise streaks and a global streak based on each day’s best exercise; historical records are preserved
+- **Compatible history migration** — Legacy validations become level 10 once, with historical rep estimates; see [daily level rules](docs/daily-levels.md)
 
 ### 🎯 Workout Sessions & Routines
 - **Session queue** — Build a workout queue with drag-and-drop reordering

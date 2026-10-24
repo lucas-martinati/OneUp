@@ -34,7 +34,7 @@ export default function LineChart({
     const [active, setActive] = useState(null);
 
     const ticks = useMemo(() => niceTicks(yMin, yMax, 4), [yMin, yMax]);
-    const showDots = dots === true || (dots === 'auto' && data.length <= 12);
+    const showDots = dots === 'changes' || dots === true || (dots === 'auto' && data.length <= 12);
     const isArea = series.length === 1;
 
     // Per-series screen-space points (skipping gaps, like recharts connectNulls).
@@ -183,7 +183,7 @@ export default function LineChart({
                             strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
                             vectorEffect="non-scaling-stroke"
                         />
-                        {showDots && s.pts.map((p) => (
+                        {showDots && s.pts.filter((p, i, pts) => dots !== 'changes' || i === 0 || p.v !== pts[i - 1].v).map((p) => (
                             <g key={p.i}>
                                 <circle
                                     cx={p.x}

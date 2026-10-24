@@ -255,3 +255,16 @@ describe('syncUtils', () => {
     });
   });
 });
+
+describe('level progress sync', () => {
+  it('retains level, full-goal snapshot and exact validated volume in cloud payloads', () => {
+    const data = { progressVersion: 1, completions: { '2026-04-10': { pushups: { count: 53, goal: 100, level: 5, isCompleted: true } } } };
+    expect(sanitizeForCloud(data)).toMatchObject(data);
+  });
+
+  it('allows a newer explicit reset to replace a validated level', () => {
+    const local = { completions: { '2026-04-10': { pushups: { count: 53, goal: 100, level: 5, isCompleted: true, timestamp: 100 } } }, lastCompletionChange: 100 };
+    const cloud = { progressVersion: 1, completions: { '2026-04-10': { pushups: { count: 0, goal: 100, level: 0, isCompleted: false, timestamp: 200 } } }, lastCompletionChange: 200 };
+    expect(mergeData(local, cloud).completions['2026-04-10'].pushups).toEqual(cloud.completions['2026-04-10'].pushups);
+  });
+});

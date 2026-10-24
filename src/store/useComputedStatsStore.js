@@ -10,6 +10,7 @@ import { CARDIO_EXERCISES } from '@config/exercises';
  */
 const EMPTY_STATS = {
     totalDays: 0, maxStreak: 0, currentStreak: 0, yesterdayStreak: 0,
+    streakLevel: 0, levelStreaks: [],
     displayStreak: 0, streakActive: false, streakFrozen: false, todayDone: false,
     globalTotalReps: 0, perfectDays: 0, totalExerciseCompletions: 0,
     successRate: 0, firstActiveDate: null,
@@ -47,12 +48,12 @@ export const useComputedStatsStore = create((set) => ({
      * Recompute stats from inputs.
      * Called by the single ComputedStatsSynchronizer component.
      */
-    recompute: (completions, settings, getDayNumber, customExercises, hasShared, achievements, getConfig, cardioData, userStartDate, frozenDays) => {
+    recompute: (completions, settings, getDayNumber, customExercises, hasShared, achievements, getConfig, userStartDate, frozenDays) => {
         const allExercises = [...EXERCISES, ...WEIGHT_EXERCISES, ...CARDIO_EXERCISES, ...(customExercises || [])];
         const result = computeAllStats(
             completions, settings, getDayNumber,
             allExercises, hasShared, achievements,
-            getConfig, cardioData, userStartDate, frozenDays
+            getConfig, userStartDate, frozenDays
         );
         set({ stats: result });
     },

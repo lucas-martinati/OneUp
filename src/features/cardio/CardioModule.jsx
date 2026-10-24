@@ -69,8 +69,7 @@ export function CardioModule() {
   const {
     activeMode, setActiveMode,
     weekNumber, weeklyDistance, weeklyGoal,
-    lastSession, streak, sessions, loading, refresh,
-    isDifficultyMismatch, savedDifficulty, currentDifficulty, invalidateCurrentWeek
+    lastSession, streak, streakLevel, sessions, loading, refresh
   } = useCardio();
 
   const [, setMapExpanded] = useState(false);
@@ -215,10 +214,6 @@ export function CardioModule() {
                 distance={displayDistance}
                 goal={displayGoal}
                 weekNumber={displayWeekNumber}
-                isDifficultyMismatch={isDifficultyMismatch}
-                savedDifficulty={savedDifficulty}
-                currentDifficulty={currentDifficulty}
-                onInvalidate={invalidateCurrentWeek}
               />
 
               {/* Map */}
@@ -233,7 +228,7 @@ export function CardioModule() {
                 flexShrink: 0
               }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <CardioStreak streak={displayStreak} />
+                  <CardioStreak streak={displayStreak} level={isDemo ? 10 : streakLevel} />
                 </div>
                 <Button
                   variant="ghost"

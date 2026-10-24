@@ -116,10 +116,12 @@ export function addSession({ date, duration, name, type, exercises }) {
     exercises: (exercises || []).map(ex => ({
       id: ex.id,
       label: ex.label || ex.id,
-      reps: ex.reps || ex.goal || 0,
+      reps: ex.reps ?? ex.goal ?? 0,
       color: ex.color || getDefaultExerciseColor(),
       icon: ex.icon || 'Dumbbell',
       type: ex.type || 'counter',
+      ...(Number.isInteger(ex.level) ? { level: Math.max(0, Math.min(10, ex.level)) } : {}),
+      ...(Number.isFinite(ex.goal) && ex.goal > 0 ? { goal: ex.goal } : {}),
       ...(ex.weight ? { weight: ex.weight } : {})
     })),
   };

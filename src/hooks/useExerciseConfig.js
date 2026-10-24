@@ -11,7 +11,6 @@ import { useExercises } from '@contexts/ExercisesContext';
  */
 export function useExerciseConfig() {
   const completions = useProgressStore(s => s.completions);
-  const settings = useSettingsStore(s => s.settings);
   const updateSettings = useSettingsStore(s => s.updateSettings);
   const { getWeight: getGlobalWeight, setWeight } = useExercises();
 
@@ -22,10 +21,8 @@ export function useExerciseConfig() {
       if (savedDiff !== undefined) return savedDiff;
       return 1.0;
     }
-    const currentPrefs = settings?.exerciseDifficulties || {};
-    if (currentPrefs[exId] !== undefined) return currentPrefs[exId];
     return 1.0;
-  }, [completions, settings?.exerciseDifficulties]);
+  }, [completions]);
 
   const updateDifficulty = useCallback((exId, value) => {
     updateSettings(prev => ({

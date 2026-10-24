@@ -1,13 +1,15 @@
+import { useSettingsStore } from '@store/useSettingsStore';
+import { getCardioGoal, getCardioWeekEntry } from '@shared/cardioLevels.js';
+import { getProgressGoal, getEntryLevel } from '@shared/exerciseLevels.js';
+import { LevelEmblem } from '@components/ui/LevelEmblem';
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProgressStore } from '@store/useProgressStore';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { isCaughtUpDay, calculateRepsForDay } from '@utils/statUtils';
 import { getExerciseLabel } from '@utils/exerciseLabel';
-import { getDailyGoal } from '@config/exercises';
 import { getCurrentWeekNumber } from '@shared/dateUtils';
-import { Star, ShieldAlert, CheckCircle2, FileText, Check, getIcon } from '@utils/icons';
-import { DifficultyBadge } from '@components/ui';
+import { Star, ShieldAlert, FileText, Check, getIcon } from '@utils/icons';
 import styles from '@styles/Calendar.module.css';
 
 /** Day detail bottom sheet */
@@ -22,6 +24,7 @@ export function CalendarDayDetail({
   t,
   startDate
 }) {
+  const weekStartDay = useSettingsStore(s => s.settings.weekStartDay) || 'monday';
   const { i18n } = useTranslation();
   const dayNum = getDayNumber(dateString);
   const dayCompletions = completions[dateString] || {};
@@ -221,12 +224,15 @@ export function CalendarDayDetail({
           <div data-scroll-content className={`${styles.exList} no-scrollbar`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {exercises && exercises.map(ex => {
               const ExIcon = getIcon(ex.icon);
-              const exDiff = getConfig(ex.id, dateString).difficulty;
               const isCardio = ex.id === 'running' || ex.id === 'cycling';
+              const weekEntry = isCardio ? getCardioWeekEntry(completions, ex.id, dateString, weekStartDay) : null;
+              let entry = dayCompletions[ex.id];
+              if (isCardio) entry = weekEntry?.dateStr <= dateString ? weekEntry : null;
               const num = isCardio ? getCurrentWeekNumber(startDate, new Date(dateString)) : dayNum;
-              const goal = getDailyGoal(ex, num, exDiff, isCardio);
-              const done = !!(dayCompletions[ex.id] || {}).isCompleted;
-              const currentCount = (dayCompletions[ex.id] || {}).count || (done ? goal : 0);
+              const goal = isCardio ? getCardioGoal(ex.id, startDate, dateString, entry, weekStartDay) : getProgressGoal(ex, num, entry);
+              const done = !!(entry || {}).isCompleted;
+              const level = getEntryLevel(entry);
+              const currentCount = (entry || {}).count || (done ? goal : 0);
               return (
                 <div
                   key={ex.id}
@@ -240,23 +246,20 @@ export function CalendarDayDetail({
                     <div className={styles.exName} style={done ? { color: ex.color } : undefined}>
                       {getExerciseLabel(ex, t)}
                     </div>
-                    <div className={styles.exSub}>
-                      <DifficultyBadge difficulty={exDiff} />
-                    </div>
                   </div>
                   {done ? (
                     <>
                       <span className={styles.exReps} style={{ color: ex.color }}>
-                        {currentCount.toLocaleString()}<span className={styles.exRepsUnit}>{t('common.reps')}</span>
+                        {isCardio ? (currentCount / 1000).toFixed(2) : currentCount.toLocaleString()}<span className={styles.exRepsUnit}>{t(isCardio ? 'cardio.units.km' : 'common.reps')}</span>
                       </span>
-                      <CheckCircle2 size={22} color={ex.color} strokeWidth={2.2} />
+                      <LevelEmblem level={level} size={26} showZero />
                     </>
                   ) : (
                     <>
                       <span className={styles.exReps} style={{ color: 'var(--text-secondary)' }}>
-                        {currentCount.toLocaleString()}/{goal.toLocaleString()}<span className={styles.exRepsUnit} style={{ marginLeft: 2 }}>{t('common.reps')}</span>
+                        {isCardio ? `${(currentCount / 1000).toFixed(2)}/${(goal / 1000).toFixed(2)}` : `${currentCount}/${goal}`}<span className={styles.exRepsUnit} style={{ marginLeft: 2 }}>{t(isCardio ? 'cardio.units.km' : 'common.reps')}</span>
                       </span>
-                      <span className={styles.exTodoMark} aria-hidden />
+                      <LevelEmblem level={level} size={26} showZero />
                     </>
                   )}
                 </div>

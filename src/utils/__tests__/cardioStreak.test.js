@@ -1,167 +1,88 @@
 import { describe, it, expect } from 'vitest';
-import { evaluateCardioWeek, computeCardioCurrentStreak, computeCardioMaxStreak } from '../cardioStreak';
-import { getWeekBounds, getLocalDateStr } from '@shared/dateUtils';
+import { computeCardioLevelStreaks, getCardioLevelUpdates, getCardioGoal, getCardioReps } from '@shared/cardioLevels.js';
+import { computeLevelStreaks, getDayLevel, migrateLevelProgress } from '@shared/exerciseLevels.js';
+const entry = level => ({ level, isCompleted: level > 0, count: level * 100, goal: 1000 });
+const session = (date, distance, type = 'running') => ({ type, distance, startTime: new Date(`${date}T12:00:00`).getTime() });
 
-// Bornes de la semaine courante (weekOffset = 0) — calculées dynamiquement
-// pour que les tests restent valides quelle que soit la date d'exécution.
-const { start, end } = getWeekBounds(new Date());
-const DAY_MS = 24 * 3600 * 1000;
-const inWeek = start + DAY_MS; // mardi 00:00, toujours dans [start, end]
-
-// challengeStartDate = aujourd'hui ⇒ getCurrentWeekNumber renvoie 1.
-const today = getLocalDateStr(new Date());
-
-// Challenges lancés dans le passé (pour évaluer plusieurs semaines ≥ 1) :
-// 14 jours ⇒ semaine courante 3 ; 28 jours ⇒ semaine courante 5.
-const start2W = getLocalDateStr(new Date(Date.now() - 14 * DAY_MS));
-const start4W = getLocalDateStr(new Date(Date.now() - 28 * DAY_MS));
-
-// Objectif running semaine 1 = 450 m (WEEKLY_INCREMENT.running) × difficulté 1
-// ⇒ 0.45 km. Marge d'arrondi : 0.01 km (10 m).
-
-const runSession = (distanceM, atMs = inWeek) => ({
-  type: 'running',
-  distance: distanceM,
-  startTime: atMs,
-});
-
-describe('evaluateCardioWeek', () => {
-  it('renvoie le bon numéro de semaine (weekOffset = 0)', () => {
-    const { weekNum } = evaluateCardioWeek([], 'running', 0, today, 1);
-    expect(weekNum).toBe(1);
-  });
-
-  it('décrémente le numéro de semaine selon weekOffset', () => {
-    const start14 = getLocalDateStr(new Date(Date.now() - 14 * DAY_MS));
-    const base = evaluateCardioWeek([], 'running', 0, start14, 1).weekNum;
-    const shifted = evaluateCardioWeek([], 'running', 1, start14, 1).weekNum;
-    expect(shifted).toBe(base - 1);
-  });
-
-  it('atteint l’objectif quand la distance le dépasse', () => {
-    const { achieved } = evaluateCardioWeek([runSession(500)], 'running', 0, today, 1);
-    expect(achieved).toBe(true); // 0.5 km ≥ 0.45 km
-  });
-
-  it('n’atteint pas l’objectif quand la distance est insuffisante', () => {
-    const { achieved } = evaluateCardioWeek([runSession(400)], 'running', 0, today, 1);
-    expect(achieved).toBe(false); // 0.4 km < 0.45 km
-  });
-
-  it('applique la marge d’arrondi de 0.01 km', () => {
-    // Objectif 0.45 km, seuil effectif 0.44 km.
-    expect(evaluateCardioWeek([runSession(440)], 'running', 0, today, 1).achieved).toBe(true);
-    expect(evaluateCardioWeek([runSession(435)], 'running', 0, today, 1).achieved).toBe(false);
-  });
-
-  it('additionne plusieurs sessions de la semaine', () => {
-    const sessions = [runSession(200), runSession(300)];
-    const { achieved } = evaluateCardioWeek(sessions, 'running', 0, today, 1);
-    expect(achieved).toBe(true); // 0.2 + 0.3 = 0.5 km ≥ 0.45 km
-  });
-
-  it('traite une session sans distance comme 0 (pas de NaN)', () => {
-    const sessions = [
-      { type: 'running', startTime: inWeek }, // distance absente
-      runSession(500),
-    ];
-    const { achieved } = evaluateCardioWeek(sessions, 'running', 0, today, 1);
-    expect(achieved).toBe(true); // 0 + 0.5 km ≥ 0.45 km, sans NaN
-  });
-
-  it('ignore les sessions d’un autre mode', () => {
-    const sessions = [
-      { type: 'cycling', distance: 5000, startTime: inWeek },
-      runSession(100),
-    ];
-    const { achieved } = evaluateCardioWeek(sessions, 'running', 0, today, 1);
-    expect(achieved).toBe(false); // seuls les 0.1 km de running comptent
-  });
-
-  it('ignore les sessions hors de la fenêtre de la semaine', () => {
-    const before = runSession(1000, start - 1000); // 1 s avant le lundi 00:00
-    const after = runSession(1000, end + 1000); // après le dimanche 23:59
-    const { achieved } = evaluateCardioWeek([before, after], 'running', 0, today, 1);
-    expect(achieved).toBe(false); // aucune distance comptabilisée
-  });
-
-  it('multiplie l’objectif par la difficulté courante', () => {
-    // difficulté 2 ⇒ objectif 0.9 km : 0.5 km ne suffit plus.
-    const { achieved } = evaluateCardioWeek([runSession(500)], 'running', 0, today, 2);
-    expect(achieved).toBe(false);
-  });
-
-  it('utilise la difficulté enregistrée dans les complétions plutôt que la difficulté courante', () => {
-    const mondayStr = getLocalDateStr(new Date(start));
+describe('weekly cardio level streaks', () => {
     const completions = {
-      [mondayStr]: { running: { isCompleted: true, difficulty: 3 } },
+        '2026-02-03': { running: entry(10) },
+        '2026-02-10': { running: entry(10) },
+        '2026-02-17': { running: entry(5) },
     };
-    // Objectif = 0.45 × 3 = 1.35 km, malgré currentDifficulty = 1.
-    const { achieved } = evaluateCardioWeek([runSession(500)], 'running', 0, today, 1, completions);
-    expect(achieved).toBe(false);
-  });
-
-  it('considère l’objectif atteint pour un mode sans objectif défini', () => {
-    // 'swimming' absent de WEEKLY_INCREMENT ⇒ objectif 0 ⇒ atteint sans distance.
-    const { achieved } = evaluateCardioWeek([], 'swimming', 0, today, 1);
-    expect(achieved).toBe(true);
-  });
+    it('counts weeks, drops to the sustained level and retains higher records', () => {
+        const result = computeCardioLevelStreaks(completions, 'running', '2026-01-01', '2026-02-19');
+        expect(result.streak).toBe(3);
+        expect(result.level).toBe(5);
+        expect(result.levels[9]).toEqual({ level: 10, current: 0, max: 2 });
+    });
+    it('leaves the current week pending then breaks after a missed complete week', () => {
+        expect(computeCardioLevelStreaks(completions, 'running', '2026-01-01', '2026-02-25').streak).toBe(3);
+        expect(computeCardioLevelStreaks(completions, 'running', '2026-01-01', '2026-03-02').streak).toBe(0);
+    });
+    it('excludes future and pre-challenge entries', () => {
+        expect(computeCardioLevelStreaks(completions, 'running', '2026-02-10', '2026-02-16').streak).toBe(1);
+    });
+    it('does not double-count multiple validations within one week', () => {
+        const history = { ...completions, '2026-02-19': { running: entry(10) } };
+        expect(computeCardioLevelStreaks(history, 'running', null, '2026-02-19').streak).toBe(3);
+    });
+    it('respects Sunday and Monday calendar boundaries', () => {
+        const history = { '2026-02-07': { running: entry(10) }, '2026-02-08': { running: entry(5) } };
+        expect(computeCardioLevelStreaks(history, 'running', null, '2026-02-08', 'sunday').streak).toBe(2);
+        expect(computeCardioLevelStreaks(history, 'running', null, '2026-02-08', 'monday').streak).toBe(1);
+    });
+    it('keeps continuity over DST changes', () => {
+        const history = { '2026-03-24': { running: entry(10) }, '2026-03-31': { running: entry(10) } };
+        expect(computeCardioLevelStreaks(history, 'running', null, '2026-04-02').streak).toBe(2);
+    });
+    it('carries the best cardio level through the week for the global day streak', () => {
+        const history = { '2026-02-17': { running: entry(5) }, '2026-02-18': { pushups: entry(10) } };
+        expect(getDayLevel(history, '2026-02-16')).toBe(0);
+        expect(getDayLevel(history, '2026-02-18')).toBe(10);
+        expect(getDayLevel(history, '2026-02-22')).toBe(5);
+        expect(getDayLevel(history, '2026-02-23')).toBe(0);
+        expect(computeLevelStreaks(history, '2026-02-22')).toMatchObject({ streak: 6, level: 5 });
+        expect(getDayLevel(history, '2026-02-22', ['pushups'])).toBe(0);
+    });
 });
 
-describe('computeCardioCurrentStreak', () => {
-  it('renvoie 0 sans sessions', () => {
-    expect(computeCardioCurrentStreak([], 'running', today, 1)).toBe(0);
-  });
-
-  it('compte les semaines consécutives atteintes', () => {
-    // Semaine courante + précédente atteintes.
-    const sessions = [runSession(5000, inWeek), runSession(5000, inWeek - 7 * DAY_MS)];
-    expect(computeCardioCurrentStreak(sessions, 'running', start2W, 1)).toBe(2);
-  });
-
-  it('ne casse pas la série sur la semaine courante incomplète', () => {
-    // Semaine courante non atteinte (aucune session), mais la précédente l’est.
-    const sessions = [runSession(5000, inWeek - 7 * DAY_MS)];
-    expect(computeCardioCurrentStreak(sessions, 'running', start2W, 1)).toBe(1);
-  });
-
-  it('rompt la série sur une semaine manquée antérieure', () => {
-    // Semaine -2 atteinte, semaine -1 manquée → la série s’arrête.
-    const sessions = [runSession(5000, inWeek - 14 * DAY_MS)];
-    expect(computeCardioCurrentStreak(sessions, 'running', start2W, 1)).toBe(0);
-  });
-
-  it('ignore les semaines antérieures au début du défi (weekNum < 1)', () => {
-    // Avec un challenge lancé il y a 14 jours (semaine courante = 3), une
-    // session datant de 3 semaines (weekNum = 0) ne doit pas prolonger la série.
-    const sessions = [runSession(5000, inWeek - 21 * DAY_MS)];
-    expect(computeCardioCurrentStreak(sessions, 'running', start2W, 1)).toBe(0);
-  });
-
-  it('ignore les sessions d’un autre mode', () => {
-    const sessions = [{ type: 'cycling', distance: 5000, startTime: inWeek }];
-    expect(computeCardioCurrentStreak(sessions, 'running', start2W, 1)).toBe(0);
-  });
-});
-
-describe('computeCardioMaxStreak', () => {
-  it('renvoie 0 sans sessions', () => {
-    expect(computeCardioMaxStreak([], 'running', today, 1)).toBe(0);
-  });
-
-  it('trouve la plus longue série au-delà d’une semaine manquée', () => {
-    // Semaines 0 et 1 atteintes (série de 2), semaine 2 manquée (reset),
-    // semaine 3 atteinte seule → max = 2.
-    const sessions = [
-      runSession(5000, inWeek),
-      runSession(5000, inWeek - 7 * DAY_MS),
-      runSession(5000, inWeek - 21 * DAY_MS),
-    ];
-    expect(computeCardioMaxStreak(sessions, 'running', start4W, 1)).toBe(2);
-  });
-
-  it('ignore les semaines antérieures au début du défi', () => {
-    const sessions = [runSession(5000, inWeek - 21 * DAY_MS)];
-    expect(computeCardioMaxStreak(sessions, 'running', start2W, 1)).toBe(0);
-  });
+describe('cardio snapshots and migration', () => {
+    it('sums distance once per sport/week and snapshots the full target', () => {
+        const result = getCardioLevelUpdates([session('2026-02-17', 900), session('2026-02-19', 900), session('2026-02-18', 3000, 'cycling')], {}, '2026-01-01');
+        expect(result).toEqual([{ date: '2026-02-17', mode: 'running', count: 1800, goal: 3150 }, { date: '2026-02-18', mode: 'cycling', count: 3000, goal: 5250 }]);
+    });
+    it('ignores invalid distances, unsupported activities and pre-challenge dates', () => {
+        const result = getCardioLevelUpdates([session('2025-12-30', 1000), session('2026-02-18', -1), session('2026-02-18', 3000, 'walking')], {}, '2026-01-01');
+        expect(result).toEqual([{ date: '2026-02-18', mode: 'running', count: 0, goal: 3150 }]);
+    });
+    it('is idempotent and retains the original snapshot date', () => {
+        const history = { '2026-02-17': { running: { count: 1800, goal: 3600, level: 5, isCompleted: true } } };
+        expect(getCardioLevelUpdates([session('2026-02-19', 1800)], history, '2026-01-01')).toEqual([]);
+        expect(getCardioLevelUpdates([session('2026-02-19', 900)], history, '2026-01-01')[0]).toEqual({ date: '2026-02-17', mode: 'running', count: 900, goal: 3600 });
+    });
+    it('clears empty tracked weeks for both sports', () => {
+        const history = { '2026-02-17': { running: entry(5), cycling: entry(2) } };
+        expect(getCardioLevelUpdates([], history, '2026-01-01')).toHaveLength(2);
+        expect(getCardioLevelUpdates([], history, '2026-01-01').every(update => update.count === 0)).toBe(true);
+    });
+    it('keeps old validations at level 10 and preserves their historical volume', () => {
+        const old = { startDate: '2026-01-01', completions: { '2026-02-17': { running: { isCompleted: true, difficulty: 0.5 }, cycling: { isCompleted: false } } } };
+        const migrated = migrateLevelProgress(old);
+        const run = migrated.completions['2026-02-17'].running;
+        expect(run).toMatchObject({ level: 10, count: 1575, goal: 1575, legacyCardio: true });
+        expect(getCardioReps(run, 'running', 7)).toBe(getCardioReps(old.completions['2026-02-17'].running, 'running', 7));
+        expect(migrated.completions['2026-02-17'].cycling).toEqual({ isCompleted: false });
+        expect(migrateLevelProgress(migrated)).toBe(migrated);
+        expect(getCardioLevelUpdates([], migrated.completions, old.startDate)).toEqual([]);
+    });
+    it('does not retroactively validate a failed legacy week from imported activities', () => {
+        const history = { '2020-02-18': { running: { isCompleted: false } } };
+        expect(getCardioLevelUpdates([session('2020-02-18', 1000)], history, '2020-01-01')).toEqual([]);
+    });
+    it('counts sub-level distance as volume and snapshots goals independent of difficulty settings', () => {
+        expect(getCardioReps({ level: 0, count: 300, isCompleted: false }, 'running', 8)).toBe(32);
+        expect(getCardioGoal('running', '2026-01-01', '2026-02-19', { goal: 2000 })).toBe(2000);
+        expect(getCardioGoal('running', '2026-01-01', '2026-02-19')).toBe(3150);
+    });
 });

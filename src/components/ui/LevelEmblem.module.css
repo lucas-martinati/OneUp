@@ -1,0 +1,14 @@
+.emblem {
+    display: inline-flex;
+    flex: 0 0 auto;
+    vertical-align: middle;
+    color: var(--level-color);
+    line-height: 1;
+}
+
+.emblem svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}

@@ -20,6 +20,16 @@ describe('getDefaultState', () => {
 // ── validateProgressData ────────────────────────────────────────────────
 
 describe('validateProgressData', () => {
+  it('upgrades an existing cloud account including count-only history and keeps that result on reload', () => {
+    const data = { startDate: '2026-01-01', progressVersion: 2, isSetup: true, completions: {
+      '2026-04-10': { pushups: { count: 40 }, squats: { isCompleted: true }, abs: { count: 2, isCompleted: false } },
+    } };
+    const upgraded = validateProgressData(data);
+    expect(upgraded.completions['2026-04-10'].pushups).toMatchObject({ count: 40, goal: 100, level: 4, isCompleted: true });
+    expect(upgraded.completions['2026-04-10'].squats).toMatchObject({ level: 10, isCompleted: true });
+    expect(upgraded.completions['2026-04-10'].abs).toMatchObject({ count: 2, level: 0, isCompleted: false });
+    expect(validateProgressData(JSON.parse(JSON.stringify(upgraded)))).toEqual(upgraded);
+  });
   it('rejects non-objects', () => {
     expect(validateProgressData(null)).toBe(null);
     expect(validateProgressData('string')).toBe(null);
@@ -114,6 +124,8 @@ describe('parseProgressData', () => {
   it('preserves data from a previous year instead of wiping it', () => {
     const out = parseProgressData({
       startDate: `${currentYear - 1}-01-01`,
+      userStartDate: `${currentYear - 1}-04-15`,
+      notes: { [`${currentYear - 1}-05-01`]: 'Keep this note' },
       isSetup: true,
       completions: { [`${currentYear - 1}-05-01`]: { pushups: { isCompleted: true } } },
       cardio: { sessions: { a: { type: 'running' } } },
@@ -124,6 +136,10 @@ describe('parseProgressData', () => {
     });
     // The stored start date and all user data survive the year rollover.
     expect(out.startDate).toBe(`${currentYear - 1}-01-01`);
+    expect(out.userStartDate).toBe(`${currentYear - 1}-04-15`);
+    expect(out.isSetup).toBe(true);
+    expect(out.notes[`${currentYear - 1}-05-01`]).toBe('Keep this note');
+    expect(out.progressVersion).toBe(4);
     expect(Object.keys(out.completions)).toHaveLength(1);
     expect(out.completions[`${currentYear - 1}-05-01`].pushups.isCompleted).toBe(true);
     expect(out.cardio.sessions.a.type).toBe('running');

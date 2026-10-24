@@ -4,7 +4,7 @@ export { Card } from './Card';
 export { CategoryChips } from './CategoryChips';
 export { ConfirmDialog } from './ConfirmDialog';
 export { ModalShell } from './ModalShell';
-export { DifficultyBadge } from './DifficultyBadge';
+export { LevelBadge } from './LevelBadge';
 export { FrozenFlame } from './FrozenFlame';
 export { GoogleIcon } from './GoogleIcon';
 export { GoogleSignInButton } from './GoogleSignInButton';

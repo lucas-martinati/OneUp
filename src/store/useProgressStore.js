@@ -1,13 +1,14 @@
+import { getLevelForCount, migrateLevelProgress, getRecordedReps, mergeLevelMetadata, PROGRESS_VERSION } from '@shared/exerciseLevels.js';
 import { create } from 'zustand';
 import { Preferences } from '@capacitor/preferences';
 import { serverTimestamp } from '@utils/firebaseTimestamp';
-import { EXERCISES, getDailyGoal } from '@config/exercises';
+import { EXERCISES } from '@config/exercises';
 import { createLogger } from '@utils/logger';
 import { getLocalDateStr, parseLocalDate, isDayDoneFromCompletions } from '@shared/dateUtils';
 import { STORAGE_KEY_BASE, getDefaultState, parseProgressData, validateProgressData } from '@hooks/useProgressStorage';
 import { cloudSync } from '@services/cloudSync';
 import { reconcileStreakFreezeState } from '@shared/streakFreeze';
-import { mergeData } from '@utils/syncUtils';
+import { mergeData, areCompletionsEqual } from '@utils/syncUtils';
 
 const logger = createLogger('ProgressStore');
 
@@ -129,6 +130,7 @@ export const useProgressStore = create((set, get) => ({
   startDate: getDefaultState().startDate,
   userStartDate: getDefaultState().userStartDate,
   completions: {},
+  progressVersion: PROGRESS_VERSION,
   isSetup: false,
   achievements: {},
   cardio: {},
@@ -175,6 +177,7 @@ export const useProgressStore = create((set, get) => ({
       startDate: loaded.startDate,
       userStartDate: loaded.userStartDate || loaded.startDate,
       completions: loaded.completions || {},
+      progressVersion: loaded.progressVersion,
       isSetup: loaded.isSetup || false,
       achievements: finalAch,
       cardio: loaded.cardio || {},
@@ -185,6 +188,8 @@ export const useProgressStore = create((set, get) => ({
       lastCompletionChange: loaded.lastCompletionChange || null,
       isStoreInitialized: true,
     });
+
+    get()._persist();
 
     // Load achievements from cloud (async, non-blocking)
     if (userId) {
@@ -242,6 +247,7 @@ export const useProgressStore = create((set, get) => ({
       startDate: s.startDate,
       userStartDate: s.userStartDate,
       completions: s.completions,
+      progressVersion: s.progressVersion,
       isSetup: s.isSetup,
       achievements: s.achievements,
       cardio: s.cardio,
@@ -285,6 +291,14 @@ export const useProgressStore = create((set, get) => ({
     get()._persist();
   },
 
+  migrateLevels: (customExercises = []) => {
+    const state = get();
+    const migrated = migrateLevelProgress(state, customExercises);
+    if (migrated === state) return;
+    set({ completions: migrated.completions, progressVersion: migrated.progressVersion, lastCompletionChange: serverTimestamp() });
+    get()._persist();
+  },
+
   // ── Day-level helpers ───────────────────────────────────────────────
 
   isDayDone: (dateStr) => {
@@ -300,7 +314,7 @@ export const useProgressStore = create((set, get) => ({
       if (currentlyDone) {
         const updated = {};
         for (const [exId, exData] of Object.entries(day)) {
-          updated[exId] = { ...exData, isCompleted: false, timestamp: serverTimestamp() };
+          updated[exId] = { ...exData, count: 0, level: 0, isCompleted: false, timestamp: serverTimestamp() };
         }
         newCompletions[dateStr] = updated;
       } else {
@@ -380,17 +394,19 @@ export const useProgressStore = create((set, get) => ({
       const day = { ...(newCompletions[dateStr] || {}) };
       const current = day[exerciseId] || {};
 
-      const finalCount = Math.max(0, Math.min(newCount, dailyGoal));
-      const isNowDone = finalCount >= dailyGoal;
+      const goal = Number.isFinite(current.goal) && current.goal > 0 ? current.goal : Math.max(1, dailyGoal || 1);
+      const finalCount = Number.isFinite(newCount) ? Math.max(0, Math.min(Math.floor(newCount), goal)) : 0;
+      const level = getLevelForCount(finalCount, goal);
+      const isNowDone = level > 0;
       const wasDone = current.isCompleted || false;
       let timestamp = current.timestamp;
-      // Preserve the local hour across count edits; refresh it only when the
-      // exercise transitions to done (see makeAllDone for the rationale).
+      // Every volume edit gets a sync timestamp. Preserve the first validation
+      // hour so subsequent edits do not change time-of-day achievements.
       let localHour = current.localHour;
 
-      if (wasDone !== isNowDone) {
+      if (finalCount !== (current.count || 0) || wasDone !== isNowDone) {
         timestamp = serverTimestamp();
-        if (isNowDone) localHour = new Date().getHours();
+        if (isNowDone && !wasDone) localHour = new Date().getHours();
       }
 
       // Lock the completion-time difficulty onto the day so later global changes
@@ -400,8 +416,11 @@ export const useProgressStore = create((set, get) => ({
       const lockedDifficulty = (difficulty !== null && difficulty !== undefined) ? difficulty : current.difficulty;
       day[exerciseId] = {
         count: finalCount,
+        level, goal,
+        ...(current.legacyCardio ? { legacyCardio: true } : {}),
         isCompleted: isNowDone,
         timestamp,
+        ...(current.timestampEstimated && timestamp === current.timestamp ? { timestampEstimated: true } : {}),
         ...(Number.isInteger(localHour) ? { localHour } : {}),
         ...((weight !== null && weight !== undefined) ? { weight } : {}),
         ...((lockedDifficulty !== null && lockedDifficulty !== undefined && lockedDifficulty !== 1.0) ? { difficulty: lockedDifficulty } : {}),
@@ -449,11 +468,11 @@ export const useProgressStore = create((set, get) => ({
     return Object.keys(state.completions).reduce((total, dateStr) => {
       if (dateStr < state.startDate) return total;
       const ex = state.completions[dateStr]?.[exerciseId];
-      if (!ex?.isCompleted) return total;
+      if (!ex) return total;
       const current = parseLocalDate(dateStr);
       const utcCurrent = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
       const dayNum = Math.floor((utcCurrent - utcStart) / (1000 * 60 * 60 * 24)) + 1;
-      return total + getDailyGoal(exercise, dayNum, difficultyMultiplier);
+      return total + getRecordedReps(ex, exercise, dayNum, difficultyMultiplier);
     }, 0);
   },
 
@@ -547,6 +566,7 @@ export const useProgressStore = create((set, get) => ({
       startDate: validated.startDate,
       userStartDate: validated.userStartDate,
       completions: validated.completions,
+      progressVersion: validated.progressVersion,
       isSetup: validated.isSetup,
       cardio: validated.cardio,
       frozenDays: validated.frozenDays,
@@ -572,8 +592,7 @@ export const useProgressStore = create((set, get) => ({
     if (!cloudData) return;
     const validated = validateProgressData(cloudData);
     set((state) => {
-      const cloudJSON = JSON.stringify(validated.completions);
-      const localJSON = JSON.stringify(state.completions);
+      const completionsMatch = areCompletionsEqual(validated.completions, state.completions);
 
       const nextSessions = { ...(state.cardio?.sessions || {}), ...(validated.cardio?.sessions || {}) };
       const cardioChanged = JSON.stringify(state.cardio?.sessions) !== JSON.stringify(nextSessions);
@@ -589,7 +608,7 @@ export const useProgressStore = create((set, get) => ({
         validated.userStartDate !== state.userStartDate ||
         validated.isSetup !== state.isSetup;
 
-      if (cloudJSON === localJSON && !cardioChanged && !serverFieldsChanged) return state;
+      if (completionsMatch && !cardioChanged && !serverFieldsChanged) return state;
 
       logger.info('[Real-time sync] Incoming cloud update applied');
       const merged = cloudSync.mergeData(state, validated);
@@ -597,6 +616,7 @@ export const useProgressStore = create((set, get) => ({
         startDate: merged.startDate,
         userStartDate: merged.userStartDate,
         completions: merged.completions,
+        progressVersion: merged.progressVersion,
         isSetup: merged.isSetup,
         lastCompletionChange: merged.lastCompletionChange,
         cardio: { ...state.cardio, sessions: nextSessions },
@@ -661,6 +681,7 @@ export const useProgressStore = create((set, get) => ({
 
                 userDay[exId] = {
                   isCompleted,
+                  ...mergeLevelMetadata(userEx, guestEx, count),
                   ...(count > 0 ? { count } : {}),
                   ...(weight !== undefined && weight !== null ? { weight } : {}),
                   ...(difficulty !== undefined && difficulty !== null ? { difficulty } : {}),
@@ -728,6 +749,7 @@ export const useProgressStore = create((set, get) => ({
           startDate: state.startDate,
           userStartDate: state.userStartDate,
           completions: state.completions,
+          progressVersion: state.progressVersion,
           isSetup: state.isSetup,
           lastCompletionChange: state.lastCompletionChange,
           cardio: state.cardio,
@@ -774,6 +796,7 @@ export const useProgressStore = create((set, get) => ({
         startDate: state.startDate,
         userStartDate: state.userStartDate,
         completions: state.completions,
+        progressVersion: state.progressVersion,
         isSetup: state.isSetup,
         lastCompletionChange: state.lastCompletionChange,
         cardio: state.cardio,

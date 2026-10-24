@@ -1,0 +1,27 @@
+.burst {
+    transform-origin: 110px 110px;
+    animation: levelWave 850ms ease-out both;
+    animation-delay: 200ms;
+}
+
+.sparks {
+    transform-origin: 110px 110px;
+    animation: levelSparks 800ms ease-out both;
+    animation-delay: 200ms;
+}
+
+@keyframes levelWave {
+    0% { opacity: 0; transform: scale(0.92); }
+    15% { opacity: 0.9; }
+    100% { opacity: 0; transform: scale(1.16); }
+}
+
+@keyframes levelSparks {
+    0% { opacity: 0; transform: scale(0.9) rotate(-8deg); }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.12) rotate(8deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .burst, .sparks { display: none; }
+}

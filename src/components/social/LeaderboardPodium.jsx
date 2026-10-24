@@ -1,3 +1,5 @@
+import { StreakFlame } from '@components/ui/StreakFlame';
+import { shiftDateStr } from '@shared/dateUtils';
 import React from 'react';
 import { Crown, Star, HeartHandshake, Check, Shield, ShieldAlert } from '@utils/icons';
 import { Avatar } from '@components/ui/Avatar';
@@ -99,6 +101,7 @@ export function LeaderboardPodium({ items, currentUid, todayStr, onSelect, clanD
                             {isPerfect && <Star size={12} color={PALETTE.amber} fill={PALETTE.amber} className={styles.perfectStar} />}
                         </div>
 
+                        {entry.lastActiveDay >= shiftDateStr(todayStr, -1) && <StreakFlame streak={entry.currentStreak} level={entry.streakLevel} active={entry.lastActiveDay === todayStr} variant="badge" style={{ width: 'fit-content', marginTop: '3px' }} />}
                         <div className={styles.pReps}>
                             {reps.toLocaleString()}<span className={styles.pRepsUnit}>{t('common.reps')}</span>
                         </div>

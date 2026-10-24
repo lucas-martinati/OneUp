@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, fireEvent, cleanup } from '@testing-library/react';
 
-const tt = (k, d) => (typeof d === 'string' ? d : k);
+const tt = (k, d) => {
+  if (typeof d === 'string') return d;
+  return d?.level !== undefined ? `Lvl ${d.level}` : k;
+};
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: tt, i18n: { language: 'fr' } }),
   initReactI18next: { type: '3rdParty', init: () => {} },
@@ -9,7 +12,7 @@ vi.mock('react-i18next', () => ({
 
 import ConsistencyPieChart from '../ConsistencyPieChart';
 import DailyRepsChart from '../DailyRepsChart';
-import DifficultyEvolutionChart from '../DifficultyEvolutionChart';
+import LevelEvolutionChart from '../LevelEvolutionChart';
 import EvolutionChart from '../EvolutionChart';
 import { ExerciseBreakdown } from '../ExerciseBreakdown';
 import { MonthlyActivityChart } from '../MonthlyActivityChart';
@@ -30,7 +33,7 @@ const completions = {
 };
 const getConfig = () => ({ difficulty: 1, weight: 40 });
 
-afterEach(() => cleanup());
+afterEach(() => { cleanup(); vi.useRealTimers(); });
 
 describe('stats charts smoke tests', () => {
   it('ConsistencyPieChart renders with data and empty states', () => {
@@ -51,11 +54,43 @@ describe('stats charts smoke tests', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('DifficultyEvolutionChart renders', () => {
+  it('LevelEvolutionChart renders', () => {
     const { container } = render(
-      <DifficultyEvolutionChart title="T" t={t} getConfig={getConfig} completions={completions} exercises={[ex]} />
+      <LevelEvolutionChart title="T" t={t} getConfig={getConfig} completions={completions} exercises={[ex]} />
     );
     expect(container.firstChild).toBeTruthy();
+  });
+
+  it('plots attained levels as steps, ignores zero and missing days and marks only changes', () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-01-05T12:00:00'));
+    const levelHistory = {
+      '2026-01-01': { [ex.id]: { isCompleted: true } },
+      '2026-01-02': { [ex.id]: { isCompleted: true, level: 10 } },
+      '2026-01-03': { [ex.id]: { isCompleted: true, level: 5 } },
+      '2026-01-04': { [ex.id]: { isCompleted: false } },
+      '2026-01-05': { [ex.id]: { isCompleted: false, level: 0 } },
+    };
+    const { container } = render(<LevelEvolutionChart title="Levels" t={(key, values) => values?.level !== undefined ? `Lvl ${values.level}` : key} completions={levelHistory} exercises={[ex]} />);
+    const path = container.querySelector('.svg-chart-line').getAttribute('d');
+    expect(path).not.toContain('C'); // no curve interpolation
+    expect(path).toContain('H');
+    expect(path).toContain('V');
+    expect(container.querySelectorAll('.svg-chart-dot')).toHaveLength(2); // first value and change to five
+    expect(container.textContent).not.toContain('Lvl 0');
+    expect(container.querySelector('[aria-label="Lvl 5"]')).toBeTruthy(); // last attained level, despite today's zero
+    expect(container.textContent).not.toContain('01/04');
+    expect(container.textContent).not.toContain('01/05');
+  });
+
+  it('shows an empty history without a level badge when no level has been attained', () => {
+    const { container } = render(<LevelEvolutionChart title="Levels" t={(key, values) => values?.level !== undefined ? `Lvl ${values.level}` : key} completions={{
+      '2026-01-01': { [ex.id]: { isCompleted: false } },
+      '2026-01-02': { [ex.id]: { isCompleted: false, level: 0 } },
+    }} exercises={[ex]} />);
+    expect(container.querySelector('.svg-chart-line')).toBeNull();
+    expect(container.textContent).toContain('stats.levelNoData');
+    expect(container.textContent).not.toContain('Lvl ');
   });
 
   it('WeightEvolutionChart renders', () => {

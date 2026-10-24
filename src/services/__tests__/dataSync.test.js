@@ -221,8 +221,8 @@ describe('saveToCloud', () => {
     expect(ok).toBe(true);
     expect(update).toHaveBeenCalledTimes(1);
     const payload = update.mock.calls[0][1];
-    // count is stripped, the day survives, LCC is carried through
-    expect(payload.completions['2025-01-01'].pushups.count).toBeUndefined();
+    // Exact volume survives cloud sync, including completed entries.
+    expect(payload.completions['2025-01-01'].pushups.count).toBe(20);
     expect(payload.completions['2025-01-01'].pushups.isCompleted).toBe(true);
     expect(payload.lastCompletionChange).toBe('2025-01-01T10:00:00Z');
   });
@@ -334,7 +334,7 @@ describe('sanitizeForCloud', () => {
     expect(sanitizeForCloud(null)).toBeNull();
   });
 
-  it('strips count from completions ONLY when isCompleted is true', () => {
+  it('preserves exact counts for both completed and partial entries', () => {
     const data = {
       startDate: '2025-01-01',
       completions: {
@@ -346,9 +346,9 @@ describe('sanitizeForCloud', () => {
     };
     const sanitized = sanitizeForCloud(data);
     expect(sanitized.completions['2025-01-01'].pushups).toEqual({
-      isCompleted: true, timestamp: '2025-01-01T10:00:00Z'
+      isCompleted: true, count: 20, timestamp: '2025-01-01T10:00:00Z'
     });
-    expect(sanitized.completions['2025-01-01'].pushups.count).toBeUndefined();
+    expect(sanitized.completions['2025-01-01'].pushups.count).toBe(20);
     // when isCompleted is false, count should be kept
     expect(sanitized.completions['2025-01-01'].squats.count).toBe(10);
   });

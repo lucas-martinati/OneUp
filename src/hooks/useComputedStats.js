@@ -1,6 +1,7 @@
-import { getLocalDateStr, calculateExerciseStreak, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions, walkStreak, parseLocalDate } from '@shared/dateUtils';
-import { EXERCISES, getDailyGoal, getWeeklyGoalKm, CARDIO_REPS_PER_KM } from '@config/exercises';
-import { computeCardioCurrentStreak, computeCardioMaxStreak } from '@utils/cardioStreak';
+import { computeLevelStreaks, getDayLevel, getRecordedReps, isFullCompletion } from '@shared/exerciseLevels.js';
+import { getLocalDateStr, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions, parseLocalDate } from '@shared/dateUtils';
+import { EXERCISES } from '@config/exercises';
+import { computeCardioLevelStreaks, getCardioReps } from '@shared/cardioLevels.js';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { BADGE_DEFINITIONS, isBadgeUnlocked } from '@config/badgeDefinitions';
 import { computeAchievementStats } from '@shared/achievementStats.js';
@@ -10,7 +11,7 @@ import { isGlobalPerfectDay } from '@utils/statUtils';
  * Pure function that computes all stats in a single pass.
  * Exported separately so it can be used outside React (e.g. for leaderboard publish).
  */
-export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, achievements = {}, getConfig = null, cardioReps = null, userStartDateStr = null, frozenDays = {}, allExercisesMap = null) {
+export function computeAllStats(completions, settings, getDayNumber, allExercises, hasShared = false, achievements = {}, getConfig = null, userStartDateStr = null, frozenDays = {}, allExercisesMap = null) {
     if (!allExercisesMap && allExercises) {
         allExercisesMap = Object.fromEntries(allExercises.map(e => [e.id, e]));
     }
@@ -18,27 +19,11 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     const today = parseLocalDate(todayStr);
     const weekStartDay = settings?.weekStartDay || 'monday';
 
-    const isDayDoneLocal = (dateStr) => {
-        const day = completions[dateStr];
-        if (!day) return false;
-        return Object.entries(day).some(([exId, exData]) =>
-            exData?.isCompleted && !!allExercisesMap[exId]
-        );
-    };
+    const isDayDoneLocal = dateStr => getDayLevel(completions, dateStr, allExercises.map(ex => ex.id), weekStartDay) > 0;
 
     // A Streak Freeze protects the GLOBAL daily streak: a frozen day is
     // transparent in the walk (neither breaks nor counts). See @shared/streakFreeze.
     const isFrozenDay = (dateStr) => !!frozenDays[dateStr];
-
-    const calculateLocalStreak = (dateStr) => {
-        const checkDate = parseLocalDate(dateStr);
-        const dateAt = (offset) => {
-            const d = new Date(checkDate);
-            d.setDate(d.getDate() - offset);
-            return getLocalDateStr(d);
-        };
-        return walkStreak(dateAt, isDayDoneLocal, isFrozenDay, MAX_STREAK_WINDOW);
-    };
 
     // ─── Accumulators ────────────────────────────────────────────────────
     let totalDays = 0;
@@ -98,9 +83,10 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         if (!day || typeof day !== 'object') continue;
 
         const anyDone = isDayDoneLocal(dateStr);
-        if (!anyDone) continue;
+        const hasReps = Object.values(day).some(entry => entry?.count > 0);
+        if (!anyDone && !hasReps) continue;
 
-        totalDays++;
+        if (anyDone) totalDays++;
         if (!firstActiveDate) firstActiveDate = dateStr;
 
         // Perfect day check (category-aware, non-custom)
@@ -108,20 +94,20 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         
         if (isPerfect) perfectDays++;
         if (dateStr === todayStr) {
-            if (hasStandard && EXERCISES.every(ex => day[ex.id]?.isCompleted)) standardPerfectToday = true;
-            if (hasWeights && WEIGHT_EXERCISES.every(ex => day[ex.id]?.isCompleted)) weightsPerfectToday = true;
+            if (hasStandard && EXERCISES.every(ex => isFullCompletion(day[ex.id]))) standardPerfectToday = true;
+            if (hasWeights && WEIGHT_EXERCISES.every(ex => isFullCompletion(day[ex.id]))) weightsPerfectToday = true;
             if (isPerfect) isPerfectToday = true;
         }
 
         // Day of week
         const dateObj = parseLocalDate(dateStr);
         const dayOfWeek = dateObj.getDay();
-        if (dayOfWeek >= 1 && dayOfWeek <= 5) weekdayWorkouts++;
-        if (dayOfWeek === 0 || dayOfWeek === 6) weekendWorkouts++;
+        if (anyDone && dayOfWeek >= 1 && dayOfWeek <= 5) weekdayWorkouts++;
+        if (anyDone && (dayOfWeek === 0 || dayOfWeek === 6)) weekendWorkouts++;
 
         // Monthly activity (parse directly from YYYY-MM-DD for speed)
         const monthIdx = parseInt(dateStr.slice(5, 7), 10) - 1;
-        monthlyActivityTotal[monthIdx]++;
+        if (anyDone) monthlyActivityTotal[monthIdx]++;
 
         // Time of day (one per day — take first completed exercise)
         let dayTimeTracked = false;
@@ -137,7 +123,17 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         const currentDayExReps = {};
 
         for (const [exId, exData] of Object.entries(day)) {
-            if (!exData?.isCompleted) continue;
+            if (!exData?.isCompleted) {
+                if (allExercisesMap[exId] && exData?.count > 0) {
+                    const reps = exId === 'running' || exId === 'cycling'
+                        ? getCardioReps(exData, exId, Math.max(1, Math.floor((dayNum - 1) / 7) + 1))
+                        : getRecordedReps(exData, allExercisesMap[exId], dayNum);
+                    exerciseReps[exId] += reps;
+                    dayReps += reps;
+                    currentDayExReps[exId] = reps;
+                }
+                continue;
+            }
 
             // Exercise reps
             const ex = allExercisesMap[exId];
@@ -150,17 +146,10 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
                 
                 let reps = 0;
                 if (exId === 'running' || exId === 'cycling') {
-                    // Goal-based, same rule as every other exercise: a validated
-                    // week only ever counts that week's goal km (capped — no bonus
-                    // for logging more distance than the goal). Difficulty is the
-                    // one locked onto the completion at validation time (see
-                    // useCardio.js), not the live config, so it can't drift.
                     const weekNum = Math.max(1, Math.floor((dayNum - 1) / 7) + 1);
-                    const cardioDifficulty = exData.difficulty ?? 1;
-                    const goalKm = getWeeklyGoalKm(exId, weekNum) * cardioDifficulty;
-                    reps = Math.floor(goalKm * CARDIO_REPS_PER_KM[exId]);
+                    reps = getCardioReps(exData, exId, weekNum);
                 } else {
-                    reps = getDailyGoal(ex, dayNum, diffToUse);
+                    reps = getRecordedReps(exData, ex, dayNum, diffToUse);
                 }
 
                 if (reps > 0) {
@@ -215,7 +204,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         if (dayHasAfternoon) afternoonWorkouts++;
         if (dayHasEvening) eveningWorkouts++;
 
-        // Daily reps for line chart (computed at the end with a stable date range)
+        dailyRepsData.push({ date: dateStr, reps: dayReps });
 
         // Best day
         if (dayReps > bestDayReps || (dayReps === bestDayReps && dayExCount > bestDayExCount)) {
@@ -227,25 +216,14 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     }
 
     // ─── Streak calculations (require backward day iteration) ────────────
-    let maxStreak = 0, tempStreak = 0;
-    for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
-        const d = parseLocalDate(today);
-        d.setDate(d.getDate() - i);
-        const dStr = getLocalDateStr(d);
-        if (isDayDoneLocal(dStr)) {
-            tempStreak++;
-            if (tempStreak > maxStreak) maxStreak = tempStreak;
-        } else if (isFrozenDay(dStr)) {
-            // Protected day — keep the run alive without counting it.
-        } else {
-            tempStreak = 0;
-        }
-    }
-
-    const currentStreak = calculateLocalStreak(todayStr);
+    const globalLevels = computeLevelStreaks(completions, todayStr, { exerciseIds: allExercises.map(ex => ex.id), frozenDays, weekStartDay });
+    const maxStreak = globalLevels.levels[0].max;
+    const currentStreak = isDayDoneLocal(todayStr) || isFrozenDay(todayStr) ? globalLevels.streak : 0;
     const yesterdayDate = parseLocalDate(today);
     yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-    const yesterdayStreak = calculateLocalStreak(getLocalDateStr(yesterdayDate));
+    const yesterdayStr = getLocalDateStr(yesterdayDate);
+    const yesterdayStreak = isDayDoneLocal(yesterdayStr) || isFrozenDay(yesterdayStr)
+        ? computeLevelStreaks(completions, yesterdayStr, { exerciseIds: allExercises.map(ex => ex.id), frozenDays, weekStartDay }).streak : 0;
 
     // Perfect streak (consecutive perfect days)
     let perfectStreak = 0, maxPerfectStreak = 0;
@@ -256,8 +234,8 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         const dateStr = getLocalDateStr(d);
         const dayCompletions = completions[dateStr];
         
-        const isStandardPerfect = hasStandard && EXERCISES.every(ex => dayCompletions?.[ex.id]?.isCompleted);
-        const isWeightsPerfect = hasWeights && WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => dayCompletions?.[ex.id]?.isCompleted);
+        const isStandardPerfect = hasStandard && EXERCISES.every(ex => isFullCompletion(dayCompletions?.[ex.id]));
+        const isWeightsPerfect = hasWeights && WEIGHT_EXERCISES.length > 0 && WEIGHT_EXERCISES.every(ex => isFullCompletion(dayCompletions?.[ex.id]));
         
         const isPerfect = isStandardPerfect || isWeightsPerfect;
         if (isPerfect) {
@@ -273,6 +251,7 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     const exerciseMaxStreaks = {};
     const exerciseYesterdayStreaks = {};
     const exerciseDoneToday = {};
+    const exerciseLevels = {};
 
     function getWeeklyCompletion(comps, mode, date) {
         const { start, end } = getWeekBounds(date, weekStartDay);
@@ -288,31 +267,20 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     // antérieures au début du challenge sont ignorées, weekNum < 1).
     for (const ex of allExercises) {
         if (ex.id === 'running' || ex.id === 'cycling') {
-            const cardioSessions = cardioReps?.allSessions || [];
             const userStartDate = userStartDateStr || firstActiveDate || sortedDates[0] || todayStr;
-            const currentDifficulty = settings?.exerciseDifficulties?.[ex.id] ?? 1.0;
-            
-            exerciseCurrentStreaks[ex.id] = computeCardioCurrentStreak(cardioSessions, ex.id, userStartDate, currentDifficulty, completions, weekStartDay);
-            exerciseMaxStreaks[ex.id] = computeCardioMaxStreak(cardioSessions, ex.id, userStartDate, currentDifficulty, completions, weekStartDay);
+            const levels = computeCardioLevelStreaks(completions, ex.id, userStartDate, todayStr, weekStartDay);
+            exerciseLevels[ex.id] = levels;
+            exerciseCurrentStreaks[ex.id] = levels.streak;
+            exerciseMaxStreaks[ex.id] = levels.levels[0].max;
             exerciseDoneToday[ex.id] = isDayDoneFromCompletions(completions, todayStr) && !!getWeeklyCompletion(completions, ex.id, today);
         } else {
-            exerciseCurrentStreaks[ex.id] = calculateExerciseStreak(completions, todayStr, ex.id);
-            exerciseYesterdayStreaks[ex.id] = calculateExerciseStreak(completions, getLocalDateStr(yesterdayDate), ex.id);
+            const levels = computeLevelStreaks(completions, todayStr, { exerciseId: ex.id });
+            exerciseLevels[ex.id] = levels;
             exerciseDoneToday[ex.id] = !!completions[todayStr]?.[ex.id]?.isCompleted;
-
-            // Max streak
-            let maxExStreak = 0, tempExStreak = 0;
-            for (let i = 0; i < MAX_STREAK_WINDOW; i++) {
-                const d = parseLocalDate(today);
-                d.setDate(d.getDate() - i);
-                if (completions[getLocalDateStr(d)]?.[ex.id]?.isCompleted) {
-                    tempExStreak++;
-                    if (tempExStreak > maxExStreak) maxExStreak = tempExStreak;
-                } else {
-                    tempExStreak = 0;
-                }
-            }
-            exerciseMaxStreaks[ex.id] = maxExStreak;
+            exerciseCurrentStreaks[ex.id] = exerciseDoneToday[ex.id] ? levels.streak : 0;
+            exerciseYesterdayStreaks[ex.id] = completions[yesterdayStr]?.[ex.id]?.isCompleted
+                ? computeLevelStreaks(completions, yesterdayStr, { exerciseId: ex.id }).streak : 0;
+            exerciseMaxStreaks[ex.id] = levels.levels[0].max;
         }
     }
 
@@ -329,13 +297,15 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     // If filtering by cardio only, daily consecutive streaks don't make sense.
     // Return the max weekly streak instead.
     const isOnlyCardio = allExercises.length > 0 && allExercises.every(ex => ex.id === 'running' || ex.id === 'cycling');
-    if (isOnlyCardio) {
-        finalMaxStreak = Math.max(0, ...Object.values(exerciseMaxStreaks));
-        finalDisplayStreak = Math.max(0, ...Object.values(exerciseCurrentStreaks));
-        finalCurrentStreak = finalDisplayStreak;
+    const cardioMode = allExercises.length === 1 ? allExercises[0].id : null;
+    const cardioLevels = isOnlyCardio ? computeCardioLevelStreaks(completions, cardioMode, userStartDateStr, todayStr, weekStartDay) : null;
+    if (cardioLevels) {
+        finalMaxStreak = cardioLevels.levels[0].max;
+        finalDisplayStreak = cardioLevels.streak;
+        finalCurrentStreak = cardioLevels.active ? cardioLevels.streak : 0;
     }
 
-    const streakActive = todayDone || (isOnlyCardio && finalCurrentStreak > 0);
+    const streakActive = cardioLevels ? cardioLevels.active : todayDone;
 
     // The streak is alive only because yesterday was protected by a Streak Freeze
     // (today not trained yet) — lets the UI show a "frozen but safe" state.
@@ -351,13 +321,16 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         const exDoneToday = exerciseDoneToday[ex.id];
         const streak = exDoneToday ? exerciseCurrentStreaks[ex.id] : exerciseYesterdayStreaks[ex.id];
         const completionRate = totalDays > 0 ? Math.round(((exerciseDays[ex.id] || 0) / totalDays) * 100) : 0;
+        const levelStats = exerciseLevels[ex.id];
         return {
             ...ex,
+            streakLevel: levelStats?.level || 0,
+            levelStreaks: levelStats?.levels || [],
             totalReps: exerciseReps[ex.id] || 0,
             daysCompleted: exerciseDays[ex.id] || 0,
-            streak,
+            streak: levelStats ? levelStats.streak : streak,
             streakActive: exDoneToday,
-            maxStreak: exerciseMaxStreaks[ex.id] || 0,
+            maxStreak: levelStats ? levelStats.levels[0].max : (exerciseMaxStreaks[ex.id] || 0),
             completionRate
         };
     });
@@ -376,39 +349,13 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
         ? exerciseStats.reduce((best, ex) => ex.totalReps > (best?.totalReps || 0) ? ex : best, exerciseStats[0])
         : null;
 
-    // Compute stable daily reps data for line chart
-    const globalCompletedDates = Object.keys(completions).filter(dateStr => isDayDoneFromCompletions(completions, dateStr)).sort();
-
-    globalCompletedDates.forEach(dateStr => {
-        const day = completions[dateStr] || {};
-        let dayReps = 0;
-        const dayNum = getDayNumber(dateStr);
-        for (const [exId, exData] of Object.entries(day)) {
-            if (!exData?.isCompleted) continue;
-            const ex = allExercisesMap[exId];
-            if (ex) {
-                let reps = 0;
-                if (exId === 'running' || exId === 'cycling') {
-                    // Same goal-based, capped rule as the main pass above.
-                    const weekNum = Math.max(1, Math.floor((dayNum - 1) / 7) + 1);
-                    const cardioDifficulty = exData.difficulty ?? 1;
-                    reps = Math.floor(getWeeklyGoalKm(exId, weekNum) * cardioDifficulty * CARDIO_REPS_PER_KM[exId]);
-                } else {
-                    reps = getDailyGoal(ex, dayNum, getConfig ? getConfig(exId, dateStr).difficulty : 1.0);
-                }
-                dayReps += reps;
-            }
-        }
-        dailyRepsData.push({ date: dateStr, reps: dayReps });
-    });
-
     // Badge stats snapshot — computed by the SAME shared function the Cloud
     // Function uses (@shared/achievementStats.js). This is the single source of
     // truth for badge inputs, so the count on the Stats page matches the count
     // published to publicProfiles (leaderboard detail + admin) instead of drifting
     // between two separate implementations. The local counters above (weekday/
     // time-of-day…) still feed the charts, which stay device-local by design.
-    const badgeStats = computeAchievementStats(completions, globalTotalReps, frozenDays);
+    const badgeStats = computeAchievementStats(completions, globalTotalReps, frozenDays, settings.weekStartDay || 'monday');
 
     // Badge count (supports manual overrides via the achievements node)
     const badgeCount = BADGE_DEFINITIONS.filter(b => isBadgeUnlocked(b.id, badgeStats, achievements)).length;
@@ -417,10 +364,12 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     return {
         // Global stats
         totalDays,
-        maxStreak: finalMaxStreak,
+        maxStreak: isOnlyCardio ? finalMaxStreak : globalLevels.levels[0].max,
         currentStreak: finalCurrentStreak,
         yesterdayStreak,
-        displayStreak: finalDisplayStreak,
+        displayStreak: isOnlyCardio ? finalDisplayStreak : globalLevels.streak,
+        streakLevel: cardioLevels ? cardioLevels.level : globalLevels.level,
+        levelStreaks: cardioLevels ? cardioLevels.levels : globalLevels.levels,
         streakActive,
         streakFrozen,
         todayDone,

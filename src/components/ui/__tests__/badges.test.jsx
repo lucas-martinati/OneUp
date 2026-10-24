@@ -2,36 +2,28 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key) => key }),
+  useTranslation: () => ({ t: (key, values) => values?.level !== undefined ? `Lvl ${values.level}` : key }),
 }));
 
-import { DifficultyBadge } from '../DifficultyBadge';
+import { LevelBadge } from '../LevelBadge';
 import { WeightBadge } from '../WeightBadge';
 import { StreakFlame } from '../StreakFlame';
 
 afterEach(cleanup);
 
-// ── DifficultyBadge ─────────────────────────────────────────────────────
+// ── LevelBadge ─────────────────────────────────────────────────────
 
-describe('DifficultyBadge', () => {
-  it('renders nothing for a neutral difficulty (1.0) or nullish value', () => {
-    expect(render(<DifficultyBadge difficulty={1.0} />).container.firstChild).toBe(null);
-    cleanup();
-    expect(render(<DifficultyBadge difficulty={0} />).container.firstChild).toBe(null);
-    cleanup();
-    expect(render(<DifficultyBadge difficulty={undefined} />).container.firstChild).toBe(null);
+describe('LevelBadge', () => {
+  it('omits unknown historical levels instead of inventing one', () => {
+    expect(render(<LevelBadge />).container.firstChild).toBe(null);
   });
-
-  it('renders the multiplier with one decimal', () => {
-    const { container } = render(<DifficultyBadge difficulty={1.2} />);
-    expect(container.firstChild.textContent).toBe('x1.2');
+  it('shows both partial and full levels', () => {
+    expect(render(<LevelBadge level={5} />).getByRole('img', { name: 'Lvl 5' })).toBeTruthy();
+    cleanup();
+    expect(render(<LevelBadge level={10} />).getByRole('img', { name: 'Lvl 10' })).toBeTruthy();
   });
-
-  it('clamps low difficulties (still renders, hue at the red end)', () => {
-    // difficulty < 0.1 exercises the Math.max clamp branch.
-    const { container } = render(<DifficultyBadge difficulty={0.05} />);
-    expect(container.firstChild).not.toBe(null);
-    expect(container.firstChild.textContent).toBe('x0.1');
+  it('omits level zero when no threshold was reached', () => {
+    expect(render(<LevelBadge level={0} />).container.firstChild).toBeNull();
   });
 });
 

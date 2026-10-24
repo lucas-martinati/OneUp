@@ -1,273 +1,126 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useCardio } from '../useCardio';
 import { useAuth } from '@contexts/AuthContext';
 import { useProgressStore } from '@store/useProgressStore';
 import { useCloudSyncStore } from '@store/useCloudSyncStore';
-import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { loadCardioSessions, saveCardioSession } from '@services/cardioService';
 import { getAllActivities } from '@services/cardioProviders';
-import { evaluateCardioWeek, computeCardioCurrentStreak } from '@utils/cardioStreak';
-import { getWeekBounds } from '@shared/dateUtils';
 
 vi.mock('@contexts/AuthContext');
 vi.mock('@store/useProgressStore');
 vi.mock('@store/useCloudSyncStore');
-vi.mock('@hooks/useExerciseConfig');
 vi.mock('@services/cardioService', () => ({
-    loadCardioSessions: vi.fn(),
-    saveCardioSession: vi.fn(),
-    getSortedCardioSessions: vi.fn((s) => s || [])
+    loadCardioSessions: vi.fn(), saveCardioSession: vi.fn(),
+    getSortedCardioSessions: vi.fn(s => s || [])
 }));
-vi.mock('@utils/cardioStreak', () => ({
-    evaluateCardioWeek: vi.fn(() => ({ weekNum: 1, achieved: true })),
-    computeCardioCurrentStreak: vi.fn(() => 3)
-}));
-vi.mock('@services/cardioProviders', () => ({
-    getAllActivities: vi.fn()
-}));
-vi.mock('@shared/dateUtils', async (importOriginal) => {
-    const actual = await importOriginal();
-    return {
-        ...actual,
-        getLocalDateStr: vi.fn((date) => date.toISOString().split('T')[0]),
-        getCurrentWeekNumber: vi.fn(() => 1),
-        getWeekBounds: vi.fn(() => ({ start: 0, end: 9999999999999 })),
-    };
-});
-vi.mock('@config/exercises', async (importOriginal) => {
-    const actual = await importOriginal();
-    return {
-        ...actual,
-        getWeeklyGoalKm: vi.fn(() => 5), // 5km goal
-    };
-});
+vi.mock('@services/cardioProviders', () => ({ getAllActivities: vi.fn() }));
+const session = (id, distance, type = 'running', date = '2026-02-17') => ({ id, type, distance, startTime: new Date(`${date}T12:00:00`).getTime() });
 
-describe('useCardio', () => {
-    let mockAuth, mockProgress, mockCloudSync, mockExerciseConfig, mockUpdateExerciseCount, mockUpdateCardioSessions;
-
+describe('useCardio automatic weekly levels', () => {
+    let auth, progress, sync;
     beforeEach(() => {
         vi.clearAllMocks();
-
-        mockAuth = { loading: false, isSignedIn: true };
-        useAuth.mockReturnValue(mockAuth);
-
-        mockUpdateExerciseCount = vi.fn();
-        mockUpdateCardioSessions = vi.fn();
-
-        mockProgress = {
-            completions: {},
-            updateExerciseCount: mockUpdateExerciseCount,
-            updateCardioSessions: mockUpdateCardioSessions,
-            cardio: { sessions: [] },
-            startDate: '2024-01-01',
-            isStoreInitialized: true
-        };
-        useProgressStore.mockImplementation((selector) => selector(mockProgress));
-
-        mockCloudSync = { isInitialSyncDone: true };
-        useCloudSyncStore.mockImplementation((selector) => selector(mockCloudSync));
-
-        mockExerciseConfig = {
-            getConfig: vi.fn(() => ({ difficulty: 1 }))
-        };
-        useExerciseConfig.mockReturnValue(mockExerciseConfig);
-
+        vi.useFakeTimers({ toFake: ['Date'] });
+        vi.setSystemTime(new Date('2026-02-19T12:00:00'));
+        auth = { loading: false, isSignedIn: true };
+        progress = { completions: {}, updateExerciseCount: vi.fn(), updateCardioSessions: vi.fn(), cardio: { sessions: [] }, startDate: '2026-01-01', isStoreInitialized: true };
+        sync = { isInitialSyncDone: true };
+        useAuth.mockReturnValue(auth);
+        useProgressStore.mockImplementation(selector => selector(progress));
+        useCloudSyncStore.mockImplementation(selector => selector(sync));
         loadCardioSessions.mockResolvedValue([]);
         getAllActivities.mockResolvedValue([]);
-        evaluateCardioWeek.mockImplementation(() => ({ weekNum: 1, achieved: true }));
     });
+    afterEach(() => vi.useRealTimers());
 
-    it('initializes and fetches sessions when ready', async () => {
-        loadCardioSessions.mockResolvedValue([{ id: 'fb1', startTime: 1000, type: 'running', distance: 1000 }]);
-        getAllActivities.mockResolvedValue([{ id: 'strava1', startTime: 2000, type: 'running', distance: 5000 }]);
-        
+    it('shows the challenge week for today rather than the start of the calendar week', async () => {
+        vi.setSystemTime(new Date('2026-10-24T12:00:00'));
         const { result } = renderHook(() => useCardio());
-        
-        // Let effects run
-        await vi.waitFor(() => {
-            expect(result.current.allSessions).toHaveLength(2);
-        }, { timeout: 3000 });
-
-        expect(result.current.loading).toBe(false);
-        expect(saveCardioSession).toHaveBeenCalledTimes(1); // Saved new strava session
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        expect(result.current.weekNumber).toBe(43);
     });
-
-    it('does not fetch if not ready', async () => {
-        mockAuth.loading = true;
+    it('merges and deduplicates provider sessions before saving new activities', async () => {
+        loadCardioSessions.mockResolvedValue([session('a', 1000)]);
+        getAllActivities.mockResolvedValue([session('a', 1000), session('b', 1000)]);
+        const { result } = renderHook(() => useCardio());
+        await waitFor(() => expect(result.current.allSessions).toHaveLength(2));
+        expect(saveCardioSession).toHaveBeenCalledTimes(1);
+        expect(saveCardioSession.mock.calls[0][0]).not.toHaveProperty('difficulty');
+    });
+    it('waits for auth and the initial cloud sync', () => {
+        sync.isInitialSyncDone = false;
         renderHook(() => useCardio());
         expect(loadCardioSessions).not.toHaveBeenCalled();
+        expect(progress.updateExerciseCount).not.toHaveBeenCalled();
     });
-
-    it('computes reps from completions', () => {
-        mockProgress.completions = {
-            '2024-01-01': { running: { isCompleted: true, difficulty: 1 } },
-            '2024-01-02': { cycling: { isCompleted: true, difficulty: 2 } }
-        };
-        
-        const { result } = renderHook(() => useCardio());
-        
-        expect(result.current.totalReps).toBeGreaterThan(0);
-    });
-
-    it('computes streak correctly', async () => {
-        // mock evaluateCardioWeek to return achieved
-        // The real streak computation uses evaluateCardioWeek which uses weekOffset.
-        const { result } = renderHook(() => useCardio());
-        
-        expect(typeof result.current.streak).toBe('number');
-    });
-
-    it('syncs sessions to completions when distance >= goal', async () => {
-        // We mock sessions so it surpasses the 5km goal
-        getAllActivities.mockResolvedValue([{ id: 's1', type: 'running', distance: 6000, startTime: 1000 }]);
-        
-        const { result } = renderHook(() => useCardio());
-        
-        await vi.waitFor(() => {
-            expect(result.current.loading).toBe(false);
-        }, { timeout: 3000 });
-
-        // Effect should have called updateExerciseCount
-        expect(mockUpdateExerciseCount).toHaveBeenCalled();
-    });
-
-    it('unmarks completion if distance < goal', async () => {
-        mockProgress.completions = {
-            '1970-01-01': { running: { isCompleted: true, difficulty: 1 } }
-        };
-        
-        getAllActivities.mockResolvedValue([{ id: 's1', type: 'running', distance: 2000, startTime: 1000 }]); // Only 2km, goal is 5km
-        
+    it('records partial distances for both sports without switching tabs', async () => {
+        loadCardioSessions.mockResolvedValue([session('a', 1800), session('b', 3000, 'cycling')]);
         renderHook(() => useCardio());
-        
-        await vi.waitFor(() => {
-            // Need to wait until it unmarks
-            expect(mockUpdateExerciseCount).toHaveBeenCalledWith('1970-01-01', 'running', 0, 1, null, 1);
-        }, { timeout: 3000 });
+        await waitFor(() => expect(progress.updateExerciseCount).toHaveBeenCalledWith('2026-02-17', 'running', 1800, 3150));
+        expect(progress.updateExerciseCount).toHaveBeenCalledWith('2026-02-17', 'cycling', 3000, 5250);
     });
-
-    it('handles invalidateCurrentWeek', () => {
-        mockProgress.completions = {
-            '1970-01-01': { running: { isCompleted: true, difficulty: 2 } }
-        };
-        const { result } = renderHook(() => useCardio());
-        
-        act(() => {
-            result.current.invalidateCurrentWeek();
-        });
-        
-        expect(mockUpdateExerciseCount).toHaveBeenCalledWith('1970-01-01', 'running', 0, 1, null, 1);
+    it('keeps sub-level volume and caps distance credit at the full weekly goal', async () => {
+        loadCardioSessions.mockResolvedValue([session('a', 30), session('b', 20000, 'cycling')]);
+        renderHook(() => useCardio());
+        await waitFor(() => expect(progress.updateExerciseCount).toHaveBeenCalledWith('2026-02-17', 'running', 30, 3150));
+        expect(progress.updateExerciseCount).toHaveBeenCalledWith('2026-02-17', 'cycling', 5250, 5250);
     });
-
-    it('handles invalidateCurrentWeek for cycling', () => {
-        mockProgress.completions = {
-            '1970-01-01': { cycling: { isCompleted: true, difficulty: 2 } }
-        };
-        const { result } = renderHook(() => useCardio());
-        
-        act(() => {
-            result.current.setActiveMode('cycling');
-        });
-
-        act(() => {
-            result.current.invalidateCurrentWeek();
-        });
-        
-        expect(mockUpdateExerciseCount).toHaveBeenCalledWith('1970-01-01', 'cycling', 0, 1, null, 1);
+    it('reduces the level when an activity is removed', async () => {
+        progress.completions = { '2026-02-17': { running: { count: 3600, goal: 3600, level: 10, isCompleted: true } } };
+        loadCardioSessions.mockResolvedValue([session('a', 1800)]);
+        renderHook(() => useCardio());
+        await waitFor(() => expect(progress.updateExerciseCount).toHaveBeenCalledWith('2026-02-17', 'running', 1800, 3600));
     });
-
-    it('handles catch error during fetch', async () => {
-        loadCardioSessions.mockRejectedValue(new Error('Network error'));
-        const { result } = renderHook(() => useCardio());
-        
-        await vi.waitFor(() => {
-            expect(result.current.loading).toBe(false);
-        }, { timeout: 3000 });
-        expect(result.current.allSessions).toEqual([]);
+    it('clears a tracked week after the last activity is deleted', async () => {
+        progress.completions = { '2026-02-17': { running: { count: 3600, goal: 3600, level: 10, isCompleted: true } } };
+        renderHook(() => useCardio());
+        await waitFor(() => expect(progress.updateExerciseCount).toHaveBeenCalledWith('2026-02-17', 'running', 0, 3600));
     });
-
-    it('keeps previously loaded sessions when a later fetch fails', async () => {
-        loadCardioSessions.mockResolvedValueOnce([{ id: 'fb1', startTime: 1000, type: 'running', distance: 5000 }]);
+    it('preserves grandfathered validations without an available activity history', async () => {
+        progress.completions = { '2026-02-17': { running: { count: 1800, goal: 1800, level: 10, isCompleted: true, legacyCardio: true } } };
         const { result } = renderHook(() => useCardio());
-
-        await vi.waitFor(() => {
-            expect(result.current.allSessions).toHaveLength(1);
-        }, { timeout: 3000 });
-
-        loadCardioSessions.mockRejectedValueOnce(new Error('offline'));
-        act(() => { result.current.refresh(); });
-
-        await vi.waitFor(() => {
-            expect(result.current.loading).toBe(false);
-        }, { timeout: 3000 });
-        // A transient fetch error must NOT wipe the previously loaded sessions
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        expect(progress.updateExerciseCount).not.toHaveBeenCalled();
+        expect(result.current.streak).toBe(1);
+        expect(result.current.streakLevel).toBe(10);
+    });
+    it('does not erase tracked progress after an initial network error', async () => {
+        progress.completions = { '2026-02-17': { running: { count: 3600, goal: 3600, level: 10, isCompleted: true } } };
+        loadCardioSessions.mockRejectedValue(new Error('offline'));
+        const { result } = renderHook(() => useCardio());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        expect(progress.updateExerciseCount).not.toHaveBeenCalled();
+        expect(progress.updateCardioSessions).not.toHaveBeenCalled();
+    });
+    it('keeps previously loaded sessions when a refresh fails', async () => {
+        loadCardioSessions.mockResolvedValue([session('a', 1800)]);
+        const { result } = renderHook(() => useCardio());
+        await waitFor(() => expect(result.current.allSessions).toHaveLength(1));
+        progress.updateExerciseCount.mockClear();
+        loadCardioSessions.mockRejectedValue(new Error('offline'));
+        await act(() => result.current.refresh());
         expect(result.current.allSessions).toHaveLength(1);
+        expect(progress.updateExerciseCount).not.toHaveBeenCalled();
     });
-
-    it('unmarks stale completion when the last session of a week is deleted', async () => {
-        // Each date maps to its own week start so weeks are distinguishable
-        getWeekBounds.mockImplementation((date) => {
-            const d = new Date(date);
-            return { start: d.getTime(), end: d.getTime() + 6 * 24 * 3600 * 1000 };
-        });
-
-        // Week of Jan 8 previously completed, but its only session was deleted;
-        // the current sessions only cover the week of Jan 15.
-        mockProgress.completions = {
-            '2024-01-08': { running: { isCompleted: true, difficulty: 1 } },
-        };
-        getAllActivities.mockResolvedValue([{ id: 's1', type: 'running', distance: 6000, startTime: Date.parse('2024-01-15T08:00:00') }]);
-
-        renderHook(() => useCardio());
-
-        await vi.waitFor(() => {
-            expect(mockUpdateExerciseCount).toHaveBeenCalledWith('2024-01-08', 'running', 0, 1, null, 1);
-        }, { timeout: 3000 });
-    });
-
-    it('unmarks all cardio completions when every session is deleted', async () => {
-        mockProgress.completions = {
-            '2024-01-08': { running: { isCompleted: true, difficulty: 1 } },
-        };
-        // No sessions at all — the ghost completion must be cleaned up
-        renderHook(() => useCardio());
-
-        await vi.waitFor(() => {
-            expect(mockUpdateExerciseCount).toHaveBeenCalledWith('2024-01-08', 'running', 0, 1, null, 1);
-        }, { timeout: 3000 });
-    });
-
-    it('switches active mode', () => {
+    it('switches the displayed sport without changing its target', async () => {
         const { result } = renderHook(() => useCardio());
-        act(() => {
-            result.current.setActiveMode('cycling');
-        });
-        expect(result.current.activeMode).toBe('cycling');
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        act(() => result.current.setActiveMode('cycling'));
+        expect(result.current.weeklyGoal).toBe(5.25);
     });
-
-    it('sets empty sessions if not signed in', async () => {
-        mockAuth.isSignedIn = false;
-        // The hook requires isStoreInitialized for guests, which is true in mockProgress
+    it('keeps local sessions for guests', async () => {
+        auth.isSignedIn = false;
+        progress.cardio.sessions = [session('a', 1800)];
         const { result } = renderHook(() => useCardio());
-        
-        await vi.waitFor(() => {
-            expect(result.current.loading).toBe(false);
-        });
-        
-        expect(result.current.allSessions).toEqual([]);
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        expect(result.current.allSessions).toHaveLength(1);
         expect(loadCardioSessions).not.toHaveBeenCalled();
     });
-
-    it('breaks streak computation properly', () => {
-        // Provide at least one session so the hook's memo doesn't short-circuit
-        mockProgress.cardio = { sessions: [{ id: '1' }] };
-
-        // The streak walk is delegated to the shared computeCardioCurrentStreak
-        // (unit-tested in cardioStreak.test.js): a missed week yields 0.
-        computeCardioCurrentStreak.mockReturnValue(0);
-
+    it('counts actual volume even before level one', async () => {
+        progress.completions = { '2026-02-17': { running: { count: 300, goal: 3600, level: 0, isCompleted: false } } };
         const { result } = renderHook(() => useCardio());
-        expect(result.current.streak).toBe(0);
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        expect(result.current.totalReps).toBe(32);
     });
 });

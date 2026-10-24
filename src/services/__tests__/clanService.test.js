@@ -1,12 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as clanService from '../clanService';
-import { get, remove, push, update, onValue, runTransaction } from 'firebase/database';
+import { get, remove, push, update, onValue, runTransaction, query, orderByChild, equalTo, limitToFirst } from 'firebase/database';
 import { getAuthInstance, getDatabaseInstance } from '../firebase';
 
 
 vi.mock('firebase/database', () => ({
   ref: vi.fn((db, path) => path),
   get: vi.fn(),
+  query: vi.fn(() => 'legacy-query'),
+  orderByChild: vi.fn(),
+  equalTo: vi.fn(),
+  limitToFirst: vi.fn(),
   remove: vi.fn(),
   push: vi.fn(() => ({ key: 'new_id' })),
   update: vi.fn(),
@@ -127,9 +131,37 @@ describe('clanService', () => {
 
     it('fails if code does not exist', async () => {
       get.mockResolvedValueOnce({ exists: () => false });
-      const result = await clanService.joinClan('BADCODE');
+      get.mockResolvedValueOnce({ exists: () => false });
+      const result = await clanService.joinClan('BAD123');
       expect(result.success).toBe(false);
       expect(result.error).toBe('clan.invalidCode');
+    });
+
+    it('joins a legacy clan whose code predates the mapping table', async () => {
+      get.mockResolvedValueOnce({ exists: () => false });
+      get.mockResolvedValueOnce({ exists: () => true, val: () => ({ legacyClan: { code: 'ABCDEF' } }) });
+      get.mockResolvedValueOnce({ exists: () => true });
+      get.mockResolvedValueOnce({ exists: () => false });
+      expect(await clanService.joinClan(' abcdef ')).toEqual({ success: true, clanId: 'legacyClan' });
+      expect(query).toHaveBeenCalled();
+      expect(orderByChild).toHaveBeenCalledWith('code');
+      expect(equalTo).toHaveBeenCalledWith('ABCDEF');
+      expect(limitToFirst).toHaveBeenCalledWith(2);
+      expect(update).toHaveBeenCalledWith(undefined, {
+        'clanMember/legacyClan/u1': 'member', 'userClan/u1/legacyClan': 'member'
+      });
+    });
+
+    it('refuses ambiguous legacy codes without changing membership', async () => {
+      get.mockResolvedValueOnce({ exists: () => false });
+      get.mockResolvedValueOnce({ exists: () => true, val: () => ({ first: {}, second: {} }) });
+      expect(await clanService.joinClan('ABCDEF')).toEqual({ success: false, error: 'clan.invalidCode' });
+      expect(update).not.toHaveBeenCalled();
+    });
+
+    it('rejects malformed codes before querying Firebase', async () => {
+      expect(await clanService.joinClan('bad/code')).toEqual({ success: false, error: 'clan.invalidCode' });
+      expect(get).not.toHaveBeenCalled();
     });
 
     it('fails if clan node does not exist', async () => {

@@ -1,5 +1,6 @@
+import { LevelEmblem } from '@components/ui/LevelEmblem';
 import React, { useState, useMemo } from 'react';
-import { Trophy, Check } from '@utils/icons';
+import { Trophy } from '@utils/icons';
 import { useTranslation } from 'react-i18next';
 import { CSSConfetti } from '../feedback/CSSConfetti';
 import { getIcon } from '@utils/icons';
@@ -34,7 +35,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
             const ex = exerciseInfo.find(e => e.id === id);
             if (!ex) return null;
             const label = getExerciseLabel(ex, t);
-            return { id: ex.id, label, reps: ex.goal, color: ex.color, icon: ex.icon, type: ex.type };
+            return { id: ex.id, label, reps: ex.count ?? 0, level: ex.level ?? 0, color: ex.color, icon: ex.icon, type: ex.type };
         }).filter(Boolean);
     }, [queue, exerciseInfo, t]);
 
@@ -52,7 +53,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
     const sessionDuration = shareSessionData?.duration || 0;
     const recapExercises = (shareSessionData.exercises || []).filter(Boolean);
     const exCount = recapExercises.length;
-    const totalReps = recapExercises.reduce((sum, ex) => sum + (ex.type !== 'timer' ? (ex.reps || ex.goal || 0) : 0), 0);
+    const totalReps = recapExercises.reduce((sum, ex) => sum + (ex.type !== 'timer' ? (ex.reps ?? ex.goal ?? 0) : 0), 0);
 
     const handleNameSave = async (newName) => {
         const previousName = sessionName;
@@ -80,7 +81,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                 <div className={styles.header}>
                     <div className={styles.trophy}><Trophy size={34} color="var(--color-amber)" /></div>
                     <div className={styles.title}>{t('workout.sessionDone')}</div>
-                    <div className={styles.subtitle}>{t('workout.allCompleted')}</div>
+                    <div className={styles.subtitle}>{t(recapExercises.every(ex => (ex.level ?? 10) === 10) ? 'workout.allCompleted' : 'workout.progressSaved')}</div>
 
                     <div className={styles.stats}>
                         <div className={styles.statChip}>
@@ -125,9 +126,9 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                                 </div>
                                 <span className={styles.rowName} style={{ color: ex.color }}>{ex.label}</span>
                                 <span className={styles.rowVal}>
-                                    {ex.type === 'timer' ? `${ex.reps || ex.goal}s` : t('common.repsCount', { count: ex.reps || ex.goal })}
+                                    {ex.type === 'timer' ? `${ex.reps ?? ex.goal ?? 0}s` : t('common.repsCount', { count: ex.reps ?? ex.goal ?? 0 })}
                                     {ex.weight ? ` • ${ex.weight} ${t('weight.kg')}` : ''}
-                                    <Check size={16} strokeWidth={2.5} />
+                                    <LevelEmblem level={ex.level ?? 10} size={26} showZero />
                                 </span>
                             </Card>
                         );

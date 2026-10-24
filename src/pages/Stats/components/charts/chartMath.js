@@ -72,25 +72,15 @@ export function smoothLinePath(points, top = -Infinity, bottom = Infinity) {
 
 /**
  * Step ("staircase") SVG path through `points` ([{x,y}]): the value is held flat
- * until the next point, then rises to it with a short smooth S-curve (instead of
- * a hard right angle). Used when a missing day must keep the last recorded value
- * instead of being interpolated. `transition` is the curve width in viewBox units.
+ * until the next point, then changes vertically. No intermediate values are
+ * drawn for discrete levels; tooltips use the same held-value rule.
  */
-export function stepLinePath(points, transition = 14) {
+export function stepLinePath(points) {
     if (!points.length) return '';
     let d = `M ${points[0].x} ${points[0].y}`;
     for (let i = 1; i < points.length; i++) {
-        const { x: x0, y: y0 } = points[i - 1];
-        const { x: x1, y: y1 } = points[i];
-        if (y1 === y0) {
-            d += ` H ${x1}`;
-            continue;
-        }
-        // Hold flat, then ease into the new value over the last `r` units.
-        const r = Math.min(transition, (x1 - x0) * 0.5);
-        const cx = x1 - r;           // where the curve starts
-        const mx = cx + r / 2;       // symmetric control x → horizontal tangents at both ends
-        d += ` H ${cx} C ${mx} ${y0}, ${mx} ${y1}, ${x1} ${y1}`;
+        d += ` H ${points[i].x}`;
+        if (points[i].y !== points[i - 1].y) d += ` V ${points[i].y}`;
     }
     return d;
 }

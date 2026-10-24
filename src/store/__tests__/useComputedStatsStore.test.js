@@ -22,7 +22,6 @@ describe('useComputedStatsStore', () => {
             false, // hasShared
             {}, // achievements
             () => ({ difficulty: 1, weight: null }), // getConfig
-            [], // cardioData
             '2026-01-01' // userStartDate
         );
 
@@ -36,7 +35,7 @@ describe('useComputedStatsStore', () => {
         const computeSpy = vi.spyOn(useComputedStatsModule, 'computeAllStats').mockReturnValue({});
         
         useComputedStatsStore.getState().recompute(
-            {}, {}, () => 1, null, false, {}, () => ({}), [], '2026-01-01'
+            {}, {}, () => 1, null, false, {}, () => ({}), '2026-01-01'
         );
 
         // Third argument to computeAllStats is getDayNumber, fourth is allExercises

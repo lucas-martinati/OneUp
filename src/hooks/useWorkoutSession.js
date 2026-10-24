@@ -1,6 +1,7 @@
+import { getProgressGoal, getEntryLevel } from '@shared/exerciseLevels.js';
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EXERCISES, getDailyGoal, isBodyweightExercise, isWeightExercise } from '@config/exercises';
+import { EXERCISES, isBodyweightExercise, isWeightExercise } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { CATEGORIES, buildFullCategoryOrder, isUserCategory, buildFullCategoryColors } from '@config/categories';
 import { canAccessFeature, FEATURES } from '@utils/entitlements';
@@ -132,15 +133,14 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         const ex = allExercisesMap[id];
         if (!ex) return false;
         const count = getExerciseCount(today, id);
-        const goal = getDailyGoal(ex, dayNumber, getConfig(ex.id, today).difficulty);
-        return completions[today]?.[id]?.isCompleted || count >= goal;
-    }, [today, dayNumber, completions, getExerciseCount, getConfig, allExercisesMap]);
+        const goal = getProgressGoal(ex, dayNumber, completions[today]?.[id]);
+        return getEntryLevel(completions[today]?.[id]) === 10 || count >= goal;
+    }, [today, dayNumber, completions, getExerciseCount, allExercisesMap]);
 
     // ── Exercise info with current state ──
     const exerciseInfo = useMemo(() => {
         return availableExercises.map(ex => {
-            const currentDiff = getConfig(ex.id, today).difficulty;
-            const goal = getDailyGoal(ex, dayNumber, currentDiff);
+            const goal = getProgressGoal(ex, dayNumber, completions[today]?.[ex.id]);
             const count = getExerciseCount(today, ex.id);
             const done = isDoneToday(ex.id);
 
@@ -158,7 +158,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
 
             return { ...ex, goal, count, done, category };
         });
-    }, [availableExercises, dayNumber, today, getExerciseCount, getConfig, exercisesByUserCategory, isDoneToday]);
+    }, [availableExercises, dayNumber, today, getExerciseCount, completions, exercisesByUserCategory, isDoneToday]);
 
     // ── Toggle exercise in queue ──
     const toggleExercise = (id) => {
@@ -342,7 +342,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     const currentExId = queue[currentIdx];
     const currentEx = currentExId ? allExercisesMap[currentExId] || null : null;
     const currentDifficulty = getConfig(currentEx?.id, today).difficulty;
-    const currentGoal = currentEx ? getDailyGoal(currentEx, dayNumber, currentDifficulty) : 0;
+    const currentGoal = currentEx ? getProgressGoal(currentEx, dayNumber, completions[today]?.[currentExId]) : 0;
     const currentCount = currentEx ? getExerciseCount(today, currentExId) : 0;
     const currentDone = currentEx ? isDoneToday(currentExId) : false;
 
@@ -386,17 +386,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         }
     }, [phase, queue, currentIdx, sessionName, sessionActiveSlide, showAll, setSessionInProgress]);
 
-    const advanceToNext = () => {
-        setHasAnimatedFirstPanel(true);
-        for (let offset = 1; offset <= queue.length; offset++) {
-            const nextIdx = (currentIdx + offset) % queue.length;
-            const nextId = queue[nextIdx];
-            const ex = exerciseInfo.find(e => e.id === nextId);
-            if (ex && !ex.done) {
-                setCurrentIdx(nextIdx);
-                return;
-            }
-        }
+    const finishSession = () => {
         // Session complete — bail out if it was already saved (re-entry guard).
         if (sessionSaved.current) return;
         sessionSaved.current = true;
@@ -413,7 +403,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
             const conf = getConfig(id, getLocalDateStr(new Date()));
             const w = conf ? conf.weight : null;
             const diff = conf ? conf.difficulty : 1.0;
-            return { id: ex.id, label, reps: getDailyGoal(ex, dayNumber, diff), color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff };
+            return { id: ex.id, label, reps: getExerciseCount(today, ex.id), color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff, level: getEntryLevel(completions[today]?.[ex.id]), goal: getProgressGoal(ex, dayNumber, completions[today]?.[ex.id]) };
         }).filter(Boolean);
 
         let detectedName = sessionName;
@@ -459,6 +449,20 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         setPhase('done');
     };
 
+    const advanceToNext = () => {
+        setHasAnimatedFirstPanel(true);
+        for (let offset = 1; offset <= queue.length; offset++) {
+            const nextIdx = (currentIdx + offset) % queue.length;
+            const nextId = queue[nextIdx];
+            const ex = exerciseInfo.find(e => e.id === nextId);
+            if (ex && !ex.done) {
+                setCurrentIdx(nextIdx);
+                return;
+            }
+        }
+        finishSession();
+    };
+
     return {
         // State
         phase, setPhase, queue, setQueue, currentIdx, showSaveRoutine, setShowSaveRoutine,
@@ -481,7 +485,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
 
         // Actions
         toggleExercise, shuffleQueue, startSession, loadRoutine,
-        handleSaveRoutine, editRoutine, advanceToNext,
+        handleSaveRoutine, editRoutine, advanceToNext, finishSession,
         moveItem, clearQueue,
         handleDragStart, handleDragOver, handleDragEnd,
         handleTouchStart, handleTouchMove, handleTouchEnd,

@@ -1,3 +1,6 @@
+import { LevelRing } from '@components/ui/LevelRing';
+import { CountingNumber } from '@components/ui/CountingNumber';
+import { NextLevelHint } from './NextLevelHint';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowDown, ArrowUp, Camera, CameraOff, RefreshCw } from 'lucide-react';
@@ -138,16 +141,10 @@ function ProgressRing({
     displayCount,
     displayTime,
     goalTime,
-    gradEnd,
-    gradStart,
-    gradientId,
     isAnimating,
     isCompleted,
     isRunning,
     isTimer,
-    progress,
-    ringCircumference,
-    ringRadius,
 
     timeFontSize,
     countFontSize = 'clamp(4rem, 12vw, 6rem)',
@@ -201,45 +198,7 @@ function ProgressRing({
                 />
             )}
 
-            <svg
-                viewBox="0 0 220 220"
-                overflow="visible"
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    pointerEvents: 'none'
-                }}
-            >
-                <circle cx="110" cy="110" r={ringRadius} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="7" />
-                <circle
-                    cx="110"
-                    cy="110"
-                    r={ringRadius}
-                    fill="none"
-                    stroke={isCompleted ? activeColor : `url(#${gradientId})`}
-                    strokeWidth="9"
-                    strokeDasharray={ringCircumference}
-                    strokeDashoffset={ringCircumference * (1 - progress / 100)}
-                    strokeLinecap="round"
-                    transform="rotate(-90 110 110)"
-                    style={{
-                        transition: `${isTimer && isRunning ? 'stroke-dashoffset 1s linear' : 'stroke-dashoffset 0.45s ease'}, stroke 0.45s ease, filter 0.45s ease`,
-                        // Glow is a paint-time filter. While a timer is actively
-                        // running the ring repaints every frame, so we drop the
-                        // filter then to avoid per-frame repaints (battery/heat).
-                        filter: filterVal
-                    }}
-                />
-                <defs>
-                    <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor={gradStart} style={{ transition: 'stop-color 0.45s ease' }} />
-                        <stop offset="100%" stopColor={gradEnd} style={{ transition: 'stop-color 0.45s ease' }} />
-                    </linearGradient>
-                </defs>
-            </svg>
+            <LevelRing count={displayCount} goal={dailyGoal} color={activeColor} celebrate style={{ filter: filterVal }} />
 
             {isCameraActive && (
                 <div
@@ -325,7 +284,7 @@ function ProgressRing({
                             textShadow: isCompleted ? `0 0 22px ${activeColor}55` : 'none'
                         }}
                     >
-                        {isTimer ? displayTime : displayCount}
+                        {isTimer ? displayTime : <CountingNumber value={displayCount} />}
                     </div>
                     <div style={{
                         fontSize: 'clamp(0.95rem, 2.8vw, 1.25rem)',
@@ -750,14 +709,16 @@ export function ExercisePanel({
     dailyGoal,
     currentCount,
     onUpdateCount,
-    isCompleted,
+    isCompleted: isValidated,
     exerciseConfig,
     dayNumber,
     onNext,
+    onFinish,
     hideNextButton = false,
     isSession = false,
     fadeIn = true
 }) {
+    const isCompleted = currentCount >= dailyGoal || (isValidated && currentCount === 0);
     const settings = useSettingsStore(s => s.settings);
     const keepScreenOn = settings?.keepScreenOn ?? true;
     useWakeLock(keepScreenOn);
@@ -845,7 +806,6 @@ export function ExercisePanel({
                 setHasCelebrated(true);
                 setShowConfetti(true);
                 sounds.success();
-                haptics.success();
             });
 
             if (onNext) {
@@ -864,16 +824,11 @@ export function ExercisePanel({
     }, [isCompleted, wasCompleted, hasCelebrated, onNext]);
 
     const displayCount = isCompleted && currentCount === 0 ? dailyGoal : currentCount;
-    const safeGoal = dailyGoal || 1;
-    const progress = Math.min((displayCount / safeGoal) * 100, 100);
     const remaining = Math.max(0, dailyGoal - displayCount);
     const activeColor = exerciseConfig?.color || (isTimer ? '#8b5cf6' : '#818cf8');
     const [gradStart, gradEnd] = exerciseConfig?.gradient || (isTimer ? ['#7c3aed', '#8b5cf6'] : ['#667eea', '#818cf8']);
     const exerciseLabel = getExerciseLabel(exerciseConfig);
-    const gradientId = 'exercisePanelGrad';
 
-    const ringRadius = 100;
-    const ringCircumference = 2 * Math.PI * ringRadius;
     const displayTime = formatTime(displayCount);
     const goalTime = formatTime(dailyGoal);
     let timeFontSize = 'clamp(2.2rem, 30cqw, 4.2rem)';
@@ -995,6 +950,8 @@ export function ExercisePanel({
                     />
                 </div>
 
+                {onFinish && <Button variant="ghost" size="sm" onClick={onFinish} icon={CheckCheck}>{t('workout.finish')}</Button>}
+
                 {/* HUD d'événement spécial (thermomètre / constellation) intégré au panneau */}
                 <EventHud placement="panel" />
 
@@ -1033,20 +990,15 @@ export function ExercisePanel({
 
                     <div style={{ width: '100%', flex: '0 1 240px', minHeight: 0, position: 'relative' }}>
                         <ProgressRing
+                            key={exerciseConfig?.id}
                             activeColor={activeColor}
                             displayCount={displayCount}
                             displayTime={displayTime}
                             goalTime={goalTime}
-                            gradEnd={gradEnd}
-                            gradStart={gradStart}
-                            gradientId={gradientId}
                             isAnimating={isAnimating}
                             isCompleted={isCompleted}
                             isRunning={isRunning}
                             isTimer={isTimer}
-                            progress={progress}
-                            ringCircumference={ringCircumference}
-                            ringRadius={ringRadius}
                             dailyGoal={dailyGoal}
                             timeFontSize={timeFontSize}
                             countFontSize={countFontSize}
@@ -1083,6 +1035,8 @@ export function ExercisePanel({
                             t={t}
                         />
                     )}
+
+                    <NextLevelHint count={displayCount} goal={dailyGoal} isTimer={isTimer} />
 
                     {isTimer ? (
                         <TimerControls

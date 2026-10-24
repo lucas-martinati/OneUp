@@ -33,6 +33,8 @@ export const DB_SCHEMA = {
       totalReps: LEAF,
       weightsTotalReps: LEAF,
       exerciseReps: LEAF,      // exId -> reps (needed for per-exercise ranking tabs)
+      streakLevel: LEAF,
+      currentStreak: LEAF,
       lastActiveDay: LEAF,
       isPublic: LEAF,
       isPerfectToday: LEAF,
@@ -93,6 +95,7 @@ export const DB_SCHEMA = {
       programCompletions: LEAF,    // programId -> { ... }
       cardioSessions: LEAF,        // sessionId -> { …, gpsTrack[] }
       progress: {
+        progressVersion: LEAF,      // versioned daily level migration
         completions: LEAF,         // date -> { exId -> { count, isCompleted, … } }
         sessionHistory: LEAF,      // array
         startDate: LEAF,
@@ -128,6 +131,7 @@ export const paths = {
   // ── Top-level, socially-readable nodes ──────────────────────────────────
   leaderboard:            ()              => 'leaderboard',
   leaderboardEntry:       (uid)           => `leaderboard/${uid}`,
+  publicProfiles:         ()              => 'publicProfiles',
   publicProfile:          (uid)           => `publicProfiles/${uid}`,
 
   // ── Clans ───────────────────────────────────────────────────────────────

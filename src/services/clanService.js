@@ -1,4 +1,4 @@
-import { ref, get, remove, push, update, onValue, serverTimestamp, runTransaction } from 'firebase/database';
+import { ref, get, remove, push, update, onValue, serverTimestamp, runTransaction, query, orderByChild, equalTo, limitToFirst } from 'firebase/database';
 import { createLogger } from '@utils/logger';
 import { getAuthInstance, getDatabaseInstance } from './firebase';
 import { paths } from '@shared/dbSchema.js';
@@ -59,13 +59,20 @@ export async function joinClan(code) {
     if (!auth?.currentUser || !database) throw new Error('Not initialized');
 
     const uid = auth.currentUser.uid;
-    const cleanCode = code.toUpperCase().trim();
+    const cleanCode = typeof code === 'string' ? code.toUpperCase().trim() : '';
+    if (!/^[A-Z0-9]{6}$/.test(cleanCode)) return { success: false, error: i18n.t('clan.invalidCode') };
 
     // Direct lookup on the unique mapping table
     const codeSnapshot = await get(ref(database, paths.clanCode(cleanCode)));
-    if (!codeSnapshot.exists()) return { success: false, error: i18n.t('clan.invalidCode') };
-
-    const foundClanId = codeSnapshot.val();
+    let foundClanId = codeSnapshot.exists() ? codeSnapshot.val() : null;
+    if (!foundClanId) {
+      // Clans created before the code index still store their invitation on the clan.
+      // Refuse ambiguous legacy codes instead of selecting an arbitrary clan.
+      const legacy = await get(query(ref(database, paths.clans()), orderByChild('code'), equalTo(cleanCode), limitToFirst(2)));
+      const matches = legacy.exists() ? Object.keys(legacy.val()) : [];
+      if (matches.length !== 1) return { success: false, error: i18n.t('clan.invalidCode') };
+      foundClanId = matches[0];
+    }
 
     // Verify clan exists
     const clanSnapshot = await get(ref(database, paths.clan(foundClanId)));
@@ -173,6 +180,8 @@ export async function getClanDetails(clanId) {
       totalReps: lbData.totalReps || 0, weightsTotalReps: lbData.weightsTotalReps || 0,
       exerciseReps: lbData.exerciseReps || {},
       lastActiveDay: lbData.lastActiveDay || null,
+      currentStreak: lbData.currentStreak || 0,
+      streakLevel: lbData.streakLevel || 0,
       lastUpdated: lbData.lastUpdated || null,
       isSupporter: !!lbData.isSupporter, isPro: !!lbData.isPro,
       isPerfectToday: !!lbData.isPerfectToday,

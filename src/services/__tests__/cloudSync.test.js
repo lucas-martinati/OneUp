@@ -105,6 +105,16 @@ describe('CloudSyncService', () => {
         expect(cb).toHaveBeenCalledWith({ user: 'mocked' });
     });
     
+    it('reloads another account’s levels when its leaderboard revision changes', async () => {
+      const oldProfile = { derivedStats: { streakLevel: 2 } };
+      const newProfile = { derivedStats: { streakLevel: 7 } };
+      mockLeaderboard.loadUserDetails.mockResolvedValueOnce(oldProfile).mockResolvedValueOnce(newProfile);
+      expect(await cloudSync.loadUserDetailsWithCache('other-levels', 100)).toEqual(oldProfile);
+      expect(await cloudSync.loadUserDetailsWithCache('other-levels', 100)).toEqual(oldProfile);
+      expect(await cloudSync.loadUserDetailsWithCache('other-levels', 200)).toEqual(newProfile);
+      expect(mockLeaderboard.loadUserDetails).toHaveBeenCalledTimes(2);
+    });
+
     it('loadUserDetailsWithCache caches results', async () => {
       mockLeaderboard.loadUserDetails.mockResolvedValueOnce({ user: '1' });
       

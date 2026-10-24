@@ -1,3 +1,5 @@
+import { migrateLevelProgress, PROGRESS_VERSION } from '@shared/exerciseLevels.js';
+
 export const STORAGE_KEY_BASE = 'pushup_challenge_data';
 
 /** Default empty state for signed-out or new users */
@@ -7,6 +9,7 @@ export function getDefaultState() {
     startDate: `${currentYear}-01-01`,
     userStartDate: `${currentYear}-01-01`,
     completions: {},
+    progressVersion: PROGRESS_VERSION,
     isSetup: false,
     achievements: {},
     cardio: {},
@@ -53,6 +56,7 @@ function migrateLegacyEntry(entry) {
       migrated.pushups = {
         isCompleted: entry.isCompleted || entry.done || false,
         timestamp: entry.timestamp || null,
+        ...(entry.timestampEstimated ? { timestampEstimated: true } : {}),
         timeOfDay: entry.timeOfDay || null,
         ...(entry.pushupCount !== undefined ? { count: entry.pushupCount } : {}),
         ...(entry.count !== undefined ? { count: entry.count } : {}),
@@ -68,7 +72,11 @@ function migrateLegacyEntry(entry) {
       migrated[key] = {
         isCompleted: val.isCompleted !== undefined ? val.isCompleted : (val.done || false),
         timestamp: val.timestamp || null,
+        ...(val.timestampEstimated ? { timestampEstimated: true } : {}),
         ...(Number.isInteger(val.localHour) ? { localHour: val.localHour } : {}),
+        ...(Number.isInteger(val.level) ? { level: val.level } : {}),
+        ...(val.legacyCardio ? { legacyCardio: true } : {}),
+        ...(Number.isFinite(val.goal) ? { goal: val.goal } : {}),
         ...(val.count !== undefined ? { count: val.count } : {}),
         ...(val.weight !== undefined ? { weight: val.weight } : {}),
         ...(val.difficulty !== undefined ? { difficulty: val.difficulty } : {})
@@ -96,7 +104,8 @@ export function validateProgressData(data) {
     }
   }
 
-  return {
+  return migrateLevelProgress({
+    progressVersion: Number.isInteger(data.progressVersion) ? data.progressVersion : 0,
     startDate: typeof data.startDate === 'string' ? data.startDate : `${new Date().getFullYear()}-01-01`,
     userStartDate:
       typeof data.userStartDate === 'string'
@@ -117,7 +126,7 @@ export function validateProgressData(data) {
     frozenDays: validateFrozenDays(data.frozenDays),
     streakFreezes: validateStreakFreezes(data.streakFreezes),
     notes: typeof data.notes === 'object' && data.notes !== null ? data.notes : {},
-  };
+  });
 }
 
 /** Custom parser for progress data */
@@ -125,25 +134,9 @@ export function parseProgressData(parsed) {
   const validated = validateProgressData(parsed);
   if (!validated) return null;
 
-  const currentYear = new Date().getFullYear();
-  const fixedStartDate = `${currentYear}-01-01`;
+  // Keep setup, notes and the original challenge dates across year boundaries.
+  // Only new accounts use the current year's defaults.
   const lastChange = parsed?.lastCompletionChange || null;
-
-  if (validated.startDate !== fixedStartDate) {
-    // Challenge carried over from a previous year: reset the "new year" fields
-    // but keep the user's data. Dropping completions here wipes a year of
-    // progress at every year rollover.
-    return {
-      ...getDefaultState(),
-      startDate: validated.startDate,
-      completions: validated.completions,
-      cardio: validated.cardio,
-      frozenDays: validated.frozenDays,
-      streakFreezes: validated.streakFreezes,
-      achievements: validated.achievements ?? {},
-      lastCompletionChange: lastChange,
-    };
-  }
 
   return { 
     ...validated, 

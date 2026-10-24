@@ -47,7 +47,7 @@ export {
   RefreshCw, Rocket, RotateCcw,
   Save, Settings, Settings2, Share2, Shield, ShieldAlert, ShoppingBag, Shuffle, Smartphone, Snowflake, Sparkles, Star, Sun,
   Target, Trash2, TrendingUp, Trophy,
-  Unlock, Upload, UserPlus, Users,
+  Upload, UserPlus, Users,
   Vibrate, Volume2,
   Weight,
   X,

@@ -20,13 +20,17 @@ export function sanitizeForCloud(data) {
       sanitizedDay[exerciseId] = {
         isCompleted: ex.isCompleted || false,
         timestamp: ex.timestamp || null,
+        ...(ex.timestampEstimated ? { timestampEstimated: true } : {}),
         // Sync the local completion hour so the Cloud Function can compute the
         // time-of-day badges (incl. the 3-4am ghost) from the user's real hour
         // rather than an unrecoverable UTC approximation — see @shared/achievementStats.
         ...(Number.isInteger(ex.localHour) ? { localHour: ex.localHour } : {}),
         ...(ex.weight !== undefined ? { weight: ex.weight } : {}),
         ...(ex.difficulty !== undefined ? { difficulty: ex.difficulty } : {}),
-        ...(!ex.isCompleted && ex.count !== undefined ? { count: ex.count } : {})
+        ...(ex.count !== undefined ? { count: ex.count } : {}),
+        ...(ex.level !== undefined ? { level: ex.level } : {}),
+        ...(ex.legacyCardio ? { legacyCardio: true } : {}),
+        ...(ex.goal !== undefined ? { goal: ex.goal } : {})
       };
     });
     sanitizedCompletions[dateStr] = sanitizedDay;
@@ -119,6 +123,7 @@ export function mergeData(localData, cloudData) {
   if (cloudLCCTs > localLCCTs && !localLCCIsPlaceholder) {
     logger.info('Cloud data is newer than local data. Overwriting local cache with cloud state.');
     return {
+      progressVersion: cloudData.progressVersion || 0,
       startDate: cloudData.startDate,
       userStartDate: cloudData.userStartDate,
       completions: reattachLocalCounts(cloudData.completions, localData.completions),
@@ -158,6 +163,7 @@ export function mergeData(localData, cloudData) {
           const cloudReplacesPlaceholder = localIsPlaceholder && !cloudIsPlaceholder && cloudEx?.timestamp && valuesMatch;
           if (!localEx || cloudIsNewer || localHasNoTimestamp || cloudReplacesPlaceholder) {
             merged[exId] = { ...localEx, ...cloudEx };
+            if (cloudEx.timestamp && !cloudEx.timestampEstimated) delete merged[exId].timestampEstimated;
           }
         });
 
@@ -174,6 +180,7 @@ export function mergeData(localData, cloudData) {
   };
 
   const result = {
+    progressVersion: Math.max(localData.progressVersion || 0, cloudData.progressVersion || 0),
     startDate: localData.startDate || cloudData.startDate,
     userStartDate: localData.userStartDate || cloudData.userStartDate,
     completions: mergedCompletions,
@@ -190,4 +197,13 @@ export function mergeData(localData, cloudData) {
 
   logger.debug(`Merge complete. Final completion days: ${Object.keys(result.completions).length}`);
   return result;
+}
+
+/** Compare progress independent of Firebase's object-key ordering. */
+export function areCompletionsEqual(left, right) {
+  if (left === right) return true;
+  if (!left || !right || typeof left !== 'object' || typeof right !== 'object') return false;
+  const keys = Object.keys(left);
+  if (keys.length !== Object.keys(right).length) return false;
+  return keys.every(key => Object.hasOwn(right, key) && areCompletionsEqual(left[key], right[key]));
 }

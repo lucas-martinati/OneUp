@@ -9,7 +9,7 @@ import { APP_URL_DISPLAY } from '@config/app';
 import { parseLocalDate, getLocalDateStr } from '@shared/dateUtils';
 import { formatDuration } from '@utils/formatters';
 import { useExerciseConfig } from '@hooks/useExerciseConfig';
-import { DifficultyBadge } from '@components/ui/DifficultyBadge';
+import { LevelBadge } from '@components/ui/LevelBadge';
 import { useExercises } from '@contexts/ExercisesContext';
 import { buildCardModel, CARD_WIDTH, resolveCardFormat } from '@features/share/services/cardModel';
 import { CARD_THEMES } from './cardThemes';
@@ -141,7 +141,7 @@ function HistoryRow({ session, t, lang }) {
   );
 }
 
-/** reps / weight / difficulty of one exercise — shown at every density. */
+/** reps / weight / level of one exercise — shown at every density. */
 function ExerciseValue({ ex, t, fontSize }) {
   return (
     <span style={{
@@ -151,7 +151,7 @@ function ExerciseValue({ ex, t, fontSize }) {
     }}>
       {ex.type === 'timer' ? `${ex.reps}s` : `×${ex.reps}`}
       {ex.weight ? ` • ${ex.weight} ${t('weight.kg')}` : ''}
-      <DifficultyBadge difficulty={ex.difficulty} />
+      <LevelBadge level={ex.level} />
     </span>
   );
 }
@@ -297,7 +297,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
   const {
     isGlobal, activeThemeKey, allExercises, categories, showSections,
     dailyCategories, showDailySections, filteredDailyExercises, categoryChips,
-    density, totalReps, duration, streak, streakActive, exerciseCount,
+    density, totalReps, duration, streak, streakLevel, streakActive, exerciseCount,
     totalDays, maxStreak,
   } = model;
 
@@ -480,6 +480,7 @@ export function ShareCard({ cardRef, sessionData, stats, sessionHistory, complet
               }}>
                 {streak}
               </span>
+              <LevelBadge level={streakLevel} />
             </div>
             <div style={{
               position: 'absolute', right: 0,

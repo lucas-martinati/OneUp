@@ -186,12 +186,14 @@ describe('day helpers', () => {
 // ── updateExerciseCount ─────────────────────────────────────────────────
 
 describe('updateExerciseCount', () => {
-  it('stores the count and marks completion at the goal', () => {
+  it('stores volume and validates from the first level', () => {
     const { updateExerciseCount } = useProgressStore.getState();
     updateExerciseCount(today, 'pushups', 50, 100);
     expect(useProgressStore.getState().completions[today].pushups).toMatchObject({
       count: 50,
-      isCompleted: false,
+      level: 5,
+      goal: 100,
+      isCompleted: true,
     });
 
     updateExerciseCount(today, 'pushups', 100, 100);
@@ -323,7 +325,7 @@ describe('mergeWithAnonymousData', () => {
       timestamp: '2026-02-01T18:00:00.000Z',
     });
     // exercises only on one side are kept
-    expect(merged.squats.isCompleted).toBe(false);
+    expect(merged.squats).toMatchObject({ isCompleted: true, count: 5, goal: 32, level: 1 });
     expect(merged.dips.isCompleted).toBe(true);
   });
 
@@ -489,6 +491,20 @@ describe('loadFromCloud', () => {
 });
 
 describe('syncWithCloud', () => {
+  it('saves retroactive levels back to the existing cloud account without requiring a new workout', async () => {
+    cloudSync.loadFromCloud.mockResolvedValueOnce({
+      startDate: '2026-01-01', progressVersion: 2, isSetup: true,
+      completions: { '2026-04-10': { pushups: { count: 40, isCompleted: false }, squats: { isCompleted: true } } },
+    });
+    await useProgressStore.getState().syncWithCloud();
+    expect(cloudSync.saveToCloud).toHaveBeenCalledWith(expect.objectContaining({
+      progressVersion: 4,
+      completions: { '2026-04-10': {
+        pushups: expect.objectContaining({ count: 40, goal: 100, level: 4, isCompleted: true }),
+        squats: expect.objectContaining({ level: 10, isCompleted: true }),
+      } },
+    }));
+  });
   it('applies the merged result and preserves local achievements', async () => {
     useProgressStore.setState({ achievements: { local_badge: true } });
     cloudSync.loadFromCloud.mockResolvedValueOnce({
@@ -546,7 +562,7 @@ describe('syncWithCloud', () => {
 
 describe('applyRealtimeUpdate', () => {
   it('ignores identical incoming data', () => {
-    const completions = { [`${currentYear}-03-01`]: { pushups: { isCompleted: true, timestamp: null } } };
+    const completions = { [`${currentYear}-03-01`]: { pushups: { isCompleted: true, timestamp: 1772366400000, count: 60, goal: 60, level: 10 } } };
     // Note: cardio.sessions must exist, otherwise the change detection always fires
     useProgressStore.setState({ completions, cardio: { sessions: {} } });
     const before = useProgressStore.getState().completions;
@@ -654,7 +670,7 @@ describe('exercise count helpers', () => {
     const store = useProgressStore.getState();
     store.updateExerciseCount(today, 'pushups', 8, 10);
     expect(useProgressStore.getState().getExerciseCount(today, 'pushups')).toBe(8);
-    expect(useProgressStore.getState().getExerciseDone(today, 'pushups')).toBe(false);
+    expect(useProgressStore.getState().getExerciseDone(today, 'pushups')).toBe(true);
 
     store.updateExerciseCount(today, 'pushups', 10, 10);
     expect(useProgressStore.getState().getExerciseDone(today, 'pushups')).toBe(true);

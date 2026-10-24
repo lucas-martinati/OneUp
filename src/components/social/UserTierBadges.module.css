@@ -1,0 +1,6 @@
+.badge { position: relative; color: var(--badge-color); font-size: 0.7rem; }
+.trigger { display: flex; align-items: center; gap: 5px; cursor: pointer; list-style: none; padding: 6px 10px; border: 1px solid color-mix(in srgb, var(--badge-color) 35%, transparent); border-radius: var(--radius-full); background: color-mix(in srgb, var(--badge-color) 12%, transparent); font-weight: 700; }
+.trigger::-webkit-details-marker { display: none; }
+.trigger:focus-visible { outline: 2px solid var(--badge-color); outline-offset: 3px; }
+.badge[open] .trigger { background: color-mix(in srgb, var(--badge-color) 25%, transparent); }
+.description { position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 2; width: 200px; max-width: 60vw; padding: 12px; line-height: 1.5; color: var(--text-primary); border: 1px solid var(--badge-color); border-radius: var(--radius-md); background: var(--tooltip-bg); box-shadow: var(--shadow-lg); }

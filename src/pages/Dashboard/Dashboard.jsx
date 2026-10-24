@@ -41,7 +41,7 @@ import { useExerciseConfig } from '@hooks/useExerciseConfig';
 import { setSoundSettingsGetter } from '@utils/soundManager';
 import { setHapticsSettingsGetter } from '@utils/hapticsManager';
 import { clearWorkoutSession } from '@utils/workoutSessionStorage';
-import { getDailyGoal } from '@config/exercises';
+import { getProgressGoal } from '@shared/exerciseLevels.js';
 import { canAccessFeature, FEATURES } from '@utils/entitlements';
 import { isAdminEmail } from '@config/admin';
 
@@ -219,8 +219,7 @@ export function Dashboard() {
 
     const isExerciseDone = completions[today]?.[globalSelectedId]?.isCompleted || false;
     const currentCount = getExerciseCount(today, globalSelectedId);
-    const currentDiff = getConfig(globalSelectedId, today).difficulty;
-    const dailyGoal = getDailyGoal(selectedExercise, dayNumber, currentDiff) || 1;
+    const dailyGoal = getProgressGoal(selectedExercise, dayNumber, completions[today]?.[globalSelectedId]);
 
     // For Cardio slide, compute total from running and cycling stats, else use computedStats
     const totalReps = currentCatKey === CATEGORIES.CARDIO
@@ -280,6 +279,8 @@ export function Dashboard() {
                     streakActive={computedStats.streakActive}
                     streakFrozen={computedStats.streakFrozen}
                     displayStreak={computedStats.displayStreak}
+                    streakLevel={computedStats.streakLevel}
+                    levelStreaks={computedStats.levelStreaks}
                     selectedExercise={selectedExercise}
                     totalReps={totalReps}
                     dayNumber={dayNumber}

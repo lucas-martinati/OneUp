@@ -2,7 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings, Star, FolderPlus, Plus } from '@utils/icons';
 import { UI_ICONS, DynamicIcon } from '@utils/icons';
-import { getDailyGoal } from '@config/exercises';
+import { getProgressGoal, getEntryLevel } from '@shared/exerciseLevels.js';
+import { LevelProgress } from '@components/ui/LevelProgress';
 import { parseTimestamp } from '@shared/dateUtils';
 import { formatTime } from '@utils/formatters';
 import { isPerfectDay } from '@utils/statUtils';
@@ -20,12 +21,11 @@ export const CategoryProgressView = React.memo(({
     const { t, i18n } = useTranslation();
     const safeSelectedExercise = exercisesMap[activeExerciseId] || exercisesList[0];
 
-    const currentDiff = safeSelectedExercise ? getConfig(safeSelectedExercise.id, today).difficulty : 1;
-    const dailyGoal = safeSelectedExercise ? (getDailyGoal(safeSelectedExercise, dayNumber, currentDiff) || 1) : 1;
+    const dailyGoal = getProgressGoal(safeSelectedExercise, dayNumber, completions[today]?.[safeSelectedExercise?.id]);
     const currentCount = safeSelectedExercise ? getExerciseCount(today, safeSelectedExercise.id) : 0;
     const isExerciseDone = safeSelectedExercise ? (completions[today]?.[safeSelectedExercise.id]?.isCompleted || currentCount >= dailyGoal) : false;
-    const progress = Math.min((dayNumber / 365) * 100, 100);
 
+    const progress = Math.min((dayNumber / 365) * 100, 100);
     const isDayPerfect = isPerfectDay(completions[today], exercisesList);
 
 
@@ -177,8 +177,8 @@ export const CategoryProgressView = React.memo(({
                                         zIndex: 1
                                     }}>
                                         {safeSelectedExercise.type === 'timer'
-                                            ? `${formatTime(dailyGoal)}/${formatTime(dailyGoal)}`
-                                            : `${dailyGoal}/${dailyGoal}`
+                                            ? `${formatTime(currentCount)}/${formatTime(dailyGoal)}`
+                                            : `${currentCount}/${dailyGoal}`
                                         }
                                     </span>
                                 </>
@@ -369,10 +369,9 @@ const ExerciseButton = React.memo(({
     const exStreak = statsEx ? statsEx.streak : 0;
     const exStreakActive = !!statsEx?.streakActive;
     const exCount = getExerciseCount(today, ex.id);
-    const { difficulty: exDiff, weight } = getConfig(ex.id, today);
-    const exGoal = getDailyGoal(ex, dayNumber, exDiff);
+    const { weight } = getConfig(ex.id, today);
+    const exGoal = getProgressGoal(ex, dayNumber, completions[today]?.[ex.id]);
     const exDone = completions[today]?.[ex.id]?.isCompleted || exCount >= exGoal;
-    const exPct = exDone ? 100 : Math.min(100, (exCount / Math.max(exGoal, 1)) * 100);
 
     const tileSizing = getTileSizing(itemCount || 4);
 
@@ -403,9 +402,9 @@ const ExerciseButton = React.memo(({
 
     let timeOrCountLabel = '';
     if (ex.type === 'timer') {
-        timeOrCountLabel = exDone ? formatTime(exGoal) : `${formatTime(exCount)}/${formatTime(exGoal)}`;
+        timeOrCountLabel = `${formatTime(exCount)}/${formatTime(exGoal)}`;
     } else {
-        timeOrCountLabel = exDone ? exGoal : `${exCount}/${exGoal}`;
+        timeOrCountLabel = `${exCount}/${exGoal}`;
     }
 
     return (
@@ -452,6 +451,7 @@ const ExerciseButton = React.memo(({
                 Flame stays colored only when the streak is active today. */}
             <StreakFlame
                 streak={exStreak}
+                level={statsEx?.streakLevel}
                 active={exStreakActive}
                 variant="badge"
                 style={{ position: 'absolute', top: '3px', left: '3px', zIndex: 1 }}
@@ -490,7 +490,7 @@ const ExerciseButton = React.memo(({
                 whiteSpace: 'nowrap'
             }}>
                 <span style={{
-                    textDecorationLine: exDone ? 'line-through' : 'none',
+                    textDecorationLine: getEntryLevel(completions[today]?.[ex.id]) === 10 ? 'line-through' : 'none',
                     textDecorationColor: `${ex.color}88`
                 }}>
                     {timeOrCountLabel}
@@ -499,19 +499,8 @@ const ExerciseButton = React.memo(({
                     <WeightBadge weight={weight} color={ex.color} style={{ marginLeft: '5px' }} />
                 )}
             </span>
-            {/* Per-tile progress bar */}
-            <div style={{
-                position: 'absolute', left: 0, right: 0, bottom: 0,
-                height: '3px',
-                background: `${ex.color}14`
-            }}>
-                <div style={{
-                    height: '100%',
-                    width: `${exPct}%`,
-                    background: `linear-gradient(90deg, ${ex.gradient[0]}, ${ex.gradient[1]})`,
-                    boxShadow: exPct > 0 ? `0 0 6px ${ex.color}88` : 'none',
-                    transition: 'width 0.4s ease'
-                }} />
+            <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '3px' }}>
+                <LevelProgress count={exCount} goal={exGoal} color={ex.color} />
             </div>
         </Button>
     );

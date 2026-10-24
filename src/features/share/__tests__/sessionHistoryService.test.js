@@ -269,3 +269,10 @@ describe('sessionHistoryService', () => {
     });
   });
 });
+
+ it('retains partial and zero levels without replacing zero reps by the target', () => {
+   const session = addSession({ exercises: [{ id: 'pushups', reps: 30, goal: 100, level: 3 }, { id: 'squats', reps: 0, goal: 100, level: 0 }] });
+   expect(getSessionHistory()[0].exercises).toEqual(session.exercises);
+   expect(session.exercises[0]).toMatchObject({ reps: 30, goal: 100, level: 3 });
+   expect(session.exercises[1]).toMatchObject({ reps: 0, goal: 100, level: 0 });
+ });

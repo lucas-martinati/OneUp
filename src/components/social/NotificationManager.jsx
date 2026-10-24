@@ -45,6 +45,7 @@ function PokeToast({ toast, onDone }) {
 
             <Button
                 variant="ghost"
+                iconOnly
                 className={styles.close}
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => { e.stopPropagation(); dismiss(); }}
