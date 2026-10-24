@@ -3,7 +3,7 @@ import { EXERCISES, WEIGHT_EXERCISES, getDailyGoal, getWeeklyGoalKm } from './ex
 import { shiftDateStr, getCurrentWeekNumber, getWeekBounds, getLocalDateStr } from './dateUtils.js';
 
 export const LEVEL_COUNT = 10;
-export const PROGRESS_VERSION = 4;
+export const PROGRESS_VERSION = 5;
 const exercisesById = Object.fromEntries([...EXERCISES, ...WEIGHT_EXERCISES].map(ex => [ex.id, ex]));
 const isDailyExercise = id => id !== 'running' && id !== 'cycling';
 
@@ -51,13 +51,14 @@ export function getRecordedReps(entry, exercise, dayNumber, difficulty = 1) {
 /**
  * Idempotent account migration. Each entry carries a level so legacy entries
  * arriving later from another device can be upgraded without touching new data.
- * Legacy validations are ALWAYS level 10, even at a historical reduced goal.
+ * Past legacy validations stay level 10, even at a historical reduced goal.
  * Keep that historical goal as a snapshot to preserve the estimated volume.
  */
 export function migrateLevelProgress(data, customExercises = []) {
   const catalog = { ...exercisesById, ...Object.fromEntries(customExercises.map(ex => [ex.id, ex])) };
   let changed = (data.progressVersion || 0) < PROGRESS_VERSION;
   const completions = {};
+  const today = getLocalDateStr(new Date());
   for (const [date, day] of Object.entries(data.completions || {})) {
     const migrated = { ...day };
     const elapsed = Math.round((Date.parse(date) - Date.parse(data.startDate)) / 86400000) + 1;
@@ -73,6 +74,19 @@ export function migrateLevelProgress(data, customExercises = []) {
         entry = { ...entry, timestamp: historicalTime, timestampEstimated: true };
         migrated[id] = entry;
         changed = true;
+      }
+      // Today's workout must remain playable up to the full target. Repair old
+      // difficulty snapshots, including accounts already migrated to levels.
+      const dailyExercise = isDailyExercise(id) ? catalog[id] : null;
+      const fullGoal = dailyExercise ? getDailyGoal(dailyExercise, dayNumber) : 0;
+      if (date === today && dailyExercise &&
+          (!Number.isInteger(entry.level) || (Number.isFinite(entry.goal) && entry.goal < fullGoal))) {
+        const count = Number.isFinite(entry.count) ? Math.max(0, entry.count)
+          : entry.isCompleted ? getDailyGoal(dailyExercise, dayNumber, entry.difficulty ?? 1) : 0;
+        const level = getLevelForCount(count, fullGoal);
+        migrated[id] = { ...entry, count, goal: fullGoal, level, isCompleted: level > 0 };
+        changed = true;
+        continue;
       }
       if (Number.isInteger(entry.level)) continue;
       if (!isDailyExercise(id)) {

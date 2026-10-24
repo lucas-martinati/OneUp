@@ -66,7 +66,7 @@ describe('level migration', () => {
             '2026-04-10': { pushups: { isCompleted: true, difficulty: 0.5, timestamp: 123 }, squats: { isCompleted: false }, running: { isCompleted: true } },
         } };
         const migrated = migrateLevelProgress(legacy);
-        expect(migrated.progressVersion).toBe(4);
+        expect(migrated.progressVersion).toBe(5);
         expect(migrated.completions['2026-04-10'].pushups).toMatchObject({ level: 10, count: 50, goal: 50, difficulty: 0.5, timestamp: 123 });
         expect(migrated.completions['2026-04-10'].squats.level).toBeUndefined();
         expect(migrated.completions['2026-04-10'].running).toMatchObject({ isCompleted: true, level: 10, legacyCardio: true });
@@ -95,7 +95,7 @@ describe('level migration', () => {
             '2026-04-10': { pushups: { isCompleted: false, count: 40 }, squats: { count: 11 }, abs: { count: 200 } },
         } };
         const migrated = migrateLevelProgress(state);
-        expect(migrated.progressVersion).toBe(4);
+        expect(migrated.progressVersion).toBe(5);
         expect(migrated.completions['2026-04-09'].pushups).toEqual({ isCompleted: true, count: 40, goal: 100, level: 4, difficulty: 0.5, timestamp: 123, weight: 12 });
         expect(migrated.completions['2026-04-09'].planche).toMatchObject({ goal: 200, level: 5, count: 100 });
         expect(migrated.completions['2026-04-10'].pushups).toMatchObject({ goal: 101, level: 3 });

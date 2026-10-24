@@ -54,7 +54,7 @@ Future dates are excluded from streaks.
 
 ## Migration and synchronization
 
-`progressVersion: 4` records the account's migration in both local storage and
+`progressVersion: 5` records the account's migration in both local storage and
 cloud progress. `validateProgressData` upgrades data on local load, cloud load,
 sync, import and realtime updates. New entry metadata survives sanitization.
 
@@ -149,3 +149,5 @@ The profile distinguishes today's attained level from the sustained streak and
 its record, and separates bodyweight reps from weights reps (excluding cardio
 equivalents from this combined volume). Membership badges open explanations;
 stacked level emblems expand the per-level streak details.
+
+Migration v5 recalculates the current day against its full target, preserving recorded reps and timestamps, and repairs reduced goal snapshots from earlier migrations. Past days retain their historical levels and goals.

@@ -101,6 +101,10 @@
   .rise { animation: none; }
 }
 
+:global(.modal-overlay):has(.oledSaverMode) {
+  background: black;
+}
+
 .oledSaverMode {
   background: black !important;
 }

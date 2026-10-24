@@ -60,7 +60,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            signingConfig signingConfigs.release
+            // Keep the release certificate when configured (OAuth fingerprints),
+            // but allow local debug builds without production signing secrets.
+            signingConfig keystoreProperties['storeFile'] ? signingConfigs.release : signingConfigs.debug
         }
     }
 }

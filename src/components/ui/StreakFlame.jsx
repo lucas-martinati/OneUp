@@ -26,6 +26,7 @@ export const StreakFlame = React.memo(({ streak, active, level = 0, weekly = fal
     if (!streak || streak <= 0) return null;
 
     const isBadge = variant === 'badge';
+    const borderColor = active ? 'rgba(249, 115, 22, 0.3)' : 'rgba(148, 163, 184, 0.3)';
     const unit = t(weekly ? 'common.weeksAbbr' : 'common.daysAbbr');
 
     const containerStyle = isBadge
@@ -34,7 +35,7 @@ export const StreakFlame = React.memo(({ streak, active, level = 0, weekly = fal
             fontSize: 'clamp(0.52rem, 1.2vh, 0.7rem)', fontWeight: '700',
             padding: '1px 5px', borderRadius: '999px',
             background: 'rgba(0, 0, 0, 0.35)',
-            border: active ? '1px solid rgba(249, 115, 22, 0.3)' : '1px solid rgba(148, 163, 184, 0.3)',
+            border: `1px solid ${borderColor}`,
             color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
             lineHeight: 1.4,
             ...style
@@ -59,7 +60,7 @@ export const StreakFlame = React.memo(({ streak, active, level = 0, weekly = fal
             }}>
                 {streak}{isBadge ? '' : unit}
             </span>
-            {level > 0 && <><LevelSeparator color={separatorColor} /><LevelEmblem level={level} size={isBadge ? 18 : 22} /></>}
+            {level > 0 && <><LevelSeparator color={separatorColor ?? borderColor} /><LevelEmblem level={level} size={isBadge ? 18 : 22} /></>}
         </div>
     );
 });

@@ -498,7 +498,7 @@ describe('syncWithCloud', () => {
     });
     await useProgressStore.getState().syncWithCloud();
     expect(cloudSync.saveToCloud).toHaveBeenCalledWith(expect.objectContaining({
-      progressVersion: 4,
+      progressVersion: 5,
       completions: { '2026-04-10': {
         pushups: expect.objectContaining({ count: 40, goal: 100, level: 4, isCompleted: true }),
         squats: expect.objectContaining({ level: 10, isCompleted: true }),
@@ -770,7 +770,7 @@ describe('applyCloudData', () => {
     });
     const s = useProgressStore.getState();
     expect(s.isSetup).toBe(true);
-    expect(s.completions[today].pushups.isCompleted).toBe(true);
+    expect(s.completions[today].pushups).toMatchObject({ count: 5, level: 0, isCompleted: false });
   });
 
   it('ignores a null payload', () => {

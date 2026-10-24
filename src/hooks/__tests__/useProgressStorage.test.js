@@ -139,7 +139,7 @@ describe('parseProgressData', () => {
     expect(out.userStartDate).toBe(`${currentYear - 1}-04-15`);
     expect(out.isSetup).toBe(true);
     expect(out.notes[`${currentYear - 1}-05-01`]).toBe('Keep this note');
-    expect(out.progressVersion).toBe(4);
+    expect(out.progressVersion).toBe(5);
     expect(Object.keys(out.completions)).toHaveLength(1);
     expect(out.completions[`${currentYear - 1}-05-01`].pushups.isCompleted).toBe(true);
     expect(out.cardio.sessions.a.type).toBe('running');
