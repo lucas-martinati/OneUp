@@ -20,7 +20,8 @@ const BADGE_BASE = {
     display: 'flex', alignItems: 'center', gap: '5px',
     padding: 'clamp(4px, 0.7vh, 8px) clamp(8px, 1.2vw, 14px)',
     borderRadius: '16px', fontSize: 'clamp(0.75rem, 1.6vh, 0.95rem)',
-    fontWeight: '700', lineHeight: 1.5, flexShrink: 0, cursor: 'pointer',
+    fontWeight: '700', lineHeight: 1.5, flex: '0 0 auto', cursor: 'pointer',
+    width: 'max-content', minWidth: 0,
     // Button resets — all badges are <button> for accessibility.
     color: 'inherit', fontFamily: 'inherit',
     boxSizing: 'border-box', margin: 0,
@@ -51,8 +52,12 @@ export const DashboardHeader = React.memo(({
 
     const headerRef = useRef(null);
     const rightSideRef = useRef(null);
+    const topBarRef = useRef(null);
+    const logoRef = useRef(null);
+    const titleRef = useRef(null);
 
-    const [availableSpace, setAvailableSpace] = useState(500);
+    const [showLogo, setShowLogo] = useState(true);
+    const [showTitle, setShowTitle] = useState(true);
     const [particles, setParticles] = useState([]);
 
     const handleStreakClick = (e) => {
@@ -91,26 +96,35 @@ export const DashboardHeader = React.memo(({
 
     useLayoutEffect(() => {
         const updateSpace = () => {
-            if (!headerRef.current || !rightSideRef.current) return;
-            const w = headerRef.current.getBoundingClientRect().width;
-            if (w > 0) {
-                const rightWidth = rightSideRef.current.getBoundingClientRect().width;
-                const newSpace = w - rightWidth - 40;
-                setAvailableSpace(prev => (Math.abs(prev - newSpace) < 2 ? prev : newSpace));
+            if (!topBarRef.current || !rightSideRef.current) return;
+            const bar = topBarRef.current;
+            if (bar.clientWidth > 0) {
+                const styles = getComputedStyle(bar);
+                const padding = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+                const gap = parseFloat(styles.columnGap) || 0;
+                const available = bar.clientWidth - padding - rightSideRef.current.getBoundingClientRect().width - gap;
+                const logoWidth = logoRef.current?.getBoundingClientRect().width || 0;
+                setShowLogo(available >= logoWidth);
+                const title = titleRef.current;
+                if (title) {
+                    // Keep its layout width while hidden so resizing cannot toggle
+                    // between an ellipsis and an empty title on successive frames.
+                    const minReadableWidth = parseFloat(getComputedStyle(title).fontSize) * 2.5;
+                    setShowTitle(title.getBoundingClientRect().width >= minReadableWidth);
+                }
             }
         };
 
         updateSpace();
 
         const observer = new ResizeObserver(updateSpace);
-        if (headerRef.current) observer.observe(headerRef.current);
+        if (topBarRef.current) observer.observe(topBarRef.current);
+        if (logoRef.current) observer.observe(logoRef.current);
+        if (titleRef.current) observer.observe(titleRef.current);
         if (rightSideRef.current) observer.observe(rightSideRef.current);
 
         return () => observer.disconnect();
     }, []);
-
-    const showText = availableSpace >= 93;
-    const showLogo = availableSpace >= 35;
 
     // Streak badge palette by state
     let streakBadge;
@@ -154,10 +168,12 @@ export const DashboardHeader = React.memo(({
             <Card
                 as="div"
                 padding="none"
+                ref={topBarRef}
                 className="dashboard-header-top-bar"
                 style={{
                     display: 'flex',
-                    justify: 'space-between',
+                    justifyContent: 'space-between',
+                    gap: 'var(--space-2)',
                     alignItems: 'center',
                     width: '100%',
                     boxSizing: 'border-box',
@@ -168,28 +184,28 @@ export const DashboardHeader = React.memo(({
                     animation: `${entranceAnimation}, headerUnfold 0.5s ease-out forwards`,
                 }}
             >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0, flexShrink: 1 }}>
-                    {showLogo && (
-                        <img
-                            onClick={() => window.location.reload()}
-                            src={`${import.meta.env.BASE_URL}logo-64x64.webp`}
-                            alt="OneUp Logo"
-                            className="bounce-on-hover"
-                            style={{
-                                width: 'clamp(28px, 4vh, 40px)',
-                                height: 'clamp(28px, 4vh, 40px)',
-                                flexShrink: 0,
-                                borderRadius: '10px',
-                                cursor: 'pointer',
-                                transition: 'transform 0.3s ease'
-                            }}
-                        />
-                    )}
-                    {showText && (
-                        <span className="app-logo-text">
-                            OneUp
-                        </span>
-                    )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
+                    <img
+                        ref={logoRef}
+                        aria-hidden={!showLogo}
+                        onClick={() => window.location.reload()}
+                        src={`${import.meta.env.BASE_URL}logo-64x64.webp`}
+                        alt="OneUp Logo"
+                        className="bounce-on-hover"
+                        style={{
+                            width: 'clamp(28px, 4vh, 40px)',
+                            height: 'clamp(28px, 4vh, 40px)',
+                            flexShrink: 0,
+                            borderRadius: '10px',
+                            cursor: 'pointer',
+                            ...(!showLogo ? { position: 'absolute', visibility: 'hidden', pointerEvents: 'none' } : {}),
+                            transition: 'transform 0.3s ease'
+                        }}
+                    />
+                    <span ref={titleRef} className="app-logo-text" aria-hidden={!showTitle}
+                        style={{ flexShrink: 1, visibility: showTitle ? 'visible' : 'hidden' }}>
+                        OneUp
+                    </span>
                 </div>
 
                 <Stack
