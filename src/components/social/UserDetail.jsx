@@ -1,8 +1,9 @@
+import { CloseButton } from '@components/ui/CloseButton';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Trophy, Medal, Award, Activity, Dumbbell, Calendar, Star, getIcon } from '@utils/icons';
+import { Trophy, Medal, Award, Activity, Dumbbell, Calendar, Star, getIcon } from '@utils/icons';
 import { Avatar } from '@components/ui/Avatar';
-import { Button, ModalContainer, WeightBadge } from '@components/ui';
+import { ModalContainer, WeightBadge } from '@components/ui';
 import { StreakFlame } from '@components/ui/StreakFlame';
 import { LevelProfileSummary } from '@components/ui/LevelProfileSummary';
 import { LevelStreakDetails } from '@components/ui/LevelStreakDetails';
@@ -74,7 +75,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                         <UserTierBadges entry={entry} />
                     </div>
                 </div>
-                <div className={styles.close}><Button iconOnly icon={X} variant="ghost" size="sm" onClick={onClose} aria-label={t('common.close')} /></div>
+                <div className={styles.close}><CloseButton onClick={onClose} /></div>
             </header>
             <div className={styles.body}>
                 {!loadingDetails && <LevelProfileSummary stats={stats} todayLevel={todayLevel} />}

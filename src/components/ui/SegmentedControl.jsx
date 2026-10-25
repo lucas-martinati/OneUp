@@ -36,17 +36,12 @@ export function SegmentedControl({
 
   const rawIndex = options.findIndex(o => o.id === effectiveValue);
   const activeIndex = rawIndex >= 0 ? rawIndex : 0;
-  const activeOption = options[activeIndex] || options[0];
+  const activeOption = options[activeIndex] || {};
 
   const handleOptionClick = (clickedId) => {
-    if (options.length === 2) {
-      if (clickedId === effectiveValue) {
-        const other = options.find(o => o.id !== clickedId) || options[0];
-        onChange(other.id);
-      } else {
-        onChange(clickedId);
-      }
-    } else {
+    if (options.length === 2 && clickedId === effectiveValue) {
+      onChange(options.find(option => option.id !== clickedId).id);
+    } else if (clickedId !== effectiveValue) {
       onChange(clickedId);
     }
   };
@@ -55,7 +50,7 @@ export function SegmentedControl({
   const PADDINGS = { sm: '4px 10px', lg: '8px 18px', md: '6px 14px' };
   const FONT_SIZES = { sm: '0.75rem', lg: '0.88rem', md: '0.82rem' };
 
-  let pad = PADS[size] || 4;
+  const pad = PADS[size] || 4;
   const count = options.length || 1;
 
   const fontSize = FONT_SIZES[size] || '0.82rem';
@@ -140,7 +135,8 @@ export function SegmentedControl({
       }}
     >
       {/* Sliding Indicator */}
-      <div 
+      <div
+        aria-hidden="true"
         style={{
           position: 'absolute',
           boxSizing: 'border-box',
@@ -157,13 +153,26 @@ export function SegmentedControl({
         }}
       />
 
-      {options.map((option) => {
+      {options.map((option, index) => {
         const isActive = option.id === effectiveValue;
         return (
           <button
             key={option.id}
             type="button"
+            className="segmented-option"
+            aria-pressed={isActive}
             onClick={() => handleOptionClick(option.id)}
+            onKeyDown={(event) => {
+              let next;
+              if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % count;
+              if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index + count - 1) % count;
+              if (event.key === 'Home') next = 0;
+              if (event.key === 'End') next = count - 1;
+              if (next === undefined) return;
+              event.preventDefault();
+              if (options[next].id !== effectiveValue) onChange(options[next].id);
+              event.currentTarget.parentElement.querySelectorAll('button')[next]?.focus();
+            }}
             style={{
               padding: buttonPadding,
               borderRadius: vStyles.buttonBorderRadius || vStyles.indicator.borderRadius || 'var(--radius-full)',
@@ -186,11 +195,10 @@ export function SegmentedControl({
               textOverflow: 'ellipsis',
               width: '100%',
               boxSizing: 'border-box',
-              WebkitTapHighlightColor: 'transparent',
-              outline: 'none'
+              WebkitTapHighlightColor: 'transparent'
             }}
           >
-            {option.icon && <span>{option.icon}</span>}
+            {option.icon && <span aria-hidden="true">{option.icon}</span>}
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {option.label}
             </span>

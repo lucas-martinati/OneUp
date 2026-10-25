@@ -153,3 +153,29 @@ describe('ModalContainer ambientGlow', () => {
   });
 });
 
+
+
+describe('ModalContainer keyboard focus', () => {
+  it('focuses the dialog and returns focus to its opener on close', () => {
+    const opener = document.createElement('button');
+    document.body.append(opener);
+    opener.focus();
+    const { unmount } = render(<ModalContainer open ariaLabel="Focus test"><button>Action</button></ModalContainer>);
+    expect(document.activeElement).toBe(screen.getByRole('dialog'));
+    unmount();
+    expect(document.activeElement).toBe(opener);
+    opener.remove();
+  });
+
+  it('only dismisses the top dialog on Escape', () => {
+    const onParentClose = vi.fn();
+    const onChildClose = vi.fn();
+    render(<>
+      <ModalContainer open onClose={onParentClose} ariaLabel="Parent">Parent</ModalContainer>
+      <ModalContainer open onClose={onChildClose} ariaLabel="Child">Child</ModalContainer>
+    </>);
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onParentClose).not.toHaveBeenCalled();
+    expect(onChildClose).toHaveBeenCalledTimes(1);
+  });
+});

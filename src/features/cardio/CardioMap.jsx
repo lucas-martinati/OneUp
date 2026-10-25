@@ -1,14 +1,12 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-leaflet';
+import { MapContainer, Polyline, CircleMarker, useMap } from 'react-leaflet';
 import { useBackHandler } from '@hooks/useBackHandler';
 import { CardioFullscreenMap } from './CardioFullscreenMap';
-import { MAP_TILES } from '@config/mapTiles';
+import { MapTileLayer } from './MapTileLayer';
 import { MapPin } from '@utils/icons';
 import 'leaflet/dist/leaflet.css';
 
-// Dark map tiles (CartoDB Dark Matter)
-const TILE_URL = MAP_TILES.dark;
 
 // Fit bounds component - zoom in to fill the container
 function FitBounds({ gpsTrack }) {
@@ -101,7 +99,9 @@ export const CardioMap = React.memo(({ gpsTrack, height = 'var(--cardio-map-heig
   // Compact view
   return (
     <div
-      onClick={handleExpand}
+      onClick={(event) => {
+        if (!event.target.closest('.leaflet-control-attribution')) handleExpand();
+      }}
       style={{
         width: '100%', height, flex: '1 1 auto', minHeight: '50px',
         borderRadius: 'var(--radius-md)',
@@ -125,7 +125,7 @@ export const CardioMap = React.memo(({ gpsTrack, height = 'var(--cardio-map-heig
         boxZoom={false}
         keyboard={false}
       >
-        <TileLayer url={TILE_URL} attribution="" />
+        <MapTileLayer />
         <FitBounds gpsTrack={gpsTrack} />
         
         <Polyline

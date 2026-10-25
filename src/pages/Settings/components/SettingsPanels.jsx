@@ -25,7 +25,6 @@ export function PreferencesSection({ settings, onSave }) {
                     icon={Bell}
                     title={t('settings.notifications')}
                     description={t('settings.reminder')}
-                    color="var(--accent-glow)"
                     isLast={!settings.notificationsEnabled}
                 >
                     <ToggleSwitch

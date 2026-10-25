@@ -1,10 +1,10 @@
+import { CloseButton } from '@components/ui/CloseButton';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { HeartHandshake, X } from '@utils/icons';
+import { HeartHandshake } from '@utils/icons';
 import { sounds } from '@utils/soundManager';
 import { cloudSync } from '@services/cloudSync';
 import { Avatar } from '@components/ui/Avatar';
-import { Button } from '@components/ui';
 import { useToastGestures } from '@hooks/useToastGestures';
 import { getToastRoot } from '../feedback/toastRoot';
 import styles from '@styles/NotificationManager.module.css';
@@ -43,16 +43,10 @@ function PokeToast({ toast, onDone }) {
                 <div className={styles.message}>{toast.message}</div>
             </div>
 
-            <Button
-                variant="ghost"
-                iconOnly
-                className={styles.close}
+            <CloseButton
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => { e.stopPropagation(); dismiss(); }}
-                aria-label="dismiss"
-            >
-                <X size={16} />
-            </Button>
+            />
 
             {!exit && <span key={toast.count} className={styles.progress} />}
         </div>

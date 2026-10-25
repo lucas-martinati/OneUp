@@ -116,7 +116,6 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
           icon={Sparkles}
           title="Utilisateur PRO"
           description="Déverrouille les catégories personnalisées, les thèmes Pro, etc."
-          color="var(--accent-glow)"
           isLast={false}
         >
           <ToggleSwitch
@@ -223,7 +222,6 @@ export function AdminUserForm({ formState, setFormState, meta, saveLoading, onSa
           icon={Volume2}
           title="Sons"
           description="Effets sonores de l'application."
-          color="var(--accent-glow)"
           isLast={false}
         >
           <ToggleSwitch

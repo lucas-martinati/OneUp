@@ -1,15 +1,14 @@
+import { CloseButton } from '@components/ui/CloseButton';
 import React, { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { MapContainer, TileLayer, Polyline, CircleMarker, useMap } from 'react-leaflet';
+import { MapContainer, Polyline, CircleMarker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useBackHandler } from '@hooks/useBackHandler';
-import { X, Clock, Target, TrendingUp, Footprints } from '@utils/icons';
-import { Button } from '@components/ui';
-import { MAP_TILES } from '@config/mapTiles';
+import { Clock, Target, TrendingUp, Footprints } from '@utils/icons';
+import { MapTileLayer } from './MapTileLayer';
 import { formatDuration, formatDistance, formatSpeed } from '@utils/cardioFormatters';
 
-const TILE_URL = MAP_TILES.dark;
 
 // Fit bounds component to handle zoom correctly
 function FullscreenFitBounds({ gpsTrack }) {
@@ -76,7 +75,7 @@ export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
         <MapContainer
           bounds={initialBounds}
           boundsOptions={{ padding: [50, 50], maxZoom: 17 }}
-          style={{ height: '100%', width: '100%', background: '#0d0d1a' }}
+          className="cardio-fullscreen-map"
           zoomControl={false}
           scrollWheelZoom={true}
           dragging={true}
@@ -85,7 +84,7 @@ export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
           boxZoom={true}
           keyboard={true}
         >
-          <TileLayer url={TILE_URL} attribution="" />
+          <MapTileLayer />
           <FullscreenFitBounds gpsTrack={gpsTrack} />
 
           {/* Outer glow line */}
@@ -195,7 +194,7 @@ export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
           </div>
 
           {/* Close button (Right) */}
-          <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label={t('common.close')} />
+          <CloseButton onClick={onClose} />
         </div>
 
         {/* Floating stats bar */}
@@ -203,7 +202,7 @@ export function CardioFullscreenMap({ gpsTrack, title, session, onClose }) {
           <div style={{
             position: 'absolute', bottom: 0, left: 0, right: 0,
             paddingBottom: 'calc(16px + env(safe-area-inset-bottom))',
-            padding: '0 16px calc(16px + env(safe-area-inset-bottom))',
+            padding: '0 16px calc(40px + env(safe-area-inset-bottom))',
             zIndex: 1001,
             display: 'flex', justifyContent: 'center',
           }}>

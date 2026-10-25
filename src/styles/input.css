@@ -17,7 +17,7 @@
   font-weight: 700;
   color: var(--text-secondary);
   letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
+  line-height: var(--line-height-tight);
 }
 
 .input-wrapper {
@@ -33,7 +33,7 @@
 .input-wrapper:focus-within {
   background: var(--surface-dim);
   border-color: var(--accent-glow);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-glow) 20%, transparent);
+  box-shadow: var(--focus-ring);
 }
 
 .input-wrapper--error {
@@ -53,6 +53,7 @@
 
 .input-field {
   width: 100%;
+  min-width: 0;
   border: none;
   background: transparent;
   color: var(--text-primary);
@@ -71,7 +72,7 @@
 
 .input-wrapper--sm .input-field {
   padding: 6px 12px;
-  min-height: 36px;
+  min-height: var(--control-height-sm);
   font-size: var(--text-sm);
 }
 
@@ -82,7 +83,7 @@
 
 .input-wrapper--lg .input-field {
   padding: 14px 18px;
-  min-height: 50px;
+  min-height: var(--control-height-lg);
   font-size: 1rem;
 }
 
@@ -110,9 +111,10 @@
 }
 
 /* Select specifics */
-.input-field--select {
+.input-wrapper .input-field--select {
   appearance: none;
   cursor: pointer;
+  padding-right: var(--space-10);
 }
 
 .input-field--select:disabled {
@@ -129,4 +131,21 @@
 .input-helper {
   font-size: var(--text-xs);
   color: var(--text-secondary);
+}
+
+.input-field--select option {
+  background: var(--select-option-bg);
+  color: var(--text-primary);
+}
+
+/* The chevron is decorative; the entire select remains clickable. */
+.input-select-chevron {
+  position: absolute;
+  right: var(--space-3);
+  pointer-events: none;
+}
+
+.input-helper,
+.input-error {
+  line-height: var(--line-height-relaxed);
 }

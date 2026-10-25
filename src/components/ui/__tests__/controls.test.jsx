@@ -23,10 +23,13 @@ describe('SegmentedControl', () => {
   const two = [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }];
   const three = [{ id: 'x', label: 'X', icon: '🏃' }, { id: 'y', label: 'Y' }, { id: 'z', label: 'Z' }];
 
-  it('toggles to the other option when clicked with exactly two options', () => {
+  it('toggles to the other option when the active option is clicked with two options', () => {
     const onChange = vi.fn();
     const { getByText } = render(<SegmentedControl options={two} value="a" onChange={onChange} />);
     fireEvent.click(getByText('A'));
+    expect(onChange).toHaveBeenCalledWith('b');
+    onChange.mockClear();
+    fireEvent.click(getByText('B'));
     expect(onChange).toHaveBeenCalledWith('b');
   });
 
@@ -36,6 +39,16 @@ describe('SegmentedControl', () => {
     fireEvent.click(getByText('Z'));
     expect(onChange).toHaveBeenCalledWith('z');
     expect(onChange).toHaveBeenCalledTimes(1);
+  });
+
+  it('announces selection and supports arrow navigation with wrapping', () => {
+    const onChange = vi.fn();
+    const { getByRole } = render(<SegmentedControl options={three} value="x" onChange={onChange} />);
+    const selected = getByRole('button', { name: 'X' });
+    expect(selected.getAttribute('aria-pressed')).toBe('true');
+    fireEvent.keyDown(selected, { key: 'ArrowLeft' });
+    expect(onChange).toHaveBeenCalledWith('z');
+    expect(document.activeElement).toBe(getByRole('button', { name: 'Z' }));
   });
 
   it('renders an option icon when present', () => {
@@ -194,9 +207,9 @@ describe('SettingRow', () => {
 
   it('drops the bottom border when it is the last row', () => {
     const { container, rerender } = render(<SettingRow icon={Icon} title="T" color="#fff" />);
-    expect(container.firstChild.style.borderBottom).toContain('solid');
+    expect(container.firstChild.className).not.toContain('setting-row--last');
     rerender(<SettingRow icon={Icon} title="T" color="#fff" isLast />);
-    expect(container.firstChild.style.borderBottom).not.toContain('solid');
+    expect(container.firstChild.className).toContain('setting-row--last');
   });
 });
 

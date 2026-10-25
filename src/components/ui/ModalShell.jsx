@@ -1,7 +1,6 @@
+import { CloseButton } from './CloseButton';
 import { useMemo } from 'react';
-import { Button } from './Button';
 import { ModalContainer } from './ModalContainer';
-import { X } from '@utils/icons';
 
 /**
  * Structured dialog shell providing consistent header / body / footer
@@ -62,7 +61,9 @@ export function ModalShell({
           ? '0 24px 64px rgba(0, 0, 0, 0.5), 0 0 40px color-mix(in srgb, var(--error) 10%, transparent)'
           : 'var(--shadow-lg)',
       animation: 'dialogPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
-      overflow: 'hidden',
+      maxHeight: '100%',
+      overflowY: 'auto',
+      overscrollBehavior: 'contain',
       ...style,
     }),
     [size, variant, accentTint, style],
@@ -137,13 +138,8 @@ export function ModalShell({
 
             {/* Close button */}
             {showX && (
-              <Button
-                iconOnly
-                icon={X}
+              <CloseButton
                 onClick={onClose}
-                variant="glass"
-                size="sm"
-                aria-label="Close dialog"
                 style={{ flexShrink: 0 }}
               />
             )}
@@ -164,7 +160,8 @@ export function ModalShell({
               padding: '0 var(--space-6) var(--space-6)',
               display: 'flex',
               flexDirection: footerLayout,
-              gap: '10px',
+              gap: 'var(--space-3)',
+              flexWrap: 'wrap',
             }}
           >
             {footer}

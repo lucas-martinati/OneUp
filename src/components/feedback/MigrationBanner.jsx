@@ -1,9 +1,9 @@
+import { CloseButton } from '@components/ui/CloseButton';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Rocket, ArrowRight, X } from '@utils/icons';
+import { Rocket, ArrowRight } from '@utils/icons';
 import { isNativePlatform } from '@utils/platform';
 import { APP_URL, APP_URL_DISPLAY } from '@config/app';
-import { Button } from '@components/ui';
 
 // Dismissal is kept per-session only: the user should keep being reminded on
 // later visits until they actually move to the new domain.
@@ -97,25 +97,7 @@ export function MigrationBanner() {
         {t('migration.button')}
         <ArrowRight size={14} />
       </a>
-      <Button
-        variant="ghost"
-        onClick={dismiss}
-        aria-label={t('common.close')}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '4px',
-          border: 'none',
-          background: 'transparent',
-          color: '#fff',
-          cursor: 'pointer',
-          opacity: 0.8,
-          flexShrink: 0,
-        }}
-      >
-        <X size={16} />
-      </Button>
+      <CloseButton onClick={dismiss} />
     </div>
   );
 }

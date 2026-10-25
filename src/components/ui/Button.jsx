@@ -77,6 +77,7 @@ export const Button = forwardRef(function Button(
       ref={ref}
       type={type}
       disabled={isDisabled}
+      aria-busy={loading || undefined}
       onClick={handleClick}
       className={classes}
       style={combinedStyle}

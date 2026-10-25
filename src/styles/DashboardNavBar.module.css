@@ -32,13 +32,13 @@
 }
 
 .navItem:active {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--surface-dim);
   color: var(--text-primary);
   transform: scale(0.94);
 }
 
 .label {
-  font-size: clamp(0.55rem, 1.3vh, 0.7rem);
+  font-size: clamp(0.65rem, 1.3vh, 0.75rem);
   font-weight: 600;
   max-width: 100%;
   overflow: hidden;
@@ -79,12 +79,12 @@
 
 .navItem:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-subtle);
 }
 
 .sessionBtn:hover .sessionCircle {
-  transform: translateY(-4px) scale(1.08) !important;
-  filter: brightness(1.15) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25)) !important;
+  transform: translateY(-2px) scale(1.04);
+  filter: brightness(1.08);
 }
 
 .sessionBtn:active .sessionCircle {
@@ -122,6 +122,6 @@
     --session-circle-size: clamp(42px, 6.4vh, 50px);
   }
   .label {
-    font-size: clamp(0.5rem, 1.2vh, 0.62rem);
+    font-size: 0.65rem;
   }
 }

@@ -1,6 +1,7 @@
+import { CloseButton } from '@components/ui/CloseButton';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Cloud, X } from '@utils/icons';
+import { Cloud } from '@utils/icons';
 import { useAuth } from '@contexts/AuthContext';
 import { GoogleIcon } from '@components/ui/GoogleIcon';
 import { Button } from '@components/ui';
@@ -112,24 +113,7 @@ export function GuestCloudBackupBanner({ displayStreak = 0, totalReps = 0 }) {
         </span>
       </Button>
 
-      <Button
-        variant="ghost"
-        onClick={dismiss}
-        aria-label={t('common.close')}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '4px',
-          border: 'none',
-          background: 'transparent',
-          color: 'var(--text-tertiary)',
-          cursor: 'pointer',
-          flexShrink: 0,
-        }}
-      >
-        <X size={16} />
-      </Button>
+      <CloseButton onClick={dismiss} />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { forwardRef, useId } from 'react';
+import { ChevronDown } from '@utils/icons';
 
 /**
  * Standardized Form Input primitive for the entire app.
@@ -83,6 +84,7 @@ export const Input = forwardRef(function Input(
           />
         )}
 
+        {isSelect && !IconRightComponent && <ChevronDown size={16} className="input-icon input-select-chevron" aria-hidden="true" />}
         {IconRightComponent && <IconRightComponent className="input-icon input-icon--right" size={size === 'sm' ? 14 : 18} />}
       </div>
 

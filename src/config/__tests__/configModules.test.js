@@ -23,9 +23,10 @@ describe('languages config', () => {
 });
 
 describe('mapTiles config', () => {
-  it('provides dark and light tile URLs', () => {
-    expect(MAP_TILES.dark).toMatch(/^https:\/\//);
-    expect(MAP_TILES.light).toMatch(/^https:\/\//);
+  it('uses the keyless OpenStreetMap endpoint with visible attribution', () => {
+    expect(MAP_TILES.url).toBe('https://tile.openstreetmap.org/{z}/{x}/{y}.png');
+    expect(MAP_TILES.attribution).toContain('https://www.openstreetmap.org/copyright');
+    expect(MAP_TILES.maxZoom).toBe(19);
   });
 });
 

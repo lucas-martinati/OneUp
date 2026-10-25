@@ -26,6 +26,7 @@ export const DashboardNavBar = React.memo(({
     const navItem = (id, Icon, label) => (
         <Button
             variant="ghost"
+            lift={false}
             key={id}
             onClick={() => openModal(id)}
             aria-label={label}
@@ -44,6 +45,7 @@ export const DashboardNavBar = React.memo(({
             {/* Central Séance button */}
             <Button
                 variant="ghost"
+                lift={false}
                 onClick={() => {
                     openSession('config');
                     pauseCloudSync?.();

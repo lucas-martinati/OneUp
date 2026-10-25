@@ -1,5 +1,6 @@
 export { Avatar } from './Avatar';
 export { Button } from './Button';
+export { CloseButton } from './CloseButton';
 export { Card } from './Card';
 export { CategoryChips } from './CategoryChips';
 export { ConfirmDialog } from './ConfirmDialog';

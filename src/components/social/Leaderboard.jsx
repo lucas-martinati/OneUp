@@ -1,6 +1,7 @@
+import { CloseButton } from '@components/ui/CloseButton';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { X, Trophy, LogOut, Activity } from '@utils/icons';
+import { Trophy, LogOut, Activity } from '@utils/icons';
 import { Button, Spinner, GoogleSignInButton, ModalContainer } from '@components/ui';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { EXERCISES } from '@config/exercises';
@@ -211,7 +212,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
                     />
                 </div>
 
-                <Button iconOnly icon={X} variant="glass" onClick={onClose}  aria-label="Close" style={{ flexShrink: 0 }} />
+                <CloseButton onClick={onClose} style={{ flexShrink: 0 }} />
             </div>
 
             {/* Back button and Clan Name when viewing a specific clan */}

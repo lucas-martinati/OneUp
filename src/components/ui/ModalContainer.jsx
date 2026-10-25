@@ -50,6 +50,27 @@ export function ModalContainer({
 
   const handleKeyDown = useCallback(
     (e) => {
+      const dialog = backdropRef.current;
+      const dialogs = document.querySelectorAll('[data-modal-shell]');
+      // Only the top dialog handles keys when dialogs are stacked.
+      if (dialogs[dialogs.length - 1] !== dialog) return;
+      if (e.key === 'Tab') {
+        const focusable = Array.from(dialog.querySelectorAll(
+          'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]'
+        )).filter(element => element.tabIndex >= 0 && element.getClientRects().length > 0);
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (!first) {
+          e.preventDefault();
+          dialog.focus();
+        } else if (e.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && (document.activeElement === last || !dialog.contains(document.activeElement))) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
       if (closeOnEscape && e.key === 'Escape') {
         light();
         onClose?.();
@@ -57,6 +78,16 @@ export function ModalContainer({
     },
     [closeOnEscape, onClose, light],
   );
+
+  useEffect(() => {
+    if (!open) return;
+    const previousFocus = document.activeElement;
+    // Focus the shell without opening the mobile keyboard or scrolling content.
+    backdropRef.current?.focus({ preventScroll: true });
+    return () => {
+      if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    };
+  }, [open]);
 
   // Handle hardware back button on Android / PWA
   const handleBack = useCallback(() => {
@@ -101,6 +132,8 @@ export function ModalContainer({
       onClick={handleBackdropClick}
       className={`fade-in ${baseClass} ${className}`}
       role="dialog"
+      tabIndex={-1}
+      data-modal-shell="true"
       aria-modal="true"
       aria-label={ariaLabel}
       style={{

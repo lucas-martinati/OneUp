@@ -77,7 +77,7 @@ test('migrates once, counts partial reps and keeps higher milestones accessible 
     await expect(page.getByText('Streaks by level').first()).toBeVisible();
     await expect(page.getByLabel('Lvl 1–6', { exact: true })).toBeVisible();
     await page.screenshot({ path: 'test-results/levels-streaks-mobile.png', fullPage: true, animations: 'disabled' });
-    await page.getByRole('dialog').getByRole('button', { name: 'Close dialog', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click();
     await page.getByRole('button', { name: 'Calendar', exact: true }).click();
     const day = page.getByRole('button', { name: /^19 February/ });
     await expect(day).toHaveAccessibleName('19 February · Lvl 6');

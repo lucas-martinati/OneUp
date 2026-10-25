@@ -26,6 +26,6 @@ test.describe('Main Pages Loading', () => {
 
     await counterButton.click();
 
-    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByRole('dialog', { name: /push-ups|pompes/i })).toBeVisible();
   });
 });

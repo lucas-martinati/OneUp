@@ -34,7 +34,11 @@
   --text-md: 0.9rem;
 
   /* Touch targets */
-  --touch-min: 40px;
+  --touch-min: 44px;
+  --control-height-sm: 40px;
+  --close-button-size: 40px;
+  --control-height-lg: 52px;
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--accent-glow) 20%, transparent);
 
   /* Dashboard sizes */
   --exercise-btn-min-height: clamp(62px, 9.2vh, 80px);

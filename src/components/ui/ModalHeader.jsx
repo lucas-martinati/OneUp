@@ -1,6 +1,7 @@
+import { CloseButton } from './CloseButton';
 import { useTranslation } from 'react-i18next';
 import { Button } from './Button';
-import { X, ArrowLeft } from '@utils/icons';
+import { ArrowLeft } from '@utils/icons';
 
 /**
  * Standardized Modal Header component to enforce consistent modal titles,
@@ -70,12 +71,8 @@ export function ModalHeader({
         
         {/* Bouton de fermeture géré par le paramètre showClose */}
         {showClose && onClose && (
-          <Button
-            iconOnly
-            icon={X}
+          <CloseButton
             onClick={onClose}
-            aria-label={t('common.close')}
-            variant="glass"
           />
         )}
       </div>

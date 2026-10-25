@@ -56,7 +56,7 @@
 .btn--sm {
   padding: 6px 14px;
   font-size: var(--text-sm);
-  min-height: 36px;
+  min-height: var(--control-height-sm);
   border-radius: var(--radius-sm);
 }
 
@@ -70,7 +70,7 @@
 .btn--lg {
   padding: 14px 24px;
   font-size: 1rem;
-  min-height: 50px;
+  min-height: var(--control-height-lg);
   border-radius: var(--radius-lg);
 }
 
@@ -206,12 +206,12 @@
   color: var(--text-primary);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px var(--border-default);
 }
 
 .btn--glass:hover:not(:disabled) {
   background: var(--surface-dim);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
   color: var(--text-primary);
 }
 
@@ -265,4 +265,21 @@
 
 .btn--link:active:not(:disabled) {
   transform: none;
+}
+
+.btn > svg,
+.btn > [aria-hidden] {
+  flex-shrink: 0;
+}
+
+/* Closing always uses the same dimensions, independent of button size tokens. */
+.btn.btn--close {
+  width: var(--close-button-size);
+  height: var(--close-button-size);
+  min-width: var(--close-button-size);
+  min-height: var(--close-button-size);
+  max-width: var(--close-button-size);
+  max-height: var(--close-button-size);
+  padding: 0;
+  flex-shrink: 0;
 }

@@ -1,31 +1,15 @@
 import { test as base, expect } from '@playwright/test';
+import CURRENT_ANNOUNCEMENT from '../src/features/announcements/announcementConfig.js';
 
-/**
- * Shared test fixture that neutralises the returning-user announcement overlay.
- *
- * `useAnnouncement` shows a full-screen overlay 800ms after the dashboard mounts
- * for any user who has opened the app before (the `oneup_has_opened` flag). In
- * E2E it pops in mid-interaction and intercepts pointer events, causing flaky
- * failures. Clearing the flag before every page load forces the "new user" path,
- * where the overlay is never shown — independent of the current announcement id.
- */
+/** Keep release announcements from interrupting unrelated test journeys. */
 export const test = base.extend({
   page: async ({ page }, use) => {
-    await page.addInitScript(() => {
-      try { window.localStorage.removeItem('oneup_has_opened'); } catch { /* ignore */ }
-
-      // Safety net: even if a dashboard remount re-triggers the overlay, keep it
-      // hidden so it can never intercept pointer events. The `.ann-backdrop`
-      // class is stable across announcement content changes.
-      const css = '.ann-backdrop{display:none!important;pointer-events:none!important}';
-      const inject = () => {
-        const style = document.createElement('style');
-        style.textContent = css;
-        (document.head || document.documentElement).appendChild(style);
-      };
-      if (document.head) inject();
-      else document.addEventListener('DOMContentLoaded', inject);
-    });
+    await page.addInitScript((announcementId) => {
+      try {
+        localStorage.setItem(`announcement_seen_${announcementId}`, '1');
+        localStorage.removeItem('oneup_has_opened');
+      } catch { /* Storage may be unavailable in a restricted context. */ }
+    }, CURRENT_ANNOUNCEMENT.id);
     await use(page);
   },
 });

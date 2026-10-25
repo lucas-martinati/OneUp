@@ -132,29 +132,6 @@
   text-overflow: ellipsis;
 }
 
-.close {
-  padding: 0;
-  min-width: 30px;
-  min-height: 30px;
-  aspect-ratio: 1;
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: none;
-  background: color-mix(in srgb, var(--text-secondary) 14%, transparent);
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background 0.18s ease, color 0.18s ease;
-}
-
-.close:hover {
-  background: color-mix(in srgb, var(--text-secondary) 24%, transparent);
-  color: var(--text-primary, white);
-}
-
 /* Auto-dismiss countdown bar */
 .progress {
   position: absolute;

@@ -1,19 +1,12 @@
-export function SettingRow({ icon: IconComponent, title, description, color, children, isLast }) {
+export function SettingRow({ icon: IconComponent, title, description, color = 'var(--accent-glow)', children, isLast }) {
     return (
-        <div style={{
-            padding: '12px 0',
-            borderBottom: isLast ? 'none' : '1px solid var(--border-default)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px'
-        }}>
+        <div className={`setting-row${isLast ? ' setting-row--last' : ''}`}>
             <div className="flex-align-center gap-12" style={{ flex: 1, minWidth: 0 }}>
                 <div style={{
                     /* color-mix (pas de concat alpha) : accepte hex ET var(--token) */
                     background: `linear-gradient(135deg, color-mix(in srgb, ${color} 13%, transparent), color-mix(in srgb, ${color} 3%, transparent))`,
-                    padding: '10px',
-                    borderRadius: '12px',
+                    padding: 'var(--space-3)',
+                    borderRadius: 'var(--radius-md)',
                     border: `1px solid color-mix(in srgb, ${color} 19%, transparent)`,
                     display: 'flex',
                     alignItems: 'center',
@@ -25,7 +18,7 @@ export function SettingRow({ icon: IconComponent, title, description, color, chi
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)' }}>{title}</div>
                     {description && (
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                        <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginTop: '2px' }}>
                             {description}
                         </div>
                     )}

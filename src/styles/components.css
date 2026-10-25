@@ -129,8 +129,8 @@ button:focus:not(:focus-visible) {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-6);
-  background: rgba(0, 0, 0, 0.85);
+  padding: max(var(--page-padding), env(safe-area-inset-top)) var(--page-padding) max(var(--page-padding), env(safe-area-inset-bottom));
+  background: var(--overlay-backdrop);
   animation: overlayFadeIn 0.2s ease-out;
 }
 
@@ -596,7 +596,7 @@ button:focus:not(:focus-visible) {
   gap: var(--space-2);
   z-index: 100;
   padding: var(--space-3) 6px; /* Tighter padding around the elements */
-  background: rgba(10, 10, 15, 0.4);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 20px;
@@ -622,10 +622,10 @@ button:focus:not(:focus-visible) {
   right: calc(100% + 12px);
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(15, 23, 42, 0.92);
+  background: var(--tooltip-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(99, 102, 241, 0.4);
+  border: 1px solid var(--border-strong);
   color: var(--text-primary);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
@@ -648,7 +648,7 @@ button:focus:not(:focus-visible) {
 }
 
 .category-nav-container.expanded {
-  background: rgba(20, 20, 25, 0.7);
+  background: var(--sheet-bg);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   border: 1px solid var(--border-default);
 }
@@ -798,103 +798,6 @@ button:focus:not(:focus-visible) {
   .category-nav-dot:hover {
     width: 32px !important;
   }
-}
-
-/* ── Standardized Form Input Control Primitive ── */
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-.input-group--full {
-  width: 100%;
-}
-
-.input-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  letter-spacing: 0.02em;
-}
-
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  background: var(--surface-muted);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  transition: border-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease, background var(--motion-fast) ease;
-}
-
-.input-wrapper:focus-within {
-  border-color: var(--accent-glow);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-glow) 20%, transparent);
-  background: var(--surface-hover);
-}
-
-.input-wrapper--error {
-  border-color: var(--error) !important;
-}
-
-.input-wrapper--error:focus-within {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--error) 25%, transparent) !important;
-}
-
-.input-wrapper--disabled {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.input-wrapper--sm { min-height: 36px; padding: 0 10px; }
-.input-wrapper--md { min-height: 42px; padding: 0 14px; }
-.input-wrapper--lg { min-height: 50px; padding: 0 16px; }
-
-.input-field {
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: 0.9rem;
-}
-
-.input-field::placeholder {
-  color: var(--text-tertiary);
-}
-
-.input-field--select {
-  cursor: pointer;
-  appearance: none;
-  padding-right: 20px;
-}
-
-.input-field--select option {
-  background: var(--select-option-bg, rgba(26, 26, 46, 1));
-  color: var(--text-primary);
-}
-
-.input-icon {
-  color: var(--text-secondary);
-  flex-shrink: 0;
-}
-.input-icon--left { margin-right: 8px; }
-.input-icon--right { margin-left: 8px; }
-
-.input-error {
-  font-size: 0.75rem;
-  color: var(--error);
-  font-weight: 500;
-  margin-top: 2px;
-}
-
-.input-helper {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-  margin-top: 2px;
 }
 
 /* ── Standardized Badge Primitive ── */
@@ -1079,3 +982,57 @@ button:focus:not(:focus-visible) {
 }
 
 
+
+/* Shared settings rhythm and selector interactions, across every panel. */
+.setting-row {
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.setting-row--last {
+  border-bottom: none;
+}
+
+.setting-row > :last-child {
+  flex-shrink: 0;
+}
+
+.segmented-option:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: -2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .segmented-option[aria-pressed="false"]:hover {
+    background: var(--surface-hover) !important;
+  }
+}
+
+/* The dialog shell receives programmatic focus; controls keep visible rings. */
+.modal-overlay:focus,
+.dialog-backdrop:focus {
+  outline: none;
+}
+
+/* Preserve the compact switch silhouette with a comfortable touch target. */
+.toggle::before {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
+}
+
+.cardio-fullscreen-map {
+  height: 100%;
+  width: 100%;
+  background: var(--bg-color);
+}
+
+/* Fullscreen fades and stats must never obscure map credits. */
+.cardio-fullscreen-map .leaflet-bottom {
+  z-index: 1002;
+  bottom: env(safe-area-inset-bottom);
+}
