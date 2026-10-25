@@ -171,13 +171,7 @@ export function FitToView({
         overflow: 'visible',
         position: 'relative',
         boxSizing: 'border-box',
-        // Center the (possibly wider-than-container, scaled) content. As a
-        // plain block the content would be left-aligned, so once scaled its
-        // own center sits right of the container center and the panel looks
-        // shifted to the right. Flexbox centers overflows symmetrically, which
-        // pairs with the content's `transform-origin: top center`.
-        // `align-items: flex-start` (not stretch) is required so the scaled
-        // content keeps its `max-content` height instead of being stretched.
+        // Keep scaled content horizontally centered with a stable top edge.
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'flex-start',
@@ -188,19 +182,15 @@ export function FitToView({
         ref={contentRef}
         className="fit-to-view-content"
         style={{
-          // `contentStyle` is spread last on purpose: layouts that distribute
-          // their children across the full container (e.g. the exercise panel's
-          // `justify-content: space-between`) need a fixed `height: 100%` even
-          // while scaled, otherwise each re-measure toggles between a 100%-box
-          // (children overflow → scale down) and a max-content box (fits →
-          // scale 1) and the panel flickers. The scaling-critical props below
-          // stay overridable for those consumers.
+          // Measure a stable layout box. Compensating width by 1 / scale
+          // changes flex wrapping: fewer rows change the measured height,
+          // which changes the scale and restores the previous row count.
+          // Keep both dimensions independent of scale to prevent that loop.
+          // Consumers may still customize the layout through contentStyle.
           boxSizing: 'border-box',
-          // The container is now a flexbox (for symmetric centering of the
-          // scaled content) — keep the explicit width from shrinking back.
           flexShrink: 0,
-          width: isScaled ? `${(100 / scale).toFixed(3)}%` : '100%',
-          height: isScaled ? 'max-content' : '100%',
+          width: '100%',
+          height: '100%',
           transform: isScaled ? `scale(${scale})` : 'none',
           transformOrigin: 'top center',
           transition: transitionsOn ? 'transform 320ms cubic-bezier(0.25, 0.1, 0.25, 1)' : 'none',
