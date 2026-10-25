@@ -1,0 +1,32 @@
+.categories { display: grid; gap: 20px; min-width: 0; }
+.category { min-width: 0; }
+.categoryHeader { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; margin-bottom: 8px; padding-inline: 4px; }
+.categoryHeader h3 { margin: 0; color: var(--text-primary); font-size: 0.9rem; font-weight: 700; }
+.categoryHeader h3::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 8px; border-radius: 50%; background: var(--category-color); vertical-align: middle; }
+.categoryHeader > span { color: var(--text-secondary); font-size: 0.75rem; }
+.exercises { display: grid; gap: 8px; }
+.exercise { overflow: hidden; }
+.content { padding: 12px; }
+.header { display: flex; align-items: center; gap: 10px; }
+.icon { display: grid; place-items: center; flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px; color: var(--exercise-color); background: color-mix(in srgb, var(--exercise-color) 12%, transparent); border: 1px solid color-mix(in srgb, var(--exercise-color) 18%, transparent); }
+.identity { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.name { min-width: 0; margin: 0; font-size: 0.85rem; font-weight: 650; line-height: 1.4; overflow-wrap: anywhere; }
+.highlights { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; margin-block: 8px; }
+.total { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; min-width: 0; max-width: 48%; flex-shrink: 0; }
+.value { color: var(--text-primary); font-size: clamp(1.15rem, 5vw, 1.6rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.unit { color: var(--text-secondary); font-size: 0.65rem; }
+.progress { margin-top: 8px; }
+.progressLabel { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.7rem; }
+.progressLabel span strong { margin-left: 5px; color: var(--text-primary); }
+.progressLabel > strong { color: var(--exercise-color); font-variant-numeric: tabular-nums; }
+.track { height: 4px; border-radius: 999px; background: var(--surface-hover); overflow: hidden; }
+.fill { height: 100%; border-radius: inherit; background: var(--exercise-color); }
+.record { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 0; color: var(--text-secondary); font-size: 0.7rem; }
+.record > svg { color: var(--color-amber); }
+.record strong { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.levels { border-top: 1px solid var(--border-default); background: var(--surface-subtle); }
+.levels > details { margin-top: 0; }
+.levels summary { min-height: 44px; padding: 8px 12px; border: 0; border-radius: 0; background: transparent; }
+.levels summary:focus-visible { outline-offset: -3px; }
+.levels details[open] { padding-bottom: 8px; }
+.levels details[open] > div { margin-inline: 8px; }

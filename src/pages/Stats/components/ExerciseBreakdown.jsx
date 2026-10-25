@@ -1,135 +1,117 @@
 import { LevelStreakDetails } from '@components/ui/LevelStreakDetails';
 import { LevelEmblem } from '@components/ui/LevelEmblem';
 import { getStreakRecordLevel } from '@shared/exerciseLevels.js';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { DynamicIcon } from '@utils/icons';
+import { DynamicIcon, Trophy } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { CATEGORIES, isUserCategory } from '@config/categories';
 import { Card, StreakFlame, WeightBadge } from '@components/ui';
 import { useExercises } from '@contexts/ExercisesContext';
+import styles from './ExerciseBreakdown.module.css';
 
-/** Per-exercise breakdown list, grouped by category. */
+/** Per-exercise totals and consistency, grouped by category. */
 export function ExerciseBreakdown({
     enrichedExerciseStats,
     fullCategoryOrder, fullCategoryColors,
-    hasCardio, cardioSessions,
+    hasCardio, cardioSessions = [],
     settings
 }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { customCategoriesMap } = useExercises();
+    const numberFormat = new Intl.NumberFormat(i18n.language);
+    const distanceFormat = new Intl.NumberFormat(i18n.language, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
     if (enrichedExerciseStats.length === 0) return null;
 
     return (
-        <Card>
-            <div className="flex-col gap-8">
-                {fullCategoryOrder.map((catId, index) => {
-                    const catStats = enrichedExerciseStats.filter(ex => ex.categoryId === catId);
-                    if (catStats.length === 0) return null;
-                    let catLabel;
-                    if (isUserCategory(catId)) {
-                        const catDef = customCategoriesMap[catId];
-                        catLabel = catDef?.name || catId;
-                    } else {
-                        catLabel = {
-                            [CATEGORIES.BODYWEIGHT]: t('common.bodyweight'),
-                            [CATEGORIES.WEIGHTS]: t('common.weights'),
-                            [CATEGORIES.CUSTOM]: t('common.custom'),
-                            [CATEGORIES.CARDIO]: t('common.cardio')
-                        }[catId];
-                    }
-                    const catColor = fullCategoryColors[catId] || '#8b5cf6';
+        <div className={styles.categories}>
+            {fullCategoryOrder.map(catId => {
+                const catStats = enrichedExerciseStats.filter(ex => ex.categoryId === catId);
+                if (catStats.length === 0) return null;
+                const catLabel = isUserCategory(catId)
+                    ? customCategoriesMap[catId]?.name || catId
+                    : {
+                        [CATEGORIES.BODYWEIGHT]: t('common.bodyweight'),
+                        [CATEGORIES.WEIGHTS]: t('common.weights'),
+                        [CATEGORIES.CUSTOM]: t('common.custom'),
+                        [CATEGORIES.CARDIO]: t('common.cardio')
+                    }[catId];
 
-                    return (
-                        <React.Fragment key={catId}>
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: '8px',
-                                marginTop: index > 0 ? '12px' : '4px', marginBottom: '4px',
-                                opacity: 0.8
-                            }}>
-                                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: catColor, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                    {catLabel}
-                                </div>
-                                <div style={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${catColor}40, transparent)` }}></div>
-                            </div>
+                return (
+                    <section key={catId} className={styles.category} aria-label={catLabel} style={{ '--category-color': fullCategoryColors[catId] || 'var(--accent-glow)' }}>
+                        <div className={styles.categoryHeader}>
+                            <h3>{catLabel}</h3>
+                            <span>{t('common.exerciseCount', { count: catStats.length })}</span>
+                        </div>
+                        <div className={styles.exercises}>
                             {catStats.map(ex => {
+                                const weekly = ex.id === 'running' || ex.id === 'cycling';
+                                const isCardio = hasCardio && weekly;
+                                const sessions = isCardio ? cardioSessions.filter(s => s.type === ex.id) : [];
+                                const total = isCardio
+                                    ? distanceFormat.format(sessions.reduce((sum, s) => sum + (s.distance || 0), 0) / 1000)
+                                    : numberFormat.format(ex.totalReps || 0);
+                                const rate = Math.min(100, Math.max(0, ex.completionRate || 0));
+                                const label = getExerciseLabel(ex, t);
+
                                 return (
-                                    <Card key={ex.id} color={ex.color} padding="none" style={{
-                                        padding: '8px 12px', borderRadius: 'var(--radius-md)',
-                                        display: 'flex', flexDirection: 'column', gap: '6px',
-                                        marginBottom: '6px'
-                                    }}>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
-                                                <div style={{
-                                                    width: '28px', height: '28px', borderRadius: '8px',
-                                                    background: `${ex.color}1a`, border: `1px solid ${ex.color}33`,
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
-                                                }}>
-                                                    <DynamicIcon icon={ex.icon} size={14} color={ex.color} />
+                                    <Card as="article" key={ex.id} aria-label={label} color={ex.color} padding="none" className={styles.exercise} style={{ '--exercise-color': ex.color || 'var(--accent-glow)' }}>
+                                        <div className={styles.content}>
+                                            <div className={styles.header}>
+                                                <div className={styles.icon} aria-hidden="true">
+                                                    <DynamicIcon icon={ex.icon} size={20} color="var(--exercise-color)" />
                                                 </div>
-                                                <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                    {getExerciseLabel(ex, t)}
-                                                </span>
+                                                <div className={styles.identity}>
+                                                    <h4 className={styles.name}>{label}</h4>
+                                                    {ex.categoryId === CATEGORIES.WEIGHTS && (
+                                                        <WeightBadge weight={settings?.exerciseWeights?.[ex.id] ?? ex.defaultWeight} color={ex.color} />
+                                                    )}
+                                                </div>
+                                                <div className={styles.total}>
+                                                    <span className={styles.value}>{total}</span>
+                                                    <span className={styles.unit}>{t(isCardio ? 'cardio.units.km' : 'common.reps')}</span>
+                                                </div>
                                             </div>
 
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, flexWrap: 'wrap' }}>
-                                                <StreakFlame streak={ex.streak} level={ex.streakLevel} active={ex.streakActive} weekly={ex.id === 'running' || ex.id === 'cycling'} />
+                                            {(ex.streak > 0 || ex.maxStreak > 0) && (
+                                                <div className={styles.highlights}>
+                                                    <StreakFlame streak={ex.streak} level={ex.streakLevel} active={ex.streakActive} weekly={weekly} />
+                                                    {ex.maxStreak > 0 && (
+                                                        <div className={styles.record}>
+                                                            <Trophy size={13} aria-hidden="true" />
+                                                            <span>{t('levels.record')}</span>
+                                                            <strong>{numberFormat.format(ex.maxStreak)} {t(weekly ? 'common.weeksAbbr' : 'common.daysAbbr')}</strong>
+                                                            <LevelEmblem level={getStreakRecordLevel(ex.levelStreaks, ex.maxStreak)} size={22} />
+                                                </div>
+                                            )}
+                                                </div>
+                                            )}
 
-                                                {ex.categoryId === CATEGORIES.WEIGHTS && (
-                                                    <WeightBadge weight={settings?.exerciseWeights?.[ex.id] || ex.defaultWeight} color={ex.color} />
-                                                )}
-                                                {ex.maxStreak > 0 && (
-                                                    <span style={{
-                                                        display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.6rem', color: '#fbbf24',
-                                                        background: 'rgba(251,191,36,0.1)',
-                                                        padding: '2px 6px', borderRadius: '8px',
-                                                        fontWeight: '700'
-                                                    }}>
-                                                        {ex.id === 'running' || ex.id === 'cycling' ? `${t('levels.record')} · ${ex.maxStreak} ${t('common.weeksAbbr')}` : t('stats.maxDays', { count: ex.maxStreak })}
-                                                        <LevelEmblem level={getStreakRecordLevel(ex.levelStreaks, ex.maxStreak)} size={20} />
+                                            <div className={styles.progress}>
+                                                <div className={styles.progressLabel}>
+                                                    <span>{isCardio
+                                                        ? t('cardio.sessionsCount', { count: sessions.length })
+                                                        : <>{t('stats.completedDays')} <strong>{numberFormat.format(ex.daysCompleted || 0)}</strong></>}
                                                     </span>
-                                                )}
-                                                <div style={{ fontSize: '0.95rem', fontWeight: '800', color: ex.color, fontVariantNumeric: 'tabular-nums' }}>
-                                                    {hasCardio && (ex.id === 'running' || ex.id === 'cycling') ?
-                                                        `${((cardioSessions.filter(s => s.type === ex.id).reduce((sum, s) => sum + (s.distance || 0), 0)) / 1000).toFixed(1)} ${t('cardio.units.km')}`
-                                                        : ex.totalReps.toLocaleString()}
+                                                    <strong>{numberFormat.format(rate)}%</strong>
+                                                </div>
+                                                <div className={styles.track} role="progressbar" aria-label={`${label} · ${t('stats.completedDays')}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={rate}>
+                                                    <div className={styles.fill} style={{ width: `${rate}%` }} />
                                                 </div>
                                             </div>
                                         </div>
-                                        <LevelStreakDetails levels={ex.levelStreaks} weekly={ex.id === 'running' || ex.id === 'cycling'} />
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            <div style={{ flex: 1, height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-                                                <div style={{
-                                                    height: '100%', borderRadius: '2px', width: `${ex.completionRate}%`,
-                                                    background: ex.color,
-                                                    boxShadow: `0 0 10px ${ex.color}80`,
-                                                    transition: 'width 0.6s ease'
-                                                }} />
+                                        {ex.levelStreaks?.length > 0 && (
+                                            <div className={styles.levels}>
+                                                <LevelStreakDetails levels={ex.levelStreaks} weekly={weekly} />
                                             </div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                {hasCardio && (ex.id === 'running' || ex.id === 'cycling') ? (
-                                                    <span style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-secondary)' }}>
-                                                        {t('cardio.sessionsCount', { count: cardioSessions.filter(s => s.type === ex.id).length })}
-                                                    </span>
-                                                ) : (
-                                                    <span style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-secondary)' }}>
-                                                        {ex.daysCompleted}{t('common.daysAbbr')}
-                                                    </span>
-                                                )}
-                                                <div style={{ fontSize: '0.65rem', fontWeight: '700', color: ex.color, minWidth: '35px', textAlign: 'right' }}>
-                                                    {(ex.completionRate || 0).toFixed(1)}%
-                                                </div>
-                                            </div>
-                                        </div>
+                                        )}
                                     </Card>
                                 );
                             })}
-                        </React.Fragment>
-                    )
-                })}
-            </div>
-        </Card>
+                        </div>
+                    </section>
+                );
+            })}
+        </div>
     );
 }
