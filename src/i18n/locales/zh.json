@@ -816,6 +816,8 @@
     ]
   },
   "workout": {
+    "previousExercise": "上一个动作",
+    "nextExercise": "下一个动作",
     "allCompleted": "所有运动已完成 💪",
     "clearAll": "全部清除",
     "custom": "自定义",

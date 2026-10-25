@@ -139,7 +139,7 @@ own detail can use local computed levels; other profiles use server-published
 derived levels, with an explanatory fallback when absent. Deploying the updated
 functions and syncing migrated progress is necessary to publish those levels.
 The share preview and exported image both use the common SVG level emblem.
-Shares, level history and the widget label use the same Lvl terminology. Level history uses steps and integer values, marks only value changes, and omits level zero and unvalidated days. Its badges show the last attained level, or nothing when no level has been attained.
+Shares, level history and widget accessibility labels use the same Lvl terminology. Android widgets display the streak level as a separate medal in both sizes; the large widget replaces daily dots with the earned daily level (0 for unvalidated/future days), preserving frozen-day snowflakes and highlighting today. Weekly cardio levels and the configured week start follow the shared level calculation. Run `node scripts/android/preview-widgets.mjs` to regenerate the illustrative preview and widget picker images. Level history uses steps and integer values, marks only value changes, and omits level zero and unvalidated days. Its badges show the last attained level, or nothing when no level has been attained.
 
 ## Partial sessions and profile details
 

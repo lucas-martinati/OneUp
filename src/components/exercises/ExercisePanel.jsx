@@ -18,13 +18,13 @@ import { useCloudSyncStore } from '@store/useCloudSyncStore';
 import { useCameraPushUpCounter } from '@hooks/useCameraPushUpCounter';
 import { EventHud } from '@features/events';
 import { Button, FitToView, ModalContainer, ModalHeader } from '@components/ui';
-import { Check, CheckCheck, ChevronRight, DynamicIcon, Minus, Pause, Play, Plus, RotateCcw } from '@utils/icons';
+import { Check, CheckCheck, ChevronLeft, ChevronRight, DynamicIcon, Minus, Pause, Play, Plus, RotateCcw } from '@utils/icons';
 import styles from './ExercisePanel.module.css';
 
 /* ── Private sub-components (single-use, kept local to this panel) ───── */
 
-function PanelHeader({ activeColor, exerciseConfig, exerciseLabel, onClose, onNext, hideNextButton, t }) {
-    const showNextButton = onNext && !hideNextButton;
+function PanelHeader({ activeColor, exerciseConfig, exerciseLabel, onClose, onNext, onPrevious, hideNextButton, t }) {
+    const showNavigation = (onNext || onPrevious) && !hideNextButton;
 
     return (
         <ModalHeader
@@ -32,30 +32,29 @@ function PanelHeader({ activeColor, exerciseConfig, exerciseLabel, onClose, onNe
             icon={(props) => <DynamicIcon icon={exerciseConfig?.icon} {...props} color={activeColor} />}
             onClose={onClose}
             style={{ '--accent': activeColor, '--accent-glow': activeColor }}
-            extraElements={showNextButton && (
-                <Button
-                    variant="ghost"
-                    onClick={onNext}
-                    style={{
-                        padding: '8px 14px',
-                        borderRadius: 'var(--radius-full)',
-                        background: `${activeColor}1f`,
-                        border: `1px solid ${activeColor}44`,
-                        color: activeColor,
-                        fontSize: '0.82rem',
-                        fontWeight: '700',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '3px',
-                        cursor: 'pointer',
-                        minHeight: 'var(--touch-min)',
-                        whiteSpace: 'nowrap',
-                        transition: 'background 0.45s ease, border-color 0.45s ease, color 0.45s ease'
-                    }}
-                >
-                    <span>{t('common.next')}</span>
-                    <ChevronRight size={16} />
-                </Button>
+            extraElements={showNavigation && (
+                <div className={styles.exerciseNavigation}>
+                    <Button
+                        variant="ghost"
+                        iconOnly
+                        icon={ChevronLeft}
+                        onClick={onPrevious}
+                        disabled={!onPrevious}
+                        aria-label={t('workout.previousExercise')}
+                        title={t('workout.previousExercise')}
+                        className={styles.exerciseNavigationButton}
+                    />
+                    <Button
+                        variant="ghost"
+                        iconOnly
+                        icon={ChevronRight}
+                        onClick={onNext}
+                        disabled={!onNext}
+                        aria-label={t('workout.nextExercise')}
+                        title={t('workout.nextExercise')}
+                        className={styles.exerciseNavigationButton}
+                    />
+                </div>
             )}
         />
     );
@@ -716,6 +715,8 @@ export function ExercisePanel({
     exerciseConfig,
     dayNumber,
     onNext,
+    onPrevious,
+    onAutoAdvance = onNext,
     onFinish,
     hideNextButton = false,
     isSession = false,
@@ -739,6 +740,7 @@ export function ExercisePanel({
     const [wasCompleted, setWasCompleted] = useState(isCompleted);
     const [hasCelebrated, setHasCelebrated] = useState(false);
     const autoAdvanceTimer = useRef(null);
+    const celebrationExerciseId = useRef(exerciseConfig?.id);
 
     const isWeightExercise = !isTimer && !!WEIGHT_EXERCISES_MAP[exerciseConfig?.id];
     const currentWeight = isWeightExercise ? getConfig(exerciseConfig?.id).weight : null;
@@ -782,7 +784,7 @@ export function ExercisePanel({
         const handleKeyDown = (e) => {
             if (e.key !== 'Enter' || e.repeat) return;
             const target = e.target;
-            if (target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable) return;
+            if (target?.closest?.('input, textarea, select, button, a, [contenteditable]')) return;
             e.preventDefault();
             onNext();
         };
@@ -804,6 +806,11 @@ export function ExercisePanel({
     }, [isTimer, isRunning, isCompleted, currentCount, dailyGoal, onUpdateCount]);
 
     useEffect(() => {
+        // Revisiting a completed exercise is browsing, not a new completion.
+        if (celebrationExerciseId.current !== exerciseConfig?.id) {
+            celebrationExerciseId.current = exerciseConfig?.id;
+            return;
+        }
         if (isCompleted && !wasCompleted && !hasCelebrated) {
             queueMicrotask(() => {
                 setHasCelebrated(true);
@@ -811,9 +818,9 @@ export function ExercisePanel({
                 sounds.success();
             });
 
-            if (onNext) {
+            if (onAutoAdvance) {
                 clearTimeout(autoAdvanceTimer.current);
-                autoAdvanceTimer.current = setTimeout(() => onNext(), 1500);
+                autoAdvanceTimer.current = setTimeout(() => onAutoAdvance(), 1500);
             }
         }
 
@@ -824,7 +831,7 @@ export function ExercisePanel({
         if (isCompleted !== wasCompleted) {
             queueMicrotask(() => setWasCompleted(isCompleted));
         }
-    }, [isCompleted, wasCompleted, hasCelebrated, onNext]);
+    }, [exerciseConfig?.id, isCompleted, wasCompleted, hasCelebrated, onAutoAdvance]);
 
     const displayCount = isCompleted && currentCount === 0 ? dailyGoal : currentCount;
     const remaining = Math.max(0, dailyGoal - displayCount);
@@ -948,6 +955,7 @@ export function ExercisePanel({
                         exerciseLabel={exerciseLabel}
                         onClose={onClose}
                         onNext={onNext}
+                        onPrevious={onPrevious}
                         hideNextButton={hideNextButton}
                         t={t}
                     />

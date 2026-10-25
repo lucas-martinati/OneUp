@@ -1,4 +1,5 @@
 import i18n from '../i18n';
+import { getDayLevel } from '@shared/exerciseLevels.js';
 import { getLocalDateStr, getDayStatus, DAY_STATUS } from '@shared/dateUtils';
 import { isAndroidPlatform } from './platform';
 
@@ -60,9 +61,9 @@ export async function getWidgetBridge() {
  * @param {Object} completions - { [dateStr]: { [exerciseId]: { isCompleted } } }
  * @param {Object} frozenDays - { [dateStr]: { consumedAt } }
  * @param {string} weekStartDay - 'monday' or 'sunday'
- * @returns {number[]} Array of 7 integers (0=PENDING, 1=DONE, 2=FROZEN)
+ * @returns {{weekDays: number[], weekLevels: number[]}} Daily status and earned level
  */
-function getWeekDaysStatus(completions, frozenDays = {}, weekStartDay = 'monday') {
+function getWeekProgress(completions, frozenDays = {}, weekStartDay = 'monday') {
   const today = new Date();
   const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ... 6=Sat
   let startOffset;
@@ -75,6 +76,7 @@ function getWeekDaysStatus(completions, frozenDays = {}, weekStartDay = 'monday'
   }
 
   const weekDays = [];
+  const weekLevels = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(today);
     d.setDate(d.getDate() - startOffset + i);
@@ -82,17 +84,19 @@ function getWeekDaysStatus(completions, frozenDays = {}, weekStartDay = 'monday'
     
     const status = getDayStatus(dateStr, completions, frozenDays, getLocalDateStr(today), weekStartDay);
     
+    const level = dateStr <= getLocalDateStr(today) ? getDayLevel(completions, dateStr, null, weekStartDay) : 0;
     let state = 0; // PENDING
-    if (status === DAY_STATUS.DONE) {
+    if (level > 0) {
       state = 1;
     } else if (status === DAY_STATUS.FROZEN) {
       state = 2;
     }
     
     weekDays.push(state);
+    weekLevels.push(level);
   }
 
-  return weekDays;
+  return { weekDays, weekLevels };
 }
 
 /**
@@ -135,12 +139,16 @@ export async function updateWidgetData(computedStats, completions, frozenDays = 
         || 0,
       streakActive: !!computedStats.streakActive,
       todayDone: !!computedStats.todayDone,
-      weekDays: getWeekDaysStatus(completions, frozenDays, weekStartDay),
+      ...getWeekProgress(completions, frozenDays, weekStartDay),
+      weekStartDay,
+      streakLevel: computedStats.streakLevel || 0,
+      levelLabel: i18n.t('levels.short', { level: computedStats.streakLevel || 0 }),
+      weekLevelLabels: Array.from({ length: 11 }, (_, level) => i18n.t('levels.short', { level })),
       todayIndex: getTodayIndex(weekStartDay),
       updatedAt: Date.now(),
       streakFrozen: !!computedStats.streakFrozen,
       // Translations
-      streakLabel: [i18n.t('widgets.streak'), computedStats.streakLevel ? i18n.t('levels.short', { level: computedStats.streakLevel }) : ''].filter(Boolean).join(' · '),
+      streakLabel: i18n.t('widgets.streak'),
       daysLabel: i18n.t('widgets.days'),
       weekdayLabels: (() => {
         const labels = i18n.t('widgets.weekdays', { returnObjects: true });

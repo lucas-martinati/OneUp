@@ -816,6 +816,8 @@
     ]
   },
   "workout": {
+    "previousExercise": "이전 운동",
+    "nextExercise": "다음 운동",
     "allCompleted": "모든 운동이 완료되었습니다 💪",
     "clearAll": "모두 지우기",
     "custom": "관습",

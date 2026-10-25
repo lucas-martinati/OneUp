@@ -449,6 +449,20 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         setPhase('done');
     };
 
+    // Manual browsing follows the queue, including already completed exercises.
+    const navigateExercise = (direction) => {
+        for (let offset = 1; offset < queue.length; offset++) {
+            const index = (currentIdx + direction * offset + queue.length) % queue.length;
+            if (allExercisesMap[queue[index]]) {
+                setHasAnimatedFirstPanel(true);
+                setCurrentIdx(index);
+                return;
+            }
+        }
+    };
+    const previousExercise = () => navigateExercise(-1);
+    const nextExercise = () => navigateExercise(1);
+
     const advanceToNext = () => {
         setHasAnimatedFirstPanel(true);
         for (let offset = 1; offset <= queue.length; offset++) {
@@ -485,7 +499,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
 
         // Actions
         toggleExercise, shuffleQueue, startSession, loadRoutine,
-        handleSaveRoutine, editRoutine, advanceToNext, finishSession,
+        handleSaveRoutine, editRoutine, advanceToNext, previousExercise, nextExercise, finishSession,
         moveItem, clearQueue,
         handleDragStart, handleDragOver, handleDragEnd,
         handleTouchStart, handleTouchMove, handleTouchEnd,

@@ -193,10 +193,10 @@ export function WorkoutSession(props) {
         routines, deleteRoutine, maxRoutines, customCategories, localExercises,
         exerciseInfo, allExercisesMap, canMixDashboards,
         currentEx, currentExId, currentGoal, currentCount, currentDone,
-        currentDifficulty, hasNextAvailableExercise,
+        currentDifficulty,
         updateExerciseCount, getConfig,
         toggleExercise, shuffleQueue, startSession, loadRoutine,
-        handleSaveRoutine, editRoutine, advanceToNext, finishSession,
+        handleSaveRoutine, editRoutine, advanceToNext, previousExercise, nextExercise, finishSession,
         moveItem, clearQueue,
         handleDragStart, handleDragOver, handleDragEnd,
         handleTouchStart, handleTouchMove, handleTouchEnd,
@@ -484,12 +484,14 @@ export function WorkoutSession(props) {
                     }}
                     isCompleted={currentDone}
                     dayNumber={dayNumber}
-                    onNext={advanceToNext}
+                    onNext={nextExercise}
+                    onPrevious={previousExercise}
+                    onAutoAdvance={advanceToNext}
                     onFinish={() => {
                         if (queue.some(id => !exerciseInfo.find(ex => ex.id === id)?.done)) setConfirmFinish(true);
                         else finishSession();
                     }}
-                    hideNextButton={!hasNextAvailableExercise}
+                    hideNextButton={queue.length < 2}
                     isSession={true}
                     fadeIn={!hasAnimatedFirstPanel}
                 />

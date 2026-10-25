@@ -113,3 +113,20 @@
 .oledSaverMode .vignette {
   opacity: 0.1 !important;
 }
+
+/* Session browsing stays compact alongside the exercise title and close button. */
+.exerciseNavigation {
+    display: flex;
+    flex-shrink: 0;
+    gap: 4px;
+}
+
+.exerciseNavigationButton {
+    min-width: var(--touch-min);
+    min-height: var(--touch-min);
+    padding: 8px;
+    border: 1px solid color-mix(in srgb, var(--accent) 27%, transparent);
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+}

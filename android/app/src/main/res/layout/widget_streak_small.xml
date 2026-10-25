@@ -5,53 +5,51 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
     android:gravity="center"
-    android:orientation="horizontal"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
-    android:clipToPadding="false">
+    android:orientation="vertical"
+    android:padding="10dp">
 
-    <!-- Flame icon -->
-    <ImageView
-        android:id="@+id/widget_flame_icon"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:src="@drawable/ic_flame"
-        android:contentDescription="Streak"
-        android:scaleType="fitCenter" />
-
-    <!-- Streak info -->
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginStart="10dp"
-        android:gravity="center_vertical">
-
+        android:orientation="horizontal"
+        android:gravity="center">
+        <ImageView
+            android:id="@+id/widget_flame_icon"
+            android:layout_width="24dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_flame"
+            android:contentDescription="Streak"
+            android:scaleType="fitCenter" />
         <TextView
             android:id="@+id/widget_streak_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:text="0"
             android:textColor="#FFFFFFFF"
             android:textSize="26sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium"
-            android:includeFontPadding="false"
-            android:lineSpacingExtra="-2dp" />
-
-        <TextView
-            android:id="@+id/widget_streak_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="STREAK"
-            android:textColor="#80FFFFFF"
-            android:textSize="11sp"
-            android:fontFamily="sans-serif"
-            android:letterSpacing="0.08"
-            android:textAllCaps="true"
             android:includeFontPadding="false" />
+        <ImageView
+            android:id="@+id/widget_streak_level"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:contentDescription=""
+            android:scaleType="fitCenter" />
     </LinearLayout>
-
+    <TextView
+        android:id="@+id/widget_streak_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:gravity="center"
+        android:text="STREAK"
+        android:textColor="#80FFFFFF"
+        android:textSize="10sp"
+        android:fontFamily="sans-serif"
+        android:letterSpacing="0.08"
+        android:textAllCaps="true"
+        android:includeFontPadding="false" />
 </LinearLayout>

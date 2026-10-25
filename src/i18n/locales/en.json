@@ -831,6 +831,8 @@
     ]
   },
   "workout": {
+    "previousExercise": "Previous exercise",
+    "nextExercise": "Next exercise",
     "allCompleted": "All exercises completed 💪",
     "clearAll": "Clear all",
     "custom": "Custom",

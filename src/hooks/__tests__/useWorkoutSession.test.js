@@ -449,3 +449,46 @@ describe('additional coverage', () => {
     act(() => result.current.handleTouchMove({ touches: [{ clientY: 50 }] }));
   });
 });
+
+describe('manual exercise navigation', () => {
+  it('browses in both directions and wraps around the queue without finishing', () => {
+    const { result } = setup();
+    act(() => { result.current.toggleExercise(bwId); result.current.toggleExercise(bwId2); });
+    act(() => result.current.startSession());
+    act(() => result.current.previousExercise());
+    expect(result.current.currentIdx).toBe(1);
+    act(() => result.current.nextExercise());
+    expect(result.current.currentIdx).toBe(0);
+    act(() => result.current.nextExercise());
+    expect(result.current.currentIdx).toBe(1);
+    act(() => result.current.previousExercise());
+    expect(result.current.currentIdx).toBe(0);
+    expect(result.current.phase).toBe('running');
+    expect(addSession).not.toHaveBeenCalled();
+  });
+
+  it('lets users revisit completed exercises without changing recorded progress', () => {
+    const { result, rerender, setSessionInProgress } = setup();
+    act(() => { result.current.toggleExercise(bwId); result.current.toggleExercise(bwId2); });
+    act(() => result.current.startSession());
+    progressState.completions = { '2024-01-01': { [bwId]: { isCompleted: true, level: 10 } } };
+    rerender({ onClose: result.current.onClose, today: '2024-01-01', dayNumber: 1, activeSlide: 0, sessionMode: null, setSessionInProgress });
+    act(() => result.current.nextExercise());
+    act(() => result.current.previousExercise());
+    expect(result.current.currentExId).toBe(bwId);
+    expect(progressState.completions['2024-01-01'][bwId].level).toBe(10);
+    expect(progressState.updateExerciseCount).not.toHaveBeenCalled();
+    expect(addSession).not.toHaveBeenCalled();
+  });
+
+  it('keeps a single-exercise session open when browsing is unavailable', () => {
+    const { result } = setup();
+    act(() => result.current.toggleExercise(bwId));
+    act(() => result.current.startSession());
+    act(() => result.current.previousExercise());
+    act(() => result.current.nextExercise());
+    expect(result.current.currentIdx).toBe(0);
+    expect(result.current.phase).toBe('running');
+    expect(addSession).not.toHaveBeenCalled();
+  });
+});

@@ -129,6 +129,11 @@ public class StreakWidgetProvider extends AppWidgetProvider {
         String rawData = prefs.getString(WIDGET_DATA_KEY, null);
 
         int streak = 0;
+        int streakLevel = 0;
+        int[] weekLevels = new int[7];
+        String levelLabel = "";
+        String[] weekLevelLabels = new String[11];
+        boolean sundayStart = false;
         boolean streakActive = false;
         boolean todayDone = false;
         int[] weekDays = new int[7];
@@ -144,6 +149,21 @@ public class StreakWidgetProvider extends AppWidgetProvider {
             try {
                 JSONObject data = new JSONObject(rawData);
                 streak = data.optInt("streak", 0);
+                streakLevel = Math.max(0, Math.min(10, data.optInt("streakLevel", 0)));
+                levelLabel = data.optString("levelLabel", "");
+                sundayStart = "sunday".equals(data.optString("weekStartDay", "monday"));
+                JSONArray levels = data.optJSONArray("weekLevels");
+                if (levels != null) {
+                    for (int i = 0; i < Math.min(levels.length(), 7); i++) {
+                        weekLevels[i] = Math.max(0, Math.min(10, levels.optInt(i, 0)));
+                    }
+                }
+                JSONArray levelLabels = data.optJSONArray("weekLevelLabels");
+                if (levelLabels != null) {
+                    for (int i = 0; i < Math.min(levelLabels.length(), 11); i++) {
+                        weekLevelLabels[i] = levelLabels.optString(i, "");
+                    }
+                }
                 streakActive = data.optBoolean("streakActive", false);
                 todayDone = data.optBoolean("todayDone", false);
                 storedTodayIndex = data.optInt("todayIndex", -1);
@@ -170,10 +190,11 @@ public class StreakWidgetProvider extends AppWidgetProvider {
             }
         }
 
-        // Always recalculate todayIndex from the current system date (Mon=0 ... Sun=6)
+        // Recalculate todayIndex using the configured first day of the week.
         java.util.Calendar cal = java.util.Calendar.getInstance();
         int dayOfWeek = cal.get(java.util.Calendar.DAY_OF_WEEK); // Sun=1, Mon=2, ... Sat=7
-        int todayIndex = (dayOfWeek == java.util.Calendar.SUNDAY) ? 6 : dayOfWeek - 2;
+        int todayIndex = sundayStart ? dayOfWeek - 1
+            : (dayOfWeek == java.util.Calendar.SUNDAY ? 6 : dayOfWeek - 2);
 
         // Days elapsed since the JS bridge last wrote data. Prefer the write
         // timestamp: comparing weekday indexes alone misses exact 7-day jumps.
@@ -191,29 +212,36 @@ public class StreakWidgetProvider extends AppWidgetProvider {
         // If the day has changed since the JS bridge last wrote data
         if (daysElapsed > 0) {
             // If the stored day wasn't completed, streak is broken
-            if (!streakActive) {
+            if (!streakActive || daysElapsed > 1) {
                 streak = 0;
             }
             todayDone = false;
             streakActive = false;
 
-            // Detect if we rolled into a new week (Mon=0)
+            // Detect if we rolled into a new week (configured first day = 0)
             // New week = todayIndex < storedTodayIndex (e.g. Sun→Mon = 6→0)
             // OR jumped by 7 days or more
             boolean newWeek = daysElapsed >= 7 || todayIndex < storedTodayIndex;
 
             if (newWeek) {
-                // New week: reset all dots, only keep days already done this new week
+                // New week: discard the previous week’s history.
                 for (int i = 0; i < 7; i++) {
                     weekDays[i] = 0;
+                    weekLevels[i] = 0;
                 }
             } else {
                 // Same week, just moved forward: mark future days (from today onward) as not done
-                // Past days keep their green dots
+                // Past days keep their earned levels.
                 for (int i = storedTodayIndex + 1; i < 7; i++) {
                     weekDays[i] = 0;
+                    weekLevels[i] = 0;
                 }
             }
+        }
+
+        if (streak == 0) {
+            streakLevel = 0;
+            levelLabel = weekLevelLabels[0] == null ? "" : weekLevelLabels[0];
         }
 
         // Create intent to open the app when widget is tapped
@@ -230,10 +258,11 @@ public class StreakWidgetProvider extends AppWidgetProvider {
             if (minWidth >= 200) {
                 updateLargeWidget(context, appWidgetManager, appWidgetId, pendingIntent,
                     streak, streakActive, todayDone, weekDays, todayIndex,
-                    streakLabel, daysLabel, weekdayLabels, streakFrozen);
+                    streakLabel, daysLabel, weekdayLabels, streakFrozen,
+                    streakLevel, levelLabel, weekLevels, weekLevelLabels);
             } else {
                 updateSmallWidget(context, appWidgetManager, appWidgetId, pendingIntent,
-                    streak, streakActive, streakLabel, streakFrozen);
+                    streak, streakActive, streakLabel, streakFrozen, streakLevel, levelLabel);
             }
         }
     }
@@ -247,8 +276,10 @@ public class StreakWidgetProvider extends AppWidgetProvider {
     private void updateSmallWidget(Context context, AppWidgetManager appWidgetManager,
                                     int appWidgetId, PendingIntent pendingIntent,
                                     int streak, boolean streakActive, String streakLabel,
-                                    boolean isFrozen) {
+                                    boolean isFrozen, int streakLevel, String levelLabel) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_streak_small);
+        views.setImageViewBitmap(R.id.widget_streak_level, WidgetLevelEmblem.render(streakLevel, false));
+        views.setContentDescription(R.id.widget_streak_level, levelLabel);
 
         views.setTextViewText(R.id.widget_streak_count, String.valueOf(streak));
         views.setTextViewText(R.id.widget_streak_label, streakLabel);
@@ -288,8 +319,11 @@ public class StreakWidgetProvider extends AppWidgetProvider {
                                     int streak, boolean streakActive, boolean todayDone,
                                     int[] weekDays, int todayIndex,
                                     String streakLabel, String daysLabel, String[] weekdayLabels,
-                                    boolean isFrozen) {
+                                    boolean isFrozen, int streakLevel, String levelLabel,
+                                    int[] weekLevels, String[] weekLevelLabels) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_streak_large);
+        views.setImageViewBitmap(R.id.widget_large_streak_level, WidgetLevelEmblem.render(streakLevel, false));
+        views.setContentDescription(R.id.widget_large_streak_level, levelLabel);
 
         // Sad state when streak is 0: dormant, dim, extinguished-ember look
         boolean isSad = streak == 0;
@@ -318,7 +352,7 @@ public class StreakWidgetProvider extends AppWidgetProvider {
         views.setTextViewText(R.id.widget_large_streak_count, String.valueOf(streak));
         views.setTextViewText(R.id.widget_large_streak_label, daysLabel);
 
-        // Update week day dots and labels
+        // Update daily level emblems and weekday labels
         int[] dotIds = {
             R.id.dot_mon, R.id.dot_tue, R.id.dot_wed,
             R.id.dot_thu, R.id.dot_fri, R.id.dot_sat, R.id.dot_sun
@@ -328,33 +362,20 @@ public class StreakWidgetProvider extends AppWidgetProvider {
             R.id.label_thu, R.id.label_fri, R.id.label_sat, R.id.label_sun
         };
 
-        // Label colors: frozen uses icy sky-blue, default uses violet/cyan
-        int colorDone = 0xFFa78bfa;
-        int colorToday = 0xFF22d3ee;
-        int colorDefault = 0x60FFFFFF;
-
-        // Always reflect the real per-day completion, even when the streak is broken
-        // (isSad). A day that was validated this week must keep its "done" dot — losing
-        // the streak dims the background/flame, not the history of completed days.
         for (int i = 0; i < 7; i++) {
-            int drawableRes;
-            int labelColor;
-            
-            if (weekDays[i] == 1) { // DONE
-                drawableRes = R.drawable.dot_done;
-                labelColor = colorDone;
-            } else if (weekDays[i] == 2) { // FROZEN
-                drawableRes = R.drawable.dot_done_frozen;
-                labelColor = 0xFF7dd3fc; // sky-blue
-            } else if (i == todayIndex) { // TODAY (pending)
-                drawableRes = R.drawable.dot_today;
-                labelColor = colorToday;
-            } else { // PENDING
-                drawableRes = R.drawable.dot_pending;
-                labelColor = colorDefault;
+            int labelColor = i == todayIndex ? 0xFF22d3ee : 0x60FFFFFF;
+            if (weekDays[i] == 2) {
+                views.setImageViewResource(dotIds[i], R.drawable.dot_done_frozen);
+                labelColor = 0xFF7dd3fc;
+                views.setContentDescription(dotIds[i], weekdayLabels[i] + " ❄");
+            } else {
+                int level = weekLevels[i];
+                views.setImageViewBitmap(dotIds[i], WidgetLevelEmblem.render(level, i == todayIndex));
+                views.setContentDescription(dotIds[i], weekdayLabels[i] + " · "
+                    + (weekLevelLabels[level] == null ? String.valueOf(level) : weekLevelLabels[level]));
+                if (level > 0) labelColor = level == 10 ? 0xFFfbbf24
+                    : level >= 7 ? 0xFFc4b5fd : 0xFF67e8f9;
             }
-            
-            views.setImageViewResource(dotIds[i], drawableRes);
             views.setTextColor(labelIds[i], labelColor);
             views.setTextViewText(labelIds[i], weekdayLabels[i]);
         }
