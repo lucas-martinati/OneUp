@@ -716,7 +716,6 @@
     "exercisesDone": "演習は完了しました",
     "filters": "フィルター",
     "loadingCharts": "チャートを読み込んでいます...",
-    "maxDays": "最大{{count}}d",
     "monthAbbreviations": [
       "1月",
       "2月",

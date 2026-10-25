@@ -716,7 +716,6 @@
     "exercisesDone": "Выполненных упражнений",
     "filters": "Фильтры",
     "loadingCharts": "Загрузка графиков...",
-    "maxDays": "макс. {{count}}д",
     "monthAbbreviations": [
       "Янв",
       "Фев",

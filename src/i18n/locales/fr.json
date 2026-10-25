@@ -731,7 +731,6 @@
     "exercisesDone": "Exercices faits",
     "filters": "Filtres",
     "loadingCharts": "Chargement des graphiques...",
-    "maxDays": "max {{count}}j",
     "monthAbbreviations": [
       "Jan",
       "Fév",

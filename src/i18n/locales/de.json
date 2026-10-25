@@ -716,7 +716,6 @@
     "exercisesDone": "Übungen erledigt",
     "filters": "Filter",
     "loadingCharts": "Diagramme werden geladen...",
-    "maxDays": "max. {{count}}d",
     "monthAbbreviations": [
       "Jan",
       "Febr",

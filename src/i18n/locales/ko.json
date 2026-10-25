@@ -716,7 +716,6 @@
     "exercisesDone": "운동 완료",
     "filters": "필터",
     "loadingCharts": "차트 로드 중...",
-    "maxDays": "최대 {{count}}d",
     "monthAbbreviations": [
       "1월",
       "2월",
