@@ -14,9 +14,12 @@ vi.mock('@capacitor/preferences', () => ({ Preferences: { set: prefSet } }));
 
 import { isAndroidPlatform } from '@utils/platform';
 import { getLocalDateStr } from '@shared/dateUtils';
-import { updateWidgetData } from '@utils/widgetBridge';
+import i18n from '../../i18n';
+let updateWidgetData;
 
-beforeEach(() => {
+beforeEach(async () => {
+  vi.resetModules();
+  ({ updateWidgetData } = await import('@utils/widgetBridge'));
   vi.clearAllMocks();
   isAndroidPlatform.mockReturnValue(true);
 });
@@ -105,6 +108,107 @@ describe('updateWidgetData', () => {
     expect(payload.todayIndex).toBe(0);
     expect(payload.weekdayLabels).toEqual(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
     expect(payload.weekLevels).toEqual([2, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('skips identical visible content even when timestamps and other stats change', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 9, 22, 12));
+    await updateWidgetData(stats, {});
+    vi.setSystemTime(new Date(2026, 9, 22, 13));
+    await updateWidgetData({ ...stats, globalTotalReps: 100 }, {});
+    expect(prefSet).toHaveBeenCalledTimes(1);
+    expect(refreshWidgets).toHaveBeenCalledTimes(1);
+  });
+
+  it('deduplicates overlapping identical updates', async () => {
+    await Promise.all([updateWidgetData(stats, {}), updateWidgetData(stats, {}), updateWidgetData(stats, {})]);
+    expect(prefSet).toHaveBeenCalledTimes(1);
+    expect(refreshWidgets).toHaveBeenCalledTimes(1);
+  });
+
+  it('serializes distinct updates in order', async () => {
+    await Promise.all([updateWidgetData(stats, {}), updateWidgetData({ ...stats, displayStreak: 6 }, {})]);
+    expect(prefSet.mock.calls.map(([call]) => JSON.parse(call.value).streak)).toEqual([5, 6]);
+    expect(refreshWidgets).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries an identical payload when the previous native refresh failed', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    refreshWidgets.mockRejectedValueOnce(new Error('refresh failed'));
+    await updateWidgetData(stats, {});
+    await updateWidgetData(stats, {});
+    expect(prefSet).toHaveBeenCalledTimes(2);
+    expect(refreshWidgets).toHaveBeenCalledTimes(2);
+    warn.mockRestore();
+  });
+
+  it('retries an identical payload when writing failed', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    prefSet.mockRejectedValueOnce(new Error('write failed'));
+    await updateWidgetData(stats, {});
+    await updateWidgetData(stats, {});
+    expect(prefSet).toHaveBeenCalledTimes(2);
+    expect(refreshWidgets).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+  });
+
+  it('refreshes on a seven-day rollover even with identical visible data', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 9, 22, 12));
+    await updateWidgetData(stats, {});
+    vi.setSystemTime(new Date(2026, 9, 29, 12));
+    await updateWidgetData(stats, {});
+    expect(prefSet).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(prefSet.mock.calls[1][0].value).updatedAt).toBe(Date.now());
+  });
+
+  it('refreshes when translations change', async () => {
+    await updateWidgetData(stats, {});
+    i18n.t.mockReturnValueOnce('Niveau');
+    await updateWidgetData(stats, {});
+    expect(prefSet).toHaveBeenCalledTimes(2);
+  });
+
+  it('refreshes when a daily level changes without changing the streak', async () => {
+    const today = getLocalDateStr(new Date());
+    await updateWidgetData(stats, { [today]: { pushups: { level: 3 } } });
+    await updateWidgetData(stats, { [today]: { pushups: { level: 4 } } });
+    expect(prefSet).toHaveBeenCalledTimes(2);
+  });
+
+  it('restores the prior payload after a different payload partially failed', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await updateWidgetData(stats, {});
+    refreshWidgets.mockRejectedValueOnce(new Error('refresh failed'));
+    await updateWidgetData({ ...stats, displayStreak: 6 }, {});
+    await updateWidgetData(stats, {});
+    expect(prefSet.mock.calls.map(([call]) => JSON.parse(call.value).streak)).toEqual([5, 6, 5]);
+    warn.mockRestore();
+  });
+
+  it('refreshes when the timezone offset changes on the same local date', async () => {
+    await updateWidgetData(stats, {});
+    const offset = new Date().getTimezoneOffset();
+    const timezone = vi.spyOn(Date.prototype, 'getTimezoneOffset').mockReturnValue(offset + 60);
+    try {
+      await updateWidgetData(stats, {});
+      expect(prefSet).toHaveBeenCalledTimes(2);
+    } finally {
+      timezone.mockRestore();
+    }
+  });
+
+  it('initializes the bridge before writing and retries if initialization throws', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    registerPlugin.mockImplementationOnce(() => { throw new Error('initialization failed'); });
+    await updateWidgetData(stats, {});
+    expect(prefSet).not.toHaveBeenCalled();
+    expect(refreshWidgets).not.toHaveBeenCalled();
+    await updateWidgetData(stats, {});
+    expect(registerPlugin).toHaveBeenCalledTimes(2);
+    expect(prefSet).toHaveBeenCalledTimes(1);
+    expect(refreshWidgets).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
   });
 
 });

@@ -136,3 +136,30 @@ describe('guest level metadata', () => {
         expect(mergeLevelMetadata(full, partial, 50)).toEqual({ goal: 50, level: 10 });
     });
 });
+
+describe('single-pass yesterday streak snapshots', () => {
+    it('matches a separate yesterday calculation across gaps, freezes, cardio and week starts', () => {
+        const history = {
+            '2026-04-01': { running: entry(4) },
+            '2026-04-02': { pushups: entry(10) },
+            '2026-04-03': { pushups: entry(5) },
+            '2026-04-05': { cycling: entry(7) },
+            '2026-04-07': { pushups: entry(0) },
+            '2026-04-08': { pushups: entry(3) },
+            '2026-04-10': { hidden: entry(10) },
+        };
+        const frozenDays = { '2026-04-04': true, '2026-04-06': true, '2026-04-09': true };
+        for (const weekStartDay of ['monday', 'sunday']) {
+            for (const scope of [{}, { exerciseId: 'pushups' }, { exerciseIds: ['pushups'] }, { startDate: '2026-04-05' }]) {
+                const options = { ...scope, frozenDays, weekStartDay };
+                for (let day = 2; day <= 12; day++) {
+                    const date = `2026-04-${String(day).padStart(2, '0')}`;
+                    const yesterday = `2026-04-${String(day - 1).padStart(2, '0')}`;
+                    const { yesterdayStreak, ...todayResult } = computeLevelStreaks(history, date, { ...options, includeYesterday: true });
+                    expect(yesterdayStreak).toBe(computeLevelStreaks(history, yesterday, options).streak);
+                    expect(todayResult).toEqual(computeLevelStreaks(history, date, options));
+                }
+            }
+        }
+    });
+});

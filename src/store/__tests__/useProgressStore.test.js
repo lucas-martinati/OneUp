@@ -45,6 +45,7 @@ vi.mock('@services/cloudSync', () => ({
 }));
 
 import { Preferences } from '@capacitor/preferences';
+import { serverTimestamp } from '@utils/firebaseTimestamp';
 import { cloudSync } from '@services/cloudSync';
 import { useProgressStore } from '../useProgressStore';
 import { STORAGE_KEY_BASE } from '@hooks/useProgressStorage';
@@ -186,6 +187,57 @@ describe('day helpers', () => {
 // ── updateExerciseCount ─────────────────────────────────────────────────
 
 describe('updateExerciseCount', () => {
+  it('preserves state identity and skips persistence for unchanged normalized counts', () => {
+    const update = useProgressStore.getState().updateExerciseCount;
+    update(today, 'pushups', 100, 100);
+    const state = useProgressStore.getState();
+    const listener = vi.fn();
+    const unsubscribe = useProgressStore.subscribe(listener);
+    Preferences.set.mockClear();
+    update(today, 'pushups', 100, 100);
+    update(today, 'pushups', 999, 100);
+    update(today, 'pushups', 100.9, 100);
+    expect(useProgressStore.getState()).toBe(state);
+    expect(listener).not.toHaveBeenCalled();
+    expect(Preferences.set).not.toHaveBeenCalled();
+    unsubscribe();
+  });
+
+  it('keeps sync flags and version unchanged for no-ops, including canonical difficulty 1', () => {
+    const update = useProgressStore.getState().updateExerciseCount;
+    update(today, 'pushups', 50, 100, null, 1);
+    const state = useProgressStore.getState();
+    serverTimestamp.mockClear();
+    Preferences.set.mockClear();
+    update(today, 'pushups', 50, 100);
+    update(today, 'pushups', 50, 100, null, 1);
+    expect(useProgressStore.getState()).toBe(state);
+    expect(useProgressStore.getState().lastCompletionChange).toBe(state.lastCompletionChange);
+    expect(useProgressStore.getState().progressVersion).toBe(state.progressVersion);
+    expect(serverTimestamp).not.toHaveBeenCalled();
+    expect(Preferences.set).not.toHaveBeenCalled();
+  });
+
+  it('still persists weight and difficulty edits when the count stays the same', () => {
+    const update = useProgressStore.getState().updateExerciseCount;
+    update(today, 'bench', 10, 100, 40, 1);
+    Preferences.set.mockClear();
+    update(today, 'bench', 10, 100, 45, 0.5);
+    expect(useProgressStore.getState().completions[today].bench).toMatchObject({ count: 10, weight: 45, difficulty: 0.5 });
+    expect(Preferences.set).toHaveBeenCalledTimes(1);
+    Preferences.set.mockClear();
+    update(today, 'bench', 10, 100, 45, 0.5);
+    expect(Preferences.set).not.toHaveBeenCalled();
+  });
+
+  it('fills missing legacy level metadata even when the count is unchanged', () => {
+    useProgressStore.setState({ completions: { [today]: { pushups: { count: 50, isCompleted: true } } } });
+    Preferences.set.mockClear();
+    useProgressStore.getState().updateExerciseCount(today, 'pushups', 50, 100);
+    expect(useProgressStore.getState().completions[today].pushups).toMatchObject({ count: 50, level: 5, goal: 100 });
+    expect(Preferences.set).toHaveBeenCalledTimes(1);
+  });
+
   it('stores volume and validates from the first level', () => {
     const { updateExerciseCount } = useProgressStore.getState();
     updateExerciseCount(today, 'pushups', 50, 100);

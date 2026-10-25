@@ -139,7 +139,7 @@ export function migrateLevelProgress(data, customExercises = []) {
 
 /** Cardio remains valid from its recorded day until the end of its calendar week. */
 export function getDayLevel(completions, date, exerciseIds = null, weekStartDay = 'monday') {
-  const allowed = exerciseIds ? new Set(exerciseIds) : null;
+  const allowed = exerciseIds ? (exerciseIds instanceof Set ? exerciseIds : new Set(exerciseIds)) : null;
   let level = Object.entries(completions[date] || {}).reduce((best, [id, entry]) =>
     !allowed || allowed.has(id) ? Math.max(best, getEntryLevel(entry)) : best, 0);
   const { start } = getWeekBounds(new Date(`${date}T12:00:00`), weekStartDay);
@@ -151,14 +151,24 @@ export function getDayLevel(completions, date, exerciseIds = null, weekStartDay 
   return level;
 }
 
+/** Cache daily levels only for the lifetime of one stats computation. */
+export function createDayLevelLookup(completions, exerciseIds = null, weekStartDay = 'monday') {
+  const allowed = exerciseIds ? new Set(exerciseIds) : null;
+  const cache = new Map();
+  return date => {
+    if (!cache.has(date)) cache.set(date, getDayLevel(completions, date, allowed, weekStartDay));
+    return cache.get(date);
+  };
+}
+
 /**
  * Ten nested streaks, measured over the full available history. Frozen days
  * protect only the global streak and never increment it. A pending today uses
  * yesterday; once any level is reached today, higher levels end immediately.
  */
-export function computeLevelStreaks(completions, today, { exerciseId = null, exerciseIds = null, frozenDays = {}, startDate = null, weekStartDay = 'monday' } = {}) {
-  const levelAt = date => exerciseId ? getEntryLevel(completions[date]?.[exerciseId])
-    : getDayLevel(completions, date, exerciseIds, weekStartDay);
+export function computeLevelStreaks(completions, today, { exerciseId = null, exerciseIds = null, frozenDays = {}, startDate = null, weekStartDay = 'monday', dayLevelAt = null, includeYesterday = false } = {}) {
+  const levelAt = exerciseId ? date => getEntryLevel(completions[date]?.[exerciseId])
+    : dayLevelAt || createDayLevelLookup(completions, exerciseIds, weekStartDay);
   const protectedDay = date => !exerciseId && !!frozenDays[date];
   const current = Array(LEVEL_COUNT).fill(0);
   const records = Array(LEVEL_COUNT).fill(0);
@@ -175,6 +185,10 @@ export function computeLevelStreaks(completions, today, { exerciseId = null, exe
     .filter(date => date <= today && (!startDate || date >= startDate)
       && (date !== today || levelAt(today) > 0 || protectedDay(today))).sort();
   let previous = null;
+  const yesterday = includeYesterday ? shiftDateStr(today, -1) : null;
+  const yesterdayAnchor = includeYesterday
+    ? (levelAt(yesterday) > 0 || protectedDay(yesterday) ? yesterday : shiftDateStr(yesterday, -1)) : null;
+  let yesterdayStreak = 0;
   for (const date of dates) {
     if (previous && shiftDateStr(previous, 1) !== date) current.fill(0);
     const dailyLevel = levelAt(date);
@@ -183,6 +197,8 @@ export function computeLevelStreaks(completions, today, { exerciseId = null, exe
       else if (!protectedDay(date) || dailyLevel > 0) current[i] = 0;
       records[i] = Math.max(records[i], current[i]);
     }
+    // Capture yesterday before today's completion can reset higher levels.
+    if (date === yesterdayAnchor) yesterdayStreak = current[0];
     previous = date;
   }
   const anchor = levelAt(today) > 0 || protectedDay(today) ? today : shiftDateStr(today, -1);
@@ -191,6 +207,7 @@ export function computeLevelStreaks(completions, today, { exerciseId = null, exe
   const level = streak > 0 ? current.lastIndexOf(streak) + 1 : 0;
   return {
     streak, level,
+    ...(includeYesterday ? { yesterdayStreak } : {}),
     levels: current.map((days, i) => ({ level: i + 1, current: days, max: records[i] })),
   };
 }

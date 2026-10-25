@@ -1,4 +1,4 @@
-import { computeLevelStreaks, getDayLevel, getRecordedReps, isFullCompletion } from '@shared/exerciseLevels.js';
+import { computeLevelStreaks, createDayLevelLookup, getRecordedReps, isFullCompletion } from '@shared/exerciseLevels.js';
 import { getLocalDateStr, MAX_STREAK_WINDOW, parseTimestamp, getWeekBounds, isDayDoneFromCompletions, parseLocalDate } from '@shared/dateUtils';
 import { EXERCISES } from '@config/exercises';
 import { computeCardioLevelStreaks, getCardioReps } from '@shared/cardioLevels.js';
@@ -19,7 +19,9 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     const today = parseLocalDate(todayStr);
     const weekStartDay = settings?.weekStartDay || 'monday';
 
-    const isDayDoneLocal = dateStr => getDayLevel(completions, dateStr, allExercises.map(ex => ex.id), weekStartDay) > 0;
+    const exerciseIds = allExercises.map(ex => ex.id);
+    const dayLevelAt = createDayLevelLookup(completions, exerciseIds, weekStartDay);
+    const isDayDoneLocal = dateStr => dayLevelAt(dateStr) > 0;
 
     // A Streak Freeze protects the GLOBAL daily streak: a frozen day is
     // transparent in the walk (neither breaks nor counts). See @shared/streakFreeze.
@@ -216,14 +218,14 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
     }
 
     // ─── Streak calculations (require backward day iteration) ────────────
-    const globalLevels = computeLevelStreaks(completions, todayStr, { exerciseIds: allExercises.map(ex => ex.id), frozenDays, weekStartDay });
+    const globalLevels = computeLevelStreaks(completions, todayStr, { exerciseIds, frozenDays, weekStartDay, dayLevelAt, includeYesterday: true });
     const maxStreak = globalLevels.levels[0].max;
     const currentStreak = isDayDoneLocal(todayStr) || isFrozenDay(todayStr) ? globalLevels.streak : 0;
     const yesterdayDate = parseLocalDate(today);
     yesterdayDate.setDate(yesterdayDate.getDate() - 1);
     const yesterdayStr = getLocalDateStr(yesterdayDate);
     const yesterdayStreak = isDayDoneLocal(yesterdayStr) || isFrozenDay(yesterdayStr)
-        ? computeLevelStreaks(completions, yesterdayStr, { exerciseIds: allExercises.map(ex => ex.id), frozenDays, weekStartDay }).streak : 0;
+        ? globalLevels.yesterdayStreak : 0;
 
     // Perfect streak (consecutive perfect days)
     let perfectStreak = 0, maxPerfectStreak = 0;
@@ -274,12 +276,12 @@ export function computeAllStats(completions, settings, getDayNumber, allExercise
             exerciseMaxStreaks[ex.id] = levels.levels[0].max;
             exerciseDoneToday[ex.id] = isDayDoneFromCompletions(completions, todayStr) && !!getWeeklyCompletion(completions, ex.id, today);
         } else {
-            const levels = computeLevelStreaks(completions, todayStr, { exerciseId: ex.id });
+            const levels = computeLevelStreaks(completions, todayStr, { exerciseId: ex.id, includeYesterday: true });
             exerciseLevels[ex.id] = levels;
             exerciseDoneToday[ex.id] = !!completions[todayStr]?.[ex.id]?.isCompleted;
             exerciseCurrentStreaks[ex.id] = exerciseDoneToday[ex.id] ? levels.streak : 0;
             exerciseYesterdayStreaks[ex.id] = completions[yesterdayStr]?.[ex.id]?.isCompleted
-                ? computeLevelStreaks(completions, yesterdayStr, { exerciseId: ex.id }).streak : 0;
+                ? levels.yesterdayStreak : 0;
             exerciseMaxStreaks[ex.id] = levels.levels[0].max;
         }
     }

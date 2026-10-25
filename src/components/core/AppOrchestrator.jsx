@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@contexts/AuthContext';
 import { useProgressStore } from '@store/useProgressStore';
 import { useSettingsStore } from '@store/useSettingsStore';
@@ -26,6 +27,7 @@ import { updateWidgetData } from '@utils/widgetBridge';
  */
 export function AppOrchestrator({ computedStats }) {
   const auth = useAuth();
+  const { i18n } = useTranslation();
 
   const completions = useProgressStore(s => s.completions);
   const frozenDays = useProgressStore(s => s.frozenDays);
@@ -60,7 +62,7 @@ export function AppOrchestrator({ computedStats }) {
   // ── Push widget data ───────────────────────────────────────────────
   useEffect(() => {
     updateWidgetData(computedStats, completions, frozenDays, settings.weekStartDay);
-  }, [computedStats, completions, frozenDays, settings.weekStartDay]);
+  }, [computedStats, completions, frozenDays, settings.weekStartDay, i18n.resolvedLanguage]);
 
   // ── Performance mode & Theme on document root ──────────────────────
   useEffect(() => {

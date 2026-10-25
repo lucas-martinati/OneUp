@@ -389,10 +389,9 @@ export const useProgressStore = create((set, get) => ({
   },
 
   updateExerciseCount: (dateStr, exerciseId, newCount, dailyGoal, weight = null, difficulty = null) => {
+    let changed = false;
     set((state) => {
-      const newCompletions = { ...state.completions };
-      const day = { ...(newCompletions[dateStr] || {}) };
-      const current = day[exerciseId] || {};
+      const current = state.completions[dateStr]?.[exerciseId] || {};
 
       const goal = Number.isFinite(current.goal) && current.goal > 0 ? current.goal : Math.max(1, dailyGoal || 1);
       const finalCount = Number.isFinite(newCount) ? Math.max(0, Math.min(Math.floor(newCount), goal)) : 0;
@@ -414,7 +413,7 @@ export const useProgressStore = create((set, get) => ({
       // supplied. 1.0 is the max (full reps) and needs no lock, so it's left
       // unsaved to keep the cloud payload clean.
       const lockedDifficulty = (difficulty !== null && difficulty !== undefined) ? difficulty : current.difficulty;
-      day[exerciseId] = {
+      const nextEntry = {
         count: finalCount,
         level, goal,
         ...(current.legacyCardio ? { legacyCardio: true } : {}),
@@ -425,7 +424,16 @@ export const useProgressStore = create((set, get) => ({
         ...((weight !== null && weight !== undefined) ? { weight } : {}),
         ...((lockedDifficulty !== null && lockedDifficulty !== undefined && lockedDifficulty !== 1.0) ? { difficulty: lockedDifficulty } : {}),
       };
-      newCompletions[dateStr] = day;
+      // Preserve reference identity and skip persistence for a real no-op,
+      // while still writing missing level/goal metadata on legacy entries.
+      const keys = Object.keys(nextEntry);
+      if (keys.length === Object.keys(current).length
+          && keys.every(key => Object.hasOwn(current, key) && Object.is(current[key], nextEntry[key]))) return state;
+      changed = true;
+      const newCompletions = {
+        ...state.completions,
+        [dateStr]: { ...state.completions[dateStr], [exerciseId]: nextEntry },
+      };
 
       const completionChanged = wasDone !== isNowDone;
       const countChanged = finalCount !== (current.count || 0);
@@ -438,7 +446,7 @@ export const useProgressStore = create((set, get) => ({
         ...(needsCloudSync ? { lastCompletionChange: serverTimestamp() } : {}),
       };
     });
-    get()._persist();
+    if (changed) get()._persist();
   },
 
   // ── Day Number ──────────────────────────────────────────────────────

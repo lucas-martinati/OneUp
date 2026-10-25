@@ -16,6 +16,8 @@ import { isAndroidPlatform } from './platform';
 let coreModulePromise = null;
 let preferencesModulePromise = null;
 let widgetBridgeInstance = null;
+let lastWidgetFingerprint = null;
+let widgetUpdateQueue = Promise.resolve();
 
 async function getCoreModule() {
   if (!coreModulePromise) {
@@ -127,9 +129,6 @@ export async function updateWidgetData(computedStats, completions, frozenDays = 
   if (!isAndroidPlatform()) return;
 
   try {
-    await getWidgetBridge();
-    const { Preferences } = await getPreferencesModule();
-
     const widgetData = {
       // Show the ongoing streak even if today isn't done yet.
       // displayStreak = 0 when today isn't done and yesterday isn't done either,
@@ -145,7 +144,6 @@ export async function updateWidgetData(computedStats, completions, frozenDays = 
       levelLabel: i18n.t('levels.short', { level: computedStats.streakLevel || 0 }),
       weekLevelLabels: Array.from({ length: 11 }, (_, level) => i18n.t('levels.short', { level })),
       todayIndex: getTodayIndex(weekStartDay),
-      updatedAt: Date.now(),
       streakFrozen: !!computedStats.streakFrozen,
       // Translations
       streakLabel: i18n.t('widgets.streak'),
@@ -160,15 +158,27 @@ export async function updateWidgetData(computedStats, completions, frozenDays = 
       })(),
     };
 
-    await Preferences.set({
-      key: 'widget_data',
-      value: JSON.stringify(widgetData),
+    // The timestamp is bookkeeping, not widget content. Include the local
+    // date and timezone so midnight, seven-day jumps and timezone changes
+    // still refresh even if all visible counters happen to be identical.
+    const updatedAt = Date.now();
+    const fingerprint = JSON.stringify([getLocalDateStr(new Date(updatedAt)), new Date(updatedAt).getTimezoneOffset(), widgetData]);
+    const update = widgetUpdateQueue.then(async () => {
+      if (fingerprint === lastWidgetFingerprint) return;
+      // A failed write/refresh may have partially changed native state. Do not
+      // keep an older successful fingerprint that could suppress its repair.
+      lastWidgetFingerprint = null;
+      const { plugin } = await getWidgetBridge();
+      const { Preferences } = await getPreferencesModule();
+      await Preferences.set({ key: 'widget_data', value: JSON.stringify({ ...widgetData, updatedAt }) });
+      await plugin.refreshWidgets();
+      // Cache only successful writes AND refreshes; failures remain retryable.
+      lastWidgetFingerprint = fingerprint;
     });
-
-    // Send broadcast to refresh all widgets immediately
-    if (widgetBridgeInstance) {
-      await widgetBridgeInstance.refreshWidgets();
-    }
+    // Serialize overlapping calls so an older write cannot overwrite a newer
+    // payload. Swallow queue rejection here; the caller below logs the failure.
+    widgetUpdateQueue = update.catch(() => {});
+    await update;
   } catch (error) {
     // Silently fail — widget data is non-critical
     console.warn('[WidgetBridge] Failed to update widget data:', error);
