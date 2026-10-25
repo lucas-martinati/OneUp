@@ -1,5 +1,5 @@
 import { getCardioReps } from '@shared/cardioLevels.js';
-import { getRecordedReps, isFullCompletion } from '@shared/exerciseLevels.js';
+import { getRecordedReps, isFullCompletion, getSessionExerciseReps } from '@shared/exerciseLevels.js';
 import { isBodyweightExercise, isWeightExercise } from '@config/exercises';
 
 import { getCurrentWeekNumber } from '@shared/dateUtils';
@@ -117,6 +117,6 @@ export function isGlobalPerfectDay(dayCompletions, allExercises = []) {
  */
 export function sumExerciseReps(exercises) {
     if (!Array.isArray(exercises)) return 0;
-    return exercises.reduce((sum, ex) => sum + (ex.reps || 0), 0);
+    return exercises.reduce((sum, ex) => sum + getSessionExerciseReps(ex), 0);
 }
 

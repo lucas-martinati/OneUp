@@ -80,8 +80,8 @@ describe('cardio snapshots and migration', () => {
         const history = { '2020-02-18': { running: { isCompleted: false } } };
         expect(getCardioLevelUpdates([session('2020-02-18', 1000)], history, '2020-01-01')).toEqual([]);
     });
-    it('counts sub-level distance as volume and snapshots goals independent of difficulty settings', () => {
-        expect(getCardioReps({ level: 0, count: 300, isCompleted: false }, 'running', 8)).toBe(32);
+    it('excludes sub-level distance from credited reps and preserves goal snapshots', () => {
+        expect(getCardioReps({ level: 0, count: 300, isCompleted: false }, 'running', 8)).toBe(0);
         expect(getCardioGoal('running', '2026-01-01', '2026-02-19', { goal: 2000 })).toBe(2000);
         expect(getCardioGoal('running', '2026-01-01', '2026-02-19')).toBe(3150);
     });

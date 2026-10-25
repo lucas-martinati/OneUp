@@ -1,6 +1,6 @@
 import { getWeeklyGoalKm, CARDIO_REPS_PER_KM } from './exerciseRules.js';
 import { getWeekBounds, getLocalDateStr, getCurrentWeekNumber, shiftDateStr } from './dateUtils.js';
-import { computeLevelStreaks, getEntryLevel, getLevelForCount } from './exerciseLevels.js';
+import { computeLevelStreaks, getEntryLevel, getLevelForCount, getValidatedCount } from './exerciseLevels.js';
 
 const CARDIO_MODES = ['running', 'cycling'];
 
@@ -14,7 +14,10 @@ export function getCardioGoal(mode, startDate, date, entry, weekStartDay = 'mond
 
 export function getCardioReps(entry, mode, weekNumber) {
   if (Number.isInteger(entry?.level) && Number.isFinite(entry.count)) {
-    return Math.floor(Math.max(0, entry.count) / 1000 * CARDIO_REPS_PER_KM[mode]);
+    const goal = Number.isFinite(entry.goal) && entry.goal > 0
+      ? entry.goal : Math.max(1, Math.ceil(getWeeklyGoalKm(mode, weekNumber) * (entry.difficulty ?? 1) * 1000));
+    const distance = getValidatedCount(entry, Math.max(0, entry.count), goal);
+    return Math.floor(distance / 1000 * CARDIO_REPS_PER_KM[mode]);
   }
   return entry?.isCompleted ? Math.floor(getWeeklyGoalKm(mode, weekNumber) * (entry.difficulty ?? 1) * CARDIO_REPS_PER_KM[mode]) : 0;
 }

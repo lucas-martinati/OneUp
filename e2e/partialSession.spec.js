@@ -8,7 +8,7 @@ test('finishes a partial session only after confirmation and preserves reached l
         localStorage.setItem(`announcement_seen_${id}`, '1');
         localStorage.setItem('oneup_language', 'fr');
         localStorage.setItem('pushup_challenge_data', JSON.stringify({ startDate: '2026-01-01', isSetup: true, completions: {
-            '2026-02-19': { pushups: { count: 15, goal: 50, level: 3, isCompleted: true } },
+            '2026-02-19': { pushups: { count: 17, goal: 50, level: 3, isCompleted: true } },
         } }));
     }, CURRENT_ANNOUNCEMENT.id);
     await page.goto('/');
@@ -31,6 +31,7 @@ test('finishes a partial session only after confirmation and preserves reached l
     ]));
     const day = await page.evaluate(() => JSON.parse(localStorage.getItem('pushup_challenge_data')).completions['2026-02-19']);
     expect(day.pushups.level).toBe(3);
+    expect(day.pushups.count).toBe(17); // Keep the live counter; credit only the 15-rep threshold.
     expect(day.squats?.isCompleted || false).toBe(false);
     await page.screenshot({ path: 'test-results/partial-session-mobile.png', animations: 'disabled' });
     await page.setViewportSize({ width: 640, height: 360 });

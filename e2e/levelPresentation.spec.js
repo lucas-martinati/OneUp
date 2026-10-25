@@ -32,7 +32,7 @@ test('shows level profiles, graphical settings and exports the shared level embl
         const host = document.createElement('div'); document.body.append(host);
         const root = ReactDOM.createRoot(host);
         window.presentationRoot = root;
-        root.render(React.createElement(UserDetail, { entry: { uid: 'fixture', pseudo: 'Camille', isPro: true, isSupporter: true, lastActiveDay: '2026-10-24', totalReps: 1250, weightsTotalReps: 300, exerciseReps: { pushups: 1200, running: 50 } }, rank: 3, isMe: false, onClose: () => root.unmount() }));
+        root.render(React.createElement(UserDetail, { entry: { uid: 'fixture', pseudo: 'Camille', isPro: true, isSupporter: true, lastActiveDay: '2026-10-24', totalReps: 1250, weightsTotalReps: 300, exerciseReps: { pushups: 1200, biceps_curl: 300, running: 50 } }, rank: 3, isMe: false, onClose: () => root.unmount() }));
     });
     await expect(page.getByRole('heading', { name: 'Parcours de niveaux' })).toBeVisible();
     await expect(page.getByText('Mes séries par niveau', { exact: true })).toHaveCount(0);
@@ -41,8 +41,10 @@ test('shows level profiles, graphical settings and exports the shared level embl
     const profile = page.getByRole('dialog', { name: 'Camille' });
     const levelSummary = profile.locator('section').filter({ has: page.getByRole('heading', { name: 'Parcours de niveaux' }) }).last();
     for (const level of [8, 6, 10]) await expect(levelSummary.getByRole('img', { name: `Lvl ${level}`, exact: true }).first()).toBeVisible();
-    await expect(profile.getByText(/1[\s\u202f]500/, { exact: true })).toBeVisible();
-    await expect(profile.getByText('300', { exact: true })).toBeVisible();
+    await expect(profile.getByText(/1[\s\u202f]550/, { exact: true })).toBeVisible();
+    await expect(profile.getByText('300', { exact: true }).first()).toBeVisible();
+    await expect(profile.getByLabel('Classement #3', { exact: true })).toBeVisible();
+    await expect(profile.getByText(/1[\s\u202f]250/, { exact: true })).toBeVisible();
     for (const [label, description] of [['Pro', 'Membre Pro — programmes personnalisés'], ['Soutien', "Soutient l'app par un don"]]) {
         const badge = profile.locator('summary').filter({ hasText: new RegExp(`^${label}$`) });
         await badge.click();

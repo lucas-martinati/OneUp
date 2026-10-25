@@ -1,3 +1,5 @@
+import { getSessionExerciseReps } from '@shared/exerciseLevels.js';
+import { sumExerciseReps } from '@utils/statUtils';
 import { LevelEmblem } from '@components/ui/LevelEmblem';
 import React, { useState, useMemo } from 'react';
 import { Trophy } from '@utils/icons';
@@ -35,7 +37,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
             const ex = exerciseInfo.find(e => e.id === id);
             if (!ex) return null;
             const label = getExerciseLabel(ex, t);
-            return { id: ex.id, label, reps: ex.count ?? 0, level: ex.level ?? 0, color: ex.color, icon: ex.icon, type: ex.type };
+            return { id: ex.id, label, reps: getSessionExerciseReps({ ...ex, reps: ex.count }), goal: ex.goal, level: ex.level ?? 0, color: ex.color, icon: ex.icon, type: ex.type };
         }).filter(Boolean);
     }, [queue, exerciseInfo, t]);
 
@@ -51,9 +53,9 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
     }, [sessionData, exercises, sessionName]);
 
     const sessionDuration = shareSessionData?.duration || 0;
-    const recapExercises = (shareSessionData.exercises || []).filter(Boolean);
+    const recapExercises = (shareSessionData.exercises || []).filter(Boolean).map(ex => ({ ...ex, reps: getSessionExerciseReps({ ...ex, reps: ex.reps ?? ex.goal ?? 0 }) }));
     const exCount = recapExercises.length;
-    const totalReps = recapExercises.reduce((sum, ex) => sum + (ex.type !== 'timer' ? (ex.reps ?? ex.goal ?? 0) : 0), 0);
+    const totalReps = sumExerciseReps(recapExercises);
 
     const handleNameSave = async (newName) => {
         const previousName = sessionName;

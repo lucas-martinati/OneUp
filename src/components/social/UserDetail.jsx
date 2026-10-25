@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy, Medal, Award, Activity, Dumbbell, Calendar, Star, getIcon } from '@utils/icons';
 import { Avatar } from '@components/ui/Avatar';
-import { ModalContainer, WeightBadge } from '@components/ui';
+import { Card, ModalContainer, WeightBadge } from '@components/ui';
 import { StreakFlame } from '@components/ui/StreakFlame';
 import { LevelProfileSummary } from '@components/ui/LevelProfileSummary';
 import { LevelStreakDetails } from '@components/ui/LevelStreakDetails';
@@ -16,6 +16,7 @@ import { useComputedStatsFromStore } from '@hooks/useComputedStatsFromStore';
 import { UserTierBadges } from './UserTierBadges';
 import styles from './UserDetail.module.css';
 import { PALETTE } from '@styles/palette';
+import { getLeaderboardTotals } from '@utils/leaderboard';
 
 export function UserDetail({ entry, rank, isMe, onClose }) {
     const { t, i18n } = useTranslation();
@@ -54,9 +55,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
         { label: t('common.bodyweight'), exercises: EXERCISES },
         { label: t('common.weights'), exercises: WEIGHT_EXERCISES.filter(ex => entry.exerciseReps?.[ex.id] > 0) },
     ];
-    // The leaderboard total includes cardio equivalents; use exercise volumes for bodyweight.
-    const bodyweightReps = EXERCISES.reduce((sum, ex) => sum + (entry.exerciseReps?.[ex.id] || 0), 0);
-    const weightsReps = entry.weightsTotalReps || 0;
+    const { bodyweightReps, weightsReps, totalReps } = getLeaderboardTotals(entry);
     const hasProgressToday = isMe ? myStats?.streakActive : entry.lastActiveDay === todayStr && Object.values(stats.exerciseDoneToday || {}).some(Boolean);
     const todayLevel = hasProgressToday ? Math.max(0, ...(stats.levelStreaks || []).filter(row => row.current > 0).map(row => row.level)) : 0;
     const achievementCount = (isMe ? myStats?.badgeCount : details?.achievements) || 0;
@@ -67,49 +66,55 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
     return <ModalContainer open onClose={onClose} ariaLabel={entry.pseudo} position="center" unstyled>
         <section className={styles.panel} style={{ '--profile-accent': rankColor }}>
             <header className={styles.header}>
-                <Avatar photoURL={entry.photoURL} name={entry.pseudo} size={76} borderColor={rankColor} />
+                <Avatar photoURL={entry.photoURL} name={entry.pseudo} size={56} borderColor={rankColor} />
                 <div className={styles.identity}>
                     <h2>{entry.pseudo} {isMe && <small>({t('common.you')})</small>}</h2>
                     <div className={styles.badges}>
-                        <span className={styles.rank}><RankIcon size={15} />#{rank}</span>
+                        <span className={styles.rank} aria-label={`${t('leaderboard.title')} #${rank}`}><RankIcon size={14} aria-hidden="true" />#{rank}</span>
                         <UserTierBadges entry={entry} />
                     </div>
                 </div>
                 <div className={styles.close}><CloseButton onClick={onClose} /></div>
             </header>
             <div className={styles.body}>
-                {!loadingDetails && <LevelProfileSummary stats={stats} todayLevel={todayLevel} />}
-                <section className={styles.volume}>
-                    <div className={styles.volumeHeading}><span>{t('stats.totalReps')}</span><strong>{(bodyweightReps + weightsReps).toLocaleString(i18n.language)}</strong></div>
+                <Card className={styles.volume} padding="sm">
+                    <div className={styles.volumeHeading}><span>{t('stats.totalReps')}</span><strong>{totalReps.toLocaleString(i18n.language)}</strong></div>
                     <div className={styles.volumeSplit}>
                         <div><Activity size={16} /><strong>{bodyweightReps.toLocaleString(i18n.language)}</strong><span>{t('common.bodyweight')}</span></div>
                         <div><Dumbbell size={16} /><strong>{weightsReps.toLocaleString(i18n.language)}</strong><span>{t('common.weights')}</span></div>
                     </div>
-                </section>
-                <div className={styles.metrics}>
+                </Card>
+                <div className={styles.metrics} aria-busy={loadingDetails}>
                     {metrics.map(metric => {
                         const Icon = metric.icon;
                         return <div className={styles.metric} key={metric.label} style={{ '--metric-color': metric.color }}><Icon size={18} /><strong>{metric.value}</strong><span>{metric.label}</span></div>;
                     })}
                 </div>
+                <div className={styles.journey} aria-busy={loadingDetails}>
+                    {loadingDetails ? <p role="status" className={styles.loading}>{t('common.loading')}</p> : <LevelProfileSummary stats={stats} todayLevel={todayLevel} />}
+                </div>
                 {groups.filter(group => group.exercises.length).map(group => <section key={group.label} className={styles.group}>
-                    <h3>{group.label}</h3>
+                    <div className={styles.groupHeading}><h3>{group.label}</h3><span>{t('common.exerciseCount', { count: group.exercises.length })}</span></div>
                     {group.exercises.map(ex => {
                         const Icon = getIcon(ex.icon);
                         const levels = stats.exerciseLevels?.[ex.id];
-                        return <div className={styles.exercise} key={ex.id} style={{ '--exercise-color': ex.color }}>
+                        return <Card as="article" aria-label={getExerciseLabel(ex, t)} className={styles.exercise} padding="none" color={ex.color} key={ex.id} style={{ '--exercise-color': ex.color }}>
                             <div className={styles.exerciseTop}>
                                 <span className={styles.exerciseIcon}><Icon size={18} /></span>
-                                <span className={styles.exerciseName}>{getExerciseLabel(ex, t)}</span>
-                                {isWeightExercise(ex.id) && <WeightBadge weight={details?.exerciseWeights?.[ex.id] || ex.defaultWeight} color={ex.color} />}
-                                <strong>{(entry.exerciseReps?.[ex.id] || 0).toLocaleString(i18n.language)}</strong>
+                                <div className={styles.exerciseIdentity}>
+                                    <span className={styles.exerciseName}>{getExerciseLabel(ex, t)}</span>
+                                    {isWeightExercise(ex.id) && <WeightBadge weight={details?.exerciseWeights?.[ex.id] ?? ex.defaultWeight} color={ex.color} />}
+                                </div>
+                                <div className={styles.exerciseValue}><strong>{(entry.exerciseReps?.[ex.id] || 0).toLocaleString(i18n.language)}</strong><span>{t('common.reps')}</span></div>
                             </div>
-                            {!loadingDetails && <div className={styles.exerciseStreak}>
+                            {!loadingDetails && (levels?.streak > 0 || stats.exerciseStreaks?.[ex.id] > 0) && <div className={styles.exerciseStreak}>
                                 <StreakFlame streak={levels?.streak ?? stats.exerciseStreaks?.[ex.id]} level={levels?.level}
                                     active={!!stats.exerciseDoneToday?.[ex.id] && entry.lastActiveDay === todayStr} weekly={isCardioExercise(ex.id)} />
-                                <LevelStreakDetails levels={levels?.levels} weekly={isCardioExercise(ex.id)} />
                             </div>}
-                        </div>;
+                            {!loadingDetails && levels?.levels?.length > 0 && <div className={styles.exerciseLevels}>
+                                <LevelStreakDetails levels={levels.levels} weekly={isCardioExercise(ex.id)} />
+                            </div>}
+                        </Card>;
                     })}
                 </section>)}
             </div>

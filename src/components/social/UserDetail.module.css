@@ -1,32 +1,51 @@
-.panel { --profile-surface: color-mix(in srgb, var(--bg-color) 92%, var(--text-primary)); width: 100%; max-width: 440px; max-height: 90dvh; display: flex; flex-direction: column; overflow: hidden; background: var(--profile-surface); border: 1px solid color-mix(in srgb, var(--profile-accent) 35%, transparent); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); }
-.header { flex-shrink: 0; position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 28px 48px 22px; text-align: center; border-bottom: 1px solid color-mix(in srgb, var(--profile-accent) 20%, transparent); background: linear-gradient(145deg, color-mix(in srgb, var(--profile-accent) 24%, transparent), color-mix(in srgb, var(--profile-accent) 4%, transparent)); }
+.panel { --profile-surface: var(--sheet-bg, var(--bg-color)); width: 100%; max-width: 480px; max-height: 90dvh; display: flex; flex-direction: column; overflow: hidden; background: var(--profile-surface); border: 1px solid var(--border-default); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); }
+.header { z-index: 1; flex-shrink: 0; position: relative; display: flex; align-items: center; gap: 14px; padding: 20px 56px 20px 20px; border-bottom: 1px solid var(--border-default); background: radial-gradient(ellipse at top left, color-mix(in srgb, var(--profile-accent) 12%, transparent), transparent 75%); }
 .close { position: absolute; top: 12px; right: 12px; }
 .identity { flex: 1; min-width: 0; }
-.identity h2 { margin: 0 0 8px; font-size: 1.4rem; overflow-wrap: anywhere; }
-.identity small { color: var(--text-secondary); font-size: 0.75rem; font-weight: 500; }
-.badges { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; }
-.rank { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 700; color: var(--profile-accent); padding: 5px 10px; border-radius: var(--radius-full); border: 1px solid color-mix(in srgb, var(--profile-accent) 30%, transparent); background: color-mix(in srgb, var(--profile-accent) 10%, transparent); }
-.body { padding: 20px; overflow-y: auto; min-height: 0; }
-.metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.metric { display: flex; flex-direction: column; gap: 6px; padding: 12px 6px; align-items: center; text-align: center; background: color-mix(in srgb, var(--metric-color) 8%, transparent); border: 1px solid color-mix(in srgb, var(--metric-color) 20%, transparent); border-radius: var(--radius-md); }
-.metric > svg { color: var(--metric-color); }
-.metric strong { font-size: 1.1rem; overflow-wrap: anywhere; }
-.metric span { font-size: 0.65rem; color: var(--text-secondary); }
-.group h3 { font-size: 0.75rem; color: var(--text-secondary); margin: 22px 0 10px; }
-.exercise { padding: 12px; margin-bottom: 8px; border: 1px solid color-mix(in srgb, var(--exercise-color) 22%, transparent); border-radius: var(--radius-md); background: color-mix(in srgb, var(--exercise-color) 7%, transparent); }
-.exerciseTop { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
-.exerciseIcon { display: grid; place-items: center; width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px; color: var(--exercise-color); background: color-mix(in srgb, var(--exercise-color) 14%, transparent); }
-.exerciseTop strong { color: var(--exercise-color); }
-.exerciseName { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.exerciseStreak { margin-top: 8px; }
-.exerciseStreak > div { width: fit-content; }
-
-.volume { margin-bottom: 12px; padding: 14px; border: 1px solid color-mix(in srgb, var(--color-indigo) 25%, transparent); border-radius: var(--radius-lg); background: linear-gradient(135deg, color-mix(in srgb, var(--color-indigo) 12%, transparent), var(--surface-subtle)); }
-.volumeHeading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
-.volumeHeading > span { font-size: 0.75rem; font-weight: 700; }
-.volumeHeading > strong { font-size: 1.45rem; }
-.volumeSplit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.volumeSplit > div { display: grid; grid-template-columns: 18px 1fr; align-items: center; gap: 5px; color: var(--accent-primary); }
+.identity h2 { margin: 0 0 8px; font-size: 1.2rem; line-height: 1.3; overflow-wrap: anywhere; }
+.identity small { color: var(--text-secondary); font-size: 0.7rem; font-weight: 500; }
+.badges { position: relative; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.badges details { position: static; }
+.badges details > div { left: 0; transform: none; width: 220px; max-width: 100%; }
+.body { display: grid; gap: 14px; padding: 16px; overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
+.rank { display: inline-flex; align-items: center; gap: 4px; min-height: 29px; padding: 5px 8px; color: var(--profile-accent); font-size: 0.7rem; font-weight: 700; font-variant-numeric: tabular-nums; border: 1px solid color-mix(in srgb, var(--profile-accent) 30%, transparent); border-radius: var(--radius-full); background: color-mix(in srgb, var(--profile-accent) 10%, transparent); }
+.volumeHeading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.volumeHeading > span { color: var(--text-secondary); font-size: 0.75rem; font-weight: 600; }
+.volumeHeading > strong { font-size: 1.5rem; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; overflow-wrap: anywhere; }
+.volumeSplit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-top: 12px; border-top: 1px solid var(--border-default); }
+.volumeSplit > div { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: center; gap: 5px; color: var(--color-indigo-light); }
 .volumeSplit > div + div { border-left: 1px solid var(--border-default); padding-left: 12px; color: var(--color-orange); }
-.volumeSplit strong { color: var(--text-primary); font-size: 1rem; }
-.volumeSplit span { grid-column: 1 / -1; color: var(--text-secondary); font-size: 0.65rem; }
+.volumeSplit strong { color: var(--text-primary); font-size: 1rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.volumeSplit span { grid-column: 1 / -1; color: var(--text-secondary); font-size: 0.7rem; }
+.metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.metric { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 2px 8px; padding: 12px; background: var(--surface-subtle); border: 1px solid var(--border-default); border-radius: var(--radius-md); }
+.metric > svg { grid-row: span 2; align-self: center; color: var(--metric-color); }
+.metric strong { font-size: 1.05rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.metric span { font-size: 0.65rem; color: var(--text-secondary); }
+.journey > section { margin: 0; padding: 14px; border-color: var(--border-default); background: var(--surface-subtle); }
+.loading { padding: 20px; text-align: center; color: var(--text-secondary); font-size: 0.8rem; }
+.group { min-width: 0; display: grid; gap: 8px; }
+.groupHeading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 4px 2px; }
+.groupHeading h3 { margin: 0; font-size: 0.85rem; }
+.groupHeading > span { color: var(--text-secondary); font-size: 0.7rem; }
+.exercise { overflow: hidden; }
+.exerciseTop { display: flex; align-items: center; gap: 10px; padding: 12px; }
+.exerciseIcon { display: grid; place-items: center; width: 32px; height: 32px; flex-shrink: 0; border-radius: 9px; color: var(--exercise-color); background: color-mix(in srgb, var(--exercise-color) 12%, transparent); }
+.exerciseIdentity { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.exerciseName { font-size: 0.8rem; font-weight: 600; overflow-wrap: anywhere; }
+.exerciseValue { display: grid; gap: 2px; text-align: right; max-width: 40%; }
+.exerciseValue strong { color: var(--exercise-color); font-size: 1.1rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.exerciseValue > span { color: var(--text-secondary); font-size: 0.6rem; }
+.exerciseStreak { padding: 0 12px 10px; }
+.exerciseStreak > div { width: fit-content; }
+.exerciseLevels { border-top: 1px solid var(--border-default); }
+.exerciseLevels > details { margin-top: 0; }
+.exerciseLevels summary { min-height: 44px; border: 0; border-radius: 0; background: var(--surface-subtle); padding: 8px 12px; }
+.exerciseLevels summary:focus-visible { outline-offset: -3px; }
+.exerciseLevels details[open] { padding-bottom: 8px; }
+.exerciseLevels details[open] > div { margin-inline: 8px; }
+.journey details { margin-top: 12px; }
+@media (max-width: 360px) {
+    .header { gap: 10px; padding: 16px 48px 16px 14px; }
+    .body { padding: 12px; gap: 12px; }
+}

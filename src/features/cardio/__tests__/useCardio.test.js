@@ -117,10 +117,10 @@ describe('useCardio automatic weekly levels', () => {
         expect(result.current.allSessions).toHaveLength(1);
         expect(loadCardioSessions).not.toHaveBeenCalled();
     });
-    it('counts actual volume even before level one', async () => {
+    it('credits no reps before level one', async () => {
         progress.completions = { '2026-02-17': { running: { count: 300, goal: 3600, level: 0, isCompleted: false } } };
         const { result } = renderHook(() => useCardio());
         await waitFor(() => expect(result.current.loading).toBe(false));
-        expect(result.current.totalReps).toBe(32);
+        expect(result.current.totalReps).toBe(0);
     });
 });

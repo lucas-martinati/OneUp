@@ -1,4 +1,4 @@
-import { getLevelForCount } from '@shared/exerciseLevels.js';
+import { getLevelForCount, getRecordedReps } from '@shared/exerciseLevels.js';
 import { useRef, useEffect, useMemo, useState } from 'react';
 import { X, Play, Check, Save, Trash2, Pencil, Shuffle, DynamicIcon } from '@utils/icons';
 import { Button, ToggleSwitch, ListActionRow, ModalHeader, ModalContainer, ConfirmDialog } from '@components/ui';
@@ -508,7 +508,7 @@ export function WorkoutSession(props) {
             const conf = getConfig(id, getLocalDateStr(new Date()));
             const w = conf ? conf.weight : null;
             const diff = conf ? conf.difficulty : 1.0;
-            return ex ? { id: ex.id, label: getExerciseLabel(ex, t), reps: ex.count, color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff, level: getLevelForCount(ex.count, ex.goal) } : null;
+            return ex ? { id: ex.id, label: getExerciseLabel(ex, t), reps: getRecordedReps({ ...ex, level: getLevelForCount(ex.count, ex.goal) }, ex, 1, diff), goal: ex.goal, color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff, level: getLevelForCount(ex.count, ex.goal) } : null;
         }).filter(Boolean);
 
         // activeSlide indexes into fullCategoryOrder (built-ins + user-created

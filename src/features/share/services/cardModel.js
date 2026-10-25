@@ -1,7 +1,7 @@
 import { getCardioWeekEntry, getCardioReps } from '@shared/cardioLevels.js';
-import { isFullCompletion, getEntryLevel } from '@shared/exerciseLevels.js';
+import { isFullCompletion, getEntryLevel, getRecordedReps, getSessionExerciseReps } from '@shared/exerciseLevels.js';
 import { CATEGORIES, buildFullCategoryOrder, buildFullCategoryColors, isUserCategory } from '@config/categories';
-import { EXERCISES, CARDIO_EXERCISES, getDailyGoal, isCardioExercise, isWeightExercise } from '@config/exercises';
+import { EXERCISES, CARDIO_EXERCISES, isCardioExercise, isWeightExercise } from '@config/exercises';
 import { WEIGHT_EXERCISES } from '@config/weights';
 import { isCustomExercise } from '@utils/exerciseLabel';
 import { sumExerciseReps } from '@utils/statUtils';
@@ -71,6 +71,7 @@ export function buildCardModel({
 
   const allExercises = (sessionData?.exercises || []).map(ex => ({
     ...ex,
+    reps: getSessionExerciseReps(ex),
     level: ex.level ?? getEntryLevel(completions?.[sessionData?.date]?.[ex.id] || { isCompleted: true })
   }));
   const sessionType = sessionData?.type || CATEGORIES.BODYWEIGHT;
@@ -96,7 +97,7 @@ export function buildCardModel({
             const conf = getConfig(exId, targetDate);
             dailyExercises.push({
               ...knownEx,
-              reps: exStats.count || getDailyGoal(knownEx, dayNum, conf.difficulty) || knownEx.reps || 0,
+              reps: getRecordedReps(exStats, knownEx, dayNum, conf.difficulty),
               weight: exStats.weight,
               level: getEntryLevel(exStats)
             });
@@ -230,7 +231,9 @@ export function buildCardModel({
         }
       }
       if (selectedCats.includes(CATEGORIES.CARDIO)) {
-        totalReps += ((stats?.exerciseReps?.['running'] || 0) + (stats?.exerciseReps?.['cycling'] || 0));
+        for (const id of ['running', 'cycling']) {
+          if (!countedIds.has(id)) totalReps += stats?.exerciseReps?.[id] || 0;
+        }
       }
     } else if (stats?.globalTotalReps) {
       totalReps = stats.globalTotalReps;

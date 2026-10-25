@@ -85,7 +85,7 @@ describe('level migration', () => {
         expect(migrated.completions['2026-04-10'].squats).toMatchObject(entry(5));
         expect(migrated.completions['2026-04-10'].abs).toMatchObject({ isCompleted: true, count: 50, level: 5, goal: 100 });
         expect(migrated.completions['2026-04-11'].pushups.level).toBe(10);
-        expect(getRecordedReps(migrated.completions['2026-04-10'].pushups, { multiplier: 1 }, 100)).toBe(7);
+        expect(getRecordedReps(migrated.completions['2026-04-10'].pushups, { multiplier: 1 }, 100)).toBe(0);
         expect(migrateLevelProgress(migrated)).toBe(migrated);
     });
 

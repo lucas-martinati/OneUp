@@ -1,3 +1,4 @@
+import { getLeaderboardReps, getLeaderboardTotals } from '@utils/leaderboard';
 import { CloseButton } from '@components/ui/CloseButton';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
@@ -148,13 +149,10 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
     }, [loadData, communityContext]);
 
     const sorted = useMemo(() => {
-        const filteredEntries = domain === 'weights' ? entries.filter(e => e.isPro || e.weightsTotalReps > 0) : entries;
-        return [...filteredEntries].sort((a, b) => {
-            if (activeTab === 'global_combined') return ((b.totalReps || 0) + (b.weightsTotalReps || 0)) - ((a.totalReps || 0) + (a.weightsTotalReps || 0));
-            if (activeTab === 'bodyweight') return (b.totalReps || 0) - (a.totalReps || 0);
-            if (activeTab === 'weights') return (b.weightsTotalReps || 0) - (a.weightsTotalReps || 0);
-            return (b.exerciseReps?.[activeTab] || 0) - (a.exerciseReps?.[activeTab] || 0);
-        });
+        const filteredEntries = domain === 'weights' && activeTab !== 'global_combined'
+            ? entries.filter(e => e.isPro || getLeaderboardTotals(e).weightsReps > 0)
+            : entries;
+        return [...filteredEntries].sort((a, b) => getLeaderboardReps(b, activeTab) - getLeaderboardReps(a, activeTab));
     }, [entries, activeTab, domain]);
 
     const getRank = (index) => {
@@ -165,12 +163,7 @@ export function Leaderboard({ onClose, activeSlide = 0, initialClanData = null, 
         return index + 1;
     };
 
-    const getReps = (entry) => {
-        if (activeTab === 'global_combined') return (entry.totalReps || 0) + (entry.weightsTotalReps || 0);
-        if (activeTab === 'bodyweight') return entry.totalReps || 0;
-        if (activeTab === 'weights') return entry.weightsTotalReps || 0;
-        return entry.exerciseReps?.[activeTab] || 0;
-    };
+    const getReps = entry => getLeaderboardReps(entry, activeTab);
 
     const activeTabConfig = VISIBLE_TABS.find(t => t.id === activeTab) || VISIBLE_TABS[0];
 

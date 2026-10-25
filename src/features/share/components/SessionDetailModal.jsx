@@ -1,5 +1,5 @@
 import { LevelEmblem } from '@components/ui/LevelEmblem';
-import { getEntryLevel } from '@shared/exerciseLevels.js';
+import { getEntryLevel, getSessionExerciseReps } from '@shared/exerciseLevels.js';
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clock, Trash2, Dumbbell, Zap } from '@utils/icons';
@@ -41,7 +41,7 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
 
 
 
-  const exercises = session?.exercises || [];
+  const exercises = (session?.exercises || []).map(ex => ({ ...ex, reps: getSessionExerciseReps(ex) }));
   const totalReps = sumExerciseReps(exercises);
   const sessionWithName = useMemo(() => ({ ...session, name, exercises: (session?.exercises || []).map(ex => ({
     ...ex, level: getEntryLevel({ level: ex.level, isCompleted: true }),

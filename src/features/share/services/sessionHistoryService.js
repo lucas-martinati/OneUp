@@ -1,3 +1,4 @@
+import { getSessionExerciseReps } from '@shared/exerciseLevels.js';
 import { ref, set, get } from 'firebase/database';
 import { getAuthInstance, getDatabaseInstance } from '@services/firebase';
 import { paths } from '@shared/dbSchema.js';
@@ -116,7 +117,7 @@ export function addSession({ date, duration, name, type, exercises }) {
     exercises: (exercises || []).map(ex => ({
       id: ex.id,
       label: ex.label || ex.id,
-      reps: ex.reps ?? ex.goal ?? 0,
+      reps: getSessionExerciseReps({ ...ex, reps: ex.reps ?? ex.goal ?? 0 }),
       color: ex.color || getDefaultExerciseColor(),
       icon: ex.icon || 'Dumbbell',
       type: ex.type || 'counter',

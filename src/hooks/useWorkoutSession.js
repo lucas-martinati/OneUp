@@ -1,4 +1,4 @@
-import { getProgressGoal, getEntryLevel } from '@shared/exerciseLevels.js';
+import { getProgressGoal, getEntryLevel, getRecordedReps } from '@shared/exerciseLevels.js';
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EXERCISES, isBodyweightExercise, isWeightExercise } from '@config/exercises';
@@ -403,7 +403,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
             const conf = getConfig(id, getLocalDateStr(new Date()));
             const w = conf ? conf.weight : null;
             const diff = conf ? conf.difficulty : 1.0;
-            return { id: ex.id, label, reps: getExerciseCount(today, ex.id), color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff, level: getEntryLevel(completions[today]?.[ex.id]), goal: getProgressGoal(ex, dayNumber, completions[today]?.[ex.id]) };
+            return { id: ex.id, label, reps: getRecordedReps(completions[today]?.[ex.id], ex, dayNumber, diff), color: ex.color, icon: ex.icon, type: ex.type, weight: w, difficulty: diff, level: getEntryLevel(completions[today]?.[ex.id]), goal: getProgressGoal(ex, dayNumber, completions[today]?.[ex.id]) };
         }).filter(Boolean);
 
         let detectedName = sessionName;

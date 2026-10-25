@@ -23,8 +23,8 @@ vi.mock('@services/cloudSync', () => ({
 }));
 
 // Stub the heavy child components so we cover Leaderboard's own orchestration.
-vi.mock('../LeaderboardTabs', () => ({ LeaderboardTabs: ({ setActiveTab, showExerciseTabs }) => (
-  showExerciseTabs ? <button data-testid="tab-weights" onClick={() => setActiveTab('weights')}>tabs</button> : null
+vi.mock('../LeaderboardTabs', () => ({ LeaderboardTabs: ({ setActiveTab, showExerciseTabs = true }) => (
+  showExerciseTabs ? <><button data-testid="tab-weights" onClick={() => setActiveTab('weights')}>tabs</button><button data-testid="tab-global" onClick={() => setActiveTab('global_combined')}>global</button></> : null
 ) }));
 vi.mock('../LeaderboardRow', () => ({ LeaderboardRow: ({ entry, onSelect, onNudge }) => (
   <div data-testid={`row-${entry.uid}`} onClick={() => onSelect(entry)}>
@@ -32,7 +32,7 @@ vi.mock('../LeaderboardRow', () => ({ LeaderboardRow: ({ entry, onSelect, onNudg
   </div>
 ) }));
 vi.mock('../LeaderboardPodium', () => ({ LeaderboardPodium: ({ items, onSelect }) => (
-  <div data-testid="podium">{items.map(it => <button key={it.entry.uid} data-testid={`podium-${it.entry.uid}`} onClick={() => onSelect(it.entry)}>{it.entry.uid}</button>)}</div>
+  <div data-testid="podium">{items.map(it => <button key={it.entry.uid} data-reps={it.reps} data-rank={it.rank} data-testid={`podium-${it.entry.uid}`} onClick={() => onSelect(it.entry)}>{it.entry.uid}</button>)}</div>
 ) }));
 vi.mock('../ClanManager', () => ({ ClanManager: ({ onClanJoined }) => <button data-testid="clan-manager" onClick={() => onClanJoined('c1')}>manager</button> }));
 vi.mock('../UserDetail', () => ({ UserDetail: ({ entry, onClose }) => <div data-testid="user-detail">{entry.uid}<button data-testid="ud-close" onClick={onClose}>x</button></div> }));
@@ -66,6 +66,32 @@ describe('Leaderboard', () => {
     expect(getByTestId('podium-me')).toBeTruthy();
     expect(getByTestId('row-u4')).toBeTruthy();
     expect(getByTestId('row-u5')).toBeTruthy();
+  });
+
+  it('includes cardio in bodyweight and global scores, sorting by those same totals', async () => {
+    cloudSync.loadLeaderboard.mockResolvedValue([
+      { uid: 'cardio', totalReps: 44211, weightsTotalReps: 3750, exerciseReps: { pushups: 36463, biceps_curl: 3750, running: 7748 } },
+      { uid: 'strength', totalReps: 41000, weightsTotalReps: 100, exerciseReps: { pushups: 41000, biceps_curl: 100 } },
+    ]);
+    const { getByTestId } = render(<Leaderboard onClose={vi.fn()} />);
+    await waitFor(() => expect(getByTestId('podium-cardio').getAttribute('data-rank')).toBe('1'));
+    expect(getByTestId('podium-cardio').getAttribute('data-reps')).toBe('44211');
+    fireEvent.click(getByTestId('tab-global'));
+    expect(getByTestId('podium-cardio').getAttribute('data-reps')).toBe('47961');
+    expect(getByTestId('podium-cardio').getAttribute('data-rank')).toBe('1');
+  });
+
+  it('includes bodyweight-only users in the combined global ranking from the weights domain', async () => {
+    cloudSync.loadLeaderboard.mockResolvedValue([
+      { uid: 'bodyweight', exerciseReps: { pushups: 500 } },
+      { uid: 'weights', exerciseReps: { biceps_curl: 100 } },
+    ]);
+    const { getByTestId, queryByTestId } = render(<Leaderboard onClose={vi.fn()} activeSlide={2} />);
+    await waitFor(() => expect(getByTestId('podium-weights')).toBeTruthy());
+    expect(queryByTestId('podium-bodyweight')).toBeNull();
+    fireEvent.click(getByTestId('tab-global'));
+    expect(getByTestId('podium-bodyweight').getAttribute('data-rank')).toBe('1');
+    expect(getByTestId('podium-bodyweight').getAttribute('data-reps')).toBe('500');
   });
 
   it('shows the sign-in prompt when signed out with no entries', async () => {

@@ -41,11 +41,28 @@ export function getProgressGoal(exercise, dayNumber, entry) {
     ? entry.goal : getDailyGoal(exercise, dayNumber);
 }
 
-/** Actual volume for new entries; historical goal estimate for legacy booleans. */
+/** Reps credited by the last attained level; raw progress stays in entry.count. */
+export function getValidatedCount(entry, count, goal) {
+  const level = Math.min(getEntryLevel(entry), getLevelForCount(count, goal));
+  return level > 0 ? getLevelThreshold(goal, level) : 0;
+}
+
+/** Shared credited volume for panels, achievements and Firebase projections. */
 export function getRecordedReps(entry, exercise, dayNumber, difficulty = 1) {
   if (!entry) return 0;
-  if (Number.isFinite(entry.count)) return Math.max(0, entry.count);
-  return entry.isCompleted ? getDailyGoal(exercise, dayNumber, entry.difficulty ?? difficulty) : 0;
+  const count = Number.isFinite(entry.count) ? Math.max(0, entry.count)
+    : entry.isCompleted ? getDailyGoal(exercise, dayNumber, entry.difficulty ?? difficulty) : 0;
+  if (!Number.isInteger(entry.level)) return count;
+  const goal = Number.isFinite(entry.goal) && entry.goal > 0
+    ? entry.goal : getDailyGoal(exercise, dayNumber, entry.difficulty ?? difficulty);
+  return getValidatedCount(entry, count, goal);
+}
+
+/** Session snapshots without level/goal metadata retain their historical volume. */
+export function getSessionExerciseReps(exercise) {
+  const count = Math.max(0, exercise?.reps || 0);
+  return Number.isInteger(exercise?.level) && Number.isFinite(exercise.goal) && exercise.goal > 0
+    ? getValidatedCount(exercise, count, exercise.goal) : count;
 }
 
 /**
