@@ -56,10 +56,10 @@ test('shows level profiles, graphical settings and exports the shared level embl
     await levelToggle.click();
     await page.screenshot({ path: 'test-results/level-profile-mobile.png', animations: 'disabled' });
     await page.evaluate(async () => {
-        const [{ default: React }, { LevelSettings }] = await Promise.all([
-            import('/node_modules/.vite/deps/react.js'), import('/src/pages/Settings/components/LevelSettings.jsx'),
+        const [{ default: React }, { LevelSection }] = await Promise.all([
+            import('/node_modules/.vite/deps/react.js'), import('/src/pages/Settings/components/SettingsPanels.jsx'),
         ]);
-        window.presentationRoot.render(React.createElement('div', { style: { position: 'fixed', inset: 0, zIndex: 99999, background: '#0c0c15', padding: 16, overflow: 'auto' } }, React.createElement(LevelSettings)));
+        window.presentationRoot.render(React.createElement('div', { style: { position: 'fixed', inset: 0, zIndex: 99999, background: '#0c0c15', padding: 16, overflow: 'auto' } }, React.createElement(LevelSection)));
     });
     await expect(page.getByText('Exemple de progression', { exact: true })).toBeVisible();
     await page.screenshot({ path: 'test-results/level-settings-mobile.png', animations: 'disabled' });
@@ -112,11 +112,19 @@ test('shows level profiles, graphical settings and exports the shared level embl
         window.presentationRoot.render(React.createElement(GoogleOAuthProvider, { clientId: "fixture" }, React.createElement(AuthProvider, null, React.createElement(SubscriptionProvider, null, React.createElement(SessionDetailModal, { onClose: () => {}, session: {
             id: 'fixture-detail', date: '2026-02-19T12:00:00Z', duration: 600, exercises: [
                 { id: 'pushups', reps: 50 }, { id: 'squats', reps: 15, level: 3 }, { id: 'abs', reps: 0, level: 0 },
+                { id: 'custom_long', label: 'Développé incliné avec haltères et prise neutre', reps: 125, weight: 22.5, level: 7 },
             ],
         } })))));
     });
     const sessionDetail = page.getByRole('dialog').last();
     for (const level of [10, 3, 0]) await expect(sessionDetail.getByRole('img', { name: `Lvl ${level}`, exact: true })).toBeVisible();
     await page.screenshot({ path: 'test-results/session-detail-levels-mobile.png', animations: 'disabled' });
+    await page.setViewportSize({ width: 320, height: 640 });
+    const longName = sessionDetail.getByText('Développé incliné avec haltères et prise neutre', { exact: true });
+    await longName.scrollIntoViewIfNeeded();
+    expect(await longName.evaluate(el => el.scrollWidth <= el.clientWidth && el.scrollHeight <= el.clientHeight)).toBe(true);
+    expect(await sessionDetail.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+    await expect(sessionDetail.getByRole('img', { name: 'Lvl 7', exact: true })).toBeVisible();
+    await page.screenshot({ path: 'test-results/session-detail-small-screen.png', animations: 'disabled' });
     expect(errors).toEqual([]);
 });

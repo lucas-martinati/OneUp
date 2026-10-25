@@ -1,11 +1,11 @@
+import { SettingsCard } from './components/SettingsCard';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShoppingBag } from '@utils/icons';
-import { Button, ModalHeader, Card, ModalContainer } from '@components/ui';
+import { Button, ModalHeader, ModalContainer } from '@components/ui';
 import { CloudSyncPanel } from './components/CloudSyncPanel';
 import { StoreView } from './components/StoreView';
-import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection, DataSection } from './components/SettingsPanels';
-import { LevelSettings } from './components/LevelSettings';
+import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection, DataSection, LevelSection } from './components/SettingsPanels';
 import { openLegalPage } from '@utils/navigation';
 import { useAuth } from '@contexts/AuthContext';
 import { useSettingsStore } from '@store/useSettingsStore';
@@ -84,7 +84,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
 
                         {/* ── Données & Cloud ─────────────────────────────────────── */}
                         {cloudAuth && cloudSync && (
-                            <Card>
+                            <SettingsCard>
                                 <CloudSyncPanel
                                     authState={cloudAuth}
                                     onSignIn={() => cloudAuth.signIn()}
@@ -101,12 +101,12 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                         window.location.reload();
                                     } : undefined}
                                 />
-                            </Card>
+                            </SettingsCard>
                         )}
 
                         <DataSection />
 
-                        <LevelSettings />
+                        <LevelSection />
 
                         {/* Legal footer */}
                         <div style={{

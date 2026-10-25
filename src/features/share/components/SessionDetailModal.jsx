@@ -119,12 +119,12 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
                       <Icon size={18} color={color} />
                     </div>
                     <div className={styles.rowName}>{getExerciseLabel(ex)}</div>
-                    {ex.weight ? <WeightBadge weight={ex.weight} color={color} /> : null}
                     <div className={styles.rowVal}>
-                      {ex.reps}
+                      {Number(ex.reps || 0).toLocaleString(lang)}
                       <span className={styles.rowUnit}>
                         {ex.type === 'timer' ? 's' : t('common.reps')}
                       </span>
+                      {ex.weight ? <WeightBadge weight={ex.weight} color={color} /> : null}
                     </div>
                     <LevelEmblem level={getEntryLevel({ level: ex.level, isCompleted: true })} size={26} showZero />
                   </div>

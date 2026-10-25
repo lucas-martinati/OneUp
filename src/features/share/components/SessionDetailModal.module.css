@@ -108,16 +108,21 @@
    colored wash + border so the list reads as a colorful recap, while the
    name stays in --text-primary for contrast. */
 .row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 26px;
+  grid-template-areas: "icon name level" "icon value level";
   align-items: center;
-  gap: 12px;
+  gap: 5px 10px;
   padding: 10px 12px;
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--ex-color, var(--accent-glow)) 9%, transparent);
   border: 1px solid color-mix(in srgb, var(--ex-color, var(--accent-glow)) 22%, transparent);
 }
 
+.row > span:last-child { grid-area: level; }
+
 .rowIcon {
+  grid-area: icon;
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -128,22 +133,25 @@
 }
 
 .rowName {
+  grid-area: name;
   flex: 1;
   min-width: 0;
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
 }
 
 .rowVal {
+  grid-area: value;
+  min-width: 0;
+  flex-wrap: wrap;
   flex-shrink: 0;
   display: flex;
   align-items: baseline;
   gap: 3px;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: var(--ex-color, var(--text-primary));

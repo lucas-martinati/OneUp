@@ -20,7 +20,7 @@ function formatDuration(seconds) {
 }
 
 export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stats, defaultSessionName = '' }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [sessionName, setSessionName] = useState(defaultSessionName);
     const [confettiDone, setConfettiDone] = useState(false);
 
@@ -76,7 +76,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                 onDone={() => setConfettiDone(true)}
             />
 
-            <div className={styles.card}>
+            <div className={styles.card} role="dialog" aria-modal="true" aria-label={t('workout.sessionDone')}>
                 {/* ── Header (fixed) ── */}
                 <div className={styles.header}>
                     <div className={styles.trophy}><Trophy size={34} color="var(--color-amber)" /></div>
@@ -90,7 +90,7 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                         </div>
                         {totalReps > 0 && (
                             <div className={styles.statChip}>
-                                <div className={styles.statVal}>{totalReps.toLocaleString()}</div>
+                                <div className={styles.statVal}>{totalReps.toLocaleString(i18n.language)}</div>
                                 <div className={styles.statLab}>{t('common.reps')}</div>
                             </div>
                         )}
@@ -128,8 +128,8 @@ export function SessionSummary({ queue, exerciseInfo, onClose, sessionData, stat
                                 <span className={styles.rowVal}>
                                     {ex.type === 'timer' ? `${ex.reps ?? ex.goal ?? 0}s` : t('common.repsCount', { count: ex.reps ?? ex.goal ?? 0 })}
                                     {ex.weight ? ` • ${ex.weight} ${t('weight.kg')}` : ''}
-                                    <LevelEmblem level={ex.level ?? 10} size={26} showZero />
                                 </span>
+                                <span className={styles.rowLevel}><LevelEmblem level={ex.level ?? 10} size={30} showZero /></span>
                             </Card>
                         );
                     })}

@@ -19,7 +19,7 @@
 .card {
   position: relative;
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   max-height: 100%;
   display: flex;
   flex-direction: column;
@@ -128,40 +128,40 @@
   padding: 4px var(--space-6) var(--space-6);
 }
 .row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 11px 13px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 30px;
+  grid-template-areas: "icon name level" "icon value level";
+  gap: 5px 10px;
+  padding: 12px;
   border-radius: var(--radius-md);
   flex-shrink: 0;
 }
 .rowIcon {
+  grid-area: icon;
   width: 38px;
   height: 38px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  flex-shrink: 0;
 }
 .rowName {
-  flex: 1;
+  grid-area: name;
   min-width: 0;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 .rowVal {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  flex-shrink: 0;
-  font-size: 0.85rem;
-  font-weight: 800;
+  grid-area: value;
+  min-width: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: var(--success);
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
 }
+.rowLevel { grid-area: level; align-self: center; }
 
 /* ── Footer (fixed) ──────────────────────────────────────────────────── */
 .footer {
@@ -189,4 +189,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .card { animation: none; }
+}
+
+@media (max-height: 600px) {
+  .header { padding: 10px var(--space-4); gap: 5px; }
+  .trophy { display: none; }
+  .statChip { padding: 6px; }
+  .statVal { font-size: 1rem; }
+  .title { font-size: 1.25rem; }
+  .list { padding: 4px var(--space-4) var(--space-4); }
+  .footer { padding: 10px var(--space-4); }
 }

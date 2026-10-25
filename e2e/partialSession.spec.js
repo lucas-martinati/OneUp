@@ -33,4 +33,10 @@ test('finishes a partial session only after confirmation and preserves reached l
     expect(day.pushups.level).toBe(3);
     expect(day.squats?.isCompleted || false).toBe(false);
     await page.screenshot({ path: 'test-results/partial-session-mobile.png', animations: 'disabled' });
+    await page.setViewportSize({ width: 640, height: 360 });
+    const recap = page.getByRole('dialog', { name: 'Séance terminée !' });
+    await expect(recap.getByRole('button', { name: 'Fermer', exact: true })).toBeInViewport();
+    await recap.getByText('Squats', { exact: true }).scrollIntoViewIfNeeded();
+    await expect(recap.getByText('Squats', { exact: true })).toBeInViewport();
+    await page.screenshot({ path: 'test-results/session-summary-landscape.png', animations: 'disabled' });
 });
