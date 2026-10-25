@@ -5,7 +5,7 @@ import { Card, SectionTitle, EmptyState } from '@components/ui';
 
 export default function ConsistencyPieChart({ activeData, trackedCount, title, subTitle, emptyTitle, emptySub }) {
     return (
-        <Card variant="premium" className="chart-card" style={{ background: 'linear-gradient(135deg, rgba(109,40,217,0.1), rgba(139,92,246,0.1))' }}>
+        <Card variant="premium" className="chart-card">
             <SectionTitle level="h3" className="chart-title">{title}</SectionTitle>
 
             {trackedCount > 0 ? (

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { SegmentedControl } from '@components/ui/SegmentedControl';
-import { SectionTitle, Button } from '@components/ui';
+import { Card, SectionTitle, Button } from '@components/ui';
 
 export function StoreCard({
     isActive,
@@ -51,13 +51,7 @@ export function StoreCard({
         : buyButtonText;
 
     return (
-        <div className="glass-premium" style={{
-            padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)',
-            background: isActive
-                ? `linear-gradient(135deg, rgba(${colorRGB},0.08), rgba(${colorRGB},0.02))`
-                : 'var(--glass-bg, var(--card-bg))',
-            border: isActive ? `1px solid rgba(${colorRGB},0.2)` : '1px solid var(--border-default)'
-        }}>
+        <Card color={colorMain}>
             <SectionTitle spacing="md">{title}</SectionTitle>
 
             {isActive && (
@@ -197,6 +191,6 @@ export function StoreCard({
                     </Button>
                 </div>
             )}
-        </div>
+        </Card>
     );
 }

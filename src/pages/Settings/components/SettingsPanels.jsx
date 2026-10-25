@@ -1,8 +1,7 @@
-import { SettingsCard } from './SettingsCard';
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, Volume2, Vibrate, Clock, Users, Lock, Gauge, Globe, Smartphone, Download, Upload, Calendar, Flame, Activity } from '@utils/icons';
-import { ToggleSwitch, SettingRow, ThemeSwatch, Button, Input, SectionTitle, Stack } from '@components/ui';
+import { Card, ToggleSwitch, SettingRow, ThemeSwatch, Button, Input, SectionTitle, Stack } from '@components/ui';
 import { LevelEmblem } from '@components/ui/LevelEmblem';
 import { LevelProgress } from '@components/ui/LevelProgress';
 import styles from './SettingsPanels.module.css';
@@ -18,7 +17,7 @@ export function PreferencesSection({ settings, onSave }) {
     const { t } = useTranslation();
 
     return (
-        <SettingsCard style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Card style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.preferences')}</SectionTitle>
 
             <Stack gap="xs">
@@ -180,7 +179,7 @@ export function PreferencesSection({ settings, onSave }) {
                     />
                 </Stack>
             </Stack>
-        </SettingsCard>
+        </Card>
     );
 }
 
@@ -189,7 +188,7 @@ export function LanguageSection() {
     const { t, i18n } = useTranslation();
 
     return (
-        <SettingsCard style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Card style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.language')}</SectionTitle>
             <SettingRow
                 icon={Globe}
@@ -228,7 +227,7 @@ export function LanguageSection() {
                     ))}
                 </select>
             </SettingRow>
-        </SettingsCard>
+        </Card>
     );
 }
 
@@ -237,7 +236,7 @@ export function PerformanceSection({ settings, onSave }) {
     const { t } = useTranslation();
 
     return (
-        <SettingsCard style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Card style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.performance')}</SectionTitle>
 
             <SettingRow
@@ -264,7 +263,7 @@ export function PerformanceSection({ settings, onSave }) {
                     ]}
                 />
             </SettingRow>
-        </SettingsCard>
+        </Card>
     );
 }
 
@@ -273,7 +272,7 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
     const { t } = useTranslation();
 
     return (
-        <SettingsCard style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Card style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.community')}</SectionTitle>
 
             <Stack gap="xs">
@@ -304,7 +303,7 @@ export function CommunitySection({ settings, onSave, cloudAuth }) {
                     </div>
                 )}
             </Stack>
-        </SettingsCard>
+        </Card>
     );
 }
 
@@ -315,7 +314,7 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
     const currentTheme = settings.appTheme || 'dark';
 
     return (
-        <SettingsCard style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Card style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span>{t('settings.appTheme')}</span>
                 {!isPro && <Lock size={14} color="var(--accent)" style={{ opacity: 0.8 }} />}
@@ -354,7 +353,7 @@ export function ThemeSection({ settings, updateSettings, isPro, onOpenStore }) {
                     </div>
                 </div>
             )}
-        </SettingsCard>
+        </Card>
     );
 }
 
@@ -393,7 +392,7 @@ export function DataSection() {
     };
 
     return (
-        <SettingsCard style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Card style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <SectionTitle>{t('settings.dataTitle')}</SectionTitle>
 
             <Stack gap="xs">
@@ -439,7 +438,7 @@ export function DataSection() {
                     {status.msg}
                 </div>
             )}
-        </SettingsCard>
+        </Card>
     );
 }
 
@@ -447,7 +446,7 @@ export function DataSection() {
 export function LevelSection() {
     const { t } = useTranslation();
     const steps = [{ level: 1, label: t('levels.step1') }, { level: 5, label: t('levels.step5') }, { level: 10, label: t('levels.step10') }];
-    return <SettingsCard className={styles.card}>
+    return <Card className={styles.card}>
         <SectionTitle>{t('levels.progress')}</SectionTitle>
         <div className={styles.journey}>
             {steps.map(({ level, label }) => <div key={level} className={styles.step}>
@@ -464,5 +463,5 @@ export function LevelSection() {
             <div><Flame size={20} /><p>{t('levels.globalRule')}</p></div>
             <div><Activity size={20} /><p>{t('levels.cardioRule')}</p></div>
         </div>
-    </SettingsCard>;
+    </Card>;
 }

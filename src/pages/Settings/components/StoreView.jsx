@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Heart, RotateCcw, Sparkles } from '@utils/icons';
-import { Button, Card } from '@components/ui';
+import { Button, Card, SectionTitle } from '@components/ui';
 import { getPurchaseHistory } from '@services/purchaseService';
 import { StoreCard } from '@components/store/StoreCard';
 import { useAuth } from '@contexts/AuthContext';
@@ -96,19 +96,11 @@ export function StoreView() {
             {/* --- Historique des achats --- */}
             {displayHistory && displayHistory.length > 0 && (
                 <Card>
-                    <div style={{
-                        fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)',
-                        textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px'
-                    }}>
-                        {t('supporter.history')}
-                    </div>
+                    <SectionTitle spacing="md">{t('supporter.history')}</SectionTitle>
                     <div className="flex-col gap-8">
                         {displayHistory.map((receipt, index) => (
-                            <div key={index} style={{
+                            <Card key={receipt.id || index} padding="sm" color={receipt.isActive ? 'var(--success)' : undefined} style={{
                                 display: 'flex', flexDirection: 'column',
-                                padding: '14px', borderRadius: 'var(--radius-md)',
-                                background: 'var(--surface-muted)',
-                                border: `1px solid ${receipt.isActive ? 'rgba(16, 185, 129, 0.2)' : 'var(--border-default)'}`,
                             }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                                     <div style={{ fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
@@ -177,7 +169,7 @@ export function StoreView() {
                                 }}>
                                     {receipt.id || 'N/A'}
                                 </div>
-                            </div>
+                            </Card>
                         ))}
                     </div>
                 </Card>

@@ -91,9 +91,18 @@ describe('Card', () => {
     expect(cls).toContain('mine');
   });
 
-  it('renders no class attribute for a plain non-interactive card', () => {
+  it('keeps the shared surface without glass effects for a plain card', () => {
     const { container } = render(<Card variant="plain">hi</Card>);
-    expect(container.firstChild.getAttribute('class')).toBe(null);
+    expect(container.firstChild.className).toBeTruthy();
+    expect(container.firstChild.className).not.toContain('glass');
+  });
+
+  it('accepts a primary CSS color and preserves the legacy tint API', () => {
+    const { container, rerender } = render(<Card color="var(--success)">hi</Card>);
+    expect(container.firstChild.style.getPropertyValue('--card-accent')).toBe('var(--success)');
+    expect(container.firstChild.hasAttribute('color')).toBe(false);
+    rerender(<Card variant="tinted" tint="#f59e0b">hi</Card>);
+    expect(container.firstChild.style.getPropertyValue('--card-accent')).toBe('#f59e0b');
   });
 
   it('renders a custom element via the `as` prop', () => {

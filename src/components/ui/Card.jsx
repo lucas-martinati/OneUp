@@ -1,17 +1,14 @@
 import { forwardRef, useMemo } from 'react';
+import styles from './Card.module.css';
 
 /**
  * Surface/card primitive.
  *
- * Standardises the recurring "glass panel" look (background + border + radius +
- * shadow) that was previously copy-pasted as inline styles — often with the
- * `.glass` class on some screens and ad-hoc rgba() values on others.
+ * Shared theme-aware surface across settings, statistics and other panels.
+ * Glass variants retain the global blur utilities and their low-performance
+ * overrides. Tinted cards use the same surface with a semantic accent color.
  *
- * The `glass` variant intentionally reuses the existing `.glass` utility class
- * (rather than re-inlining its declarations) so it keeps inheriting the
- * `[data-perf="low"]` overrides in index.css that disable backdrop-blur on
- * low-end devices. The other variants are token-driven inline styles.
- *
+ * @param {string} [color] – primary CSS color for the background, border and title divider
  * @param {'glass'|'elevated'|'section'|'plain'|'premium'|'tinted'} [variant='glass']
  * @param {'none'|'xs'|'sm'|'md'|'lg'|'xl'} [padding='md']
  * @param {boolean} [interactive=false] – adds hover-lift affordance
@@ -40,47 +37,25 @@ const VARIANT_CLASS = {
   tinted: '',
 };
 
-const VARIANT_STYLE = {
-  glass: {},
-  elevated: {
-    background: 'var(--surface-elevated)',
-    border: '1px solid var(--border-default)',
-    boxShadow: 'var(--shadow-lg)',
-  },
-  section: {
-    background: 'var(--surface-section)',
-    border: '1px solid var(--border-default)',
-    boxShadow: 'var(--shadow-sm)',
-  },
-  plain: {
-    background: 'var(--card-bg)',
-    border: '1px solid var(--border-default)',
-  },
-  premium: {},
-  tinted: {},
-};
-
 export const Card = forwardRef(function Card(
-  { variant = 'glass', padding = 'md', interactive = false, as: Tag = 'div', className = '', style, children, tint, ...rest },
+  { variant = 'glass', padding = 'md', interactive = false, as: Tag = 'div', className = '', style, children, color, tint, ...rest },
   ref,
 ) {
   const composed = useMemo(
     () => ({
       ...BASE,
-      ...VARIANT_STYLE[variant],
-      padding: PADDING[padding],
-      ...(variant === 'tinted' && tint
+      padding: padding === 'md' ? 'var(--card-padding, var(--space-6))' : PADDING[padding],
+      ...((color || (variant === 'tinted' && tint))
         ? {
-            background: `linear-gradient(160deg, ${tint}2e, ${tint}12)`,
-            border: `1px solid ${tint}38`,
+            '--card-accent': color || tint,
           }
         : {}),
       ...style,
     }),
-    [variant, padding, tint, style],
+    [variant, padding, color, tint, style],
   );
 
-  const classes = [VARIANT_CLASS[variant], interactive && 'micro-scale-hover', className]
+  const classes = [styles.card, VARIANT_CLASS[variant], interactive && 'micro-scale-hover', className]
     .filter(Boolean)
     .join(' ');
 

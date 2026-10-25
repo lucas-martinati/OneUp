@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Clock, ChevronRight, DynamicIcon } from '@utils/icons';
 import { getExerciseColor } from '@utils/exerciseLabel';
-import { SectionTitle } from '@components/ui';
+import { Card, SectionTitle } from '@components/ui';
 
 /** Recent workout sessions list (last 10), opens the session detail modal. */
 export function SessionHistoryList({ sessionHistory, onSelectSession }) {
@@ -10,10 +10,7 @@ export function SessionHistoryList({ sessionHistory, onSelectSession }) {
     if (sessionHistory.length === 0) return null;
 
     return (
-        <div className="glass-premium" style={{
-            padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)',
-            background: 'var(--surface-section)',
-        }}>
+        <Card>
             <SectionTitle spacing="md" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Clock size={14} />
                 {t('share.recentSessions')}
@@ -76,6 +73,6 @@ export function SessionHistoryList({ sessionHistory, onSelectSession }) {
                     );
                 })}
             </div>
-        </div>
+        </Card>
     );
 }

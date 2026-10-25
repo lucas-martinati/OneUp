@@ -27,7 +27,6 @@ export default function LevelEvolutionChart({ title, t, completions, exercises, 
     return <EvolutionChart
         title={title} t={t} exercises={exercises} completions={history}
         valueKey="level" defaultValue={0} initialMax={10} carryForward includeIncomplete
-        gradient="linear-gradient(135deg, rgba(139,92,246,0.1), rgba(99,102,241,0.08))"
         emptyTitle={t('stats.levelNoData')} emptyHint={t('stats.levelNoDataHint')}
         yDomain={() => [1, 10]}
         yAxisExtra={{ tickFormatter: value => t('levels.short', { level: Math.round(value) }) }}

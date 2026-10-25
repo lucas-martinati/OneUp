@@ -1,8 +1,7 @@
-import { SettingsCard } from './components/SettingsCard';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShoppingBag } from '@utils/icons';
-import { Button, ModalHeader, ModalContainer } from '@components/ui';
+import { Card, Button, ModalHeader, ModalContainer } from '@components/ui';
 import { CloudSyncPanel } from './components/CloudSyncPanel';
 import { StoreView } from './components/StoreView';
 import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection, DataSection, LevelSection } from './components/SettingsPanels';
@@ -84,7 +83,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
 
                         {/* ── Données & Cloud ─────────────────────────────────────── */}
                         {cloudAuth && cloudSync && (
-                            <SettingsCard>
+                            <Card>
                                 <CloudSyncPanel
                                     authState={cloudAuth}
                                     onSignIn={() => cloudAuth.signIn()}
@@ -101,7 +100,7 @@ export function Settings({ defaultShowStore = false, onClose }) {
                                         window.location.reload();
                                     } : undefined}
                                 />
-                            </SettingsCard>
+                            </Card>
                         )}
 
                         <DataSection />

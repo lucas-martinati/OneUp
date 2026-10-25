@@ -12,6 +12,7 @@ import { Card, EmptyState } from '@components/ui';
  * les différences sont passées en props (métrique, format, domaine, couleurs…).
  */
 export default function EvolutionChart({
+    color,
     title,
     t,
     exercises,
@@ -19,7 +20,6 @@ export default function EvolutionChart({
     valueKey,        // champ lu dans completions (ex. 'difficulty', 'weight')
     defaultValue,    // valeur de repli quand le point n'est pas un nombre
     initialMax,      // borne basse pour le calcul du maximum
-    gradient,        // dégradé de fond de la carte
     emptyTitle,
     emptyHint,
     yDomain,         // (maxValue) => [min, max]
@@ -94,7 +94,7 @@ export default function EvolutionChart({
     else if (yAxisExtra?.unit) formatYTick = (v) => `${v}${yAxisExtra.unit}`;
 
     return (
-        <Card variant="premium" className="chart-card" style={{ background: gradient }}>
+        <Card variant="premium" color={color} className="chart-card">
             <h3 className="chart-title">
                 {title}
             </h3>

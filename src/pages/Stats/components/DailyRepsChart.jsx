@@ -13,7 +13,7 @@ export default function DailyRepsChart({ dailyRepsData, title, t }) {
     const maxReps = Math.max(...data.map(d => d.reps), 1);
 
     return (
-        <Card variant="premium" className="chart-card" style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.1), rgba(139,92,246,0.08))' }}>
+        <Card variant="premium" className="chart-card">
             <h3 className="chart-title">{title}</h3>
             <LineChart
                 data={data}

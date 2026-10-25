@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { SectionTitle } from '@components/ui';
+import { Card, SectionTitle } from '@components/ui';
 
 /** Stacked per-exercise monthly activity bar chart (pure CSS, no charting lib). */
 export function MonthlyActivityChart({ monthlyActivityTotal, monthlyActivityByExercise, exercises }) {
@@ -9,10 +9,7 @@ export function MonthlyActivityChart({ monthlyActivityTotal, monthlyActivityByEx
     const today = new Date();
 
     return (
-        <div className="glass-premium" style={{
-            padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)',
-            background: 'var(--surface-section)'
-        }}>
+        <Card>
             <SectionTitle spacing="md">{t('stats.monthlyActivity')}</SectionTitle>
             <div style={{
                 display: 'flex', alignItems: 'flex-end', gap: '4px',
@@ -86,6 +83,6 @@ export function MonthlyActivityChart({ monthlyActivityTotal, monthlyActivityByEx
                     );
                 })}
             </div>
-        </div>
+        </Card>
     );
 }

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { DynamicIcon } from '@utils/icons';
 import { getExerciseLabel } from '@utils/exerciseLabel';
 import { CATEGORIES, isUserCategory } from '@config/categories';
-import { StreakFlame, WeightBadge } from '@components/ui';
+import { Card, StreakFlame, WeightBadge } from '@components/ui';
 import { useExercises } from '@contexts/ExercisesContext';
 
 /** Per-exercise breakdown list, grouped by category. */
@@ -22,10 +22,7 @@ export function ExerciseBreakdown({
     if (enrichedExerciseStats.length === 0) return null;
 
     return (
-        <div className="glass-premium" style={{
-            padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)',
-            background: 'var(--surface-section)'
-        }}>
+        <Card>
             <div className="flex-col gap-8">
                 {fullCategoryOrder.map((catId, index) => {
                     const catStats = enrichedExerciseStats.filter(ex => ex.categoryId === catId);
@@ -58,9 +55,8 @@ export function ExerciseBreakdown({
                             </div>
                             {catStats.map(ex => {
                                 return (
-                                    <div key={ex.id} style={{
+                                    <Card key={ex.id} color={ex.color} padding="none" style={{
                                         padding: '8px 12px', borderRadius: 'var(--radius-md)',
-                                        background: `${ex.color}10`, border: `1px solid ${ex.color}20`,
                                         display: 'flex', flexDirection: 'column', gap: '6px',
                                         marginBottom: '6px'
                                     }}>
@@ -127,13 +123,13 @@ export function ExerciseBreakdown({
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Card>
                                 );
                             })}
                         </React.Fragment>
                     )
                 })}
             </div>
-        </div>
+        </Card>
     );
 }

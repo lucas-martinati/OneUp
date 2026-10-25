@@ -5,6 +5,7 @@ import EvolutionChart from './EvolutionChart';
 export default function WeightEvolutionChart({ title, t, getConfig, completions }) {
     return (
         <EvolutionChart
+            color="var(--color-amber)"
             title={title}
             t={t}
             exercises={WEIGHT_EXERCISES}
@@ -13,7 +14,6 @@ export default function WeightEvolutionChart({ title, t, getConfig, completions 
             defaultValue={0}
             carryForward
             initialMax={1}
-            gradient="linear-gradient(135deg, rgba(245,158,11,0.1), rgba(234,88,12,0.08))"
             emptyTitle={t('weight.noData')}
             emptyHint={t('weight.noDataHint')}
             yDomain={(maxValue) => [0, Math.ceil(maxValue * 1.15)]}
