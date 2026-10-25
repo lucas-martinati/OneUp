@@ -804,8 +804,10 @@
     }
   },
   "timer": {
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
     "remaining": "{{time}} left to hold",
-    "reset": "Reset",
     "skip": "Skip",
     "validated": "Timer Complete!"
   },

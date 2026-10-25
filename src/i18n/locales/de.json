@@ -789,8 +789,10 @@
     }
   },
   "timer": {
+    "start": "Starten",
+    "pause": "Pause",
+    "resume": "Fortsetzen",
     "remaining": "{{time}} bleibt zu halten",
-    "reset": "Zurücksetzen",
     "skip": "Überspringen",
     "validated": "Timer abgeschlossen!"
   },

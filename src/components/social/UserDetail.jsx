@@ -17,7 +17,7 @@ import styles from './UserDetail.module.css';
 import { PALETTE } from '@styles/palette';
 
 export function UserDetail({ entry, rank, isMe, onClose }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const myStats = useComputedStatsFromStore();
     const rankColor = ({ 1: PALETTE.amber, 2: PALETTE.silver, 3: PALETTE.bronze })[rank] || PALETTE.indigoLight;
     const RankIcon = ({ 1: Trophy, 2: Medal, 3: Award })[rank] || Trophy;
@@ -63,7 +63,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
         { icon: Calendar, color: PALETTE.cyan, label: t('leaderboard.activeDays'), value: loadingDetails ? '…' : stats.totalDays || 0 },
         { icon: Star, color: PALETTE.amber, label: t('common.achievements'), value: loadingDetails ? '…' : achievementCount },
     ];
-    return <ModalContainer open onClose={onClose} ariaLabel="User details" position="center" unstyled>
+    return <ModalContainer open onClose={onClose} ariaLabel={entry.pseudo} position="center" unstyled>
         <section className={styles.panel} style={{ '--profile-accent': rankColor }}>
             <header className={styles.header}>
                 <Avatar photoURL={entry.photoURL} name={entry.pseudo} size={76} borderColor={rankColor} />
@@ -79,10 +79,10 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
             <div className={styles.body}>
                 {!loadingDetails && <LevelProfileSummary stats={stats} todayLevel={todayLevel} />}
                 <section className={styles.volume}>
-                    <div className={styles.volumeHeading}><span>{t('stats.totalReps')}</span><strong>{(bodyweightReps + weightsReps).toLocaleString()}</strong></div>
+                    <div className={styles.volumeHeading}><span>{t('stats.totalReps')}</span><strong>{(bodyweightReps + weightsReps).toLocaleString(i18n.language)}</strong></div>
                     <div className={styles.volumeSplit}>
-                        <div><Activity size={16} /><strong>{bodyweightReps.toLocaleString()}</strong><span>{t('common.bodyweight')}</span></div>
-                        <div><Dumbbell size={16} /><strong>{weightsReps.toLocaleString()}</strong><span>{t('common.weights')}</span></div>
+                        <div><Activity size={16} /><strong>{bodyweightReps.toLocaleString(i18n.language)}</strong><span>{t('common.bodyweight')}</span></div>
+                        <div><Dumbbell size={16} /><strong>{weightsReps.toLocaleString(i18n.language)}</strong><span>{t('common.weights')}</span></div>
                     </div>
                 </section>
                 <div className={styles.metrics}>
@@ -101,7 +101,7 @@ export function UserDetail({ entry, rank, isMe, onClose }) {
                                 <span className={styles.exerciseIcon}><Icon size={18} /></span>
                                 <span className={styles.exerciseName}>{getExerciseLabel(ex, t)}</span>
                                 {isWeightExercise(ex.id) && <WeightBadge weight={details?.exerciseWeights?.[ex.id] || ex.defaultWeight} color={ex.color} />}
-                                <strong>{(entry.exerciseReps?.[ex.id] || 0).toLocaleString()}</strong>
+                                <strong>{(entry.exerciseReps?.[ex.id] || 0).toLocaleString(i18n.language)}</strong>
                             </div>
                             {!loadingDetails && <div className={styles.exerciseStreak}>
                                 <StreakFlame streak={levels?.streak ?? stats.exerciseStreaks?.[ex.id]} level={levels?.level}

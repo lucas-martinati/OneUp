@@ -361,7 +361,7 @@ export function WorkoutSession(props) {
                                                         onClick={(e) => { e.stopPropagation(); toggleExercise(id); }} 
                                                         variant="danger-ghost" 
                                                         size="sm" 
-                                                        aria-label="Remove" 
+                                                        aria-label={t('common.delete')}
                                                     />
                                                 )}
                                                 className={styles.queueItem}

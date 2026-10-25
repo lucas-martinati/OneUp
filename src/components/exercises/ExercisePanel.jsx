@@ -372,6 +372,8 @@ function TimerControls({
     setIsRunning,
     t
 }) {
+    const idleLabel = displayCount > 0 ? t('timer.resume') : t('timer.start');
+    const toggleLabel = isRunning ? t('timer.pause') : idleLabel;
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(12px, 2vh, 20px)', width: '100%', maxWidth: '360px' }}>
             {!isCompleted && (
@@ -379,7 +381,8 @@ function TimerControls({
                     variant="ghost"
                     onClick={() => setIsRunning(!isRunning)}
                     className="ripple"
-                    aria-label={isRunning ? t('timer.reset') : t('common.next')}
+                    aria-label={toggleLabel}
+                    title={toggleLabel}
                     style={{
                         width: 'clamp(76px, 13vh, 96px)',
                         height: 'clamp(76px, 13vh, 96px)',
@@ -408,7 +411,7 @@ function TimerControls({
                 isCompleted={isCompleted}
                 onComplete={handleCompleteAll}
                 onReset={handleReset}
-                resetLabel={t('timer.reset')}
+                resetLabel={t('counter.reset')}
             />
         </div>
     );

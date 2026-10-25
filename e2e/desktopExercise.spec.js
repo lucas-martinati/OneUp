@@ -14,11 +14,11 @@ test('desktop timer darkens the full overlay and streak separators match their b
     const panel = page.getByRole('dialog', { name: 'Plank' });
     const overlay = page.locator('.modal-overlay').filter({ has: panel });
     const original = await overlay.evaluate(el => getComputedStyle(el).backgroundColor);
-    await panel.getByRole('button', { name: 'Next', exact: true }).click();
+    await panel.getByRole('button', { name: 'Start', exact: true }).click();
     await expect(overlay).toHaveCSS('background-color', 'rgb(0, 0, 0)');
     expect(await overlay.evaluate(el => el.getBoundingClientRect().width)).toBe(1565);
     await page.screenshot({ path: 'test-results/desktop-timer-black.png', animations: 'disabled' });
-    await panel.getByRole('button', { name: 'Reset', exact: true }).first().click();
+    await panel.getByRole('button', { name: 'Pause', exact: true }).first().click();
     await expect(overlay).toHaveCSS('background-color', original);
     await page.evaluate(async () => {
         const [{ default: React }, { default: ReactDOM }, { StreakFlame }] = await Promise.all([

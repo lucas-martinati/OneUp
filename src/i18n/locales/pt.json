@@ -789,8 +789,10 @@
     }
   },
   "timer": {
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "resume": "Retomar",
     "remaining": "{{time}} restante para segurar",
-    "reset": "Reiniciar",
     "skip": "Pular",
     "validated": "Temporizador concluído!"
   },

@@ -789,8 +789,10 @@
     }
   },
   "timer": {
+    "start": "开始",
+    "pause": "暂停",
+    "resume": "继续",
     "remaining": "还需保持 {{time}}",
-    "reset": "重置",
     "skip": "跳过",
     "validated": "计时器完成！"
   },

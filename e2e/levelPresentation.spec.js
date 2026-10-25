@@ -38,10 +38,10 @@ test('shows level profiles, graphical settings and exports the shared level embl
     await expect(page.getByText('Mes séries par niveau', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Séries par niveau', { exact: true }).first()).toBeVisible();
     await expect(page.getByRole('img', { name: 'Lvl 6', exact: true }).first()).toBeVisible();
-    const profile = page.getByRole('dialog', { name: 'User details' });
+    const profile = page.getByRole('dialog', { name: 'Camille' });
     const levelSummary = profile.locator('section').filter({ has: page.getByRole('heading', { name: 'Parcours de niveaux' }) }).last();
     for (const level of [8, 6, 10]) await expect(levelSummary.getByRole('img', { name: `Lvl ${level}`, exact: true }).first()).toBeVisible();
-    await expect(profile.getByText('1,500', { exact: true })).toBeVisible();
+    await expect(profile.getByText(/1[\s\u202f]500/, { exact: true })).toBeVisible();
     await expect(profile.getByText('300', { exact: true })).toBeVisible();
     for (const [label, description] of [['Pro', 'Membre Pro — programmes personnalisés'], ['Soutien', "Soutient l'app par un don"]]) {
         const badge = profile.locator('summary').filter({ hasText: new RegExp(`^${label}$`) });

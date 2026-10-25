@@ -789,8 +789,10 @@
     }
   },
   "timer": {
+    "start": "시작",
+    "pause": "일시 정지",
+    "resume": "계속",
     "remaining": "{{time}} 남음",
-    "reset": "다시 놓기",
     "skip": "건너뛰다",
     "validated": "타이머 완료!"
   },

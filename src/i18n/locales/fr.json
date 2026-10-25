@@ -804,9 +804,11 @@
     }
   },
   "timer": {
+    "start": "Démarrer",
+    "pause": "Pause",
+    "resume": "Reprendre",
     "remaining": "Encore {{time}} à tenir",
-    "reset": "reset",
-    "skip": "Skip",
+    "skip": "Passer",
     "validated": "Chrono Validé !"
   },
   "weight": {

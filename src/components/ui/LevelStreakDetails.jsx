@@ -7,6 +7,9 @@ import styles from './LevelStreakDetails.module.css';
 export function LevelStreakDetails({ levels = [], expanded = false, weekly = false }) {
     const { t } = useTranslation();
     if (!levels.length) return null;
+    const earned = levels.filter(row => row.current > 0 || row.max > 0);
+    const currentLevel = Math.max(0, ...levels.filter(row => row.current > 0).map(row => row.level));
+    const previewLevels = [...new Set([earned[0]?.level || 0, currentLevel, earned.at(-1)?.level || 0])].filter(level => level > 0);
     const groups = [];
     for (const row of levels) {
         const previous = groups.at(-1);
@@ -28,7 +31,7 @@ export function LevelStreakDetails({ levels = [], expanded = false, weekly = fal
     if (expanded) return content;
     return <details className={styles.details}>
         <summary className={styles.summary}>
-            <span className={styles.stack} aria-hidden="true">{[1, 5, 10].map(level => <LevelEmblem key={level} level={level} size={28} />)}</span>
+            <span className={styles.stack} aria-hidden="true">{(previewLevels.length ? previewLevels : [0]).map(level => <LevelEmblem key={level} level={level} size={28} showZero />)}</span>
             <span className={styles.summaryLabel}>{t('levels.streaks')}</span><ChevronDown size={16} className={styles.chevron} />
         </summary>
         {content}

@@ -789,8 +789,10 @@
     }
   },
   "timer": {
+    "start": "開始",
+    "pause": "一時停止",
+    "resume": "再開",
     "remaining": "{{time}} はまだ保持されています",
-    "reset": "リセット",
     "skip": "スキップ",
     "validated": "タイマー完了！"
   },

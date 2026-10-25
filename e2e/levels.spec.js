@@ -54,7 +54,7 @@ test('migrates once, counts partial reps and keeps higher milestones accessible 
     await counter.click();
     await expect(dialog.getByText('30', { exact: true })).toBeVisible();
     const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('pushup_challenge_data')));
-    expect(persisted.progressVersion).toBe(4);
+    expect(persisted.progressVersion).toBe(5);
     const entries = Object.values(persisted.completions).map(day => day.pushups);
     expect(entries.some(entry => entry.level === 10 && entry.count > 0 && entry.goal > 0)).toBe(true);
     const unfinishedLegacy = Object.values(persisted.completions).find(day => day.squats)?.squats;
@@ -66,7 +66,7 @@ test('migrates once, counts partial reps and keeps higher milestones accessible 
     await expect(page.getByRole('button', { name: 'Streak', exact: true }).getByRole('img', { name: 'Lvl 6' })).toBeVisible();
     await page.locator('.exercise-button').filter({ hasText: 'Plank' }).click();
     await counter.click();
-    await dialog.getByRole('button', { name: 'Next', exact: true }).click();
+    await dialog.getByRole('button', { name: 'Resume', exact: true }).click();
     await expect.poll(() => page.evaluate(() => {
         const data = JSON.parse(localStorage.getItem('pushup_challenge_data'));
         return Math.max(...Object.values(data.completions).map(day => day.planche?.count || 0));

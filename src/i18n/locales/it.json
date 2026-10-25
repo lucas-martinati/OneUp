@@ -789,8 +789,10 @@
     }
   },
   "timer": {
+    "start": "Avvia",
+    "pause": "Pausa",
+    "resume": "Riprendi",
     "remaining": "{{time}} rimasto da tenere premuto",
-    "reset": "Reset",
     "skip": "Saltare",
     "validated": "Cronometro completato!"
   },
