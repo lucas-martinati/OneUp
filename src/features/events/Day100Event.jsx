@@ -693,7 +693,7 @@ const TERMINAL_LINES = [
     { text: 'Pour les aider, tu dois réaliser', delay: 5200, color: '#10b981' },
     { text: 'une JOURNÉE PARFAITE aujourd\'hui.', delay: 5800, color: '#10b981' },
     { text: '', delay: 6200, color: '#666' },
-    { text: '> Complète TOUS tes exercices.', delay: 6600, color: '#0ea5e9' },
+    { text: '> Atteins le NIVEAU 10 sur les 10 exercices standards.', delay: 6600, color: '#0ea5e9' },
     { text: '> Le système sera restauré.', delay: 7200, color: '#0ea5e9' },
 ];
 
@@ -962,7 +962,7 @@ function Day100UnhackAnimation({ onComplete }) {
                         textAlign: 'center',
                         animation: 'terminalLineIn 0.4s ease-out 0.5s both',
                     }}>
-                        Merci, agent. Le Jour 100 est sécurisé. 🛡️
+                        Les 10 exercices sont au niveau 10. Jour 100 sécurisé. 🛡️
                     </div>
                 </>
             )}

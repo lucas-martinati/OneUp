@@ -17,6 +17,7 @@
  */
 import React, { useState, useEffect, memo } from 'react';
 import { Button } from '@components/ui';
+import { getRecordedReps } from '@shared/exerciseLevels';
 import { EXERCISES } from '@config/exercises';
 import { makeEventManager, seeded } from './eventEngine';
 
@@ -27,9 +28,12 @@ export const SWEAT_GOAL = 2000;
 const TEMP_HOT = 42;
 const TEMP_COOL = 22;
 
-// Total des reps du jour, tous exercices standard confondus.
-const totalRepsToday = ({ today, getExerciseCount }) =>
-    EXERCISES.reduce((sum, ex) => sum + (getExerciseCount(today, ex.id) || 0), 0);
+// Volume crédité au dernier palier atteint, tous exercices standards confondus.
+const totalRepsToday = ({ today, dayNumber, getExerciseCount, completions }) =>
+    EXERCISES.reduce((sum, ex) => {
+        const entry = completions?.[today]?.[ex.id];
+        return sum + getRecordedReps(entry ?? { count: getExerciseCount(today, ex.id) || 0 }, ex, dayNumber);
+    }, 0);
 
 const lerp = (a, b, t) => a + (b - a) * t;
 

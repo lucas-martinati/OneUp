@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, act, cleanup } from '@testing-library/react';
-import { Day300EventManager, VALIDATE_GOAL } from '../Day300Event';
+import { Day300EventManager, LEVEL_GOAL } from '../Day300Event';
 import { EventHud } from '../EventHud';
 import { EXERCISES } from '@config/exercises';
 
@@ -12,8 +12,9 @@ const ctxWith = (n) => {
   const ids = EXERCISES.map(e => e.id);
   const completions = {};
   completions[today] = {};
-  ids.slice(0, n).forEach(id => {
-    completions[today][id] = { isCompleted: true };
+  ids.forEach((id, i) => {
+    const level = Math.max(0, Math.min(10, n - i * 10));
+    completions[today][id] = { level, isCompleted: level > 0 };
   });
   return {
     getConfig: () => ({ difficulty: 1 }),
@@ -55,14 +56,40 @@ function renderApp(eventProps) {
 }
 
 describe('Day300EventManager', () => {
+  it('sums partial levels across all ten exercises and updates live at 70', () => {
+    const completions = { [today]: Object.fromEntries(EXERCISES.map((ex, i) => [ex.id, {
+      level: i === 0 ? 6 : 7, isCompleted: true,
+    }])) };
+    const { getByText, rerender } = renderApp({ dayNumber, today, ...ctxWith(0), completions });
+    findAndDismiss(getByText);
+    expect(document.querySelector('.d300-constellation-count').textContent).toMatch(/^69\/70/);
+    expect(document.querySelectorAll('.d300-cstar')).toHaveLength(7);
+    expect(localStorage.getItem('day300_challenge_done')).toBeNull();
+    const updated = { [today]: { ...completions[today], [EXERCISES[0].id]: { level: 7, isCompleted: true } } };
+    act(() => { rerender(<><Day300EventManager dayNumber={dayNumber} today={today} {...ctxWith(0)} completions={updated} /><EventHud /></>); });
+    act(() => { vi.advanceTimersByTime(12000); });
+    expect(localStorage.getItem('day300_challenge_done')).toBe('1');
+  });
+
+  it('excludes weights, cardio and custom exercises from the level total', () => {
+    const ctx = ctxWith(60);
+    Object.assign(ctx.completions[today], {
+      running: { level: 10 }, bench_press: { level: 10 }, custom: { level: 10 },
+    });
+    const { getByText } = renderApp({ dayNumber, today, ...ctx });
+    findAndDismiss(getByText);
+    expect(document.querySelector('.d300-constellation-count').textContent).toMatch(/^60\/70/);
+    expect(localStorage.getItem('day300_challenge_done')).toBeNull();
+  });
+
   it('renders nothing when it is not day 300', () => {
     const { container } = renderApp({ dayNumber: 42, today, ...ctxWith(0) });
     expect(container.textContent).toBe('');
   });
 
-  it('shows the intro splash with the exercise challenge', () => {
+  it('shows the intro splash with the level challenge', () => {
     renderApp({ dayNumber, today, ...ctxWith(0) });
-    expect(document.body.textContent).toContain(`${VALIDATE_GOAL} exercices à valider`);
+    expect(document.body.textContent).toContain(`${LEVEL_GOAL} niveaux à cumuler`);
     expect(document.body.textContent).toContain("Lancer l'ascension");
   });
 
@@ -71,20 +98,20 @@ describe('Day300EventManager', () => {
     findAndDismiss(getByText);
     expect(root().classList.contains('day300-global')).toBe(true);
     const hudEl = document.querySelector('.d300-constellation-count');
-    expect(hudEl?.textContent).toMatch(new RegExp(`^0/${VALIDATE_GOAL}`));
+    expect(hudEl?.textContent).toMatch(new RegExp(`^0/${LEVEL_GOAL}`));
   });
 
-  it('does NOT complete while fewer than VALIDATE_GOAL exercises are validated', () => {
-    const { getByText } = renderApp({ dayNumber, today, ...ctxWith(VALIDATE_GOAL - 1) });
+  it('does NOT complete while fewer than LEVEL_GOAL levels are reached', () => {
+    const { getByText } = renderApp({ dayNumber, today, ...ctxWith(LEVEL_GOAL - 1) });
     findAndDismiss(getByText);
     act(() => { vi.advanceTimersByTime(2000); });
     const hudEl = document.querySelector('.d300-constellation-count');
-    expect(hudEl?.textContent).toMatch(new RegExp(`^${VALIDATE_GOAL - 1}/${VALIDATE_GOAL}`));
+    expect(hudEl?.textContent).toMatch(new RegExp(`^${LEVEL_GOAL - 1}/${LEVEL_GOAL}`));
     expect(localStorage.getItem('day300_challenge_done')).toBeNull();
   });
 
-  it('completes once enough exercises are validated → reward then done', () => {
-    const { getByText } = renderApp({ dayNumber, today, ...ctxWith(VALIDATE_GOAL) });
+  it('completes once enough levels are reached → reward then done', () => {
+    const { getByText } = renderApp({ dayNumber, today, ...ctxWith(LEVEL_GOAL) });
     findAndDismiss(getByText);
     act(() => { vi.advanceTimersByTime(12000); });
     expect(localStorage.getItem('day300_challenge_done')).toBe('1');

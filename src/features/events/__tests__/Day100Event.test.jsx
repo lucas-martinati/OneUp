@@ -13,7 +13,7 @@ const notPerfect = {
 const perfect = {
   getExerciseCount: () => 99999,
   getConfig: () => ({ difficulty: 1 }),
-  completions: { [today]: Object.fromEntries(EXERCISES.map(e => [e.id, { isCompleted: true }])) },
+  completions: { [today]: Object.fromEntries(EXERCISES.map(e => [e.id, { level: 10, isCompleted: true }])) },
 };
 
 beforeEach(() => {
@@ -31,6 +31,23 @@ afterEach(() => {
 const root = () => document.getElementById('root');
 
 describe('Day100EventManager', () => {
+  it.each([1, 9])('does not restore the system when one exercise is only level %i', (level) => {
+    const completions = { [today]: {
+      ...perfect.completions[today], [EXERCISES[0].id]: { level, isCompleted: true },
+    } };
+    sessionStorage.setItem('day100_modal_shown', '1');
+    render(<Day100EventManager dayNumber={100} today={today} {...perfect} completions={completions} />);
+    act(() => { vi.advanceTimersByTime(12000); });
+    expect(localStorage.getItem('day100_unhacked')).toBeNull();
+    expect(root().classList.contains('day100-global')).toBe(true);
+  });
+
+  it('accepts stored level 10 on every exercise without relying on raw counters', () => {
+    render(<Day100EventManager dayNumber={100} today={today} {...perfect} getExerciseCount={() => 0} />);
+    act(() => { vi.advanceTimersByTime(50); });
+    expect(localStorage.getItem('day100_unhacked')).toBe('1');
+  });
+
   it('renders nothing when it is not day 100', () => {
     const { container } = render(<Day100EventManager dayNumber={42} today={today} {...notPerfect} />);
     expect(container.firstChild).toBeNull();

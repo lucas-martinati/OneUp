@@ -12,6 +12,7 @@
  */
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { EXERCISES, getDailyGoal } from '@config/exercises';
+import { isFullCompletion } from '@shared/exerciseLevels';
 import { useEventHudStore } from './eventHudStore';
 
 /** PRNG déterministe (mêmes décors d'un rendu à l'autre, sans état). */
@@ -31,7 +32,10 @@ function useIsDayPerfect(active, { today, dayNumber, getExerciseCount, getConfig
             const count = getExerciseCount(today, ex.id);
             const exDiff = getConfig(ex.id, today).difficulty;
             const goal = getDailyGoal(ex, dayNumber, exDiff);
-            return completions[today]?.[ex.id]?.isCompleted || count >= goal;
+            const entry = completions[today]?.[ex.id];
+            return Number.isInteger(entry?.level)
+                ? isFullCompletion(entry)
+                : isFullCompletion(entry) || count >= goal;
         });
     }, [active, today, completions, dayNumber, getExerciseCount, getConfig]);
 }

@@ -7,30 +7,22 @@
  * étoiles filantes, une comète qui s'élève. Volontairement TRÈS différent du
  * Jour 100 (glitch rouge) et du Jour 200 (plage / coucher de soleil).
  *
- * ✦ MÉCANIQUE — VALIDER DES EXERCICES (reliée à l'app, libre) ✦
- * Ni « journée parfaite » (Jour 100), ni volume de reps (Jour 200). Ici, il faut
- * VALIDER VALIDATE_GOAL exercices — CEUX QUE TU VEUX (on ne force pas lesquels).
- * Un exercice est « validé » quand il atteint son objectif du jour. Chaque exercice
- * validé rallume une étoile ; la constellation complète déclenche la supernova.
- * L'avancée est lue en temps réel depuis les compteurs de l'app.
+ * ✦ MÉCANIQUE — CUMULER DES NIVEAUX ✦
+ * Cumuler 70 niveaux aujourd'hui sur les 10 exercices standards, au choix.
+ * Chaque exercice contribue à hauteur de son niveau atteint (0 à 10).
+ * Chaque tranche de 10 niveaux rallume une étoile ; à 70, la supernova éclate.
  */
 import React, { useState, useEffect, memo } from 'react';
 import { Button } from '@components/ui';
-import { EXERCISES, getDailyGoal } from '@config/exercises';
+import { getEntryLevel } from '@shared/exerciseLevels';
+import { EXERCISES } from '@config/exercises';
 import { makeEventManager, seeded } from './eventEngine';
 
-// Nombre d'exercices à valider (au choix) pour rallumer la constellation.
-export const VALIDATE_GOAL = 9;
+// Niveaux à cumuler aujourd'hui pour rallumer la constellation.
+export const LEVEL_GOAL = 70;
 
-// Compte les exercices VALIDÉS aujourd'hui (objectif du jour atteint), peu importe lesquels.
-const validatedCount = ({ today, dayNumber, getExerciseCount, getConfig, completions }) =>
-    EXERCISES.reduce((n, ex) => {
-        const count = getExerciseCount(today, ex.id) || 0;
-        const diff = getConfig(ex.id, today).difficulty;
-        const goal = getDailyGoal(ex, dayNumber, diff);
-        const done = completions?.[today]?.[ex.id]?.isCompleted || count >= goal;
-        return n + (done ? 1 : 0);
-    }, 0);
+const totalLevelsToday = ({ today, completions }) =>
+    EXERCISES.reduce((sum, ex) => sum + getEntryLevel(completions?.[today]?.[ex.id]), 0);
 
 // ============================================================================
 // 1. STYLES CSS (Injectés uniquement pour cet événement)
@@ -258,7 +250,7 @@ const Day300Styles = memo(() => (
         .day300-global .progress-ring-svg circle { stroke: #38bdf8 !important; }
 
         /* ── ✦ CONSTELLATION (HUD intégré) ──
-           Une étoile par exercice à valider ; chaque exercice validé l'allume.
+           Une étoile par tranche de 10 niveaux atteints.
            Mobile : pastille DANS le flux (placée par l'hôte). Desktop : épinglée
            dans la gouttière GAUCHE, en colonne. Jamais en superposition. */
         .d300-constellation {
@@ -440,13 +432,13 @@ const Day300Decor = memo(() => (
 
 
 // ============================================================================
-// 3. CONSTELLATION : la mécanique vivante (valider des exercices → ciel rallumé)
+// 3. CONSTELLATION : la mécanique vivante (cumuler des niveaux → ciel rallumé)
 // ============================================================================
-function ExerciseConstellation({ validated = 0, goal = VALIDATE_GOAL, onSolve, placement = 'dashboard', hidden = false }) {
-    const lit = Math.min(validated, goal);
-    const complete = goal > 0 && validated >= goal;
+function ExerciseConstellation({ levels = 0, goal = LEVEL_GOAL, onSolve, placement = 'dashboard', hidden = false }) {
+    const lit = Math.min(levels, goal);
+    const complete = goal > 0 && levels >= goal;
 
-    // Assez d'exercices validés → constellation rallumée → supernova.
+    // Assez de niveaux atteints → constellation rallumée → supernova.
     useEffect(() => {
         if (complete) onSolve?.();
     }, [complete, onSolve]);
@@ -458,11 +450,11 @@ function ExerciseConstellation({ validated = 0, goal = VALIDATE_GOAL, onSolve, p
             transition: 'opacity 0.3s ease'
         }}>
             <div className="d300-constellation-label">
-                {complete ? 'Constellation rallumée ✦' : 'Valide des exercices'}
+                {complete ? 'Constellation rallumée ✦' : 'Cumule des niveaux'}
             </div>
             <div className="d300-constellation-stars" aria-hidden="true">
-                {Array.from({ length: goal }).map((_, i) => (
-                    <span key={i} className={i < lit ? 'd300-cstar d300-cstar-lit' : 'd300-cstar'} />
+                {Array.from({ length: Math.ceil(goal / 10) }).map((_, i) => (
+                    <span key={i} className={(i + 1) * 10 <= lit ? 'd300-cstar d300-cstar-lit' : 'd300-cstar'} />
                 ))}
             </div>
             <div className="d300-constellation-count">
@@ -483,11 +475,11 @@ function Day300DecorOverlay() {
 }
 
 // HUD intégré (rendu par le Dashboard / l'ExercisePanel via <EventHud />).
-function Day300Hud({ onSolve, validated, goal, placement, hidden }) {
+function Day300Hud({ onSolve, levels, goal, placement, hidden }) {
     return (
         <>
             <Day300Styles />
-            <ExerciseConstellation validated={validated} goal={goal} onSolve={onSolve} placement={placement} hidden={hidden} />
+            <ExerciseConstellation levels={levels} goal={goal} onSolve={onSolve} placement={placement} hidden={hidden} />
         </>
     );
 }
@@ -571,7 +563,7 @@ function Day300IntroModal({ onDismiss }) {
                     marginTop: '8px',
                     animation: 'd300Rise 0.6s ease-out 0.7s both',
                 }}>
-                    {VALIDATE_GOAL} exercices à valider
+                    {LEVEL_GOAL} niveaux à cumuler
                 </div>
                 <div style={{
                     fontFamily: "'Inter', system-ui, sans-serif",
@@ -580,8 +572,9 @@ function Day300IntroModal({ onDismiss }) {
                     maxWidth: '330px', margin: '10px auto 0',
                     animation: 'd300Rise 0.6s ease-out 0.9s both',
                 }}>
-                    Valide {VALIDATE_GOAL} exercices — ceux que tu veux. Chaque
-                    objectif du jour atteint rallume une étoile de la constellation. ✦
+                    Cumule {LEVEL_GOAL} niveaux aujourd’hui sur les 10 exercices standards.
+                    Par exemple : 7 exercices au niveau 10, ou les 10 au niveau 7.
+                    Chaque tranche de 10 niveaux rallume une étoile. ✦
                 </div>
 
                 <Button
@@ -704,7 +697,7 @@ function Day300RewardAnimation({ onComplete }) {
                         color: 'rgba(224, 242, 254, 0.92)', fontWeight: 600,
                         animation: 'd300Rise 0.5s ease-out 0.5s both',
                     }}>
-                        {VALIDATE_GOAL} exercices validés — la constellation s'embrase. ✦🚀
+                        {LEVEL_GOAL} niveaux atteints — la constellation s'embrase. ✦🚀
                     </div>
                 </div>
             )}
@@ -747,8 +740,8 @@ export const Day300EventManager = makeEventManager({
     autoReward: false,              // ✦ c'est la constellation (Overlay) qui résout via onSolve
     activeClasses: ['day300-global'],
     doneClass: 'day300-lifting',
-    // Avancée live du défi (exercices validés aujourd'hui) injectée dans le HUD.
-    hudProps: (ctx) => ({ validated: validatedCount(ctx), goal: VALIDATE_GOAL }),
+    // Avancée live du défi (niveaux atteints aujourd'hui) injectée dans le HUD.
+    hudProps: (ctx) => ({ levels: totalLevelsToday(ctx), goal: LEVEL_GOAL }),
     Intro: Day300IntroModal,
     Decor: Day300DecorOverlay,
     Hud: Day300Hud,

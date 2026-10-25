@@ -41,6 +41,18 @@ const dismissIntro = (getByText) => {
 };
 
 describe('Day200EventManager', () => {
+  it('credits only the last reached level, excluding progress towards the next one', () => {
+    const props = {
+      ...ctx(0),
+      completions: { [today]: { pushups: { count: 219, goal: 220, level: 9, isCompleted: true } } },
+      getExerciseCount: (_date, id) => id === 'pushups' ? 219 : 0,
+    };
+    const { getByText } = render(<Harness dayNumber={200} today={today} {...props} />);
+    dismissIntro(getByText);
+    expect(document.querySelector('.d200-thermo').textContent).toContain('198/2000');
+    expect(localStorage.getItem('day200_challenge_done')).toBeNull();
+  });
+
   it('renders nothing when it is not day 200', () => {
     const { container } = render(<Harness dayNumber={150} today={today} {...ctx(0)} />);
     expect(container.querySelector('.d200-thermo')).toBeNull();
