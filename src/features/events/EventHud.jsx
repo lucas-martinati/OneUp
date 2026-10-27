@@ -15,5 +15,8 @@ export function EventHud({ placement = 'dashboard', hidden = false }) {
     const hud = useEventHudStore(s => s.hud);
     if (!hud) return null;
     const { Component, props } = hud;
-    return <Component {...props} placement={placement} hidden={hidden} />;
+    const content = <Component {...props} placement={placement} hidden={hidden} />;
+    return placement === 'dashboard'
+        ? <div className="dashboard-event-hud">{content}</div>
+        : content;
 }

@@ -145,6 +145,29 @@
   flex-shrink: 0;
 }
 
+.dashboard-event-hud {
+  display: contents;
+}
+
+/* Mobile HUDs live in the page flow; desktop HUDs use the side gutter.
+   Reserve the pod's space before the mobile HUD instead of inside each slide. */
+@media (max-width: 767px) {
+  .dashboard-wrapper:has(> .dashboard-event-hud) > .dashboard-header-wrapper {
+    margin-bottom: var(--day-pod-space);
+    flex-shrink: 0;
+  }
+
+  .dashboard-event-hud {
+    display: block;
+    flex-shrink: 0;
+    width: 100%;
+  }
+
+  .dashboard-wrapper:has(> .dashboard-event-hud) .dashboard-slide-pod-spacer {
+    height: 0;
+  }
+}
+
 .dashboard-main {
   min-height: 0;
 }
