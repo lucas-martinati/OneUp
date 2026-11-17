@@ -49,6 +49,7 @@ vi.mock('react-i18next', () => ({
 vi.mock('@features/share/services/sessionHistoryService', () => ({ addSession: vi.fn((s) => ({ ...s, id: 'sess1' })) }));
 vi.mock('@utils/sessionNameGenerator', () => ({ generateSessionName: vi.fn(() => 'Generated Session') }));
 vi.mock('@utils/workoutSessionStorage', () => ({
+  getWorkoutSessionId: () => 'session-from-phone',
   isWorkoutSessionStarted: (...a) => storage.isWorkoutSessionStarted(...a),
   loadWorkoutSession: (...a) => storage.loadWorkoutSession(...a),
   saveWorkoutSession: (...a) => storage.saveWorkoutSession(...a),

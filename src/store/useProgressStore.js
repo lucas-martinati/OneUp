@@ -1,3 +1,4 @@
+import { reduceWearOperation } from '@features/wear/wearProtocol';
 import { getLevelForCount, migrateLevelProgress, getRecordedReps, mergeLevelMetadata, PROGRESS_VERSION } from '@shared/exerciseLevels.js';
 import { create } from 'zustand';
 import { Preferences } from '@capacitor/preferences';
@@ -71,12 +72,16 @@ async function loadFromStorage(userId) {
   }
 }
 
+let preferenceWriteChain = Promise.resolve();
+let lastStorageTimestamp = 0;
+
 async function saveToStorage(userId, state) {
   try {
     const key = getStorageKey(userId);
     // Add a local timestamp to determine which storage is fresher on reload
     // This is crucial for surviving sudden app kills where async Preferences.set might not finish
-    const stateToSave = { ...state, _localUpdatedTs: Date.now() };
+    lastStorageTimestamp = Math.max(Date.now(), lastStorageTimestamp + 1);
+    const stateToSave = { ...state, _localUpdatedTs: lastStorageTimestamp };
     const serialized = JSON.stringify(stateToSave);
     
     // High-speed synchronous fallback buffer
@@ -84,7 +89,9 @@ async function saveToStorage(userId, state) {
       localStorage.setItem(key, serialized);
     } catch { /* ignore */ }
 
-    await Preferences.set({ key, value: serialized });
+    const write = preferenceWriteChain.catch(() => {}).then(() => Preferences.set({ key, value: serialized }));
+    preferenceWriteChain = write;
+    await write;
   } catch (e) {
     logger.error('Failed to persist progress:', e);
     throw e;
@@ -130,6 +137,7 @@ export const useProgressStore = create((set, get) => ({
   startDate: getDefaultState().startDate,
   userStartDate: getDefaultState().userStartDate,
   completions: {},
+  wearReceipts: {},
   progressVersion: PROGRESS_VERSION,
   isSetup: false,
   achievements: {},
@@ -177,6 +185,7 @@ export const useProgressStore = create((set, get) => ({
       startDate: loaded.startDate,
       userStartDate: loaded.userStartDate || loaded.startDate,
       completions: loaded.completions || {},
+      wearReceipts: loaded.wearReceipts || {},
       progressVersion: loaded.progressVersion,
       isSetup: loaded.isSetup || false,
       achievements: finalAch,
@@ -247,6 +256,7 @@ export const useProgressStore = create((set, get) => ({
       startDate: s.startDate,
       userStartDate: s.userStartDate,
       completions: s.completions,
+      wearReceipts: s.wearReceipts,
       progressVersion: s.progressVersion,
       isSetup: s.isSetup,
       achievements: s.achievements,
@@ -256,6 +266,24 @@ export const useProgressStore = create((set, get) => ({
       notes: s.notes,
       lastCompletionChange: s.lastCompletionChange,
     }).catch(err => logger.error('Async background persist failed:', err));
+  },
+
+  /** Commit progress and its delivery receipt together before acknowledging the watch. */
+  applyWearOperation: async (operation, catalog, scope, beforeCommit) => {
+    const result = reduceWearOperation(get(), operation, catalog, scope);
+    if (result.status !== 'applied' && result.status !== 'duplicate') return result.status;
+    if (result.status === 'applied') {
+      beforeCommit?.(result.effect, get());
+      set({ ...result.state, lastCompletionChange: serverTimestamp() });
+    }
+    const s = get();
+    await saveToStorage(s._userId, {
+      startDate: s.startDate, userStartDate: s.userStartDate, completions: s.completions,
+      wearReceipts: s.wearReceipts, progressVersion: s.progressVersion, isSetup: s.isSetup,
+      achievements: s.achievements, cardio: s.cardio, frozenDays: s.frozenDays,
+      streakFreezes: s.streakFreezes, notes: s.notes, lastCompletionChange: s.lastCompletionChange,
+    });
+    return result.status;
   },
 
   // ── Challenge Setup ─────────────────────────────────────────────────

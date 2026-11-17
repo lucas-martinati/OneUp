@@ -15,7 +15,7 @@ import { useExerciseConfig } from './useExerciseConfig';
 import { useBackHandler } from './useBackHandler';
 import { getLocalDateStr } from '@shared/dateUtils';
 import { generateSessionName } from '@utils/sessionNameGenerator';
-import { isWorkoutSessionStarted, loadWorkoutSession, saveWorkoutSession, clearWorkoutSession } from '@utils/workoutSessionStorage';
+import { isWorkoutSessionStarted, loadWorkoutSession, saveWorkoutSession, clearWorkoutSession, getWorkoutSessionId } from '@utils/workoutSessionStorage';
 
 /**
  * Extracts all state management and business logic from WorkoutSession,
@@ -76,6 +76,8 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     const queueListRef = useRef(null);
     const itemRefs = useRef({});
 
+    const panelSessionId = useRef(getWorkoutSessionId());
+
     // Session tracking
     const sessionStartTime = useRef(null);
     // Guards against the session being saved twice: setPhase('done') is async,
@@ -93,6 +95,18 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
     const [savedSession, setSavedSession] = useState(null);
     const [sessionName, setSessionName] = useState(() => persisted?.name ?? '');
     const [hasAnimatedFirstPanel, setHasAnimatedFirstPanel] = useState(false);
+
+    useEffect(() => {
+        const onWatchFinished = event => {
+            if (event.detail?.sessionId !== panelSessionId.current) return;
+            sessionSaved.current = true;
+            setSessionDuration(event.detail.session.duration);
+            setSavedSession(event.detail.session);
+            setPhase('done');
+        };
+        window.addEventListener('oneup:wear-session-finished', onWatchFinished);
+        return () => window.removeEventListener('oneup:wear-session-finished', onWatchFinished);
+    }, []);
 
     // ── Back handler ──
     useBackHandler(() => {
@@ -381,6 +395,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
                     activeSlide: sessionActiveSlide,
                     showAll,
                 });
+                panelSessionId.current = getWorkoutSessionId();
                 setSessionInProgress?.(true);
             }
         }
@@ -439,6 +454,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         }
 
         const session = addSession({
+            id: getWorkoutSessionId(),
             date: new Date().toISOString(),
             duration,
             name: detectedName,

@@ -1,3 +1,4 @@
+import { useWearSync } from '@features/wear/useWearSync';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@contexts/AuthContext';
@@ -55,6 +56,8 @@ export function AppOrchestrator({ computedStats }) {
   useCloudSettingsSync(auth);
   useProgressAutoSave(auth);
   useRealtimeCloudListener(auth);
+
+  useWearSync(auth);
 
   // ── Notifications ──────────────────────────────────────────────────
   useNotificationScheduling();

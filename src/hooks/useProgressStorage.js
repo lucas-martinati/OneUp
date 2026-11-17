@@ -1,3 +1,4 @@
+import { validateWearReceipts } from '@features/wear/wearProtocol';
 import { migrateLevelProgress, PROGRESS_VERSION } from '@shared/exerciseLevels.js';
 
 export const STORAGE_KEY_BASE = 'pushup_challenge_data';
@@ -9,6 +10,7 @@ export function getDefaultState() {
     startDate: `${currentYear}-01-01`,
     userStartDate: `${currentYear}-01-01`,
     completions: {},
+    wearReceipts: {},
     progressVersion: PROGRESS_VERSION,
     isSetup: false,
     achievements: {},
@@ -112,6 +114,7 @@ export function validateProgressData(data) {
         ? data.userStartDate
         : data.startDate || `${new Date().getFullYear()}-01-01`,
     completions,
+    wearReceipts: validateWearReceipts(data.wearReceipts),
     isSetup: typeof data.isSetup === 'boolean' ? data.isSetup : false,
     achievements: (() => {
       let ach = typeof data.achievements === 'object' && data.achievements !== null ? data.achievements : {};

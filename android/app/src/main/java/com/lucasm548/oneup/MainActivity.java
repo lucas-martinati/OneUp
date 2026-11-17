@@ -13,6 +13,7 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         // Register custom plugins before super.onCreate
         registerPlugin(WidgetBridgePlugin.class);
+        registerPlugin(com.lucasm548.oneup.wearbridge.WearBridgePlugin.class);
 
         super.onCreate(savedInstanceState);
 

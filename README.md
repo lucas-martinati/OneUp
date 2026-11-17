@@ -12,7 +12,7 @@
 
 🚀 **OneUp** is a progressive fitness challenge where your daily rep goal increases over 365 days. Complete your exercises every day, build an unbreakable streak, and track your transformation with rich analytics. Compete with friends in Clans, earn achievements, and push your limits — one day at a time.
 
-Available as a **PWA** 🌐 and **Android app** 📱 (Capacitor).
+Available as a **PWA** 🌐 and **Android app** 📱 (Capacitor). A native **Wear OS companion** is available as a local development build; see [setup, synchronization and installation](docs/wear-os.md).
 
 ---
 

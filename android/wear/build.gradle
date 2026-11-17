@@ -1,0 +1,53 @@
+import groovy.json.JsonSlurper
+apply plugin: 'com.android.application'
+def signing = new Properties()
+def signingFile = rootProject.file('keystore.properties')
+if (signingFile.exists()) signingFile.withInputStream { signing.load(it) }
+android {
+    namespace 'com.lucasm548.oneup.wear'
+    compileSdk rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId 'com.lucasm548.oneup'
+        minSdk 30
+        targetSdk rootProject.ext.targetSdkVersion
+        versionCode = (project.findProperty('wearVersionCode') ?: '1000001').toString().toInteger()
+        versionName new JsonSlurper().parse(file('../../package.json')).version
+    }
+    signingConfigs {
+        release {
+            keyAlias signing['keyAlias']
+            keyPassword signing['keyPassword']
+            storeFile signing['storeFile'] ? project(':app').file(signing['storeFile']) : null
+            storePassword signing['storePassword']
+        }
+    }
+    flavorDimensions 'environment'
+    productFlavors {
+        prod { dimension 'environment' }
+        dev { dimension 'environment'; applicationIdSuffix '.dev' }
+    }
+    buildTypes {
+        debug { signingConfig signing['storeFile'] ? signingConfigs.release : signingConfigs.debug }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    testOptions {
+        unitTests.includeAndroidResources = true
+        unitTests.all { systemProperty 'robolectric.dependency.repo.url', 'https://repo.maven.apache.org/maven2' }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+dependencies {
+    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.9.25')
+    implementation project(':wear-shared')
+    implementation "androidx.activity:activity:$androidxActivityVersion"
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation 'org.robolectric:robolectric:4.16.1'
+}

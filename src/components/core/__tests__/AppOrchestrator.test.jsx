@@ -1,3 +1,4 @@
+vi.mock('@features/wear/useWearSync', () => ({ useWearSync: vi.fn() }));
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, waitFor, cleanup } from '@testing-library/react';
 

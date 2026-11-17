@@ -106,9 +106,12 @@ export async function syncSessionHistory() {
   return merged;
 }
 
-export function addSession({ date, duration, name, type, exercises }) {
+export function addSession({ id, date, duration, name, type, exercises, source }) {
+  const existing = id && getSessionHistory().find(session => session.id === id);
+  if (existing) return existing;
   const session = {
-    id: generateId(),
+    id: id || generateId(),
+    ...(source ? { source } : {}),
     date: date || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     duration: duration || 0,

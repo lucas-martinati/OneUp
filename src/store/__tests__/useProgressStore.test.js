@@ -218,23 +218,26 @@ describe('updateExerciseCount', () => {
     expect(Preferences.set).not.toHaveBeenCalled();
   });
 
-  it('still persists weight and difficulty edits when the count stays the same', () => {
+  it('still persists weight and difficulty edits when the count stays the same', async () => {
     const update = useProgressStore.getState().updateExerciseCount;
     update(today, 'bench', 10, 100, 40, 1);
+    await flush();
     Preferences.set.mockClear();
     update(today, 'bench', 10, 100, 45, 0.5);
     expect(useProgressStore.getState().completions[today].bench).toMatchObject({ count: 10, weight: 45, difficulty: 0.5 });
+    await flush();
     expect(Preferences.set).toHaveBeenCalledTimes(1);
     Preferences.set.mockClear();
     update(today, 'bench', 10, 100, 45, 0.5);
     expect(Preferences.set).not.toHaveBeenCalled();
   });
 
-  it('fills missing legacy level metadata even when the count is unchanged', () => {
+  it('fills missing legacy level metadata even when the count is unchanged', async () => {
     useProgressStore.setState({ completions: { [today]: { pushups: { count: 50, isCompleted: true } } } });
     Preferences.set.mockClear();
     useProgressStore.getState().updateExerciseCount(today, 'pushups', 50, 100);
     expect(useProgressStore.getState().completions[today].pushups).toMatchObject({ count: 50, level: 5, goal: 100 });
+    await flush();
     expect(Preferences.set).toHaveBeenCalledTimes(1);
   });
 
@@ -1017,5 +1020,33 @@ describe('more edge cases', () => {
     const merged = useProgressStore.getState().completions[day].bench;
     expect(merged.timestamp).toBe(2000);
     expect(merged.localHour).toBe(9); // fallback to user's
+  });
+});
+
+describe('watch delivery persistence', () => {
+  const operation = { version: 1, scope: 'scope-a', date: today, device: 'watch-a', sequence: 1, type: 'count', exerciseId: 'pushups', delta: 5, localHour: 10 };
+  const catalog = { ready: true, scope: 'scope-a', date: today, exercises: [{ id: 'pushups', goal: 50 }] };
+  it('persists the count and receipt together, including after a user reload', async () => {
+    await useProgressStore.getState().initForUser('user-a');
+    await useProgressStore.getState().applyWearOperation(operation, catalog, 'scope-a');
+    const persisted = JSON.parse(Preferences._mem.get(`${STORAGE_KEY_BASE}_user-a`));
+    expect(persisted.completions[today].pushups.count).toBe(5);
+    expect(persisted.wearReceipts).toEqual({ 'watch-a': 1 });
+    await useProgressStore.getState().initForUser('user-a');
+    expect(await useProgressStore.getState().applyWearOperation(operation, catalog, 'scope-a')).toBe('duplicate');
+    expect(useProgressStore.getState().completions[today].pushups.count).toBe(5);
+  });
+  it('withholds acknowledgment on a storage failure and safely retries without adding reps twice', async () => {
+    await flush();
+    Preferences.set.mockRejectedValueOnce(new Error('disk full'));
+    await expect(useProgressStore.getState().applyWearOperation(operation, catalog, 'scope-a')).rejects.toThrow('disk full');
+    expect(await useProgressStore.getState().applyWearOperation(operation, catalog, 'scope-a')).toBe('duplicate');
+    expect(useProgressStore.getState().completions[today].pushups.count).toBe(5);
+  });
+  it('does not carry another user’s receipts into a new profile', async () => {
+    await useProgressStore.getState().initForUser('user-a');
+    await useProgressStore.getState().applyWearOperation(operation, catalog, 'scope-a');
+    await useProgressStore.getState().initForUser('user-b');
+    expect(useProgressStore.getState().wearReceipts).toEqual({});
   });
 });

@@ -5,7 +5,12 @@
  * the session lifecycle (start / resume / discard) stays consistent across
  * Dashboard, ActiveWorkoutIndicator and useWorkoutSession.
  */
+function newSessionId() {
+    return globalThis.crypto?.randomUUID?.() || `session_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}
+
 const KEYS = {
+    id: 'workout_session_id',
     started: 'sessionStarted',
     queue: 'workout_session_queue',
     currentIdx: 'workout_session_current_idx',
@@ -51,7 +56,19 @@ export function loadWorkoutSession() {
     };
 }
 
-export function saveWorkoutSession({ queue, currentIdx, startTime, name, activeSlide, showAll }) {
+export function getWorkoutSessionId() {
+    let id = localStorage.getItem(KEYS.id);
+    if (!id && isWorkoutSessionStarted()) {
+        id = newSessionId();
+        localStorage.setItem(KEYS.id, id);
+    }
+    return id || null;
+}
+
+export function saveWorkoutSession({ queue, currentIdx, startTime, name, activeSlide, showAll, sessionId }) {
+    if (!getWorkoutSessionId() || sessionId) {
+        localStorage.setItem(KEYS.id, sessionId || newSessionId());
+    }
     localStorage.setItem(KEYS.started, 'true');
     localStorage.setItem(KEYS.queue, JSON.stringify(queue));
     localStorage.setItem(KEYS.currentIdx, String(currentIdx));
@@ -61,8 +78,10 @@ export function saveWorkoutSession({ queue, currentIdx, startTime, name, activeS
     localStorage.setItem(KEYS.name, name);
     localStorage.setItem(KEYS.activeSlide, String(activeSlide));
     localStorage.setItem(KEYS.showAll, String(!!showAll));
+    window.dispatchEvent(new Event('oneup:workout-session'));
 }
 
 export function clearWorkoutSession() {
     Object.values(KEYS).forEach(key => localStorage.removeItem(key));
+    window.dispatchEvent(new Event('oneup:workout-session'));
 }

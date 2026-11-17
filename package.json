@@ -30,7 +30,10 @@
     "deploy:database": "firebase deploy --only database --project oneup-1c3f5",
     "secrets:set": "bash scripts/set-secrets.sh",
     "db:audit": "node scripts/firebase-helper.js audit",
-    "db:prune": "node scripts/firebase-helper.js prune"
+    "db:prune": "node scripts/firebase-helper.js prune",
+    "build:wear:apk": "NATIVE_BUILD=true npm run build && npx cap sync android && cd android && ./gradlew :app:assembleDevDebug :wear:assembleDevDebug",
+    "build:wear:bundle": "cd android && ./gradlew :wear:bundleProdRelease",
+    "test:wear": "cd android && ./gradlew :wear:testDevDebugUnitTest"
   },
   "dependencies": {
     "@capacitor/android": "^8.2.0",
