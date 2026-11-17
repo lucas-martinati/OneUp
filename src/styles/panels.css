@@ -1,13 +1,51 @@
 
-/* ── Performance Optimization for Exercise Panel ── */
-/* When the Exercise Panel is open (and keeping the screen on),
-   we completely hide the full-screen animated background.
-   This prevents the GPU from constantly compositing the background
-   with the semi-transparent modal overlay, solving battery drain and heat.
-   We use display: none instead of animation-play-state: paused to avoid
-   forcing main-thread repaints which cause input delays. */
-body.exercise-panel-active::before {
+/* ── Performance Optimization for Fullscreen Modals & Idle State ── */
+/* 1. When any fullscreen modal is open (Calendar, Stats, Settings, ExercisePanel,
+      WorkoutSession, Leaderboard, Achievements...), immediately pause all
+      Dashboard animations and backdrop blurs underneath. Once the 90ms modal
+      fade-in finishes (data-modal-occluded), hide the Dashboard from painting
+      altogether while keeping its layout & scroll offsets intact. */
+body.exercise-panel-active::before,
+html[data-modal-occluded="true"] body::before {
   display: none !important;
+}
+
+html[data-modal-open="true"] .dashboard-wrapper *,
+html[data-modal-open="true"] .dashboard-wrapper *::before,
+html[data-modal-open="true"] .dashboard-wrapper *::after,
+.dashboard-slide-container[data-inactive-slide="true"] *,
+.dashboard-slide-container[data-inactive-slide="true"] *::before,
+.dashboard-slide-container[data-inactive-slide="true"] *::after {
+  animation-play-state: paused !important;
+}
+
+html[data-modal-open="true"] .dashboard-wrapper .glass,
+html[data-modal-open="true"] .dashboard-wrapper .glass-premium {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html[data-modal-occluded="true"] .dashboard-wrapper {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* 2. When the user leaves the screen untouched for >12s (or the app is hidden),
+      pause infinite decorative animations so the WebView drops to 0 FPS idle
+      instead of heating the device continuously. Resumes on first touch/scroll. */
+html[data-idle="true"] .counter-button,
+html[data-idle="true"] .rainbow-gradient,
+html[data-idle="true"] .gold-text,
+html[data-idle="true"] .shimmer::after,
+html[data-idle="true"] .sparkle-icon,
+html[data-idle="true"] .perfect-day-row::before,
+html[data-idle="true"] .cardio-wall-glow,
+html[data-idle="true"] [data-decorative-anim="true"] {
+  animation-play-state: paused !important;
+}
+
+[data-perf="low"] [data-decorative-anim="true"] {
+  animation: none !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════

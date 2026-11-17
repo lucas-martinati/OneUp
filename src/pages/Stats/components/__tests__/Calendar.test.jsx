@@ -172,4 +172,22 @@ describe('Calendar swipe and touch events', () => {
     fireEvent(sheet, clickEvent);
     expect(clickEvent.stopPropagation).toHaveBeenCalled();
   });
+
+  it('edits day notes without recomputing exercise configs on each keystroke', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-06-20'));
+    render(<Calendar {...defaultProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /^19 Junio/ }));
+    mockGetDayNumber.mockClear();
+
+    const textarea = screen.getByPlaceholderText('calendar.addNotePlaceholder');
+    fireEvent.change(textarea, { target: { value: 'Bonne séance !' } });
+    fireEvent.change(textarea, { target: { value: 'Bonne séance ! + gainage' } });
+
+    // Typing inside the isolated DayNoteSection must not re-run CalendarDayDetail's day summary memo
+    expect(mockGetDayNumber).not.toHaveBeenCalled();
+
+    vi.useRealTimers();
+  });
 });

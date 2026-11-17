@@ -70,6 +70,64 @@ export function AppOrchestrator({ computedStats }) {
     document.documentElement.setAttribute('data-theme', settings.appTheme || 'dark');
   }, [settings.performanceMode, settings.appTheme]);
 
+  // ── Auto-pause infinite decorative CSS animations when idle ────────
+  // Drops WebView compositor load to 0 FPS when the phone sits untouched
+  // (e.g. between sets or left open on a desk), preventing thermal build-up
+  // with zero visual difference while interacting.
+  useEffect(() => {
+    const root = document.documentElement;
+    const IDLE_DELAY_MS = 12000;
+    const THROTTLE_MS = 2000;
+    let idleTimer = null;
+    let lastWake = 0;
+
+    const markIdle = () => {
+      root.setAttribute('data-idle', 'true');
+    };
+
+    const wakeUp = () => {
+      const now = Date.now();
+      if (root.hasAttribute('data-idle')) {
+        root.removeAttribute('data-idle');
+      } else if (now - lastWake < THROTTLE_MS) {
+        return;
+      }
+      lastWake = now;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(markIdle, IDLE_DELAY_MS);
+    };
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        clearTimeout(idleTimer);
+        markIdle();
+      } else {
+        lastWake = 0;
+        wakeUp();
+      }
+    };
+
+    wakeUp();
+    const opts = { passive: true, capture: true };
+    window.addEventListener('pointerdown', wakeUp, opts);
+    window.addEventListener('touchstart', wakeUp, opts);
+    window.addEventListener('wheel', wakeUp, opts);
+    window.addEventListener('scroll', wakeUp, opts);
+    window.addEventListener('keydown', wakeUp, opts);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      clearTimeout(idleTimer);
+      root.removeAttribute('data-idle');
+      window.removeEventListener('pointerdown', wakeUp, opts);
+      window.removeEventListener('touchstart', wakeUp, opts);
+      window.removeEventListener('wheel', wakeUp, opts);
+      window.removeEventListener('scroll', wakeUp, opts);
+      window.removeEventListener('keydown', wakeUp, opts);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, []);
+
   // ── Pre-load user clans ────────────────────────────────────────────
   // Gated on `authConfirmed`: this hits the cloud, so it must wait for the
   // real Firebase session rather than firing during an optimistic boot.

@@ -1,6 +1,6 @@
-import { getDayLevel } from '@shared/exerciseLevels.js';
+import { createDayLevelLookup, LEVEL_COUNT } from '@shared/exerciseLevels.js';
 import { LevelEmblem } from '@components/ui/LevelEmblem';
-import { useState, useRef, useMemo } from 'react';
+import { memo, useState, useRef, useMemo, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight, Snowflake } from '@utils/icons';
 import { ModalHeader, ModalContainer } from '@components/ui';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,76 @@ import { useSettingsStore } from '@store/useSettingsStore';
 import { CalendarDayDetail } from './CalendarDayDetail';
 import styles from '@styles/Calendar.module.css';
 
+const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+
+const CalendarDayCell = memo(function CalendarDayCell({
+    cell,
+    monthName,
+    levelLabel,
+    isSelected,
+    hasNote,
+    animDelayMs,
+    onToggleDay,
+}) {
+    const {
+        dateString,
+        dayOfMonth,
+        stateClass,
+        isToday,
+        isMuted,
+        isMissed,
+        isFrozen,
+        level,
+        completedDots,
+        dotPx,
+    } = cell;
+
+    const cls = [styles.day];
+    if (stateClass) cls.push(stateClass);
+    if (isToday) cls.push(styles.today);
+    if (isSelected) cls.push(styles.selected);
+
+    return (
+        <button
+            type="button"
+            className={cls.join(' ')}
+            style={animDelayMs !== undefined ? { animationDelay: `${animDelayMs}ms` } : undefined}
+            disabled={isMuted}
+            aria-pressed={isSelected}
+            aria-label={`${dayOfMonth} ${monthName}${level ? ' · ' + levelLabel : ''}`}
+            onClick={() => onToggleDay(dateString)}
+        >
+            <span className={styles.dayNum}>{dayOfMonth}</span>
+            {level > 0 && !isMuted && <LevelEmblem level={level} size={20} label={levelLabel} />}
+            {!isMuted && (
+                <span className={styles.dots}>
+                    {completedDots.map(dot => (
+                        <span
+                            key={dot.id}
+                            className={styles.dot}
+                            style={{
+                                width: dotPx,
+                                height: dotPx,
+                                background: dot.color,
+                            }}
+                        />
+                    ))}
+                    {isMissed && (
+                        <X className={styles.missedIcon} size={dotPx + 6} color="#ef4444" strokeWidth={3} />
+                    )}
+                    {isFrozen && (
+                        <Snowflake className={styles.frozenIcon} size={dotPx + 6} color="#38bdf8" strokeWidth={2.5} />
+                    )}
+                </span>
+            )}
+            {hasNote && !isMuted && (
+                <span className={styles.noteIndicator} />
+            )}
+        </button>
+    );
+});
+
 export function Calendar({ startDate, completions, exercises, isCustom, getDayNumber, onClose, getConfig }) {
     const { t } = useTranslation();
     const frozenDays = useProgressStore(s => s.frozenDays);
@@ -21,6 +91,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
     const [selectedDay, setSelectedDay] = useState(null);
     const [isClosing, setIsClosing] = useState(false);
     const [slideDirection, setSlideDirection] = useState(null); // 'left' | 'right' | null
+    const [hasSwitchedMonth, setHasSwitchedMonth] = useState(false);
 
     // Swipe tracking refs (no re-renders during drag)
     const touchStartX = useRef(null);
@@ -30,16 +101,17 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
     const gridRef = useRef(null);
     const swipeAnimating = useRef(false);
 
-    const handleCloseDetail = () => {
+    const handleCloseDetail = useCallback(() => {
         setIsClosing(true);
         setTimeout(() => {
             setSelectedDay(null);
             setIsClosing(false);
         }, 150);
-    };
+    }, []);
 
-    const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
-    const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+    const handleToggleDay = useCallback((dateString) => {
+        setSelectedDay(prev => (prev === dateString ? null : dateString));
+    }, []);
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -50,6 +122,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
         // direction: 1 = next, -1 = prev
         setSlideDirection(direction === 1 ? 'left' : 'right');
         setTimeout(() => {
+            setHasSwitchedMonth(true);
             setCurrentDate(new Date(year, month + direction, 1));
             setSlideDirection(null);
             swipeAnimating.current = false;
@@ -118,6 +191,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                 gridRef.current.style.opacity = '0';
             }
             setTimeout(() => {
+                setHasSwitchedMonth(true);
                 if (diff > 0) setCurrentDate(new Date(year, month + 1, 1));
                 else setCurrentDate(new Date(year, month - 1, 1));
                 // Reset grid for slide-in
@@ -156,49 +230,122 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
     }, true);
 
     const monthNames = t('calendar.months', { returnObjects: true });
+    const levelLabels = useMemo(
+        () => Array.from({ length: LEVEL_COUNT + 1 }, (_, lvl) => (lvl > 0 ? t('levels.short', { level: lvl }) : '')),
+        [t]
+    );
 
-    const todayStr = getLocalDateStr(new Date());
-
-    const { days, monthCompleted, completionRate, monthPerfect, perfectSet } = useMemo(() => {
+    const { cells, monthCompleted, completionRate, monthPerfect } = useMemo(() => {
         const daysInMonth = getDaysInMonth(year, month);
         const firstDay = getFirstDayOfMonth(year, month);
+        const todayStr = getLocalDateStr(new Date());
+        const padMonth = String(month + 1).padStart(2, '0');
+        const safeExercises = exercises || [];
+        const exerciseIds = safeExercises.map(ex => ex.id);
+        const getLevelAt = createDayLevelLookup(completions, exerciseIds, weekStartDay);
 
-        const daysArr = [];
         // Compute padding: how many empty cells before Day 1
         // getDay() returns 0=Sun, 1=Mon, ... 6=Sat
         let padding;
         if (weekStartDay === 'sunday') {
-            // Sunday-first: column 0 is Sunday, so padding = firstDay directly
             padding = firstDay;
         } else {
-            // Monday-first: column 0 is Monday
             padding = firstDay === 0 ? 6 : firstDay - 1;
         }
-        for (let i = 0; i < padding; i++) daysArr.push(null);
-        for (let i = 1; i <= daysInMonth; i++) daysArr.push(new Date(year, month, i));
 
-        const todayStr = getLocalDateStr(new Date());
+        const cellList = [];
+        for (let i = 0; i < padding; i++) {
+            cellList.push({ isPad: true });
+        }
+
         let completed = 0, total = 0, perfect = 0;
-        const pSet = new Set();
 
-        daysArr.filter(Boolean).forEach(date => {
-            const dStr = getLocalDateStr(date);
-            const isFuture = dStr > todayStr;
-            const isBeforeStart = dStr < startDate;
+        for (let dayOfMonth = 1; dayOfMonth <= daysInMonth; dayOfMonth++) {
+            const dateString = `${year}-${padMonth}-${String(dayOfMonth).padStart(2, '0')}`;
+            const isFuture = dateString > todayStr;
+            const isBeforeStart = dateString < startDate;
+            const isToday = dateString === todayStr;
+            const dayCompletions = completions[dateString] || {};
+            const dayPerfect = !isFuture && !isBeforeStart && isPerfectDay(dayCompletions, safeExercises);
+
+            let status = null;
             if (!isFuture && !isBeforeStart) {
                 total++;
-                if (getDayStatus(dStr, completions, frozenDays, todayStr, weekStartDay) === DAY_STATUS.DONE) completed++;
-                const day = completions[dStr] || {};
-                if (isPerfectDay(day, exercises)) {
-                    pSet.add(dStr);
-                    if (!isCustom) perfect++;
+                status = getDayStatus(dateString, completions, frozenDays, todayStr, weekStartDay);
+                if (status === DAY_STATUS.DONE) completed++;
+                if (dayPerfect && !isCustom) perfect++;
+            }
+
+            let isMissed = false;
+            let isFrozen = false;
+            let isPerfect = false;
+            let isAnyDone = false;
+            let isCaughtUp = false;
+            let isMuted = false;
+
+            if (isCustom) {
+                isPerfect = dayPerfect;
+                isAnyDone = !isPerfect && Object.values(dayCompletions).some(ex => ex?.isCompleted);
+                isMuted = isFuture || isBeforeStart;
+                isMissed = !isPerfect && !isAnyDone && !isMuted && !isToday;
+            } else {
+                const resolvedStatus = status ?? getDayStatus(dateString, completions, frozenDays, todayStr, weekStartDay);
+                if ((isBeforeStart && resolvedStatus === DAY_STATUS.MISSED) || resolvedStatus === DAY_STATUS.FUTURE) {
+                    isMuted = true;
+                } else if (resolvedStatus === DAY_STATUS.DONE) {
+                    isPerfect = dayPerfect;
+                    isAnyDone = !isPerfect;
+                    isCaughtUp = isCaughtUpDay(dayCompletions, dateString);
+                } else if (resolvedStatus === DAY_STATUS.FROZEN) {
+                    isFrozen = true;
+                } else if (resolvedStatus === DAY_STATUS.MISSED) {
+                    isMissed = true;
                 }
             }
-        });
+
+            const completedDots = [];
+            if (!isMuted) {
+                for (let j = 0; j < safeExercises.length; j++) {
+                    const ex = safeExercises[j];
+                    if (dayCompletions[ex.id]?.isCompleted) {
+                        completedDots.push({ id: ex.id, color: ex.color });
+                    }
+                }
+            }
+
+            const level = isMuted ? 0 : getLevelAt(dateString);
+            const dotCount = completedDots.length + (isMissed ? 1 : 0);
+            let dotPx = 7;
+            if (dotCount > 12) dotPx = 4;
+            else if (dotCount > 8) dotPx = 5;
+            else if (dotCount > 5) dotPx = 6;
+
+            let stateClass = '';
+            if (isMuted) stateClass = styles.muted;
+            else if (isPerfect) stateClass = styles.perfect;
+            else if (isCaughtUp) stateClass = styles.caught;
+            else if (isAnyDone) stateClass = styles.done;
+            else if (isFrozen) stateClass = styles.frozen;
+            else if (isMissed) stateClass = styles.missed;
+
+            cellList.push({
+                isPad: false,
+                dateString,
+                dayOfMonth,
+                stateClass,
+                isToday,
+                isMuted,
+                isMissed,
+                isFrozen,
+                level,
+                completedDots,
+                dotPx,
+            });
+        }
 
         const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-        return { days: daysArr, monthCompleted: completed, completionRate: rate, monthPerfect: perfect, perfectSet: pSet };
+        return { cells: cellList, monthCompleted: completed, completionRate: rate, monthPerfect: perfect };
     }, [year, month, startDate, completions, exercises, isCustom, frozenDays, weekStartDay]);
 
     // Slide-in animation for button navigation
@@ -210,6 +357,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
     const viewingCurrentMonth = year === now.getFullYear() && month === now.getMonth();
     const goToToday = () => {
         if (viewingCurrentMonth || swipeAnimating.current) return;
+        setHasSwitchedMonth(true);
         setCurrentDate(new Date());
     };
 
@@ -218,6 +366,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
         : t('calendar.weekdays', { returnObjects: true });
     // Fallback: if weekdaysMon doesn't exist yet, rotate the Sun-first array
     const weekdayLabels = Array.isArray(rawWeekdayLabels) ? rawWeekdayLabels : t('calendar.weekdays', { returnObjects: true });
+    const monthName = monthNames[month];
 
     return (
         <ModalContainer
@@ -247,7 +396,7 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                         tabIndex={0}
                         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToToday(); } }}
                     >
-                        <div className={styles.monthName}>{monthNames[month]}</div>
+                        <div className={styles.monthName}>{monthName}</div>
                         <div className={styles.monthYear}>{year}</div>
                         {!viewingCurrentMonth && <span className={styles.todayHint}>{'↩'} {t('calendar.today')}</span>}
                     </div>
@@ -275,119 +424,31 @@ export function Calendar({ startDate, completions, exercises, isCustom, getDayNu
                 </div>
 
                 {/* Day grid */}
-                <div ref={gridRef} className={`${styles.grid} ${styles.rise} ${styles.rise3}`} style={gridSlideStyle}>
+                <div
+                    ref={gridRef}
+                    className={[styles.grid, styles.rise, styles.rise3, hasSwitchedMonth && styles.gridSwitched].filter(Boolean).join(' ')}
+                    style={gridSlideStyle}
+                >
                     {weekdayLabels.map(d => (
                         <div key={d} className={styles.weekday}>{d}</div>
                     ))}
 
-                    {days.map((date, i) => {
-                        if (!date) return <div key={`pad-${i}-${year}-${month}`} className={styles.pad} />;
-
-                        const dateString = getLocalDateStr(date);
-                        const isFuture = dateString > todayStr;
-                        const isBeforeStart = dateString < startDate;
-                        const isToday = dateString === todayStr;
-
-                        let isMissed = false;
-                        let isFrozen = false;
-                        let isPerfect = false;
-                        let isAnyDone = false;
-                        let isCaughtUp = false;
-                        let isMuted = false;
-
-                        const dayCompletions = completions[dateString] || {};
-
-                        if (isCustom) {
-                            // Custom routine view (subset of exercises)
-                            isPerfect = perfectSet.has(dateString);
-                            isAnyDone = !isPerfect && Object.values(dayCompletions).some(ex => ex?.isCompleted);
-                            isMuted = isFuture || isBeforeStart;
-                            isMissed = !isPerfect && !isAnyDone && !isMuted && !isToday;
-                        } else {
-                            // Global stats view
-                            const status = getDayStatus(dateString, completions, frozenDays, todayStr, weekStartDay);
-                            if (isBeforeStart && status === DAY_STATUS.MISSED) {
-                                isMuted = true;
-                            } else if (status === DAY_STATUS.FUTURE) {
-                                isMuted = true;
-                            } else if (status === DAY_STATUS.DONE) {
-                                isPerfect = perfectSet.has(dateString);
-                                isAnyDone = !isPerfect;
-                                isCaughtUp = isCaughtUpDay(dayCompletions, dateString);
-                            } else if (status === DAY_STATUS.FROZEN) {
-                                isFrozen = true;
-                            } else if (status === DAY_STATUS.MISSED) {
-                                isMissed = true;
-                            }
-                        }
-                        const completedCount = exercises.filter(ex => dayCompletions[ex.id]?.isCompleted).length;
-                        const level = getDayLevel(completions, dateString, exercises.map(ex => ex.id), weekStartDay);
-                        const isSelected = selectedDay === dateString;
-
-                        // Exercise dots scale down as the day gets busier so they stay inside the cell.
-                        const dotCount = completedCount + (isMissed ? 1 : 0);
-                        let dotPx = 7;
-                        if (dotCount > 12) {
-                            dotPx = 4;
-                        } else if (dotCount > 8) {
-                            dotPx = 5;
-                        } else if (dotCount > 5) {
-                            dotPx = 6;
-                        }
-
-                        const cls = [styles.day];
-                        if (isMuted) cls.push(styles.muted);
-                        else if (isPerfect) cls.push(styles.perfect);
-                        else if (isCaughtUp) cls.push(styles.caught);
-                        else if (isAnyDone) cls.push(styles.done);
-                        else if (isFrozen) cls.push(styles.frozen);
-                        else if (isMissed) cls.push(styles.missed);
-                        if (isToday) cls.push(styles.today);
-                        if (isSelected) cls.push(styles.selected);
-                        
-                        const hasNote = !!notes?.[dateString];
-
-                        return (
-                            <button
-                                key={dateString}
-                                type="button"
-                                className={cls.join(' ')}
-                                style={{ animationDelay: `${i * 10}ms` }}
-                                disabled={isMuted}
-                                aria-pressed={isSelected}
-                                aria-label={`${date.getDate()} ${monthNames[month]}${level ? ' · ' + t('levels.short', { level }) : ''}`}
-                                onClick={() => setSelectedDay(isSelected ? null : dateString)}
-                            >
-                                <span className={styles.dayNum}>{date.getDate()}</span>
-                                {level > 0 && !isMuted && <LevelEmblem level={level} size={20} />}
-                                {!isMuted && (
-                                    <span className={styles.dots}>
-                                        {exercises && exercises.map(ex => (
-                                            dayCompletions[ex.id]?.isCompleted ? (
-                                                <span
-                                                    key={ex.id}
-                                                    className={styles.dot}
-                                                    style={{
-                                                        width: dotPx, height: dotPx,
-                                                        background: ex.color
-                                                    }}
-                                                />
-                                            ) : null
-                                        ))}
-                                        {isMissed && (
-                                            <X className={styles.missedIcon} size={dotPx + 6} color="#ef4444" strokeWidth={3} />
-                                        )}
-                                        {isFrozen && (
-                                            <Snowflake className={styles.frozenIcon} size={dotPx + 6} color="#38bdf8" strokeWidth={2.5} />
-                                        )}
-                                    </span>
-                                )}
-                                {hasNote && !isMuted && (
-                                    <span className={styles.noteIndicator} />
-                                )}
-                            </button>
-                        );
-                    })}
+                    {cells.map((cell, i) => (
+                        cell.isPad ? (
+                            <div key={`slot-${i}`} className={styles.pad} />
+                        ) : (
+                            <CalendarDayCell
+                                key={`slot-${i}`}
+                                cell={cell}
+                                monthName={monthName}
+                                levelLabel={levelLabels[cell.level]}
+                                isSelected={selectedDay === cell.dateString}
+                                hasNote={!!notes?.[cell.dateString]}
+                                animDelayMs={hasSwitchedMonth ? undefined : i * 10}
+                                onToggleDay={handleToggleDay}
+                            />
+                        )
+                    ))}
                 </div>
 
                 {/* Legend — calendar states (per-exercise breakdown lives in the day sheet) */}

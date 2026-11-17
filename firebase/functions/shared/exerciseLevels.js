@@ -72,35 +72,63 @@ export function getSessionExerciseReps(exercise) {
  * Keep that historical goal as a snapshot to preserve the estimated volume.
  */
 export function migrateLevelProgress(data, customExercises = []) {
-  const catalog = { ...exercisesById, ...Object.fromEntries(customExercises.map(ex => [ex.id, ex])) };
+  const catalog = customExercises.length > 0
+    ? { ...exercisesById, ...Object.fromEntries(customExercises.map(ex => [ex.id, ex])) }
+    : exercisesById;
   let changed = (data.progressVersion || 0) < PROGRESS_VERSION;
-  const completions = {};
+  const rawCompletions = data.completions || {};
+  let completions = null;
   const today = getLocalDateStr(new Date());
-  for (const [date, day] of Object.entries(data.completions || {})) {
-    const migrated = { ...day };
-    const elapsed = Math.round((Date.parse(date) - Date.parse(data.startDate)) / 86400000) + 1;
-    const dayNumber = Math.max(1, Number.isFinite(elapsed) ? elapsed : 1);
-    for (const [id, original] of Object.entries(day || {})) {
-      if (!original) continue;
+  const startMs = Date.parse(data.startDate);
+
+  const ensureDayClone = (date, day, current) => {
+    if (current) return current;
+    const copy = { ...day };
+    if (!completions) completions = { ...rawCompletions };
+    completions[date] = copy;
+    return copy;
+  };
+
+  for (const date of Object.keys(rawCompletions)) {
+    const day = rawCompletions[date];
+    if (!day) continue;
+    let migrated = null;
+    let dayNumber = 0;
+    const getDayNum = () => {
+      if (!dayNumber) {
+        const elapsed = Math.round((Date.parse(date) - startMs) / 86400000) + 1;
+        dayNumber = Math.max(1, Number.isFinite(elapsed) ? elapsed : 1);
+      }
+      return dayNumber;
+    };
+
+    for (const id of Object.keys(day)) {
+      const original = day[id];
+      // Fast path: historical entries that already carry a timestamp and integer level need zero work.
+      if (!original || (date !== today && original.timestamp && Number.isInteger(original.level))) continue;
+
       let entry = original;
       // Only the calendar day survives in old partial records. Use a deterministic
       // historical timestamp, explicitly estimated, never the migration date.
-      const historicalTime = Date.parse(`${date}T12:00:00.000Z`);
-      if (!entry.timestamp && (entry.isCompleted || entry.count > 0) &&
-          (catalog[id] || !isDailyExercise(id)) && Number.isFinite(historicalTime)) {
-        entry = { ...entry, timestamp: historicalTime, timestampEstimated: true };
-        migrated[id] = entry;
-        changed = true;
+      if (!entry.timestamp && (entry.isCompleted || entry.count > 0) && (catalog[id] || !isDailyExercise(id))) {
+        const historicalTime = Date.parse(`${date}T12:00:00.000Z`);
+        if (Number.isFinite(historicalTime)) {
+          entry = { ...entry, timestamp: historicalTime, timestampEstimated: true };
+          migrated = ensureDayClone(date, day, migrated);
+          migrated[id] = entry;
+          changed = true;
+        }
       }
       // Today's workout must remain playable up to the full target. Repair old
       // difficulty snapshots, including accounts already migrated to levels.
       const dailyExercise = isDailyExercise(id) ? catalog[id] : null;
-      const fullGoal = dailyExercise ? getDailyGoal(dailyExercise, dayNumber) : 0;
+      const fullGoal = dailyExercise && date === today ? getDailyGoal(dailyExercise, getDayNum()) : 0;
       if (date === today && dailyExercise &&
           (!Number.isInteger(entry.level) || (Number.isFinite(entry.goal) && entry.goal < fullGoal))) {
         const count = Number.isFinite(entry.count) ? Math.max(0, entry.count)
-          : entry.isCompleted ? getDailyGoal(dailyExercise, dayNumber, entry.difficulty ?? 1) : 0;
+          : entry.isCompleted ? getDailyGoal(dailyExercise, getDayNum(), entry.difficulty ?? 1) : 0;
         const level = getLevelForCount(count, fullGoal);
+        migrated = ensureDayClone(date, day, migrated);
         migrated[id] = { ...entry, count, goal: fullGoal, level, isCompleted: level > 0 };
         changed = true;
         continue;
@@ -109,6 +137,7 @@ export function migrateLevelProgress(data, customExercises = []) {
       if (!isDailyExercise(id)) {
         if (!entry.isCompleted) continue;
         const goal = Math.max(1, Math.ceil(getWeeklyGoalKm(id, Math.max(1, getCurrentWeekNumber(data.startDate, date))) * (entry.difficulty ?? 1) * 1000));
+        migrated = ensureDayClone(date, day, migrated);
         migrated[id] = { ...entry, count: goal, goal, level: LEVEL_COUNT, legacyCardio: true };
         changed = true;
         continue;
@@ -121,20 +150,26 @@ export function migrateLevelProgress(data, customExercises = []) {
         if (!Number.isFinite(entry.count) || entry.count <= 0) continue;
         // Partial legacy effort is measured against that day's full target,
         // independent of the former difficulty setting. Snapshot it once.
-        const goal = getProgressGoal(exercise, dayNumber, entry);
+        const goal = getProgressGoal(exercise, getDayNum(), entry);
         const level = getLevelForCount(entry.count, goal);
+        migrated = ensureDayClone(date, day, migrated);
         migrated[id] = { ...entry, goal, level, isCompleted: level > 0 };
         changed = true;
         continue;
       }
-      const goal = getDailyGoal(exercise, dayNumber, entry.difficulty ?? 1);
+      const goal = getDailyGoal(exercise, getDayNum(), entry.difficulty ?? 1);
       const count = Number.isFinite(entry.count) && entry.count > 0 ? entry.count : goal;
+      migrated = ensureDayClone(date, day, migrated);
       migrated[id] = { ...entry, count, goal: count, level: LEVEL_COUNT, isCompleted: true };
       changed = true;
     }
-    completions[date] = migrated;
   }
-  return changed ? { ...data, completions, progressVersion: Math.max(data.progressVersion || 0, PROGRESS_VERSION) } : data;
+  if (!changed) return data;
+  return {
+    ...data,
+    completions: completions || { ...rawCompletions },
+    progressVersion: Math.max(data.progressVersion || 0, PROGRESS_VERSION),
+  };
 }
 
 /** Cardio remains valid from its recorded day until the end of its calendar week. */

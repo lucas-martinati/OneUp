@@ -1,6 +1,7 @@
 import { LevelRing } from '@components/ui/LevelRing';
 import { CountingNumber } from '@components/ui/CountingNumber';
 import { NextLevelHint } from './NextLevelHint';
+import { getLevelForCount } from '@shared/exerciseLevels.js';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowDown, ArrowUp, Camera, CameraOff, RefreshCw } from 'lucide-react';
@@ -722,7 +723,6 @@ export function ExercisePanel({
     isSession = false,
     fadeIn = true
 }) {
-    const isCompleted = currentCount >= dailyGoal || (isValidated && currentCount === 0);
     const settings = useSettingsStore(s => s.settings);
     const keepScreenOn = settings?.keepScreenOn ?? true;
     useWakeLock(keepScreenOn);
@@ -735,6 +735,18 @@ export function ExercisePanel({
     const isTimer = exerciseConfig?.type === 'timer';
     const [isAnimating, setIsAnimating] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
+    const [liveTimerCount, setLiveTimerCount] = useState(null);
+    const pendingTimerFlushRef = useRef(null);
+    const currentCountRef = useRef(currentCount);
+    const onUpdateCountRef = useRef(onUpdateCount);
+    useEffect(() => {
+        currentCountRef.current = currentCount;
+        onUpdateCountRef.current = onUpdateCount;
+    }, [currentCount, onUpdateCount]);
+    const effectiveCount = isTimer && isRunning && liveTimerCount !== null
+        ? Math.max(currentCount, liveTimerCount)
+        : currentCount;
+    const isCompleted = effectiveCount >= dailyGoal || (isValidated && effectiveCount === 0);
     const [completeFlash, setCompleteFlash] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
     const [wasCompleted, setWasCompleted] = useState(isCompleted);
@@ -767,6 +779,7 @@ export function ExercisePanel({
         queueMicrotask(() => {
             setIsAnimating(false);
             setIsRunning(false);
+            setLiveTimerCount(null);
             setCompleteFlash(false);
             setShowConfetti(false);
             setHasCelebrated(false);
@@ -795,15 +808,49 @@ export function ExercisePanel({
     useEffect(() => {
         if (!isTimer || !isRunning || isCompleted) return undefined;
 
-        let lastCount = currentCount;
+        let lastCount = currentCountRef.current;
+        let lastFlushed = lastCount;
+        pendingTimerFlushRef.current = null;
+
+        const flushPending = () => {
+            if (pendingTimerFlushRef.current !== null) {
+                const toFlush = pendingTimerFlushRef.current;
+                pendingTimerFlushRef.current = null;
+                lastFlushed = toFlush;
+                onUpdateCountRef.current(toFlush);
+            }
+        };
+
         const interval = setInterval(() => {
             lastCount += 1;
-            onUpdateCount(lastCount);
-            if (lastCount >= dailyGoal) setIsRunning(false);
+            setLiveTimerCount(lastCount);
+            const reachedGoal = lastCount >= dailyGoal;
+            const crossedLevel = getLevelForCount(lastCount, dailyGoal) !== getLevelForCount(lastFlushed, dailyGoal);
+            // Buffer intermediate 1s ticks locally to avoid serializing the full
+            // 365-day store + recomputing global stats every second while keeping
+            // the screen awake; flush immediately on level-ups, completion, pause,
+            // backgrounding, unmount, or every 15s checkpoint.
+            if (reachedGoal || crossedLevel || lastCount - lastFlushed >= 15) {
+                pendingTimerFlushRef.current = null;
+                lastFlushed = lastCount;
+                onUpdateCountRef.current(lastCount);
+            } else {
+                pendingTimerFlushRef.current = lastCount;
+            }
+            if (reachedGoal) setIsRunning(false);
         }, 1000);
 
-        return () => clearInterval(interval);
-    }, [isTimer, isRunning, isCompleted, currentCount, dailyGoal, onUpdateCount]);
+        const onVisibilityChange = () => {
+            if (document.hidden) flushPending();
+        };
+        document.addEventListener('visibilitychange', onVisibilityChange);
+
+        return () => {
+            clearInterval(interval);
+            document.removeEventListener('visibilitychange', onVisibilityChange);
+            flushPending();
+        };
+    }, [isTimer, isRunning, isCompleted, dailyGoal, exerciseConfig?.id]);
 
     useEffect(() => {
         // Revisiting a completed exercise is browsing, not a new completion.
@@ -833,7 +880,7 @@ export function ExercisePanel({
         }
     }, [exerciseConfig?.id, isCompleted, wasCompleted, hasCelebrated, onAutoAdvance]);
 
-    const displayCount = isCompleted && currentCount === 0 ? dailyGoal : currentCount;
+    const displayCount = isCompleted && effectiveCount === 0 ? dailyGoal : effectiveCount;
     const remaining = Math.max(0, dailyGoal - displayCount);
     const activeColor = exerciseConfig?.color || (isTimer ? '#8b5cf6' : '#818cf8');
     const [gradStart, gradEnd] = exerciseConfig?.gradient || (isTimer ? ['#7c3aed', '#8b5cf6'] : ['#667eea', '#818cf8']);
@@ -886,6 +933,8 @@ export function ExercisePanel({
     };
 
     const handleReset = () => {
+        pendingTimerFlushRef.current = null;
+        setLiveTimerCount(null);
         setIsRunning(false);
         setIsAnimating(true);
         onUpdateCount(0);
@@ -894,6 +943,8 @@ export function ExercisePanel({
 
     const handleCompleteAll = () => {
         if (isCompleted) return;
+        pendingTimerFlushRef.current = null;
+        setLiveTimerCount(null);
         setIsRunning(false);
         setIsAnimating(true);
         setCompleteFlash(true);

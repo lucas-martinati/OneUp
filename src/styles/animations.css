@@ -405,7 +405,6 @@
     var(--ring-c2, var(--accent-glow)) var(--ring-progress, 0%),
     var(--ring-track, rgba(255, 255, 255, 0.12)) var(--ring-progress, 0%) 360deg
   );
-  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.3));
   -webkit-mask:
     linear-gradient(white 0 0) content-box,
     linear-gradient(white 0 0);

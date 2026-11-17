@@ -38,9 +38,16 @@ export function useDashboardState() {
             }
         };
         handleDayChange();
-        const interval = setInterval(handleDayChange, 10000);
+        const interval = setInterval(() => {
+            if (!document.hidden) handleDayChange();
+        }, 10000);
+        const handleVisibility = () => {
+            if (!document.hidden) handleDayChange();
+        };
+        document.addEventListener('visibilitychange', handleVisibility);
         return () => {
             clearInterval(interval);
+            document.removeEventListener('visibilitychange', handleVisibility);
         };
     }, [today, getDayNumber, settings, scheduleNotification]);
 

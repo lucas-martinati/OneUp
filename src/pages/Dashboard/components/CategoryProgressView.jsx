@@ -121,7 +121,7 @@ export const CategoryProgressView = React.memo(({
                         height: 'var(--bottom-btn-size, clamp(96px, 16vh, 140px))'
                     }}>
                         {/* Ambient halo behind the counter button */}
-                        <div style={{
+                        <div data-decorative-anim="true" style={{
                             position: 'absolute', inset: '-45%', borderRadius: '50%',
                             background: `radial-gradient(circle, ${safeSelectedExercise.color}${isExerciseDone ? '35' : '20'} 0%, transparent 65%)`,
                             pointerEvents: 'none',

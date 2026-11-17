@@ -286,3 +286,20 @@ describe('AppOrchestrator — sync pause', () => {
     });
   });
 });
+
+describe('AppOrchestrator — idle decorative animation pause', () => {
+  it('marks document root as data-idle after inactivity and clears it on interaction', () => {
+    vi.useFakeTimers();
+    const { unmount } = renderOrchestrator();
+    expect(document.documentElement.hasAttribute('data-idle')).toBe(false);
+
+    vi.advanceTimersByTime(12500);
+    expect(document.documentElement.getAttribute('data-idle')).toBe('true');
+
+    window.dispatchEvent(new Event('pointerdown'));
+    expect(document.documentElement.hasAttribute('data-idle')).toBe(false);
+
+    unmount();
+    vi.useRealTimers();
+  });
+});

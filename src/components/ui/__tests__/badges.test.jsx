@@ -25,6 +25,11 @@ describe('LevelBadge', () => {
   it('omits level zero when no threshold was reached', () => {
     expect(render(<LevelBadge level={0} />).container.firstChild).toBeNull();
   });
+  it('merges active and inactive medal segments into at most two arc paths', () => {
+    const { container } = render(<LevelBadge level={5} />);
+    // 1 shield polygon path + 1 active arc path + 1 inactive arc path = 3 total <path> nodes (down from 11)
+    expect(container.querySelectorAll('path').length).toBe(3);
+  });
 });
 
 // ── WeightBadge ─────────────────────────────────────────────────────────

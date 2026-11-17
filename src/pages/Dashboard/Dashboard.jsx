@@ -102,13 +102,23 @@ export function Dashboard() {
     const fullCategoryColors = useMemo(() => buildFullCategoryColors(customCategories), [customCategories]);
     const defaultSlide = fullCategoryOrder.indexOf(CATEGORIES.BODYWEIGHT);
     const [activeSlide, setActiveSlide] = useState(defaultSlide);
+    const [swiperTouched, setSwiperTouched] = useState(false);
+    const initialScrollDoneRef = useRef(false);
+    const enableSwiperNeighbors = useCallback(() => {
+        setSwiperTouched(prev => (prev ? prev : true));
+    }, []);
     const renderedSlides = useMemo(() => {
         const set = new Set();
         set.add(activeSlide);
-        if (activeSlide > 0) set.add(activeSlide - 1);
-        if (activeSlide < fullCategoryOrder.length - 1) set.add(activeSlide + 1);
+        // Defer mounting off-screen neighbor slides (especially Cardio + Leaflet map
+        // and secondary CategoryProgressView blobs) until the user first interacts
+        // with the vertical swiper or switches slides.
+        if (swiperTouched || activeSlide !== defaultSlide) {
+            if (activeSlide > 0) set.add(activeSlide - 1);
+            if (activeSlide < fullCategoryOrder.length - 1) set.add(activeSlide + 1);
+        }
         return set;
-    }, [activeSlide, fullCategoryOrder.length]);
+    }, [activeSlide, defaultSlide, fullCategoryOrder.length, swiperTouched]);
     const scrollContainerRef = useRef(null);
     const handleIntersection = useCallback((entries) => {
         entries.forEach(entry => {
@@ -156,6 +166,10 @@ export function Dashboard() {
                 el.scrollTo({ top: el.clientHeight * defaultSlide, behavior: 'instant' });
             }
         }
+        const raf = requestAnimationFrame(() => {
+            initialScrollDoneRef.current = true;
+        });
+        return () => cancelAnimationFrame(raf);
     }, [defaultSlide]);
 
     const isCatAccessible = (catKey) => {
@@ -232,19 +246,32 @@ export function Dashboard() {
     useBackHandler(closeTopModal, anyModalOpen);
 
     useEffect(() => {
+        const root = document.documentElement;
+        let occludeTimer = null;
         if (anyModalOpen) {
             document.body.style.overflow = 'hidden';
             document.body.style.touchAction = 'none';
-            document.documentElement.style.overflow = 'hidden';
+            root.style.overflow = 'hidden';
+            root.setAttribute('data-modal-open', 'true');
+            // Wait for the 90ms modal-overlay fade-in to become fully opaque
+            // before hiding the Dashboard from WebView paint/compositing.
+            occludeTimer = setTimeout(() => {
+                root.setAttribute('data-modal-occluded', 'true');
+            }, 130);
         } else {
             document.body.style.overflow = '';
             document.body.style.touchAction = '';
-            document.documentElement.style.overflow = '';
+            root.style.overflow = '';
+            root.removeAttribute('data-modal-open');
+            root.removeAttribute('data-modal-occluded');
         }
         return () => {
+            clearTimeout(occludeTimer);
             document.body.style.overflow = '';
             document.body.style.touchAction = '';
-            document.documentElement.style.overflow = '';
+            root.style.overflow = '';
+            root.removeAttribute('data-modal-open');
+            root.removeAttribute('data-modal-occluded');
         };
     }, [anyModalOpen]);
 
@@ -304,10 +331,18 @@ export function Dashboard() {
                     quand une modale est ouverte — l'ExercisePanel affiche le sien. */}
                 <EventHud hidden={anyModalOpen} />
 
-                <main className="flex-1 flex-col pos-relative dashboard-main">
+                <main
+                    className="flex-1 flex-col pos-relative dashboard-main"
+                    onPointerDown={enableSwiperNeighbors}
+                    onTouchStart={enableSwiperNeighbors}
+                    onWheel={enableSwiperNeighbors}
+                >
                     <div
                         ref={scrollContainerRef}
                         className="no-scrollbar"
+                        onScroll={() => {
+                            if (initialScrollDoneRef.current) enableSwiperNeighbors();
+                        }}
                         style={{
                             flex: 1, overflowY: anyModalOpen ? 'hidden' : 'auto', overflowX: 'hidden',
                             scrollSnapType: 'y mandatory',
@@ -319,6 +354,7 @@ export function Dashboard() {
                     >
                         <CategoryViewSwiper
                             fullCategoryOrder={fullCategoryOrder}
+                            activeSlide={activeSlide}
                             renderedSlides={renderedSlides}
                             isFuture={isFuture} effectiveStart={effectiveStart} dayNumber={dayNumber} today={today}
                             isCounterTransitioning={isCounterTransitioning} prevDayNumber={prevDayNumber}
@@ -341,13 +377,6 @@ export function Dashboard() {
                     activeCategoryColor={fullCategoryColors[fullCategoryOrder[effectiveSlide]]}
                 />
 
-                <DashboardModals
-                    currentCatKey={currentCatKey} effectiveSlide={effectiveSlide}
-                    selectedExercise={selectedExercise} selectedExerciseId={globalSelectedId}
-                    dailyGoal={dailyGoal} currentCount={currentCount} isExerciseDone={isExerciseDone}
-                    dayNumber={dayNumber} today={today}
-                />
-
                 <ConfirmDialog
                     open={showDiscardConfirm}
                     message={t('dashboard.discardConfirm')}
@@ -357,6 +386,13 @@ export function Dashboard() {
                     confirmLabel={t('dashboard.discard')}
                 />
             </div>
+
+            <DashboardModals
+                currentCatKey={currentCatKey} effectiveSlide={effectiveSlide}
+                selectedExercise={selectedExercise} selectedExerciseId={globalSelectedId}
+                dailyGoal={dailyGoal} currentCount={currentCount} isExerciseDone={isExerciseDone}
+                dayNumber={dayNumber} today={today}
+            />
         </>
     );
 }
