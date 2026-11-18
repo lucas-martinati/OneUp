@@ -81,9 +81,9 @@ final class WatchFace extends View {
         super(context);
         semiBold = font(context, 600);
         extraBold = font(context, 800);
-        // Outer curved labels: apex at y=33 (top) and y=258 (bottom) to utilize the full round glass without overlapping HH:mm
-        top.addArc(new RectF(33, 33, 243, 243), 225, 90);
-        bottom.addArc(new RectF(18, 18, 258, 258), 135, -90);
+        // Outer curved labels: apex at y=30 (top) and y=264 (bottom) to utilize the full round glass
+        top.addArc(new RectF(30, 30, 246, 246), 225, 90);
+        bottom.addArc(new RectF(12, 12, 264, 264), 135, -90);
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
     }
 
@@ -140,8 +140,8 @@ final class WatchFace extends View {
             paint.setStyle(Paint.Style.FILL);
         }
 
-        curved(canvas, title, false, (themeAccent & 0x00ffffff) | 0xee000000, 105f, 13f);
-        curved(canvas, category.toUpperCase(Locale.getDefault()), true, categoryColor, 120f, 11.5f);
+        curved(canvas, title, false, (themeAccent & 0x00ffffff) | 0xee000000, 108f, 13.5f);
+        curved(canvas, category.toUpperCase(Locale.getDefault()), true, categoryColor, 126f, 12f);
         canvas.restore();
     }
 
