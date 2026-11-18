@@ -2,6 +2,7 @@ package com.lucasm548.oneup.wear;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.util.Log;
 import com.google.android.gms.wearable.Wearable;
 import com.lucasm548.oneup.wearbridge.WearProtocol;
@@ -11,6 +12,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /** Watch-owned immutable operations; phone-owned authoritative snapshots. */
@@ -36,6 +38,34 @@ public final class WatchRepository {
     public JSONObject session() { return object("session_" + scope()); }
     public JSONObject summary() { return object("summary_" + scope()); }
     public JSONArray pending() { return array("pending_" + scope()); }
+    public boolean isFrench() {
+        return snapshot().optString("language", Locale.getDefault().getLanguage()).startsWith("fr");
+    }
+    public String str(String key, String frFallback, String enFallback) {
+        JSONObject strings = snapshot().optJSONObject("strings");
+        if (strings != null) {
+            String val = strings.optString(key, "");
+            if (!val.isEmpty() && !val.startsWith("wear.") && !val.contains(".")) return val;
+            if (!val.isEmpty() && !val.startsWith("wear.watch.") && !val.equals(key)) return val;
+        }
+        return isFrench() ? frFallback : enFallback;
+    }
+    public int themeAccent() {
+        JSONObject theme = snapshot().optJSONObject("theme");
+        if (theme != null) {
+            try { return Color.parseColor(theme.optString("accent", "#8b5cf6")); }
+            catch (IllegalArgumentException ignored) {}
+        }
+        return 0xff8b5cf6;
+    }
+    public int themeAccent2() {
+        JSONObject theme = snapshot().optJSONObject("theme");
+        if (theme != null) {
+            try { return Color.parseColor(theme.optString("accent2", "#c4b5fd")); }
+            catch (IllegalArgumentException ignored) {}
+        }
+        return 0xffc4b5fd;
+    }
     public JSONObject exercise(String id) {
         JSONArray list = snapshot().optJSONArray("exercises");
         if (list != null) for (int i = 0; i < list.length(); i++) {
@@ -50,6 +80,16 @@ public final class WatchRepository {
         if (list != null) for (int i = 0; i < list.length(); i++) if (list.optJSONObject(i) != null) result.add(list.optJSONObject(i));
         return result;
     }
+    public List<JSONObject> routines() {
+        List<JSONObject> result = new ArrayList<>();
+        JSONArray list = snapshot().optJSONArray("routines");
+        if (list != null) for (int i = 0; i < list.length(); i++) {
+            JSONObject r = list.optJSONObject(i);
+            JSONArray ids = r == null ? null : r.optJSONArray("exerciseIds");
+            if (r != null && ids != null && ids.length() > 0 && !r.optString("name").isEmpty()) result.add(r);
+        }
+        return result;
+    }
     public List<JSONObject> exercises(String category) {
         List<JSONObject> result = new ArrayList<>();
         JSONArray list = snapshot().optJSONArray("exercises");
@@ -60,17 +100,17 @@ public final class WatchRepository {
         return result;
     }
     public int count(JSONObject exercise) {
+        if (exercise == null) return 0;
         synchronized (LOCK) {
-        int count = exercise.optInt("count");
-        JSONArray pending = pending();
-        String date = snapshot().optString("date");
-        for (int i = 0; i < pending.length(); i++) {
-            JSONObject op = pending.optJSONObject(i);
-            if (op != null && "count".equals(op.optString("type")) && date.equals(op.optString("date"))
-                && exercise.optString("id").equals(op.optString("exerciseId"))) count += op.optInt("delta");
-        }
-        return Math.max(0, Math.min(exercise.optInt("goal", 1), count));
-    
+            int count = exercise.optInt("count");
+            JSONArray pending = pending();
+            String date = snapshot().optString("date");
+            for (int i = 0; i < pending.length(); i++) {
+                JSONObject op = pending.optJSONObject(i);
+                if (op != null && "count".equals(op.optString("type")) && date.equals(op.optString("date"))
+                    && exercise.optString("id").equals(op.optString("exerciseId"))) count += op.optInt("delta");
+            }
+            return Math.max(0, Math.min(exercise.optInt("goal", 1), count));
         }
     }
     public void accept(JSONObject incoming) throws JSONException {
@@ -130,45 +170,75 @@ public final class WatchRepository {
     public void adjust(String id, int delta) throws JSONException { adjust(id, delta, scope()); }
     public void adjust(String id, int delta, String expectedScope) throws JSONException {
         synchronized (LOCK) {
-        if (!scope().equals(expectedScope)) throw new IllegalStateException("Account changed");
-        JSONObject ex = exercise(id);
-        if (!ready() || ex == null || ex.optBoolean("locked")) throw new IllegalStateException("Synchronise OneUp sur le téléphone");
-        int before = count(ex), after = Math.max(0, Math.min(ex.optInt("goal"), before + delta));
-        if (after != before) append(new JSONObject().put("type", "count").put("exerciseId", id).put("delta", after - before), null, null);
-    
+            if (!scope().equals(expectedScope)) throw new IllegalStateException("Account changed");
+            JSONObject ex = exercise(id);
+            if (!ready() || ex == null || ex.optBoolean("locked")) throw new IllegalStateException("Synchronise OneUp sur le téléphone");
+            int before = count(ex), after = Math.max(0, Math.min(ex.optInt("goal"), before + delta));
+            if (after != before) append(new JSONObject().put("type", "count").put("exerciseId", id).put("delta", after - before), null, null);
         }
     }
-    public void start(List<String> selected) throws JSONException {
+    public void start(List<String> selected) throws JSONException { start(selected, ""); }
+    public void start(List<String> selected, String routineName) throws JSONException {
         synchronized (LOCK) {
-        if (!ready() || selected.isEmpty()) return;
-        JSONArray queue = new JSONArray();
-        for (String id : selected) { JSONObject ex = exercise(id); if (ex != null && !ex.optBoolean("locked")) queue.put(id); }
-        if (queue.length() == 0) return;
-        JSONObject session = new JSONObject().put("id", UUID.randomUUID().toString()).put("date", snapshot().optString("date"))
-            .put("catalogId", snapshot().optString("catalogId")).put("queue", queue).put("index", 0).put("startedAt", System.currentTimeMillis()).put("origin", "watch");
-        append(sessionOperation("session_start", session), session, null);
-    
+            if (!ready() || selected.isEmpty()) return;
+            JSONArray queue = new JSONArray();
+            for (String id : selected) { JSONObject ex = exercise(id); if (ex != null && !ex.optBoolean("locked")) queue.put(id); }
+            if (queue.length() == 0) return;
+            JSONObject session = new JSONObject()
+                .put("id", UUID.randomUUID().toString())
+                .put("date", snapshot().optString("date"))
+                .put("catalogId", snapshot().optString("catalogId"))
+                .put("queue", queue)
+                .put("index", 0)
+                .put("startedAt", System.currentTimeMillis())
+                .put("origin", "watch");
+            if (routineName != null && !routineName.trim().isEmpty()) {
+                session.put("routineName", routineName.trim());
+            }
+            append(sessionOperation("session_start", session), session, null);
         }
     }
     private JSONObject sessionOperation(String type, JSONObject session) throws JSONException {
-        return new JSONObject().put("type", type).put("catalogId", session.optString("catalogId", snapshot().optString("catalogId"))).put("sessionId", session.getString("id")).put("date", session.getString("date"))
-            .put("queue", session.getJSONArray("queue")).put("startedAt", session.getLong("startedAt"));
+        JSONObject op = new JSONObject()
+            .put("type", type)
+            .put("catalogId", session.optString("catalogId", snapshot().optString("catalogId")))
+            .put("sessionId", session.getString("id"))
+            .put("date", session.getString("date"))
+            .put("queue", session.getJSONArray("queue"))
+            .put("startedAt", session.getLong("startedAt"));
+        String routineName = session.optString("routineName", "");
+        if (!routineName.isEmpty()) op.put("routineName", routineName);
+        return op;
     }
     public void navigate(int direction) throws JSONException {
         synchronized (LOCK) {
-        JSONObject session = session(); JSONArray queue = session.optJSONArray("queue");
-        if (queue == null || queue.length() == 0) return;
-        session.put("index", WatchMath.wrap(session.optInt("index"), direction, queue.length()));
-        if (!prefs.edit().putString("session_" + scope(), session.toString()).commit()) throw new IllegalStateException("Cannot save position");
-    
+            JSONObject session = session(); JSONArray queue = session.optJSONArray("queue");
+            if (queue == null || queue.length() == 0) return;
+            session.put("index", WatchMath.wrap(session.optInt("index"), direction, queue.length()));
+            if (!prefs.edit().putString("session_" + scope(), session.toString()).commit()) throw new IllegalStateException("Cannot save position");
         }
     }
     public void finish() throws JSONException {
         synchronized (LOCK) {
-        JSONObject session = session(); if (session.length() == 0) return;
-        JSONObject summary = new JSONObject(session.toString()).put("duration", Math.max(0, (System.currentTimeMillis() - session.optLong("startedAt")) / 1000));
-        append(sessionOperation("session_finish", session), null, summary);
-    
+            JSONObject session = session(); if (session.length() == 0) return;
+            JSONArray queue = session.optJSONArray("queue");
+            int completed = 0, totalReps = 0, totalExercises = queue == null ? 0 : queue.length();
+            if (queue != null) {
+                for (int i = 0; i < queue.length(); i++) {
+                    JSONObject ex = exercise(queue.optString(i));
+                    if (ex != null) {
+                        int c = count(ex);
+                        totalReps += c;
+                        if (WatchMath.level(c, ex.optInt("goal", 1)) > 0) completed++;
+                    }
+                }
+            }
+            JSONObject summary = new JSONObject(session.toString())
+                .put("duration", Math.max(0, (System.currentTimeMillis() - session.optLong("startedAt")) / 1000))
+                .put("completedExercises", completed)
+                .put("totalExercises", totalExercises)
+                .put("totalReps", totalReps);
+            append(sessionOperation("session_finish", session), null, summary);
         }
     }
 }

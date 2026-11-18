@@ -1042,5 +1042,33 @@
     "cardioRule": "유산소 운동의 10개 레벨은 일주일 동안 이동한 거리로 채워져요.",
     "profileTitle": "레벨 여정",
     "profilePending": "이 프로필의 레벨은 업데이트 후 표시돼요. 기존 연속 기록은 계속 볼 수 있어요."
+  },
+  "wear": {
+    "title": "Wear OS 워치",
+    "connected": "연결됨: {{name}}",
+    "disconnected": "근처에 감지된 워치 없음",
+    "pendingOps": "워치 작업 {{count}}개 대기 중",
+    "upToDate": "목표 및 진행도 동기화됨",
+    "syncNow": "워치 동기화",
+    "recordedOnWatch": "Wear OS에서 기록됨",
+    "watch": {
+      "myWorkout": "내 운동",
+      "openOnPhone": "휴대폰에서 OneUp을\n열어주세요",
+      "syncSubtitle": "오늘의 운동과 진행도를\n동기화합니다",
+      "syncBtn": "동기화",
+      "proRequired": "OneUp Pro에서 이용 가능",
+      "activateOnPhone": "휴대폰에서 활성화하세요",
+      "noExercises": "운동 없음",
+      "addOnPhone": "휴대폰에서 추가하세요",
+      "selectedSuffix": "선택됨",
+      "startWorkout": "운동 시작",
+      "rest": "휴식",
+      "recovery": "회복 시간",
+      "finishPrompt": "운동을\n종료할까요?",
+      "waitingSync": "동기화 대기 중",
+      "synced": "동기화 완료",
+      "home": "홈",
+      "noRoutines": "휴대폰에서 루틴을 만드세요"
+    }
   }
 }

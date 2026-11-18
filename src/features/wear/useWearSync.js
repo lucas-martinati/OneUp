@@ -4,16 +4,17 @@ import { useSubscription } from '@contexts/SubscriptionContext';
 import { useProgressStore } from '@store/useProgressStore';
 import { useExercisesStore } from '@store/useExercisesStore';
 import { useComputedStatsStore } from '@store/useComputedStatsStore';
+import { useSettingsStore } from '@store/useSettingsStore';
 import { isAndroidPlatform } from '@utils/platform';
 import { createLogger } from '@utils/logger';
 import { buildWearSnapshot } from './wearSnapshot';
 import { applyWearSessionEffect } from './wearSession';
-import { WEAR_SESSION_EVENT } from './wearProtocol';
+import { WEAR_MANUAL_SYNC_EVENT, WEAR_SESSION_EVENT, WEAR_STATUS_EVENT } from './wearProtocol';
 
 const logger = createLogger('WearSync');
 let nativePlugin;
 
-async function getBridge() {
+export async function getWearBridge() {
   if (!nativePlugin) {
     const { registerPlugin } = await import('@capacitor/core');
     nativePlugin = registerPlugin('WearBridge');
@@ -38,8 +39,11 @@ export function useWearSync(auth) {
     const subscriptions = [];
 
     const snapshot = () => buildWearSnapshot({
-      progress: useProgressStore.getState(), exerciseStore: useExercisesStore.getState(),
-      stats: useComputedStatsStore.getState().stats, isPro, scope, t, userId: auth.user?.uid || null, language: i18n.resolvedLanguage,
+      progress: useProgressStore.getState(),
+      exerciseStore: useExercisesStore.getState(),
+      stats: useComputedStatsStore.getState().stats,
+      settings: useSettingsStore.getState().settings,
+      isPro, scope, t, userId: auth.user?.uid || null, language: i18n.resolvedLanguage,
     });
     const publish = async () => {
       const data = snapshot();
@@ -59,16 +63,18 @@ export function useWearSync(auth) {
         const { operations = [] } = await bridge.getPending({ scope });
         operations.sort((a, b) => a.operation.device.localeCompare(b.operation.device) || a.operation.sequence - b.operation.sequence);
         const acknowledged = [];
+        const onSessionEffect = (effect, progressState) => applyWearSessionEffect(effect, progressState, t);
         for (const item of operations) {
           if (disposed || useProgressStore.getState()._userId !== (auth.user?.uid || null)
             || !useProgressStore.getState().isStoreInitialized) break;
-          const status = await useProgressStore.getState().applyWearOperation(item.operation, item.catalog, scope, applyWearSessionEffect);
+          const status = await useProgressStore.getState().applyWearOperation(item.operation, item.catalog, scope, onSessionEffect);
           if (status === 'applied' || status === 'duplicate') acknowledged.push(item.uri);
         }
         if (acknowledged.length) {
           await publish();
           await bridge.acknowledge({ uris: acknowledged });
         }
+        window.dispatchEvent(new CustomEvent(WEAR_STATUS_EVENT));
       } catch (error) {
         logger.warn('Watch synchronization will retry:', error);
       } finally {
@@ -80,17 +86,28 @@ export function useWearSync(auth) {
       clearTimeout(timer);
       timer = setTimeout(sync, 200);
     };
+    const onManualSync = () => {
+      lastPublished = '';
+      bridge?.syncNow?.().catch(() => {});
+      schedule();
+    };
     const onVisible = () => { if (!document.hidden) schedule(); };
     const initialize = async () => {
-      const { plugin } = await getBridge();
+      const { plugin } = await getWearBridge();
       if (disposed) return;
       bridge = plugin;
       ({ scope } = await bridge.configure({ userId: auth.user?.uid || '' }));
       if (disposed) return;
       listener = await bridge.addListener('wearOperations', schedule);
       if (disposed) { listener.remove(); return; }
-      subscriptions.push(useProgressStore.subscribe(schedule), useExercisesStore.subscribe(schedule), useComputedStatsStore.subscribe(schedule));
+      subscriptions.push(
+        useProgressStore.subscribe(schedule),
+        useExercisesStore.subscribe(schedule),
+        useComputedStatsStore.subscribe(schedule),
+        useSettingsStore.subscribe(schedule),
+      );
       window.addEventListener(WEAR_SESSION_EVENT, schedule);
+      window.addEventListener(WEAR_MANUAL_SYNC_EVENT, onManualSync);
       document.addEventListener('visibilitychange', onVisible);
       schedule();
     };
@@ -107,6 +124,7 @@ export function useWearSync(auth) {
       subscriptions.forEach(unsubscribe => unsubscribe());
       listener?.remove();
       window.removeEventListener(WEAR_SESSION_EVENT, schedule);
+      window.removeEventListener(WEAR_MANUAL_SYNC_EVENT, onManualSync);
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, [auth.loading, auth.user?.uid, isPro, isSubscriptionLoading, t, i18n.resolvedLanguage]);

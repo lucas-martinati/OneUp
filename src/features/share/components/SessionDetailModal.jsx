@@ -2,7 +2,7 @@ import { LevelEmblem } from '@components/ui/LevelEmblem';
 import { getEntryLevel, getSessionExerciseReps } from '@shared/exerciseLevels.js';
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, Trash2, Dumbbell, Zap } from '@utils/icons';
+import { Clock, Trash2, Dumbbell, Watch, Zap } from '@utils/icons';
 import { getIcon } from '@utils/icons';
 import { Button, ConfirmDialog, WeightBadge, InlineNameEditor, ModalHeader, ModalContainer } from '@components/ui';
 import { updateSessionName } from '@features/share/services/sessionHistoryService';
@@ -85,7 +85,15 @@ export function SessionDetailModal({ session, onClose, onDelete, stats = {}, isP
         <div className={styles.body}>
           {/* Date & name */}
           <div className={styles.hero}>
-            <div className={styles.date}>{formatDateTime(session.date, lang)}</div>
+            <div className={styles.dateRow}>
+              <div className={styles.date}>{formatDateTime(session.date, lang)}</div>
+              {session.source === 'wear' && (
+                <span className={styles.wearBadge}>
+                  <Watch size={11} />
+                  {t('wear.recordedOnWatch')}
+                </span>
+              )}
+            </div>
             <InlineNameEditor
               value={name}
               onSave={handleNameSave}

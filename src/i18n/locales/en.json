@@ -1042,5 +1042,33 @@
     "cardioRule": "For cardio, all ten levels fill with the distance covered during the week.",
     "profileTitle": "Level journey",
     "profilePending": "This profile’s levels will appear after it updates. Previously known streaks remain visible."
+  },
+  "wear": {
+    "title": "Wear OS Watch",
+    "connected": "Connected: {{name}}",
+    "disconnected": "No watch detected nearby",
+    "pendingOps": "{{count}} watch action(s) queued",
+    "upToDate": "Goals & progress synced",
+    "syncNow": "Sync watch",
+    "recordedOnWatch": "Recorded on Wear OS",
+    "watch": {
+      "myWorkout": "My workout",
+      "openOnPhone": "Open OneUp\non your phone",
+      "syncSubtitle": "Sync today's exercises\nand progress",
+      "syncBtn": "Sync",
+      "proRequired": "Available with OneUp Pro",
+      "activateOnPhone": "Activate on your phone",
+      "noExercises": "No exercises",
+      "addOnPhone": "Add them on your phone",
+      "selectedSuffix": "selected",
+      "startWorkout": "Start workout",
+      "rest": "Rest",
+      "recovery": "Recovery",
+      "finishPrompt": "Finish\nyour workout?",
+      "waitingSync": "Waiting to sync",
+      "synced": "Synced with phone",
+      "home": "Home",
+      "noRoutines": "Save routines on your phone"
+    }
   }
 }

@@ -1042,5 +1042,33 @@
     "cardioRule": "有氧运动的十个等级按一周内完成的距离累积。",
     "profileTitle": "等级历程",
     "profilePending": "此用户资料更新后将显示等级，已有连续记录仍会保留显示。"
+  },
+  "wear": {
+    "title": "Wear OS 手表",
+    "connected": "已连接：{{name}}",
+    "disconnected": "附近未检测到手表",
+    "pendingOps": "{{count}} 项手表记录待同步",
+    "upToDate": "目标与进度已同步",
+    "syncNow": "同步手表",
+    "recordedOnWatch": "记录自 Wear OS",
+    "watch": {
+      "myWorkout": "我的训练",
+      "openOnPhone": "请在手机上\n打开 OneUp",
+      "syncSubtitle": "同步今日训练项目\n与完成进度",
+      "syncBtn": "同步",
+      "proRequired": "需解锁 OneUp Pro",
+      "activateOnPhone": "请在手机端激活",
+      "noExercises": "暂无训练项目",
+      "addOnPhone": "请在手机端添加",
+      "selectedSuffix": "已选",
+      "startWorkout": "开始训练",
+      "rest": "休息",
+      "recovery": "恢复休息",
+      "finishPrompt": "结束本次\n训练吗？",
+      "waitingSync": "等待同步至手机",
+      "synced": "已同步",
+      "home": "主页",
+      "noRoutines": "请在手机端创建训练计划"
+    }
   }
 }

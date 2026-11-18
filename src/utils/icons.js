@@ -14,7 +14,7 @@ import {
   LogOut, Hash, Swords,
   // Navigation & settings
   Settings, Settings2, Bell, Volume2, Vibrate, Clock, Lock, Unlock,
-  Globe, Gauge, ShoppingBag, PieChart,
+  Globe, Gauge, ShoppingBag, PieChart, Watch, Bookmark,
   // Sharing & media
   Share2, Download, Image, Palette, Target, Maximize2,
   History, Weight, Filter, Loader2, Smartphone,
@@ -49,7 +49,7 @@ export {
   Target, Trash2, TrendingUp, Trophy,
   Upload, UserPlus, Users,
   Vibrate, Volume2,
-  Weight,
+  Watch, Weight,
   X,
   Zap
 };
@@ -81,7 +81,7 @@ export const SOCIAL_ICONS = {
 
 const NAV_ICONS = {
   Settings, Settings2, Bell, Volume2, Clock, Lock, Unlock,
-  Globe, Gauge, ShoppingBag, PieChart,
+  Globe, Gauge, ShoppingBag, PieChart, Watch, Bookmark,
 };
 
 export const SHARE_ICONS = {

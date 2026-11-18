@@ -1,6 +1,8 @@
 # OneUp sur Wear OS
 
-L'application montre native est dans `android/wear`. Elle reprend l'accueil à tuiles, les catégories verticales, le choix des exercices et les panneaux en boucle de la maquette. Le téléphone reste la source des objectifs, traductions des exercices, catégories personnalisées, poids et droits Pro.
+L'application montre native est située dans `android/wear`. Conçue spécifiquement pour les cadrans circulaires Wear OS (225dp+), elle propose l'accueil à tuiles Canvas haute densité, les routines enregistrées en un geste, la navigation verticale et rotative par catégories, le compteur ergonomique (`−1` / `+1` / `+5` / appui long `+10`), le chronomètre temps réel seconde par seconde, le minuteur de récupération avec aperçu de l'exercice suivant et les emblèmes hexagonaux des 10 niveaux.
+
+Le téléphone reste la source de vérité des objectifs journaliers, des 10 langues de l'application, du thème visuel actif, des routines enregistrées, des catégories personnalisées, des charges (kg) et des droits OneUp Pro.
 
 ## Construire et installer une paire de développement
 
@@ -11,12 +13,12 @@ npm install
 npm run build:wear:apk
 ```
 
-Les deux APK se trouvent ici :
+Les deux APK générés se trouvent ici :
 
 - Téléphone : `android/app/build/outputs/apk/dev/debug/app-dev-debug.apk`
 - Montre : `android/wear/build/outputs/apk/dev/debug/wear-dev-debug.apk`
 
-Les deux versions `dev` utilisent `com.lucasm548.oneup.dev` et la même configuration de signature. Il faut installer les deux depuis le même poste/configuration. Une montre `dev` ne peut pas communiquer avec le téléphone de production `com.lucasm548.oneup`.
+Les deux versions `dev` partagent l'identifiant `com.lucasm548.oneup.dev` et la même signature de débogage. Il faut installer les deux depuis le même poste. Une montre `dev` ne communique pas avec l'application de production `com.lucasm548.oneup`.
 
 ```sh
 adb devices
@@ -24,28 +26,31 @@ adb -s TELEPHONE install -r android/app/build/outputs/apk/dev/debug/app-dev-debu
 adb -s MONTRE install -r android/wear/build/outputs/apk/dev/debug/wear-dev-debug.apk
 ```
 
-Le débogage Wi-Fi de la montre permet également son installation via `adb pair`, puis `adb connect`. Utiliser les ports de jumelage et de connexion affichés par la montre ; ils sont distincts.
+Le débogage Wi-Fi de la montre permet également l'installation via `adb pair` puis `adb connect` (les ports de jumelage et de connexion affichés par la montre sont distincts).
 
 1. Ouvrir OneUp sur le téléphone, terminer l'onboarding et se connecter au compte habituel si nécessaire.
-2. Garder le téléphone ouvert pour la première synchronisation.
-3. Ouvrir OneUp sur la montre et toucher « Synchroniser » si son catalogue n'est pas encore arrivé.
-4. Glisser horizontalement entre les pages d'exercices ; verticalement, ou avec la couronne, entre les catégories. Toucher un exercice pour son compteur individuel.
-5. « Ma séance » permet de sélectionner les exercices dans l'ordre des touches, y compris dans plusieurs catégories. Le bouton lecture démarre la séance.
-6. Dans une séance, le dernier exercice revient au premier dans les deux sens. Le drapeau ouvre la confirmation de fin ; la séance rejoint ensuite l'historique mobile.
+2. Vérifier l'état de connexion ou forcer une synchronisation à tout moment depuis **Paramètres › Montre Wear OS** sur le téléphone Android.
+3. Ouvrir OneUp sur la montre et toucher « Synchroniser » si le catalogue initial n'est pas encore arrivé.
+4. Glisser horizontalement entre les pages d'exercices ; verticalement, ou via la couronne rotative, entre les catégories. Toucher une tuile ouvre son compteur rapide.
+5. « Ma séance » permet soit de lancer directement l'une des **Routines** enregistrées sur le téléphone en un geste, soit de composer une sélection ordonnée multi-catégories.
+6. Pendant la séance :
+   - Exercices de répétitions : boutons `−1`, `+1`, `+5` (appui long `+10`) ou appui direct sur le compteur central (`+1`), avec vibration haptique à chaque palier de niveau franchi.
+   - Exercices chronométrés : boutons `−5s`, `Chrono / Pause`, `+5s`, progression fluide seconde par seconde sur l'anneau à 10 segments et arrêt automatique avec double vibration au niveau 10.
+   - Récupération (`Repos`) : anneau de décompte visuel, maintien de l'écran actif, ajustement `−15s` / `+15s`, aperçu du prochain exercice et vibration au poignet à `00:00`.
+7. Le drapeau ouvre la confirmation de fin ; l'écran de bilan affiche la durée exacte, les exercices validés et le volume total, puis la séance rejoint l'historique mobile (identifiée par le badge montre Wear OS).
 
-Une séance démarrée sur le téléphone apparaît aussi sur la montre. L'accueil affiche six tuiles sur les grands cadrans et quatre sur les petits, pour préserver les libellés. L'interface native propose actuellement le français et l'anglais ; les noms d'exercices et de catégories suivent la langue du téléphone.
+L'interface native de la montre suit automatiquement les **10 langues** et le **thème de couleur** actif du téléphone, ainsi que les **64 icônes vectorielles** des exercices standards et personnalisés.
 
 ## Synchronisation et fonctionnement hors connexion
 
 - `wear-shared` expose les chemins et transports de la Data Layer officielle Google Play Services.
-- Le téléphone publie un instantané privé sur `/oneup/v1/snapshot`. Chaque version du catalogue possède un identifiant et conserve ses objectifs historiques pour importer une séance après reconnexion.
-- La montre enregistre chaque action en SharedPreferences avant son émission : progression, début et fin de séance. Les opérations sont immuables et publiées sous `/oneup/v1/operations/<flux>/<séquence>`.
-- Chaque compte possède un flux distinct. Les identifiants de compte transmis sont des empreintes propres à l'installation ; aucun jeton Firebase ou secret n'est envoyé.
-- Le service Android du téléphone conserve les opérations entrantes même si l'interface est fermée. L'import dans Zustand et la synchronisation Firebase se font lorsque OneUp est ouvert ou revient au premier plan. La montre signale les actions en attente par un point ambré.
-- Le téléphone enregistre la progression et son reçu ensemble avant de confirmer la livraison. Les répétitions sont ajoutées à la progression mobile courante, bornées à l'objectif ; les livraisons répétées ne les ajoutent pas une deuxième fois.
-- Le changement de compte suspend les opérations de l'ancien compte et sépare les données locales de la montre. Elles pourront être importées en revenant au compte concerné.
-- Les objectifs restent utilisables hors connexion jusqu'au prochain minuit du téléphone. Il faut ensuite rouvrir l'app mobile pour récupérer les objectifs du nouveau jour. Les actions déjà enregistrées restent conservées.
-- Les chronomètres d'exercice créditent les secondes écoulées par lots de cinq et se mettent en pause en quittant l'app. Le repos se base sur une échéance persistée et reprend son affichage au retour. Il n'y a pas encore d'alarme de repos en arrière-plan ni de comptage par capteurs.
+- Le téléphone publie un instantané privé sur `/oneup/v1/snapshot`. Chaque version du catalogue possède un identifiant `catalogId` ; les catalogues obsolètes déjà acquittés sont nettoyés automatiquement pour préserver le stockage local.
+- La montre enregistre chaque action dans `SharedPreferences` avant émission : progression, début et fin de séance (incluant le nom de la routine éventuelle). Les opérations sont immuables et publiées sous `/oneup/v1/operations/<flux>/<séquence>`.
+- Chaque compte possède un flux isolé identifié par une empreinte SHA-256 propre à l'installation ; aucun jeton Firebase ni secret n'est transmis à la montre.
+- Le service Android du téléphone conserve les opérations entrantes même lorsque la WebView est fermée. L'import dans Zustand, la génération automatique du nom de séance et la synchronisation Firebase s'effectuent à l'ouverture ou au retour au premier plan.
+- Le téléphone enregistre durablement la progression et son reçu avant d'acquitter l'opération auprès de la montre, garantissant l'absence de double comptage.
+- Les objectifs restent utilisables hors connexion jusqu'au prochain minuit local du téléphone.
+- Sur la montre, la police variable `Outfit` est mise en cache en mémoire et les rafraîchissements chaque seconde mettent à jour les vues en place sans reconstruire l'arbre UI, minimisant la consommation batterie.
 
 ## Validation
 
@@ -55,21 +60,15 @@ npm run lint
 npm run test:wear
 ```
 
-Les tests JavaScript couvrent les doublons, l'ordre d'arrivée, les comptes, les anciens objectifs, les droits Pro et la persistance après échec disque. Les tests JVM Android couvrent les seuils des dix niveaux, la navigation circulaire, le journal hors connexion, les reçus et la séparation des comptes. Un test Robolectric parcourt l'accueil, la sélection et un panneau natif ; ses rendus sont dans `android/wear/build/test-previews/`.
-
-Une validation sur une vraie paire téléphone/montre reste indispensable : première connexion, coupure Bluetooth, reprise après arrêt des apps, changement de compte, frontière de minuit et fin d'une séance pilotée depuis le téléphone.
+Les tests JavaScript vérifient le protocole idempotent, l'isolation des comptes, l'export des routines/thèmes/traductions, la reprise et le nommage des séances ainsi que la synchronisation manuelle. Les tests JVM/Robolectric Android vérifient les seuils des 10 niveaux, la persistance hors connexion, le lancement des routines, le compteur `+1`/`+5`, le chronomètre temps réel et génèrent les aperçus circulaires dans `android/wear/build/test-previews/`.
 
 ## Distribution
 
-La version mobile conserve son circuit de publication existant. La montre dispose d'une version indépendante (`wearVersionCode`, 1000001 par défaut), distincte de celle du téléphone. Avant chaque publication, choisir un code encore inutilisé dans la même fiche Google Play :
+La montre utilise un `versionCode` indépendant (`wearVersionCode`, `1000001` par défaut), distinct de celui du téléphone :
 
 ```sh
 cd android
 ./gradlew :wear:bundleProdRelease -PwearVersionCode=1000001
 ```
 
-Le bundle est produit dans `android/wear/build/outputs/bundle/prodRelease/`. La signature de production utilise le même `keystore.properties` que le téléphone. L'APK installé depuis Google Play doit avoir le même certificat de signature d'application que la version mobile ; une signature locale d'upload seule ne suffit pas à communiquer avec une app signée par Play App Signing.
-
-L'envoi sur la piste Wear OS de Google Play est séparé et n'est pas automatisé par cette modification. Aucune publication n'est effectuée par les commandes de test ou de construction.
-
-Références : [Data Layer et conditions de signature](https://developer.android.com/training/wearables/data/overview), [persistance du DataClient](https://developers.google.com/android/reference/com/google/android/gms/wearable/DataClient), [distribution et versions propres à Wear OS](https://developer.android.com/training/wearables/packaging).
+Le bundle AAB est généré dans `android/wear/build/outputs/bundle/prodRelease/` avec le même certificat de signature (`keystore.properties`) que l'application mobile afin d'autoriser la communication Data Layer via Google Play App Signing.

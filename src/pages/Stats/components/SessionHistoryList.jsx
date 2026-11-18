@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Clock, ChevronRight, DynamicIcon } from '@utils/icons';
+import { Clock, ChevronRight, DynamicIcon, Watch } from '@utils/icons';
 import { getExerciseColor } from '@utils/exerciseLabel';
 import { Card, SectionTitle } from '@components/ui';
 
@@ -51,14 +51,26 @@ export function SessionHistoryList({ sessionHistory, onSelectSession }) {
                                 {dateLabel}
                             </span>
                             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                                {hasName && (
-                                    <span style={{
-                                        fontSize: '0.8rem', fontWeight: 600,
-                                        color: 'var(--text-primary)',
-                                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                                    }}>
-                                        {session.name}
-                                    </span>
+                                {(hasName || session.source === 'wear') && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                                        {hasName && (
+                                            <span style={{
+                                                fontSize: '0.8rem', fontWeight: 600,
+                                                color: 'var(--text-primary)',
+                                                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                            }}>
+                                                {session.name}
+                                            </span>
+                                        )}
+                                        {session.source === 'wear' && (
+                                            <Watch
+                                                size={12}
+                                                color="var(--accent)"
+                                                style={{ flexShrink: 0, opacity: 0.9 }}
+                                                aria-label={t('wear.recordedOnWatch')}
+                                            />
+                                        )}
+                                    </div>
                                 )}
                                 {exercises.length > 0 && (
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', alignItems: 'center' }}>

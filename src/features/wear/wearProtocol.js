@@ -2,6 +2,8 @@ import { getLevelForCount } from '@shared/exerciseLevels';
 
 export const WEAR_VERSION = 1;
 export const WEAR_SESSION_EVENT = 'oneup:workout-session';
+export const WEAR_MANUAL_SYNC_EVENT = 'oneup:wear-manual-sync';
+export const WEAR_STATUS_EVENT = 'oneup:wear-status';
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const STREAM = /^[a-zA-Z0-9_-]{1,100}$/;
 const TYPES = new Set(['count', 'session_start', 'session_finish']);
@@ -39,7 +41,12 @@ export function reduceWearOperation(state, operation, catalog, scope) {
       || operation.queue.some(id => !byId.has(id) || byId.get(id).locked)) return { status: 'invalid' };
     const startedAt = Number(operation.startedAt);
     if (!Number.isFinite(startedAt) || startedAt <= 0 || startedAt > Date.now() + 60000) return { status: 'invalid' };
-    effect = { type: operation.type, sessionId: operation.sessionId, queue: operation.queue, startedAt, endedAt: Math.min(Date.now(), Number(operation.occurredAt) || Date.now()), catalog };
+    const routineName = typeof operation.routineName === 'string' ? operation.routineName.trim().slice(0, 60) : '';
+    effect = {
+      type: operation.type, sessionId: operation.sessionId, queue: operation.queue, startedAt,
+      endedAt: Math.min(Date.now(), Number(operation.occurredAt) || Date.now()), catalog,
+      ...(routineName ? { routineName } : {}),
+    };
   }
   return {
     status: 'applied', effect,

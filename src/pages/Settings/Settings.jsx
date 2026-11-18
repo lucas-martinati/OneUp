@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { ShoppingBag } from '@utils/icons';
 import { Card, Button, ModalHeader, ModalContainer } from '@components/ui';
 import { CloudSyncPanel } from './components/CloudSyncPanel';
+import { WearCompanionPanel } from './components/WearCompanionPanel';
 import { StoreView } from './components/StoreView';
 import { PreferencesSection, LanguageSection, PerformanceSection, CommunitySection, ThemeSection, DataSection, LevelSection } from './components/SettingsPanels';
+import { isAndroidPlatform } from '@utils/platform';
 import { openLegalPage } from '@utils/navigation';
 import { useAuth } from '@contexts/AuthContext';
 import { useSettingsStore } from '@store/useSettingsStore';
@@ -81,7 +83,9 @@ export function Settings({ defaultShowStore = false, onClose }) {
                             onOpenStore={() => setShowStore(true)}
                         />
 
-                        {/* ── Données & Cloud ─────────────────────────────────────── */}
+                        {/* ── Wear OS & Cloud ─────────────────────────────────────── */}
+                        {isAndroidPlatform() && <WearCompanionPanel />}
+
                         {cloudAuth && cloudSync && (
                             <Card>
                                 <CloudSyncPanel

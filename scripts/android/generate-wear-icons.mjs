@@ -1,6 +1,19 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-const names = ['dumbbell', 'arrow-down-up', 'arrow-up', 'zap', 'chevrons-up', 'footprints', 'flame', 'square', 'move-down', 'move-diagonal', 'arrow-left', 'flag', 'play', 'pause', 'check', 'plus', 'list-plus', 'chevron-up', 'chevron-down', 'refresh-cw', 'lock', 'folder-plus', 'activity', 'circle-check'];
+const names = [
+  // Core & custom exercise icons
+  'dumbbell', 'arrow-down-up', 'arrow-up', 'zap', 'chevrons-up', 'footprints',
+  'flame', 'square', 'move-down', 'move-diagonal', 'activity', 'heart', 'star',
+  'target', 'trophy', 'swords', 'crown', 'medal', 'award', 'shield', 'bike',
+  'mountain', 'droplets', 'ghost', 'moon', 'sun', 'rocket', 'gem', 'sparkles',
+  'navigation', 'map-pin', 'compass', 'anchor', 'coffee', 'music', 'hexagon',
+  'circle', 'triangle', 'scissors', 'hammer', 'wrench', 'thermometer', 'wind',
+  'umbrella', 'snowflake', 'smile', 'battery', 'battery-full',
+  // Watch UI & navigation icons
+  'arrow-left', 'flag', 'play', 'pause', 'check', 'check-check', 'plus', 'minus',
+  'list-plus', 'chevron-up', 'chevron-down', 'chevron-left', 'chevron-right',
+  'refresh-cw', 'rotate-ccw', 'lock', 'folder-plus', 'circle-check', 'bookmark', 'watch', 'clock'
+];
 const pathData = (type, a) => {
   if (type === 'path') return a.d;
   if (type === 'line') return `M${a.x1},${a.y1} L${a.x2},${a.y2}`;

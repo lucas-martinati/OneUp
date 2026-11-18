@@ -11,6 +11,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 final class PhoneWearStore {
@@ -28,6 +30,39 @@ final class PhoneWearStore {
     }
     private void save(String key, JSONObject data) {
         if (!prefs.edit().putString(key, data.toString()).commit()) throw new IllegalStateException("Cannot persist Wear data");
+    }
+    private void pruneCatalogsLocked(JSONObject inbox, JSONObject catalogs, String activeCatalogId) {
+        Set<String> keep = new HashSet<>();
+        if (activeCatalogId != null && !activeCatalogId.isEmpty()) keep.add(activeCatalogId);
+        for (var keys = inbox.keys(); keys.hasNext();) {
+            JSONObject op = inbox.optJSONObject(keys.next());
+            if (op != null && !op.optString("catalogId").isEmpty()) keep.add(op.optString("catalogId"));
+        }
+        java.util.List<String> stale = new java.util.ArrayList<>();
+        for (var keys = catalogs.keys(); keys.hasNext();) {
+            String id = keys.next();
+            if (!keep.contains(id)) stale.add(id);
+        }
+        for (String id : stale) catalogs.remove(id);
+    }
+    String scope() {
+        synchronized (LOCK) { return prefs.getString("scope", ""); }
+    }
+    long lastSyncedAt() {
+        synchronized (LOCK) { return prefs.getLong("lastSyncedAt", 0L); }
+    }
+    int pendingCount(String scope) {
+        synchronized (LOCK) {
+            String target = (scope == null || scope.isEmpty()) ? prefs.getString("scope", "") : scope;
+            if (target.isEmpty()) return 0;
+            JSONObject inbox = read("inbox");
+            int count = 0;
+            for (var keys = inbox.keys(); keys.hasNext();) {
+                JSONObject op = inbox.optJSONObject(keys.next());
+                if (op != null && target.equals(op.optString("scope"))) count++;
+            }
+            return count;
+        }
     }
     String configure(String user) throws Exception {
         synchronized (LOCK) {
@@ -50,7 +85,8 @@ final class PhoneWearStore {
     void publish(JSONObject snapshot) throws JSONException {
         synchronized (LOCK) {
             if (!snapshot.optString("scope").equals(prefs.getString("scope", ""))) return;
-            JSONObject copy = new JSONObject(snapshot.toString()).put("updatedAt", System.currentTimeMillis());
+            long now = System.currentTimeMillis();
+            JSONObject copy = new JSONObject(snapshot.toString()).put("updatedAt", now);
             if (copy.optBoolean("ready")) {
                 JSONArray definitions = new JSONArray();
                 JSONArray exercises = copy.optJSONArray("exercises");
@@ -66,9 +102,11 @@ final class PhoneWearStore {
             }
             save("snapshot", copy);
             if (copy.optBoolean("ready")) {
+                prefs.edit().putLong("lastSyncedAt", now).apply();
                 JSONObject catalogs = read("catalogs");
-                catalogs.put(copy.getString("catalogId"), copy);
-                // Keep historical targets until their watch operations have been imported.
+                String activeId = copy.getString("catalogId");
+                catalogs.put(activeId, copy);
+                pruneCatalogsLocked(read("inbox"), catalogs, activeId);
                 save("catalogs", catalogs);
             }
             WearProtocol.put(context, WearProtocol.SNAPSHOT, copy)
@@ -126,6 +164,9 @@ final class PhoneWearStore {
                     .addOnFailureListener(error -> Log.d("OneUpWear", "Receipt will deduplicate retry", error));
             }
             save("inbox", inbox);
+            JSONObject catalogs = read("catalogs");
+            pruneCatalogsLocked(inbox, catalogs, read("snapshot").optString("catalogId"));
+            save("catalogs", catalogs);
         }
     }
 }

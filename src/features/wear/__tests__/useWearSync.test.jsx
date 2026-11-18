@@ -3,7 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const fixture = vi.hoisted(() => ({
   android: true, listener: null, progress: null, exercises: null, pending: [],
-  plugin: { configure: vi.fn(), publish: vi.fn(), getPending: vi.fn(), acknowledge: vi.fn(), addListener: vi.fn() },
+  settings: { appTheme: 'dark' },
+  plugin: { configure: vi.fn(), publish: vi.fn(), getPending: vi.fn(), acknowledge: vi.fn(), addListener: vi.fn(), syncNow: vi.fn() },
   stats: { displayStreak: 12 }, i18n: { resolvedLanguage: 'fr' }, t: key => key,
 }));
 vi.mock('@utils/platform', () => ({ isAndroidPlatform: () => fixture.android }));
@@ -13,19 +14,23 @@ vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: fixture.t, i18n: f
 vi.mock('@store/useProgressStore', () => ({ useProgressStore: { getState: () => fixture.progress, subscribe: () => () => {} } }));
 vi.mock('@store/useExercisesStore', () => ({ useExercisesStore: { getState: () => fixture.exercises, subscribe: () => () => {} } }));
 vi.mock('@store/useComputedStatsStore', () => ({ useComputedStatsStore: { getState: () => ({ stats: fixture.stats }), subscribe: () => () => {} } }));
+vi.mock('@store/useSettingsStore', () => ({ useSettingsStore: { getState: () => ({ settings: fixture.settings }), subscribe: () => () => {} } }));
 vi.mock('@utils/exerciseLabel', () => ({ getExerciseLabel: ex => ex.id }));
 vi.mock('../wearSession', () => ({ applyWearSessionEffect: vi.fn() }));
 vi.mock('@features/share/services/sessionHistoryService', () => ({ getSessionHistory: () => [] }));
 import { useWearSync } from '../useWearSync';
+import { WEAR_MANUAL_SYNC_EVENT } from '../wearProtocol';
 
 const auth = { loading: false, user: { uid: 'user-a' } };
 async function advance() { await act(async () => { await vi.advanceTimersByTimeAsync(250); }); }
 beforeEach(() => {
   vi.useFakeTimers(); vi.clearAllMocks(); fixture.android = true; fixture.pending = []; localStorage.clear();
+  fixture.settings = { appTheme: 'dark' };
   fixture.progress = { _userId: 'user-a', isStoreInitialized: true, isSetup: true, getDayNumber: () => 50, completions: {}, wearReceipts: {}, applyWearOperation: vi.fn(async () => 'applied') };
-  fixture.exercises = { _userId: 'user-a', isStoreInitialized: true, getWeight: () => null, customExercises: [], customCategories: [] };
+  fixture.exercises = { _userId: 'user-a', isStoreInitialized: true, getWeight: () => null, customExercises: [], customCategories: [], routines: [] };
   fixture.plugin.configure.mockResolvedValue({ scope: 'scope-a' });
   fixture.plugin.publish.mockResolvedValue({});
+  fixture.plugin.syncNow.mockResolvedValue({ ok: true });
   fixture.plugin.getPending.mockImplementation(async () => ({ operations: fixture.pending }));
   fixture.plugin.acknowledge.mockResolvedValue({});
   fixture.plugin.addListener.mockImplementation(async (_name, callback) => { fixture.listener = callback; return { remove: vi.fn() }; });
@@ -52,5 +57,13 @@ describe('native Wear orchestration', () => {
     fixture.exercises._userId = 'previous-user'; renderHook(() => useWearSync(auth)); await advance();
     expect(fixture.plugin.publish.mock.calls.at(-1)[0].snapshot.ready).toBe(false);
     expect(fixture.plugin.getPending).not.toHaveBeenCalled();
+  });
+  it('forces republish and inbox recovery on manual sync trigger', async () => {
+    renderHook(() => useWearSync(auth)); await advance();
+    expect(fixture.plugin.publish).toHaveBeenCalledTimes(1);
+    window.dispatchEvent(new CustomEvent(WEAR_MANUAL_SYNC_EVENT));
+    await advance();
+    expect(fixture.plugin.syncNow).toHaveBeenCalledTimes(1);
+    expect(fixture.plugin.publish).toHaveBeenCalledTimes(2);
   });
 });

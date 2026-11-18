@@ -1042,5 +1042,33 @@
     "cardioRule": "有酸素運動では、1週間の距離で10段階のレベルを積み上げます。",
     "profileTitle": "レベルの歩み",
     "profilePending": "プロフィールの更新後にレベルが表示されます。既存の連続記録は引き続き表示されます。"
+  },
+  "wear": {
+    "title": "Wear OS ウォッチ",
+    "connected": "接続済み: {{name}}",
+    "disconnected": "近くにウォッチが見つかりません",
+    "pendingOps": "{{count}} 件のウォッチ操作が待機中",
+    "upToDate": "目標と進捗は最新です",
+    "syncNow": "ウォッチを同期",
+    "recordedOnWatch": "Wear OS で記録",
+    "watch": {
+      "myWorkout": "マイセッション",
+      "openOnPhone": "スマホで OneUp を\n開いてください",
+      "syncSubtitle": "今日の種目と進捗を\n同期します",
+      "syncBtn": "同期",
+      "proRequired": "OneUp Pro で利用可能",
+      "activateOnPhone": "スマホで有効化してください",
+      "noExercises": "種目がありません",
+      "addOnPhone": "スマホで追加してください",
+      "selectedSuffix": "選択中",
+      "startWorkout": "セッション開始",
+      "rest": "休憩",
+      "recovery": "リカバリー",
+      "finishPrompt": "セッションを\n終了しますか？",
+      "waitingSync": "同期を待機中",
+      "synced": "同期済み",
+      "home": "ホーム",
+      "noRoutines": "スマホでルーティンを作成"
+    }
   }
 }

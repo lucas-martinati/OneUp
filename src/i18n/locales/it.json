@@ -1042,5 +1042,33 @@
     "cardioRule": "Nel cardio, i dieci livelli si completano con la distanza percorsa durante la settimana.",
     "profileTitle": "Percorso dei livelli",
     "profilePending": "I livelli di questo profilo appariranno dopo il suo aggiornamento. Le serie note restano visibili."
+  },
+  "wear": {
+    "title": "Orologio Wear OS",
+    "connected": "Connesso: {{name}}",
+    "disconnected": "Nessun orologio rilevato vicino",
+    "pendingOps": "{{count}} azione/i orologio in coda",
+    "upToDate": "Obiettivi e progressi aggiornati",
+    "syncNow": "Sincronizza orologio",
+    "recordedOnWatch": "Registrata su Wear OS",
+    "watch": {
+      "myWorkout": "La mia sessione",
+      "openOnPhone": "Apri OneUp\nsul telefono",
+      "syncSubtitle": "Sincronizza gli esercizi\ne i progressi di oggi",
+      "syncBtn": "Sincronizza",
+      "proRequired": "Disponibile con OneUp Pro",
+      "activateOnPhone": "Attiva sul telefono",
+      "noExercises": "Nessun esercizio",
+      "addOnPhone": "Aggiungili sul telefono",
+      "selectedSuffix": "scelti",
+      "startWorkout": "Avvia sessione",
+      "rest": "Riposo",
+      "recovery": "Recupero",
+      "finishPrompt": "Terminare\nla sessione?",
+      "waitingSync": "In attesa di sincronizzazione",
+      "synced": "Sincronizzata",
+      "home": "Home",
+      "noRoutines": "Crea le tue routine sul telefono"
+    }
   }
 }

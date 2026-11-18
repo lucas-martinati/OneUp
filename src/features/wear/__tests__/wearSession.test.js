@@ -3,19 +3,25 @@ vi.mock('@services/firebase', () => ({ getAuthInstance: () => null, getDatabaseI
 import { applyWearSessionEffect } from '../wearSession';
 import { getSessionHistory } from '@features/share/services/sessionHistoryService';
 import { getWorkoutSessionId, isWorkoutSessionStarted, saveWorkoutSession } from '@utils/workoutSessionStorage';
+import { useExercisesStore } from '@store/useExercisesStore';
 import { useUIStore } from '@store/useUIStore';
 import { getLocalDateStr } from '@shared/dateUtils';
 
-function workout(type) {
+function workout(type, extraEffect = {}) {
   const date = getLocalDateStr(new Date());
   const endedAt = Date.now() - 30000;
   return {
     effect: { type, sessionId: 'watch-session-1', queue: ['pushups'], startedAt: endedAt - 60000, endedAt,
-      catalog: { date, exercises: [{ id: 'pushups', name: 'Pompes', goal: 100, color: '#818cf8', icon: 'Dumbbell' }] } },
+      catalog: { date, exercises: [{ id: 'pushups', name: 'Pompes', goal: 100, color: '#818cf8', icon: 'Dumbbell' }] },
+      ...extraEffect },
     progress: { completions: { [date]: { pushups: { count: 50, goal: 100, level: 5 } } } },
   };
 }
-beforeEach(() => { localStorage.clear(); useUIStore.getState().setSessionInProgress(false); });
+beforeEach(() => {
+  localStorage.clear();
+  useUIStore.getState().setSessionInProgress(false);
+  useExercisesStore.setState({ routines: [] });
+});
 describe('sessions shared with the phone', () => {
   it('makes a watch-started session resumable on the phone', () => {
     const { effect, progress } = workout('session_start'); applyWearSessionEffect(effect, progress);
@@ -23,15 +29,22 @@ describe('sessions shared with the phone', () => {
     expect(getWorkoutSessionId()).toBe(effect.sessionId);
     expect(useUIStore.getState().sessionInProgress).toBe(true);
   });
-  it('keeps one history entry on replay and uses the offline finish time', () => {
-    const { effect, progress } = workout('session_start'); applyWearSessionEffect(effect, progress);
+  it('keeps one history entry on replay, uses routineName or generated name, and records offline finish time', () => {
+    const { effect, progress } = workout('session_start', { routineName: 'Full Body' });
+    applyWearSessionEffect(effect, progress);
     const finished = { ...effect, type: 'session_finish' };
     applyWearSessionEffect(finished, progress); applyWearSessionEffect(finished, progress);
     expect(getSessionHistory()).toHaveLength(1);
-    expect(getSessionHistory()[0]).toMatchObject({ id: effect.sessionId, source: 'wear', duration: 60,
+    expect(getSessionHistory()[0]).toMatchObject({ id: effect.sessionId, name: 'Full Body', source: 'wear', duration: 60,
       exercises: [{ id: 'pushups', label: 'Pompes', reps: 50 }] });
     expect(isWorkoutSessionStarted()).toBe(false);
     expect(useUIStore.getState().sessionInProgress).toBe(false);
+  });
+  it('generates a contextual session name when no routine matches', () => {
+    const { effect, progress } = workout('session_finish');
+    const mockT = (key, opts) => (opts?.returnObjects ? ['Séance du matin 💪'] : key);
+    applyWearSessionEffect(effect, progress, mockT);
+    expect(getSessionHistory()[0].name).toBe('Séance du matin 💪');
   });
   it('does not replace or close a different session already running on the phone', () => {
     saveWorkoutSession({ sessionId: 'phone-session', queue: ['squats'], currentIdx: 0, startTime: Date.now(), name: '', activeSlide: 1 });
