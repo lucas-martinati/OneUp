@@ -2,11 +2,14 @@ const { google } = require('googleapis');
 
 /**
  * Fetches the highest versionCode currently uploaded to any track on Google Play.
+ * - Default: returns highest phone versionCode (< 1000000).
+ * - With `--wear`: returns highest Wear OS versionCode (>= 1000000, default 1000000).
  * Requires SERVICE_ACCOUNT_JSON and PACKAGE_NAME environment variables.
  */
 async function getLatestVersion() {
   const serviceAccountJson = process.env.SERVICE_ACCOUNT_JSON;
   const packageName = process.env.PACKAGE_NAME;
+  const isWear = process.argv.includes('--wear');
 
   if (!serviceAccountJson || !packageName) {
     console.error('❌ Error: SERVICE_ACCOUNT_JSON or PACKAGE_NAME not provided.');
@@ -28,7 +31,6 @@ async function getLatestVersion() {
   });
 
   try {
-    // We need to create an "edit" to list tracks
     const edit = await publisher.edits.insert({ packageName });
     editId = edit.data.id;
 
@@ -37,15 +39,22 @@ async function getLatestVersion() {
       editId,
     });
 
-    let maxCode = 0;
+    let maxPhoneCode = 0;
+    let maxWearCode = 1000000;
+
     if (tracksRes.data.tracks) {
       for (const track of tracksRes.data.tracks) {
+        const isWearTrack = typeof track.track === 'string' && track.track.startsWith('wear:');
         if (track.releases) {
           for (const release of track.releases) {
             if (release.versionCodes) {
               for (const code of release.versionCodes) {
                 const c = parseInt(code, 10);
-                if (c > maxCode) maxCode = c;
+                if (isWearTrack || c >= 1000000) {
+                  if (c > maxWearCode) maxWearCode = c;
+                } else if (c > maxPhoneCode) {
+                  maxPhoneCode = c;
+                }
               }
             }
           }
@@ -53,16 +62,13 @@ async function getLatestVersion() {
       }
     }
 
-    // Output the max code to stdout so the workflow can capture it
-    console.log(maxCode);
+    console.log(isWear ? maxWearCode : maxPhoneCode);
   } catch (err) {
     console.error('❌ Error fetching version from Play Store:', err.message);
     process.exit(1);
   } finally {
     if (editId) {
-      await publisher.edits.delete({ packageName, editId }).catch(() => {
-        // Silently ignore deletion errors in finally
-      });
+      await publisher.edits.delete({ packageName, editId }).catch(() => {});
     }
   }
 }

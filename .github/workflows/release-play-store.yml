@@ -26,6 +26,10 @@ on:
         description: 'Envoyer automatiquement en révision ? (mettre "false" si une déclaration Health Connect/permissions doit être complétée à la main dans la console)'
         required: false
         default: 'true'
+      target:
+        description: 'Cible de déploiement : "all" (téléphone + montre), "phone" ou "wear"'
+        required: false
+        default: 'all'
 
 jobs:
   build-and-deploy:
@@ -59,7 +63,9 @@ jobs:
         run: |
           npm install googleapis --no-save
           MAX_CODE=$(node scripts/android/get-play-store-version.cjs)
+          WEAR_MAX_CODE=$(node scripts/android/get-play-store-version.cjs --wear)
           echo "max_code=$MAX_CODE" >> $GITHUB_OUTPUT
+          echo "wear_max_code=$WEAR_MAX_CODE" >> $GITHUB_OUTPUT
 
       # ── Auto-increment versionCode ─────────────────────────────
       - name: Bump versionCode in build.gradle
@@ -69,6 +75,7 @@ jobs:
           LOCAL_CODE=$(grep -oP 'versionCode \K[0-9]+' "$GRADLE_FILE")
           # Get play store version from previous step
           STORE_CODE="${{ steps.play_store_version.outputs.max_code || '0' }}"
+          WEAR_STORE_CODE="${{ steps.play_store_version.outputs.wear_max_code || '1000000' }}"
           # Get manual offset
           OFFSET="${{ github.event.inputs.version_code_offset || '1' }}"
           
@@ -79,6 +86,7 @@ jobs:
             echo "🚀 Play Store has higher version ($STORE_CODE) than local ($LOCAL_CODE)"
           fi
           NEW_CODE=$((MAX_BASE + OFFSET))
+          WEAR_NEW_CODE=$((WEAR_STORE_CODE + OFFSET))
           
           # Update versionCode
           sed -i "s/versionCode $LOCAL_CODE/versionCode $NEW_CODE/" "$GRADLE_FILE"
@@ -96,9 +104,10 @@ jobs:
             echo "✅ package.json version → $TAG_VERSION (from tag)"
           fi
           
-          echo "✅ versionCode: $LOCAL_CODE → $NEW_CODE"
+          echo "✅ versionCode: $LOCAL_CODE → $NEW_CODE (Wear: $WEAR_STORE_CODE → $WEAR_NEW_CODE)"
           VERSION_NAME=$(node -p "require('./package.json').version")
           echo "VERSION_CODE=$NEW_CODE" >> $GITHUB_ENV
+          echo "WEAR_VERSION_CODE=$WEAR_NEW_CODE" >> $GITHUB_ENV
           echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
 
       # ── Java 21 (required by Capacitor) ───────────────────────
@@ -173,7 +182,7 @@ jobs:
         working-directory: android
         run: |
           chmod +x ./gradlew
-          ./gradlew bundleProdRelease
+          ./gradlew bundleProdRelease -PwearVersionCode=$WEAR_VERSION_CODE
 
       # ── Upload AAB artifact (for debugging) ───────────────────
       - name: Upload AAB as artifact
@@ -205,8 +214,9 @@ jobs:
             echo "$NOTES_EN" > distribution/whatsnew/whatsnew-en-US
           fi
 
-      # ── Deploy to Play Store ──────────────────────────────────
+      # ── Deploy to Play Store (Phone) ──────────────────────────
       - name: Upload to Google Play Store
+        if: ${{ github.event.inputs.target != 'wear' }}
         uses: r0adkll/upload-google-play@v1.1.5
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
@@ -222,3 +232,18 @@ jobs:
           # keep the automatic behaviour.
           changesNotSentForReview: ${{ github.event.inputs.send_for_review == 'false' }}
           whatsNewDirectory: ${{ (github.event.inputs.release_notes_fr != '' || github.event.inputs.release_notes_en != '') && 'distribution/whatsnew' || '' }}
+
+      # ── Deploy to Play Store (Wear OS) ────────────────────────
+      - name: Upload Wear OS to Google Play Store
+        if: ${{ github.event.inputs.target != 'phone' }}
+        env:
+          SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          PACKAGE_NAME: com.lucasm548.oneup
+          WEAR_AAB_PATH: android/wear/build/outputs/bundle/prodRelease/wear-prod-release.aab
+          VERSION_NAME: ${{ env.VERSION_NAME }}
+          NOTES_FR: ${{ github.event.inputs.release_notes_fr }}
+          NOTES_EN: ${{ github.event.inputs.release_notes_en }}
+          SEND_FOR_REVIEW: ${{ github.event.inputs.send_for_review }}
+        run: |
+          npm install googleapis --no-save
+          node scripts/android/deploy-wear-play-store.cjs
