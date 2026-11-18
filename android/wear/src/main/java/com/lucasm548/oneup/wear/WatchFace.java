@@ -67,7 +67,7 @@ final class WatchFace extends View {
     }
 
     private final Typeface semiBold, extraBold;
-    private final RectF ring = new RectF(10, 10, 266, 266);
+    private final RectF ring = new RectF(5.5f, 5.5f, 270.5f, 270.5f);
     private final Path top = new Path(), bottom = new Path();
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private RadialGradient cachedBg;
@@ -81,9 +81,9 @@ final class WatchFace extends View {
         super(context);
         semiBold = font(context, 600);
         extraBold = font(context, 800);
-        // Apex at y=39 (top) and y=252 (bottom): cleanly below HH:mm (y=9..22) and above top pills (y=52)
-        top.addArc(new RectF(39, 39, 237, 237), 225, 90);
-        bottom.addArc(new RectF(24, 24, 252, 252), 135, -90);
+        // Outer curved labels: apex at y=33 (top) and y=258 (bottom) to utilize the full round glass without overlapping HH:mm
+        top.addArc(new RectF(33, 33, 243, 243), 225, 90);
+        bottom.addArc(new RectF(18, 18, 258, 258), 135, -90);
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
     }
 
@@ -114,7 +114,7 @@ final class WatchFace extends View {
 
         if (level >= 0) {
             paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(5.5f);
+            paint.setStrokeWidth(6.2f);
             paint.setStrokeCap(Paint.Cap.ROUND);
             int activeColor = level >= 10 ? 0xfffbbf24 : accent;
             for (int i = 0; i < 10; i++) {
@@ -129,7 +129,7 @@ final class WatchFace extends View {
             paint.setStyle(Paint.Style.FILL);
         } else if (restProgress >= 0f) {
             paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(5.5f);
+            paint.setStrokeWidth(6.2f);
             paint.setStrokeCap(Paint.Cap.ROUND);
             paint.setColor(0xff251f30);
             canvas.drawArc(ring, -90f, 360f, false, paint);
@@ -141,14 +141,14 @@ final class WatchFace extends View {
         } else {
             // Subtle bezel framing ring on Home / Prepare / Sync / Routines
             paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(1.2f);
-            paint.setColor(0x1affffff);
-            canvas.drawCircle(138f, 138f, 131f, paint);
+            paint.setStrokeWidth(1.5f);
+            paint.setColor(0x28ffffff);
+            canvas.drawCircle(138f, 138f, 134f, paint);
             paint.setStyle(Paint.Style.FILL);
         }
 
-        curved(canvas, title, false, (themeAccent & 0x00ffffff) | 0xee000000, 99f, 12.5f);
-        curved(canvas, category.toUpperCase(Locale.getDefault()), true, categoryColor, 114f, 10.5f);
+        curved(canvas, title, false, (themeAccent & 0x00ffffff) | 0xee000000, 105f, 13f);
+        curved(canvas, category.toUpperCase(Locale.getDefault()), true, categoryColor, 120f, 11.5f);
         canvas.restore();
     }
 

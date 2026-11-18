@@ -411,11 +411,11 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
             liveClockView = text(clockText(), 10.5f, MUTED, 600);
             topClockRow.addView(liveClockView);
             if (repository.ready() && repository.pending().length() > 0) {
-                TextView dot = text(" •", 11f, 0xfffbbf24, 800);
+                TextView dot = text(" •", 11.5f, 0xfffbbf24, 800);
                 dot.setContentDescription(s("waitingSync", "En attente de synchronisation", "Waiting to sync"));
                 topClockRow.addView(dot);
             }
-            place(topClockRow, 92, 9, 92, 15);
+            place(topClockRow, 92, 5, 92, 15);
         }
 
         if (!repository.ready()) {
@@ -445,10 +445,10 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
     private void syncScreen() {
         int accent = repository.themeAccent();
         face.title = "ONEUP";
-        place(icon("Watch", accent, 22), 127, 56, 22, 22);
-        place(text(s("openOnPhone", "Ouvre OneUp\nsur ton téléphone", "Open OneUp\non your phone"), 16.5f, TEXT, 700), 38, 84, 200, 52);
-        place(text(s("syncSubtitle", "Pour synchroniser les exercices\net la progression du jour", "Sync today's exercises\nand progress"), 11f, MUTED), 38, 140, 200, 34);
-        place(button(s("syncBtn", "Synchroniser", "Sync"), "RefreshCw", accent, true, () -> repository.retry()), 68, 186, 140, 34);
+        place(icon("Watch", accent, 26), 125, 48, 26, 26);
+        place(text(s("openOnPhone", "Ouvre OneUp\nsur ton téléphone", "Open OneUp\non your phone"), 17f, TEXT, 700), 34, 78, 208, 54);
+        place(text(s("syncSubtitle", "Pour synchroniser les exercices\net la progression du jour", "Sync today's exercises\nand progress"), 11.5f, MUTED), 34, 136, 208, 36);
+        place(button(s("syncBtn", "Synchroniser", "Sync"), "RefreshCw", accent, true, () -> repository.retry()), 64, 182, 148, 36);
     }
 
     private List<JSONObject> currentExercises() {
@@ -482,11 +482,11 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
                     routinePage = 0;
                     page = "routines";
                 });
-                place(routineBtn, 54, 52, 84, 20);
-                place(text(selected.size() + " " + s("selectedSuffix", "choisis", "selected"), 10.5f, accent2, 600), 142, 52, 82, 20);
+                place(routineBtn, 50, 48, 88, 22);
+                place(text(selected.size() + " " + s("selectedSuffix", "choisis", "selected"), 11f, accent2, 600), 140, 48, 86, 22);
             } else {
-                place(text(selected.size() + " " + s("selectedSuffix", "choisis", "selected"), 10.5f, accent2, 600), 52, 52, 84, 20);
-                place(text(cat.optString("name"), 10.5f, color(cat), 600), 138, 52, 88, 20);
+                place(text(selected.size() + " " + s("selectedSuffix", "choisis", "selected"), 11f, accent2, 600), 48, 48, 88, 22);
+                place(text(cat.optString("name"), 11f, color(cat), 600), 138, 48, 90, 22);
             }
         } else {
             boolean frozen = repository.snapshot().optBoolean("streakFrozen");
@@ -494,21 +494,21 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
             int flameColor = frozen ? 0xff38bdf8 : (activeStreak ? 0xfffb923c : 0xccf59e0b);
             LinearLayout streak = new LinearLayout(this);
             streak.setGravity(Gravity.CENTER);
-            streak.addView(icon(frozen ? "Snowflake" : "Flame", flameColor, 12));
-            streak.addView(text(" " + repository.snapshot().optInt("streak"), 11.5f, flameColor, 700));
-            place(streak, 48, 51, 66, 21);
+            streak.addView(icon(frozen ? "Snowflake" : "Flame", flameColor, 13));
+            streak.addView(text(" " + repository.snapshot().optInt("streak"), 12f, flameColor, 700));
+            place(streak, 44, 47, 72, 22);
 
             String dayWord = s("day", "Jour", "Day").toUpperCase(Locale.getDefault());
-            place(text(dayWord + " " + repository.snapshot().optInt("day"), 10.5f, accent2, 700), 152, 51, 76, 21);
+            place(text(dayWord + " " + repository.snapshot().optInt("day"), 11f, accent2, 700), 150, 47, 82, 22);
         }
 
         if (cat.optBoolean("locked")) {
-            place(icon("Lock", accent, 20), 128, 84, 20, 20);
-            place(text(s("proRequired", "Disponible avec OneUp Pro", "Available with OneUp Pro"), 14.5f, TEXT, 700), 40, 108, 196, 38);
-            place(text(s("activateOnPhone", "À activer sur le téléphone", "Activate on your phone"), 11f, MUTED), 40, 148, 196, 28);
+            place(icon("Lock", accent, 22), 127, 84, 22, 22);
+            place(text(s("proRequired", "Disponible avec OneUp Pro", "Available with OneUp Pro"), 15f, TEXT, 700), 36, 108, 204, 38);
+            place(text(s("activateOnPhone", "À activer sur le téléphone", "Activate on your phone"), 11.5f, MUTED), 36, 148, 204, 28);
         } else if (exercises.isEmpty()) {
-            place(text(s("noExercises", "Aucun exercice", "No exercises"), 16f, TEXT, 700), 44, 104, 188, 32);
-            place(text(s("addOnPhone", "Ajoute-les sur ton téléphone", "Add them on your phone"), 11f, MUTED), 42, 140, 192, 30);
+            place(text(s("noExercises", "Aucun exercice", "No exercises"), 16.5f, TEXT, 700), 40, 104, 196, 32);
+            place(text(s("addOnPhone", "Ajoute-les sur ton téléphone", "Add them on your phone"), 11.5f, MUTED), 40, 140, 196, 30);
         } else {
             int size = pageSize();
             int pages = (exercises.size() + size - 1) / size;
@@ -519,15 +519,15 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
 
             String subHeader = (start + 1) + "–" + end + " / " + exercises.size()
                 + (picking ? " • " + cat.optString("name") : "");
-            TextView pager = text(subHeader, 9.5f, MUTED, 600);
+            TextView pager = text(subHeader, 10f, MUTED, 600);
             pager.setSingleLine(true);
             pager.setEllipsize(TextUtils.TruncateAt.END);
-            place(pager, 58, 74, 160, 13);
+            place(pager, 52, 71, 172, 14);
 
-            float gridWidth = 216f;
+            float gridWidth = 232f;
             float gap = 5f;
             float tileWidth = (gridWidth - (cols - 1) * gap) / cols;
-            float tileHeight = size == 6 ? 49f : 52f;
+            float tileHeight = size == 6 ? 51f : 55f;
             List<String> orderedSelection = new ArrayList<>(selected);
 
             for (int i = start; i < end; i++) {
@@ -562,15 +562,15 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
                 }));
 
                 int cell = i - start;
-                float tx = 30f + (cell % cols) * (tileWidth + gap);
-                float ty = 89f + (cell / cols) * (tileHeight + gap);
+                float tx = 22f + (cell % cols) * (tileWidth + gap);
+                float ty = 86f + (cell / cols) * (tileHeight + gap);
                 place(tile, tx, ty, tileWidth, tileHeight);
             }
         }
 
         if (picking) {
-            // Safe inside round bezel: corners (54, 232) and (222, 232) -> r = 126 < 138!
-            circleIconButton("ArrowLeft", s("home", "Accueil", "Home"), MUTED, 54, 198, 34, true, () -> page = "home");
+            // Safe inside round bezel: corners inside radius 132 < 138
+            circleIconButton("ArrowLeft", s("home", "Accueil", "Home"), MUTED, 50, 196, 36, true, () -> page = "home");
             String startLabel = s("startWorkout", "Démarrer la séance", "Start workout");
             String shortCta = selected.isEmpty()
                 ? "0 " + s("selectedSuffix", "choisis", "selected")
@@ -582,15 +582,15 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
             startBtn.setContentDescription(startLabel);
             startBtn.setEnabled(!selected.isEmpty());
             startBtn.setAlpha(selected.isEmpty() ? 0.38f : 1f);
-            place(startBtn, 94, 198, 128, 34);
+            place(startBtn, 92, 196, 134, 36);
         } else {
             boolean active = repository.session().length() > 0;
             String mainCta = active ? s("resume", "Reprendre", "Resume") : s("myWorkout", "Ma séance", "My workout");
             LinearLayout workoutBtn = button(mainCta, active ? "Play" : "ListPlus", accent, true, () -> page = active ? "work" : "prepare");
             workoutBtn.setContentDescription(mainCta);
-            place(workoutBtn, 78, 197, 120, 31);
-            circleIconButton("ChevronUp", repository.isFrench() ? "Catégorie précédente" : "Previous category", MUTED, 40, 196, 32, false, () -> changeCategory(-1));
-            circleIconButton("ChevronDown", repository.isFrench() ? "Catégorie suivante" : "Next category", MUTED, 204, 196, 32, false, () -> changeCategory(1));
+            place(workoutBtn, 72, 196, 132, 34);
+            circleIconButton("ChevronUp", repository.isFrench() ? "Catégorie précédente" : "Previous category", MUTED, 34, 196, 34, false, () -> changeCategory(-1));
+            circleIconButton("ChevronDown", repository.isFrench() ? "Catégorie suivante" : "Next category", MUTED, 208, 196, 34, false, () -> changeCategory(1));
         }
     }
 
@@ -599,7 +599,7 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
         face.title = s("routines", "Mes Routines", "My Routines").toUpperCase(Locale.getDefault());
         List<JSONObject> routines = repository.routines();
         if (routines.isEmpty()) {
-            place(text(s("noRoutines", "Crée tes routines sur le téléphone", "Save routines on your phone"), 14f, MUTED), 42, 102, 192, 54);
+            place(text(s("noRoutines", "Crée tes routines sur le téléphone", "Save routines on your phone"), 14.5f, MUTED), 38, 102, 200, 54);
         } else {
             int perPage = 3;
             int pages = (routines.size() + perPage - 1) / perPage;
@@ -607,7 +607,7 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
             int start = routinePage * perPage;
             int end = Math.min(start + perPage, routines.size());
             if (pages > 1) {
-                place(text((routinePage + 1) + " / " + pages, 9.5f, MUTED, 600), 108, 52, 60, 13);
+                place(text((routinePage + 1) + " / " + pages, 10f, MUTED, 600), 108, 48, 60, 14);
             }
             for (int i = start; i < end; i++) {
                 JSONObject r = routines.get(i);
@@ -621,25 +621,25 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
                     page = "work";
                 });
                 row.setGravity(Gravity.CENTER_VERTICAL);
-                int padH = Math.round(10 * scale);
+                int padH = Math.round(11 * scale);
                 row.setPadding(padH, 0, padH, 0);
                 row.setContentDescription(name + " (" + ids.size() + ")");
 
-                TextView titleView = text(name, 12.5f, TEXT, 700);
+                TextView titleView = text(name, 13f, TEXT, 700);
                 titleView.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
                 titleView.setSingleLine(true);
                 titleView.setEllipsize(TextUtils.TruncateAt.END);
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, -2, 1f);
                 row.addView(titleView, lp);
 
-                TextView countBadge = text(ids.size() + " ex. ", 10.5f, repository.themeAccent2(), 600);
+                TextView countBadge = text(ids.size() + " ex. ", 11f, repository.themeAccent2(), 600);
                 row.addView(countBadge);
-                row.addView(icon("Play", accent, 13));
+                row.addView(icon("Play", accent, 14));
 
-                place(row, 42, 68 + (i - start) * 41, 192, 36);
+                place(row, 36, 66 + (i - start) * 42, 204, 38);
             }
         }
-        place(button(s("back", "Retour", "Back"), "ArrowLeft", MUTED, false, () -> page = "prepare"), 88, 199, 100, 32);
+        place(button(s("back", "Retour", "Back"), "ArrowLeft", MUTED, false, () -> page = "prepare"), 83, 197, 110, 34);
     }
 
     private List<String> panelQueue() {
@@ -707,20 +707,20 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
         face.level = lvl;
         face.subProgress = computeSubProgress(count, goal, lvl);
 
-        // Top info bar cleanly INSIDE the 10-segment ring (y=24, ring inner edge is y=13)
+        // Top info bar cleanly INSIDE the 10-segment ring
         LinearLayout headerRow = new LinearLayout(this);
         headerRow.setGravity(Gravity.CENTER);
-        liveClockView = text(clockText(), 10.5f, MUTED, 600);
+        liveClockView = text(clockText(), 11f, MUTED, 600);
         headerRow.addView(liveClockView);
-        headerRow.addView(text("  •  " + (index + 1) + "/" + queue.size(), 10.5f, c, 700));
+        headerRow.addView(text("  •  " + (index + 1) + "/" + queue.size(), 11f, c, 700));
         if (repository.pending().length() > 0) {
-            TextView dot = text(" •", 11f, 0xfffbbf24, 800);
+            TextView dot = text(" •", 11.5f, 0xfffbbf24, 800);
             dot.setContentDescription(s("waitingSync", "En attente de synchronisation", "Waiting to sync"));
             headerRow.addView(dot);
         }
-        place(headerRow, 62, 23, 152, 16);
+        place(headerRow, 50, 18, 176, 17);
 
-        // Neighbor buttons cleanly inside the ring (r = 107 < 125)
+        // Neighbor buttons cleanly inside the ring (r = 126 < 135)
         if (queue.size() > 1) {
             for (int direction : new int[]{-1, 1}) {
                 JSONObject neighbor = repository.exercise(queue.get(WatchMath.wrap(index, direction, queue.size())));
@@ -732,7 +732,7 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
                     neighbor.optString("icon"),
                     prefix + neighbor.optString("name"),
                     color(neighbor),
-                    direction < 0 ? 18 : 226,
+                    direction < 0 ? 16 : 226,
                     92,
                     32,
                     true,
@@ -742,26 +742,26 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
         }
 
         // Exercise title + optional weight badge
-        TextView exTitle = text(ex.optString("name"), ex.has("weight") ? 15.5f : 17.5f, c, 700);
+        TextView exTitle = text(ex.optString("name"), ex.has("weight") ? 16f : 18.5f, c, 700);
         exTitle.setSingleLine(true);
         exTitle.setEllipsize(TextUtils.TruncateAt.END);
-        place(exTitle, 46, 41, 184, 24);
+        place(exTitle, 36, 38, 204, 26);
 
         if (ex.has("weight")) {
             double w = ex.optDouble("weight");
             String wStr = (w == Math.floor(w) ? String.valueOf((int) w) : String.valueOf(w)) + " kg";
-            place(text(wStr, 10.5f, MUTED, 600), 88, 64, 100, 14);
+            place(text(wStr, 11f, MUTED, 600), 86, 63, 104, 15);
         }
 
         // Hero count (tappable for +1 on counter exercises)
-        liveMetricView = text("", 38f, TEXT, 800);
+        liveMetricView = text("", 42f, TEXT, 800);
         liveMetricView.setText(formatHeroMetric(count, goal, timed));
         liveMetricView.setSingleLine(true);
         if (!timed) {
             liveMetricView.setClickable(true);
             liveMetricView.setOnClickListener(v -> act(() -> adjustWithMilestone(ex, 1)));
         }
-        place(liveMetricView, 52, ex.has("weight") ? 78 : 73, 172, 46);
+        place(liveMetricView, 38, ex.has("weight") ? 76 : 69, 200, 48);
 
         // Genuine OneUp Hexagonal LevelEmblem + level label
         LinearLayout levelRow = new LinearLayout(this);
@@ -776,20 +776,20 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
                 WatchFace.drawHexMedal(canvas, medalPaint, hexPath, medalBold, getWidth() / 2f, getHeight() / 2f, r, currentLvl, c);
             }
         };
-        int medalPx = Math.round(20 * scale);
+        int medalPx = Math.round(22 * scale);
         levelRow.addView(liveMedalView, new LinearLayout.LayoutParams(medalPx, medalPx));
-        liveLevelTextView = text(formatLevelCaption(lvl), 11.5f, lvl >= 10 ? 0xfffbbf24 : c, 700);
+        liveLevelTextView = text(formatLevelCaption(lvl), 12.5f, lvl >= 10 ? 0xfffbbf24 : c, 700);
         liveLevelTextView.setPadding(Math.round(5 * scale), 0, 0, 0);
         levelRow.addView(liveLevelTextView);
         levelRow.setContentDescription((repository.isFrench() ? "Niveau " : "Level ") + lvl + " / 10");
-        place(levelRow, 78, 126, 120, 22);
+        place(levelRow, 68, 122, 140, 24);
 
-        // Action row (inside ring: corners at r = 113 < 125)
+        // Action row (inside ring: corners at r = 123 < 135)
         if (timed) {
             place(button("−5s", null, c, false, () -> {
                 flushTimer(true);
                 repository.adjust(ex.optString("id"), -5);
-            }), 40, 156, 48, 36);
+            }), 34, 150, 52, 38);
 
             String chronoLabel = timerRunning ? s("pause", "Pause", "Pause") : s("timer", "Chrono", "Timer");
             place(button(chronoLabel, timerRunning ? "Pause" : "Play", c, true, () -> {
@@ -804,35 +804,35 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
                     lastTimerLevel = WatchMath.level(repository.count(ex), goal);
                     syncKeepScreenOn();
                 }
-            }), 93, 156, 90, 36);
+            }), 92, 150, 92, 38);
 
             place(button("+5s", null, c, false, () -> {
                 flushTimer(true);
                 adjustWithMilestone(ex, 5);
-            }), 188, 156, 48, 36);
+            }), 190, 150, 52, 38);
         } else {
-            place(button("−1", null, c, false, () -> repository.adjust(ex.optString("id"), -1)), 40, 156, 50, 36);
-            place(button("+1", null, c, true, () -> adjustWithMilestone(ex, 1)), 95, 156, 68, 36);
+            place(button("−1", null, c, false, () -> repository.adjust(ex.optString("id"), -1)), 34, 150, 54, 40);
+            place(button("+1", null, c, true, () -> adjustWithMilestone(ex, 1)), 94, 150, 74, 40);
             LinearLayout plusFive = button("+5", null, c, true, () -> adjustWithMilestone(ex, 5));
             plusFive.setOnLongClickListener(v -> {
                 act(() -> adjustWithMilestone(ex, 10));
                 return true;
             });
-            place(plusFive, 168, 156, 68, 36);
+            place(plusFive, 174, 150, 68, 40);
         }
 
-        // Bottom controls (inside ring: r < 102 < 125)
+        // Bottom controls (inside ring)
         if ("quick".equals(page)) {
-            circleIconButton("ArrowLeft", s("home", "Accueil", "Home"), MUTED, 84, 199, 34, false, () -> {
+            circleIconButton("ArrowLeft", s("home", "Accueil", "Home"), MUTED, 82, 195, 34, false, () -> {
                 flushTimer(true);
                 page = "home";
             });
-            circleIconButton("ListPlus", s("myWorkout", "Ma séance", "My workout"), repository.themeAccent(), 158, 199, 34, false, () -> {
+            circleIconButton("ListPlus", s("myWorkout", "Ma séance", "My workout"), repository.themeAccent(), 158, 195, 34, false, () -> {
                 flushTimer(true);
                 page = "prepare";
             });
         } else {
-            circleIconButton("ArrowLeft", s("home", "Accueil", "Home"), MUTED, 62, 199, 34, false, () -> {
+            circleIconButton("ArrowLeft", s("home", "Accueil", "Home"), MUTED, 58, 195, 34, false, () -> {
                 flushTimer(true);
                 page = "home";
             });
@@ -843,8 +843,8 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
                 restAlerted = false;
                 repository.prefs.edit().putLong("restUntil", restUntil).putLong("restTotalMs", restTotalMs).apply();
                 page = "rest";
-            }), 101, 201, 74, 30);
-            circleIconButton("Flag", s("finishSession", "Terminer la séance", "Finish session"), 0xffe8799a, 180, 199, 34, false, () -> {
+            }), 98, 196, 80, 32);
+            circleIconButton("Flag", s("finishSession", "Terminer la séance", "Finish session"), 0xffe8799a, 184, 195, 34, false, () -> {
                 flushTimer(true);
                 page = "confirm";
             });
@@ -888,18 +888,18 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
 
         face.restProgress = restTotalMs > 0 ? Math.max(0f, Math.min(1f, (float) remainingMs / restTotalMs)) : 0f;
 
-        liveClockView = text(clockText(), 10.5f, MUTED, 600);
-        place(liveClockView, 105, 23, 66, 15);
+        liveClockView = text(clockText(), 11f, MUTED, 600);
+        place(liveClockView, 105, 18, 66, 16);
 
-        place(text(s("recovery", "Récupération", "Recovery"), 13.5f, repository.themeAccent2(), 700), 58, 44, 160, 20);
+        place(text(s("recovery", "Récupération", "Recovery"), 14f, repository.themeAccent2(), 700), 54, 38, 168, 22);
 
         liveRestTimerView = text(
             String.format(Locale.ROOT, "%02d:%02d", remainingSec / 60, remainingSec % 60),
-            42f,
+            46f,
             remainingSec == 0 ? 0xff34d399 : TEXT,
             800
         );
-        place(liveRestTimerView, 46, 68, 184, 52);
+        place(liveRestTimerView, 42, 63, 192, 54);
 
         List<String> queue = panelQueue();
         if (!queue.isEmpty()) {
@@ -908,29 +908,29 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
             if (nextEx != null) {
                 String preview = s("next", "Suivant", "Next") + " : " + nextEx.optString("name")
                     + " (" + repository.count(nextEx) + "/" + nextEx.optInt("goal", 1) + ")";
-                TextView nextView = text(preview, 10.5f, MUTED, 600);
+                TextView nextView = text(preview, 11f, MUTED, 600);
                 nextView.setSingleLine(true);
                 nextView.setEllipsize(TextUtils.TruncateAt.END);
-                place(nextView, 42, 124, 192, 18);
+                place(nextView, 38, 121, 200, 20);
             }
         }
 
-        place(button("−15s", null, accent, false, () -> adjustRest(-15_000L)), 40, 154, 48, 34);
-        place(button(s("resume", "Reprendre", "Resume"), "Play", accent, true, () -> page = "work"), 93, 154, 90, 34);
-        place(button("+15s", null, accent, false, () -> adjustRest(15_000L)), 188, 154, 48, 34);
+        place(button("−15s", null, accent, false, () -> adjustRest(-15_000L)), 34, 148, 54, 38);
+        place(button(s("resume", "Reprendre", "Resume"), "Play", accent, true, () -> page = "work"), 94, 148, 94, 38);
+        place(button("+15s", null, accent, false, () -> adjustRest(15_000L)), 194, 148, 54, 38);
 
-        circleIconButton("Flag", s("finishSession", "Terminer la séance", "Finish session"), 0xffe8799a, 121, 198, 34, false, () -> page = "confirm");
+        circleIconButton("Flag", s("finishSession", "Terminer la séance", "Finish session"), 0xffe8799a, 120, 196, 36, false, () -> page = "confirm");
     }
 
     private void confirm() {
         int accent = repository.themeAccent();
-        place(icon("Flag", 0xffe8799a, 22), 127, 48, 22, 22);
-        place(text(s("finishPrompt", "Terminer\nla séance ?", "Finish\nyour workout?"), 19f, TEXT, 700), 42, 76, 192, 62);
-        place(button(s("continueBtn", "Continuer", "Continue"), null, accent, false, () -> page = "work"), 42, 156, 92, 38);
+        place(icon("Flag", 0xffe8799a, 24), 126, 42, 24, 24);
+        place(text(s("finishPrompt", "Terminer\nla séance ?", "Finish\nyour workout?"), 20f, TEXT, 700), 38, 70, 200, 64);
+        place(button(s("continueBtn", "Continuer", "Continue"), null, accent, false, () -> page = "work"), 38, 150, 96, 40);
         place(button(s("finishBtn", "Terminer", "Finish"), "Check", 0xffe8799a, true, () -> {
             repository.finish();
             page = "summary";
-        }), 142, 156, 92, 38);
+        }), 142, 150, 96, 40);
     }
 
     private String formatSummaryDuration(long seconds) {
@@ -948,22 +948,22 @@ public class WatchActivity extends ComponentActivity implements SharedPreference
         int accent = repository.themeAccent();
         boolean synced = repository.pending().length() == 0;
 
-        place(icon("CircleCheck", 0xff34d399, 24), 126, 38, 24, 24);
-        place(text(s("workoutDone", "Séance terminée !", "Session Complete!"), 17f, TEXT, 700), 38, 66, 200, 26);
-        place(text(formatSummaryDuration(sum.optLong("duration")), 22f, repository.themeAccent2(), 800), 44, 96, 188, 30);
+        place(icon("CircleCheck", 0xff34d399, 26), 125, 32, 26, 26);
+        place(text(s("workoutDone", "Séance terminée !", "Session Complete!"), 18.5f, TEXT, 700), 34, 62, 208, 28);
+        place(text(formatSummaryDuration(sum.optLong("duration")), 26f, repository.themeAccent2(), 800), 40, 92, 196, 32);
 
         int totalEx = sum.optInt("totalExercises", sum.optJSONArray("queue") == null ? 0 : sum.optJSONArray("queue").length());
         int doneEx = sum.optInt("completedExercises", totalEx);
         int totalReps = sum.optInt("totalReps", 0);
         String statsLine = doneEx + "/" + totalEx + " ex.  •  " + totalReps + " " + s("reps", "reps", "reps");
-        place(text(statsLine, 11.5f, TEXT, 600), 42, 130, 192, 20);
+        place(text(statsLine, 12f, TEXT, 600), 38, 126, 200, 22);
 
         String syncLabel = synced
             ? "✓ " + s("synced", "Synchronisée", "Synced with phone")
             : "• " + s("waitingSync", "En attente de synchronisation", "Waiting to sync");
-        place(text(syncLabel, 10.5f, synced ? 0xff34d399 : 0xfffbbf24, 600), 36, 155, 204, 20);
+        place(text(syncLabel, 11f, synced ? 0xff34d399 : 0xfffbbf24, 600), 34, 152, 208, 20);
 
-        place(button(s("home", "Accueil", "Home"), null, accent, true, () -> page = "home"), 78, 188, 120, 34);
+        place(button(s("home", "Accueil", "Home"), null, accent, true, () -> page = "home"), 70, 184, 136, 38);
     }
 
     private void changeCategory(int delta) {
