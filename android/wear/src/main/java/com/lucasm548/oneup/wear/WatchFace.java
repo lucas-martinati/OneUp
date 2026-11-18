@@ -67,7 +67,7 @@ final class WatchFace extends View {
     }
 
     private final Typeface semiBold, extraBold;
-    private final RectF ring = new RectF(5.5f, 5.5f, 270.5f, 270.5f);
+    private final RectF ring = new RectF(4.5f, 4.5f, 271.5f, 271.5f);
     private final Path top = new Path(), bottom = new Path();
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private RadialGradient cachedBg;
@@ -137,13 +137,6 @@ final class WatchFace extends View {
                 paint.setColor(themeAccent);
                 canvas.drawArc(ring, -90f, 360f * Math.min(1f, restProgress), false, paint);
             }
-            paint.setStyle(Paint.Style.FILL);
-        } else {
-            // Subtle bezel framing ring on Home / Prepare / Sync / Routines
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(1.5f);
-            paint.setColor(0x28ffffff);
-            canvas.drawCircle(138f, 138f, 134f, paint);
             paint.setStyle(Paint.Style.FILL);
         }
 
