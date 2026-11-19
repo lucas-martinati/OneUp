@@ -465,7 +465,7 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         setPhase('done');
     };
 
-    // Manual browsing follows the queue, including already completed exercises.
+    // Manual browsing backwards follows the queue, including completed exercises.
     const navigateExercise = (direction) => {
         for (let offset = 1; offset < queue.length; offset++) {
             const index = (currentIdx + direction * offset + queue.length) % queue.length;
@@ -477,7 +477,17 @@ export function useWorkoutSession({ onClose, today, dayNumber, activeSlide, sess
         }
     };
     const previousExercise = () => navigateExercise(-1);
-    const nextExercise = () => navigateExercise(1);
+    const nextExercise = () => {
+        for (let offset = 1; offset < queue.length; offset++) {
+            const index = (currentIdx + offset) % queue.length;
+            const id = queue[index];
+            if (allExercisesMap[id] && !isDoneToday(id)) {
+                setHasAnimatedFirstPanel(true);
+                setCurrentIdx(index);
+                return;
+            }
+        }
+    };
 
     const advanceToNext = () => {
         setHasAnimatedFirstPanel(true);

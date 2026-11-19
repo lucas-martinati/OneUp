@@ -492,4 +492,78 @@ describe('manual exercise navigation', () => {
     expect(result.current.phase).toBe('running');
     expect(addSession).not.toHaveBeenCalled();
   });
+
+  it('skips completed exercises when advancing with nextExercise but allows reaching them via previousExercise', () => {
+    const { result, rerender, setSessionInProgress } = setup();
+    act(() => {
+      result.current.toggleExercise(bwId);
+      result.current.toggleExercise(bwId2);
+      result.current.toggleExercise(weightId);
+    });
+    act(() => result.current.startSession());
+    // Mark bwId as completed
+    progressState.completions = { '2024-01-01': { [bwId]: { isCompleted: true, level: 10 } } };
+    rerender({ onClose: result.current.onClose, today: '2024-01-01', dayNumber: 1, activeSlide: 0, sessionMode: null, setSessionInProgress });
+
+    // Moving from bwId -> next should pick bwId2 (index 1)
+    act(() => result.current.nextExercise());
+    expect(result.current.currentIdx).toBe(1);
+    expect(result.current.currentExId).toBe(bwId2);
+
+    // On bwId2, nextExercise should skip bwId and go to weightId (index 2)
+    act(() => result.current.nextExercise());
+    expect(result.current.currentIdx).toBe(2);
+    expect(result.current.currentExId).toBe(weightId);
+
+    // On weightId, nextExercise should wrap around, skip completed bwId, and land back on bwId2 (index 1)
+    act(() => result.current.nextExercise());
+    expect(result.current.currentIdx).toBe(1);
+    expect(result.current.currentExId).toBe(bwId2);
+
+    // But previousExercise allows stepping backwards into the completed exercise
+    act(() => result.current.previousExercise());
+    expect(result.current.currentIdx).toBe(0);
+    expect(result.current.currentExId).toBe(bwId);
+
+    // From completed bwId, nextExercise moves back forward to the uncompleted exercise (bwId2)
+    act(() => result.current.nextExercise());
+    expect(result.current.currentIdx).toBe(1);
+    expect(result.current.currentExId).toBe(bwId2);
+  });
+
+  it('disables next navigation and does not advance when on the only remaining uncompleted exercise', () => {
+    const { result, rerender, setSessionInProgress } = setup();
+    act(() => { result.current.toggleExercise(bwId); result.current.toggleExercise(bwId2); });
+    act(() => result.current.startSession());
+
+    // Mark bwId as completed
+    progressState.completions = { '2024-01-01': { [bwId]: { isCompleted: true, level: 10 } } };
+    rerender({ onClose: result.current.onClose, today: '2024-01-01', dayNumber: 1, activeSlide: 0, sessionMode: null, setSessionInProgress });
+
+    // Move to bwId2
+    act(() => result.current.nextExercise());
+    expect(result.current.currentIdx).toBe(1);
+    expect(result.current.currentExId).toBe(bwId2);
+
+    // On bwId2, bwId is already done, so there is no other uncompleted exercise
+    expect(result.current.hasNextAvailableExercise).toBe(false);
+
+    // Calling nextExercise on bwId2 must NOT switch back to completed bwId
+    act(() => result.current.nextExercise());
+    expect(result.current.currentIdx).toBe(1);
+    expect(result.current.currentExId).toBe(bwId2);
+
+    // Doing "retour" (previousExercise) DOES allow reaching completed bwId
+    act(() => result.current.previousExercise());
+    expect(result.current.currentIdx).toBe(0);
+    expect(result.current.currentExId).toBe(bwId);
+
+    // When on completed bwId, hasNextAvailableExercise is true because bwId2 is undone
+    expect(result.current.hasNextAvailableExercise).toBe(true);
+
+    // From bwId, nextExercise brings the user back to bwId2
+    act(() => result.current.nextExercise());
+    expect(result.current.currentIdx).toBe(1);
+    expect(result.current.currentExId).toBe(bwId2);
+  });
 });

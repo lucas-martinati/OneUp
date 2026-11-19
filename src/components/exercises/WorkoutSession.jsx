@@ -193,7 +193,7 @@ export function WorkoutSession(props) {
         routines, deleteRoutine, maxRoutines, customCategories, localExercises,
         exerciseInfo, allExercisesMap, canMixDashboards,
         currentEx, currentExId, currentGoal, currentCount, currentDone,
-        currentDifficulty,
+        currentDifficulty, hasNextAvailableExercise,
         updateExerciseCount, getConfig,
         toggleExercise, shuffleQueue, startSession, loadRoutine,
         handleSaveRoutine, editRoutine, advanceToNext, previousExercise, nextExercise, finishSession,
@@ -484,7 +484,7 @@ export function WorkoutSession(props) {
                     }}
                     isCompleted={currentDone}
                     dayNumber={dayNumber}
-                    onNext={nextExercise}
+                    onNext={hasNextAvailableExercise ? nextExercise : null}
                     onPrevious={previousExercise}
                     onAutoAdvance={advanceToNext}
                     onFinish={() => {

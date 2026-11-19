@@ -40,10 +40,15 @@ test('browses session exercises with both arrows and preserves partial progress'
     expect(prevBox.x + prevBox.width).toBeLessThanOrEqual(nextBox.x);
     await page.getByRole('button', { name: 'Tout compléter', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Squats', exact: true })).toBeVisible();
+    await expect(next).toBeDisabled();
     await previous.click();
     await expect(page.getByRole('heading', { name: 'Pompes', exact: true })).toBeVisible();
     // Wait beyond the 1500 ms celebration timer to catch an unintended auto-skip.
     await page.waitForTimeout(1800);
     await expect(page.getByRole('heading', { name: 'Pompes', exact: true })).toBeVisible();
+    await expect(next).toBeEnabled();
+    await next.click();
+    await expect(page.getByRole('heading', { name: 'Squats', exact: true })).toBeVisible();
+    await expect(next).toBeDisabled();
     expect(await page.evaluate(() => JSON.parse(localStorage.getItem('oneup_session_history') || '[]').length)).toBe(0);
 });
